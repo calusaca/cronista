@@ -43,6 +43,14 @@
 | 2026-09-30 | Diseño | Investigación de jueces (pedida por Carlos) entregada y aplicada: validación fuerte — los ganadores Microsoft recientes ganaron con agentes que se verifican entre sí (DELPHAI, ModelProof, RiskWise) y venden EL MOMENTO DEL RECHAZO. Ajustes: guion del video reestructurado (rechazo al centro, 1:50, la cifra al cierre), eval comparativa un-agente-vs-pipeline como métrica reproducible (`npm run eval`), README en el orden de los ganadores con tabla contra las 5 exigencias de la categoría y sección Responsible AI, vocabulario literal del tema, demo con partido precargado sin login, estado ✓/↻ por frase que abre la Caja de cristal | investigador-jueces/Fable | ✅ |
 | 2026-09-30 | Entrega | **Carlos se registró en el hackathon** (Microsoft Innovation Studio). Deuda saldada; queda solo la cuenta de Azure el 6 oct | Carlos | ✅ |
 
+| 2026-10-01 | Diseño | Pregunta de Carlos «¿cómo ganar más puntos?»: prueba del espectador frío agregada al 005 (alguien que no sabe nada abre la demo y el video antes de entregar); export de overlay broadcast anotado como opción pegada al stretch del partido en vivo (go/no-go 12 oct). El resto de los puntos restantes ya tienen fecha: eval + Foundry + bake-off (6 oct), stretches (12 y 19), video y entrega anticipada (semana 4) | Carlos/Fable | ✅ |
+
+| 2026-10-01 | Diseño | Go del Partido en vivo ADELANTADO (estaba para el 12 oct; prerequisitos auditados y 2 semanas de ventaja, no necesita Azure): brief `008-partido-en-vivo.md` cerrado — replay rotulado honesto, análisis incremental por prefijo, updates verificadas por V1–V8 con la propiedad «sin clarividencia» (una update del minuto M no puede citar el futuro), ticker clicable, export de overlay broadcast (§4.1). Lanzado a Opus | Fable/Opus | ⏳ en curso |
+
+| 2026-10-01 | Diseño | Idea de Carlos: valoración de jugadores → brief `009-valoracion-jugadores.md` cerrado — nota 1–10 determinista computada de los eventos con desglose clicable (ratings auditables, no opiniones), hecho `figura_del_partido` con su regla V8, notas evolutivas en el modo live. En cola tras el 008 | Carlos/Fable | ⏳ en cola |
+
+| 2026-10-01 | Entrega | «Haz todo lo que falta» (Carlos): adelantado todo lo no bloqueado — CI de GitHub Actions (`.github/workflows/ci.yml`: typecheck + 3 suites + e2e con reporte en fallo), borrador del README en inglés en el orden de los ganadores (con placeholders marcados para eval, URLs y GIFs) y borrador del elevator pitch EN (`docs/entrega/pitch.md`). Bloqueado restante: Foundry/eval/bake-off/deploy (cuenta Azure, 6 oct), video y espectador frío (Carlos, semana 4), revisión estética (Carlos) | Fable | ✅ |
+
 ## Deudas conocidas (honestas)
 
 - Corrida real contra Foundry pendiente de la cuenta Azure (6 oct); smoke manual

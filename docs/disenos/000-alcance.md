@@ -47,7 +47,11 @@ exactos que la respaldan. Una sola interacción, pulida de verdad.
 - **Stretch prioritario — Partido en vivo:** replay acelerado donde los eventos
   entran minuto a minuto y la crónica crece con actualizaciones verificadas antes de
   publicarse. Cubriría un tercer caso de uso oficial ("analyze match events in real
-  time"). **Go/no-go el 12 de octubre** (antes que los demás stretches porque toca
+  time"). Si entra, evaluar también el **export de overlay** (endpoint JSON con las
+  actualizaciones verificadas, con minutado): las reglas §4.1 mencionan
+  explícitamente salidas "timed and machine-readable" para overlays de broadcast —
+  sería el guiño al caso studio/streaming a costo casi nulo sobre el modo en vivo.
+  **Go/no-go el 12 de octubre** (antes que los demás stretches porque toca
   la arquitectura del Analista: analizar prefijos de eventos, que ya es compatible
   con su diseño de función pura). Si entra, abre el video.
 

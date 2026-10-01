@@ -118,6 +118,14 @@ Recordatorio de marcas (riesgo serio): cero nombres o logos de clubes reales de
 la Premier League en UI, video y README — ya es regla nuestra, pero el video se
 revisa contra esto explícitamente.
 
+## Prueba del espectador frío (agregada 2026-10-01)
+
+Antes de grabar el video y antes de entregar: **una persona que no sepa nada del
+proyecto** (ni de fútbol, idealmente) abre la demo y ve el video. Si en 30
+segundos no puede decir qué hace y por qué importa, se corrige lo que la confundió
+— no se le explica. Es la simulación más barata del juez real, que llega frío y
+con 4 minutos. Carlos elige al conejillo; sus tropiezos van a la bitácora.
+
 ## Pitch y submission
 
 Elevator pitch en inglés (un párrafo: qué se construyó + qué tecnologías Microsoft),
