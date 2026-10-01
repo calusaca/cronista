@@ -51,6 +51,8 @@
 
 | 2026-10-01 | Entrega | «Haz todo lo que falta» (Carlos): adelantado todo lo no bloqueado — CI de GitHub Actions (`.github/workflows/ci.yml`: typecheck + 3 suites + e2e con reporte en fallo), borrador del README en inglés en el orden de los ganadores (con placeholders marcados para eval, URLs y GIFs) y borrador del elevator pitch EN (`docs/entrega/pitch.md`). Bloqueado restante: Foundry/eval/bake-off/deploy (cuenta Azure, 6 oct), video y espectador frío (Carlos, semana 4), revisión estética (Carlos) | Fable | ✅ |
 
+| 2026-10-01 | Diseño | Veredicto estético de Carlos: la maqueta sí le gustó; el producto «es funcional pero la estética está medio meh». Diagnóstico con la skill diseno-profesional (§7): no falta decoración — la identidad entregada no es la aprobada (oscuro/dorado/serif/14 px vs claro/verde/editorial con chips). Brief `010-estetica.md` cerrado: el producto adopta los tokens exactos de la maqueta (claro por defecto + oscuro automático), Archivo + Source Sans 3 vía next/font (Newsreader fuera), cuerpo a 16 px, chips en la línea de tiempo, resaltado verde; sin fotografía (es herramienta y la maqueta tampoco lleva); contraste medido y cero cambios de comportamiento (e2e pasa sin editarse). En cola tras el 009 — 008, 009 y 010 tocan `globals.css` | Carlos/Fable | ⏳ en cola |
+
 ## Deudas conocidas (honestas)
 
 - Corrida real contra Foundry pendiente de la cuenta Azure (6 oct); smoke manual
