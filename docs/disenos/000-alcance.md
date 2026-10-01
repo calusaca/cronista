@@ -51,10 +51,32 @@ exactos que la respaldan. Una sola interacción, pulida de verdad.
   la arquitectura del Analista: analizar prefijos de eventos, que ya es compatible
   con su diseño de función pura). Si entra, abre el video.
 
+## La quinta etapa: personalización (2026-09-30, lectura completa de las reglas)
+
+La tubería oficial del reto es Ingest → Interpret → Explain → Render →
+**Personalize**, y las reglas advierten: «a Project that only generates metrics
+has no audience». El Grand Prize pide experiencias personalizadas explícitamente.
+Se revierte el descarte original: personalización **comprometida y acotada** en el
+brief 007 (modo Aficionado/Analista, modo «mi equipo», ES/EN como idioma), bajo el
+principio de que se personaliza selección, orden y tono — jamás la verdad: todo
+pasa por el mismo Verificador.
+
+Otros hallazgos de la lectura completa (2026-09-30):
+- La categoría Multi-Agent acepta «another supported orchestration approach»: la
+  cadena TS propia califica por sí sola bien demostrada; el sidecar AF queda como
+  bonus genuino, no requisito.
+- «Creativity and optimized synthetic data creation» es rubro puntuado del criterio
+  técnico: el simulador auditado se luce en README y video, no se esconde.
+- La demo debe quedar accesible a jueces hasta el **10 de noviembre**; las entregas
+  son visibles para todos los participantes; el video no puede llevar música con
+  copyright; todos los materiales en inglés.
+- Juicio en dos etapas: la 1 es pass/fail de encaje con tema y tecnologías.
+
 ## Lo que NO se hace (y no se discute sin reabrir este brief)
 
 - Tiempo real / streaming de partidos en vivo.
-- Personalización por usuario o por plataforma.
+- Personalización más allá del alcance del 007 (perfiles persistentes, cuentas,
+  recomendaciones).
 - Integración enterprise (Fabric, M365, dashboards corporativos).
 - Infraestructura pesada (AKS, microservicios). El deploy de la demo es lo mínimo
   que funcione bien (Azure Container Apps o Static Web Apps, se decide en el 005).

@@ -1,7 +1,7 @@
 # 002 — El Analista
 
-**Fecha:** 2026-09-30 · **Diseña:** Fable · **Implementa:** Opus (a partir del 6 oct,
-después del 001) · **Estado:** cerrado, pendiente de implementación
+**Fecha:** 2026-09-30 · **Diseña:** Fable · **Implementa:** Opus (desde el 30 sep,
+después del 001) · **Estado:** CERRADO (rev 2.3, auditado, 2026-09-30)
 
 ## Objetivo
 
@@ -107,6 +107,77 @@ debe poner rojo el fixture correspondiente.
 
 Hechos que requieran datos que el simulador no emite (posesión %, pases totales,
 distancias). Análisis con LLM. Ranking "narrativo" de hechos (eso es del Cronista).
+
+## Revisión 2.1 — calibración de rareza (2026-09-30, Fable)
+
+Hallazgo del implementador midiendo el corpus 1..1000: con los umbrales iniciales,
+`presion_sostenida` aparece en el 99.3 % de los partidos (4.4 por partido) y
+`portero_destacado` en el 71.8 %. **Un hecho que sale en casi todos los partidos no
+es noticia**: diluye la relevancia y empuja al Cronista a crónicas repetitivas.
+
+La corrección fija la propiedad, no solo la cifra:
+
+- **Nueva propiedad de corpus (1..1000), en la suite rápida:** la fracción de
+  partidos con ≥1 `presion_sostenida` debe caer en `RAREZA_PRESION` ([0.10, 0.40])
+  con media ≤ 1.0 por partido; la de `portero_destacado` en `RAREZA_PORTERO`
+  ([0.08, 0.35]). Constantes comentadas en `umbrales.ts`. Así, si una calibración
+  futura del simulador vuelve banales estos hechos, una prueba se pone roja.
+- **El implementador calibra los umbrales** (tiros mínimos, ventana, xG mínimo
+  acumulado del tramo; atajadas mínimas / xG atajado) hasta cumplir la propiedad,
+  y reporta el histograma medido antes y después.
+- `presion_sostenida` exige además un **xG acumulado mínimo** en la ventana
+  (constante en `umbrales.ts`): tres tiritos de 0.08 xG no son presión.
+- Las relevancias propuestas por el implementador (gol 70, portero 65, gol_tardio
+  60, justicia_xg 55, marcador_por_periodo 50, dominio 45, gol_temprano 40,
+  presión 35) quedan **aceptadas** como parte del brief.
+- Las interpretaciones del implementador (ventanas que no cruzan el descanso,
+  greedy sin solape; portero expulsado sin nombre; disciplina solo cuenta
+  amarillas emitidas) quedan **aceptadas**.
+
+## Revisión 2.2 — niveles de remontada (2026-09-30, Fable)
+
+Medición del implementador: `remontada` aparece en el 32.4 % de los partidos, la
+mayoría déficits de un gol que terminan en empate — y hoy toda remontada lleva
+relevancia 90, la máxima. Una remontada que termina en empate no es titular.
+
+- `remontada` gana `datos.desenlace: "victoria" | "empate"`.
+- Relevancia condicional (tabla en `umbrales.ts`): **victoria 90, empate 60**.
+- Banda de rareza para la de victoria: fracción de partidos con remontada-victoria
+  dentro de `RAREZA_REMONTADA_VICTORIA` ([0.03, 0.20]), misma mecánica que la 2.1.
+- Los textos ya distinguen «y ganó» / «y empató»; no cambian.
+- `dominio_periodo` (59.4 %) queda como está: es contexto con relevancia media,
+  no un hecho cuyo valor sea su excepcionalidad. Decisión documentada.
+
+## Revisión 2.3 — el oráculo (2026-09-30, Fable, por auditoría adversaria)
+
+La auditoría probó que la salida actual dice la verdad (verificación a mano de 5
+semillas + oráculo independiente sobre 1..5000: 0 fallas), pero que la suite solo
+vigila estructura: 14 de 22 mutaciones que hacen MENTIR al analista dejan
+`npm test` en verde. Correcciones:
+
+1. **Oráculo independiente como prueba** (`__tests__/oraculo.test.ts`): recalcula
+   cada tipo de hecho directamente desde los eventos — marcador tras cada gol,
+   penal, dominio solo con ofensivos, redondeo de xG, ventanas de presión,
+   atajadas y xG del portero, minutos de disciplina, doble amarilla vs directa,
+   desenlace de remontada — y compara contra la salida de `analizar` sobre el
+   corpus 1..1000 (+ semilla 497 explícita). Punto de partida: el script ya
+   validado del auditor en el scratchpad (`oraculo.ts`). **Regla de
+   independencia:** el oráculo no importa `analista.ts` ni `textos.ts` (solo
+   tipos y la función pública), y un comentario en su cabecera lo declara.
+2. **Paridad ES/EN como prueba**: en todo hecho del corpus, los dígitos de
+   `texto_es` y `texto_en` son idénticos, y los nombres propios pertenecen al
+   equipo correcto (contrastar contra `datos` y la plantilla del equipo).
+3. **Borde de justicia_xg**: fixture con xG exactamente igual entre equipos ⇒
+   `contra_la_corriente: "no"` (mata la mutación `<` → `<=`; hoy solo la semilla
+   497 la delataría).
+4. **[B1] Desempate cronológico por el evento definitorio**: el desempate de
+   relevancia usa el minuto del evento que define el hecho (tabla por tipo; para
+   `expulsion_y_efecto` es LA ROJA, no la amarilla previa citada). Fixture con
+   dos dobles amarillas cuyas amarillas previas invierten el orden: las rojas
+   deben quedar cronológicas.
+5. **[B2] Fixture de roja al portero** (válido según invariantes del 001): tras
+   la expulsión del arquero, las atajadas posteriores usan «El portero de
+   {equipo}» sin nombre. Mata la mutación superviviente de esa rama.
 
 ## Aceptación
 

@@ -19,6 +19,18 @@
   Antes de entregar, **bake-off con 3 semillas** (Haiku vs Sonnet vs Opus, cuesta
   centavos): se elige a ojo y se cambia solo el nombre del deployment — cero código.
   La caché de abajo reduce el costo real todavía más.
+- **Opción de costo cero real** (2026-09-30, pregunta de Carlos): el hackathon NO
+  reparte créditos de API; lo único gratis es el crédito estándar de Azure ($200 /
+  30 días de cuenta nueva). Ese crédito **no paga Claude** (Marketplace → tarjeta)
+  pero **sí paga los modelos first-party de Azure OpenAI** desplegados en el mismo
+  Foundry — y un modelo OpenAI en Foundry cuenta igualmente como uso de Microsoft
+  Foundry ante el jurado. Candidato pagado-con-crédito (verificado 2026-09-30):
+  **GPT-6.1 Sol**, GA en Foundry desde el 29 sep, rendimiento cercano al tope de
+  OpenAI a 1/5 del precio. El bake-off final es GPT-6.1 Sol ($0 de tarjeta) contra
+  Sonnet/Haiku (~$3–7 de tarjeta). Nota: la suscripción de ChatGPT de Carlos trae
+  el mismo modelo pero como app de chat, sin API — no sirve para el pipeline. La costura `llm.ts` ya soporta ambos:
+  gana el que escriba mejor prosa; si el OpenAI empata, gana el gratis. El
+  desarrollo diario sigue siendo con el stub ($0 siempre).
 - **Microsoft Agent Framework NO tiene SDK TypeScript usable** (npm 0.0.1-beta stub;
   discusión oficial #6181 sin respuesta). Ver anexo: sidecar Python opcional.
 - Validación de esquema con `zod` (^4).
@@ -40,6 +52,12 @@ interface CronicaVerificada extends CronicaDraft {
 }
 type Motivo = { oracion: number; regla: "V1"|"V2"|"V3"|"V4"|"V5"|"V6"; detalle: string };
 ```
+
+**Guarda de entrada** (de la auditoría del 002): el pipeline corre
+`verificarContrato` + invariantes del simulador sobre el `Partido` ANTES de
+`analizar`, y falla fuerte si algo no cuadra. `analizar` garantiza sus propiedades
+solo para salida válida del simulador; esta guarda hace imposible alimentarlo con
+otra cosa por accidente.
 
 ## La costura LLM
 

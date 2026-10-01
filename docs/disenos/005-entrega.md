@@ -25,6 +25,32 @@ repo. URL pública para los jueces. Verificación honesta: abrirla desde una red
 distinta a la de la casa (el puerto local ocupado ya nos mintió antes) y correr una
 semilla nueva de punta a punta en producción.
 
+Reglas §4.8 (verificadas 2026-09-30): el acceso para jueces debe mantenerse **hasta
+el fin del Judging Period, 10 de noviembre** — el deploy y el presupuesto cubren
+hasta esa fecha, no hasta la entrega. Las entregas son visibles para todos los
+participantes del hackathon. Los jueces pueden evaluar solo con texto, imágenes y
+video, así que la página del proyecto debe sostenerse sola sin la demo.
+
+## Tecnologías GitHub (nota 2026-09-30, pregunta de Carlos sobre Copilot)
+
+El criterio técnico lista «hero technologies» que incluyen GitHub Copilot Agent
+Mode, GitHub CLI y GitHub SDK, junto a Foundry, Agent Framework y Azure. Copilot
+NO es requisito: es un ítem de una lista donde ya usamos varios (Foundry para el
+LLM, Azure para el deploy). Cobertura honesta de la parte GitHub:
+
+- **GitHub CLI (`gh`)**: ya instalado; se usa de verdad para crear y administrar
+  el repo. Está en la lista de hero technologies.
+- **GitHub Actions (CI)**: workflow que corre `npm test` + `test:stats` + e2e en
+  cada push del repo público. Además puntúa en «quality software development
+  practices», que es rubro explícito del jurado.
+- **Copilot code review (opcional, decisión de Carlos)**: si Carlos habilita
+  Copilot (hay tier gratuito) en su cuenta de GitHub, se le pide revisión a los
+  PRs del repo — uso real y citable.
+- **Regla de integridad: el pitch y el README listan SOLO lo que usamos de
+  verdad.** No se declara Copilot si no se usó. El stack real (Claude en
+  Microsoft Foundry, cadena multi-agente propia, Azure Container Apps, GitHub
+  CLI + Actions) ya cubre de sobra el criterio.
+
 ## Repo público (GitHub, se publica cerca de la entrega)
 
 README en inglés: qué es, el diagrama de la cadena, cómo correrlo local **sin API
@@ -45,8 +71,10 @@ Guion por segundos (Fable escribe el texto palabra por palabra en
 | 1:45–2:00 | Cierre: cada frase es demostrable con un clic. |
 
 Graba Carlos (OBS o similar, pantalla + voz en inglés leída del guion o subtítulos
-EN sobre voz ES — se decide al grabar). Regla: **cero features en el video que no
-estén entregadas**; el video promete solo lo que el juez puede reproducir.
+EN sobre voz ES — se decide al grabar). Reglas: **cero features en el video que no
+estén entregadas** (§4.3 exige que el proyecto funcione «as depicted in the
+video»); **sin música con copyright ni marcas de terceros** (§4.4) — silencio, voz
+o música libre verificada; todos los materiales de la entrega **en inglés** (§4.9).
 
 ## Pitch y submission
 
