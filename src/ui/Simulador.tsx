@@ -27,7 +27,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
 
   return (
     <header className="topbar">
-      <Link href="/" className="brand">
+      <Link href="/" className="brand" prefetch={false}>
         <span className="brand-mark">CRONISTA</span>
         <span className="brand-tag">Match reports where every sentence shows its evidence</span>
       </Link>

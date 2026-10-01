@@ -25,6 +25,7 @@ import { validarConfig } from "../sim/motor";
 import type { Partido } from "../sim/tipos";
 import { borradorActa, tituloActa } from "./acta";
 import type { Cache, ClaveCache } from "./cache";
+import { instruccionPerspectiva, repriorizar } from "./personalizacion";
 import { feedback, mensajeInicial, SYSTEM_PROMPT } from "./prompt";
 import type { CronicaDraft, CronicaVerificada, IntentoAudit, ModoPersonalizacion, Motivo } from "./tipos";
 import { MAX_REINTENTOS } from "./umbrales";
@@ -84,8 +85,11 @@ function acta(hechos: Hecho[], intentos: number, audit: IntentoAudit[]): Cronica
 
 export async function generarCronica(partido: Partido, opciones: OpcionesCadena): Promise<ResultadoCadena> {
   guardaDeEntrada(partido);
-  const hechos = analizar(partido);
   const modoPersonalizacion = opciones.modoPersonalizacion ?? "neutral";
+  // Brief 007: la personalización ocurre ANTES del Cronista (re-priorización determinista);
+  // los hechos, textos, datos, eventos e IDs no cambian, y el Verificador es el mismo.
+  const hechos = repriorizar(analizar(partido), modoPersonalizacion, partido);
+  const perspectiva = instruccionPerspectiva(modoPersonalizacion, partido);
 
   if (opciones.forzarActa) {
     return { cronica: asegurarVerificada(acta(hechos, 0, []), hechos, partido), hechos, desdeCache: false };
@@ -100,7 +104,7 @@ export async function generarCronica(partido: Partido, opciones: OpcionesCadena)
   if (cacheada && verificarDraft(cacheada, hechos, partido).length === 0) return { cronica: cacheada, hechos, desdeCache: true };
 
   const audit: IntentoAudit[] = [];
-  const mensajes: Mensaje[] = [{ rol: "user", contenido: mensajeInicial(hechos) }];
+  const mensajes: Mensaje[] = [{ rol: "user", contenido: mensajeInicial(hechos, perspectiva) }];
   let ultimo: { draft: CronicaDraft | null; motivos: Motivo[] } = { draft: null, motivos: [] };
   let huboErrorLlm = false;
 

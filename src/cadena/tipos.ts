@@ -42,9 +42,11 @@ export interface CronicaVerificada extends CronicaDraft {
 }
 
 /**
- * Personalización del 007 que entra en la clave de caché (seed, deployment, modo).
- * Hoy solo existe la crónica neutral; "mi equipo" llega con el 007.
+ * Personalización del 007 que entra en la clave de caché (seed, deployment, modo):
+ * la crónica neutral, o la de «mi equipo» contada para la afición del local o la visita.
  * Se llama `ModoPersonalizacion` para no confundirlo con `CronicaVerificada.modo`
  * ("llm" | "acta"), que es otra cosa.
  */
-export type ModoPersonalizacion = "neutral";
+export type ModoPersonalizacion = "neutral" | "equipo:local" | "equipo:visita";
+
+export const MODOS_PERSONALIZACION: readonly ModoPersonalizacion[] = ["neutral", "equipo:local", "equipo:visita"];

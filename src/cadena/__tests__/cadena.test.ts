@@ -293,14 +293,21 @@ describe("CLI de la crónica", () => {
     [["--modo", "acta", "--modo", "llm"], "modo repetido"],
     [["--rapido"], "flag desconocido"],
     [["42"], "posicional"],
+    [["--perspectiva", "rival"], "perspectiva desconocida"],
+    [["--perspectiva"], "perspectiva sin valor"],
   ] as [string[], string][])("rechaza %j (%s)", (args) => {
     expect(parsearArgsCronica(args).ok).toBe(false);
+  });
+
+  it("acepta --perspectiva local|visita (brief 007)", () => {
+    const r = parsearArgsCronica(["--seed", "7", "--perspectiva", "visita"]);
+    expect(r.ok && r.opciones.perspectiva).toBe("visita");
   });
 
   it("acepta --seed, --modo acta, --json y --sin-cache", () => {
     expect(parsearArgsCronica(["--seed", "7", "--modo", "acta", "--json", "--sin-cache"])).toEqual({
       ok: true,
-      opciones: { seed: 7, modo: "acta", json: true, sinCache: true },
+      opciones: { seed: 7, modo: "acta", json: true, sinCache: true, perspectiva: "neutral" },
     });
   });
 

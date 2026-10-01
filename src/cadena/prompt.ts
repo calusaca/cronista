@@ -36,7 +36,7 @@ export function serializarHechos(hechos: Hecho[]): string {
 }
 
 /** Primer mensaje del usuario: los hechos y cuáles son de cobertura obligatoria. */
-export function mensajeInicial(hechos: Hecho[]): string {
+export function mensajeInicial(hechos: Hecho[], perspectiva?: string): string {
   const obligatorios = hechos.filter((h) => h.relevancia >= COBERTURA).map((h) => h.id);
   return [
     "Estos son los hechos verificados del partido, ordenados por relevancia:",
@@ -44,6 +44,8 @@ export function mensajeInicial(hechos: Hecho[]): string {
     serializarHechos(hechos),
     CIERRA,
     `Hechos obligatorios (cada uno debe ser el "hecho" principal de una oración que lo narre): ${obligatorios.length > 0 ? obligatorios.join(", ") : "ninguno"}.`,
+    // Brief 007: instrucción de perspectiva («mi equipo»). Cambia el tono, nunca las reglas.
+    ...(perspectiva ? [perspectiva] : []),
     "Devolvé solo el JSON de la crónica.",
   ].join("\n");
 }

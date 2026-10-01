@@ -526,6 +526,113 @@ a {
   gap: 6px;
 }
 
+/* ---------- modo Analista (brief 007) ---------- */
+
+.analyst {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.analyst-meta {
+  color: var(--faint);
+  letter-spacing: 0.02em;
+}
+
+.analyst-data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.chip-label {
+  color: var(--faint);
+}
+
+.chip-xg {
+  border-color: var(--accent-line);
+}
+
+.analyst-events {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.analyst-events li {
+  display: grid;
+  grid-template-columns: 44px 18px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.analyst-id {
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.analyst-history {
+  margin-top: 8px;
+  color: var(--accent);
+}
+
+.unused {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.unused ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 15px;
+}
+
+.unused li {
+  padding: 6px 0;
+}
+
+.perspective-option {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--faint);
+  text-decoration: none;
+  transition: background 150ms, color 150ms;
+}
+
+.perspective-option:hover {
+  color: var(--text);
+}
+
+.perspective-option[aria-current="true"] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.perspective {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
 /* ---------- capas (Caja de cristal, proceso, gol) ---------- */
 
 .scrim {

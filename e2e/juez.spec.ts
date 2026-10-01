@@ -61,14 +61,16 @@ test("el camino del juez: evidencia, inversa, idioma, caja de cristal y pizarra 
   await expect(frasesCitan.first()).toBeVisible();
   expect(await frasesCitan.count()).toBeGreaterThanOrEqual(1);
 
-  // 5. Toggle EN: el texto cambia, los números no.
-  const textoEs = (await primera.getByTestId("sentence-text").innerText()).trim();
-  await clicConMouse(page, page.getByTestId("lang-toggle").locator('[data-lang="en"]'));
+  // 5. La crónica abre en INGLÉS (jurado internacional); toggle ES: el texto cambia, los números no.
   await expect(page.getByTestId("lang-toggle").locator('[data-lang="en"]')).toHaveAttribute("aria-pressed", "true");
   const textoEn = (await primera.getByTestId("sentence-text").innerText()).trim();
-  expect(textoEn).not.toBe(textoEs);
-  expect(cifras(textoEn)).toBe(cifras(textoEs));
-  expect(cifras(textoEn).length).toBeGreaterThan(0);
+  await clicConMouse(page, page.getByTestId("lang-toggle").locator('[data-lang="es"]'));
+  await expect(page.getByTestId("lang-toggle").locator('[data-lang="es"]')).toHaveAttribute("aria-pressed", "true");
+  const textoEs = (await primera.getByTestId("sentence-text").innerText()).trim();
+  expect(textoEs).not.toBe(textoEn);
+  expect(cifras(textoEs)).toBe(cifras(textoEn));
+  expect(cifras(textoEs).length).toBeGreaterThan(0);
+  await clicConMouse(page, page.getByTestId("lang-toggle").locator('[data-lang="en"]'));
 
   // 6. Caja de cristal: la frase corregida (↻) abre su historia con ≥1 intento.
   const corregida = page.locator('[data-testid="sentence"][data-state="corregida"]').first();
@@ -109,6 +111,74 @@ test("el camino del juez: evidencia, inversa, idioma, caja de cristal y pizarra 
   await expect(tarjeta.getByTestId("pitch-diagram")).toBeVisible();
   expect(await tarjeta.getByTestId("goal-step").count()).toBeGreaterThanOrEqual(2);
   await expect(tarjeta).toContainText("Schematic");
+});
+
+/** Todas las cifras de la crónica visible, ordenadas (un multiconjunto). */
+async function cifrasCronica(page: Page): Promise<string> {
+  const textos = await page.getByTestId("sentence-text").allInnerTexts();
+  return textos
+    .flatMap((t) => t.match(/\d+(?:[.,]\d+)?/g) ?? [])
+    .sort()
+    .join(" ");
+}
+
+test("personalización (007): Aficionado ↔ Analista sin llamadas, y «mi equipo» cambia el orden, no los números", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("sentence").first()).toBeVisible();
+  const textosFan = await page.getByTestId("sentence-text").allInnerTexts();
+  const cifrasNeutral = await cifrasCronica(page);
+
+  // 1. Toggle Analista: render puro del cliente — ninguna petición al server mientras tanto.
+  const peticiones: string[] = [];
+  page.on("request", (r) => {
+    const u = new URL(r.url());
+    if (!u.pathname.startsWith("/_next/static")) peticiones.push(`${r.method()} ${u.pathname}${u.search}`);
+  });
+  await clicConMouse(page, page.getByTestId("mode-toggle").locator('[data-mode="analista"]'));
+  await expect(page.getByTestId("mode-toggle").locator('[data-mode="analista"]')).toHaveAttribute("aria-pressed", "true");
+  // xG por frase, citas expandidas y hechos no usados aparecen…
+  await expect(page.getByTestId("sentence-xg").first()).toBeVisible();
+  expect(await page.getByTestId("sentence-xg").count()).toBeGreaterThanOrEqual(1);
+  await expect(page.getByTestId("sentence-evidence").first()).toBeVisible();
+  await expect(page.getByTestId("unused-facts")).toBeVisible();
+  // …y las frases y sus números NO cambian entre modos.
+  expect(await page.getByTestId("sentence-text").allInnerTexts()).toEqual(textosFan);
+  expect(await cifrasCronica(page)).toBe(cifrasNeutral);
+  // De vuelta a Aficionado: el detalle desaparece.
+  await clicConMouse(page, page.getByTestId("mode-toggle").locator('[data-mode="aficionado"]'));
+  await expect(page.getByTestId("analyst-detail")).toHaveCount(0);
+  await page.waitForTimeout(300);
+  expect(peticiones, "el cambio de modo no debe pedir nada al server").toEqual([]);
+
+  // 2. «Mi equipo»: contar el partido para la afición visitante.
+  const ordenNeutral = await page.getByTestId("sentence").evaluateAll((els) => els.map((e) => e.getAttribute("data-hecho")));
+  await clicConMouse(page, page.getByTestId("perspective").locator('[data-perspective="visita"]'));
+  await page.waitForURL("**/?perspectiva=visita");
+  await expect(page.getByTestId("perspective").locator('[data-perspective="visita"]')).toHaveAttribute("aria-current", "true");
+  await expect(page.getByTestId("match-view")).toContainText("Told for");
+  const ordenVisita = await page.getByTestId("sentence").evaluateAll((els) => els.map((e) => e.getAttribute("data-hecho")));
+  // El orden cambia…
+  expect(ordenVisita).not.toEqual(ordenNeutral);
+  // …los hechos narrados son los mismos y los números también: la verdad no se personaliza.
+  expect([...ordenVisita].sort()).toEqual([...ordenNeutral].sort());
+  expect(await cifrasCronica(page)).toBe(cifrasNeutral);
+  // La misma verificación: la barra sigue diciendo que todo está verificado.
+  await expect(page.getByTestId("verify-bar")).toContainText("sentences verified");
+});
+
+test("cargar la página NO pide de antemano las otras perspectivas (sin prefetch: cada una cuesta una crónica)", async ({ page }) => {
+  // El espía se instala ANTES de cargar: un prefetch dispara al montar los enlaces.
+  const pedidas: string[] = [];
+  page.on("request", (r) => {
+    if (r.url().includes("perspectiva=")) pedidas.push(r.url());
+  });
+  await page.goto("/");
+  const selector = page.getByTestId("perspective");
+  await selector.scrollIntoViewIfNeeded();
+  await page.mouse.move(10, 10);
+  // Tiempo de sobra para que un prefetch por visibilidad/inactividad ocurra si existiera.
+  await page.waitForTimeout(2500);
+  expect(pedidas, "ninguna perspectiva se pide sin que el usuario la elija").toEqual([]);
 });
 
 test("simular otra semilla desde la barra superior abre su partido", async ({ page }) => {

@@ -20,7 +20,7 @@ import { mkdirSync, readdirSync, readFileSync, renameSync, statSync, unlinkSync,
 import { join } from "node:path";
 import { z } from "zod";
 import type { Hecho } from "../analista/tipos";
-import type { CronicaVerificada, ModoPersonalizacion } from "./tipos";
+import { type CronicaVerificada, MODOS_PERSONALIZACION, type ModoPersonalizacion } from "./tipos";
 import { MAX_REINTENTOS, RENAME_ESPERA_MS, RENAME_REINTENTOS, TMP_HUERFANO_MS } from "./umbrales";
 import { esquemaDraft, esquemaDraftAudit } from "./verificador";
 
@@ -90,7 +90,7 @@ const esquemaCronica = esquemaDraft
 
 const esquemaEntrada = z.object({
   version: z.literal(VERSION_CACHE),
-  clave: z.object({ seed: z.number(), deployment: z.string(), modo: z.literal("neutral") }),
+  clave: z.object({ seed: z.number(), deployment: z.string(), modo: z.enum(MODOS_PERSONALIZACION) }),
   hechos: z.string(),
   cronica: esquemaCronica,
 });

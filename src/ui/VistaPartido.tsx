@@ -4,6 +4,7 @@
 // persistente al clic, transitorio al pasar el mouse, scroll al primero) y evento →
 // oraciones que lo citan. Las capas: Caja de cristal (006), proceso, y el gol.
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Evento } from "../sim/tipos";
 import { eventosDeOracion, oracionesDeEvento } from "../vista/evidencia";
@@ -17,9 +18,13 @@ type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol
 
 const ESTILO: Record<string, string> = { posesion: "possession", contragolpe: "counter-attack", presion: "pressing" };
 
-export function VistaPartido({ datos, etiqueta, modo = "aficionado" }: { datos: DatosPartido; etiqueta: string; modo?: ModoRender }) {
+export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; etiqueta: string; ruta: string }) {
   const { cronica, hechos, eventos, local, visita } = datos;
-  const [lengua, setLengua] = useState<Lengua>("es");
+  // Jurado internacional: la crónica abre en inglés; el español queda en el toggle.
+  const [lengua, setLengua] = useState<Lengua>("en");
+  // Brief 007: Aficionado ↔ Analista es solo render (estado del cliente): cero llamadas al LLM.
+  const [modo, setModo] = useState<ModoRender>("aficionado");
+  const equipoPerspectiva = datos.perspectiva === "local" ? local.nombre : datos.perspectiva === "visita" ? visita.nombre : undefined;
   const [oracionSel, setOracionSel] = useState<number | null>(null);
   const [oracionHover, setOracionHover] = useState<number | null>(null);
   const [eventoSel, setEventoSel] = useState<string | null>(null);
@@ -79,7 +84,7 @@ export function VistaPartido({ datos, etiqueta, modo = "aficionado" }: { datos: 
     <div data-testid="match-view" data-seed={datos.seed}>
       <header className="match-head">
         <div className="overline tnum">
-          {etiqueta} · Seed {datos.seed} · Simulated match
+          {etiqueta} · Seed {datos.seed} · Simulated match{equipoPerspectiva ? ` · Told for ${equipoPerspectiva} supporters` : ""}
         </div>
         <div className="scoreline">
           <div className="team home">
@@ -100,6 +105,32 @@ export function VistaPartido({ datos, etiqueta, modo = "aficionado" }: { datos: 
             </span>
           </div>
         </div>
+        <nav className="perspective" aria-label="Tell the match for" data-testid="perspective">
+          <span className="overline">Tell it for</span>
+          <div className="lang-toggle" role="group">
+            {(
+              [
+                ["neutral", "Neutral"],
+                ["local", local.nombre],
+                ["visita", visita.nombre],
+              ] as const
+            ).map(([p, nombre]) => (
+              <Link
+                key={p}
+                href={p === "neutral" ? ruta : `${ruta}?perspectiva=${p}`}
+                className="perspective-option"
+                aria-current={datos.perspectiva === p ? "true" : undefined}
+                data-perspective={p}
+                scroll={false}
+                // Sin prefetch: cada perspectiva es una crónica que el server calcula (y con un LLM
+                // real, una llamada que cuesta). Solo se pide si el usuario la elige.
+                prefetch={false}
+              >
+                {nombre}
+              </Link>
+            ))}
+          </div>
+        </nav>
       </header>
 
       <div className="panels">
@@ -133,7 +164,12 @@ export function VistaPartido({ datos, etiqueta, modo = "aficionado" }: { datos: 
         <section className="panel" aria-label="Match report">
           <Cronica
             cronica={cronica}
+            hechos={hechos}
+            eventos={eventos}
+            {...(equipoPerspectiva ? { equipoPerspectiva } : {})}
+            deltaMiEquipo={datos.deltaMiEquipo}
             modo={modo}
+            onModo={setModo}
             lengua={lengua}
             onLengua={setLengua}
             resaltadas={oracionesResaltadas}

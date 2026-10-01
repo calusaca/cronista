@@ -1,4 +1,4 @@
-// Parser estricto del CLI de la crónica: `--seed N [--modo llm|acta] [--json] [--sin-cache]`.
+// Parser estricto del CLI de la crónica: `--seed N [--modo llm|acta] [--perspectiva neutral|local|visita] [--json] [--sin-cache]`.
 // Función pura (no lee process.argv ni termina el proceso).
 
 import { SEED_POR_DEFECTO, validarSeedTexto } from "../sim/cli-args";
@@ -9,6 +9,8 @@ export interface OpcionesCronicaCli {
   modo: "llm" | "acta";
   json: boolean;
   sinCache: boolean;
+  /** Brief 007: «mi equipo» — contar el partido para la afición del local o la visita. */
+  perspectiva: "neutral" | "local" | "visita";
 }
 
 export type ResultadoArgsCronica = { ok: true; opciones: OpcionesCronicaCli } | { ok: false; error: string };
@@ -20,6 +22,7 @@ export function parsearArgsCronica(args: readonly string[]): ResultadoArgsCronic
   let modo: "llm" | "acta" | undefined;
   let json = false;
   let sinCache = false;
+  let perspectiva: "neutral" | "local" | "visita" | undefined;
   for (let i = 0; i < args.length; i++) {
     const a = args[i] as string;
     switch (a) {
@@ -42,6 +45,15 @@ export function parsearArgsCronica(args: readonly string[]): ResultadoArgsCronic
         modo = v as "llm" | "acta";
         break;
       }
+      case "--perspectiva": {
+        if (perspectiva !== undefined) return { ok: false, error: "--perspectiva repetido" };
+        const v = args[i + 1];
+        if (v === undefined || v.startsWith("--")) return { ok: false, error: "--perspectiva necesita un valor (neutral, local o visita)" };
+        i++;
+        if (v !== "neutral" && v !== "local" && v !== "visita") return { ok: false, error: `--perspectiva debe ser neutral, local o visita (recibido: "${v}")` };
+        perspectiva = v;
+        break;
+      }
       case "--json":
         if (json) return { ok: false, error: "--json repetido" };
         json = true;
@@ -54,5 +66,5 @@ export function parsearArgsCronica(args: readonly string[]): ResultadoArgsCronic
         return { ok: false, error: a.startsWith("-") ? `flag desconocido: ${a}` : `argumento inesperado: "${a}"` };
     }
   }
-  return { ok: true, opciones: { seed: seed ?? SEED_POR_DEFECTO, modo: modo ?? "llm", json, sinCache } };
+  return { ok: true, opciones: { seed: seed ?? SEED_POR_DEFECTO, modo: modo ?? "llm", json, sinCache, perspectiva: perspectiva ?? "neutral" } };
 }

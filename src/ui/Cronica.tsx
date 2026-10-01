@@ -7,16 +7,27 @@
 // modo «analista» (datos duros expuestos) llega con ese brief.
 
 import type { KeyboardEvent } from "react";
+import type { Hecho } from "../analista/tipos";
 import type { CronicaVerificada } from "../cadena/tipos";
-import { estadoOracion, type EstadoOracion, resumenVerificacion } from "../vista/evidencia";
-import { IconoActa, IconoCorregida, IconoHistoria, IconoVerificada } from "./Iconos";
+import type { Evento } from "../sim/tipos";
+import { estadoOracion, type EstadoOracion, eventosDeOracion, fmtMinuto, historiaDeOracion, resumenVerificacion } from "../vista/evidencia";
+import { datosDuros, hechosNoUsados } from "../vista/modoAnalista";
+import { IconoActa, IconoCorregida, IconoEvento, IconoHistoria, IconoVerificada } from "./Iconos";
+import { describirEvento } from "./textos";
 
-export type ModoRender = "aficionado";
+/** Brief 007: «aficionado» = la crónica tal cual; «analista» = los datos duros expuestos. */
+export type ModoRender = "aficionado" | "analista";
 export type Lengua = "es" | "en";
 
 interface Props {
   cronica: CronicaVerificada;
+  hechos: Hecho[];
+  eventos: Evento[];
+  /** Brief 007 «mi equipo»: el equipo para el que se cuenta, y cuánto suben sus hechos. */
+  equipoPerspectiva?: string;
+  deltaMiEquipo: number;
   modo: ModoRender;
+  onModo: (m: ModoRender) => void;
   lengua: Lengua;
   onLengua: (l: Lengua) => void;
   resaltadas: Set<number>;
@@ -39,10 +50,60 @@ function IconoEstado({ estado }: { estado: EstadoOracion }) {
   return <IconoVerificada />;
 }
 
+/** Lo que el modo Analista agrega bajo cada frase: hecho, datos duros, eventos citados, historia. */
+function DetalleAnalista({ cronica, hechos, eventos, i, equipoPerspectiva, delta }: { cronica: CronicaVerificada; hechos: Hecho[]; eventos: Evento[]; i: number; equipoPerspectiva?: string; delta: number }) {
+  const o = cronica.oraciones[i];
+  const h = hechos.find((x) => x.id === o?.hecho);
+  if (!o || !h) return null;
+  const porId = new Map(eventos.map((e) => [e.id, e] as const));
+  const citados = eventosDeOracion(cronica, hechos, i)
+    .map((id) => porId.get(id))
+    .filter((e): e is Evento => e !== undefined);
+  const datos = datosDuros(h);
+  const historia = historiaDeOracion(cronica, i);
+  const rechazos = historia.filter((p) => p.motivos.length > 0);
+  const subio = equipoPerspectiva !== undefined && h.datos.equipo === equipoPerspectiva;
+  return (
+    <div className="analyst" data-testid="analyst-detail">
+      <div className="analyst-meta tnum">
+        Fact {h.id} · {h.tipo.replace(/_/g, " ")} · relevance {h.relevancia}
+        {subio ? ` (+${delta} for ${equipoPerspectiva})` : ""}
+        {o.apoyo && o.apoyo.length > 0 ? ` · support ${o.apoyo.join(", ")}` : ""}
+      </div>
+      {datos.length > 0 && (
+        <div className="analyst-data">
+          {datos.map((d) => (
+            <span key={d.clave} className={`chip tnum${d.esXg ? " chip-xg" : ""}`} data-testid={d.esXg ? "sentence-xg" : undefined}>
+              <span className="chip-label">{d.etiqueta}</span> {d.valor}
+            </span>
+          ))}
+        </div>
+      )}
+      <ol className="analyst-events" data-testid="sentence-evidence">
+        {citados.map((e) => (
+          <li key={e.id} className="tnum">
+            <span className="ev-min">{fmtMinuto(e.minuto)}</span>
+            <IconoEvento tipo={e.tipo} size={13} />
+            <span>{describirEvento(e)}</span>
+            <span className="analyst-id">{e.id}</span>
+          </li>
+        ))}
+      </ol>
+      {rechazos.length > 0 && (
+        <div className="analyst-history">
+          {rechazos.map((p) => `Rejected in attempt ${p.n} (${p.motivos.map((m) => m.regla).join(", ")})`).join(" · ")} → approved in attempt{" "}
+          {[...historia].reverse().find((p) => p.aprobada)?.n ?? "—"}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Cronica(props: Props) {
-  const { cronica, lengua, onLengua, resaltadas, seleccionada, onOracion, onHover, onHistoria, onProceso } = props;
+  const { cronica, hechos, eventos, equipoPerspectiva, deltaMiEquipo, modo, onModo, lengua, onLengua, resaltadas, seleccionada, onOracion, onHover, onHistoria, onProceso } = props;
   const r = resumenVerificacion(cronica);
   const titulo = lengua === "es" ? cronica.titulo_es : cronica.titulo_en;
+  const noUsados = modo === "analista" ? hechosNoUsados(cronica, hechos) : [];
 
   const teclado = (i: number) => (ev: KeyboardEvent) => {
     if (ev.key === "Enter" || ev.key === " ") {
@@ -55,6 +116,18 @@ export function Cronica(props: Props) {
     <div>
       <div className="panel-head">
         <span className="overline">Match report</span>
+        <div className="lang-toggle" role="group" aria-label="View" data-testid="mode-toggle">
+          {(
+            [
+              ["aficionado", "Fan"],
+              ["analista", "Analyst"],
+            ] as const
+          ).map(([m, etiqueta]) => (
+            <button key={m} type="button" aria-pressed={modo === m} data-mode={m} onClick={() => onModo(m)}>
+              {etiqueta}
+            </button>
+          ))}
+        </div>
         <div className="lang-toggle" role="group" aria-label="Report language" data-testid="lang-toggle">
           {(["es", "en"] as const).map((l) => (
             <button key={l} type="button" aria-pressed={lengua === l} data-lang={l} onClick={() => onLengua(l)}>
@@ -116,6 +189,7 @@ export function Cronica(props: Props) {
                 tabIndex={0}
                 data-testid="sentence"
                 data-index={i}
+                data-hecho={o.hecho}
                 data-state={estado}
                 data-highlighted={resaltadas.has(i) ? "true" : "false"}
                 data-selected={seleccionada === i ? "true" : "false"}
@@ -155,11 +229,31 @@ export function Cronica(props: Props) {
                       <IconoHistoria /> How it was written
                     </button>
                   </div>
+                  {modo === "analista" && (
+                    <DetalleAnalista cronica={cronica} hechos={hechos} eventos={eventos} i={i} equipoPerspectiva={equipoPerspectiva} delta={deltaMiEquipo} />
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+
+        {modo === "analista" && (
+          <section className="unused" data-testid="unused-facts">
+            <div className="overline">Facts the report did not use · {noUsados.length}</div>
+            {noUsados.length === 0 ? (
+              <p className="caption">Every fact the analyst found is narrated above.</p>
+            ) : (
+              <ul>
+                {noUsados.map((h) => (
+                  <li key={h.id} className="tnum">
+                    <span className="analyst-id">{h.id}</span> {lengua === "es" ? h.texto_es : h.texto_en} <span className="analyst-id">relevance {h.relevancia}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
 
         <div className="legend">
           {cronica.modo === "llm" ? (

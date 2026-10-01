@@ -8,6 +8,7 @@ import type { Hecho } from "../analista/tipos";
 import { crearCacheDisco } from "../cadena/cache";
 import { generarCronica } from "../cadena/cadena";
 import type { CronicaVerificada } from "../cadena/tipos";
+import { DELTA_MI_EQUIPO } from "../cadena/umbrales";
 import { crearLlmDesdeEnv } from "../lib/llm";
 import { simular } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
@@ -23,8 +24,16 @@ export interface EquipoVista {
   estilo: Estilo;
 }
 
+/** Brief 007: para qué afición se cuenta el partido. */
+export type Perspectiva = "neutral" | "local" | "visita";
+
+export const leerPerspectiva = (v: unknown): Perspectiva => (v === "local" || v === "visita" ? v : "neutral");
+
 export interface DatosPartido {
   seed: number;
+  perspectiva: Perspectiva;
+  /** Relevancia que suma el modo «mi equipo» (DELTA_MI_EQUIPO), para mostrarla en modo Analista. */
+  deltaMiEquipo: number;
   local: EquipoVista;
   visita: EquipoVista;
   eventos: Evento[];
@@ -49,12 +58,18 @@ const equipo = (e: { nombre: string; ataque: number; defensa: number; estilo: Es
   estilo: e.estilo,
 });
 
-export async function cargarPartido(seed: number): Promise<DatosPartido> {
+export async function cargarPartido(seed: number, perspectiva: Perspectiva = "neutral"): Promise<DatosPartido> {
   const partido = simular(configDeSemilla(seed));
   const llm = crearLlmDesdeEnv();
-  const { cronica, hechos, desdeCache } = await generarCronica(partido, { llm, cache: crearCacheDisco() });
+  const { cronica, hechos, desdeCache } = await generarCronica(partido, {
+    llm,
+    cache: crearCacheDisco(),
+    modoPersonalizacion: perspectiva === "neutral" ? "neutral" : `equipo:${perspectiva}`,
+  });
   return {
     seed: partido.config.seed,
+    perspectiva,
+    deltaMiEquipo: DELTA_MI_EQUIPO,
     local: equipo(partido.config.local),
     visita: equipo(partido.config.visita),
     eventos: partido.eventos,

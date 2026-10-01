@@ -10,7 +10,7 @@ import { crearCacheDisco, directorioPorDefecto } from "./cache";
 import { generarCronica } from "./cadena";
 import { parsearArgsCronica } from "./cli-args";
 
-const USO = "uso: npm run cronica -- [--seed <entero 0..4294967295>] [--modo llm|acta] [--json] [--sin-cache]";
+const USO = "uso: npm run cronica -- [--seed <entero 0..4294967295>] [--modo llm|acta] [--perspectiva neutral|local|visita] [--json] [--sin-cache]";
 
 async function main(): Promise<void> {
   const args = parsearArgsCronica(process.argv.slice(2));
@@ -19,7 +19,7 @@ async function main(): Promise<void> {
     console.error(USO);
     process.exit(1);
   }
-  const { seed, modo, json, sinCache } = args.opciones;
+  const { seed, modo, json, sinCache, perspectiva } = args.opciones;
   if (existsSync(".env")) process.loadEnvFile(".env");
 
   // El acta no llama al LLM: se resuelve ANTES de validar su configuración (rev. 3.1),
@@ -29,6 +29,7 @@ async function main(): Promise<void> {
   const { cronica, hechos, desdeCache } = await generarCronica(partido, {
     ...(llm ? { llm } : {}),
     forzarActa: modo === "acta",
+    modoPersonalizacion: perspectiva === "neutral" ? "neutral" : `equipo:${perspectiva}`,
     ...(sinCache ? {} : { cache: crearCacheDisco() }),
   });
 
@@ -40,7 +41,7 @@ async function main(): Promise<void> {
   const porHecho = new Map(hechos.map((h) => [h.id, h] as const));
   const linea = "─".repeat(78);
   console.log(linea);
-  console.log(`CRONISTA · crónica verificada · semilla ${seed}`);
+  console.log(`CRONISTA · crónica verificada · semilla ${seed}${perspectiva === "neutral" ? "" : ` · para la afición de ${perspectiva === "local" ? partido.config.local.nombre : partido.config.visita.nombre}`}`);
   console.log(
     `modo ${cronica.modo} · ${llm ? `LLM ${llm.id}` : "sin LLM (acta pedida)"} · intentos ${cronica.intentos} · frases omitidas ${cronica.frasesOmitidas}` +
       (desdeCache ? ` · desde caché (${directorioPorDefecto()})` : ""),

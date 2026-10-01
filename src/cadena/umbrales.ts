@@ -42,6 +42,16 @@ export const MINUTO_DESCANSO = 45;
  */
 export const TMP_HUERFANO_MS = 60_000;
 
+/**
+ * Brief 007 — modo «mi equipo»: los hechos del equipo elegido (los que tienen
+ * `datos.equipo` igual a su nombre) suben esta cantidad de relevancia (tope 100). Vive en
+ * la CADENA, no en el Analista: el 002 queda neutral y cerrado; la personalización es un
+ * paso de selección y orden ANTES del Cronista, nunca en el medio.
+ * Con 15: un gol propio (70) pasa a 85; el portero propio (65) pasa a 80 y se vuelve
+ * obligatorio para V5 (≥ COBERTURA); la presión propia (35) sube a 50.
+ */
+export const DELTA_MI_EQUIPO = 15;
+
 /** Caché (rev. 3.2) — reintentos del `rename` atómico (Windows da EPERM/EBUSY si otro proceso lee). */
 export const RENAME_REINTENTOS = 5;
 export const RENAME_ESPERA_MS = 15;
