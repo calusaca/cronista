@@ -6,6 +6,7 @@
 // GPT-6.1 Sol) es: un archivo `llm-<nombre>.ts` que devuelva un `Llm`, y un `case`
 // en `crearLlmDesdeEnv`. La cadena no cambia una línea.
 
+import { crearLlmEnsayo } from "./llm-ensayo";
 import { crearLlmFoundry } from "./llm-foundry";
 import { crearLlmStub } from "./llm-stub";
 
@@ -23,8 +24,9 @@ export interface Llm {
   completar(system: string, mensajes: Mensaje[]): Promise<string>;
 }
 
-export type TipoLlm = "stub" | "foundry";
-export const TIPOS_LLM: readonly TipoLlm[] = ["stub", "foundry"];
+export type TipoLlm = "stub" | "foundry" | "ensayo";
+/** "ensayo" es un fixture de pruebas (e2e de la UI): jamás alimenta la demo. */
+export const TIPOS_LLM: readonly TipoLlm[] = ["stub", "foundry", "ensayo"];
 
 type Env = Record<string, string | undefined>;
 
@@ -42,6 +44,8 @@ export function crearLlmDesdeEnv(env: Env = process.env): Llm {
   switch (tipo) {
     case "stub":
       return crearLlmStub();
+    case "ensayo":
+      return crearLlmEnsayo();
     case "foundry":
       return crearLlmFoundry({
         apiKey: requerida(env, "FOUNDRY_API_KEY"),
