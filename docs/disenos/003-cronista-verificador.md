@@ -1,7 +1,8 @@
 # 003 — Cronista y Verificador
 
 **Fecha:** 2026-09-30 · **Diseña:** Fable (con informe de investigador-foundry) ·
-**Implementa:** Opus (semana 2, tras el 002) · **Estado:** cerrado
+**Implementa:** Opus · **Estado:** CERRADO (rev 3.2, 2 rondas de auditoría,
+2026-09-30; pendiente solo la corrida real contra Foundry al existir la cuenta)
 
 ## Decisiones de stack (según investigación del 2026-09-30)
 
@@ -117,6 +118,137 @@ condicional de feedback — cuyos ejecutores llaman la cadena TS por HTTP; su De
 muestra el grafo en vivo (oro para el video). Si el tiempo no da, se corta sin dolor
 (prioridad 4 del 000) y el pitch explica que AF aún no publica SDK TS, con enlace a
 la discusión #6181: argumento defendible, no excusa.
+
+## Revisión 3.1 — un hecho por oración (2026-09-30, Fable, por auditoría adversaria)
+
+La auditoría demostró que V1–V6 son reglas léxicas y no sostienen la promesa
+completa: 25 de 26 mentiras construidas pasaron (recombinación de cifras entre
+hechos citados, ganador invertido con tokens legítimos, citar sin narrar, números
+en palabras fuera del diccionario, nombres tras puntuación). Respuesta
+arquitectónica, no parches:
+
+### 1. Cambio de contrato: hecho principal
+```ts
+interface Oracion {
+  texto_es: string; texto_en: string;
+  hecho: string;        // EL hecho que esta oración narra (exactamente uno)
+  apoyo?: string[];     // hechos de contexto; solo amplían el resaltado en la UI
+}
+```
+- **V3/V4 verifican contra el hecho principal**, no contra la unión de citas:
+  números y nombres de la oración deben existir en `datos`/textos de SU hecho.
+  Mata la recombinación (A3) y los nombres compuestos de piezas de dos hechos.
+- **V5 → narración obligatoria**: todo hecho requerido es `hecho` principal de
+  alguna oración (citarlo en `apoyo` no basta). Mata A5.
+- El prompt del Cronista cambia acorde: una oración = un hecho, y lo dice.
+
+### 2. Léxicos completos (A2, B5)
+- Números en palabras 0–99 ES/EN, ordinales (tercer/third…), `docena/dozen`,
+  `doblete/triplete/brace/hat-trick` (mapeados a su cuenta real), `par/ambos/both`.
+- Normalización Unicode de dígitos (fullwidth ７ ⇒ 7) antes de V3/V6.
+- Falsos positivos corregidos: «con diez/ten men» válido si el hecho principal es
+  expulsión; «one-two», «los 90 minutos», «2nd» al léxico; títulos EN en Title
+  Case con diccionario corto de palabras comunes.
+
+### 3. V4 cerrado (A1)
+«Inicio de frase» = solo la posición 0 del texto; después de puntuación, una
+palabra capitalizada debe ser nombre del hecho principal O estar en el diccionario
+corto de palabras funcionales (Después, El, La, The, A, In… — lo controlamos
+nosotros porque controlamos los idiomas). Nombres compuestos se cotejan completos.
+
+### 4. Reglas nuevas
+- **V7 — negaciones**: construcción que niega eventos («sin», «no hubo», «ni»,
+  «ningún», without/no + sustantivo de evento) se rechaza: ningún hecho afirma
+  ausencias. Determinista y barato.
+- **V8 — vocabulario de juicio**: palabras de juicio fuerte solo si el hecho
+  principal las habilita (tabla en umbrales.ts): «dominó» ⇐ dominio_periodo;
+  «mereció / contra la corriente» ⇐ justicia_xg; «goleada» ⇐ margen ≥ 3 en datos;
+  «monólogo», «paliza» y similares fuera de tabla ⇒ rechazo. El color que el
+  Cronista puede usar es el que los hechos pagan.
+
+### 5. La batería del auditor como prueba permanente
+`__tests__/mentiras.test.ts`: las 26 mentiras del informe (adaptadas al contrato
+nuevo) deben ser TODAS rechazadas con la regla esperada; los falsos positivos de
+B5 deben ser aceptados. Fuente: scratchpad del auditor (`ataque.ts`,
+`protocolo.ts`).
+
+### 6. Mutaciones y caché (A6, B1–B4, B6, B7)
+- Tests que matan las 11 mutaciones supervivientes (prioridad: M14 — la
+  re-verificación al leer caché es la única barrera contra caché manipulada).
+- Caché: entrada que no pasa esquema zod completo (incluido `audit`) o no pasa el
+  Verificador ⇒ **se regenera**, nunca lanza ni se sirve; nombres `.tmp` únicos
+  (pid+aleatorio); `--modo acta` resuelve antes de validar el env del LLM.
+- B6: si el último intento falla por V1, se recupera el mejor intento previo
+  (menos oraciones rechazadas) por la vía de omisión antes de caer al acta.
+- Tests para el orden del acta y la versión de caché.
+
+### 7. La promesa, en palabras exactas (para 000/006/pitch)
+Lo que garantizamos y podemos demostrar: **cada oración narra un hecho
+verificado; cada número, nombre y juicio fuerte está respaldado por ese hecho;
+la estructura hace imposible recombinar hechos para mentir; y todo rechazo queda
+visible en la Caja de cristal.** Ni más ni menos.
+
+## Revisión 3.2 — afirmaciones computables y robustez (2026-09-30, Fable, ronda 2)
+
+La ronda 2 confirmó el cierre de la ronda 1 y delimitó el residuo: mentiras de
+color/causa/tiempo con vocabulario abierto. La respuesta distingue lo computable
+de lo incerrable:
+
+### 1. Bugs reales (clase A, se cierran)
+- **Sujeto de V8**: «Ante J, A ganó 4–1» pasa porque V8 toma el primer equipo
+  antes del verbo. El sujeto es el sintagma inmediatamente antes del verbo (sin
+  preposición delante: ante/contra/frente a/against/versus descartan candidato).
+  Casos R01/T01/R02 (pasiva: «fue superado por» invierte roles) a la batería.
+- **Marcador no orientable**: «4 a 1» / «4 to 1» se orientan igual que «4–1»;
+  tabla de guiones Unicode (U+2010, U+2212, etc.) normalizada ANTES de V3/V6.
+- **Léxico**: twice/dos veces/por partida doble (= 2), ordinales completos 1º–20º
+  + decenas ES/EN, «no ganó / unable to / failed to win / sin victoria /
+  penalty-free / -free» a V7/V8.
+
+### 2. Afirmaciones computables nuevas (V8 crece donde el dato paga)
+Cada una se verifica contra `datos` del hecho principal, determinista:
+- **«gol de la victoria / winner / decisivo»** ⇐ ese gol puso el marcador que
+  decidió (computable con marcador del hecho + resultado final).
+- **«valla invicta / clean sheet»** ⇐ goles recibidos = 0.
+- **Franjas temporales**: «tras el descanso» ⇐ minuto > 45; «sobre el final /
+  late on» ⇐ minuto ≥ `FINAL_MIN` (umbral comentado); «temprano» ⇐ ≤ 10.
+- **V7 con respaldo**: una negación se ACEPTA si los datos del principal afirman
+  ese cero (p. ej. «sin que A respondiera» con expulsion_y_efecto que dice
+  «después A marcó 0»). Cierra el falso positivo P03 sin abrir la puerta.
+
+### 3. Muletillas enumeradas (la cola abierta, acotada con honestidad)
+El lenguaje para el color es abierto; las muletillas típicas de un LLM no.
+`lexico.ts` gana la lista del auditor: golazo, polémico/a, controversially,
+gracias a, por culpa de, error del portero/defensa, el mejor de la tarde,
+épico, se impuso, doblegó, sucumbió, cayó, superó, edged, downed, cruised past,
+got the better of (los verbos de resultado entran a la tabla V8 con orientación).
+**Límite documentado** (000/006/pitch): la verificación de color cubre las
+afirmaciones computables y el léxico mantenido; una figura retórica inédita no
+listada puede pasar — el riesgo residual real según la auditoría es medio solo
+ahí, y la Caja de cristal lo deja inspeccionable.
+
+### 4. Falsos positivos (cuestan reintentos)
+Aperturas al diccionario (However, Shortly, Poco/Minutos/Momentos después,
+Solo, Moments); nombres cortos de equipo válidos tras puntuación (prefijos
+derivados de la plantilla); P08 se mantiene (coherente con un-hecho-por-oración).
+
+### 5. Robustez (B de ronda 2)
+- **B6 bien definido**: el mejor intento previo minimiza (oraciones rechazadas +
+  hechos requeridos que quedarían sin narrar tras omitir); con eso
+  `[sinGol, mal(h14), roto]` rescata el intento de h14, no cae al acta.
+- **Concurrencia Windows**: rename con reintentos y catch (si falla, se sirve el
+  resultado calculado SIN cachear — nunca lanzar después de pagar al LLM);
+  limpieza de `.tmp` huérfanos al abrir la caché.
+- **Coherencia del audit servido desde caché**: refinamientos zod (n secuencial
+  desde 1, último veredicto vacío en modo llm, intentos = audit.length, modo/
+  intentos consistentes, apoyo sin duplicados); incoherente ⇒ regenerar. La Caja
+  de cristal no muestra historia fabricada.
+
+### 6. Suite
+Tests que matan las 9 mutaciones supervivientes (N17, N09, N04, N03, N06, N15,
+N14, N16, N02) + los casos R/T/P de ronda 2 a la batería permanente (los de
+probabilidad casi nula — homóglifos, espacio de ancho cero, futuro — también:
+ya están escritos y son gratis).
 
 ## Aceptación
 

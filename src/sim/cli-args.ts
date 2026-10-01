@@ -39,15 +39,22 @@ export function parsearArgs(args: readonly string[]): ResultadoArgs {
       const v = args[i + 1];
       if (v === undefined || v.startsWith("--")) return { ok: false, error: "--seed necesita un valor" };
       i++;
-      if (!ENTERO_DECIMAL.test(v)) {
-        return { ok: false, error: `--seed debe ser un entero decimal en [0, ${SEED_MAX}] (recibido: "${v}")` };
-      }
-      const n = Number(v);
-      if (!Number.isSafeInteger(n) || n > SEED_MAX) {
-        return { ok: false, error: `--seed fuera de rango: ${v} (máximo ${SEED_MAX})` };
-      }
-      seed = n;
+      const s = validarSeedTexto(v);
+      if (!s.ok) return s;
+      seed = s.seed;
     }
   }
   return { ok: true, opciones: { seed: seed ?? SEED_POR_DEFECTO, todo, json } };
+}
+
+/** Valida el valor de --seed (compartido por todos los CLI del proyecto). */
+export function validarSeedTexto(v: string): { ok: true; seed: number } | { ok: false; error: string } {
+  if (!ENTERO_DECIMAL.test(v)) {
+    return { ok: false, error: `--seed debe ser un entero decimal en [0, ${SEED_MAX}] (recibido: "${v}")` };
+  }
+  const n = Number(v);
+  if (!Number.isSafeInteger(n) || n > SEED_MAX) {
+    return { ok: false, error: `--seed fuera de rango: ${v} (máximo ${SEED_MAX})` };
+  }
+  return { ok: true, seed: n };
 }
