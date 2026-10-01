@@ -46,6 +46,7 @@ export function Linea({ eventos, local, visita, resaltados, hover, seleccionado,
                   data-testid="timeline-event"
                   data-event-id={e.id}
                   data-tipo={e.tipo}
+                  data-minuto={e.minuto}
                   data-highlighted={resaltados.has(e.id) ? "true" : "false"}
                   data-hover={hover.has(e.id) ? "true" : "false"}
                   data-selected={seleccionado === e.id ? "true" : "false"}

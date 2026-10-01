@@ -107,6 +107,8 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   expulsion_y_efecto: 85,
   doblete_o_mas: 80,
   resultado_final: 75,
+  // Brief 009: entre el resultado (75) y el gol (70).
+  figura_del_partido: 72,
   gol_anotado: 70,
   portero_destacado: 65,
   gol_tardio: 60,
@@ -144,4 +146,45 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   portero_destacado: "atajada",
   expulsion_y_efecto: "tarjeta_roja",
   disciplina: "tarjeta_amarilla",
+  // Brief 009: hay una sola figura por partido, así que nunca empata consigo misma;
+  // si empatara en relevancia con otro tipo, decide su primer gol (o su primer evento citado).
+  figura_del_partido: "gol",
 };
+
+// ---------------------------------------------------------------------------------
+// Brief 009 — valoración de jugadores (nota de partido 1–10, estilo prensa).
+// Valores INICIALES del brief, calibrables: se cambian aquí y en ningún otro lado (las
+// pruebas importan estas cifras). Deltas con signo, en notas. El cálculo suma en
+// centésimas enteras para no arrastrar errores de coma flotante.
+// ---------------------------------------------------------------------------------
+
+export const VALORACION = {
+  /** Nota de partida de todo jugador con participación. */
+  base: 6.0,
+  /** Escala final acotada [min, max]; redondeo a un decimal. */
+  min: 3.0,
+  max: 10.0,
+  /** Gol (al que lo marca). */
+  gol: 1.2,
+  /** Extra por definición difícil: gol de un tiro con xG ESTRICTAMENTE menor que `gol_dificil_xg_max`. */
+  gol_dificil: 0.3,
+  gol_dificil_xg_max: 0.15,
+  /** Tiro a puerta que el portero atajó (al tirador). */
+  tiro_atajado: 0.3,
+  pase_clave: 0.3,
+  /** Córner: al jugador que nombra el evento `corner` (ver valoracion.ts). */
+  corner: 0.1,
+  amarilla: -0.5,
+  /** Roja (directa o segunda amarilla, que llega como tarjeta_roja). */
+  roja: -1.5,
+  falta: -0.1,
+  fuera_de_juego: -0.1,
+  /** Porteros (el que está en el arco en ese evento): atajada, xG atajado ×factor, gol recibido.
+   *  Calibrado el 1 oct (barrido de 500 semillas): con 0.5/1.0 el portero era la figura en el
+   *  61 % de los partidos. Con 0.1/1.0 queda en 5.8 % (DEL 56 %, MED 29 %, DEF 9 %), que es lo
+   *  que firma la prensa; el factor se mantiene en 1.0 porque un xG (centésimas) por un factor
+   *  fraccionario produce medias centésimas y rompe la aritmética exacta del cálculo. */
+  atajada: 0.1,
+  xg_atajado_factor: 1.0,
+  gol_recibido: -0.3,
+} as const;

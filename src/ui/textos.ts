@@ -57,3 +57,21 @@ export const siglas = (nombre: string) =>
     .toUpperCase();
 
 export const ladoTexto = (l: Lado) => (l === "local" ? "home" : "away");
+
+/** Brief 009: motivo de cada delta del desglose de una nota. */
+export const MOTIVO_VALORACION_EN: Record<string, string> = {
+  gol: "Goal",
+  gol_dificil: "Difficult finish (low xG)",
+  tiro_atajado: "Shot on target (saved)",
+  pase_clave: "Key pass",
+  corner: "Corner",
+  amarilla: "Yellow card",
+  roja: "Red card",
+  falta: "Foul",
+  fuera_de_juego: "Offside",
+  atajada: "Save",
+  xg_atajado: "xG of the saved shot",
+  gol_recibido: "Goal conceded",
+};
+
+export const POSICION_EN: Record<string, string> = { POR: "GK", DEF: "DF", MED: "MF", DEL: "FW" };

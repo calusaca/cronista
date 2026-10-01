@@ -12,7 +12,10 @@ import { DELTA_MI_EQUIPO } from "../cadena/umbrales";
 import { crearLlmDesdeEnv } from "../lib/llm";
 import { simular } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
-import type { Estilo, Evento } from "../sim/tipos";
+import type { Estilo, Evento, SimConfig } from "../sim/tipos";
+import { crearCacheUpdates } from "../vivo/cache";
+import { construirOverlay, type Overlay } from "../vivo/overlay";
+import { generarUpdates } from "../vivo/updates";
 
 /** Partido destacado de la home: variado (expulsión, doblete, dos penales, portero, presión). */
 export const SEMILLA_DESTACADA = 246;
@@ -37,6 +40,8 @@ export interface DatosPartido {
   local: EquipoVista;
   visita: EquipoVista;
   eventos: Evento[];
+  /** Brief 009: config del partido (plantillas) para valorar en el cliente lo visto (replay incluido). */
+  config: SimConfig;
   hechos: Hecho[];
   cronica: CronicaVerificada;
   llm: { id: string; etiqueta: string; fixture: boolean };
@@ -73,11 +78,29 @@ export async function cargarPartido(seed: number, perspectiva: Perspectiva = "ne
     local: equipo(partido.config.local),
     visita: equipo(partido.config.visita),
     eventos: partido.eventos,
+    config: partido.config,
     hechos,
     cronica,
     llm: { id: llm.id, ...etiquetaLlm(llm.id) },
     desdeCache,
   };
+}
+
+// ---------------------------------------------------------------------------------
+// Brief 008: overlay de las actualizaciones en vivo (replay). Lo pide el endpoint
+// /api/overlay/[seed] y lo consume el ticker de la UI: misma fuente, mismo JSON.
+// ---------------------------------------------------------------------------------
+
+export async function cargarOverlay(seed: number, perspectiva: Perspectiva = "neutral"): Promise<Overlay> {
+  const partido = simular(configDeSemilla(seed));
+  const llm = crearLlmDesdeEnv();
+  const modo = perspectiva === "neutral" ? "neutral" : (`equipo:${perspectiva}` as const);
+  const updates = await generarUpdates(partido, { llm, cache: crearCacheUpdates(), modoPersonalizacion: modo });
+  return construirOverlay(
+    { seed: partido.config.seed, llm: llm.id, modo, local: partido.config.local.nombre, visita: partido.config.visita.nombre },
+    updates,
+    partido.eventos.map((e) => e.id),
+  );
 }
 
 // ---------------------------------------------------------------------------------

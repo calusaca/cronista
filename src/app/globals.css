@@ -633,6 +633,269 @@ a {
   margin-top: 18px;
 }
 
+/* ---------- replay en vivo (brief 008) ---------- */
+
+.watch-live {
+  margin-left: 14px;
+}
+
+.replay-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.replay-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.replay-clock {
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 64px;
+  text-align: center;
+}
+
+.lang-toggle button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ticker {
+  padding: 18px 24px 40px;
+  height: calc(100vh - 250px);
+  min-height: 420px;
+  overflow-y: auto;
+}
+
+.ticker-note,
+.ticker-empty {
+  color: var(--muted);
+  margin: 0 0 16px;
+  max-width: 62ch;
+}
+
+.ticker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.ticker-item {
+  display: grid;
+  grid-template-columns: 56px 1fr 20px;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border: 1px solid var(--line-soft);
+  border-left: 2px solid transparent;
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  animation: ticker-entra 300ms ease-out;
+}
+
+.ticker-item:hover {
+  border-color: var(--line);
+}
+
+.ticker-item[data-highlighted="true"] {
+  background: var(--accent-soft);
+}
+
+.ticker-item[data-selected="true"] {
+  border-left-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+}
+
+.ticker-min {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.ticker-body {
+  display: grid;
+  gap: 4px;
+}
+
+.ticker-text {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ticker-state {
+  color: var(--ok);
+}
+
+.ticker-state.acta {
+  color: var(--faint);
+}
+
+@keyframes ticker-entra {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-item {
+    animation: none;
+  }
+}
+
+/* ---------- ratings (brief 009) — mínimo; el 010 re-tokeniza ---------- */
+
+.ratings {
+  border-top: 1px solid var(--line-soft);
+}
+
+.ratings-note {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.ratings-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.ratings-col {
+  padding: 12px 24px 28px;
+  min-width: 0;
+}
+
+.ratings-col + .ratings-col {
+  border-left: 1px solid var(--line-soft);
+}
+
+.ratings-team {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ratings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rating-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 10px;
+  border-left: 2px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.rating-row:hover {
+  background: var(--surface);
+}
+
+.rating-row[data-selected="true"] {
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.rating-nota {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.rating-nota.figura {
+  color: var(--accent);
+}
+
+.rating-potm {
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.rating-pos {
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.rating-breakdown {
+  margin: 4px 0 10px 60px;
+  padding: 8px 12px;
+  border-left: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.rating-breakdown ol {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.rating-breakdown li {
+  display: grid;
+  grid-template-columns: 52px auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.rating-delta {
+  min-width: 46px;
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.rating-delta.neg {
+  color: var(--card-red);
+}
+
+.rating-ev {
+  color: var(--faint);
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rating-base {
+  color: var(--faint);
+}
+
+@media (max-width: 900px) {
+  .ratings-cols {
+    grid-template-columns: 1fr;
+  }
+  .ratings-col + .ratings-col {
+    border-left: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .rating-breakdown {
+    margin-left: 12px;
+  }
+  .rating-breakdown li {
+    grid-template-columns: 52px 1fr;
+    gap: 2px 10px;
+  }
+  .rating-ev {
+    grid-column: 2;
+  }
+}
+
 /* ---------- capas (Caja de cristal, proceso, gol) ---------- */
 
 .scrim {

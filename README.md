@@ -78,6 +78,48 @@ npm run test:stats # statistical realism of the simulator, N=1000 matches
 npm run e2e        # the judge's path, driven with a real mouse (Playwright)
 ```
 
+## Live replay & broadcast overlay
+
+**Watch live** on any match view replays the simulated match minute by minute
+(labeled **Replay** — it is a deterministic match played back, not a live
+broadcast). At each key moment (goal, red card, half-time, full time) the Writer
+produces a short update from the facts known *up to that minute* — the Analyst
+runs on the event prefix — and the update passes the same Verifier (V1–V8)
+before it reaches the ticker. No clairvoyance: an update at minute M cites only
+events with minute ≤ M and no figure from the future (tested over seeds 1–100).
+If the Writer's drafts are rejected after retries, the ticker shows the fact's
+template instead. Speed ×1 / ×5 / pause, and **Skip to full-time** opens the full
+chronicle.
+
+**Integration point for studios / streaming overlays:** the same verified updates
+are served as timed, machine-readable JSON (the ticker consumes this endpoint, so
+what the viewer sees and what an overlay receives are the same data):
+
+```
+GET /api/overlay/{seed}[?perspectiva=local|visita]
+```
+
+```json
+{
+  "seed": 246, "replay": true, "llm": "stub", "modo": "neutral",
+  "local": "…", "visita": "…",
+  "actualizaciones": [
+    { "minuto": 3, "texto_es": "…", "texto_en": "…", "hecho": "h02",
+      "eventos": ["e004", "e005"], "momento": "gol-e005", "tipo": "gol",
+      "verificacion": "llm", "intentos": 1 }
+  ]
+}
+```
+
+`actualizaciones` is ordered by `minuto`; each entry is one verified sentence
+(`hecho` is the fact it narrates — facts are computed on the event prefix, so
+fact IDs are local to their `momento`; `eventos` are global match event IDs that
+back the sentence, all at minute ≤ `minuto`). `verificacion` is `llm` (written by the Writer, approved) or
+`plantilla` (the fact's template after rejected drafts). The schema is
+`esquemaOverlay` in `src/vivo/overlay.ts` (zod). Updates are cached per
+(seed, moment, deployment, perspective): with a real model, ~5–8 calls per match,
+once.
+
 ## Synthetic data
 
 No real match footage or data is used anywhere. The simulator generates

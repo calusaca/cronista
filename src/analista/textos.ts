@@ -98,6 +98,11 @@ export const PLANTILLAS = {
     es: "{equipo} recibió {amarillas} tarjetas amarillas (minutos {minutos}).",
     en: "{equipo} received {amarillas} yellow cards (minutes {minutos}).",
   },
+  // Brief 009.
+  figura_del_partido: {
+    es: "{jugador} fue la figura del partido (nota {nota}).",
+    en: "{jugador} was the player of the match (rating {nota}).",
+  },
 } as const satisfies Record<string, Plantilla>;
 
 export type ClavePlantilla = keyof typeof PLANTILLAS;

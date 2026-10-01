@@ -19,10 +19,13 @@
 //   expulsión llega como `tarjeta_roja`, contrato 001 v1.1).
 // - `justicia_xg` sin ningún tiro (0 xG) cita el fin_periodo final, para que la lista
 //   de eventos nunca quede vacía.
+// - Brief 009: el portero en el arco (`porteros`) vive ahora en valoracion.ts, que lo
+//   comparte con la valoración de jugadores; la regla es la misma.
 
 import type { Evento, Lado, Partido } from "../sim/tipos";
 import { minutoTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
+import { figura, notaTxt, porteros } from "./valoracion";
 import {
   DISCIPLINA_AMARILLAS_MIN,
   DOBLETE_MIN_GOLES,
@@ -342,37 +345,8 @@ function justiciaXg(c: Ctx): Borrador[] {
   return [hecho(c, "justicia_xg", "justicia_neutra", ids, base)];
 }
 
-/**
- * Portero en el campo de cada equipo a lo largo del stream (por índice de evento):
- * - arranca el POR titular;
- * - un cambio cuyo `sale` es el portero pone en el arco al que entra;
- * - una roja al portero deja el arco sin portero identificable (undefined): con los
- *   datos del simulador no se sabe qué jugador de campo se pone los guantes;
- * - si el arco está sin portero identificable y entra por cambio un jugador de
- *   posición POR, ese pasa a ser el portero.
- */
-function porteros(p: Partido, c: Ctx): Record<Lado, (string | undefined)[]> {
-  const posicion = new Map<string, string>();
-  for (const lado of LADOS) for (const j of p.config[lado].jugadores) posicion.set(`${lado}|${j.nombre}`, j.posicion);
-  const actual: Record<Lado, string | undefined> = {
-    local: p.config.local.jugadores.slice(0, 11).find((j) => j.posicion === "POR")?.nombre,
-    visita: p.config.visita.jugadores.slice(0, 11).find((j) => j.posicion === "POR")?.nombre,
-  };
-  const out: Record<Lado, (string | undefined)[]> = { local: [], visita: [] };
-  for (const e of c.ev) {
-    for (const lado of LADOS) out[lado].push(actual[lado]);
-    if (e.tipo === "cambio" && e.jugador !== undefined) {
-      const entraPortero = posicion.get(`${e.equipo}|${e.jugador}`) === "POR";
-      if (e.sale !== undefined && e.sale === actual[e.equipo]) actual[e.equipo] = e.jugador;
-      else if (actual[e.equipo] === undefined && entraPortero) actual[e.equipo] = e.jugador;
-    }
-    if (e.tipo === "tarjeta_roja" && e.jugador !== undefined && e.jugador === actual[e.equipo]) actual[e.equipo] = undefined;
-  }
-  return out;
-}
-
 function porteroDestacado(p: Partido, c: Ctx): Borrador[] {
-  const gk = porteros(p, c);
+  const gk = porteros(p);
   const out: Borrador[] = [];
   for (const tirador of LADOS) {
     const defensor = rival(tirador);
@@ -433,6 +407,23 @@ function expulsiones(c: Ctx): Borrador[] {
     );
   });
   return out;
+}
+
+/**
+ * Brief 009: la figura del partido — el mejor valorado (valoracion.ts). Cita los eventos
+ * de su desglose; la nota va en `datos` (con un decimal, como la dice el texto) para que
+ * V3 la verifique. Sin desglose no hay figura.
+ */
+function figuraDelPartido(p: Partido, c: Ctx): Borrador[] {
+  const f = figura(p);
+  if (!f) return [];
+  return [
+    hecho(c, "figura_del_partido", "figura_del_partido", f.desglose.map((d) => d.evento), {
+      jugador: f.jugador,
+      equipo: f.equipo,
+      nota: notaTxt(f.nota),
+    }),
+  ];
 }
 
 function disciplina(c: Ctx): Borrador[] {
@@ -506,6 +497,7 @@ export function analizar(partido: Partido): Hecho[] {
     ...porteroDestacado(partido, c),
     ...expulsiones(c),
     ...disciplina(c),
+    ...figuraDelPartido(partido, c),
   ];
   borradores.sort(comparar(c));
   return borradores.map((b, i) => ({ id: `h${String(i + 1).padStart(2, "0")}`, ...b }));

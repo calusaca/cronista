@@ -14,7 +14,9 @@ export type TipoHecho =
   | "justicia_xg"
   | "portero_destacado"
   | "expulsion_y_efecto"
-  | "disciplina";
+  | "disciplina"
+  // Brief 009: el mejor valorado del partido (nota computada desde los eventos).
+  | "figura_del_partido";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
@@ -41,4 +43,5 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "portero_destacado",
   "expulsion_y_efecto",
   "disciplina",
+  "figura_del_partido",
 ];

@@ -327,6 +327,78 @@ function esperados(p: Partido): Map<string, Esperado> {
     });
   }
 
+  // figura_del_partido (brief 009) — la valoración se RECALCULA aquí, por otro camino, con
+  // los pesos de U.VALORACION (especificación) y el portero en el arco seguido aparte.
+  {
+    const C = (x: number) => Math.round(x * 100);
+    const V = U.VALORACION;
+    const plantilla = (l: Lado) => p.config[l].jugadores;
+    const pos = new Map<string, string>();
+    for (const l of LADOS) for (const j of plantilla(l)) pos.set(`${l}|${j.nombre}`, j.posicion);
+    const arco: Record<Lado, string | undefined> = {
+      local: plantilla("local").slice(0, 11).find((j) => j.posicion === "POR")?.nombre,
+      visita: plantilla("visita").slice(0, 11).find((j) => j.posicion === "POR")?.nombre,
+    };
+    const suma = new Map<string, number>(); // lado|nombre → centésimas sumadas
+    const golesC = new Map<string, number>(); // delta positivo de goles
+    const citados = new Map<string, string[]>();
+    const jugo = new Set<string>();
+    for (const l of LADOS) if (arco[l]) jugo.add(`${l}|${arco[l]}`);
+    const sumar = (l: Lado, n: string | undefined, e: Evento, c: number, deGol = false) => {
+      if (!n) return;
+      const k = `${l}|${n}`;
+      jugo.add(k);
+      suma.set(k, (suma.get(k) ?? 0) + c);
+      if (deGol) golesC.set(k, (golesC.get(k) ?? 0) + c);
+      citados.set(k, [...(citados.get(k) ?? []), e.id]);
+    };
+    const atajado = new Set(ev.filter((e) => e.tipo === "atajada").map((e) => e.relacionadoCon));
+    for (const e of ev) {
+      if (e.jugador) jugo.add(`${e.equipo}|${e.jugador}`);
+      const def = otro(e.equipo);
+      if (e.tipo === "gol") {
+        sumar(e.equipo, e.jugador, e, C(V.gol), true);
+        if (cen(e.xg) < C(V.gol_dificil_xg_max)) sumar(e.equipo, e.jugador, e, C(V.gol_dificil), true);
+        sumar(def, arco[def], e, C(V.gol_recibido));
+      }
+      if (e.tipo === "tiro" && atajado.has(e.id)) sumar(e.equipo, e.jugador, e, C(V.tiro_atajado));
+      if (e.tipo === "atajada") {
+        sumar(def, arco[def], e, C(V.atajada));
+        const x = Math.round(cen(by.get(e.relacionadoCon ?? "")?.xg) * V.xg_atajado_factor);
+        if (x !== 0) sumar(def, arco[def], e, x);
+      }
+      if (e.tipo === "pase_clave") sumar(e.equipo, e.jugador, e, C(V.pase_clave));
+      if (e.tipo === "corner") sumar(e.equipo, e.jugador, e, C(V.corner));
+      if (e.tipo === "tarjeta_amarilla") sumar(e.equipo, e.jugador, e, C(V.amarilla));
+      if (e.tipo === "tarjeta_roja") sumar(e.equipo, e.jugador, e, C(V.roja));
+      if (e.tipo === "falta") sumar(e.equipo, e.jugador, e, C(V.falta));
+      if (e.tipo === "fuera_de_juego") sumar(e.equipo, e.jugador, e, C(V.fuera_de_juego));
+      // portero en el arco DESPUÉS de este evento
+      if (e.tipo === "cambio") {
+        if (e.sale !== undefined && e.sale === arco[e.equipo]) arco[e.equipo] = e.jugador;
+        else if (arco[e.equipo] === undefined && pos.get(`${e.equipo}|${e.jugador}`) === "POR") arco[e.equipo] = e.jugador;
+      }
+      if (e.tipo === "tarjeta_roja" && e.jugador === arco[e.equipo]) arco[e.equipo] = undefined;
+    }
+    const nota = (k: string) => Math.min(C(V.max) / 10, Math.max(C(V.min) / 10, Math.round((C(V.base) + (suma.get(k) ?? 0)) / 10))) / 10;
+    const candidatos = [...jugo].map((k) => {
+      const [l, n] = k.split("|") as [Lado, string];
+      return { k, l, n, nota: nota(k), goles: golesC.get(k) ?? 0, i: plantilla(l).findIndex((j) => j.nombre === n) };
+    });
+    candidatos.sort((a, b) => b.nota - a.nota || b.goles - a.goles || a.i - b.i || (a.l === b.l ? 0 : a.l === "local" ? -1 : 1));
+    const top = candidatos[0];
+    if (top && (citados.get(top.k) ?? []).length > 0) {
+      const n = top.nota.toFixed(1);
+      poner(`figura_del_partido|${top.l}`, {
+        tipo: "figura_del_partido",
+        eventos: orden(citados.get(top.k) as string[]),
+        datos: { jugador: top.n, equipo: nombre[top.l], nota: n },
+        cifras: [n],
+        nombres: [top.n],
+      });
+    }
+  }
+
   // disciplina
   for (const lado of LADOS) {
     const am = ev.filter((e) => e.tipo === "tarjeta_amarilla" && e.equipo === lado);

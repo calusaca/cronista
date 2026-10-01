@@ -45,11 +45,11 @@ describe("mutaciones supervivientes de la ronda 2", () => {
     expect(reglas(enOracion(ms))).toEqual(["V8"]);
   });
   it("[N04] «primer tiempo» para un gol del minuto 67 ⇒ V3", () => {
-    const ms = con("h08", "Dante Doraena marcó en el primer tiempo, en el minuto 67.", "Dante Doraena scored in the first half, in minute 67.");
+    const ms = con("h09", "Dante Doraena marcó en el primer tiempo, en el minuto 67.", "Dante Doraena scored in the first half, in minute 67.");
     expect(reglas(enOracion(ms))).toEqual(["V3"]);
   });
   it("[N03] «goleada» con un margen de exactamente 2 (el 2–0 del descanso) ⇒ V8", () => {
-    const ms = con("h11", `Al descanso, una goleada parcial: ${J} 2–0 ${A}.`, `At the break, a rout: ${J} 2–0 ${A}.`);
+    const ms = con("h12", `Al descanso, una goleada parcial: ${J} 2–0 ${A}.`, `At the break, a rout: ${J} 2–0 ${A}.`);
     expect(reglas(enOracion(ms))).toEqual(["V8"]);
   });
   it("[N06] el título no puede tomar cifras de un hecho que no es el resultado ni de un jugador que nombra ⇒ V3", () => {
@@ -59,11 +59,11 @@ describe("mutaciones supervivientes de la ronda 2", () => {
     expect(verificarDraft(d, hechos, p).some((m) => m.regla === "V3" && m.oracion === -1 && m.detalle.includes("1.75"))).toBe(true);
   });
   it("[N16] tras una COMA una palabra funcional con mayúscula no está permitida ⇒ V4", () => {
-    const ms = con("h04", "Darío Mariosa marcó en el minuto 3, Tras un pase.", "Darío Mariosa scored in minute 3, After a pass.");
+    const ms = con("h05", "Darío Mariosa marcó en el minuto 3, Tras un pase.", "Darío Mariosa scored in minute 3, After a pass.");
     expect(reglas(enOracion(ms))).toEqual(["V4"]);
   });
   it("[N02] un marcador de dos cifras cuyas cifras sueltas sí están en el hecho ⇒ V3", () => {
-    const ms = con("h15", `${A} recibió 4 tarjetas amarillas (minutos 18, 33, 46, 48), un 18–4 de la tarde.`, `${A} received 4 yellow cards (minutes 18, 33, 46, 48), an 18–4 afternoon.`);
+    const ms = con("h16", `${A} recibió 4 tarjetas amarillas (minutos 18, 33, 46, 48), un 18–4 de la tarde.`, `${A} received 4 yellow cards (minutes 18, 33, 46, 48), an 18–4 afternoon.`);
     expect(enOracion(ms).some((m) => m.regla === "V3" && m.detalle.includes("18–4"))).toBe(true);
   });
   it("[N14] una entrada copiada bajo la clave de OTRO deployment no se sirve ⇒ se regenera", async () => {
@@ -99,7 +99,7 @@ describe("casos que aíslan UN mecanismo (sin que otro lo tape en el otro idioma
 
 describe("[N15] B6 bien definido (protocolo2.ts del auditor)", () => {
   const sinGol: Corruptor = (d) => {
-    d.oraciones.splice(indiceDeId(d, "h07"), 1);
+    d.oraciones.splice(indiceDeId(d, "h08"), 1);
     return d;
   };
   const mal =
@@ -113,30 +113,30 @@ describe("[N15] B6 bien definido (protocolo2.ts del auditor)", () => {
   const roto: Corruptor = (d) => JSON.stringify(d).slice(0, -5);
   const resto = (sin: string) => hechos.map((h) => h.id).filter((id) => id !== sin);
 
-  it("B6a [sinGol, mal(h14), roto] ⇒ rescata el intento de h14 (no el acta)", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([sinGol, mal("h14"), roto]) });
+  it("B6a [sinGol, mal(h15), roto] ⇒ rescata el intento de h15 (no el acta)", async () => {
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([sinGol, mal("h15"), roto]) });
     expect(cronica).toMatchObject({ modo: "llm", intentos: 1 + MAX_REINTENTOS, frasesOmitidas: 1 });
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h14"));
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h15"));
   });
-  it("B6b [mal(h14), sinGol, roto] ⇒ rescata el intento 1", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([mal("h14"), sinGol, roto]) });
+  it("B6b [mal(h15), sinGol, roto] ⇒ rescata el intento 1", async () => {
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([mal("h15"), sinGol, roto]) });
     expect(cronica).toMatchObject({ modo: "llm", frasesOmitidas: 1 });
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h14"));
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h15"));
   });
-  it("B6e costos DISTINTOS [mal(h14)+mal(h15), mal(h14), roto] ⇒ el de menor costo (1 omitida, no 2)", async () => {
-    const dosMalas: Corruptor = (d, hs) => mal("h15")(mal("h14")(d, hs) as CronicaDraft, hs);
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([dosMalas, mal("h14"), roto]) });
+  it("B6e costos DISTINTOS [mal(h15)+mal(h16), mal(h15), roto] ⇒ el de menor costo (1 omitida, no 2)", async () => {
+    const dosMalas: Corruptor = (d, hs) => mal("h16")(mal("h15")(d, hs) as CronicaDraft, hs);
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([dosMalas, mal("h15"), roto]) });
     expect(cronica).toMatchObject({ modo: "llm", frasesOmitidas: 1 });
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h14"));
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h15"));
   });
   it("B6c [roto, roto, roto] ⇒ acta", async () => {
     const { cronica } = await generarCronica(p, { llm: llmGuionado([roto]) });
     expect(cronica.modo).toBe("acta");
   });
-  it("B6d [mal(h14), error, error] ⇒ rescata el intento 1", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([mal("h14"), new Error("red")]) });
+  it("B6d [mal(h15), error, error] ⇒ rescata el intento 1", async () => {
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([mal("h15"), new Error("red")]) });
     expect(cronica).toMatchObject({ modo: "llm", frasesOmitidas: 1 });
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h14"));
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(resto("h15"));
   });
 });
 
@@ -162,7 +162,7 @@ describe("caché: coherencia del audit (una historia imposible se regenera)", ()
     e.cronica.modo = "acta";
     e.cronica.intentos = 0;
     e.cronica.frasesOmitidas = 9;
-    e.cronica.oraciones[0].apoyo = ["h01", "h01", "h15"];
+    e.cronica.oraciones[0].apoyo = ["h01", "h01", "h16"];
     writeFileSync(archivo, JSON.stringify(e));
     expect(await servida(dir)).toBe(false);
   });
@@ -190,7 +190,7 @@ describe("caché: coherencia del audit (una historia imposible se regenera)", ()
   it("una corrida legítima por omisión (reintentos agotados) se cachea y se sirve", async () => {
     const dir = dirTemporal();
     const mal14: Corruptor = (d) => {
-      const o = d.oraciones[indiceDeId(d, "h14")]!;
+      const o = d.oraciones[indiceDeId(d, "h15")]!;
       o.texto_es += " Hubo 99 tiros.";
       o.texto_en += " There were 99 shots.";
       return d;
@@ -259,7 +259,7 @@ describe("caché: robustez de escritura (Windows / multiproceso)", () => {
 
 describe("afirmaciones computables: el lado VERDADERO pasa", () => {
   it("«gol de la victoria» para el gol que decidió (el 2–0 de Celeloya, con final 4–1)", () => {
-    expect(con("h05", "Darío Celeloya marcó de penal el gol de la victoria en el minuto 31.", "Darío Celeloya scored the winning goal from the spot in minute 31.")).toEqual([]);
+    expect(con("h06", "Darío Celeloya marcó de penal el gol de la victoria en el minuto 31.", "Darío Celeloya scored the winning goal from the spot in minute 31.")).toEqual([]);
   });
   it(`«sobre el final» para un gol del minuto ≥ ${FINAL_MIN}; «temprano» para uno ≤ ${TEMPRANO_MAX}`, () => {
     const gol = hechos.find((h) => h.tipo === "gol_temprano") as Hecho;
@@ -292,11 +292,11 @@ describe("afirmaciones computables: el lado VERDADERO pasa", () => {
   });
   it("V7 con respaldo: «A no marcó» se acepta si A hizo 0 y se rechaza si A hizo goles", () => {
     // Al descanso: J 2–0 A ⇒ A no marcó en el primer tiempo (cierto); J sí marcó.
-    expect(con("h11", `Al descanso: ${J} 2–0 ${A}; ${A} no marcó.`, `Half time: ${J} 2–0 ${A}; ${A} did not score.`)).toEqual([]);
-    expect(reglas(enOracion(con("h11", `Al descanso: ${J} 2–0 ${A}; ${J} no marcó.`, `Half time: ${J} 2–0 ${A}; ${J} did not score.`)))).toEqual(["V7"]);
+    expect(con("h12", `Al descanso: ${J} 2–0 ${A}; ${A} no marcó.`, `Half time: ${J} 2–0 ${A}; ${A} did not score.`)).toEqual([]);
+    expect(reglas(enOracion(con("h12", `Al descanso: ${J} 2–0 ${A}; ${J} no marcó.`, `Half time: ${J} 2–0 ${A}; ${J} did not score.`)))).toEqual(["V7"]);
   });
   it("una negación que NO es de goles no se respalda con ceros («sin tarjetas» con A en 0) ⇒ V7", () => {
-    expect(reglas(enOracion(con("h11", `Al descanso: ${J} 2–0 ${A}, sin tarjetas para ${A}.`, `Half time: ${J} 2–0 ${A}, without cards for ${A}.`)))).toEqual(["V7"]);
+    expect(reglas(enOracion(con("h12", `Al descanso: ${J} 2–0 ${A}, sin tarjetas para ${A}.`, `Half time: ${J} 2–0 ${A}, without cards for ${A}.`)))).toEqual(["V7"]);
   });
 });
 
@@ -309,6 +309,6 @@ describe("normalización de la ronda 2", () => {
     }
   });
   it("«1.75 to 2.45» no es un marcador «75 to 2» (decimales intactos)", () => {
-    expect(con("h10", `${J} ganó con menos xG que su rival: 1.75 contra 2.45.`, `${J} won with less xG than their opponent: 1.75 to 2.45.`)).toEqual([]);
+    expect(con("h11", `${J} ganó con menos xG que su rival: 1.75 contra 2.45.`, `${J} won with less xG than their opponent: 1.75 to 2.45.`)).toEqual([]);
   });
 });

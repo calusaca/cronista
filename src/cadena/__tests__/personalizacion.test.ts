@@ -108,7 +108,7 @@ describe("la crónica de «mi equipo» pasa el MISMO Verificador (cronista malic
     const r = d.oraciones[indiceDeId(d, "h03")]!;
     r.texto_es = `${A} ganó a ${J}: ${J} 4–1 ${A}.`;
     r.texto_en = `${A} beat ${J}: ${J} 4–1 ${A}.`;
-    const pres = d.oraciones[indiceDeId(d, "h14")]!;
+    const pres = d.oraciones[indiceDeId(d, "h15")]!;
     pres.texto_es += ` ${A} dominó y mereció más.`;
     pres.texto_en += ` ${A} dominated and deserved more.`;
     return d;
@@ -132,7 +132,7 @@ describe("la crónica de «mi equipo» pasa el MISMO Verificador (cronista malic
 
   it("perspectiva sin mentir pasa: un texto fiel centrado en Atlético es aceptado", async () => {
     const fiel: Corruptor = (d) => {
-      const o = d.oraciones[indiceDeId(d, "h07")]!;
+      const o = d.oraciones[indiceDeId(d, "h08")]!;
       o.texto_es = `Para ${A}, el descuento llegó en el minuto 60: Bruno Toroino marcó de penal.`;
       o.texto_en = `For ${A}, the consolation came in minute 60: Bruno Toroino scored a penalty.`;
       return d;

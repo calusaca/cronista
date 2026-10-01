@@ -58,6 +58,17 @@ en V8 SOLO con este hecho como principal.
 6. E2e: panel visible → clic en nota → desglose con ≥1 evento → evento
    resaltado.
 
+## Calibración (1 oct, tras la implementación)
+
+Con los pesos iniciales el portero salía figura en el 61 % de 500 semillas (en
+la 246: portero 10.0 por encima de un doblete 8.9 — eso no lo firma un
+periodista). Barrido del implementador + contraprueba independiente de Fable:
+`atajada` baja de 0.5 a **0.1**; el factor de xG atajado se queda en 1.0 porque
+un factor fraccionario sobre un xG en centésimas produce medias centésimas y
+rompe la aritmética exacta del cálculo. Resultado medido: portero figura 5.8 %,
+DEL 56 %, MED 29 %, DEF 9 %. Los valores viven solo en `umbrales.ts`; los de
+arriba quedan como historia del punto de partida.
+
 ## Fuera de alcance
 
 Comparaciones entre partidos, promedios de temporada, percentiles, ratings de

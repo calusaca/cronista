@@ -5,8 +5,8 @@
 // en el lugar correcto. Los falsos positivos que la auditoría encontró deben ser ACEPTADOS.
 //
 // Semilla 246 (15 hechos): h01 expulsión por doble amarilla · h02 doblete · h03 resultado
-// 4–1 · h04–h08 goles (h05 y h07 de penal) · h09 portero · h10 justicia xG contra la
-// corriente · h11/h12 marcador por periodo · h13 gol temprano · h14 presión · h15 disciplina.
+// 4–1 · h05–h09 goles (h06 y h08 de penal) · h10 portero · h11 justicia xG contra la
+// corriente · h12/h13 marcador por periodo · h14 gol temprano · h15 presión · h16 disciplina.
 
 import { describe, expect, it } from "vitest";
 import { analizar } from "../../analista/analista";
@@ -90,13 +90,13 @@ describe("falsos positivos de la auditoría: aceptados", () => {
 
 describe("ataques al protocolo (protocolo.ts del auditor)", () => {
   const sinH07: Corruptor = (d) => {
-    d.oraciones.splice(indiceDeId(d, "h07"), 1);
+    d.oraciones.splice(indiceDeId(d, "h08"), 1);
     return d;
   };
-  const h07Ritual: Corruptor = (d) => {
-    d.oraciones.splice(indiceDeId(d, "h07"), 1);
-    const o = d.oraciones[indiceDeId(d, "h15")]!;
-    o.apoyo = [...(o.apoyo ?? []), "h07"];
+  const h08Ritual: Corruptor = (d) => {
+    d.oraciones.splice(indiceDeId(d, "h08"), 1);
+    const o = d.oraciones[indiceDeId(d, "h16")]!;
+    o.apoyo = [...(o.apoyo ?? []), "h08"];
     return d;
   };
   const enMiente: Corruptor = (d) => {
@@ -114,10 +114,10 @@ describe("ataques al protocolo (protocolo.ts del auditor)", () => {
   const roto: Corruptor = (d) => JSON.stringify(d).slice(0, -5);
 
   it("P1 «V5 ritual»: poner el hecho faltante en el apoyo de otra oración no cuenta como narrarlo", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([sinH07, h07Ritual]) });
-    expect(cronica.audit.slice(1).every((a) => a.veredicto.some((m) => m.regla === "V5" && m.detalle.includes("h07")))).toBe(true);
-    // Lo que llega al lector narra h07 como principal (aquí, vía acta).
-    expect(cronica.oraciones.some((o) => o.hecho === "h07")).toBe(true);
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([sinH07, h08Ritual]) });
+    expect(cronica.audit.slice(1).every((a) => a.veredicto.some((m) => m.regla === "V5" && m.detalle.includes("h08")))).toBe(true);
+    // Lo que llega al lector narra h08 como principal (aquí, vía acta).
+    expect(cronica.oraciones.some((o) => o.hecho === "h08")).toBe(true);
     expect(verificarDraft(cronica, hechos, p)).toEqual([]);
   });
 
@@ -129,17 +129,17 @@ describe("ataques al protocolo (protocolo.ts del auditor)", () => {
   });
 
   it("P4: una frase mala distinta en cada intento ⇒ se omite la del último, el resto llega verificado", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([malEn("h14"), malEn("h15"), malEn("h13")]) });
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([malEn("h15"), malEn("h16"), malEn("h14")]) });
     expect(cronica).toMatchObject({ modo: "llm", intentos: 1 + MAX_REINTENTOS, frasesOmitidas: 1 });
-    expect(cronica.oraciones.some((o) => o.hecho === "h13")).toBe(false);
+    expect(cronica.oraciones.some((o) => o.hecho === "h14")).toBe(false);
     expect(verificarDraft(cronica, hechos, p)).toEqual([]);
   });
 
   it("P5 (B6): intento 1 casi bueno y luego JSON roto ⇒ se recupera el intento 1 por omisión, no el acta", async () => {
-    const { cronica } = await generarCronica(p, { llm: llmGuionado([malEn("h14"), roto, roto]) });
+    const { cronica } = await generarCronica(p, { llm: llmGuionado([malEn("h15"), roto, roto]) });
     expect(cronica).toMatchObject({ modo: "llm", intentos: 1 + MAX_REINTENTOS, frasesOmitidas: 1 });
-    expect(cronica.oraciones.some((o) => o.hecho === "h14")).toBe(false);
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(hechos.map((h) => h.id).filter((id) => id !== "h14"));
+    expect(cronica.oraciones.some((o) => o.hecho === "h15")).toBe(false);
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(hechos.map((h) => h.id).filter((id) => id !== "h15"));
     expect(verificarDraft(cronica, hechos, p)).toEqual([]);
   });
 });

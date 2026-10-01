@@ -27,9 +27,9 @@ const porId = new Map(hechos.map((h) => [h.id, h] as const));
 
 /** Crónica mínima a mano con una oración que cita dos hechos cuyos eventos se solapan. */
 function conSolape(): { cronica: CronicaVerificada; h1: Hecho; h2: Hecho } {
-  // h02 (doblete) y h05 (gol de penal del mismo jugador) comparten el evento del gol.
+  // h02 (doblete) y h06 (gol de penal del mismo jugador) comparten el evento del gol.
   const h1 = porId.get("h02") as Hecho;
-  const h2 = porId.get("h05") as Hecho;
+  const h2 = porId.get("h06") as Hecho;
   const cronica: CronicaVerificada = {
     titulo_es: "t",
     titulo_en: "t",

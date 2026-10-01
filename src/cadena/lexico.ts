@@ -286,6 +286,15 @@ export const JUICIO: EntradaJuicio[] = [
     requisito: "«encajó / conceded» solo con un hecho que cuenta goles (resultado, marcador, remontada, expulsión, gol)",
   },
   {
+    // Brief 009: «figura / man of the match / player of the match» SOLO con el hecho
+    // figura_del_partido como principal (la nota computada desde los eventos la respalda).
+    id: "figura",
+    es: palabras(["figura", "la figura", "figura del partido", "jugador del partido", "el mejor del partido"]),
+    en: palabras(["man of the match", "player of the match", "star of the match"]),
+    habilita: (h) => h.tipo === "figura_del_partido",
+    requisito: "«figura / man of the match / player of the match» exige el hecho figura_del_partido como principal",
+  },
+  {
     id: "fuera_de_tabla",
     es: palabras([
       "monólogo", "paliza", "baile", "bailó", "vapuleo", "vapuleó", "humillación", "humilló", "masacre", "aplastó", "aplastante", "épico", "épica",
@@ -294,7 +303,7 @@ export const JUICIO: EntradaJuicio[] = [
       // rev. 3.2 — muletillas típicas de un LLM (lista mantenida; el lenguaje abierto no se cierra)
       "golazo", "golazos", "polémico", "polémica", "polémicamente", "de forma polémica", "controvertido", "controvertida", "gracias a",
       "por culpa de", "error del portero", "error del arquero", "error de la defensa", "error defensivo", "el mejor de la tarde",
-      "el mejor gol", "mejor gol", "la figura", "figura del partido", "injusto", "injusta", "injusticia", "fue justo", "es justo",
+      "el mejor gol", "mejor gol", "injusto", "injusta", "injusticia", "fue justo", "es justo",
       "inolvidable", "espectacular", "brillante", "magistral",
     ]),
     en: palabras([
@@ -303,7 +312,7 @@ export const JUICIO: EntradaJuicio[] = [
       "injured", "var", "referee", "shameful", "disgrace",
       // rev. 3.2
       "controversially", "controversial", "thanks to", "due to an error", "because of an error", "error by", "goalkeeping error",
-      "defensive error", "stunner", "screamer", "wonder goal", "worldie", "best goal", "man of the match", "standout", "unfair", "fair",
+      "defensive error", "stunner", "screamer", "wonder goal", "worldie", "best goal", "standout", "unfair", "fair",
       "unforgettable", "spectacular", "brilliant", "outplayed",
     ]),
     habilita: () => false,
@@ -395,6 +404,18 @@ export const FRANJAS: { id: "tras_descanso" | "final" | "temprano" | "descuento"
 ];
 
 /** Tiempo futuro (rev. 3.2): los hechos son pasados; una crónica no anuncia. */
+/**
+ * Hallazgo F1 del 008 — SOLO en actualizaciones en vivo: un balance de lo que pasó
+ * «después» de un momento. Sobre un prefijo ese balance es parcial y se lee como de cierre
+ * («afterwards … scored 0»), y el cero del marcador del momento lo respaldaría ante V7. En
+ * vivo el partido sigue: el balance posterior se rechaza siempre (V7). La crónica completa
+ * no usa esta lista (la plantilla de la expulsión del 002 sí dice «después»).
+ */
+export const BALANCE_POSTERIOR: Record<Lengua, RegExp> = {
+  es: palabras(["después", "despues", "desde entonces", "a partir de ahí", "a partir de entonces", "en adelante", "tras eso", "luego de eso", "hasta el final", "el resto del partido", "más tarde"]),
+  en: palabras(["afterwards", "afterward", "after that", "since then", "thereafter", "from then on", "from that point", "until the end", "the rest of the match", "the rest of the game", "later on"]),
+};
+
 export const FUTURO: Record<Lengua, RegExp> = {
   es: /(?<![\p{L}])\p{L}{2,}(?:ará|erá|irá|arán|erán|irán)(?![\p{L}])/giu,
   en: palabras(["will", "shall", "going to", "is set to", "are set to"]),

@@ -23,6 +23,7 @@ import { z } from "zod";
 import type { Hecho } from "../analista/tipos";
 import type { Partido } from "../sim/tipos";
 import {
+  BALANCE_POSTERIOR,
   CUENTA_GOLES,
   FRANJAS,
   FRASES_INFERIORIDAD,
@@ -50,7 +51,7 @@ import {
 import type { CronicaDraft, Motivo, Oracion, Regla } from "./tipos";
 import { COBERTURA, FINAL_MIN, MARCADOR_MAX_GOLES, MINUTO_DESCANSO, TEMPRANO_MAX } from "./umbrales";
 
-const esquemaOracion = z.object({
+export const esquemaOracion = z.object({
   texto_es: z.string(),
   texto_en: z.string(),
   hecho: z.string(),
@@ -639,8 +640,21 @@ export function verificarDraft(draft: CronicaDraft, hechos: Hecho[], partido: Pa
 
   // Título
   motivos.push(...verificarPar(-1, "título: ", draft.titulo_es, draft.titulo_en, contexto(hechosDelTitulo(draft, hechos, pl), hechos, partido, pl), true).motivos);
+  motivos.push(...verificarOraciones(draft.oraciones, hechos, partido));
+  motivos.push(...cobertura(draft.oraciones, hechos));
+  return motivos;
+}
 
-  draft.oraciones.forEach((o: Oracion, i) => {
+/**
+ * Las reglas por oración (V2–V8 y que cada oración narre a su principal), sin título ni
+ * cobertura global. La comparten la crónica completa y las actualizaciones en vivo (008):
+ * el MISMO Verificador.
+ */
+export function verificarOraciones(oraciones: Oracion[], hechos: Hecho[], partido: Partido): Motivo[] {
+  const motivos: Motivo[] = [];
+  const pl = plantel(partido);
+  const porId = new Map(hechos.map((h) => [h.id, h] as const));
+  oraciones.forEach((o: Oracion, i) => {
     // V2
     if (o.hecho.trim() === "") {
       motivos.push({ oracion: i, regla: "V2", detalle: "no tiene hecho principal" });
@@ -657,9 +671,59 @@ export function verificarDraft(draft: CronicaDraft, hechos: Hecho[], partido: Pa
       motivos.push({ oracion: i, regla: "V5", detalle: `no narra su hecho principal ${principal.id} (no nombra a nadie ni dice ninguna cifra suya)` });
     }
   });
-
-  motivos.push(...cobertura(draft.oraciones, hechos));
   return motivos;
+}
+
+// ---------------------------------------------------------------------------------
+// Brief 008 — actualizaciones en vivo
+// ---------------------------------------------------------------------------------
+
+export const esquemaUpdate = (maxOraciones: number) =>
+  z.object({ oraciones: z.array(esquemaOracion).min(1).max(maxOraciones) });
+
+/**
+ * Verifica una actualización en vivo: el MISMO Verificador por oración (V2–V8) contra los
+ * hechos del PREFIJO del partido, más las reglas propias de una actualización:
+ * 1–`maxOraciones` oraciones (V1) y la primera narra como principal el hecho del momento
+ * que la dispara (V5: la cobertura de crónica completa no aplica aquí).
+ * Sin clarividencia por construcción: los únicos hechos citables son los del prefijo.
+ */
+export function verificarUpdate(
+  salida: string,
+  hechosPrefijo: Hecho[],
+  partido: Partido,
+  hechoMomento: string,
+  maxOraciones: number,
+): { oraciones: Oracion[] | null; motivos: Motivo[] } {
+  let t = salida.trim();
+  const fence = t.match(/^```(?:json)?\s*\n([\s\S]*)\n```$/);
+  if (fence) t = (fence[1] as string).trim();
+  let json: unknown;
+  try {
+    json = JSON.parse(t);
+  } catch (e) {
+    return { oraciones: null, motivos: [{ oracion: -1, regla: "V1", detalle: `no es JSON: ${(e as Error).message}` }] };
+  }
+  const r = esquemaUpdate(maxOraciones).safeParse(json);
+  if (!r.success) {
+    return {
+      oraciones: null,
+      motivos: [{ oracion: -1, regla: "V1", detalle: `no cumple el esquema de actualización (1–${maxOraciones} oraciones): ${r.error.issues.map((i) => `${i.path.join(".") || "(raíz)"} ${i.message}`).join("; ")}` }],
+    };
+  }
+  const oraciones = r.data.oraciones as Oracion[];
+  const motivos = verificarOraciones(oraciones, hechosPrefijo, partido);
+  // F1 del 008: en vivo, ningún balance de lo que pasó «después» (el partido sigue).
+  oraciones.forEach((o, i) => {
+    for (const [lengua, texto] of [["es", o.texto_es], ["en", o.texto_en]] as const) {
+      const m = texto.match(new RegExp(BALANCE_POSTERIOR[lengua].source, "iu"));
+      if (m) motivos.push({ oracion: i, regla: "V7", detalle: `balance posterior en vivo («${m[0]}»): el partido sigue y ese balance afirmaría una ausencia que nadie conoce todavía (${lengua.toUpperCase()})` });
+    }
+  });
+  if (oraciones[0]?.hecho !== hechoMomento) {
+    motivos.push({ oracion: 0, regla: "V5", detalle: `la actualización debe narrar primero el hecho de su momento (${hechoMomento})` });
+  }
+  return { oraciones, motivos };
 }
 
 /** V5 — narración obligatoria: todo hecho requerido es el PRINCIPAL de alguna oración. */

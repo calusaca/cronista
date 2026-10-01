@@ -47,9 +47,9 @@ describe("feedback al Cronista [M01, M02, M03]", () => {
 });
 
 describe("omisión precisa [M04, M05]", () => {
-  // Dos frases NO obligatorias malas en todos los intentos (semilla 246: presión h14 y disciplina h15).
+  // Dos frases NO obligatorias malas en todos los intentos (semilla 246: presión h15 y disciplina h16).
   const dosMalas: Corruptor = (d) => {
-    for (const id of ["h14", "h15"]) {
+    for (const id of ["h15", "h16"]) {
       const o = d.oraciones[indiceDeId(d, id)]!;
       o.texto_es += " Hubo 99 tiros.";
       o.texto_en += " There were 99 shots.";
@@ -61,7 +61,7 @@ describe("omisión precisa [M04, M05]", () => {
     const p = p246();
     const { cronica, hechos } = await generarCronica(p, { llm: llmGuionado([dosMalas]) });
     expect(cronica).toMatchObject({ modo: "llm", intentos: 1 + MAX_REINTENTOS, frasesOmitidas: 2 });
-    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(hechos.map((h) => h.id).filter((id) => id !== "h14" && id !== "h15"));
+    expect(cronica.oraciones.map((o) => o.hecho)).toEqual(hechos.map((h) => h.id).filter((id) => id !== "h15" && id !== "h16"));
     expect(verificarDraft(cronica, hechos, p)).toEqual([]);
   });
 });
