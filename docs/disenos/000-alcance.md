@@ -38,6 +38,19 @@ Next.js. Línea de tiempo del partido + crónica bilingüe. **La interacción es
 clic en cualquier frase de la crónica → se resaltan en la línea de tiempo los eventos
 exactos que la respaldan. Una sola interacción, pulida de verdad.
 
+## El factor que destaca (pedido de Carlos, 2026-09-30)
+
+- **Comprometido — la Caja de cristal (brief 006):** junto a cada frase, «cómo se
+  escribió»: borrador, rechazo del Verificador con su regla, feedback y corrección.
+  *"Glass box, not black box."* Es la prueba viviente del sistema multi-agente y
+  nadie puede fingirla sin tenerla.
+- **Stretch prioritario — Partido en vivo:** replay acelerado donde los eventos
+  entran minuto a minuto y la crónica crece con actualizaciones verificadas antes de
+  publicarse. Cubriría un tercer caso de uso oficial ("analyze match events in real
+  time"). **Go/no-go el 12 de octubre** (antes que los demás stretches porque toca
+  la arquitectura del Analista: analizar prefijos de eventos, que ya es compatible
+  con su diseño de función pura). Si entra, abre el video.
+
 ## Lo que NO se hace (y no se discute sin reabrir este brief)
 
 - Tiempo real / streaming de partidos en vivo.

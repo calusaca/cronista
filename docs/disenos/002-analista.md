@@ -34,6 +34,20 @@ interface Hecho {
 function analizar(partido: Partido): Hecho[];
 ```
 
+## Notas del contrato real del simulador (v1.1, tras auditoría)
+
+- `atajada` lleva el **equipo del tirador** y no nombra al portero. Para
+  `portero_destacado`, el nombre del arquero se resuelve por la plantilla del
+  equipo rival (posición `POR`), teniendo en cuenta un eventual cambio del portero.
+- La **doble amarilla se emite como una sola `tarjeta_roja`** (sin segunda
+  amarilla); se distingue de la roja directa porque el jugador ya tenía una
+  amarilla previa. `expulsion_y_efecto` debe decir cuál de las dos fue.
+- `cambio` trae `jugador` (entra) y `sale` (deja el campo).
+- El descuento del primer tiempo queda sellado al minuto 45; el del segundo corre
+  en 91–96.
+- `gol` hereda el `xg` de su tiro vía `relacionadoCon`; cada tiro tiene a lo sumo
+  un desenlace.
+
 ## Definición de cada tipo de hecho
 
 Solo se usa lo que el contrato del 001 garantiza (minuto, tipo, equipo, jugador,

@@ -16,6 +16,10 @@
 | 2026-09-30 | Diseño | Links del correo verificados: registro = Microsoft Innovation Studio (aka.ms/insidethegame, SPA — verificar en navegador con cuenta Microsoft); sesiones Reactor 14 oct (relevante, 10 AM CR) y 21 oct (opcional); playlists de estudio opcionales | Fable | ✅ |
 | 2026-09-30 | Diseño | Regla de tiempos verificada en las OFFICIAL RULES: «newly created after the start of the Hackathon Registration Period» (29 sep). El código arranca HOY; calendario del 000 adelantado una semana | Fable | ✅ |
 | 2026-09-30 | Implementación | git inicializado; brief 001 (simulador) lanzado a opus-implementador | Fable/Opus | ⏳ en curso |
+| 2026-09-30 | Diseño | Pedido de Carlos «algo que haga decir: estos merecen el premio»: brief `006-caja-de-cristal.md` COMPROMETIDO (ver borradores, rechazos del Verificador y correcciones por frase; solo rechazos reales, jamás fabricados); «Partido en vivo» como stretch prioritario con go/no-go el 12 oct | Carlos/Fable | ✅ |
+| 2026-09-30 | Implementación | Brief 001 implementado en `src/sim/` (tipos, limites, prng mulberry32, plantillas ficticias, motor de posesiones, verificadores puros, CLI). `npm test` 41/41 y `test:stats` 6/6 con N=1000 **corridos y vistos por Fable** (goles 2.855, xG 2.730, fuerte gana 63.0 %, amarillas 3.94, roja 12.5 %, estilos 1.55/1.25/1.22); smoke CLI semilla 42 revisado a ojo por Fable: se lee como fútbol. Mutaciones de control ejecutadas por Opus (prop. 3 en rojo) y revertidas | Opus/Fable | ⏳ pendiente de auditoría adversaria |
+| 2026-09-30 | Auditoría | Auditor adversario sobre el 001: invariantes y determinismo entre procesos SÓLIDOS (13,293 partidos extremos, 0 violaciones); 1 hallazgo A (prueba de determinismo detecta mutación solo ~1/3 de las veces) y 7 B (tiro con doble desenlace indetectable, `cambio` sin `sale` hace invisible al sustituido fantasma, descuento del 2T sin prueba, límite de cambios como código muerto, fatiga/expulsión sin prueba, semillas que colisionan, NaN silencioso, CLI acepta flags malformados). Los 9 aceptados por Fable → revisión 1.1 del brief 001 | auditor-adversario/Fable | ✅ |
+| 2026-09-30 | Implementación | Revisión 1.1 del 001 implementada en iteración 1: determinismo por hash del corpus en dos pasadas, props. 14–17, `cambio.sale`, semilla normalizada, config validada, xg NaN rechazado, CLI estricto. `npm test` 104/104 y `test:stats` 6/6 **corridos y vistos por Fable**; CLI de error y «entra X por Y» vistos. Mutaciones M1–M5 rojas (M2 demuestra el valor del hash de corpus: la semilla 7 sola no la atrapaba). Interpretación de fatiga (error defensivo) validada contra el texto del brief. **Brief 001 CERRADO** | Opus/Fable | ✅ |
 
 ## Deudas conocidas (honestas)
 
@@ -28,3 +32,12 @@
 - **Azure CLI no instalado** en la máquina (se instala cuando toque el deploy).
 - Repo de GitHub (público) se crea cerca de la entrega; git local ya inicializado
   para fechar la evidencia de que todo es posterior al 29 sep.
+- El descuento del primer tiempo queda sellado al minuto 45 (para no romper la
+  monotonía con el arranque del segundo tiempo).
+- `Evento.sale` es opcional en el tipo TS y obligatorio vía `verificarContrato`;
+  una unión discriminada sería más estricta (se evalúa si algún consumidor tropieza).
+- `atajada` lleva el equipo del tirador y no nombra al portero; el Analista debe
+  resolver el nombre del arquero vía plantilla (posición POR) para `portero_destacado`.
+- Umbrales fijados por Opus donde el brief callaba (GOLES_FRANJA, XG_MEDIA,
+  AMARILLAS_MEDIA, ROJA_MAX/MIN, firma de presión⇒faltas): validados por Fable el
+  30 sep al ver la suite, pero el auditor debe atacarlos.

@@ -95,6 +95,35 @@ tiempo compacta). El smoke de aceptación es correrlo con 3 semillas y **mirarlo
 Posiciones espaciales continuas (solo `zona`), atributos individuales profundos,
 lesiones, VAR, clima, prórroga/penales de desempate. Nada de esto se agrega sin brief.
 
+## Revisión 1.1 — correcciones de auditoría (2026-09-30, Fable)
+
+La auditoría adversaria (1 hallazgo A, 7 B, todos aceptados) obliga estos cambios:
+
+**Contrato:**
+- `cambio` gana el campo **`sale: string`** (obligatorio): nombre del que deja el
+  campo. `jugador` sigue siendo el que entra.
+- `config.seed` se **normaliza** al rango entero [0, 2³²−1] y el `Partido` guarda la
+  semilla normalizada (nunca una semilla que no generó esos eventos). `simular`
+  **lanza** ante config inválida: fuerzas no enteras, fuera de 1–100 o no finitas,
+  seed no entera.
+
+**Propiedades nuevas o reforzadas:**
+13. Determinismo fuerte: el corpus completo de la suite rápida se simula DOS veces
+    y se compara por hash (además de las 3 semillas fijas). [A1]
+14. Cada `tiro` tiene a lo sumo UN desenlace (gol o atajada); los `relacionadoCon`
+    de goles y atajadas no se repiten. [B1]
+15. Un jugador que `sale` en un cambio no aparece en ningún evento posterior. [B2]
+16. En el corpus, una fracción de partidos termina después del 90 (el descuento del
+    segundo tiempo existe). [B3]
+17. `verificarContrato` rechaza un xg no finito o fuera de (0,1). [B7]
+
+**Unit tests directos** (sin estadística, funciones puras): la fatiga reduce el
+rendimiento con el minuto; un equipo con expulsado pierde peso ofensivo; el límite
+de 3 cambios rechaza un plan de 4. [B4, B5]
+
+**CLI estricto:** flag desconocido, `--seed` sin valor, vacío, hex, decimal o fuera
+de rango ⇒ error con mensaje y exit 1. [B6, B8]
+
 ## Aceptación
 
 - `npm test` (invariantes) y `npm run test:stats` **vistos correr en verde**, salida
