@@ -19,6 +19,22 @@ export const NOMBRE_EVENTO: Record<Evento["tipo"], string> = {
   cambio: "Substitution",
 };
 
+/** Brief 010: rótulo corto del chip de cada evento en la línea de tiempo (se muestra en versalitas). */
+export const CHIP_EVENTO: Record<Evento["tipo"], string> = {
+  inicio_periodo: "Kick-off",
+  fin_periodo: "End",
+  pase_clave: "Key pass",
+  tiro: "Shot",
+  gol: "Goal",
+  atajada: "Save",
+  falta: "Foul",
+  tarjeta_amarilla: "Yellow",
+  tarjeta_roja: "Red",
+  corner: "Corner",
+  fuera_de_juego: "Offside",
+  cambio: "Sub",
+};
+
 /** Qué rechaza cada regla del Verificador, en palabras (006: «la regla con su explicación»). */
 export const REGLA_EN: Record<Regla, string> = {
   V1: "The writer's output was not valid JSON in the required shape.",

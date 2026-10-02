@@ -60,7 +60,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
           Simulate match
         </button>
         {error && (
-          <span role="alert" style={{ color: "var(--accent)", fontSize: 12 }}>
+          <span role="alert" style={{ color: "var(--danger)", fontSize: 14 }}>
             {error}
           </span>
         )}

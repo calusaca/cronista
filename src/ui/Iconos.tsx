@@ -71,7 +71,7 @@ export function IconoEvento({ tipo, size = 16 }: { tipo: TipoEvento } & P) {
     case "tarjeta_roja":
       return (
         <svg {...base(size)}>
-          <rect x="7" y="4" width="10" height="15" rx="1.5" fill="var(--card-red)" stroke="var(--card-red)" />
+          <rect x="7" y="4" width="10" height="15" rx="1.5" fill="var(--danger)" stroke="var(--danger)" />
         </svg>
       );
     case "fuera_de_juego":

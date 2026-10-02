@@ -50,7 +50,8 @@ function Pizarra({ pasos }: { pasos: PasoJugada[] }) {
   const tirador = pasos.find((p) => p.rol === "tiro")?.evento;
   const pasador = pasos.find((p) => p.rol === origenRol)?.evento;
   const arco = { x: 50, y: 2.2 };
-  const linea = "rgba(236,233,226,0.22)";
+  // Brief 010: sin colores en componentes — las líneas de la cancha usan el token --pitch-line.
+  const linea = "var(--pitch-line)";
   return (
     <svg className="pitch" viewBox="0 0 100 72" role="img" aria-label="Schematic of the goal" data-testid="pitch-diagram">
       <rect x="2" y="2" width="96" height="68" fill="none" stroke={linea} strokeWidth="0.4" />
@@ -58,8 +59,8 @@ function Pizarra({ pasos }: { pasos: PasoJugada[] }) {
       <rect x="37" y="2" width="26" height="6" fill="none" stroke={linea} strokeWidth="0.4" />
       <path d="M40 19 A11 11 0 0 0 60 19" fill="none" stroke={linea} strokeWidth="0.4" />
       <circle cx="50" cy="13" r="0.5" fill={linea} />
-      <line x1="45" y1="2" x2="55" y2="2" stroke="var(--text)" strokeWidth="1" />
-      <text x="4" y="67" fontSize="2.6" fill="var(--faint)" letterSpacing="0.4">
+      <line x1="45" y1="2" x2="55" y2="2" stroke="var(--ink)" strokeWidth="1" />
+      <text x="4" y="67" fontSize="2.6" fill="var(--muted)" letterSpacing="0.4">
         SCHEMATIC · NOT TRACKING DATA
       </text>
       {origen && (
@@ -77,7 +78,7 @@ function Pizarra({ pasos }: { pasos: PasoJugada[] }) {
       <circle cx={remate.x} cy={remate.y} r="1.6" fill="var(--accent)" />
       <circle cx={arco.x} cy={arco.y + 0.6} r="1.2" fill="none" stroke="var(--accent)" strokeWidth="0.5" />
       {tirador?.jugador && (
-        <text x={remate.x + 2.4} y={remate.y + 1} fontSize="2.8" fill="var(--text)">
+        <text x={remate.x + 2.4} y={remate.y + 1} fontSize="2.8" fill="var(--ink)">
           {apellido(tirador.jugador)}
           {tirador.xg !== undefined ? ` · xG ${tirador.xg.toFixed(2)}` : ""}
         </text>
@@ -108,7 +109,7 @@ export function TarjetaGol({ eventos, golId, citas, onCerrar }: { eventos: Event
           <ol className="steps">
             {pasos.map((p) => (
               <li key={p.evento.id} data-testid="goal-step">
-                <span className="tnum" style={{ color: "var(--faint)", fontSize: 12 }}>
+                <span className="tnum" style={{ color: "var(--muted)", fontSize: 12 }}>
                   {fmtMinuto(p.evento.minuto)}
                 </span>
                 <span style={{ color: "var(--muted)", display: "flex" }}>

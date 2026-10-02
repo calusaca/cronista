@@ -6,7 +6,7 @@ import { type RefObject } from "react";
 import type { Evento } from "../sim/tipos";
 import { fmtMinuto, marcadorProgresivo, porPeriodo } from "../vista/evidencia";
 import { IconoEvento } from "./Iconos";
-import { describirEvento, siglas } from "./textos";
+import { CHIP_EVENTO, describirEvento, siglas } from "./textos";
 
 const CLAVE = new Set<Evento["tipo"]>(["gol", "tarjeta_amarilla", "tarjeta_roja", "cambio"]);
 
@@ -55,6 +55,8 @@ export function Linea({ eventos, local, visita, resaltados, hover, seleccionado,
                   title={esGol ? "Show how the goal happened" : "Show the sentences that cite this event"}
                 >
                   <span className="ev-min tnum">{fmtMinuto(e.minuto)}</span>
+                  {/* Brief 010: el chip escaneable del tipo de evento (único cambio de markup). */}
+                  <span className="chip">{CHIP_EVENTO[e.tipo]}</span>
                   <span className="ev-ico">
                     <IconoEvento tipo={e.tipo} />
                   </span>
