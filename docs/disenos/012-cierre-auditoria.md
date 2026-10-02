@@ -88,9 +88,14 @@ contra «pruebas contra constantes»:
 
 1. **Matriz completa de bandas xG por zona** en `limites.ts` (hoy solo
    área chica y media distancia): área chica [0.15, 1.0]; punto penal =
-   [XG_PENAL exacto]; frontal [0.03, 0.50); bandas [0.01, 0.30); media
+   [XG_PENAL exacto]; frontal **[0.01, 0.50)**; bandas [0.01, 0.30); media
    distancia [0.01, 0.15). El generador sortea respetándolas y el invariante
    las exige en el corpus; la prueba P12 lleva su copia literal.
+   *(Rev 1.1: el frontal arrancaba en 0.03 y eso contradecía F4 — 645 tiros
+   tras córner con xG 0.01–0.02 no tenían zona de área posible. Decisión de
+   Fable: piso del frontal a 0.01, SIN exenciones del invariante — un tiro
+   raso desde el frontal tras el despeje de un córner es fútbol normal. La
+   copia literal de P12 se actualiza en el mismo cambio, conscientemente.)*
 2. **El penal nunca es «tras córner»:** un tiro con `penal` no hereda origen
    de córner y su pizarra es: falta (texto) → punto penal → arco. Muere la
    secuencia banderín → punto penal (4 goles del corpus).
