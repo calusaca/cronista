@@ -154,6 +154,34 @@ export const ESPACIAL = {
 } as const;
 
 /**
+ * Brief 018 — los SEIS modificadores de las condiciones (ni uno más). Son perillas: las
+ * bandas que los acotan (A/B) viven en limites.ts (AB_CONDICIONES), escritas aparte. Todos
+ * multiplican o suman a una probabilidad que ya existía: ninguno consume sorteos propios, así
+ * que unas condiciones neutras dan el partido de siempre.
+ */
+export const CONDICIONES = {
+  /** Intensidad del calor: 0 hasta `calorDesdeC`, lineal hasta 1 en `calorHastaC`. */
+  calorDesdeC: 25,
+  calorHastaC: 41,
+  /** 1 · Cansancio: en el 2.º tiempo, acciones micro × (1 − k·i) y llegadas al último tercio × (1 − k·i). */
+  calorRitmo2T: 0.2,
+  calorAtaque2T: 0.22,
+  /** 2 · Piernas pesadas: en el 2.º tiempo, faltas × (1 + k·i). */
+  calorFaltas2T: 0.45,
+  /** 3 · Lluvia: completación de todo pase − k; atajada sin retención ⇒ córner × k. */
+  lluviaPase: 0.05,
+  lluviaCornerTrasAtajada: 1.6,
+  /** 4 · Sintética: velocidad del tiro + k km/h (bandas del 015 intactas); peso de media distancia en tiros lejanos × k. */
+  sinteticaVelocidadKmh: 5,
+  sinteticaMediaDistancia: 1.8,
+  /** 5 · Césped alto: completación de los pases CORTOS del visitante − k. */
+  cespedAltoCortoVisita: 0.065,
+  /** 6 · Presión alta: completación de los pases en la zona de salida del presionado − k, en tramos antes de este minuto. */
+  presionAltaSalida: 0.12,
+  presionHastaMin: 25,
+} as const;
+
+/**
  * Brief 013 — perillas de la capa micro (los umbrales que las acotan viven en limites.ts).
  * Todo se sortea con prngDerivado(semilla, "micro:" + id del ancla): nunca el stream principal.
  */

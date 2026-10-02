@@ -2,8 +2,12 @@
 // `semillaDePartido` (hash determinista) y su config es la estándar { seed, local, visita }
 // con los equipos del mundo; se simula con el `simular` de siempre.
 
+import { PRESION_LOCAL_POR_LIGA, PROB_CLIMA } from "../analista/umbrales";
+import { nivelSiguiente } from "../sim/condiciones";
+import { TEMPERATURA_C, type ClimaPartido } from "../sim/limites";
 import { simular } from "../sim/motor";
-import type { Partido, SimConfig } from "../sim/tipos";
+import { prngDerivado } from "../sim/prng";
+import type { Condiciones, Partido, SimConfig } from "../sim/tipos";
 import { calendarioCirculo } from "./calendario";
 import { goleadores, tablaDePosiciones } from "./tabla";
 import type { Calendario, Cruce, Liga, PartidoLiga, Temporada } from "./tipos";
@@ -47,14 +51,38 @@ export function cruceDe(liga: Liga, jornada: number, indice: number): Cruce | un
   return calendarioDeLiga(liga)[jornada - 1]?.[indice - 1];
 }
 
-/** La config estándar de un partido de liga (el 018 le sumará condiciones). */
+/**
+ * Brief 018 §1 — las condiciones de un partido de liga: clima sorteado del perfil del país
+ * (flujo derivado por la semilla del partido: reproducible y sin tocar el stream del motor),
+ * la cancha del local y la presión de la liga (visitante un nivel arriba).
+ */
+export function condicionesDePartido(liga: Liga, cruce: Cruce, seed: number): Condiciones {
+  const rng = prngDerivado(seed, "condiciones:clima");
+  const p = PROB_CLIMA[liga.clima];
+  const u = rng.next();
+  const clima: ClimaPartido = u < p.calor ? "calor" : u < p.calor + p.lluvia ? "lluvia" : u < p.calor + p.lluvia + p.frio ? "frio" : "despejado";
+  const cancha = (liga.equipos[cruce.local] as Liga["equipos"][number]).cancha;
+  const local = PRESION_LOCAL_POR_LIGA[liga.id];
+  if (!local) throw new Error(`liga sin presión definida: ${liga.id} (PRESION_LOCAL_POR_LIGA)`);
+  return {
+    clima,
+    ...(clima === "calor" || clima === "frio" ? { temperaturaC: rng.int(TEMPERATURA_C[clima].min, TEMPERATURA_C[clima].max) } : {}),
+    superficie: cancha.superficie,
+    ...(cancha.superficie === "natural" ? { cesped: cancha.cesped } : {}),
+    presion: { local, visita: nivelSiguiente(local) },
+  };
+}
+
+/** La config de un partido de liga: la estándar del 016 más sus condiciones (brief 018). */
 export function configDePartidoLiga(liga: Liga, temporada: number, jornada: number, indice: number): SimConfig {
   const c = cruceDe(liga, jornada, indice);
   if (!c) throw new Error(`partido inexistente: ${liga.id} jornada ${jornada} partido ${indice}`);
+  const seed = semillaDePartido(liga.id, temporada, jornada, indice);
   return {
-    seed: semillaDePartido(liga.id, temporada, jornada, indice),
+    seed,
     local: (liga.equipos[c.local] as Liga["equipos"][number]).equipo,
     visita: (liga.equipos[c.visita] as Liga["equipos"][number]).equipo,
+    condiciones: condicionesDePartido(liga, c, seed),
   };
 }
 

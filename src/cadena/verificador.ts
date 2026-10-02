@@ -28,7 +28,9 @@ import {
   CIERRE_EN_VIVO,
   CIERRE_EN_VIVO_EXCEPTO,
   CUENTA_GOLES,
+  EFECTOS_CONDICION,
   FRANJAS,
+  GRADOS_C,
   FRASES_CANAL,
   FUERA_DEL_AREA,
   MISIL,
@@ -440,6 +442,13 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
     const rival = equipo && fin ? [...fin.keys()].find((k) => k !== equipo) : undefined;
     if (!(fin && rival !== undefined && fin.get(rival) === 0)) h.push({ regla: "V8", detalle: `«${m[0]}»: ${equipo ?? "el equipo"} recibió goles` });
   });
+  // Brief 018 — el color de las condiciones, solo con su efecto medido como principal (antes de
+  // V7: «nunca se acomodó / never settled» describe la medición, no niega un suceso).
+  for (const e of EFECTOS_CONDICION) {
+    s = quitar(s, e[lengua], (m) => {
+      if (!ctx.hechos.some((x) => e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
+    });
+  }
   for (const f of FRANJAS) {
     s = quitar(s, f[lengua], (m) => {
       const ms = ctx.minutos;
@@ -568,7 +577,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
 
   // V4 — nombres
   let nombrados = 0;
-  let v = w;
+  let v = quitar(w, GRADOS_C); // brief 018: la unidad no es un nombre
   for (const n of ctx.pl.nombres) {
     let i = v.indexOf(n);
     while (i >= 0) {

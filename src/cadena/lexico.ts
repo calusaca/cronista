@@ -585,3 +585,57 @@ export const MISIL: Record<Lengua, RegExp> = {
   es: palabras(["un misil", "misil", "un cañonazo", "cañonazo", "un obús", "obús", "un zapatazo", "zapatazo"]),
   en: palabras(["a rocket", "rocket", "a thunderbolt", "thunderbolt", "a piledriver", "piledriver"]),
 };
+
+// ---------------------------------------------------------------------------------
+// Brief 018 — el color de las condiciones lo paga SOLO el efecto MEDIDO en el partido: cada
+// frase exige su hecho de efecto como principal (la condición registrada sola —
+// condiciones_del_partido— no la paga). Se juzgan ANTES de V7, como la valla invicta: «never
+// settled» lleva un «never» que no niega un suceso, describe la medición.
+// Las listas se exportan en crudo para que la batería de mentiras las recorra frase por frase.
+// ---------------------------------------------------------------------------------
+
+export const FRASES_EFECTO: Record<"presion_que_ahoga" | "cancha_incomoda" | "efecto_calor", Record<Lengua, readonly string[]>> = {
+  // Primero la presión: «buckled under the pressure» no debe leerse como otra cosa.
+  presion_que_ahoga: {
+    es: [
+      "la presión lo ahogó", "la presión los ahogó", "la presión la ahogó", "ahogado por la presión", "ahogados por la presión", "lo ahogó", "los ahogó",
+      "se ahogó", "se ahogaron", "salida nerviosa", "nerviosismo", "nervioso", "nerviosa", "nerviosos", "nerviosas", "nervios",
+    ],
+    en: [
+      "buckled under the pressure", "buckled under pressure", "crumbled under the pressure", "crumbled under pressure", "buckled", "choked", "nervy",
+      "nervous", "nerves", "rattled",
+    ],
+  },
+  cancha_incomoda: {
+    es: [
+      "se le hizo de barro", "se les hizo de barro", "se hizo de barro", "nunca se acomodó", "nunca se asentó", "nunca se sintió cómodo", "incómodo",
+      "incómoda", "incómodos", "incomodó", "trabado", "trabada",
+    ],
+    en: [
+      "never settled", "never got comfortable", "never found their feet", "bogged down", "struggled on the surface", "struggled on the long grass",
+      "uncomfortable", "ill at ease",
+    ],
+  },
+  efecto_calor: {
+    es: [
+      "le pasó factura", "les pasó factura", "pasó factura", "el calor los fundió", "el calor lo fundió", "los fundió", "lo fundió", "se fundió",
+      "se fundieron", "fundidos", "fundido", "piernas pesadas", "cansancio", "cansados", "cansado", "agotados", "agotado", "exhaustos", "se apagó",
+      "se apagaron",
+    ],
+    en: [
+      "wilted in the heat", "took its toll", "took a toll", "melted in the heat", "ran out of legs", "heavy legs", "wilted", "wilting", "tiredness",
+      "tired", "fatigue", "exhausted", "leggy", "faded",
+    ],
+  },
+};
+
+export const EFECTOS_CONDICION: EntradaJuicio[] = (Object.keys(FRASES_EFECTO) as (keyof typeof FRASES_EFECTO)[]).map((tipo) => ({
+  id: tipo,
+  es: palabras(FRASES_EFECTO[tipo].es),
+  en: palabras(FRASES_EFECTO[tipo].en),
+  habilita: (h) => h.tipo === tipo,
+  requisito: `esa frase exige el hecho ${tipo} como principal (el efecto medido en el partido; la condición registrada sola no la paga)`,
+}));
+
+/** Brief 018: «°C» es una unidad, no un nombre propio (V4); la cifra la sigue juzgando V3. */
+export const GRADOS_C = /°\s?C(?![\p{L}\p{N}])/gu;

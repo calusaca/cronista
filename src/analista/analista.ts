@@ -24,7 +24,8 @@
 
 import type { Evento, Lado, Partido } from "../sim/tipos";
 import { micro, type MicroPartido } from "../sim/micro";
-import { CANAL_TEXTO, minutoTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { CANAL_TEXTO, CANCHA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { medirCalor, medirCancha, medirPresion } from "./condiciones";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
 import {
@@ -488,9 +489,12 @@ function duelos(c: Ctx, m: MicroPartido): Borrador[] {
 }
 
 /** `perdidas_en_salida`: por equipo, el canal con más pérdidas en su zona de salida, si llega a PERDIDAS_MIN. */
-function perdidasEnSalida(c: Ctx, m: MicroPartido): Borrador[] {
+function perdidasEnSalida(c: Ctx, m: MicroPartido, subsumidos: ReadonlySet<Lado> = new Set()): Borrador[] {
   const out: Borrador[] = [];
   for (const lado of LADOS) {
+    // Brief 018 (verificación de Fable): si ese equipo ya tiene presion_que_ahoga, ese hecho lo
+    // SUBSUME (las mismas pérdidas en salida, contadas con su causa): no se narran dos veces.
+    if (subsumidos.has(lado)) continue;
     const por = new Map<string, string[]>();
     for (const x of m.eventos) if (x.tipo === "perdida" && x.equipo === lado && x.zona === "defensa") por.set(x.canal, [...(por.get(x.canal) ?? []), x.id]);
     const mejor = [...por.entries()].sort((a, b) => b[1].length - a[1].length)[0];
@@ -553,6 +557,84 @@ function dominioPorCanal(c: Ctx, m: MicroPartido): Borrador[] {
     );
   }
   return out;
+}
+
+// ---------------- brief 018: condiciones y sus efectos medidos ----------------
+
+/**
+ * `condiciones_del_partido`: dato puro, la config registrada (clima, cancha, presión). Cita el
+ * inicio del partido. Existe desde el 0' (en vivo, también).
+ */
+function condicionesDelPartido(p: Partido, c: Ctx): Borrador[] {
+  const k = p.config.condiciones;
+  const inicio = c.ev.find((e) => e.tipo === "inicio_periodo");
+  if (!k || !inicio) return [];
+  const conTemp = k.temperaturaC !== undefined;
+  const clima = conTemp ? { es: `${temperaturaTxt(k.temperaturaC as number)} °C`, en: `${temperaturaTxt(k.temperaturaC as number)} °C` } : (CLIMA_TEXTO[k.clima] as { es: string; en: string });
+  const cancha = CANCHA_TEXTO[k.superficie === "sintetica" ? "sintetica" : `natural_${k.cesped}`] as { es: string; en: string };
+  const pl = PRESION_TEXTO[k.presion.local] as { es: string; en: string };
+  const pv = PRESION_TEXTO[k.presion.visita] as { es: string; en: string };
+  return [
+    hecho(c, "condiciones_del_partido", "condiciones_del_partido", [inicio.id], {
+      ...equipos(c),
+      clima: k.clima,
+      ...(conTemp ? { temperatura_c: k.temperaturaC as number } : {}),
+      superficie: k.superficie,
+      ...(k.cesped ? { cesped: k.cesped } : {}),
+      presion_local: k.presion.local,
+      presion_visita: k.presion.visita,
+      clima_es: clima.es,
+      clima_en: clima.en,
+      cancha_es: cancha.es,
+      cancha_en: cancha.en,
+      presion_local_es: pl.es,
+      presion_local_en: pl.en,
+      presion_visita_es: pv.es,
+      presion_visita_en: pv.en,
+    }),
+  ];
+}
+
+/** `efecto_calor`: SOLO con calor registrado Y la caída medida en ESTE partido (desglose por periodo). */
+function efectoCalor(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
+  const x = medirCalor(p, m);
+  if (!x || !x.efecto) return [];
+  return [
+    hechoMicro("efecto_calor", "efecto_calor", inicios(c), {
+      ...equipos(c),
+      temperatura_c: x.temperaturaC,
+      periodo: 2,
+      pases_primer_tiempo: x.pases1,
+      pases_segundo_tiempo: x.pases2,
+      porcentaje: x.porcentaje,
+    }),
+  ];
+}
+
+/** `cancha_incomoda`: SOLO con césped natural alto Y la completación corta del visitante bajo umbral. */
+function canchaIncomoda(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
+  const x = medirCancha(p, m);
+  if (!x || !x.efecto) return [];
+  return [
+    hechoMicro("cancha_incomoda", "cancha_incomoda", inicios(c), {
+      ...equipos(c),
+      equipo: c.nombre.visita,
+      cesped: "alto",
+      porcentaje: x.porcentaje,
+      completados: x.completados,
+      intentados: x.intentados,
+      porcentaje_local: x.porcentajeLocal,
+      completados_local: x.completadosLocal,
+      intentados_local: x.intentadosLocal,
+    }),
+  ];
+}
+
+/** `presion_que_ahoga`: SOLO con presión alta Y sus pérdidas tempranas en salida sobre el umbral. Cita esas pérdidas. */
+function presionQueAhoga(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
+  const x = medirPresion(p, m);
+  if (!x || !x.efecto) return [];
+  return [hechoMicro("presion_que_ahoga", "presion_que_ahoga", x.ids, { ...equipos(c), equipo: c.nombre[x.lado], presion: "alta", perdidas: x.ids.length, limite: x.limite })];
 }
 
 // ---------------- orden y API ----------------
@@ -623,7 +705,12 @@ export function analizar(partido: Partido): Hecho[] {
   ];
   // Brief 013: la capa micro es función pura del partido (o del prefijo): se deriva aquí.
   const m = micro(partido);
-  borradores.push(...duelos(c, m), ...perdidasEnSalida(c, m), ...dominioGlobal(c, m), ...dominioPorCanal(c, m));
+  // Brief 018: presion_que_ahoga subsume a perdidas_en_salida del MISMO equipo.
+  const presionAlta = medirPresion(partido, m);
+  const subsumidos = new Set<Lado>(presionAlta?.efecto ? [presionAlta.lado] : []);
+  borradores.push(...duelos(c, m), ...perdidasEnSalida(c, m, subsumidos), ...dominioGlobal(c, m), ...dominioPorCanal(c, m));
+  // Brief 018: solo si el partido registra condiciones (los partidos sueltos no las tienen).
+  borradores.push(...condicionesDelPartido(partido, c), ...efectoCalor(partido, c, m), ...canchaIncomoda(partido, c, m), ...presionQueAhoga(partido, c, m));
   borradores.sort(comparar(c, m));
   return borradores.map((b, i) => ({ id: `h${String(i + 1).padStart(2, "0")}`, ...b }));
 }

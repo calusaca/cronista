@@ -25,8 +25,9 @@ import {
   type Destino,
   type ZonaOrigen,
 } from "./limites";
+import { extraVelocidad, factorMediaDistancia } from "./condiciones";
 import { prngDerivado, type Rng } from "./prng";
-import { CAMPOS_ESPACIALES, type Evento, type Partido } from "./tipos";
+import { CAMPOS_ESPACIALES, type Condiciones, type Evento, type Partido } from "./tipos";
 
 export type OrigenTiro = "penal" | "corner" | "tiro_libre" | "jugada";
 
@@ -70,7 +71,7 @@ function filtrar(tabla: Readonly<Partial<Record<ZonaOrigen, number>>>, xg: numbe
 /** Último recurso (nunca vacío para un xG del simulador): cualquier zona de juego cuya banda lo contenga. */
 const ZONAS_DE_JUEGO: ZonaOrigen[] = ["area_chica", "frontal_del_area", "banda_izquierda", "banda_derecha", "media_distancia"];
 
-function zonaDelTiro(rng: Rng, origen: OrigenTiro, xg: number): ZonaOrigen {
+function zonaDelTiro(rng: Rng, origen: OrigenTiro, xg: number, condiciones?: Condiciones): ZonaOrigen {
   if (origen === "penal") return "punto_penal";
   let tabla: Readonly<Partial<Record<ZonaOrigen, number>>>;
   if (origen === "corner") {
@@ -81,7 +82,13 @@ function zonaDelTiro(rng: Rng, origen: OrigenTiro, xg: number): ZonaOrigen {
   } else {
     const claro = xg >= ZONA_XG_BANDAS.area_chica.min;
     const lejano = enBanda("media_distancia", xg) && xg <= ESPACIAL.lejanoXgMax;
-    tabla = claro ? ESPACIAL.jugadaClara : lejano ? ESPACIAL.jugadaLejana : ESPACIAL.jugadaMedia;
+    // Brief 018 · efecto 4: en sintética, la bola corre y se prueba más de media distancia
+    // (el peso se multiplica por 1 exacto en cualquier otra cancha: el sorteo no cambia).
+    tabla = claro
+      ? ESPACIAL.jugadaClara
+      : lejano
+        ? { ...ESPACIAL.jugadaLejana, media_distancia: ESPACIAL.jugadaLejana.media_distancia * factorMediaDistancia(condiciones) }
+        : ESPACIAL.jugadaMedia;
   }
   const z = sortear(rng, filtrar(tabla, xg));
   if (z) return z;
@@ -95,7 +102,7 @@ function zonaDelTiro(rng: Rng, origen: OrigenTiro, xg: number): ZonaOrigen {
  * origen informado por el motor; «tras córner» se decide con `cornerDelTiro` (la definición
  * única), y un penal manda sobre todo.
  */
-export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes: ReadonlyMap<string, OrigenTiro>): void {
+export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes: ReadonlyMap<string, OrigenTiro>, condiciones?: Condiciones): void {
   const porId = new Map(eventos.map((e) => [e.id, e] as const));
   eventos.forEach((e, i) => {
     const rng = prngDerivado(semilla, e.id);
@@ -103,12 +110,12 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
       case "tiro": {
         const informado = origenes.get(e.id) ?? "jugada";
         const origen: OrigenTiro = informado === "penal" ? "penal" : cornerDelTiro(eventos, i) ? "corner" : informado === "corner" ? "jugada" : informado;
-        e.zonaOrigen = zonaDelTiro(rng, origen, e.xg ?? 0);
+        e.zonaOrigen = zonaDelTiro(rng, origen, e.xg ?? 0, condiciones);
         e.destino = sortear(rng, ESPACIAL.destino) as Destino;
         e.altura = sortear(rng, ESPACIAL.altura);
         // Brief 015: magnitudes del mismo stream derivado, DESPUÉS de los sorteos del 011
         // (así zona, destino y altura no cambian).
-        Object.assign(e, magnitudes(rng, e.zonaOrigen, e.xg ?? 0, e.penal === true));
+        Object.assign(e, magnitudes(rng, e.zonaOrigen, e.xg ?? 0, e.penal === true, extraVelocidad(condiciones)));
         break;
       }
       case "pase_clave":
@@ -155,7 +162,7 @@ export function rangoDistancia(zona: ZonaOrigen, xg: number, penal: boolean): { 
 }
 
 /** Distancia y velocidad de un tiro: dentro de sus bandas, más lejos cuanto menor el xG, más fuerte desde lejos. */
-function magnitudes(rng: Rng, zona: ZonaOrigen | undefined, xg: number, penal: boolean): { distanciaM: number; velocidadKmh: number } {
+function magnitudes(rng: Rng, zona: ZonaOrigen | undefined, xg: number, penal: boolean, extraKmh = 0): { distanciaM: number; velocidadKmh: number } {
   const r = rangoDistancia(zona ?? "frontal_del_area", xg, penal);
   const cerca = Math.min(1, xg / XG_ALTO.xgMin); // 1 = ocasión clara
   const t = 0.35 * (1 - cerca) + 0.65 * rng.next();
@@ -163,7 +170,9 @@ function magnitudes(rng: Rng, zona: ZonaOrigen | undefined, xg: number, penal: b
   let velocidadKmh: number;
   if (penal) velocidadKmh = rng.int(VELOCIDAD_PENAL.min, VELOCIDAD_PENAL.max);
   else {
-    const v = ESPACIAL.velocidadMedia + ESPACIAL.velocidadSigma * rng.normal() + ESPACIAL.velocidadPorMetro * (distanciaM - ESPACIAL.velocidadMetroRef);
+    // Brief 018 · efecto 4: + extraKmh en sintética (0 exacto en otra cancha), y el recorte de
+    // siempre: las bandas del 015 no se mueven.
+    const v = ESPACIAL.velocidadMedia + ESPACIAL.velocidadSigma * rng.normal() + ESPACIAL.velocidadPorMetro * (distanciaM - ESPACIAL.velocidadMetroRef) + extraKmh;
     const piso = distanciaM >= VELOCIDAD_LEJANO.distanciaMin ? VELOCIDAD_LEJANO.min : VELOCIDAD.min;
     velocidadKmh = Math.round(Math.min(VELOCIDAD.max, Math.max(piso, v)));
   }

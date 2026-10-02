@@ -28,6 +28,9 @@ export const MAX_ORACIONES_UPDATE = 2;
  */
 // Brief 009: `figura_del_partido` también es de cierre («fue la figura del partido»: sobre
 // un prefijo sería el mejor HASTA AHORA, no del partido). Misma lección que el hallazgo F1.
+// Brief 018: `efecto_calor` NO figura aquí a propósito: el Analista ya no lo emite antes del
+// pitazo final (exige el 2.º tiempo terminado). Una segunda llave aquí era código muerto (la
+// mutación que la quitaba sobrevivía): la regla vive en un solo lugar y la prueba la vigila.
 export const HECHOS_DE_CIERRE: readonly TipoHecho[] = ["resultado_final", "justicia_xg", "remontada", "figura_del_partido"];
 
 /**

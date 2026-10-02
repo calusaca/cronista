@@ -22,7 +22,12 @@ export type TipoHecho =
   | "duelo_ganado"
   | "perdidas_en_salida"
   | "dominio_global"
-  | "dominio_por_canal";
+  | "dominio_por_canal"
+  // Brief 018: las condiciones registradas (dato puro) y los tres efectos MEDIDOS en el partido.
+  | "condiciones_del_partido"
+  | "efecto_calor"
+  | "cancha_incomoda"
+  | "presion_que_ahoga";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
@@ -54,4 +59,14 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "perdidas_en_salida",
   "dominio_global",
   "dominio_por_canal",
+  "condiciones_del_partido",
+  "efecto_calor",
+  "cancha_incomoda",
+  "presion_que_ahoga",
 ];
+
+/**
+ * Brief 018: los hechos que solo existen con condiciones registradas (partidos de liga). El
+ * corpus de semillas sueltas (configDeSemilla) no las tiene: allí estos tipos no aparecen nunca.
+ */
+export const TIPOS_HECHO_CONDICIONES: readonly TipoHecho[] = ["condiciones_del_partido", "efecto_calor", "cancha_incomoda", "presion_que_ahoga"];

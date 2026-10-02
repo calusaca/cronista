@@ -25,7 +25,7 @@ export interface EquipoMundo {
   equipo: Equipo;
   pais: string; // id del país
   liga: string; // id de la liga
-  /** Identidad de la cancha local (sin efecto hasta el 018). */
+  /** Identidad de la cancha local (desde el 018, entra a las condiciones de sus partidos de local). */
   cancha: Cancha;
 }
 
@@ -33,6 +33,8 @@ export interface Liga {
   id: string;
   nombre: string;
   pais: string; // id del país
+  /** Brief 018: el perfil climático del país (de él sale el clima de cada partido). */
+  clima: Clima;
   equipos: EquipoMundo[];
 }
 

@@ -10,6 +10,7 @@ import { CANALES, type Canal } from "../sim/limites";
 import { micro } from "../sim/micro";
 import type { Lado, Partido } from "../sim/tipos";
 import { CANAL_TXT, estadisticas, relato } from "../vista/stats";
+import { efectosMedidos } from "../vista/condiciones";
 import { IconoCerrar } from "./Iconos";
 import { EXPLICA_XG, formatoXg, type LenguaXg } from "./textos";
 
@@ -18,6 +19,7 @@ type Evidencia =
   | { tipo: "canal"; lado: Lado }
   | { tipo: "duelo"; i: number }
   | { tipo: "perdidas"; lado: Lado; canal: Canal }
+  | { tipo: "efecto"; i: number }
   | null;
 
 const LADOS: readonly Lado[] = ["local", "visita"];
@@ -40,6 +42,8 @@ export function Stats({
   const fx = (xg: number) => formatoXg(xg, analista ? "analista" : "aficionado", lengua);
   const m = useMemo(() => micro(partido), [partido]);
   const s = useMemo(() => estadisticas(partido, m), [partido, m]);
+  // Brief 018: las mediciones de los efectos de las condiciones (solo partidos de liga).
+  const efectos = useMemo(() => (partido.config.condiciones ? efectosMedidos(partido, nombres, m) : undefined), [partido, nombres, m]);
   const [ev, setEv] = useState<Evidencia>(null);
 
   useEffect(() => {
@@ -151,9 +155,23 @@ export function Stats({
             </div>
           ))}
         </div>
+
+        {/* Brief 018: efectos de las condiciones, medidos en este partido (lo visto). */}
+        {efectos && (
+          <div className="stats-block" data-testid="stats-conditions">
+            <div className="stats-title">Conditions: measured effects</div>
+            {efectos.length === 0 && <p className="stats-vacio">None of these conditions has a per-match measurement.</p>}
+            {efectos.map((x, i) => (
+              <button key={x.tipo} type="button" className="stats-row stats-efecto" data-testid="stat-efecto" data-tipo={x.tipo} data-destacado={x.destacado ? "true" : "false"} onClick={() => setEv({ tipo: "efecto", i })}>
+                <span className="stats-efecto-titulo">{x.titulo}</span>
+                <span className={`stats-num tnum${x.destacado ? " destacado" : ""}`}>{x.valor}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {ev && <EvidenciaStats ev={ev} partido={partido} m={m} s={s} nombres={nombres} fx={fx} onCerrar={() => setEv(null)} />}
+      {ev && <EvidenciaStats ev={ev} partido={partido} m={m} s={s} nombres={nombres} fx={fx} efectos={efectos ?? []} onCerrar={() => setEv(null)} />}
     </section>
   );
 }
@@ -165,9 +183,11 @@ function EvidenciaStats({
   s,
   nombres,
   fx,
+  efectos,
   onCerrar,
 }: {
   ev: NonNullable<Evidencia>;
+  efectos: ReturnType<typeof efectosMedidos>;
   partido: Partido;
   m: ReturnType<typeof micro>;
   s: ReturnType<typeof estadisticas>;
@@ -194,6 +214,11 @@ function EvidenciaStats({
     const d = s.duelos[ev.i];
     titulo = d ? `${d.jugador} beat ${d.rival} ${d.n} times` : "";
     ids = d?.ids ?? [];
+  } else if (ev.tipo === "efecto") {
+    const x = efectos[ev.i];
+    titulo = x ? `${x.titulo}: ${x.valor}` : "";
+    ids = x?.ids ?? [];
+    desglose = x?.desglose ?? [];
   } else {
     const x = s.perdidas[ev.lado][ev.canal];
     titulo = `${nombres[ev.lado]} lost the ball ${x.n} times playing out down the ${CANAL_TXT[ev.canal]}`;

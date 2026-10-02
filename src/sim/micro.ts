@@ -20,6 +20,7 @@
 //   de limites.ts y coherentes con la zona (un pase largo no sale de la zona de ataque).
 
 import { CANALES, CONDUCCION_M, PASE_M, type Canal, type TipoMicro } from "./limites";
+import { castigoPase, factorRitmo } from "./condiciones";
 import { MICRO } from "./parametros";
 import { prngDerivado, type Rng } from "./prng";
 import type { Evento, Jugador, Lado, Partido, Posicion, Zona } from "./tipos";
@@ -181,6 +182,8 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
   const pref: Record<Lado, Canal> = { local: canalPreferido(semilla, "local"), visita: canalPreferido(semilla, "visita") };
   const cfg = p.config;
   const fuerza = (l: Lado) => (cfg[l].ataque - cfg[rival(l)].defensa) / 100;
+  // Brief 018: el periodo del tramo (el de su ancla) para el cansancio del calor.
+  const periodo: 1 | 2 = p.eventos.slice(0, k + 1).filter((x) => x.tipo === "inicio_periodo").length >= 2 ? 2 : 1;
 
   const eventos: Borrador[] = [];
   const posesiones: { equipo: Lado; termina: "ancla" | "perdida" }[] = [];
@@ -228,7 +231,9 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
     const banda = PASE_M[clase];
     const distanciaM = clase === "largo" ? rng.int(banda.min, banda.max) : rng.int(banda.min, banda.max - 1);
     const ajuste = clase === "corto" ? 0.06 : clase === "largo" ? -0.2 : -0.03;
-    const pc = MICRO.paseBase + MICRO.paseKFuerza * fuerza(e.equipo) + MICRO.paseEstilo[cfg[e.equipo].estilo] + MICRO.paseZona[e.zona] + ajuste;
+    // Brief 018 · efectos 3, 5 y 6: lluvia, césped alto (visitante, cortos) y presión alta en la
+    // salida temprana restan completación; sin condiciones el castigo es 0 exacto.
+    const pc = MICRO.paseBase + MICRO.paseKFuerza * fuerza(e.equipo) + MICRO.paseEstilo[cfg[e.equipo].estilo] + MICRO.paseZona[e.zona] + ajuste - castigoPase(cfg.condiciones, e.equipo, e.zona, clase, ancla.minuto);
     const completado = forzarCompletado || rng.chance(pc);
     emitir({ tipo: "pase", jugador: e.actor, receptor, completado, distanciaM });
     if (!completado) return perder();
@@ -244,7 +249,8 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
   // El juego del tramo: acciones ∝ minutos de reloj, más la elaboración si el ancla es de ataque.
   const delta = prev ? Math.max(0, ancla.minuto - prev.minuto) : 0;
   const deAtaque = ANCLAS_ATAQUE.has(ancla.tipo) || ancla.tipo === "falta";
-  const n = Math.max(0, Math.round(MICRO.accionesPorMinuto * delta + (deAtaque ? MICRO.accionesAncla : 0) + rng.int(-2, 2)));
+  // Brief 018 · efecto 1: con calor, el 2.º tiempo tiene menos acciones (factor 1 exacto sin calor).
+  const n = Math.max(0, Math.round((MICRO.accionesPorMinuto * delta + (deAtaque ? MICRO.accionesAncla : 0)) * factorRitmo(cfg.condiciones, periodo) + rng.int(-2, 2)));
   let recienRegateo = false; // nadie regatea dos veces seguidas al mismo rival en la misma jugada
   for (let i = 0; i < n; i++) {
     const pos = cancha[e.equipo].find((j) => j.nombre === e.actor)?.posicion ?? "MED";

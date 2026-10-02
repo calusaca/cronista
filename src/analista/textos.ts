@@ -120,6 +120,23 @@ export const PLANTILLAS = {
     es: "{equipo} atacó sobre todo por {canal_es} ({porcentaje} % de sus avances).",
     en: "{equipo} attacked mostly down {canal_en} ({porcentaje}% of their attacks).",
   },
+  // Brief 018: las condiciones (dato puro: cita la config registrada) y los tres efectos medidos.
+  condiciones_del_partido: {
+    es: "Con {clima_es} y {cancha_es} en la cancha de {local}; presión {presion_local_es} para el local y {presion_visita_es} para {visita}.",
+    en: "With {clima_en} and {cancha_en} at {local}'s ground; {presion_local_en} pressure on the hosts and {presion_visita_en} on {visita}.",
+  },
+  efecto_calor: {
+    es: "Con {temperatura_c} °C, el ritmo bajó en el segundo tiempo: {pases_segundo_tiempo} pases, frente a {pases_primer_tiempo} antes del descanso ({porcentaje} %).",
+    en: "With {temperatura_c} °C, the tempo dropped in the second half: {pases_segundo_tiempo} passes, against {pases_primer_tiempo} before the break ({porcentaje}%).",
+  },
+  cancha_incomoda: {
+    es: "En el césped alto de la cancha de {local}, {equipo} completó el {porcentaje} % de sus pases cortos ({completados} de {intentados}).",
+    en: "On the long grass at {local}'s ground, {equipo} completed {porcentaje}% of their short passes ({completados} of {intentados}).",
+  },
+  presion_que_ahoga: {
+    es: "Con presión alta, {equipo} perdió el balón {perdidas} veces en su salida antes del minuto {limite}.",
+    en: "Under high pressure, {equipo} lost the ball {perdidas} times playing out before minute {limite}.",
+  },
 } as const satisfies Record<string, Plantilla>;
 
 export type ClavePlantilla = keyof typeof PLANTILLAS;
@@ -147,6 +164,26 @@ export function minutoTxt(m: number): string {
 export function xgTxt(centesimas: number): string {
   return (centesimas / 100).toFixed(2);
 }
+
+/**
+ * Brief 018: cómo se dicen las condiciones en los textos de los hechos. La temperatura bajo
+ * cero va con el signo menos tipográfico (el Verificador lo normaliza: la cifra es la misma).
+ */
+export const temperaturaTxt = (c: number): string => (c < 0 ? `−${-c}` : String(c));
+export const CLIMA_TEXTO: Record<string, { es: string; en: string }> = {
+  despejado: { es: "cielo despejado", en: "clear skies" },
+  lluvia: { es: "lluvia", en: "rain" },
+};
+export const CANCHA_TEXTO: Record<string, { es: string; en: string }> = {
+  natural_corto: { es: "césped natural corto", en: "short natural grass" },
+  natural_alto: { es: "césped natural alto", en: "long natural grass" },
+  sintetica: { es: "césped sintético", en: "an artificial pitch" },
+};
+export const PRESION_TEXTO: Record<string, { es: string; en: string }> = {
+  baja: { es: "baja", en: "low" },
+  media: { es: "media", en: "medium" },
+  alta: { es: "alta", en: "high" },
+};
 
 /** Brief 013: cómo se dice cada canal en los textos de los hechos. */
 export const CANAL_TEXTO: Record<string, { es: string; en: string }> = {

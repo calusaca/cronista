@@ -1,7 +1,7 @@
 // Contrato del simulador — brief 001 (docs/disenos/001-simulador.md).
 // Los nombres y propiedades de este archivo NO se cambian sin actualizar el brief.
 
-import type { Altura, Banda, Destino, LadoPortero, ZonaOrigen } from "./limites";
+import type { Altura, Banda, Cesped, ClimaPartido, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
 
 export type Estilo = "posesion" | "contragolpe" | "presion";
 
@@ -26,10 +26,30 @@ export interface Equipo {
   jugadores: Jugador[]; // 11 titulares (índices 0–10) + 5 suplentes (11–15), nombres ficticios
 }
 
+/**
+ * Brief 018 — condiciones del partido. AUSENTES ⇒ el partido de siempre, byte a byte (los
+ * partidos sueltos por semilla no las llevan; solo la temporada del 016 las fabrica). Las
+ * neutras (despejado, natural de césped corto, sin presión alta) tampoco cambian nada: todos
+ * los efectos son modificadores de probabilidad que no consumen sorteos propios.
+ */
+export interface Condiciones {
+  clima: ClimaPartido;
+  /** Solo en calor y frío (TEMPERATURA_C). */
+  temperaturaC?: number;
+  /** De la cancha del local. */
+  superficie: Superficie;
+  /** Solo en superficie natural. */
+  cesped?: Cesped;
+  /** v1 del brief: el visitante, siempre un nivel por encima del local. */
+  presion: Record<"local" | "visita", NivelPresion>;
+}
+
 export interface SimConfig {
   seed: number;
   local: Equipo;
   visita: Equipo;
+  /** Brief 018: opcional y aditivo. */
+  condiciones?: Condiciones;
 }
 
 export type TipoEvento =

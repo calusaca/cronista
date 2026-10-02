@@ -2,6 +2,7 @@
 // Las pruebas los importan; ninguna prueba repite un número de este archivo a mano.
 // Si un umbral parece mal, se reporta a Fable; no se mueve para que una prueba pase.
 
+import type { Clima } from "../mundo/tipos";
 import type { TipoEvento } from "../sim/tipos";
 import type { TipoHecho } from "./tipos";
 
@@ -123,6 +124,12 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   gol_temprano: 40,
   presion_sostenida: 35,
   disciplina: 30,
+  // Brief 018: los efectos medidos, por debajo de los goles y sin obligar a narrarlos (< COBERTURA);
+  // las condiciones registradas son contexto (dato puro), relevancia baja.
+  presion_que_ahoga: 62,
+  efecto_calor: 58,
+  cancha_incomoda: 56,
+  condiciones_del_partido: 25,
 };
 
 /**
@@ -160,6 +167,12 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   perdidas_en_salida: "inicio_periodo",
   dominio_global: "inicio_periodo",
   dominio_por_canal: "inicio_periodo",
+  // Brief 018: las condiciones y los agregados citan los inicios de periodo; la presión cita
+  // micro-eventos (como perdidas_en_salida).
+  condiciones_del_partido: "inicio_periodo",
+  efecto_calor: "inicio_periodo",
+  cancha_incomoda: "inicio_periodo",
+  presion_que_ahoga: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -238,12 +251,81 @@ export const MUNDO_SEMILLA = 2026;
  * Liga del Sol Alto (la primera) salió la desafortunada del lote (41,1 % / 2,34); la Liga de
  * los Valles es la más viva (21,1 % / 2,92). La dispersión de fuerzas es la estándar: es
  * azar de una temporada, no un sesgo del mundo.
+ * Re-medido con las condiciones del 018 (2 oct): total 28,1 % / 2,64; los Valles siguen entre
+ * las más vivas (24,4 % / 2,90) — la elección se sostiene.
  */
 export const LIGA_DESTACADA = "liga-de-los-valles";
 /** Temporada que muestra la UI. */
 export const TEMPORADA_ACTUAL = 1;
 export const N_PAISES = 8;
 export const EQUIPOS_POR_LIGA = 10;
-/** Identidad de la cancha (sin efecto hasta el 018): probabilidad de césped sintético y de césped alto. */
+/** Identidad de la cancha (con efecto desde el 018): probabilidad de césped sintético y de césped alto. */
 export const PROB_CANCHA_SINTETICA = 0.25;
 export const PROB_CESPED_ALTO = 0.5;
+
+// ---------------------------------------------------------------------------------
+// Brief 018 — condiciones de los partidos de liga (generación) y umbrales de los hechos de
+// efecto. Una sola fuente; las pruebas las importan.
+// ---------------------------------------------------------------------------------
+
+/**
+ * «A veces» (brief §1): probabilidad de cada clima por perfil del país, sorteada por partido
+ * (despejado = el resto). El frío no tiene efecto en el brief (los seis efectos no lo incluyen):
+ * se registra y se muestra, nada más.
+ */
+export const PROB_CLIMA: Record<Clima, { calor: number; lluvia: number; frio: number }> = {
+  tropical: { calor: 0.4, lluvia: 0.3, frio: 0 },
+  desertico: { calor: 0.55, lluvia: 0.03, frio: 0.05 },
+  templado: { calor: 0.2, lluvia: 0.2, frio: 0.1 },
+  nordico: { calor: 0, lluvia: 0.2, frio: 0.45 },
+  lluvioso: { calor: 0.03, lluvia: 0.55, frio: 0.1 },
+  de_altura: { calor: 0.02, lluvia: 0.15, frio: 0.35 },
+};
+
+/**
+ * `efecto_calor` (brief §3): pases del 2.º tiempo ≤ K % de los del 1.º, con calor registrado y
+ * el 2.º tiempo terminado. Calibrado el 2 oct (A/B N=500, semillas 1..500): sin calor ningún
+ * partido baja de 90 % (p10 = 99,6 %, mediana 109 %: el 2.º tiempo tiene más descuento); con
+ * 41 °C la mediana cae a 90,6 % y el 46 % pasa el umbral; con 30 °C, el 2,4 %.
+ */
+export const CALOR_PASES_2T_MAX = 90;
+/**
+ * `cancha_incomoda` (brief §3): completación de pases CORTOS del visitante ≤ este % con césped
+ * natural alto. Calibrado el 2 oct (N=500): sin césped alto, el 3,4 % de los visitantes ya
+ * queda en ≤ 73 % (equipos flojos: por eso el hecho exige ADEMÁS el césped alto); con césped
+ * alto, ~14 %. Muestra mínima para un prefijo (en vivo): CANCHA_CORTOS_MUESTRA_MIN pases cortos.
+ * Verificación de Fable (2 oct): además, SIN lluvia — con lluvia la caída salía en el 55 % de los
+ * partidos de césped alto (14 % en seco): la lluvia, no el césped, podía explicarla. Re-medido en
+ * liga (720): 4,4 % de los partidos, 16,4 % de los 195 de césped alto sin lluvia.
+ */
+export const CANCHA_CORTOS_MAX = 73;
+export const CANCHA_CORTOS_MUESTRA_MIN = 60;
+/**
+ * `presion_que_ahoga` (brief §3): pérdidas en salida del presionado antes de SALIDA_TEMPRANA_MIN
+ * (limites.ts). Calibrado el 2 oct (N=500): sin presión alta el visitante pierde 2,3 de media
+ * ahí y llega a 8 en el 1,6 % de los partidos; con presión alta, 4,6 de media y 8+ en el 18,8 %.
+ * Verificación de Fable (2 oct): SUBSUME a `perdidas_en_salida` del mismo equipo (mismas pérdidas,
+ * con su causa: no se narran dos veces). Re-medido en liga (720): perdidas_en_salida pasa de 35,4 %
+ * a 27,5 % (29,7 % con presión alta; 25,3 % sin), bajo RAREZA_MICRO_MAX.
+ */
+export const PRESION_PERDIDAS_MIN = 8;
+/** Rareza de los hechos de efecto sobre el corpus de liga (las 8 ligas, temporada 1): como en el 013, ≤ 35 %. */
+export const RAREZA_CONDICION_MAX = 0.35;
+
+/**
+ * Presión v1 (brief §1): el nivel del LOCAL por liga; el visitante va siempre uno por encima
+ * (baja ⇒ media, media ⇒ alta). Solo la presión ALTA tiene efecto (el 6). Elegido a mano por
+ * Opus: cuatro ligas de ambiente caliente («media»: el visitante juega con presión alta) y
+ * cuatro tranquilas, para que el mundo muestre los dos casos. Presión por puesto en la tabla:
+ * queda para después (brief).
+ */
+export const PRESION_LOCAL_POR_LIGA: Record<string, "baja" | "media"> = {
+  "liga-del-sol-alto": "media",
+  "liga-de-las-dunas": "baja",
+  "liga-de-los-valles": "media",
+  "liga-del-norte-blanco": "baja",
+  "liga-de-la-bruma": "media",
+  "liga-de-las-cumbres": "media",
+  "liga-del-oasis-hondo": "baja",
+  "liga-de-los-fiordos": "baja",
+};

@@ -95,7 +95,7 @@ export function crearMundo(semilla: number = MUNDO_SEMILLA): Mundo {
         },
       });
     }
-    return { id, nombre: nombreLiga, pais: pais.id, equipos };
+    return { id, nombre: nombreLiga, pais: pais.id, clima: pais.clima, equipos };
   });
   return { semilla, paises, ligas };
 }

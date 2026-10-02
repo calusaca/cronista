@@ -15,6 +15,7 @@
 
 import { ESTILO_ATAQUE, ESTILO_DEFENSA, P, PESOS } from "./parametros";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
+import { erroresCondiciones, factorAtaque, factorCornerTrasAtajada, factorFaltas } from "./condiciones";
 import { crearRng, type Rng } from "./prng";
 import {
   FUERZA_MAX,
@@ -148,6 +149,11 @@ export function validarConfig(config: SimConfig): void {
       nombres.add(j.nombre);
     }
   }
+  // Brief 018: las condiciones son opcionales; si vienen, cumplen su contrato.
+  if (config.condiciones !== undefined) {
+    const err = erroresCondiciones(config.condiciones);
+    if (err.length > 0) throw new Error(`config inválida: condiciones — ${err.join("; ")}`);
+  }
 }
 
 const ESTILOS_VALIDOS: readonly string[] = ["posesion", "contragolpe", "presion"];
@@ -245,7 +251,14 @@ class Simulacion {
   }
 
   private factores(atk: EstadoEquipo, def: EstadoEquipo): FactoresAtaque {
-    return factoresAtaque(atk, def, this.t);
+    const f = factoresAtaque(atk, def, this.t);
+    // Brief 018 · efecto 1: con calor, el 2.º tiempo llega menos (factor 1 exacto sin calor).
+    return { pAtaque: f.pAtaque * factorAtaque(this.config.condiciones, this.periodo), xgShift: f.xgShift };
+  }
+
+  /** Brief 018 · efecto 2: con calor, más faltas en el 2.º tiempo (factor 1 exacto sin calor). */
+  private factorFaltas(): number {
+    return factorFaltas(this.config.condiciones, this.periodo);
   }
 
   // ---------------- acciones ----------------
@@ -295,7 +308,8 @@ class Simulacion {
     const pAtajada = opciones.penal ? P.pAtajadaPenal : P.pAtajada;
     if (this.rng.chance(pAtajada)) {
       this.emitir("atajada", atk.lado, { zona: "ataque", relacionadoCon: idTiro });
-      if (!opciones.penal && this.rng.chance(P.pCornerTrasAtajada)) return this.corner(atk, opciones.profundidad + 1);
+      // Brief 018 · efecto 3: con lluvia, el portero retiene menos (factor 1 exacto sin lluvia).
+      if (!opciones.penal && this.rng.chance(P.pCornerTrasAtajada * factorCornerTrasAtajada(this.config.condiciones))) return this.corner(atk, opciones.profundidad + 1);
     } else if (!opciones.penal && this.rng.chance(P.pCornerTrasDesvio)) {
       return this.corner(atk, opciones.profundidad + 1);
     }
@@ -328,7 +342,7 @@ class Simulacion {
     const dur =
       (P.duracionMin + this.rng.next() * P.duracionRango) * ESTILO_ATAQUE[atk.eq.estilo].duracion;
     const { pAtaque, xgShift } = this.factores(atk, def);
-    const mFaltasDef = ESTILO_DEFENSA[def.eq.estilo].faltas * (1 + P.fatigaFaltas * this.fatiga());
+    const mFaltasDef = ESTILO_DEFENSA[def.eq.estilo].faltas * (1 + P.fatigaFaltas * this.fatiga()) * this.factorFaltas();
     let gol = false;
 
     this.avanzar(P.pasoEvento);
@@ -337,7 +351,7 @@ class Simulacion {
       if (this.rng.chance(P.pFaltaDefensorMedio * mFaltasDef)) {
         const zona: Zona = def.eq.estilo === "presion" && this.rng.chance(0.5) ? "ataque" : "medio";
         this.falta(def, zona);
-      } else if (this.rng.chance(P.pFaltaAtacante)) {
+      } else if (this.rng.chance(P.pFaltaAtacante * this.factorFaltas())) {
         this.falta(atk, this.rng.chance(0.5) ? "medio" : "defensa");
       }
     } else {
@@ -430,7 +444,7 @@ class Simulacion {
     this.jugarPeriodo(1, saque);
     this.jugarPeriodo(2, this.rival(saque));
     // Brief 011: detalle espacial DESPUÉS de simular, desde streams derivados por (semilla, id).
-    enriquecerEspacial(this.eventos, this.config.seed, this.origenes);
+    enriquecerEspacial(this.eventos, this.config.seed, this.origenes, this.config.condiciones);
     return { config: this.config, eventos: this.eventos };
   }
 }

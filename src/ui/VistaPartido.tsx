@@ -18,6 +18,7 @@ import { Linea } from "./Linea";
 import { ControlesReplay, Ticker } from "./Vivo";
 import { claveValoracion, Ratings } from "./Ratings";
 import { Stats } from "./Stats";
+import { EXPLICA_CONDICIONES, piezasChip } from "../vista/condiciones";
 import { figura as figuraDe, valorar } from "../analista/valoracion";
 
 type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | null;
@@ -231,6 +232,15 @@ export function VistaPartido({
         <div className="overline tnum">
           {etiqueta} · {origen ?? `Seed ${datos.seed}`} · Simulated match{equipoPerspectiva ? ` · Told for ${equipoPerspectiva} supporters` : ""}
         </div>
+        {/* Brief 018: las condiciones registradas, visibles desde el 0' (también en el replay). */}
+        {datos.config.condiciones && (
+          <div className="conditions" data-testid="conditions">
+            <span className="conditions-chip tnum" data-testid="conditions-chip" data-clima={datos.config.condiciones.clima}>
+              {piezasChip(datos.config.condiciones).join(" · ")}
+            </span>
+            <span className="conditions-note">{EXPLICA_CONDICIONES}</span>
+          </div>
+        )}
         <div className="scoreline">
           <div className="team home">
             {local.nombre}

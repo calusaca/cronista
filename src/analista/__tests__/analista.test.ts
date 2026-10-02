@@ -10,7 +10,7 @@ import type { Partido } from "../../sim/tipos";
 import { EQUIPO_LOCAL, EQUIPO_VISITA } from "../__fixtures__/constructor";
 import * as F from "../__fixtures__/partidos";
 import { analizar, claveRelevancia } from "../analista";
-import { TIPOS_HECHO, type Hecho, type TipoHecho } from "../tipos";
+import { TIPOS_HECHO, TIPOS_HECHO_CONDICIONES, type Hecho, type TipoHecho } from "../tipos";
 import {
   DESEMPATE_EVENTO,
   DOBLETE_MIN_GOLES,
@@ -431,7 +431,10 @@ describe(`propiedades de corpus (semillas 1..${CORPUS})`, () => {
 
   it("los 13 tipos de hecho aparecen en el corpus (ningún detector muerto)", () => {
     const vistos = new Set(analisis.flat().map((h) => h.tipo));
-    expect(TIPOS_HECHO.filter((t) => !vistos.has(t))).toEqual([]);
+    // Brief 018: los de condiciones solo existen en partidos de liga (su corpus los prueba aparte,
+    // src/analista/__tests__/condiciones.test.ts); aquí, al revés: jamás aparecen sin condiciones.
+    expect(TIPOS_HECHO.filter((t) => !vistos.has(t) && !TIPOS_HECHO_CONDICIONES.includes(t))).toEqual([]);
+    expect(TIPOS_HECHO_CONDICIONES.filter((t) => vistos.has(t))).toEqual([]);
   });
 
   it("los nombres de jugadores en datos pertenecen a la plantilla del partido", () => {

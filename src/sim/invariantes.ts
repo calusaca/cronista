@@ -5,6 +5,7 @@
 import { MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
+import { CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
@@ -296,6 +297,29 @@ export function verificarEspacial(p: Partido): string[] {
   return err;
 }
 
+/**
+ * Brief 018 — contrato de las condiciones registradas (si las hay). Implementación propia,
+ * independiente de la validación del motor: vocabularios cerrados, temperatura solo en calor
+ * y frío y dentro de su banda, césped solo en natural, visitante un nivel por encima.
+ */
+export function verificarCondiciones(p: Partido): string[] {
+  const c = p.config.condiciones;
+  if (c === undefined) return [];
+  const err: string[] = [];
+  if (!CLIMAS_PARTIDO.includes(c.clima)) err.push(`condiciones: clima ${String(c.clima)}`);
+  const banda = c.clima === "calor" ? TEMPERATURA_C.calor : c.clima === "frio" ? TEMPERATURA_C.frio : undefined;
+  if (banda) {
+    const t = c.temperaturaC;
+    if (t === undefined || !Number.isInteger(t) || t < banda.min || t > banda.max) err.push(`condiciones: ${c.clima} a ${String(t)} °C`);
+  } else if (c.temperaturaC !== undefined) err.push(`condiciones: ${c.clima} con temperatura`);
+  if (!SUPERFICIES.includes(c.superficie)) err.push(`condiciones: superficie ${String(c.superficie)}`);
+  if (c.superficie === "natural" ? c.cesped === undefined || !CESPEDES.includes(c.cesped) : c.cesped !== undefined) err.push(`condiciones: césped ${String(c.cesped)} en ${c.superficie}`);
+  const nl = NIVELES_PRESION.indexOf(c.presion?.local);
+  const nv = NIVELES_PRESION.indexOf(c.presion?.visita);
+  if (nl < 0 || nv < 0 || nv !== nl + 1) err.push(`condiciones: presión ${String(c.presion?.local)}/${String(c.presion?.visita)}`);
+  return err;
+}
+
 export const VERIFICADORES = {
   minutos: verificarMinutos,
   relaciones: verificarRelaciones,
@@ -306,6 +330,8 @@ export const VERIFICADORES = {
   salidas: verificarSalidas,
   contrato: verificarContrato,
   espacial: verificarEspacial,
+  // Brief 018.
+  condiciones: verificarCondiciones,
   // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
   micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;

@@ -212,3 +212,61 @@ export const VELOCIDAD_STATS = { mediaMin: 85, mediaMax: 95, colaAltaKmh: 110, c
 /** V8 computable (brief 015): «desde fuera del área» desde esta distancia; «un misil» desde esta velocidad. */
 export const FUERA_DEL_AREA_M = 17;
 export const MISIL_KMH = 100;
+
+// ---------------------------------------------------------------------------------
+// Brief 018 — condiciones del partido (clima, cancha, presión). Vocabularios cerrados, bandas
+// de temperatura y las BANDAS de los A/B estadísticos: ÚNICA fuente. Los modificadores que
+// producen los efectos viven en parametros.ts (CONDICIONES); las bandas de aquí se escribieron
+// APARTE, como expectativa del brief, para que generador y prueba no se muevan juntos (la
+// técnica de la copia independiente del 012/P12): si alguien toca un modificador, el A/B sale
+// de su banda y se pone rojo.
+// ---------------------------------------------------------------------------------
+
+export const CLIMAS_PARTIDO = ["despejado", "calor", "lluvia", "frio"] as const;
+export type ClimaPartido = (typeof CLIMAS_PARTIDO)[number];
+export const SUPERFICIES = ["natural", "sintetica"] as const;
+export type Superficie = (typeof SUPERFICIES)[number];
+export const CESPEDES = ["corto", "alto"] as const;
+export type Cesped = (typeof CESPEDES)[number];
+export const NIVELES_PRESION = ["baja", "media", "alta"] as const;
+export type NivelPresion = (typeof NIVELES_PRESION)[number];
+
+/** Brief 018 §1: temperatura (°C enteros, inclusivos) de los climas que la registran. Despejado y lluvia no llevan. */
+export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max: 5 } } as const;
+
+/**
+ * Efecto 6 — ventana de la «salida nerviosa» que MIDEN el A/B y el Analista: pérdidas en la
+ * zona de salida antes de este minuto (brief: «los primeros 25'»). El generador tiene su
+ * propia copia en parametros.ts (CONDICIONES.presionHastaMin).
+ */
+export const SALIDA_TEMPRANA_MIN = 25;
+
+/** Tamaño de cada brazo de los A/B del brief 018 (condición vs control, mismas semillas). */
+export const N_AB = 500;
+
+/**
+ * Bandas de los A/B (cociente = condición / control sobre el corpus, salvo donde dice
+ * «diferencia»). Cada banda exige el SIGNO (el intervalo no contiene el 1 o el 0) y acota la
+ * magnitud por los dos lados.
+ */
+export const AB_CONDICIONES = {
+  /** Efecto 1 a 41 °C: pases y tiros del 2.º tiempo (cociente). El 1.er tiempo no cambia. */
+  calorPases2T: { min: 0.72, max: 0.9 },
+  calorTiros2T: { min: 0.6, max: 0.92 },
+  /** Efecto 1, gradiente: el cociente de pases a 30 °C queda entre el de 41 °C y 1. */
+  calorTemperaturaBaja: 30,
+  /** Efecto 2 a 41 °C: faltas del 2.º tiempo (cociente). */
+  calorFaltas2T: { min: 1.15, max: 1.7 },
+  /** Efecto 3: completación de pases (diferencia absoluta) y atajadas que terminan en córner (cociente). */
+  lluviaCompletacion: { min: -0.08, max: -0.025 },
+  lluviaCornerTrasAtajada: { min: 1.25, max: 2.1 },
+  /** Efecto 4: velocidad media del tiro (diferencia, km/h) y fracción de tiros de media distancia (cociente). */
+  sinteticaVelocidadKmh: { min: 2.5, max: 8 },
+  sinteticaMediaDistancia: { min: 1.15, max: 1.8 },
+  /** Efecto 5: completación de pases CORTOS del visitante (diferencia) y la del local, que no se mueve (|diferencia| ≤). */
+  cespedVisitaCortos: { min: -0.1, max: -0.03 },
+  cespedLocalTolerancia: 0.015,
+  /** Efecto 6: pérdidas en salida del presionado antes de SALIDA_TEMPRANA_MIN (cociente) y después (cociente, sin efecto). */
+  presionSalidaTemprana: { min: 1.3, max: 2.6 },
+  presionSalidaDespues: { min: 0.9, max: 1.1 },
+} as const;
