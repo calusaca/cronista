@@ -13,9 +13,10 @@ const AZAR_MAX = 99999;
 
 const SEED_MAX = 4294967295;
 
-export function Simulador({ presets, semillaActual }: { presets: Preset[]; semillaActual: number }) {
+/** Brief 016: `semillaActual` es opcional — en la liga el campo arranca vacío (su semilla no es un /match). */
+export function Simulador({ presets, semillaActual }: { presets: Preset[]; semillaActual?: number }) {
   const router = useRouter();
-  const [semilla, setSemilla] = useState(String(semillaActual));
+  const [semilla, setSemilla] = useState(semillaActual === undefined ? "" : String(semillaActual));
   const [error, setError] = useState<string | null>(null);
 
   const simular = (ev: FormEvent) => {
@@ -40,6 +41,11 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
       <Link href="/" className="brand" prefetch={false}>
         <span className="brand-mark">CRONISTA</span>
         <span className="brand-tag">Match reports where every sentence shows its evidence</span>
+      </Link>
+      <div className="topbar-acciones">
+      {/* Brief 016: la liga ficticia completa. */}
+      <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode">
+        League mode
       </Link>
       <form className="sim-form" onSubmit={simular} aria-label="Simulate a match">
         <select
@@ -84,6 +90,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
           </span>
         )}
       </form>
+      </div>
     </header>
   );
 }

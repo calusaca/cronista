@@ -1,4 +1,5 @@
 // Generador determinista de equipos y plantillas FICTICIAS.
+// Brief 016: el mundo (src/mundo) reusa PREFIJOS y SILABAS_INICIO — se exportan, no cambian.
 // Los nombres de club son lugares inventados; los apellidos se arman con sílabas
 // para no coincidir con jugadores reales. Nada de clubes ni personas reales.
 
@@ -6,7 +7,7 @@ import { normalizarSeed } from "./motor";
 import { crearRng, type Rng } from "./prng";
 import type { Equipo, Estilo, Jugador, Posicion, SimConfig } from "./tipos";
 
-const PREFIJOS = ["Atlético", "Deportivo", "Unión", "Sporting", "Racing", "Club", "Olímpico", "Juventud"] as const;
+export const PREFIJOS = ["Atlético", "Deportivo", "Unión", "Sporting", "Racing", "Club", "Olímpico", "Juventud"] as const;
 const LUGARES = [
   "Torreluna",
   "Pradoalto",
@@ -32,7 +33,7 @@ const NOMBRES = [
   "Owen", "Rafael", "Teo", "Vicente", "Adrián", "Benja", "Darío", "Germán", "Ismael", "Marco",
 ] as const;
 
-const SILABAS_INICIO = ["Bar", "Cel", "Dor", "Fen", "Gal", "Lor", "Mar", "Nev", "Or", "Pal", "Quin", "Ros", "Tor", "Val", "Zar", "Brel", "Cast", "Mend", "Sor", "Ulv"] as const;
+export const SILABAS_INICIO = ["Bar", "Cel", "Dor", "Fen", "Gal", "Lor", "Mar", "Nev", "Or", "Pal", "Quin", "Ros", "Tor", "Val", "Zar", "Brel", "Cast", "Mend", "Sor", "Ulv"] as const;
 const SILABAS_MEDIO = ["", "a", "e", "i", "o", "ar", "el", "in"] as const;
 const SILABAS_FIN = ["ena", "ido", "ales", "ón", "ueta", "era", "ino", "ardi", "osa", "ell", "ánez", "oya", "ich", "uz"] as const;
 

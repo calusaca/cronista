@@ -225,3 +225,25 @@ export const DOMINIO_PASES_MIN = 100;
 export const CANAL_AVANCES_MIN = 10;
 /** Rareza del brief 013: cada hecho nuevo en ≤ 35 % de los partidos del corpus. */
 export const RAREZA_MICRO_MAX = 0.35;
+
+// ---------------------------------------------------------------------------------
+// Brief 016 — el mundo. Constantes de generación (no son umbrales del Analista, pero el
+// brief las pone «en umbrales»: una sola fuente, y las pruebas las importan).
+// ---------------------------------------------------------------------------------
+/** Semilla del mundo: países, ligas, equipos y canchas salen de aquí, de forma determinista. */
+export const MUNDO_SEMILLA = 2026;
+/**
+ * Liga que muestra /liga (id = slug del nombre). Medido el 2 oct sobre la temporada 1 de las 8
+ * ligas (720 partidos): total 27,2 % de empates y 2,72 goles por partido, pegado al motor. La
+ * Liga del Sol Alto (la primera) salió la desafortunada del lote (41,1 % / 2,34); la Liga de
+ * los Valles es la más viva (21,1 % / 2,92). La dispersión de fuerzas es la estándar: es
+ * azar de una temporada, no un sesgo del mundo.
+ */
+export const LIGA_DESTACADA = "liga-de-los-valles";
+/** Temporada que muestra la UI. */
+export const TEMPORADA_ACTUAL = 1;
+export const N_PAISES = 8;
+export const EQUIPOS_POR_LIGA = 10;
+/** Identidad de la cancha (sin efecto hasta el 018): probabilidad de césped sintético y de césped alto. */
+export const PROB_CANCHA_SINTETICA = 0.25;
+export const PROB_CESPED_ALTO = 0.5;

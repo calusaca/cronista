@@ -65,7 +65,12 @@ const equipo = (e: { nombre: string; ataque: number; defensa: number; estilo: Es
 });
 
 export async function cargarPartido(seed: number, perspectiva: Perspectiva = "neutral"): Promise<DatosPartido> {
-  const partido = simular(configDeSemilla(seed));
+  return cargarPartidoDeConfig(configDeSemilla(seed), perspectiva);
+}
+
+/** Brief 016: lo mismo desde una config ya hecha (los partidos de liga la fabrica la temporada). */
+export async function cargarPartidoDeConfig(config: SimConfig, perspectiva: Perspectiva = "neutral"): Promise<DatosPartido> {
+  const partido = simular(config);
   const llm = crearLlmDesdeEnv();
   const { cronica, hechos, desdeCache } = await generarCronica(partido, {
     llm,
@@ -93,7 +98,12 @@ export async function cargarPartido(seed: number, perspectiva: Perspectiva = "ne
 // ---------------------------------------------------------------------------------
 
 export async function cargarOverlay(seed: number, perspectiva: Perspectiva = "neutral"): Promise<Overlay> {
-  const partido = simular(configDeSemilla(seed));
+  return cargarOverlayDeConfig(configDeSemilla(seed), perspectiva);
+}
+
+/** Brief 016: el overlay de un partido de liga (config de la temporada). */
+export async function cargarOverlayDeConfig(config: SimConfig, perspectiva: Perspectiva = "neutral"): Promise<Overlay> {
+  const partido = simular(config);
   const llm = crearLlmDesdeEnv();
   const modo = perspectiva === "neutral" ? "neutral" : (`equipo:${perspectiva}` as const);
   const updates = await generarUpdates(partido, { llm, cache: crearCacheUpdates(), modoPersonalizacion: modo });

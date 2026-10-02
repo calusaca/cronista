@@ -1607,3 +1607,257 @@ button.stats-row:hover {
     gap: 4px;
   }
 }
+
+/* ---------- Brief 016: modo liga (tokens del 010) ---------- */
+
+.topbar-acciones {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.league-link {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14.5px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.league-link:hover {
+  text-decoration: underline;
+}
+
+.liga-head {
+  margin-bottom: 18px;
+}
+
+.liga-titulo {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin: 6px 0 4px;
+  color: var(--ink);
+}
+
+.liga-sub {
+  color: var(--muted);
+  margin: 0;
+}
+
+.liga-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-board);
+  background: var(--surface);
+}
+
+.liga-panel {
+  min-width: 0;
+}
+
+.liga-panel + .liga-panel {
+  border-left: 1px solid var(--line);
+}
+
+/* La tabla es lo único que puede scrollear en horizontal, en su propio contenedor. */
+.tabla-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.tabla th,
+.tabla td {
+  padding: 9px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tabla th {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.tabla th:first-child,
+.tabla td:first-child {
+  text-align: right;
+  width: 2.5em;
+  color: var(--muted);
+}
+
+.tabla .tabla-equipo {
+  text-align: left;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tabla .tabla-pts {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.jornadas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px 4px;
+}
+
+.jornada-pill {
+  min-width: 34px;
+  padding: 5px 0;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.jornada-pill:hover {
+  border-color: var(--hl-line);
+}
+
+.jornada-pill[aria-current="page"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.jornada-partidos {
+  list-style: none;
+  margin: 0;
+  padding: 8px 16px 12px;
+}
+
+.jornada-partido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.jornada-partidos li:last-child .jornada-partido {
+  border-bottom: 0;
+}
+
+.jornada-partido:hover {
+  background: var(--hl);
+}
+
+.jp-local {
+  text-align: right;
+}
+
+.jp-local,
+.jp-visita {
+  overflow-wrap: anywhere;
+}
+
+.jp-marcador {
+  font-weight: 800;
+  font-size: 17px;
+  min-width: 3.2em;
+  text-align: center;
+}
+
+.goleadores-head {
+  border-top: 1px solid var(--line);
+}
+
+.goleadores {
+  margin: 0;
+  padding: 8px 16px 14px 40px;
+}
+
+.goleadores li {
+  padding: 5px 0;
+}
+
+.goleadores li > span {
+  margin-right: 10px;
+}
+
+.gol-jugador {
+  font-weight: 600;
+}
+
+.gol-equipo {
+  color: var(--muted);
+}
+
+.gol-n {
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-bottom: 12px;
+}
+
+.breadcrumb-back {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.breadcrumb-back:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-meta {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.breadcrumb-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+@media (max-width: 900px) {
+  .topbar-acciones {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .liga-grid {
+    grid-template-columns: 1fr;
+  }
+  .liga-panel + .liga-panel {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .liga-titulo {
+    font-size: 27px;
+  }
+  .breadcrumb-nav {
+    margin-left: 0;
+  }
+}

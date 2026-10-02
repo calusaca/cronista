@@ -24,7 +24,24 @@ type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol
 
 const ESTILO: Record<string, string> = { posesion: "possession", contragolpe: "counter-attack", presion: "pressing" };
 
-export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; etiqueta: string; ruta: string }) {
+export function VistaPartido({
+  datos,
+  etiqueta,
+  ruta,
+  overlayUrl,
+  origen,
+}: {
+  datos: DatosPartido;
+  etiqueta: string;
+  ruta: string;
+  /** Brief 016: un partido de liga no se reconstruye desde su semilla; trae su propio endpoint. */
+  overlayUrl?: string;
+  /**
+   * Brief 016 (cierre): rótulo del origen en la cabecera. Por defecto «Seed N»; un partido de
+   * liga dice «League fixture», porque su semilla escrita en Simulate daría OTRO partido.
+   */
+  origen?: string;
+}) {
   const { cronica, hechos, eventos, local, visita } = datos;
   // Jurado internacional: la crónica abre en inglés; el español queda en el toggle.
   const [lengua, setLengua] = useState<Lengua>("en");
@@ -63,7 +80,7 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
     if (overlay) return;
     setErrorOverlay(null);
     const q = datos.perspectiva === "neutral" ? "" : `?perspectiva=${datos.perspectiva}`;
-    fetch(`/api/overlay/${datos.seed}${q}`)
+    fetch(`${overlayUrl ?? `/api/overlay/${datos.seed}`}${q}`)
       .then(async (r) => {
         const json: unknown = await r.json();
         if (!r.ok) throw new Error((json as { error?: string }).error ?? `HTTP ${r.status}`);
@@ -72,7 +89,7 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
         setOverlay(v.data);
       })
       .catch((e: unknown) => setErrorOverlay((e as Error).message));
-  }, [overlay, datos.perspectiva, datos.seed]);
+  }, [overlay, datos.perspectiva, datos.seed, overlayUrl]);
 
   const salirAlFinal = useCallback(() => {
     setVivo(false);
@@ -212,7 +229,7 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
     <div data-testid="match-view" data-seed={datos.seed}>
       <header className="match-head">
         <div className="overline tnum">
-          {etiqueta} · Seed {datos.seed} · Simulated match{equipoPerspectiva ? ` · Told for ${equipoPerspectiva} supporters` : ""}
+          {etiqueta} · {origen ?? `Seed ${datos.seed}`} · Simulated match{equipoPerspectiva ? ` · Told for ${equipoPerspectiva} supporters` : ""}
         </div>
         <div className="scoreline">
           <div className="team home">

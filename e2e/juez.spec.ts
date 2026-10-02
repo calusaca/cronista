@@ -16,6 +16,9 @@ async function clicConMouse(page: Page, l: Locator) {
 }
 
 test("el camino del juez: evidencia, inversa, idioma, caja de cristal y pizarra del gol", async ({ page }) => {
+  // Cierre del 016 (autorizado por Fable): es el camino largo por diseño; bajo carga ya iba a
+  // 51,5 s de los 60 s por defecto. 120 s para este test, y solo este.
+  test.setTimeout(120_000);
   // 1. Home: el partido destacado ya está cargado, sin configurar nada.
   await page.goto("/");
   const destacado = page.getByTestId("featured-match");

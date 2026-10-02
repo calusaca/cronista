@@ -143,3 +143,13 @@ export function motivoValoracion(motivo: string, modo: ModoXg): string {
   }
   return MOTIVO_VALORACION_EN[motivo] ?? motivo;
 }
+
+/** Brief 016: el perfil climático de un país, en el chrome (inglés). */
+export const CLIMA_EN: Record<string, string> = {
+  tropical: "Tropical",
+  desertico: "Desert",
+  templado: "Temperate",
+  nordico: "Nordic",
+  lluvioso: "Rainy",
+  de_altura: "High-altitude",
+};

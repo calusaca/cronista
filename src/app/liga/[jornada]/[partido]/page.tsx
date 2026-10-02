@@ -1,0 +1,64 @@
+// Brief 016 §4 — un partido de liga: la vista de partido de SIEMPRE (crónica, stats, pizarra,
+// ratings, replay), con su config fabricada por la temporada, más un breadcrumb y la
+// navegación anterior/siguiente por el calendario.
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Pie } from "../../../../ui/Pie";
+import { Simulador } from "../../../../ui/Simulador";
+import { VistaPartido } from "../../../../ui/VistaPartido";
+import { cargarPartidoLiga, contextoDe, leerRefPartido, rutaPartidoLiga } from "../../../../vista/liga";
+import { leerPerspectiva, presets } from "../../../../vista/servidor";
+
+export const dynamic = "force-dynamic";
+
+export default async function PartidoDeLiga({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ jornada: string; partido: string }>;
+  searchParams: Promise<{ perspectiva?: string }>;
+}) {
+  const { jornada, partido } = await params;
+  const ref = leerRefPartido(jornada, partido);
+  if (!ref) notFound();
+  const perspectiva = leerPerspectiva((await searchParams).perspectiva);
+  const datos = await cargarPartidoLiga(ref, perspectiva);
+  const c = contextoDe(ref);
+  const ruta = rutaPartidoLiga(ref);
+  return (
+    <>
+      <Simulador presets={presets()} />
+      <main>
+        <nav className="breadcrumb" aria-label="League" data-testid="league-breadcrumb">
+          <Link href={`/liga?j=${c.jornada}`} className="breadcrumb-back" data-testid="league-back" prefetch={false}>
+            ← {c.liga} · Matchday {c.jornada}
+          </Link>
+          <span className="breadcrumb-meta tnum">
+            Match {c.indice} of the matchday · {c.pais}
+          </span>
+          <span className="breadcrumb-nav">
+            {c.anterior ? (
+              <Link href={rutaPartidoLiga(c.anterior)} className="btn btn-quiet" data-testid="league-prev" prefetch={false}>
+                ← Previous
+              </Link>
+            ) : null}
+            {c.siguiente ? (
+              <Link href={rutaPartidoLiga(c.siguiente)} className="btn btn-quiet" data-testid="league-next" prefetch={false}>
+                Next →
+              </Link>
+            ) : null}
+          </span>
+        </nav>
+        <VistaPartido
+          key={`${ruta}|${perspectiva}`}
+          datos={datos}
+          etiqueta={`${c.liga} · Matchday ${c.jornada}`}
+          ruta={ruta}
+          overlayUrl={`/api/liga/${ref.jornada}/${ref.indice}/overlay`}
+          origen="League fixture"
+        />
+      </main>
+      <Pie datos={datos} />
+    </>
+  );
+}
