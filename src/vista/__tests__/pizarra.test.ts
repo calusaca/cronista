@@ -1,8 +1,9 @@
-// Brief 011 — la pizarra dibuja solo lo registrado: geometría desde los campos espaciales,
-// animación que termina EXACTAMENTE en el palo registrado, y caída a la pizarra
-// convencional cuando el partido no tiene detalle (proyección legado).
+// Brief 011 + 012 §F — la pizarra dibuja solo lo registrado: geometría desde los campos
+// espaciales, animación que termina EXACTAMENTE en el palo registrado, caída a la pizarra
+// convencional sin detalle, y (012) origen = paso de ataque inmediato, penal sin córner,
+// una sola definición de «tras córner».
 import { describe, expect, it } from "vitest";
-import { proyeccionLegado } from "../../sim/espacial";
+import { cornerDelTiro, enBanda, proyeccionLegado } from "../../sim/espacial";
 import { DESTINOS } from "../../sim/limites";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
@@ -10,9 +11,10 @@ import type { Evento, Partido } from "../../sim/tipos";
 import { jugadaDelGol } from "../evidencia";
 import { geometriaJugada, posicionBalon, POS_CORNER, POS_DESTINO, POS_ZONA, recorrido } from "../pizarra";
 
-const corpus: Partido[] = Array.from({ length: 300 }, (_, i) => simular(configDeSemilla(i + 1)));
+const corpus: Partido[] = Array.from({ length: 1000 }, (_, i) => simular(configDeSemilla(i + 1)));
 const goles = corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "gol").map((g) => ({ p, g })));
 const tiroDe = (p: Partido, g: Evento) => p.eventos.find((e) => e.id === g.relacionadoCon) as Evento;
+const geoDe = (p: Partido, g: Evento) => geometriaJugada(jugadaDelGol(p.eventos, g.id), p.eventos);
 
 function buscar(pred: (p: Partido, g: Evento) => boolean) {
   const r = goles.find(({ p, g }) => pred(p, g));
@@ -21,35 +23,33 @@ function buscar(pred: (p: Partido, g: Evento) => boolean) {
 }
 
 describe("011 · geometría desde los datos", () => {
-  it("gol de penal ⇒ el remate está en el punto penal (dato: zonaOrigen = punto_penal)", () => {
-    const { p, g, pasos } = buscar((p, g) => tiroDe(p, g).penal === true);
-    const geo = geometriaJugada(pasos)!;
+  it("gol de penal ⇒ el remate está en el punto penal y no hay origen dibujado (la falta no tiene zona)", () => {
+    const { p, g } = buscar((p, g) => tiroDe(p, g).penal === true);
+    const geo = geoDe(p, g)!;
     expect(geo.zona).toBe("punto_penal");
     expect(geo.remate).toEqual(POS_ZONA.punto_penal);
+    expect(geo.origen).toBeUndefined();
     expect(geo.destino).toBe(tiroDe(p, g).destino);
   });
 
-  it("gol tras córner ⇒ el origen está en el banderín de la banda registrada y el remate en el área", () => {
-    const { pasos } = buscar((_p, g) => jugadaDelGol(_p.eventos, g.id).some((s) => s.rol === "corner"));
-    const corner = pasos.find((s) => s.rol === "corner")!.evento;
-    const geo = geometriaJugada(pasos)!;
-    expect(geo.origenRol).toBe("corner");
+  it("gol tras córner (LA definición) ⇒ origen en el banderín de la banda registrada", () => {
+    const { p, g } = buscar((p, g) => cornerDelTiro(p.eventos, p.eventos.indexOf(tiroDe(p, g))) !== undefined && geoDe(p, g)?.origenRol === "corner");
+    const corner = cornerDelTiro(p.eventos, p.eventos.indexOf(tiroDe(p, g)))!;
+    const geo = geoDe(p, g)!;
     expect(geo.origen).toEqual(POS_CORNER[corner.banda!]);
-    expect(["area_chica", "frontal_del_area"]).toContain(geo.zona);
   });
 
-  it("gol de jugada con pase clave ⇒ el origen sale de la zona registrada del pase", () => {
-    const { pasos } = buscar((p, g) => jugadaDelGol(p.eventos, g.id).some((s) => s.rol === "pase_clave"));
+  it("gol con pase clave inmediato ⇒ el origen sale de la zona registrada del pase", () => {
+    const { p, g, pasos } = buscar((p, g) => jugadaDelGol(p.eventos, g.id).filter((s) => s.rol !== "tiro" && s.rol !== "gol").pop()?.rol === "pase_clave");
     const pase = pasos.find((s) => s.rol === "pase_clave")!.evento;
-    const geo = geometriaJugada(pasos)!;
+    const geo = geoDe(p, g)!;
     expect(geo.origenRol).toBe("pase_clave");
-    const z = POS_ZONA[pase.zonaOrigen!];
-    expect(geo.origen!.x).toBe(z.x);
+    expect(geo.origen!.x).toBe(POS_ZONA[pase.zonaOrigen!].x);
   });
 
-  it("todo gol del corpus: el remate es el punto de SU zona y el arco el de SU destino", () => {
+  it("todo gol del corpus: el remate es el punto de SU zona y el arco el de SU destino; máximo 3 pasos", () => {
     for (const { p, g } of goles) {
-      const geo = geometriaJugada(jugadaDelGol(p.eventos, g.id))!;
+      const geo = geoDe(p, g)!;
       const t = tiroDe(p, g);
       expect(geo.remate).toEqual(POS_ZONA[t.zonaOrigen!]);
       expect(geo.arco).toEqual(POS_DESTINO[t.destino!]);
@@ -60,21 +60,81 @@ describe("011 · geometría desde los datos", () => {
   it("sin detalle espacial (proyección legado) ⇒ sin geometría: la UI cae a la pizarra convencional", () => {
     const p = proyeccionLegado(goles[0]!.p);
     const g = p.eventos.find((e) => e.tipo === "gol")!;
-    expect(geometriaJugada(jugadaDelGol(p.eventos, g.id))).toBeUndefined();
+    expect(geometriaJugada(jugadaDelGol(p.eventos, g.id), p.eventos)).toBeUndefined();
+  });
+});
+
+describe("012 §F · re-conteo de pizarras en el corpus 1..1000 (aceptación del brief)", () => {
+  const geos = goles.map(({ p, g }) => ({ p, g, geo: geoDe(p, g)! }));
+
+  it("0 banderín → punto penal", () => {
+    expect(geos.filter(({ geo }) => geo.origenRol === "corner" && geo.zona === "punto_penal").map(({ p, g }) => `${p.config.seed} ${g.id}`)).toEqual([]);
+  });
+
+  it("§F2: la jugada de un penal es falta → tiro → gol (nunca un córner ni un pase en los pasos)", () => {
+    const penales = goles.filter(({ p, g }) => tiroDe(p, g).penal === true);
+    expect(penales.length).toBeGreaterThan(0);
+    for (const { p, g } of penales) {
+      const roles = jugadaDelGol(p.eventos, g.id).map((s) => s.rol);
+      expect(roles.filter((r) => r === "corner" || r === "pase_clave"), `${p.config.seed} ${g.id}`).toEqual([]);
+    }
+  });
+
+  it("0 banderín → media distancia", () => {
+    expect(geos.filter(({ geo }) => geo.origenRol === "corner" && geo.zona === "media_distancia").map(({ p, g }) => `${p.config.seed} ${g.id}`)).toEqual([]);
+  });
+
+  it("0 banderín → banda (rev 1.1: todo tiro tras córner sale del área, sin excepciones)", () => {
+    expect(
+      geos.filter(({ geo }) => geo.origenRol === "corner" && (geo.zona === "banda_izquierda" || geo.zona === "banda_derecha")).map(({ p, g }) => `${p.config.seed} ${g.id}`),
+    ).toEqual([]);
+  });
+
+  it("0 goles fuera de la banda xG de su zona", () => {
+    expect(geos.filter(({ p, g, geo }) => !enBanda(geo.zona, tiroDe(p, g).xg ?? 0)).map(({ p, g }) => `${p.config.seed} ${g.id}`)).toEqual([]);
+  });
+
+  it("pizarra y generador no divergen: el banderín se dibuja SI Y SOLO SI el tiro es «tras córner» y nada más inmediato lo precede", () => {
+    for (const { p, g, geo } of geos) {
+      const i = p.eventos.indexOf(tiroDe(p, g));
+      if (geo.origenRol === "corner") expect(cornerDelTiro(p.eventos, i)).toBeDefined();
+      if (cornerDelTiro(p.eventos, i)) expect(geo.origenRol).toBe("corner");
+    }
+  });
+
+  it("si hay un pase clave entre el córner y el tiro, se dibuja el pase (el córner queda en los pasos de texto)", () => {
+    const caso = goles.find(({ p, g }) => {
+      const r = jugadaDelGol(p.eventos, g.id).map((s) => s.rol);
+      return r.indexOf("corner") >= 0 && r.indexOf("pase_clave") > r.indexOf("corner");
+    });
+    if (!caso) return; // el corpus puede no tenerlo; la regla la cubre también la prueba de abajo
+    expect(geoDe(caso.p, caso.g)!.origenRol).toBe("pase_clave");
+  });
+
+  it("fixture: córner → pase clave → tiro → gol dibuja el pase, no el banderín", () => {
+    const { p, g } = goles.find(({ p, g }) => jugadaDelGol(p.eventos, g.id).some((s) => s.rol === "pase_clave"))!;
+    const ev = JSON.parse(JSON.stringify(p.eventos)) as Evento[];
+    const pi = ev.findIndex((e) => e.id === jugadaDelGol(p.eventos, g.id).find((s) => s.rol === "pase_clave")!.evento.id);
+    const pase = ev[pi]!;
+    // un córner del mismo equipo, en el mismo minuto, justo antes del pase
+    ev.splice(pi, 0, { id: "e999", minuto: pase.minuto, tipo: "corner", equipo: pase.equipo, banda: "izquierda" });
+    const geo = geometriaJugada(jugadaDelGol(ev, g.id), ev)!;
+    expect(jugadaDelGol(ev, g.id).map((s) => s.rol)).toEqual(["corner", "pase_clave", "tiro", "gol"]);
+    expect(geo.origenRol).toBe("pase_clave");
   });
 });
 
 describe("011 · animación conectada al dato", () => {
   it("t = 0 arranca en el primer punto registrado; t = 1 termina EXACTAMENTE en el destino registrado", () => {
-    for (const { p, g } of goles.slice(0, 200)) {
-      const geo = geometriaJugada(jugadaDelGol(p.eventos, g.id))!;
+    for (const { p, g } of goles.slice(0, 400)) {
+      const geo = geoDe(p, g)!;
       expect(posicionBalon(geo, 0)).toEqual(recorrido(geo)[0]);
       expect(posicionBalon(geo, 1)).toEqual(POS_DESTINO[tiroDe(p, g).destino!]);
     }
   });
 
   it("los tres destinos terminan en puntos distintos: palo izquierdo a la izquierda, derecho a la derecha", () => {
-    const base = geometriaJugada(jugadaDelGol(goles[0]!.p.eventos, goles[0]!.g.id))!;
+    const base = geoDe(goles[0]!.p, goles[0]!.g)!;
     const fin = Object.fromEntries(DESTINOS.map((d) => [d, posicionBalon({ ...base, arco: POS_DESTINO[d], destino: d }, 1).x]));
     expect(fin.palo_izquierdo).toBeLessThan(fin.centro_del_arco!);
     expect(fin.palo_derecho).toBeGreaterThan(fin.centro_del_arco!);
@@ -82,7 +142,7 @@ describe("011 · animación conectada al dato", () => {
 
   it("a mitad de recorrido el balón está entre puntos registrados (no inventa desvíos)", () => {
     const { p, g } = goles[0]!;
-    const geo = geometriaJugada(jugadaDelGol(p.eventos, g.id))!;
+    const geo = geoDe(p, g)!;
     const ps = recorrido(geo);
     const m = posicionBalon(geo, 0.5);
     const xs = ps.map((q) => q.x);

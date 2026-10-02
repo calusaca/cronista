@@ -66,8 +66,8 @@ export interface OpcionesUpdates {
 }
 
 /** Motivos del Verificador para unas oraciones ya estructuradas (re-verificación). */
-export function verificarOracionesUpdate(oraciones: Oracion[], hechos: Hecho[], partido: Partido, hechoMomento: string): Motivo[] {
-  return verificarUpdate(JSON.stringify({ oraciones }), hechos, partido, hechoMomento, MAX_ORACIONES_UPDATE).motivos;
+export function verificarOracionesUpdate(oraciones: Oracion[], hechos: Hecho[], partido: Partido, hechoMomento: string, final = false): Motivo[] {
+  return verificarUpdate(JSON.stringify({ oraciones }), hechos, partido, hechoMomento, MAX_ORACIONES_UPDATE, { final }).motivos;
 }
 
 /** La plantilla del hecho del momento: el «acta» de las actualizaciones. */
@@ -95,15 +95,17 @@ function guardar(cache: CacheUpdates | undefined, clave: ClaveUpdate, hechos: He
 export async function generarUpdate(partido: Partido, momento: Momento, opciones: OpcionesUpdates): Promise<UpdateVerificada> {
   const modoP = opciones.modoPersonalizacion ?? "neutral";
   const { hechos, principal, pre } = contextoDelMomento(partido, momento, modoP);
+  // Brief 012 §A1: la regla de cierre en vivo rige en todo momento salvo el final.
+  const esFinal = momento.tipo === "final";
   const asegurar = (oraciones: Oracion[]): Oracion[] => {
-    const m = verificarOracionesUpdate(oraciones, hechos, pre, principal.id);
+    const m = verificarOracionesUpdate(oraciones, hechos, pre, principal.id, esFinal);
     if (m.length > 0) throw new Error(`error de programa: la update ${momento.id} no pasa el Verificador: ${m.map((x) => `${x.regla} ${x.detalle}`).join(" | ")}`);
     return oraciones;
   };
 
   const clave: ClaveUpdate = { seed: partido.config.seed, momento: momento.id, deployment: opciones.llm.id, modo: modoP };
   const cacheada = opciones.cache?.leer(clave, hechos);
-  if (cacheada && verificarOracionesUpdate(cacheada.oraciones, hechos, pre, principal.id).length === 0) {
+  if (cacheada && verificarOracionesUpdate(cacheada.oraciones, hechos, pre, principal.id, esFinal).length === 0) {
     return { momento, ...cacheada, hechos, desdeCache: true };
   }
 
@@ -124,7 +126,7 @@ export async function generarUpdate(partido: Partido, momento: Momento, opciones
     const r =
       errorLlm !== undefined
         ? { oraciones: null, motivos: [{ oracion: -1, regla: "V1" as const, detalle: `el LLM falló: ${errorLlm}` }] }
-        : verificarUpdate(salida, hechos, pre, principal.id, MAX_ORACIONES_UPDATE);
+        : verificarUpdate(salida, hechos, pre, principal.id, MAX_ORACIONES_UPDATE, { final: esFinal });
     const intento: IntentoUpdate = { n: n as 1 | 2 | 3, oraciones: r.oraciones ?? [], veredicto: r.motivos };
     if (!r.oraciones) intento.crudo = salida;
     audit.push(intento);

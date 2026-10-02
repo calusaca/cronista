@@ -24,6 +24,8 @@ import type { Hecho } from "../analista/tipos";
 import type { Partido } from "../sim/tipos";
 import {
   BALANCE_POSTERIOR,
+  CIERRE_EN_VIVO,
+  CIERRE_EN_VIVO_EXCEPTO,
   CUENTA_GOLES,
   FRANJAS,
   FRASES_INFERIORIDAD,
@@ -32,6 +34,7 @@ import {
   FUNCIONALES,
   FUTURO,
   GOL_DECISIVO,
+  GOL_DEFINITIVO,
   JUICIO,
   type Lengua,
   MARGEN,
@@ -399,6 +402,24 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
       });
     if (!ok) h.push({ regla: "V8", detalle: `«${m[0]}»: ese gol no fue el que decidió el partido` });
   });
+  // Brief 012 §D — «definitivo / settled the match»: el ÚLTIMO gol del partido y deja al ganador por delante.
+  s = quitar(s, GOL_DEFINITIVO[lengua], (m) => {
+    const ok =
+      fin !== undefined &&
+      ctx.hechos.some((x) => {
+        if (x.tipo !== "gol_anotado") return false;
+        const [local, visita] = nombresLocalVisita(x, ctx.partido);
+        const ml = x.datos.marcador_local;
+        const mv = x.datos.marcador_visita;
+        const gl = fin.get(local);
+        const gv = fin.get(visita);
+        if (ml !== gl || mv !== gv || gl === undefined || gv === undefined) return false; // no es el último gol
+        const equipo = String(x.datos.equipo);
+        const ganador = gl > gv ? local : gv > gl ? visita : undefined;
+        return ganador !== undefined && ganador === equipo;
+      });
+    if (!ok) h.push({ regla: "V8", detalle: `«${m[0]}»: ese gol no fue el último del partido dejando al ganador por delante` });
+  });
   s = quitar(s, VALLA_INVICTA[lengua], (m) => {
     const equipos = ctx.hechos.map((x) => x.datos.equipo).filter((x): x is string => typeof x === "string");
     const [a, b] = segmentoDe(s, m.index as number);
@@ -443,7 +464,13 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   const r = ctx.resultado;
   const juzgar = (clase: "gana" | "pierde" | "empata", m: RegExpMatchArray, texto: string) => {
     const sujeto = sujetoDe(texto, m.index as number, lengua, ctx.pl);
-    const ok = r !== undefined && (clase === "empata" ? r.empate : !r.empate && sujeto !== undefined && sujeto === (clase === "gana" ? r.ganador : r.perdedor));
+    // Brief 012 §C: con un GOL como principal, «empató / equalised» es computable: el marcador
+    // tras ese gol (datos del hecho) queda igualado.
+    const empateDeGol = ctx.hechos.some((x) => x.tipo === "gol_anotado" && typeof x.datos.marcador_local === "number" && x.datos.marcador_local === x.datos.marcador_visita);
+    const ok =
+      clase === "empata"
+        ? (r !== undefined && r.empate) || empateDeGol
+        : r !== undefined && !r.empate && sujeto !== undefined && sujeto === (clase === "gana" ? r.ganador : r.perdedor);
     if (!ok) h.push({ regla: "V8", detalle: `«${m[0]}»${sujeto ? ` con sujeto ${sujeto}` : ""} no coincide con el resultado que afirma el hecho` });
   };
   let sv = quitar(s, verbos.excepto);
@@ -694,6 +721,7 @@ export function verificarUpdate(
   partido: Partido,
   hechoMomento: string,
   maxOraciones: number,
+  opciones: { final?: boolean } = {},
 ): { oraciones: Oracion[] | null; motivos: Motivo[] } {
   let t = salida.trim();
   const fence = t.match(/^```(?:json)?\s*\n([\s\S]*)\n```$/);
@@ -720,6 +748,16 @@ export function verificarUpdate(
       if (m) motivos.push({ oracion: i, regla: "V7", detalle: `balance posterior en vivo («${m[0]}»): el partido sigue y ese balance afirmaría una ausencia que nadie conoce todavía (${lengua.toUpperCase()})` });
     }
   });
+  // Brief 012 §A1: antes del final nada está terminado ni decidido (ES y EN por separado).
+  if (opciones.final !== true) {
+    oraciones.forEach((o, i) => {
+      for (const [lengua, texto] of [["es", o.texto_es], ["en", o.texto_en]] as const) {
+        const limpio = texto.replace(new RegExp(CIERRE_EN_VIVO_EXCEPTO[lengua].source, "giu"), " ");
+        const m = limpio.match(new RegExp(CIERRE_EN_VIVO[lengua].source, "iu"));
+        if (m) motivos.push({ oracion: i, regla: "V8", detalle: `cierre en vivo («${m[0]}»): antes del final el partido no está terminado ni decidido (${lengua.toUpperCase()})` });
+      }
+    });
+  }
   if (oraciones[0]?.hecho !== hechoMomento) {
     motivos.push({ oracion: 0, regla: "V5", detalle: `la actualización debe narrar primero el hecho de su momento (${hechoMomento})` });
   }

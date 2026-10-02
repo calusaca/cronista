@@ -2,6 +2,7 @@
 // los umbrales viven en limites.ts. Estos valores se ajustan para que el motor caiga
 // dentro de esos umbrales, nunca al revés.
 
+import { XG_PENAL } from "./limites";
 import type { Estilo, Posicion } from "./tipos";
 
 export const P = {
@@ -50,7 +51,7 @@ export const P = {
   pCornerTrasDesvio: 0.12,
   /** Tiro tras corner (cabezazo). */
   pTiroCorner: 0.3,
-  xgPenal: 0.76,
+  xgPenal: XG_PENAL, // brief 012: la misma cifra que la banda del punto penal (limites.ts)
   /** Tras una falta en el último tercio: penal o tiro libre directo. */
   pPenalTrasFalta: 0.035,
   pTiroLibreTrasFalta: 0.12,
@@ -134,7 +135,9 @@ export const ESPACIAL = {
   jugadaClara: { area_chica: 0.55, frontal_del_area: 0.3, banda_izquierda: 0.075, banda_derecha: 0.075 },
   /** Tiro de jugada intermedio (entre las dos bandas). */
   jugadaMedia: { frontal_del_area: 0.6, banda_izquierda: 0.2, banda_derecha: 0.2 },
-  /** Tiro de jugada lejano (xG ≤ banda de media distancia). */
+  /** Brief 012: un tiro de jugada con xG ≤ esto (y dentro de la banda de media distancia) usa la tabla lejana. */
+  lejanoXgMax: 0.08,
+  /** Tiro de jugada lejano. */
   jugadaLejana: { media_distancia: 0.5, frontal_del_area: 0.2, banda_izquierda: 0.15, banda_derecha: 0.15 },
   /** Cabezazo de córner con ocasión clara; si no, frontal del área. */
   cornerClaro: { area_chica: 0.7, frontal_del_area: 0.3 },

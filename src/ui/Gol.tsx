@@ -153,8 +153,15 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
         {terminada && (
           <>
             <circle cx={geo.arco.x} cy={geo.arco.y + 0.6} r="1.2" fill="none" stroke="var(--accent)" strokeWidth="0.5" data-testid="pitch-target" />
-            {/* Al costado del arco (no sobre la trayectoria): el palo y la altura registrados. */}
-            <text x={57} y={5.4} fontSize="2.6" fill="var(--ink)" textAnchor="start" data-testid="pitch-destino">
+            {/* Al costado del arco, del lado CONTRARIO al remate (así no pisa la trayectoria). */}
+            <text
+              x={geo.remate.x > 50 ? 43 : 57}
+              y={5.4}
+              fontSize="2.6"
+              fill="var(--ink)"
+              textAnchor={geo.remate.x > 50 ? "end" : "start"}
+              data-testid="pitch-destino"
+            >
               {DESTINO_EN[geo.destino]}
               {geo.altura ? ` · ${ALTURA_EN[geo.altura]}` : ""}
             </text>
@@ -216,7 +223,7 @@ function PizarraConvencional({ pasos }: { pasos: PasoJugada[] }) {
 export function TarjetaGol({ eventos, golId, citas, onCerrar }: { eventos: Evento[]; golId: string; citas: number; onCerrar: () => void }) {
   const pasos = jugadaDelGol(eventos, golId);
   const gol = pasos.find((p) => p.rol === "gol")?.evento;
-  const geo = geometriaJugada(pasos);
+  const geo = geometriaJugada(pasos, eventos);
   const tirador = pasos.find((p) => p.rol === "tiro")?.evento;
   const pasador = geo?.origenRol ? pasos.find((p) => p.rol === geo.origenRol)?.evento : undefined;
   const citado = citas > 0 ? ` Cited by ${citas} ${citas === 1 ? "sentence" : "sentences"} of the report.` : "";

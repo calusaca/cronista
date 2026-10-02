@@ -191,5 +191,7 @@ describe("sin LLM solo con acta", () => {
     });
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/modo acta · sin LLM \(acta pedida\)/);
-  });
+    // Un subproceso de tsx tarda ~4–5 s con la suite en paralelo: el límite de la prueba es el
+    // mismo que el del spawn (con el de 5 s por defecto se ponía roja por carga, no por fallo).
+  }, 60_000);
 });

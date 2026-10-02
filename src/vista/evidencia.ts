@@ -3,6 +3,7 @@
 // y la jugada de un gol. Todo sale de datos reales — nunca de un mapeo hecho a mano.
 // Sin React ni DOM: se prueba con vitest.
 
+import { TIPOS_ATAQUE, TRAS_CORNER_MAX_MIN } from "../sim/limites";
 import type { Hecho } from "../analista/tipos";
 import type { CronicaVerificada, IntentoAudit, Motivo, Oracion } from "../cadena/tipos";
 import type { Evento, Lado } from "../sim/tipos";
@@ -143,8 +144,12 @@ export interface PasoJugada {
 
 /**
  * La jugada de un gol: su tiro (relacionadoCon) y lo que lo preparó inmediatamente antes
- * en el stream — un pase clave o un córner del mismo equipo, o la falta rival si fue
- * penal — sin cruzar más de un minuto. Nada que los eventos no digan.
+ * en el stream, sin cruzar más de TRAS_CORNER_MAX_MIN minutos. Nada que los eventos no digan.
+ * - Penal: la falta rival (las tarjetas de esa falta se saltan) y ahí termina (brief 012 §F2:
+ *   un penal nunca es «tras córner»).
+ * - Si no: hacia atrás por los eventos de ATAQUE (los demás — faltas, tarjetas, cambios — se
+ *   saltan), hasta 2 pasos de pase clave o córner del mismo equipo. Es el mismo recorrido de
+ *   `cornerDelTiro` (brief 012 §F4), así pizarra y generador no pueden divergir.
  */
 export function jugadaDelGol(eventos: Evento[], golId: string): PasoJugada[] {
   const idx = new Map(eventos.map((e, i) => [e.id, i] as const));
@@ -156,12 +161,15 @@ export function jugadaDelGol(eventos: Evento[], golId: string): PasoJugada[] {
   const previos: PasoJugada[] = [];
   for (let k = ti - 1; k >= 0 && previos.length < 2; k--) {
     const e = eventos[k] as Evento;
-    if (tiro.minuto - e.minuto > 1) break;
+    if (tiro.minuto - e.minuto > TRAS_CORNER_MAX_MIN) break;
+    if (tiro.penal === true) {
+      if (e.tipo === "tarjeta_amarilla" || e.tipo === "tarjeta_roja") continue;
+      if (e.tipo === "falta" && e.equipo !== tiro.equipo) previos.unshift({ evento: e, rol: "falta" });
+      break;
+    }
+    if (!TIPOS_ATAQUE.includes(e.tipo)) continue;
     if (e.tipo === "pase_clave" && e.equipo === tiro.equipo) previos.unshift({ evento: e, rol: "pase_clave" });
     else if (e.tipo === "corner" && e.equipo === tiro.equipo) previos.unshift({ evento: e, rol: "corner" });
-    else if (e.tipo === "falta" && e.equipo !== tiro.equipo && tiro.penal === true) previos.unshift({ evento: e, rol: "falta" });
-    // Las tarjetas van justo después de su falta (penal): se saltan sin cortar la jugada.
-    else if (e.tipo === "tarjeta_amarilla" || e.tipo === "tarjeta_roja") continue;
     else break;
   }
   return [...previos, { evento: tiro, rol: "tiro" }, { evento: gol, rol: "gol" }];

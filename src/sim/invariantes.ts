@@ -3,7 +3,8 @@
 // La prop. 1 (determinismo) se prueba directamente en la suite.
 
 import { MAX_CAMBIOS, TITULARES, type Lado, type Partido } from "./tipos";
-import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
+import { cornerDelTiro, enBanda } from "./espacial";
+import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
 export function verificarMinutos(p: Partido): string[] {
@@ -206,9 +207,9 @@ export function verificarContrato(p: Partido): string[] {
  * ellos, como los fixtures hechos a mano, es válido); si están, tienen que cuadrar:
  * - vocabulario cerrado y solo en los tipos de evento que corresponden;
  * - penal ⇔ zonaOrigen = punto_penal;
- * - tiro nacido de un córner (el tiro inmediatamente posterior a un córner del mismo
- *   equipo: así lo emite el motor, cabezazo tras el saque) ⇒ zona de área;
- * - zona↔xG por bandas (ZONA_XG);
+ * - tiro tras córner (brief 012: LA definición `cornerDelTiro`, la misma del generador y
+ *   la pizarra) ⇒ zona de área, sin excepciones (rev 1.1 del 012: el frontal empieza en 0.01);
+ * - zona↔xG: la banda COMPLETA de cada zona (ZONA_XG_BANDAS, brief 012 §F1);
  * - el gol repite zona/destino/altura de su tiro; la atajada, el lado del portero que
  *   corresponde al destino del tiro (LADO_PORTERO_DE); pase clave solo desde ZONAS_ORIGEN_PASE.
  */
@@ -240,12 +241,13 @@ export function verificarEspacial(p: Partido): string[] {
     if (e.tipo === "tiro" && e.zonaOrigen !== undefined) {
       if (e.penal === true && e.zonaOrigen !== "punto_penal") err.push(`${e.id}: penal con zonaOrigen ${e.zonaOrigen}`);
       if (e.penal !== true && e.zonaOrigen === "punto_penal") err.push(`${e.id}: punto_penal en un tiro que no es penal`);
-      const prev = p.eventos[i - 1];
-      if (prev?.tipo === "corner" && prev.equipo === e.equipo && !ZONAS_AREA.includes(e.zonaOrigen))
-        err.push(`${e.id}: tiro de córner desde ${e.zonaOrigen} (fuera del área)`);
       const xg = e.xg ?? 0;
-      if (e.zonaOrigen === "area_chica" && xg < ZONA_XG.areaChicaXgMin) err.push(`${e.id}: area_chica con xG ${xg}`);
-      if (e.zonaOrigen === "media_distancia" && xg > ZONA_XG.mediaDistanciaXgMax) err.push(`${e.id}: media_distancia con xG ${xg}`);
+      if (cornerDelTiro(p.eventos, i) && !ZONAS_AREA.includes(e.zonaOrigen))
+        err.push(`${e.id}: tiro de córner desde ${e.zonaOrigen} (fuera del área)`);
+      if (!enBanda(e.zonaOrigen, xg)) {
+        const b = ZONA_XG_BANDAS[e.zonaOrigen];
+        err.push(`${e.id}: ${e.zonaOrigen} con xG ${xg} (banda [${b.min}, ${b.max}${b.incluyeMax ? "]" : ")"})`);
+      }
     }
     if (e.tipo === "pase_clave" && e.zonaOrigen !== undefined && !ZONAS_ORIGEN_PASE.includes(e.zonaOrigen))
       err.push(`${e.id}: pase clave desde ${e.zonaOrigen}`);

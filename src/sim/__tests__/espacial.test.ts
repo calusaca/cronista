@@ -7,7 +7,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { proyeccionLegado } from "../espacial";
 import { verificarEspacial, VERIFICADORES } from "../invariantes";
-import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG, ZONAS_AREA, ZONAS_ORIGEN } from "../limites";
+import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN } from "../limites";
+import { cornerDelTiro, enBanda } from "../espacial";
 import { simular } from "../motor";
 import { configDeSemilla } from "../plantillas";
 import { prngDerivado } from "../prng";
@@ -110,15 +111,15 @@ describe(`011 · coherencia espacial sobre el corpus 1..${CORPUS_INV}`, () => {
     const penales = todos.filter((e) => e.tipo === "tiro" && e.penal);
     expect(penales.length).toBeGreaterThan(0);
     expect(penales.every((e) => e.zonaOrigen === "punto_penal")).toBe(true);
-    const deCorner = corpus.flatMap((p) => p.eventos.filter((e, i) => e.tipo === "tiro" && p.eventos[i - 1]?.tipo === "corner" && p.eventos[i - 1]?.equipo === e.equipo));
+    const deCorner = corpus.flatMap((p) => p.eventos.filter((e, i) => cornerDelTiro(p.eventos, i) !== undefined));
     expect(deCorner.length).toBeGreaterThan(50);
     expect(deCorner.every((e) => ZONAS_AREA.includes(e.zonaOrigen!))).toBe(true);
     const chica = todos.filter((e) => e.tipo === "tiro" && e.zonaOrigen === "area_chica");
     const lejos = todos.filter((e) => e.tipo === "tiro" && e.zonaOrigen === "media_distancia");
     expect(chica.length).toBeGreaterThan(0);
     expect(lejos.length).toBeGreaterThan(0);
-    expect(chica.every((e) => (e.xg ?? 0) >= ZONA_XG.areaChicaXgMin)).toBe(true);
-    expect(lejos.every((e) => (e.xg ?? 0) <= ZONA_XG.mediaDistanciaXgMax)).toBe(true);
+    expect(chica.every((e) => enBanda("area_chica", e.xg ?? 0))).toBe(true);
+    expect(lejos.every((e) => enBanda("media_distancia", e.xg ?? 0))).toBe(true);
   });
 });
 
@@ -149,7 +150,7 @@ describe("011 · mutaciones de control sobre verificarEspacial", () => {
   });
   it("detecta un cabezazo de córner desde fuera del área", () => {
     const p = clonar(base);
-    const t = ev(p, (e, i) => e.tipo === "tiro" && p.eventos[i - 1]?.tipo === "corner" && p.eventos[i - 1]?.equipo === e.equipo);
+    const t = ev(p, (_e, i) => cornerDelTiro(p.eventos, i) !== undefined);
     t.zonaOrigen = "banda_izquierda";
     expect(verificarEspacial(p).some((m) => m.includes("córner"))).toBe(true);
   });
@@ -157,13 +158,13 @@ describe("011 · mutaciones de control sobre verificarEspacial", () => {
     const p = clonar(base);
     // Un tiro sin gol colgado: así el gol que copia su zona no da un motivo que se confunda.
     const conGol = new Set(p.eventos.filter((e) => e.tipo === "gol").map((e) => e.relacionadoCon));
-    const t = ev(p, (e, i) => e.tipo === "tiro" && !e.penal && !conGol.has(e.id) && p.eventos[i - 1]?.tipo !== "corner");
+    const t = ev(p, (e, i) => e.tipo === "tiro" && !e.penal && !conGol.has(e.id) && cornerDelTiro(p.eventos, i) === undefined);
     t.zonaOrigen = "area_chica";
-    t.xg = ZONA_XG.areaChicaXgMin - 0.01;
-    expect(verificarEspacial(p)).toEqual([`${t.id}: area_chica con xG ${t.xg}`]);
+    t.xg = ZONA_XG_BANDAS.area_chica.min - 0.01;
+    expect(verificarEspacial(p)).toEqual([expect.stringContaining(`${t.id}: area_chica con xG ${t.xg} (banda`)]);
     t.zonaOrigen = "media_distancia";
-    t.xg = ZONA_XG.mediaDistanciaXgMax + 0.01;
-    expect(verificarEspacial(p)).toEqual([`${t.id}: media_distancia con xG ${t.xg}`]);
+    t.xg = ZONA_XG_BANDAS.media_distancia.max;
+    expect(verificarEspacial(p)).toEqual([expect.stringContaining(`${t.id}: media_distancia con xG ${t.xg} (banda`)]);
   });
   it("detecta un portero tirado al lado equivocado", () => {
     const p = clonar(base);
@@ -188,5 +189,56 @@ describe("011 · mutaciones de control sobre verificarEspacial", () => {
     const m = verificarEspacial(p);
     expect(m.some((x) => x.includes("banda fuera de vocabulario"))).toBe(true);
     expect(m.some((x) => x.includes("destino en falta"))).toBe(true);
+  });
+});
+
+describe("012 §E · P12 — bandas xG por zona, con COPIA INDEPENDIENTE de las del brief 012 §F1", () => {
+  // Copia literal del brief (NO importada de limites.ts): si el generador y el invariante se
+  // mueven juntos (los dos leen ZONA_XG_BANDAS), esta prueba se pone roja.
+  // área chica [0.15, 1.0] · punto penal = xG del penal (0.76) · frontal [0.01, 0.50) (rev 1.1) ·
+  // bandas [0.01, 0.30) · media distancia [0.01, 0.15)  — en centésimas.
+  const BRIEF: Record<string, (c: number) => boolean> = {
+    area_chica: (c) => c >= 15 && c <= 100,
+    punto_penal: (c) => c === 76,
+    frontal_del_area: (c) => c >= 1 && c < 50,
+    banda_izquierda: (c) => c >= 1 && c < 30,
+    banda_derecha: (c) => c >= 1 && c < 30,
+    media_distancia: (c) => c >= 1 && c < 15,
+  };
+
+  it("todo tiro y gol del corpus 1..1000 cae en la banda que fija el brief para su zona", () => {
+    const fuera: string[] = [];
+    for (const p of partidos) {
+      for (const e of p.eventos) {
+        if ((e.tipo !== "tiro" && e.tipo !== "gol") || !e.zonaOrigen) continue;
+        if (!BRIEF[e.zonaOrigen]!(Math.round((e.xg ?? 0) * 100))) fuera.push(`seed ${p.config.seed} ${e.id} ${e.zonaOrigen} xG ${e.xg}`);
+      }
+    }
+    expect(fuera.slice(0, 10)).toEqual([]);
+  });
+
+  it("y la matriz de limites.ts dice lo mismo que el brief (contraste directo)", () => {
+    expect(ZONA_XG_BANDAS).toEqual({
+      area_chica: { min: 0.15, max: 1.0, incluyeMax: true },
+      punto_penal: { min: 0.76, max: 0.76, incluyeMax: true },
+      frontal_del_area: { min: 0.01, max: 0.5, incluyeMax: false },
+      banda_izquierda: { min: 0.01, max: 0.3, incluyeMax: false },
+      banda_derecha: { min: 0.01, max: 0.3, incluyeMax: false },
+      media_distancia: { min: 0.01, max: 0.15, incluyeMax: false },
+    });
+  });
+});
+
+describe("012 · el sorteo respeta la intención, no solo la banda", () => {
+  it("entre los tiros de jugada con xG de área chica, el área chica es la zona más frecuente (una ocasión clara nace cerca)", () => {
+    const cuenta: Record<string, number> = {};
+    for (const p of partidos.slice(0, 500)) {
+      p.eventos.forEach((e, i) => {
+        if (e.tipo !== "tiro" || e.penal || cornerDelTiro(p.eventos, i) || !enBanda("area_chica", e.xg ?? 0)) return;
+        cuenta[e.zonaOrigen!] = (cuenta[e.zonaOrigen!] ?? 0) + 1;
+      });
+    }
+    const orden = Object.entries(cuenta).sort((a, b) => b[1] - a[1]);
+    expect(orden[0]?.[0]).toBe("area_chica");
   });
 });

@@ -289,8 +289,15 @@ export const JUICIO: EntradaJuicio[] = [
     // Brief 009: «figura / man of the match / player of the match» SOLO con el hecho
     // figura_del_partido como principal (la nota computada desde los eventos la respalda).
     id: "figura",
-    es: palabras(["figura", "la figura", "figura del partido", "jugador del partido", "el mejor del partido"]),
-    en: palabras(["man of the match", "player of the match", "star of the match"]),
+    // Brief 012 §B: ampliada; ES y EN se buscan por separado (el español no se salva por su par).
+    es: palabras([
+      "figura", "la figura", "figura del partido", "jugador del partido", "el mejor del partido", "el mejor de la cancha", "el mejor del campo",
+      "el mejor hombre", "el hombre más destacado", "el jugador más destacado", "la estrella del partido", "el mejor jugador", "mejor jugador",
+    ]),
+    en: palabras([
+      "man of the match", "player of the match", "star of the match", "best player on the pitch", "best player on the field", "best player",
+      "star man", "man of the hour", "standout player", "outstanding player",
+    ]),
     habilita: (h) => h.tipo === "figura_del_partido",
     requisito: "«figura / man of the match / player of the match» exige el hecho figura_del_partido como principal",
   },
@@ -334,7 +341,8 @@ export const VERBOS_RESULTADO: Record<Lengua, { gana: RegExp; pierde: RegExp; em
       "se llevó la victoria", "se quedó con la victoria", "superó", "supera", "se quedó con el partido", "doblegó", "doblega", "batió",
     ]),
     pierde: palabras(["perdió", "pierde", "perdieron", "cayó", "cae", "cayeron", "sucumbió", "sucumbe"]),
-    empata: palabras(["empató", "empata", "empataron"]),
+    // Brief 012 §C: con un gol como principal, «empató/igualó» es computable (marcador igualado tras ese gol).
+    empata: palabras(["empató", "empata", "empataron", "igualó", "igualaron", "puso el empate", "niveló"]),
     // Pasiva: el sujeto gramatical PIERDE («J fue superado por A»). Se detecta antes que la activa.
     pasiva: palabras([
       "fue superado por", "fue superada por", "fueron superados por", "fue derrotado por", "fue derrotada por", "fue vencido por",
@@ -348,7 +356,7 @@ export const VERBOS_RESULTADO: Record<Lengua, { gana: RegExp; pierde: RegExp; em
       "downed", "downs", "cruised past", "cruise past", "got the better of", "gets the better of", "overpowered",
     ]),
     pierde: palabras(["lost", "loses", "fell to", "went down", "succumbed", "succumbs"]),
-    empata: palabras(["drew", "draws", "drawn", "held to a draw"]),
+    empata: palabras(["drew", "draws", "drawn", "held to a draw", "equalised", "equalized", "drew level", "levelled", "leveled", "pulled level"]),
     pasiva: palabras([
       "were beaten by", "was beaten by", "were defeated by", "was defeated by", "were outplayed by", "was outplayed by",
       "were thrashed by", "was thrashed by", "were downed by", "was downed by", "were edged by", "was edged by", "were overcome by",
@@ -371,6 +379,16 @@ export const PREPOSICIONES: Record<Lengua, Set<string>> = {
 export const GOL_DECISIVO: Record<Lengua, RegExp> = {
   es: palabras(["gol de la victoria", "gol del triunfo", "gol decisivo", "tanto decisivo", "tanto de la victoria", "gol ganador", "el gol que decidió"]),
   en: palabras(["the winning goal", "winning goal", "decisive goal", "match-winner", "game-winner", "scored the winner", "netted the winner", "grabbed the winner", "the winner in minute"]),
+};
+
+/**
+ * Brief 012 §D — «definitivo / settled the match»: solo si ese gol es el ÚLTIMO del partido
+ * y deja al equipo ganador por delante (computable con los datos del hecho y el final).
+ * En vivo, antes del final, lo rechaza además CIERRE_EN_VIVO.
+ */
+export const GOL_DEFINITIVO: Record<Lengua, RegExp> = {
+  es: palabras(["gol definitivo", "tanto definitivo", "definitivo", "definitiva", "cerró el partido", "liquidó el partido"]),
+  en: palabras(["settled the match", "settled the game", "settled it", "to settle it", "to settle the match", "settle the match", "the decisive final goal"]),
 };
 
 /** «valla invicta / clean sheet»: el equipo del hecho no recibió goles en el partido. */
@@ -403,22 +421,77 @@ export const FRANJAS: { id: "tras_descanso" | "final" | "temprano" | "descuento"
   },
 ];
 
-/** Tiempo futuro (rev. 3.2): los hechos son pasados; una crónica no anuncia. */
 /**
  * Hallazgo F1 del 008 — SOLO en actualizaciones en vivo: un balance de lo que pasó
  * «después» de un momento. Sobre un prefijo ese balance es parcial y se lee como de cierre
  * («afterwards … scored 0»), y el cero del marcador del momento lo respaldaría ante V7. En
  * vivo el partido sigue: el balance posterior se rechaza siempre (V7). La crónica completa
  * no usa esta lista (la plantilla de la expulsión del 002 sí dice «después»).
+ * Brief 012 §A2: ampliada y simétrica ES/EN; la regla corre sobre los DOS textos.
  */
 export const BALANCE_POSTERIOR: Record<Lengua, RegExp> = {
-  es: palabras(["después", "despues", "desde entonces", "a partir de ahí", "a partir de entonces", "en adelante", "tras eso", "luego de eso", "hasta el final", "el resto del partido", "más tarde"]),
-  en: palabras(["afterwards", "afterward", "after that", "since then", "thereafter", "from then on", "from that point", "until the end", "the rest of the match", "the rest of the game", "later on"]),
+  es: palabras([
+    "después", "despues", "desde entonces", "a partir de ahí", "a partir de entonces", "en adelante", "tras eso", "luego de eso", "hasta el final",
+    "el resto del partido", "más tarde",
+    // brief 012
+    "luego", "a continuación", "posteriormente", "acto seguido", "desde ahí", "en lo que quedaba", "lo que quedaba", "en lo que restaba",
+    "lo que restaba", "por el resto", "en el resto",
+  ]),
+  en: palabras([
+    "afterwards", "afterward", "after that", "since then", "thereafter", "from then on", "from that point", "until the end", "the rest of the match",
+    "the rest of the game", "later on",
+    // brief 012
+    "later", "subsequently", "from there", "for the remainder", "the remainder", "in what remained", "what remained", "for the rest",
+    "in the rest",
+  ]),
 };
 
+/**
+ * Brief 012 §A1 — SOLO en actualizaciones en vivo y SOLO en momentos ≠ final: vocabulario de
+ * partido terminado o decidido. Antes del pitazo final nada está terminado ni sentenciado.
+ * ES y EN se buscan por separado. `CIERRE_EN_VIVO_EXCEPTO` deja pasar lo que sí es verdad en
+ * el descanso («el primer tiempo terminó / the first half ended»).
+ */
+export const CIERRE_EN_VIVO: Record<Lengua, RegExp> = {
+  es: palabras([
+    "resultado final", "marcador final", "final del partido", "pitazo final", "terminó", "el partido terminó", "el partido acabó", "acabó el partido", "finalizó", "cerró el marcador",
+    "cerró la cuenta", "sentenció", "sentenciado", "selló", "liquidó", "encaminó la victoria", "encarriló", "definitivo", "definitiva",
+    "decisivo", "decisiva", "gol del triunfo", "gol de la victoria", "decidió el partido", "partido decidido", "aseguró la victoria",
+  ]),
+  en: palabras([
+    "full time", "full-time", "final score", "final whistle", "ended", "the match ended", "the match finished", "finished the match", "completed the scoring", "complete the scoring", "completing the scoring", "sealed the win",
+    "sealed it", "sealed", "wrapped up", "clinched", "on course for victory", "would prove decisive", "decisive", "settled the match", "settled it", "settle the match", "settle it",
+    "winning goal", "the winner", "decided the match",
+  ]),
+};
+export const CIERRE_EN_VIVO_EXCEPTO: Record<Lengua, RegExp> = {
+  es: palabras(["el primer tiempo terminó", "terminó el primer tiempo", "la primera parte terminó", "terminó la primera parte", "el primer tiempo acabó", "acabó el primer tiempo"]),
+  en: palabras(["the first half ended", "first half ended", "the half ended", "the first half finished", "first half finished"]),
+};
+
+/**
+ * Tiempo futuro (rev. 3.2): los hechos son pasados; una crónica no anuncia.
+ * Brief 012 §A3: + condicional (verbos del dominio en «-ría/-rían»: un sufijo genérico
+ * atraparía «categoría, mayoría»), perífrasis «va a + infinitivo», «would», «looks set to»,
+ * «on course to».
+ */
+const CONDICIONAL_ES = [
+  "terminaría", "terminarían", "sería", "serían", "acabaría", "acabarían", "quedaría", "quedarían", "ganaría", "ganarían", "perdería",
+  "perderían", "empataría", "empatarían", "marcaría", "marcarían", "llegaría", "llegarían", "resistiría", "resistirían", "sentenciaría",
+  "cerraría", "sellaría", "definiría", "decidiría", "remontaría", "remontarían", "aguantaría", "aguantarían", "mantendría", "mantendrían",
+  "lograría", "lograrían", "conseguiría", "conseguirían", "daría", "darían", "haría", "harían", "podría", "podrían", "tendría", "tendrían",
+  "iría", "irían", "vendría", "vendrían", "saldría", "saldrían", "pondría", "pondrían", "habría", "habrían",
+];
 export const FUTURO: Record<Lengua, RegExp> = {
-  es: /(?<![\p{L}])\p{L}{2,}(?:ará|erá|irá|arán|erán|irán)(?![\p{L}])/giu,
-  en: palabras(["will", "shall", "going to", "is set to", "are set to"]),
+  es: new RegExp(
+    [
+      /(?<![\p{L}])\p{L}{2,}(?:ará|erá|irá|arán|erán|irán)(?![\p{L}])/u.source,
+      palabras(CONDICIONAL_ES).source,
+      /(?<![\p{L}])(?:va|van|vamos)\s+a\s+\p{L}+(?:ar|er|ir)(?![\p{L}])/u.source,
+    ].join("|"),
+    "giu",
+  ),
+  en: palabras(["will", "shall", "going to", "is set to", "are set to", "would", "looks set to", "look set to", "looked set to", "on course to", "is about to"]),
 };
 
 // ---------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 // x 45 a 55), la vista es la del atacante mirando al arco: su izquierda es x pequeña.
 
 import type { Destino, ZonaOrigen } from "../sim/limites";
+import { cornerDelTiro } from "../sim/espacial";
 import type { Evento } from "../sim/tipos";
 import type { PasoJugada } from "./evidencia";
 
@@ -53,19 +54,28 @@ export interface GeometriaJugada {
 /**
  * Geometría desde los datos, o undefined si el tiro no tiene detalle espacial (un partido
  * viejo): entonces la UI cae a la pizarra convencional con su rótulo anterior.
+ *
+ * Brief 012 §F3–F4: el origen dibujado es el paso de ataque INMEDIATO al remate (si hay un
+ * pase clave entre el córner y el tiro, se dibuja el pase; el córner queda en los pasos de
+ * texto), y un córner solo se dibuja si el tiro es «tras córner» según LA definición del
+ * generador (`cornerDelTiro`). Un penal no dibuja origen (la falta no tiene zona).
  */
-export function geometriaJugada(pasos: PasoJugada[]): GeometriaJugada | undefined {
+export function geometriaJugada(pasos: PasoJugada[], eventos: readonly Evento[]): GeometriaJugada | undefined {
   const tiro = pasos.find((p) => p.rol === "tiro")?.evento;
   if (!tiro?.zonaOrigen || !tiro.destino) return undefined;
   const remate = POS_ZONA[tiro.zonaOrigen];
   const geo: GeometriaJugada = { remate, arco: POS_DESTINO[tiro.destino], zona: tiro.zonaOrigen, destino: tiro.destino };
   if (tiro.altura) geo.altura = tiro.altura;
-  const previo = pasos.find((p) => p.rol === "corner" || p.rol === "pase_clave");
-  const e: Evento | undefined = previo?.evento;
-  if (previo?.rol === "corner" && e?.banda) {
-    geo.origen = POS_CORNER[e.banda];
-    geo.origenRol = "corner";
-  } else if (previo?.rol === "pase_clave" && e?.zonaOrigen) {
+  // Un penal no dibuja origen: jugadaDelGol solo le da la falta (que no tiene zona) — §F2.
+  const inmediato = [...pasos].reverse().find((p) => p.rol === "corner" || p.rol === "pase_clave");
+  const e: Evento | undefined = inmediato?.evento;
+  if (inmediato?.rol === "corner" && e?.banda) {
+    const i = eventos.findIndex((x) => x.id === tiro.id);
+    if (cornerDelTiro(eventos, i)?.id === e.id) {
+      geo.origen = POS_CORNER[e.banda];
+      geo.origenRol = "corner";
+    }
+  } else if (inmediato?.rol === "pase_clave" && e?.zonaOrigen) {
     const p = POS_ZONA[e.zonaOrigen];
     // Pase y remate desde la misma zona: el pase se dibuja un poco atrás para que se vea.
     geo.origen = p.x === remate.x && p.y === remate.y ? { x: p.x, y: p.y + 9 } : p;

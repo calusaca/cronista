@@ -115,11 +115,29 @@ export const ZONAS_AREA: readonly ZonaOrigen[] = ["area_chica", "frontal_del_are
 /** Zonas posibles de un pase clave (nadie da un pase clave desde el punto penal ni el área chica). */
 export const ZONAS_ORIGEN_PASE: readonly ZonaOrigen[] = ["banda_izquierda", "banda_derecha", "frontal_del_area", "media_distancia"];
 
+/** xG de un penal (el simulador lo usa tal cual; es la banda exacta del punto penal). */
+export const XG_PENAL = 0.76;
+
 /**
- * Coherencia zona↔xG por bandas (con holgura). Medido en el corpus 1..1000 antes de
- * implementar: el xG de los tiros de juego tiene p25 0.04, p50 0.07, p75 0.12, p95 0.30.
- * - `area_chica` solo con xG ≥ `areaChicaXgMin` (una ocasión clara: cuartil alto).
- * - `media_distancia` solo con xG ≤ `mediaDistanciaXgMax` (un remate lejano: mitad baja).
- * Entre ambas bandas solo caben zonas intermedias (frontal, bandas).
+ * Brief 012 §F1 — matriz COMPLETA de bandas xG por zona de origen (antes: solo área chica y
+ * media distancia). `[min, max]` si `incluyeMax`, `[min, max)` si no. El generador sortea
+ * solo zonas cuya banda contiene el xG del tiro y el invariante lo exige en el corpus.
  */
-export const ZONA_XG = { areaChicaXgMin: 0.15, mediaDistanciaXgMax: 0.08 } as const;
+export const ZONA_XG_BANDAS: Record<ZonaOrigen, { min: number; max: number; incluyeMax: boolean }> = {
+  area_chica: { min: 0.15, max: 1.0, incluyeMax: true },
+  punto_penal: { min: XG_PENAL, max: XG_PENAL, incluyeMax: true },
+  // Rev 1.1 del 012: el piso del frontal baja a 0.01 (un tiro raso desde el frontal tras el
+  // despeje de un córner es fútbol normal): así todo tiro tras córner tiene zona de área.
+  frontal_del_area: { min: 0.01, max: 0.5, incluyeMax: false },
+  banda_izquierda: { min: 0.01, max: 0.3, incluyeMax: false },
+  banda_derecha: { min: 0.01, max: 0.3, incluyeMax: false },
+  media_distancia: { min: 0.01, max: 0.15, incluyeMax: false },
+};
+
+/**
+ * Brief 012 §F4 — UNA definición de «tiro tras córner» (la comparten generador, invariante
+ * y pizarra): el siguiente evento de ataque del stream después del córner es ese tiro, del
+ * mismo equipo, a lo sumo `TRAS_CORNER_MAX_MIN` minutos después.
+ */
+export const TIPOS_ATAQUE: readonly string[] = ["tiro", "gol", "atajada", "corner", "pase_clave", "fuera_de_juego"];
+export const TRAS_CORNER_MAX_MIN = 1;
