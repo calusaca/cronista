@@ -2,7 +2,10 @@
 
 **Fecha:** 2026-10-01 · **Diseña:** Fable (pedidos de Carlos: «ponele más
 detalle para poder respaldar la animación» y «todos los resultados dan 4–1») ·
-**Implementa:** Opus · **Estado:** cerrado
+**Implementa:** Opus · **Estado:** cerrado · **Rev 1.1** (dos bloqueos del
+implementador, ambos válidos: `zona` ya existía en el contrato del 001 con el
+vocabulario defensa/medio/ataque, y no había hashes de corpus grabados — los
+campos nuevos se renombran y el baseline lo generó Fable desde `ea12a2e`)
 
 ## Objetivo
 
@@ -18,43 +21,53 @@ Dos cosas que el juez siente en los primeros 60 segundos:
 
 ## 1 · Detalle espacial en el simulador (aditivo, sin tocar un partido existente)
 
-Campos nuevos OPCIONALES en eventos de ataque:
+Campos nuevos OPCIONALES en eventos de ataque. **El campo existente
+`Evento.zona` (defensa/medio/ataque, contrato del 001) NO se toca ni se
+reusa** — los nombres nuevos no colisionan:
 
-- `tiro` (y `gol` vía su tiro): `zona` de origen — vocabulario cerrado en
+- `tiro` (y `gol` vía su tiro): `zonaOrigen` — vocabulario cerrado en
   `limites.ts`: `area_chica | punto_penal | frontal_del_area | banda_izquierda |
   banda_derecha | media_distancia` — y `destino`: `palo_izquierdo |
   palo_derecho | centro_del_arco`, con `altura`: `raso | media | alta`.
-- `atajada`: `lado` del portero (`su_izquierda | su_derecha | centro`),
-  coherente con el `destino` del tiro relacionado (tabla fija: palo_izquierdo
-  del tirador = su_derecha del portero, etc. — invariante).
-- `corner`: `lado` (`izquierdo | derecho`).
-- `pase_clave`: `zona` de origen (mismo vocabulario).
+- `atajada`: `ladoPortero` (`su_izquierda | su_derecha | centro`), coherente
+  con el `destino` del tiro relacionado (tabla fija: palo_izquierdo del
+  tirador = su_derecha del portero, etc. — invariante).
+- `corner`: `banda` (`izquierda | derecha`).
+- `pase_clave`: `zonaOrigen` (mismo vocabulario).
 
 **Regla dura — los partidos de hoy NO cambian:**
 
 - Los campos nuevos salen de un stream DERIVADO: `prngDerivado(semilla,
   evento.id)` (hash determinista), JAMÁS del stream principal. Ni un `next()`
   extra en el flujo existente.
-- Prueba de no-regresión: la proyección legado (eventos SIN los campos nuevos)
-  del corpus hasheado del 001 produce EXACTAMENTE los hashes ya grabados (los
-  archivos de hash del corpus no se tocan). Se agrega un segundo hash que
-  incluye los campos nuevos.
+- **Baseline grabado por Fable** (rev 1.1): `src/sim/__fixtures__/
+  hashes-legado.json`, generado desde el commit `ea12a2e` ANTES de implementar
+  nada de este brief. Fórmula canónica:
+  `porSemilla[s−1] = sha256hex(JSON.stringify(proyeccionLegado(simular(configDeSemilla(s)))))`
+  para s = 1..1000, y `total = sha256hex(porSemilla.join("\n"))`.
+  `proyeccionLegado` = clon profundo del partido borrando de cada evento los
+  campos nuevos (`zonaOrigen`, `destino`, `altura`, `ladoPortero`, `banda`);
+  con el código de hoy es la identidad. Total: `43f7fa05…de00f0`.
+- Prueba de no-regresión: el test recalcula la proyección legado del corpus y
+  compara contra el fixture, que NO se regenera jamás dentro de este brief. Se
+  agrega un segundo hash (informativo, en el mismo test) que incluye los
+  campos nuevos para detectar cambios accidentales futuros.
 
 **Coherencia (invariantes nuevos, bandas en `limites.ts`):**
 
-- `penal` ⇒ `zona = punto_penal`.
-- Tiro nacido de córner (relacionadoCon) ⇒ zona de área (`area_chica` o
-  `frontal_del_area`).
-- Coherencia zona↔xG por bandas: `area_chica` solo con xG alto,
+- `penal` ⇒ `zonaOrigen = punto_penal`.
+- Tiro nacido de córner (relacionadoCon) ⇒ `zonaOrigen` de área (`area_chica`
+  o `frontal_del_area`).
+- Coherencia zonaOrigen↔xG por bandas: `area_chica` solo con xG alto,
   `media_distancia` solo con xG bajo (bandas con holgura, en limites, atacables
   por el auditor).
-- Gol ⇒ el `destino` existe; atajada ⇒ `lado` coherente con el tiro.
+- Gol ⇒ el `destino` existe; atajada ⇒ `ladoPortero` coherente con el tiro.
 - Determinismo byte a byte del partido completo con campos incluidos.
 
 ## 2 · Pizarra y animación del gol (UI)
 
 - La pizarra pasa de posiciones convencionales a **posiciones por zona desde
-  los datos**: tabla fija `zona → (x, y)` en el SVG (una sola, en el
+  los datos**: tabla fija `zonaOrigen → (x, y)` en el SVG (una sola, en el
   componente). El rótulo cambia a «positions by zone, from match data» — ya no
   pide perdón, pero tampoco promete centímetros: son zonas.
 - **Animación 2D en el mismo SVG**: el balón recorre la secuencia registrada
@@ -82,8 +95,9 @@ Campos nuevos OPCIONALES en eventos de ataque:
 
 ## Propiedades verificables
 
-1. Proyección legado del corpus ⇒ hashes grabados intactos (el test viejo pasa
-   sin editar sus datos).
+1. Proyección legado del corpus ⇒ idéntica al fixture
+   `hashes-legado.json` grabado por Fable desde `ea12a2e` (el fixture no se
+   regenera jamás dentro de este brief).
 2. Determinismo del partido con campos nuevos (doble corrida byte a byte).
 3. Invariantes de coherencia (penal, córner, zona↔xG, lado del portero) en el
    corpus 1..500; valores/bandas importados de limites, jamás repetidos.
