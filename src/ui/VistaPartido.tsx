@@ -295,6 +295,8 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
             seleccionado={eventoSel}
             onEvento={alEvento}
             contenedor={linea}
+            modo={modo}
+            lengua={lengua}
           />
         </section>
         <section className="panel" aria-label={vivo ? "Live updates" : "Match report"}>
@@ -340,15 +342,16 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
         onSeleccion={alRating}
         expandido={modo === "analista"}
         enVivo={vivo && !terminado}
+        lengua={lengua}
       />
 
       {/* Brief 014: Match stats de la capa micro (lo visto: en el replay, el prefijo). */}
-      <Stats partido={partidoVisto} nombres={{ local: local.nombre, visita: visita.nombre }} enVivo={vivo && !terminado} analista={modo === "analista"} />
+      <Stats partido={partidoVisto} nombres={{ local: local.nombre, visita: visita.nombre }} enVivo={vivo && !terminado} analista={modo === "analista"} lengua={lengua} />
 
       {capa?.tipo === "historia" && <HistoriaFrase cronica={cronica} i={capa.i} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "proceso" && <Proceso cronica={cronica} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "gol" && (
-        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id).length} onCerrar={() => setCapa(null)} />
+        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} />
       )}
     </div>
   );

@@ -8,6 +8,7 @@
 
 import { useEffect, useState } from "react";
 import type { Evento } from "../sim/tipos";
+import { EXPLICA_XG, formatoXg, type LenguaXg, type ModoXg } from "./textos";
 import { fmtMinuto, jugadaDelGol, type PasoJugada } from "../vista/evidencia";
 import { DURACION_ANIMACION_MS, geometriaJugada, type GeometriaJugada, posicionBalon, recorrido, type Punto } from "../vista/pizarra";
 import { IconoCerrar, IconoEvento, IconoHistoria } from "./Iconos";
@@ -67,7 +68,7 @@ function prefiereSinMovimiento(): boolean {
 }
 
 /** Pizarra desde los datos, con el balón animado por el recorrido registrado. */
-function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador?: Evento; pasador?: Evento }) {
+function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tirador?: Evento; pasador?: Evento; fx: (xg: number) => string }) {
   const [sinMovimiento] = useState(prefiereSinMovimiento);
   const [t, setT] = useState(sinMovimiento ? 1 : 0);
   const [ronda, setRonda] = useState(0);
@@ -160,7 +161,7 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
                 </tspan>
                 <tspan x={rotulo.x} dy="3.2" fill="var(--muted)">
                   {magnitudesTxt(tirador).replace(/^ · /, "")}
-                  {tirador.xg !== undefined ? ` · xG ${tirador.xg.toFixed(2)}` : ""}
+                  {tirador.xg !== undefined ? ` · ${fx(tirador.xg)}` : ""}
                 </tspan>
               </text>
             )}
@@ -199,7 +200,7 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
  * en el punto penal; remate tras córner en el área chica; si no, más cerca cuanto mayor el
  * xG; el lado sale de la paridad del id. Se rotula como tal.
  */
-function PizarraConvencional({ pasos }: { pasos: PasoJugada[] }) {
+function PizarraConvencional({ pasos, fx }: { pasos: PasoJugada[]; fx: (xg: number) => string }) {
   const tiro = pasos.find((p) => p.rol === "tiro")?.evento;
   const previo = pasos.find((p) => p.rol === "corner" || p.rol === "pase_clave" || p.rol === "falta");
   const lado = tiro && Number(tiro.id.slice(1)) % 2 === 0 ? 1 : -1;
@@ -229,14 +230,30 @@ function PizarraConvencional({ pasos }: { pasos: PasoJugada[] }) {
       {tiro?.jugador && (
         <text x={remate.x + 2.4} y={remate.y + 1} fontSize="2.8" fill="var(--ink)">
           {apellido(tiro.jugador)}
-          {tiro.xg !== undefined ? ` · xG ${tiro.xg.toFixed(2)}` : ""}
+          {tiro.xg !== undefined ? ` · ${fx(tiro.xg)}` : ""}
         </text>
       )}
     </Cancha>
   );
 }
 
-export function TarjetaGol({ eventos, golId, citas, onCerrar }: { eventos: Evento[]; golId: string; citas: number; onCerrar: () => void }) {
+export function TarjetaGol({
+  eventos,
+  golId,
+  citas,
+  onCerrar,
+  modo,
+  lengua,
+}: {
+  eventos: Evento[];
+  golId: string;
+  citas: number;
+  onCerrar: () => void;
+  /** Brief 017: cómo se muestra el xG (Aficionado «35% chance» / Analista «xG 0.35»). */
+  modo: ModoXg;
+  lengua: LenguaXg;
+}) {
+  const fx = (xg: number) => formatoXg(xg, modo, lengua);
   const pasos = jugadaDelGol(eventos, golId);
   const gol = pasos.find((p) => p.rol === "gol")?.evento;
   const geo = geometriaJugada(pasos, eventos);
@@ -271,19 +288,24 @@ export function TarjetaGol({ eventos, golId, citas, onCerrar }: { eventos: Event
                 <span>
                   {ROL[p.rol]}
                   {p.evento.jugador ? ` · ${p.evento.jugador}` : ""}
-                  {p.rol === "tiro" && p.evento.xg !== undefined ? <span className="tnum"> · xG {p.evento.xg.toFixed(2)}</span> : null}
+                  {p.rol === "tiro" && p.evento.xg !== undefined ? <span className="tnum"> · {fx(p.evento.xg)}</span> : null}
                   {detalleEspacial(p)}
                 </span>
               </li>
             ))}
           </ol>
-          {geo ? <PizarraDatos key={golId} geo={geo} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} /> : <PizarraConvencional pasos={pasos} />}
+          {geo ? <PizarraDatos key={golId} geo={geo} fx={fx} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} /> : <PizarraConvencional pasos={pasos} fx={fx} />}
           <p className="caption">
             {geo
               ? "Schematic: positions by zone, from match data. Each event records its zone, the post and the height of the shot — zones, not exact coordinates."
-              : "Schematic. The events record who, when and the shot's xG — not where. Positions are conventional and drawn only from those facts."}
+              : `Schematic. The events record who, when and the shot's ${modo === "analista" ? "xG" : "goal chance"} — not where. Positions are conventional and drawn only from those facts.`}
             {citado}
           </p>
+          {modo === "aficionado" && (
+            <p className="caption" data-testid="xg-explica">
+              {EXPLICA_XG[lengua]}
+            </p>
+          )}
         </div>
       </aside>
     </>

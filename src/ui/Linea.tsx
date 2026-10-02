@@ -6,7 +6,7 @@ import { type RefObject } from "react";
 import type { Evento } from "../sim/tipos";
 import { fmtMinuto, marcadorProgresivo, porPeriodo } from "../vista/evidencia";
 import { IconoEvento } from "./Iconos";
-import { CHIP_EVENTO, describirEvento, siglas } from "./textos";
+import { CHIP_EVENTO, describirEvento, type LenguaXg, type ModoXg, siglas } from "./textos";
 
 const CLAVE = new Set<Evento["tipo"]>(["gol", "tarjeta_amarilla", "tarjeta_roja", "cambio"]);
 
@@ -19,9 +19,12 @@ interface Props {
   seleccionado: string | null;
   onEvento: (e: Evento) => void;
   contenedor: RefObject<HTMLDivElement | null>;
+  /** Brief 017: cómo se muestra el xG (Aficionado «35% chance» / Analista «xG 0.35»). */
+  modo: ModoXg;
+  lengua: LenguaXg;
 }
 
-export function Linea({ eventos, local, visita, resaltados, hover, seleccionado, onEvento, contenedor }: Props) {
+export function Linea({ eventos, local, visita, resaltados, hover, seleccionado, onEvento, contenedor, modo, lengua }: Props) {
   const marcador = marcadorProgresivo(eventos);
   const periodos = porPeriodo(eventos);
   const finales = eventos.filter((e) => e.tipo === "fin_periodo");
@@ -47,6 +50,8 @@ export function Linea({ eventos, local, visita, resaltados, hover, seleccionado,
                   data-event-id={e.id}
                   data-tipo={e.tipo}
                   data-minuto={e.minuto}
+                  // Brief 017: el texto visible depende del modo; el dato crudo queda en data-*.
+                  {...(e.xg !== undefined ? { "data-xg": e.xg } : {})}
                   data-highlighted={resaltados.has(e.id) ? "true" : "false"}
                   data-hover={hover.has(e.id) ? "true" : "false"}
                   data-selected={seleccionado === e.id ? "true" : "false"}
@@ -62,7 +67,7 @@ export function Linea({ eventos, local, visita, resaltados, hover, seleccionado,
                   </span>
                   <span className="ev-body">
                     <span className="ev-team">{nombre[e.equipo]}</span>
-                    {describirEvento(e)}
+                    {describirEvento(e, modo, lengua)}
                   </span>
                   <span className="ev-score tnum">{esGol && tras ? `${tras.local}–${tras.visita}` : ""}</span>
                 </button>

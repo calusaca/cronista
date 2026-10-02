@@ -11,6 +11,7 @@ import { micro } from "../sim/micro";
 import type { Lado, Partido } from "../sim/tipos";
 import { CANAL_TXT, estadisticas, relato } from "../vista/stats";
 import { IconoCerrar } from "./Iconos";
+import { EXPLICA_XG, formatoXg, type LenguaXg } from "./textos";
 
 type Evidencia =
   | { tipo: "posesion" }
@@ -22,7 +23,21 @@ type Evidencia =
 const LADOS: readonly Lado[] = ["local", "visita"];
 const fmtN = (n: number) => n.toLocaleString("en-US");
 
-export function Stats({ partido, nombres, enVivo, analista }: { partido: Partido; nombres: Record<Lado, string>; enVivo: boolean; analista: boolean }) {
+export function Stats({
+  partido,
+  nombres,
+  enVivo,
+  analista,
+  lengua,
+}: {
+  partido: Partido;
+  nombres: Record<Lado, string>;
+  enVivo: boolean;
+  analista: boolean;
+  /** Brief 017: idioma del formateador de xG del relato. */
+  lengua: LenguaXg;
+}) {
+  const fx = (xg: number) => formatoXg(xg, analista ? "analista" : "aficionado", lengua);
   const m = useMemo(() => micro(partido), [partido]);
   const s = useMemo(() => estadisticas(partido, m), [partido, m]);
   const [ev, setEv] = useState<Evidencia>(null);
@@ -42,6 +57,11 @@ export function Stats({ partido, nombres, enVivo, analista }: { partido: Partido
           Match stats · computed from {fmtN(s.total)} simulated match events{enVivo ? " · so far" : ""}
         </span>
         <span className="ratings-note">Click any figure to see the plays behind it.</span>
+        {!analista && (
+          <span className="ratings-note" data-testid="xg-explica">
+            {EXPLICA_XG[lengua]}
+          </span>
+        )}
       </div>
 
       <div className="stats-grid">
@@ -133,7 +153,7 @@ export function Stats({ partido, nombres, enVivo, analista }: { partido: Partido
         </div>
       </div>
 
-      {ev && <EvidenciaStats ev={ev} partido={partido} m={m} s={s} nombres={nombres} onCerrar={() => setEv(null)} />}
+      {ev && <EvidenciaStats ev={ev} partido={partido} m={m} s={s} nombres={nombres} fx={fx} onCerrar={() => setEv(null)} />}
     </section>
   );
 }
@@ -144,6 +164,7 @@ function EvidenciaStats({
   m,
   s,
   nombres,
+  fx,
   onCerrar,
 }: {
   ev: NonNullable<Evidencia>;
@@ -151,6 +172,7 @@ function EvidenciaStats({
   m: ReturnType<typeof micro>;
   s: ReturnType<typeof estadisticas>;
   nombres: Record<Lado, string>;
+  fx: (xg: number) => string;
   onCerrar: () => void;
 }) {
   let titulo = "";
@@ -177,7 +199,7 @@ function EvidenciaStats({
     titulo = `${nombres[ev.lado]} lost the ball ${x.n} times playing out down the ${CANAL_TXT[ev.canal]}`;
     ids = x.ids;
   }
-  const lineas = ids.length > 0 ? relato(partido, m, ids) : [];
+  const lineas = ids.length > 0 ? relato(partido, m, ids, 2, fx) : [];
   return (
     <>
       <div className="scrim" onClick={onCerrar} />

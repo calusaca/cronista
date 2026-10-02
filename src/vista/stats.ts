@@ -129,20 +129,20 @@ export function lineaMicro(x: MicroEvento): string {
 }
 
 /** La línea del remate macro con el que termina una jugada (brief 011: zona, palo, altura, portero). */
-export function lineaRemate(p: Partido, tiro: Evento): string {
+export function lineaRemate(p: Partido, tiro: Evento, fx: (xg: number) => string = (x) => `xG ${x.toFixed(2)}`): string {
   const desenlace = p.eventos.find((e) => e.relacionadoCon === tiro.id && (e.tipo === "gol" || e.tipo === "atajada"));
   const destino = tiro.destino ? ` → ${DESTINO_TXT[tiro.destino]}${tiro.altura ? `, ${ALTURA_TXT[tiro.altura]}` : ""}` : "";
   const fin =
     desenlace?.tipo === "gol" ? " — goal" : desenlace?.tipo === "atajada" ? ` — saved${desenlace.ladoPortero ? ` (keeper dives ${PORTERO_TXT[desenlace.ladoPortero]})` : ""}` : " — off target";
   const magnitudes = `${tiro.distanciaM !== undefined ? ` · ${tiro.distanciaM} m` : ""}${tiro.velocidadKmh !== undefined ? ` · ${tiro.velocidadKmh} km/h` : ""}`;
-  return `${tiro.jugador} shoots${magnitudes}${tiro.xg !== undefined ? ` · xG ${tiro.xg.toFixed(2)}` : ""}${destino}${fin}`;
+  return `${tiro.jugador} shoots${magnitudes}${tiro.xg !== undefined ? ` · ${fx(tiro.xg)}` : ""}${destino}${fin}`;
 }
 
 /**
  * Relato de la evidencia: cada evento citado con hasta `contexto` eventos previos de SU
  * posesión (lo que la preparó) y, si esa jugada terminó en un remate, el remate.
  */
-export function relato(p: Partido, m: MicroPartido, ids: string[], contexto = 2): LineaRelato[] {
+export function relato(p: Partido, m: MicroPartido, ids: string[], contexto = 2, fx?: (xg: number) => string): LineaRelato[] {
   const citados = new Set(ids);
   const idx = new Map(m.eventos.map((x, i) => [x.id, i] as const));
   const incluidos = new Set<number>();
@@ -162,7 +162,7 @@ export function relato(p: Partido, m: MicroPartido, ids: string[], contexto = 2)
     const ancla = ps && ps.termina === "ancla" ? p.eventos.find((e) => e.id === ps.ancla) : undefined;
     if (ancla?.tipo === "tiro" && !remates.has(ancla.id) && (ps?.eventos[ps.eventos.length - 1] === id || ps?.eventos.slice(-3).includes(id))) {
       remates.add(ancla.id);
-      out.push({ id: ancla.id, minuto: fmtMinuto(ancla.minuto), texto: lineaRemate(p, ancla), citado: false });
+      out.push({ id: ancla.id, minuto: fmtMinuto(ancla.minuto), texto: lineaRemate(p, ancla, fx), citado: false });
     }
   }
   return out;

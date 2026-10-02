@@ -10,7 +10,7 @@ import { VALORACION } from "../analista/umbrales";
 import type { Evento, Lado } from "../sim/tipos";
 import { fmtMinuto } from "../vista/evidencia";
 import { IconoEvento } from "./Iconos";
-import { describirEvento, MOTIVO_VALORACION_EN, POSICION_EN } from "./textos";
+import { describirEvento, type LenguaXg, type ModoXg, motivoValoracion, POSICION_EN } from "./textos";
 
 export const claveValoracion = (v: Pick<Valoracion, "lado" | "jugador">) => `${v.lado}|${v.jugador}`;
 
@@ -24,11 +24,14 @@ interface Props {
   onSeleccion: (clave: string) => void;
   expandido: boolean;
   enVivo: boolean;
+  /** Brief 017: idioma del formateador de xG (el modo sale de `expandido`: Analista). */
+  lengua: LenguaXg;
 }
 
 const fmtDelta = (d: number) => `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(2)}`;
 
-function Desglose({ v, eventos }: { v: Valoracion; eventos: Evento[] }) {
+function Desglose({ v, eventos, modo, lengua }: { v: Valoracion; eventos: Evento[]; modo: ModoXg; lengua: LenguaXg }) {
+  // Brief 017: el desglose se abre en ambos modos (selección o Analista); el xG pasa por el formateador.
   const porId = new Map(eventos.map((e) => [e.id, e] as const));
   return (
     <div className="rating-breakdown" data-testid="rating-breakdown">
@@ -40,10 +43,10 @@ function Desglose({ v, eventos }: { v: Valoracion; eventos: Evento[] }) {
           return (
             <li key={`${d.evento}-${d.motivo}-${i}`} className="tnum" data-testid="breakdown-event" data-event-id={d.evento}>
               <span className={`rating-delta${d.delta < 0 ? " neg" : ""}`}>{fmtDelta(d.delta)}</span>
-              <span>{MOTIVO_VALORACION_EN[d.motivo] ?? d.motivo}</span>
+              <span>{motivoValoracion(d.motivo, modo)}</span>
               {e && (
                 <span className="rating-ev">
-                  {fmtMinuto(e.minuto)} <IconoEvento tipo={e.tipo} size={13} /> {describirEvento(e)}
+                  {fmtMinuto(e.minuto)} <IconoEvento tipo={e.tipo} size={13} /> {describirEvento(e, modo, lengua)}
                 </span>
               )}
             </li>
@@ -57,7 +60,7 @@ function Desglose({ v, eventos }: { v: Valoracion; eventos: Evento[] }) {
   );
 }
 
-export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, onSeleccion, expandido, enVivo }: Props) {
+export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, onSeleccion, expandido, enVivo, lengua }: Props) {
   const teclado = (k: string) => (ev: KeyboardEvent) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
@@ -106,7 +109,7 @@ export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, 
                         </span>
                         <span className="rating-pos">{POSICION_EN[v.posicion] ?? v.posicion}</span>
                       </div>
-                      {(sel || expandido) && <Desglose v={v} eventos={eventos} />}
+                      {(sel || expandido) && <Desglose v={v} eventos={eventos} modo={expandido ? "analista" : "aficionado"} lengua={lengua} />}
                     </li>
                   );
                 })}
