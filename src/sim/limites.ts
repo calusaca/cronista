@@ -141,3 +141,40 @@ export const ZONA_XG_BANDAS: Record<ZonaOrigen, { min: number; max: number; incl
  */
 export const TIPOS_ATAQUE: readonly string[] = ["tiro", "gol", "atajada", "corner", "pase_clave", "fuera_de_juego"];
 export const TRAS_CORNER_MAX_MIN = 1;
+
+// ---------------------------------------------------------------------------------
+// Brief 013 (rev 1.1) — capa de micro-eventos. Vocabularios y umbrales de realismo:
+// ÚNICA fuente. La suite estadística propia (micro.stats.test.ts) y los invariantes los
+// importan; ninguna prueba los repite a mano.
+// ---------------------------------------------------------------------------------
+
+/** Tipos de micro-evento. */
+export const TIPOS_MICRO = ["pase", "conduccion", "regate", "duelo", "perdida", "recuperacion"] as const;
+export type TipoMicro = (typeof TIPOS_MICRO)[number];
+
+/** Canal (vista del equipo que ataca: su izquierda es banda_izquierda). */
+export const CANALES = ["banda_izquierda", "centro", "banda_derecha"] as const;
+export type Canal = (typeof CANALES)[number];
+
+/** Volumen por partido: cada partido en [min, max] y el promedio del corpus ≥ mediaMin. */
+export const MICRO_TOTAL = { min: 1800, max: 2600, mediaMin: 2000 } as const;
+/** Pases por partido (media del corpus) y fracción de completados (media). */
+export const MICRO_PASES = { mediaMin: 850, mediaMax: 1000, completadosMin: 0.78, completadosMax: 0.85 } as const;
+/** Regates exitosos (fracción de intentos, media del corpus). */
+export const MICRO_REGATES_EXITO = { min: 0.45, max: 0.65 } as const;
+/**
+ * Correlación con ATT: en los partidos donde un equipo tiene al menos `difAtaqueMin` más de
+ * ataque que el otro, el de más ATT completa una fracción mayor de pases en al menos
+ * `fraccionMin` de esos partidos.
+ */
+export const MICRO_ATT = { difAtaqueMin: 10, fraccionMin: 0.6 } as const;
+
+/**
+ * Magnitudes (rev 1.1): distancia de cada pase y metros de cada conducción. Bandas de pase
+ * [min, max) salvo la última, que incluye su máximo. Mezcla realista (corto la mayoría).
+ * Coherencia con la zona: un pase LARGO no sale de la zona de ataque.
+ */
+export const PASE_M = { corto: { min: 4, max: 15 }, medio: { min: 15, max: 30 }, largo: { min: 30, max: 55 } } as const;
+export const CONDUCCION_M = { min: 2, max: 25 } as const;
+/** Mezcla de pases (fracción de cortos/largos sobre el corpus) — banda de realismo. */
+export const PASE_MEZCLA = { cortosMin: 0.5, cortosMax: 0.75, largosMin: 0.05, largosMax: 0.15 } as const;

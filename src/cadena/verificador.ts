@@ -28,6 +28,7 @@ import {
   CIERRE_EN_VIVO_EXCEPTO,
   CUENTA_GOLES,
   FRANJAS,
+  FRASES_CANAL,
   FRASES_INFERIORIDAD,
   FRASES_PERIODO,
   FRASES_SIEMPRE,
@@ -489,6 +490,13 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   w = quitar(w, INFERIORIDAD_RE[lengua], (m) => {
     if (!ctx.hechos.some((x) => x.tipo === "expulsion_y_efecto")) h.push({ regla: "V8", detalle: `«${m[0]}» exige una expulsión como hecho principal` });
   });
+
+  // V8 — canal computable (brief 013): el canal nombrado tiene que ser el del hecho principal.
+  for (const [canal, re] of FRASES_CANAL[lengua]) {
+    w = quitar(w, re, (m) => {
+      if (!ctx.hechos.some((x) => x.datos.canal === canal)) h.push({ regla: "V8", detalle: `«${m[0]}»: el hecho principal no afirma ese canal (${canal})` });
+    });
+  }
 
   // V8 — tabla de juicio y muletillas
   for (const e of JUICIO) {

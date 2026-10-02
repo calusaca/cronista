@@ -17,6 +17,7 @@ import { TarjetaGol } from "./Gol";
 import { Linea } from "./Linea";
 import { ControlesReplay, Ticker } from "./Vivo";
 import { claveValoracion, Ratings } from "./Ratings";
+import { Stats } from "./Stats";
 import { figura as figuraDe, valorar } from "../analista/valoracion";
 
 type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | null;
@@ -94,6 +95,8 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
     cont.scrollTo({ top: cont.scrollHeight });
   }, [vivo, eventosVisibles.length, updateSel, eventoSel]);
 
+  // Brief 014: el partido tal como se ve (en el replay, el prefijo) para la capa micro.
+  const partidoVisto = useMemo(() => ({ config: datos.config, eventos: eventosVisibles }), [datos.config, eventosVisibles]);
   // Brief 009: valoraciones de lo visto (en el replay, el prefijo): función pura de los eventos.
   const valoraciones = useMemo(() => valorar({ config: datos.config, eventos: eventosVisibles }), [datos.config, eventosVisibles]);
   const claveFigura = useMemo(() => {
@@ -338,6 +341,9 @@ export function VistaPartido({ datos, etiqueta, ruta }: { datos: DatosPartido; e
         expandido={modo === "analista"}
         enVivo={vivo && !terminado}
       />
+
+      {/* Brief 014: Match stats de la capa micro (lo visto: en el replay, el prefijo). */}
+      <Stats partido={partidoVisto} nombres={{ local: local.nombre, visita: visita.nombre }} enVivo={vivo && !terminado} analista={modo === "analista"} />
 
       {capa?.tipo === "historia" && <HistoriaFrase cronica={cronica} i={capa.i} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "proceso" && <Proceso cronica={cronica} lengua={lengua} onCerrar={() => setCapa(null)} />}

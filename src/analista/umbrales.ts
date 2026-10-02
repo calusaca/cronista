@@ -109,6 +109,11 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   resultado_final: 75,
   // Brief 009: entre el resultado (75) y el gol (70).
   figura_del_partido: 72,
+  // Brief 013.
+  dominio_global: 70,
+  duelo_ganado: 68,
+  perdidas_en_salida: 64,
+  dominio_por_canal: 60,
   gol_anotado: 70,
   portero_destacado: 65,
   gol_tardio: 60,
@@ -149,6 +154,12 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   // Brief 009: hay una sola figura por partido, así que nunca empata consigo misma;
   // si empatara en relevancia con otro tipo, decide su primer gol (o su primer evento citado).
   figura_del_partido: "gol",
+  // Brief 013: los acotados citan micro-eventos (no hay evento macro definitorio: desempata el
+  // orden de TIPOS_HECHO); los agregados citan los inicios de periodo.
+  duelo_ganado: "inicio_periodo",
+  perdidas_en_salida: "inicio_periodo",
+  dominio_global: "inicio_periodo",
+  dominio_por_canal: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -188,3 +199,29 @@ export const VALORACION = {
   xg_atajado_factor: 1.0,
   gol_recibido: -0.3,
 } as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 013 — hechos de la capa micro. Umbrales iniciales del brief (calibrables: se mueven
+// aquí y en ningún otro lado; si la rareza medida no cuadra, se reporta, no se mueve solo).
+// ---------------------------------------------------------------------------------
+
+/** `duelo_ganado`: regates exitosos de un mismo atacante sobre un mismo defensor (brief: ≥ 4). */
+export const DUELO_MIN = 4;
+/** `perdidas_en_salida`: pérdidas de un equipo en su zona de salida (defensa) por un mismo canal.
+ *  Calibrado el 2 oct (barrido N=1000): el 6 inicial daba 56,2 % de rareza; con 8 queda en
+ *  29,4 % — perder 8 veces por el mismo flanco sí es noticia. */
+export const PERDIDAS_MIN = 8;
+/** `dominio_global`: % de posesión (por pases intentados) de un equipo (brief: ≥ 58). */
+export const DOMINIO_MIN = 58;
+/** `dominio_por_canal`: % de los avances de un equipo por un mismo canal.
+ *  Calibrado el 2 oct (barrido N=1000): el 45 inicial daba 39,1 % (con ~40 avances, el ruido
+ *  solo ya lo pasa); con 47 queda en 26,6 %. */
+export const CANAL_MIN = 47;
+/**
+ * Agregado por el implementador (no está en el brief): muestra mínima para un porcentaje.
+ * Sobre un prefijo corto (en vivo), 3 pases de 4 serían «75 % de posesión»: no es noticia.
+ */
+export const DOMINIO_PASES_MIN = 100;
+export const CANAL_AVANCES_MIN = 10;
+/** Rareza del brief 013: cada hecho nuevo en ≤ 35 % de los partidos del corpus. */
+export const RAREZA_MICRO_MAX = 0.35;

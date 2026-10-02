@@ -103,6 +103,23 @@ export const PLANTILLAS = {
     es: "{jugador} fue la figura del partido (nota {nota}).",
     en: "{jugador} was the player of the match (rating {nota}).",
   },
+  // Brief 013.
+  duelo_ganado: {
+    es: "{jugador} ({equipo}) dribló {regates} veces a {rival} ({equipo_rival}).",
+    en: "{jugador} ({equipo}) dribbled past {rival} ({equipo_rival}) {regates} times.",
+  },
+  perdidas_en_salida: {
+    es: "{equipo} perdió el balón {perdidas} veces saliendo por {canal_es}.",
+    en: "{equipo} lost the ball {perdidas} times playing out down {canal_en}.",
+  },
+  dominio_global: {
+    es: "{equipo} dominó el partido ({porcentaje} % de la posesión).",
+    en: "{equipo} dominated the match ({porcentaje}% possession).",
+  },
+  dominio_por_canal: {
+    es: "{equipo} atacó sobre todo por {canal_es} ({porcentaje} % de sus avances).",
+    en: "{equipo} attacked mostly down {canal_en} ({porcentaje}% of their attacks).",
+  },
 } as const satisfies Record<string, Plantilla>;
 
 export type ClavePlantilla = keyof typeof PLANTILLAS;
@@ -130,3 +147,10 @@ export function minutoTxt(m: number): string {
 export function xgTxt(centesimas: number): string {
   return (centesimas / 100).toFixed(2);
 }
+
+/** Brief 013: cómo se dice cada canal en los textos de los hechos. */
+export const CANAL_TEXTO: Record<string, { es: string; en: string }> = {
+  banda_izquierda: { es: "la banda izquierda", en: "the left flank" },
+  centro: { es: "el centro", en: "the middle" },
+  banda_derecha: { es: "la banda derecha", en: "the right flank" },
+};

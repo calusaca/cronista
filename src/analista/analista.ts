@@ -23,7 +23,8 @@
 //   comparte con la valoración de jugadores; la regla es la misma.
 
 import type { Evento, Lado, Partido } from "../sim/tipos";
-import { minutoTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { micro, type MicroPartido } from "../sim/micro";
+import { CANAL_TEXTO, minutoTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
 import {
@@ -39,6 +40,12 @@ import {
   PRESION_XG_MIN_CENTESIMAS,
   DESEMPATE_EVENTO,
   RELEVANCIA,
+  CANAL_AVANCES_MIN,
+  CANAL_MIN,
+  DOMINIO_MIN,
+  DOMINIO_PASES_MIN,
+  DUELO_MIN,
+  PERDIDAS_MIN,
   type ClaveRelevancia,
 } from "./umbrales";
 
@@ -442,6 +449,109 @@ function disciplina(c: Ctx): Borrador[] {
   return out;
 }
 
+// ---------------- brief 013: hechos de la capa micro ----------------
+
+/** Hecho que cita micro-eventos (en su orden): `citar` solo conoce los macro. */
+function hechoMicro(tipo: TipoHecho, clave: ClavePlantilla, ids: string[], datos: Datos): Borrador {
+  return { tipo, ...textos(clave, datos), eventos: [...new Set(ids)], relevancia: RELEVANCIA[claveRelevancia(tipo, datos)], datos };
+}
+
+const canalDatos = (canal: string): Datos => ({ canal, canal_es: (CANAL_TEXTO[canal] as { es: string }).es, canal_en: (CANAL_TEXTO[canal] as { en: string }).en });
+const pct = (a: number, b: number) => Math.round((a * 100) / b);
+
+/** `duelo_ganado`: un atacante que regateó con éxito ≥ DUELO_MIN veces al MISMO defensor. Cita esos regates. */
+function duelos(c: Ctx, m: MicroPartido): Borrador[] {
+  const pares = new Map<string, MicroPartido["eventos"]>();
+  for (const x of m.eventos) {
+    if (x.tipo !== "regate" || x.exito !== true || !x.rival) continue;
+    const k = `${x.equipo}|${x.jugador}|${x.rival}`;
+    pares.set(k, [...(pares.get(k) ?? []), x]);
+  }
+  const out: Borrador[] = [];
+  for (const xs of pares.values()) {
+    if (xs.length < DUELO_MIN) continue;
+    const x = xs[0] as MicroPartido["eventos"][number];
+    out.push(
+      hechoMicro("duelo_ganado", "duelo_ganado", xs.map((y) => y.id), {
+        jugador: x.jugador,
+        equipo: c.nombre[x.equipo],
+        rival: x.rival as string,
+        equipo_rival: c.nombre[rival(x.equipo)],
+        regates: xs.length,
+      }),
+    );
+  }
+  return out;
+}
+
+/** `perdidas_en_salida`: por equipo, el canal con más pérdidas en su zona de salida, si llega a PERDIDAS_MIN. */
+function perdidasEnSalida(c: Ctx, m: MicroPartido): Borrador[] {
+  const out: Borrador[] = [];
+  for (const lado of LADOS) {
+    const por = new Map<string, string[]>();
+    for (const x of m.eventos) if (x.tipo === "perdida" && x.equipo === lado && x.zona === "defensa") por.set(x.canal, [...(por.get(x.canal) ?? []), x.id]);
+    const mejor = [...por.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+    if (!mejor || mejor[1].length < PERDIDAS_MIN) continue;
+    out.push(hechoMicro("perdidas_en_salida", "perdidas_en_salida", mejor[1], { equipo: c.nombre[lado], ...canalDatos(mejor[0]), perdidas: mejor[1].length }));
+  }
+  return out;
+}
+
+/** Periodo de cada micro-evento: el de su ancla macro. */
+function periodoMicro(c: Ctx, x: MicroPartido["eventos"][number]): 1 | 2 {
+  return c.periodo[c.indice.get(x.ancla) ?? 0] ?? 1;
+}
+
+/** Inicios de periodo del partido (o del prefijo): la evidencia de los agregados. */
+const inicios = (c: Ctx) => c.ev.filter((e) => e.tipo === "inicio_periodo").map((e) => e.id);
+
+/** `dominio_global`: % de posesión por pases intentados, con su desglose por periodo. */
+function dominioGlobal(c: Ctx, m: MicroPartido): Borrador[] {
+  const pases = m.eventos.filter((x) => x.tipo === "pase");
+  if (pases.length < DOMINIO_PASES_MIN) return [];
+  for (const lado of LADOS) {
+    const propios = pases.filter((x) => x.equipo === lado).length;
+    const porcentaje = pct(propios, pases.length);
+    if (porcentaje < DOMINIO_MIN) continue;
+    const datos: Datos = { equipo: c.nombre[lado], porcentaje, pases_equipo: propios, pases_total: pases.length };
+    for (const per of [1, 2] as const) {
+      const delPer = pases.filter((x) => periodoMicro(c, x) === per);
+      if (delPer.length === 0) continue;
+      datos[`pases_equipo_p${per}`] = delPer.filter((x) => x.equipo === lado).length;
+      datos[`pases_total_p${per}`] = delPer.length;
+    }
+    return [hechoMicro("dominio_global", "dominio_global", inicios(c), datos)];
+  }
+  return [];
+}
+
+/** `dominio_por_canal`: el canal de la mayoría de los avances de un equipo, con el desglose por canal. */
+function dominioPorCanal(c: Ctx, m: MicroPartido): Borrador[] {
+  const out: Borrador[] = [];
+  for (const lado of LADOS) {
+    const av = m.posesiones.filter((x) => x.equipo === lado && x.avance);
+    if (av.length < CANAL_AVANCES_MIN) continue;
+    const cuenta = { banda_izquierda: 0, centro: 0, banda_derecha: 0 } as Record<string, number>;
+    for (const x of av) cuenta[x.canal] = (cuenta[x.canal] ?? 0) + 1;
+    const [canal, n] = Object.entries(cuenta).sort((a, b) => b[1] - a[1])[0] as [string, number];
+    const porcentaje = pct(n, av.length);
+    if (porcentaje < CANAL_MIN) continue;
+    out.push(
+      hechoMicro("dominio_por_canal", "dominio_por_canal", inicios(c), {
+        equipo: c.nombre[lado],
+        ...canalDatos(canal),
+        porcentaje,
+        avances_canal: n,
+        avances_total: av.length,
+        avances_izquierda: cuenta.banda_izquierda as number,
+        avances_centro: cuenta.centro as number,
+        avances_derecha: cuenta.banda_derecha as number,
+      }),
+    );
+  }
+  return out;
+}
+
 // ---------------- orden y API ----------------
 
 /**
@@ -459,12 +569,21 @@ function definitorio(c: Ctx, h: Borrador): Evento | undefined {
  * definitorio; luego su posición en el stream; luego el orden de TIPOS_HECHO;
  * por último la lista de eventos citados (comparación lexicográfica de índices).
  */
-function comparar(c: Ctx) {
+function comparar(c: Ctx, m: MicroPartido) {
+  // Brief 013: un hecho que cita micro-eventos se ordena por su PRIMER micro-evento citado
+  // (minuto, y su posición detrás de todo el stream macro para el desempate siguiente).
+  const microIdx = new Map(m.eventos.map((x, i) => [x.id, i] as const));
+  const primerMicro = (h: Borrador) => {
+    const i = microIdx.get(h.eventos[0] ?? "");
+    return i === undefined ? undefined : (m.eventos[i] as MicroPartido["eventos"][number]);
+  };
   const primero = (h: Borrador) => {
     const e = definitorio(c, h);
-    return e ? (c.indice.get(e.id) as number) : Number.MAX_SAFE_INTEGER;
+    if (e) return c.indice.get(e.id) as number;
+    const x = primerMicro(h);
+    return x ? c.ev.length + (microIdx.get(x.id) as number) : Number.MAX_SAFE_INTEGER;
   };
-  const minuto = (h: Borrador) => definitorio(c, h)?.minuto ?? Number.MAX_SAFE_INTEGER;
+  const minuto = (h: Borrador) => definitorio(c, h)?.minuto ?? primerMicro(h)?.minuto ?? Number.MAX_SAFE_INTEGER;
   return (a: Borrador, b: Borrador): number => {
     if (a.relevancia !== b.relevancia) return b.relevancia - a.relevancia;
     if (minuto(a) !== minuto(b)) return minuto(a) - minuto(b);
@@ -499,6 +618,9 @@ export function analizar(partido: Partido): Hecho[] {
     ...disciplina(c),
     ...figuraDelPartido(partido, c),
   ];
-  borradores.sort(comparar(c));
+  // Brief 013: la capa micro es función pura del partido (o del prefijo): se deriva aquí.
+  const m = micro(partido);
+  borradores.push(...duelos(c, m), ...perdidasEnSalida(c, m), ...dominioGlobal(c, m), ...dominioPorCanal(c, m));
+  borradores.sort(comparar(c, m));
   return borradores.map((b, i) => ({ id: `h${String(i + 1).padStart(2, "0")}`, ...b }));
 }

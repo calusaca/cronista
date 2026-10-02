@@ -226,8 +226,25 @@ export const JUICIO: EntradaJuicio[] = [
     id: "dominio",
     es: palabras(["dominó", "dominio", "dominador", "dominadora", "dominante", "dominaron"]),
     en: palabras(["dominated", "dominance", "dominant", "dominating"]),
-    habilita: (h) => h.tipo === "dominio_periodo",
-    requisito: "solo un hecho dominio_periodo habilita «dominó / dominated»",
+    // Brief 013: también el dominio_global (posesión computada desde la capa micro).
+    habilita: (h) => h.tipo === "dominio_periodo" || h.tipo === "dominio_global",
+    requisito: "solo un hecho dominio_periodo o dominio_global habilita «dominó / dominated»",
+  },
+  {
+    // Brief 013: el léxico de regate SOLO con duelo_ganado como principal.
+    id: "regate",
+    es: palabras(["dribló", "driblaba", "regateó", "regateaba", "se fue de", "lo dejó atrás", "la dejó atrás", "dejó atrás", "lo desbordó", "desbordó"]),
+    en: palabras(["dribbled past", "dribbled", "beat his man", "beats his man", "skipped past", "skips past", "went past", "got past", "left him for dead"]),
+    habilita: (h) => h.tipo === "duelo_ganado",
+    requisito: "«dribló / beat his man / skipped past» exige el hecho duelo_ganado como principal",
+  },
+  {
+    // Brief 013: «se desangró por / bled down» SOLO con perdidas_en_salida como principal.
+    id: "desangro",
+    es: palabras(["se desangró por", "se desangró", "se desangraba", "sangró por"]),
+    en: palabras(["bled down", "bleeding down", "bled possession", "haemorrhaged", "hemorrhaged"]),
+    habilita: (h) => h.tipo === "perdidas_en_salida",
+    requisito: "«se desangró por / bled down» exige el hecho perdidas_en_salida como principal",
   },
   {
     id: "merecimiento",
@@ -348,7 +365,7 @@ export const VERBOS_RESULTADO: Record<Lengua, { gana: RegExp; pierde: RegExp; em
       "fue superado por", "fue superada por", "fueron superados por", "fue derrotado por", "fue derrotada por", "fue vencido por",
       "fue vencida por", "fue goleado por", "fue goleada por", "fue doblegado por", "fue doblegada por", "fue batido por", "fue batida por",
     ]),
-    excepto: palabras(["ganó un penal", "ganó un córner", "ganó una falta", "ganó el balón"]),
+    excepto: palabras(["ganó un penal", "ganó un córner", "ganó una falta", "ganó el balón", "perdió el balón", "perdió la pelota", "perdió la posesión", "perdiendo el balón"]),
   },
   en: {
     gana: palabras([
@@ -361,7 +378,7 @@ export const VERBOS_RESULTADO: Record<Lengua, { gana: RegExp; pierde: RegExp; em
       "were beaten by", "was beaten by", "were defeated by", "was defeated by", "were outplayed by", "was outplayed by",
       "were thrashed by", "was thrashed by", "were downed by", "was downed by", "were edged by", "was edged by", "were overcome by",
     ]),
-    excepto: palabras(["won a penalty", "won a corner", "won a free kick", "won the ball", "wins a penalty"]),
+    excepto: palabras(["won a penalty", "won a corner", "won a free kick", "won the ball", "wins a penalty", "beat his man", "beats his man", "beat their man", "lost the ball", "lost possession", "losing the ball"]),
   },
 };
 
@@ -457,11 +474,15 @@ export const CIERRE_EN_VIVO: Record<Lengua, RegExp> = {
     "resultado final", "marcador final", "final del partido", "pitazo final", "terminó", "el partido terminó", "el partido acabó", "acabó el partido", "finalizó", "cerró el marcador",
     "cerró la cuenta", "sentenció", "sentenciado", "selló", "liquidó", "encaminó la victoria", "encarriló", "definitivo", "definitiva",
     "decisivo", "decisiva", "gol del triunfo", "gol de la victoria", "decidió el partido", "partido decidido", "aseguró la victoria",
+    // brief 013: un dominio parcial no es el del partido entero
+    "el partido entero", "todo el partido", "de principio a fin", "los noventa minutos",
   ]),
   en: palabras([
     "full time", "full-time", "final score", "final whistle", "ended", "the match ended", "the match finished", "finished the match", "completed the scoring", "complete the scoring", "completing the scoring", "sealed the win",
     "sealed it", "sealed", "wrapped up", "clinched", "on course for victory", "would prove decisive", "decisive", "settled the match", "settled it", "settle the match", "settle it",
     "winning goal", "the winner", "decided the match",
+    // brief 013: un dominio parcial no es el del partido entero
+    "the whole match", "the entire match", "the whole game", "the entire game", "from start to finish", "all match long",
   ]),
 };
 export const CIERRE_EN_VIVO_EXCEPTO: Record<Lengua, RegExp> = {
@@ -532,3 +553,22 @@ export const TITULO_EN_COMUNES = new Set(
     "decides", "decide", "lead", "leads", "inspire", "inspires", "power", "powers", "fires", "fire", "sinks", "sink", "downs", "down", "tops",
   ].map((w) => w.toLowerCase()),
 );
+
+/**
+ * Brief 013 — CANAL computable (V8): si una oración nombra un canal (banda izquierda, el
+ * centro, banda derecha), el hecho principal tiene que afirmar ESE canal en `datos.canal`.
+ * Sin esto, «perdió el balón 6 veces por la banda derecha» pasaría con un hecho de la
+ * izquierda (no hay cifras ni nombres que lo delaten).
+ */
+export const FRASES_CANAL: Record<Lengua, [string, RegExp][]> = {
+  es: [
+    ["banda_izquierda", palabras(["banda izquierda", "por la izquierda", "costado izquierdo", "flanco izquierdo", "sector izquierdo", "carril izquierdo"])],
+    ["banda_derecha", palabras(["banda derecha", "por la derecha", "costado derecho", "flanco derecho", "sector derecho", "carril derecho"])],
+    ["centro", palabras(["por el centro", "por el medio", "por dentro", "carril central"])],
+  ],
+  en: [
+    ["banda_izquierda", palabras(["left flank", "left wing", "left side", "left channel", "down the left", "on the left"])],
+    ["banda_derecha", palabras(["right flank", "right wing", "right side", "right channel", "down the right", "on the right"])],
+    ["centro", palabras(["the middle", "through the middle", "down the middle", "the centre", "the center", "through the centre", "through the center", "central channel"])],
+  ],
+};

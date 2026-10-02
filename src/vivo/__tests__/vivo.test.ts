@@ -15,6 +15,7 @@ import type { ModoPersonalizacion } from "../../cadena/tipos";
 import { CIFRA_ENSAYO, crearLlmEnsayo } from "../../lib/llm-ensayo";
 import { crearLlmStub } from "../../lib/llm-stub";
 import type { Llm } from "../../lib/llm";
+import { micro } from "../../sim/micro";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import type { Partido } from "../../sim/tipos";
@@ -58,9 +59,13 @@ function oraculo(p: Partido, u: UpdateVerificada) {
   const pre: Partido = { config: p.config, eventos: p.eventos.slice(0, u.momento.indice + 1) };
   // F1: el oráculo aplica la misma transformación en vivo (antes del final) que la cadena.
   const hechos = u.momento.tipo === "final" ? analizar(pre) : analizar(pre).map((h) => hechoEnVivo(h, pre));
-  const pasados = new Set(pre.eventos.map((e) => e.id));
+  // Brief 013: los hechos acotados citan micro-eventos; los «pasados» incluyen la capa micro
+  // DEL PREFIJO (calculada aquí sobre el prefijo, no sobre el partido entero).
+  const microPre = micro(pre).eventos;
+  const pasados = new Set([...pre.eventos.map((e) => e.id), ...microPre.map((e) => e.id)]);
+  const minutoDe = new Map([...pre.eventos.map((e) => [e.id, e.minuto] as const), ...microPre.map((e) => [e.id, e.minuto] as const)]);
   const numerosPasados = new Set([String(u.momento.minuto), ...hechos.flatMap((h) => [...numeros(h.texto_es), ...numeros(h.texto_en)])]);
-  return { pre, hechos, pasados, numerosPasados };
+  return { pre, hechos, pasados, numerosPasados, minutoDe };
 }
 
 function marcadorFinal(p: Partido): { local: number; visita: number } {
@@ -110,8 +115,8 @@ function violaciones(p: Partido, u: UpdateVerificada): string[] {
         continue;
       }
       for (const eid of h.eventos) {
-        const ev = p.eventos.find((e) => e.id === eid);
-        if (!ev || !o.pasados.has(eid) || ev.minuto > u.momento.minuto) out.push(`${u.momento.id}[${i}]: evento ${eid} del futuro`);
+        const min = o.minutoDe.get(eid);
+        if (min === undefined || !o.pasados.has(eid) || min > u.momento.minuto) out.push(`${u.momento.id}[${i}]: evento ${eid} del futuro`);
       }
     }
     // (d) Ningún número del futuro: toda cifra del texto está en los hechos del prefijo (o es el minuto M).

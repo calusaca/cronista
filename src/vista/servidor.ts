@@ -13,12 +13,13 @@ import { crearLlmDesdeEnv } from "../lib/llm";
 import { simular } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import type { Estilo, Evento, SimConfig } from "../sim/tipos";
+import { CRITERIOS, PRESETS } from "./presets";
 import { crearCacheUpdates } from "../vivo/cache";
 import { construirOverlay, type Overlay } from "../vivo/overlay";
 import { generarUpdates } from "../vivo/updates";
 
-/** Partido destacado de la home: variado (expulsión, doblete, dos penales, portero, presión). */
-export const SEMILLA_DESTACADA = 246;
+/** Partido destacado de la home (vive en presets.ts; se re-exporta aquí por compatibilidad). */
+export { SEMILLA_DESTACADA } from "./presets";
 
 export interface EquipoVista {
   nombre: string;
@@ -104,8 +105,9 @@ export async function cargarOverlay(seed: number, perspectiva: Perspectiva = "ne
 }
 
 // ---------------------------------------------------------------------------------
-// Presets: enfrentamientos con una historia, elegidos por lo que el Analista DICE de ellos
-// (no por etiqueta a mano): la primera semilla del corpus que tiene ese hecho.
+// Presets (brief 014 §2): cinco historias curadas que muestran el rango del simulador. Las
+// semillas las cazó `cazarPresets` (src/vista/presets.ts, `npm run presets`) y están fijas en
+// PRESETS; los textos dicen el tipo de historia, no el marcador.
 // ---------------------------------------------------------------------------------
 
 export interface Preset {
@@ -113,36 +115,15 @@ export interface Preset {
   historia: string; // en inglés: es chrome de la UI
   local: string;
   visita: string;
-  marcador: string;
 }
-
-const HISTORIAS: { historia: string; cumple: (hs: Hecho[]) => boolean }[] = [
-  { historia: "Comeback win", cumple: (hs) => hs.some((h) => h.tipo === "remontada" && h.datos.desenlace === "victoria") },
-  { historia: "Red card", cumple: (hs) => hs.some((h) => h.tipo === "expulsion_y_efecto") },
-  { historia: "Against the run of play", cumple: (hs) => hs.some((h) => h.tipo === "justicia_xg" && h.datos.contra_la_corriente === "si") },
-  { historia: "Hat-trick", cumple: (hs) => hs.some((h) => h.tipo === "doblete_o_mas" && Number(h.datos.goles) >= 3) },
-  { historia: "Goalkeeper's day", cumple: (hs) => hs.some((h) => h.tipo === "portero_destacado") },
-  { historia: "Late drama", cumple: (hs) => hs.some((h) => h.tipo === "gol_tardio") && hs.some((h) => h.tipo === "remontada") },
-];
 
 let presetsCalculados: Preset[] | undefined;
 
 export function presets(): Preset[] {
   if (presetsCalculados) return presetsCalculados;
-  const out: Preset[] = [];
-  const usadas = new Set<number>([SEMILLA_DESTACADA]);
-  for (const { historia, cumple } of HISTORIAS) {
-    for (let s = 1; s <= 600; s++) {
-      if (usadas.has(s)) continue;
-      const p = simular(configDeSemilla(s));
-      const hs = analizar(p);
-      if (!cumple(hs)) continue;
-      const r = hs.find((h) => h.tipo === "resultado_final") as Hecho;
-      out.push({ seed: s, historia, local: p.config.local.nombre, visita: p.config.visita.nombre, marcador: `${r.datos.goles_local}–${r.datos.goles_visita}` });
-      usadas.add(s);
-      break;
-    }
-  }
-  presetsCalculados = out;
-  return out;
+  presetsCalculados = CRITERIOS.map((c) => {
+    const cfg = configDeSemilla(PRESETS[c.id]);
+    return { seed: PRESETS[c.id], historia: c.historia, local: cfg.local.nombre, visita: cfg.visita.nombre };
+  });
+  return presetsCalculados;
 }

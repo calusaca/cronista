@@ -2,6 +2,7 @@
 // Salida esperada cerrada por propiedad (tipos presentes/ausentes y eventos citados),
 // nunca por igualdad de texto. Umbrales importados de umbrales.ts.
 import { describe, expect, it } from "vitest";
+import { micro } from "../../sim/micro";
 import { VERIFICADORES } from "../../sim/invariantes";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
@@ -30,7 +31,10 @@ const uno = (hs: Hecho[], tipo: TipoHecho): Hecho => {
 /** Propiedades estructurales que todo análisis debe cumplir (fixtures y corpus). */
 function problemasEstructurales(p: Partido, hs: Hecho[]): string[] {
   const err: string[] = [];
-  const indice = new Map(p.eventos.map((e, i) => [e.id, i] as const));
+  // Brief 013: los hechos acotados de la capa micro citan micro-eventos (en su propio orden).
+  const mp = micro(p);
+  const indice = new Map<string, number>([...p.eventos.map((e, i) => [e.id, i] as const), ...mp.eventos.map((e, i) => [e.id, i] as const)]);
+  const microMin = new Map(mp.eventos.map((e) => [e.id, e.minuto] as const));
   hs.forEach((h, k) => {
     const pre = `${h.id} (${h.tipo})`;
     if (h.id !== `h${String(k + 1).padStart(2, "0")}`) err.push(`${pre}: id no secuencial`);
@@ -58,8 +62,10 @@ function problemasEstructurales(p: Partido, hs: Hecho[]): string[] {
       if (prev.relevancia === h.relevancia) {
         // Rev. 2.3 [B1]: desempate por el minuto del evento definitorio de cada tipo.
         const definitorio = (x: Hecho) => {
-          const id = x.eventos.find((e) => p.eventos[indice.get(e) ?? -1]?.tipo === DESEMPATE_EVENTO[x.tipo]) ?? x.eventos[0];
-          return p.eventos[indice.get(id as string) ?? 0]?.minuto ?? 0;
+          const macro = new Map(p.eventos.map((e) => [e.id, e] as const));
+          const id = x.eventos.find((e) => macro.get(e)?.tipo === DESEMPATE_EVENTO[x.tipo]) ?? x.eventos[0];
+          // Brief 013: un hecho que cita micro-eventos se ordena por el minuto de su primer micro.
+          return macro.get(id as string)?.minuto ?? microMin.get(id as string) ?? 0;
         };
         if (definitorio(prev) > definitorio(h)) err.push(`${pre}: desempate por minuto del evento definitorio roto`);
       }
@@ -441,5 +447,47 @@ describe(`propiedades de corpus (semillas 1..${CORPUS})`, () => {
       }
     });
     expect(fallas.slice(0, 10)).toEqual([]);
+  });
+});
+
+describe("013 · muestra mínima de los agregados (sobre prefijos cortos, como en vivo)", () => {
+  it("sin DOMINIO_PASES_MIN pases no hay dominio_global, aunque el porcentaje del prefijo supere DOMINIO_MIN", async () => {
+    const { micro: microDe } = await import("../../sim/micro");
+    const { DOMINIO_MIN, DOMINIO_PASES_MIN } = await import("../umbrales");
+    let casos = 0;
+    for (let s = 1; s <= 120; s++) {
+      const p = simular(configDeSemilla(s));
+      for (const k of [6, 10, 15]) {
+        const pre = { config: p.config, eventos: p.eventos.slice(0, k) };
+        const pases = microDe(pre).eventos.filter((x) => x.tipo === "pase");
+        if (pases.length >= DOMINIO_PASES_MIN || pases.length === 0) continue;
+        const share = Math.max(...(["local", "visita"] as const).map((l) => Math.round((pases.filter((x) => x.equipo === l).length * 100) / pases.length)));
+        if (share < DOMINIO_MIN) continue;
+        casos++;
+        expect(analizar(pre).some((h) => h.tipo === "dominio_global"), `seed ${s} k=${k}`).toBe(false);
+      }
+    }
+    expect(casos).toBeGreaterThan(0); // la prueba no es vacía: hubo prefijos con porcentaje alto y poca muestra
+  });
+
+  it("sin CANAL_AVANCES_MIN avances no hay dominio_por_canal", async () => {
+    const { micro: microDe } = await import("../../sim/micro");
+    const { CANAL_AVANCES_MIN } = await import("../umbrales");
+    let casos = 0;
+    for (let s = 1; s <= 120; s++) {
+      const p = simular(configDeSemilla(s));
+      for (const k of [6, 10, 15]) {
+        const pre = { config: p.config, eventos: p.eventos.slice(0, k) };
+        const m = microDe(pre);
+        const pocos = (["local", "visita"] as const).filter((l) => {
+          const n = m.posesiones.filter((x) => x.equipo === l && x.avance).length;
+          return n > 0 && n < CANAL_AVANCES_MIN;
+        });
+        if (pocos.length === 0) continue;
+        casos++;
+        for (const l of pocos) expect(analizar(pre).some((h) => h.tipo === "dominio_por_canal" && h.datos.equipo === p.config[l].nombre)).toBe(false);
+      }
+    }
+    expect(casos).toBeGreaterThan(0);
   });
 });

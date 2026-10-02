@@ -16,6 +16,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { micro } from "../../sim/micro";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import type { Evento, Lado, Partido } from "../../sim/tipos";
@@ -399,6 +400,112 @@ function esperados(p: Partido): Map<string, Esperado> {
     }
   }
 
+  // Brief 013 — hechos de la capa micro. ORÁCULO POR CONSISTENCIA (límite honesto del brief):
+  // la capa sale de un sorteo, así que no se re-deriva; se RECUENTA aquí, por otro camino,
+  // sobre micro(partido): conteos, citas, umbrales y desgloses. Los textos de canal son
+  // especificación (copiados aquí, no importados de textos.ts).
+  {
+    const m = micro(p);
+    const CANAL_ES: Record<string, string> = { banda_izquierda: "la banda izquierda", centro: "el centro", banda_derecha: "la banda derecha" };
+    const CANAL_EN: Record<string, string> = { banda_izquierda: "the left flank", centro: "the middle", banda_derecha: "the right flank" };
+    const inicios = ev.filter((e) => e.tipo === "inicio_periodo").map((e) => e.id);
+    const pct = (a: number, b: number) => Math.round((a * 100) / b);
+    // duelo_ganado: regates EXITOSOS de un mismo atacante sobre un mismo defensor
+    const pares = new Map<string, string[]>();
+    for (const x of m.eventos) {
+      if (x.tipo !== "regate" || x.exito !== true) continue;
+      const k = `${x.equipo}|${x.jugador}|${x.rival}`;
+      pares.set(k, [...(pares.get(k) ?? []), x.id]);
+    }
+    for (const [k, ids] of pares) {
+      if (ids.length < U.DUELO_MIN) continue;
+      const [l, jugador, rivalJ] = k.split("|") as [Lado, string, string];
+      poner(`duelo_ganado|${l}|${jugador}|${rivalJ}`, {
+        tipo: "duelo_ganado",
+        eventos: ids,
+        datos: { jugador, equipo: nombre[l], rival: rivalJ, equipo_rival: nombre[otro(l)], regates: ids.length },
+        cifras: [String(ids.length)],
+        nombres: [jugador, nombre[l], rivalJ, nombre[otro(l)]],
+        claveRelevancia: "duelo_ganado",
+      });
+    }
+    // perdidas_en_salida: por equipo, el canal con más pérdidas en su zona de salida (a igualdad, el primero en aparecer)
+    for (const l of LADOS) {
+      const por = new Map<string, string[]>();
+      for (const x of m.eventos) if (x.tipo === "perdida" && x.equipo === l && x.zona === "defensa") por.set(x.canal, [...(por.get(x.canal) ?? []), x.id]);
+      let mejor: [string, string[]] | undefined;
+      for (const e of por) if (!mejor || e[1].length > mejor[1].length) mejor = e;
+      if (!mejor || mejor[1].length < U.PERDIDAS_MIN) continue;
+      poner(`perdidas_en_salida|${l}`, {
+        tipo: "perdidas_en_salida",
+        eventos: mejor[1],
+        datos: { equipo: nombre[l], canal: mejor[0], canal_es: CANAL_ES[mejor[0]] as string, canal_en: CANAL_EN[mejor[0]] as string, perdidas: mejor[1].length },
+        cifras: [String(mejor[1].length)],
+        nombres: [nombre[l]],
+        claveRelevancia: "perdidas_en_salida",
+      });
+    }
+    // dominio_global: % de pases intentados, con su desglose por periodo
+    const pases = m.eventos.filter((x) => x.tipo === "pase");
+    const perDe = (ancla: string) => per(by.get(ancla) as Evento);
+    if (pases.length >= U.DOMINIO_PASES_MIN) {
+      for (const l of LADOS) {
+        const propios = pases.filter((x) => x.equipo === l).length;
+        const porcentaje = pct(propios, pases.length);
+        if (porcentaje < U.DOMINIO_MIN) continue;
+        const datos: Datos = { equipo: nombre[l], porcentaje, pases_equipo: propios, pases_total: pases.length };
+        for (const P of [1, 2] as const) {
+          const xs = pases.filter((x) => perDe(x.ancla) === P);
+          if (xs.length === 0) continue;
+          datos[`pases_equipo_p${P}`] = xs.filter((x) => x.equipo === l).length;
+          datos[`pases_total_p${P}`] = xs.length;
+        }
+        poner(`dominio_global|${l}`, { tipo: "dominio_global", eventos: inicios, datos, cifras: [String(porcentaje)], nombres: [nombre[l]], claveRelevancia: "dominio_global" });
+        break;
+      }
+    }
+    // dominio_por_canal: «avance» recalculado aquí (una posesión del equipo con algún evento
+    // suyo en zona de ataque, o que termina en un ancla de ataque), no leído de la capa.
+    const ANCLAS_ATAQUE = new Set(["tiro", "pase_clave", "corner", "fuera_de_juego"]);
+    for (const l of LADOS) {
+      const cuenta: Record<string, number> = { banda_izquierda: 0, centro: 0, banda_derecha: 0 };
+      let total = 0;
+      for (const ps of m.posesiones) {
+        if (ps.equipo !== l) continue;
+        const evs = m.eventos.filter((x) => x.posesion === ps.n);
+        const avance = evs.some((x) => x.zona === "ataque" && x.equipo === l) || (ps.termina === "ancla" && ANCLAS_ATAQUE.has((by.get(ps.ancla) as Evento).tipo));
+        if (avance !== ps.avance) throw new Error(`oráculo: la posesión ${ps.n} declara avance=${ps.avance} y sus eventos dicen ${avance}`);
+        if (!avance) continue;
+        total++;
+        cuenta[ps.canal] = (cuenta[ps.canal] ?? 0) + 1;
+      }
+      if (total < U.CANAL_AVANCES_MIN) continue;
+      let canal = "banda_izquierda";
+      for (const c of ["centro", "banda_derecha"]) if ((cuenta[c] as number) > (cuenta[canal] as number)) canal = c;
+      const porcentaje = pct(cuenta[canal] as number, total);
+      if (porcentaje < U.CANAL_MIN) continue;
+      poner(`dominio_por_canal|${l}`, {
+        tipo: "dominio_por_canal",
+        eventos: inicios,
+        datos: {
+          equipo: nombre[l],
+          canal,
+          canal_es: CANAL_ES[canal] as string,
+          canal_en: CANAL_EN[canal] as string,
+          porcentaje,
+          avances_canal: cuenta[canal] as number,
+          avances_total: total,
+          avances_izquierda: cuenta.banda_izquierda as number,
+          avances_centro: cuenta.centro as number,
+          avances_derecha: cuenta.banda_derecha as number,
+        },
+        cifras: [String(porcentaje)],
+        nombres: [nombre[l]],
+        claveRelevancia: "dominio_por_canal",
+      });
+    }
+  }
+
   // disciplina
   for (const lado of LADOS) {
     const am = ev.filter((e) => e.tipo === "tarjeta_amarilla" && e.equipo === lado);
@@ -438,6 +545,8 @@ function claveDe(p: Partido, h: Hecho): string {
       return `${h.tipo}|${h.eventos[0]}`;
     case "expulsion_y_efecto":
       return `${h.tipo}|${citado("tarjeta_roja")}`;
+    case "duelo_ganado":
+      return `${h.tipo}|${lado(h.datos.equipo)}|${h.datos.jugador}|${h.datos.rival}`;
     default:
       return `${h.tipo}|${lado(h.datos.equipo)}`;
   }
@@ -517,8 +626,13 @@ function oraculo(p: Partido, hs: Hecho[]): string[] {
   for (const clave of esp.keys()) if (!vistos.has(clave)) err.push(`falta el hecho ${clave}`);
 
   // Orden: relevancia descendente; a igualdad, minuto y luego posición del evento definitorio.
+  const mev = micro(p).eventos;
+  const midx = new Map(mev.map((x, i) => [x.id, i] as const));
   const definitorio = (h: Hecho) => {
     const id = h.eventos.find((x) => ev[idx.get(x) ?? -1]?.tipo === U.DESEMPATE_EVENTO[h.tipo]) ?? h.eventos[0];
+    // Brief 013: un hecho que cita micro-eventos se ordena por su primer micro (detrás del stream macro).
+    const mi = midx.get(id as string);
+    if (mi !== undefined) return { minuto: (mev[mi] as { minuto: number }).minuto, i: ev.length + mi };
     const i = idx.get(id as string) ?? 0;
     return { minuto: ev[i]?.minuto ?? 0, i };
   };
@@ -605,7 +719,8 @@ describe("paridad ES/EN sobre el corpus (rev. 2.3)", () => {
         const es = nombresEn(p, h.texto_es);
         const en = nombresEn(p, h.texto_en);
         if (es.join("|") !== en.join("|")) fallas.push(`seed ${p.config.seed} ${h.id}: nombres ES ≠ EN`);
-        const delEquipo = new Set(plantilla(h.datos.equipo).map((j) => j.nombre));
+        // Brief 013: el duelo nombra además al defensor rival, que es de `equipo_rival`.
+        const delEquipo = new Set([...plantilla(h.datos.equipo), ...(h.tipo === "duelo_ganado" ? plantilla(h.datos.equipo_rival) : [])].map((j) => j.nombre));
         for (const n of es) {
           if (equipos.has(n)) continue;
           if (!delEquipo.has(n)) fallas.push(`seed ${p.config.seed} ${h.id} ${h.tipo}: ${n} no es de ${String(h.datos.equipo)}`);

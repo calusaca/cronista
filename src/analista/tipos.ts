@@ -16,14 +16,20 @@ export type TipoHecho =
   | "expulsion_y_efecto"
   | "disciplina"
   // Brief 009: el mejor valorado del partido (nota computada desde los eventos).
-  | "figura_del_partido";
+  | "figura_del_partido"
+  // Brief 013: hechos de la capa micro (acotados: citan micro-eventos «m0001»; agregados:
+  // desglose auditable en `datos`, citan los inicios de periodo que cubren).
+  | "duelo_ganado"
+  | "perdidas_en_salida"
+  | "dominio_global"
+  | "dominio_por_canal";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
   tipo: TipoHecho;
   texto_es: string; // enunciado neutro por plantilla (no LLM)
   texto_en: string;
-  eventos: string[]; // IDs de eventos que lo sustentan; NUNCA vacío (orden del stream, sin repetidos)
+  eventos: string[]; // IDs de eventos que lo sustentan; NUNCA vacío (orden del stream, sin repetidos). Brief 013: micro-eventos «m0001…» en los hechos acotados de la capa micro
   relevancia: number; // 0–100, para que el Cronista priorice
   datos: Record<string, string | number>; // cifras crudas (marcador, xG, minutos…)
 }
@@ -44,4 +50,8 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "expulsion_y_efecto",
   "disciplina",
   "figura_del_partido",
+  "duelo_ganado",
+  "perdidas_en_salida",
+  "dominio_global",
+  "dominio_por_canal",
 ];

@@ -147,3 +147,48 @@ export const ESPACIAL = {
   paseAtaque: { banda_izquierda: 0.35, banda_derecha: 0.35, frontal_del_area: 0.3 },
   banda: { izquierda: 0.5, derecha: 0.5 },
 } as const;
+
+/**
+ * Brief 013 — perillas de la capa micro (los umbrales que las acotan viven en limites.ts).
+ * Todo se sortea con prngDerivado(semilla, "micro:" + id del ancla): nunca el stream principal.
+ */
+export const MICRO = {
+  /** Acciones por minuto de reloj entre anclas, y extra por ancla de ataque (la elaboración). */
+  accionesPorMinuto: 16.2,
+  accionesAncla: 2,
+  /** Reparto de acciones del poseedor (resto: pase). */
+  pConduccion: 0.34,
+  pRegate: 0.04,
+  pDuelo: 0.05,
+  /** Completación de pase: base + k·(ataque − defensa rival)/100, por estilo. */
+  paseBase: 0.8,
+  /** Ajuste de completación por zona: en la salida se juega seguro, arriba se arriesga. */
+  paseZona: { defensa: 0.17, medio: 0.0, ataque: -0.1 },
+  /** Factor de intentos de regate/duelo por zona (en la salida casi nadie regatea). */
+  riesgoZona: { defensa: 0.1, medio: 1.0, ataque: 1.4 },
+  paseKFuerza: 0.4,
+  paseEstilo: { posesion: 0.045, contragolpe: -0.04, presion: 0.0 },
+  /** Regate exitoso: base + k·(ataque − defensa rival)/100. */
+  regateBase: 0.55,
+  regateKFuerza: 0.4,
+  /** Duelo ganado por el poseedor. */
+  dueloBase: 0.5,
+  /** Mezcla de pases por zona: probabilidad de corto / medio (resto largo). */
+  paseMezcla: {
+    defensa: { corto: 0.5, medio: 0.32 },
+    medio: { corto: 0.6, medio: 0.32 },
+    ataque: { corto: 0.75, medio: 0.25 }, // sin largos: un pase largo no sale de la zona de ataque (invariante)
+  },
+  /** Avance de zona: probabilidad de subir de zona tras un pase completado según su largo, y tras una conducción. */
+  avance: {
+    defensa: { corto: 0.35, medio: 0.55, largo: 0.75, conduccion: 0.35 },
+    medio: { corto: 0.12, medio: 0.3, largo: 0.5, conduccion: 0.15 },
+    ataque: { corto: 0, medio: 0, largo: 0, conduccion: 0 },
+  },
+  /** Preferencia de canal de cada equipo: peso extra del canal preferido (sorteado por equipo). */
+  canalBase: { banda_izquierda: 0.36, centro: 0.28, banda_derecha: 0.36 },
+  canalPreferido: 0.04,
+  /** Pesos del actor según posición (POR casi no participa salvo al salir). */
+  actor: { POR: 0.3, DEF: 2, MED: 3, DEL: 2 },
+  regateador: { POR: 0, DEF: 0.5, MED: 2, DEL: 4 },
+} as const;

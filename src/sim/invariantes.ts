@@ -2,9 +2,10 @@
 // Cada función devuelve la lista de violaciones encontradas (vacía = cumple).
 // La prop. 1 (determinismo) se prueba directamente en la suite.
 
-import { MAX_CAMBIOS, TITULARES, type Lado, type Partido } from "./tipos";
+import { MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda } from "./espacial";
-import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
+import { micro, type MicroPartido } from "./micro";
+import { ALTURAS, BANDAS, CANALES, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
 export function verificarMinutos(p: Partido): string[] {
@@ -276,4 +277,87 @@ export const VERIFICADORES = {
   salidas: verificarSalidas,
   contrato: verificarContrato,
   espacial: verificarEspacial,
+  // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
+  micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 013 (rev 1.1) — invariantes de la capa micro. Implementación independiente del
+// generador: la plantilla en cancha se sigue aquí por su cuenta.
+// ---------------------------------------------------------------------------------
+
+/** Violaciones de la capa micro `m` respecto del partido `p` (vacía = cumple). */
+export function verificarMicro(p: Partido, m: MicroPartido): string[] {
+  const err: string[] = [];
+  const idxMacro = new Map(p.eventos.map((e, i) => [e.id, i] as const));
+  // Plantilla en cancha ANTES de cada evento macro (seguida aquí, aparte del generador).
+  const cancha: Record<Lado, Set<string>>[] = [];
+  const actual: Record<Lado, Set<string>> = {
+    local: new Set(p.config.local.jugadores.slice(0, TITULARES).map((j) => j.nombre)),
+    visita: new Set(p.config.visita.jugadores.slice(0, TITULARES).map((j) => j.nombre)),
+  };
+  for (const e of p.eventos) {
+    cancha.push({ local: new Set(actual.local), visita: new Set(actual.visita) });
+    if (e.tipo === "cambio" && e.jugador && e.sale) {
+      actual[e.equipo].delete(e.sale);
+      actual[e.equipo].add(e.jugador);
+    }
+    if (e.tipo === "tarjeta_roja" && e.jugador) actual[e.equipo].delete(e.jugador);
+  }
+  const otro = (l: Lado): Lado => (l === "local" ? "visita" : "local");
+  let minAnterior = -Infinity;
+  m.eventos.forEach((x, i) => {
+    const esperado = `m${String(i + 1).padStart(4, "0")}`;
+    if (x.id !== esperado) err.push(`${x.id}: id no secuencial (se esperaba ${esperado})`);
+    if (!TIPOS_MICRO.includes(x.tipo)) err.push(`${x.id}: tipo ${String(x.tipo)}`);
+    if (!CANALES.includes(x.canal)) err.push(`${x.id}: canal ${String(x.canal)}`);
+    if (x.minuto < minAnterior) err.push(`${x.id}: minuto ${x.minuto} < anterior ${minAnterior}`);
+    minAnterior = x.minuto;
+    const k = idxMacro.get(x.ancla);
+    if (k === undefined) {
+      err.push(`${x.id}: ancla ${x.ancla} inexistente`);
+      return;
+    }
+    const ancla = p.eventos[k] as Evento;
+    const prev = p.eventos[k - 1];
+    if (x.minuto > ancla.minuto || (prev && x.minuto < prev.minuto)) err.push(`${x.id}: minuto ${x.minuto} fuera de su tramo (${prev?.minuto ?? "?"}..${ancla.minuto})`);
+    const c = cancha[k] as Record<Lado, Set<string>>;
+    if (!c[x.equipo].has(x.jugador)) err.push(`${x.id}: ${x.jugador} no está en cancha (${x.tipo})`);
+    if (x.receptor !== undefined && (!c[x.equipo].has(x.receptor) || x.receptor === x.jugador)) err.push(`${x.id}: receptor ${x.receptor} inválido`);
+    if (x.rival !== undefined && !c[otro(x.equipo)].has(x.rival)) err.push(`${x.id}: rival ${x.rival} no está en cancha`);
+    // campos por tipo y magnitudes
+    if (x.tipo === "pase") {
+      if (x.receptor === undefined || x.completado === undefined || x.distanciaM === undefined) err.push(`${x.id}: pase incompleto`);
+      else {
+        if (x.distanciaM < PASE_M.corto.min || x.distanciaM > PASE_M.largo.max) err.push(`${x.id}: pase de ${x.distanciaM} m`);
+        if (x.distanciaM >= PASE_M.largo.min && x.zona === "ataque") err.push(`${x.id}: pase largo desde la zona de ataque`);
+      }
+    }
+    if (x.tipo === "conduccion" && (x.distanciaM === undefined || x.distanciaM < CONDUCCION_M.min || x.distanciaM > CONDUCCION_M.max)) err.push(`${x.id}: conducción de ${String(x.distanciaM)} m`);
+    if ((x.tipo === "regate" || x.tipo === "duelo") && (x.rival === undefined || x.exito === undefined)) err.push(`${x.id}: ${x.tipo} sin rival o sin resultado`);
+    // continuidad causal (rev 1.1)
+    const sig = m.eventos[i + 1];
+    if (sig && sig.ancla === x.ancla) {
+      const pierde = (x.tipo === "pase" && x.completado === false) || ((x.tipo === "regate" || x.tipo === "duelo") && x.exito === false);
+      if (pierde) {
+        if (sig.tipo !== "perdida" || sig.jugador !== x.jugador) err.push(`${x.id}→${sig.id}: tras perder la pelota debe venir su pérdida`);
+      } else if (x.tipo === "perdida") {
+        if (sig.tipo !== "recuperacion" || sig.equipo === x.equipo || sig.posesion === x.posesion) err.push(`${x.id}→${sig.id}: tras la pérdida recupera el rival en otra posesión`);
+      } else {
+        const tiene = x.tipo === "pase" ? x.receptor : x.jugador;
+        if (sig.posesion !== x.posesion || sig.jugador !== tiene) err.push(`${x.id}→${sig.id}: continuidad rota (la tiene ${String(tiene)}, actúa ${sig.jugador})`);
+      }
+    }
+  });
+  // la posesión del tiro es del tirador (y la del pase clave, del asistente)
+  p.eventos.forEach((a, k) => {
+    if (a.tipo !== "tiro" && a.tipo !== "pase_clave") return;
+    const del = m.eventos.filter((x) => x.ancla === a.id);
+    const u = del[del.length - 1];
+    if (!u) return;
+    const tiene = u.tipo === "pase" && u.completado ? u.receptor : u.jugador;
+    if (u.equipo !== a.equipo || tiene !== a.jugador) err.push(`${a.id} (${a.tipo} de ${a.jugador}): la pelota la tenía ${String(tiene)} (${u.id})`);
+    void k;
+  });
+  return err;
+}

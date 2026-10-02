@@ -19,7 +19,8 @@ export const esquemaEntradaOverlay = z.object({
   /** ID del hecho narrado. Local a la update (los hechos se analizan sobre el prefijo). */
   hecho: z.string().min(1),
   /** IDs de los eventos que respaldan la oración (hecho principal + apoyo), todos de minuto ≤ `minuto`. */
-  eventos: z.array(z.string().regex(/^e\d+$/)).min(1),
+  // Brief 013: también micro-eventos «m0001» (los hechos acotados de la capa micro).
+  eventos: z.array(z.string().regex(/^[em]\d+$/)).min(1),
   momento: z.string().min(1),
   tipo: z.enum(MOMENTOS_CLAVE),
   /** "llm" = el Cronista la escribió y pasó V1–V8; "plantilla" = el acta del hecho del momento. */

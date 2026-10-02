@@ -21,6 +21,12 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
   const simular = (ev: FormEvent) => {
     ev.preventDefault();
     const t = semilla.trim();
+    // Brief 014 §3: el campo vacío no deja al usuario quieto — partido al azar, como Random match.
+    if (t === "") {
+      setError(null);
+      router.push(`/match/${1 + Math.floor(Math.random() * AZAR_MAX)}`);
+      return;
+    }
     if (!/^[0-9]+$/.test(t) || Number(t) > SEED_MAX) {
       setError(`Seed must be a whole number from 0 to ${SEED_MAX}.`);
       return;
@@ -48,7 +54,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
           <option value="">Pick a story…</option>
           {presets.map((p) => (
             <option key={p.seed} value={p.seed}>
-              {p.historia} — {p.local} {p.marcador} {p.visita}
+              {p.historia} — {p.local} vs {p.visita}
             </option>
           ))}
         </select>
