@@ -52,7 +52,8 @@ export function describirEvento(e: Evento): string {
   const quien = e.jugador ?? "";
   switch (e.tipo) {
     case "tiro":
-      return `${NOMBRE_EVENTO.tiro}${e.penal ? " (penalty)" : ""} · ${quien} · xG ${(e.xg ?? 0).toFixed(2)}`;
+      // Brief 015: la distancia del tiro (la velocidad queda para la pizarra: la línea no se satura).
+      return `${NOMBRE_EVENTO.tiro}${e.penal ? " (penalty)" : ""} · ${quien} · xG ${(e.xg ?? 0).toFixed(2)}${e.distanciaM !== undefined ? ` · ${e.distanciaM} m` : ""}`;
     case "gol":
       return `${NOMBRE_EVENTO.gol} · ${quien}`;
     case "atajada":

@@ -128,7 +128,9 @@ export const ZONA_XG_BANDAS: Record<ZonaOrigen, { min: number; max: number; incl
   punto_penal: { min: XG_PENAL, max: XG_PENAL, incluyeMax: true },
   // Rev 1.1 del 012: el piso del frontal baja a 0.01 (un tiro raso desde el frontal tras el
   // despeje de un córner es fútbol normal): así todo tiro tras córner tiene zona de área.
-  frontal_del_area: { min: 0.01, max: 0.5, incluyeMax: false },
+  // Brief 015 (decisión de Fable): el techo baja de 0.50 a 0.30 — un xG ≥ 0.3 es una ocasión
+  // clara de cerca, nunca un tiro desde el borde del área. Esos tiros van al área chica.
+  frontal_del_area: { min: 0.01, max: 0.3, incluyeMax: false },
   banda_izquierda: { min: 0.01, max: 0.3, incluyeMax: false },
   banda_derecha: { min: 0.01, max: 0.3, incluyeMax: false },
   media_distancia: { min: 0.01, max: 0.15, incluyeMax: false },
@@ -178,3 +180,35 @@ export const PASE_M = { corto: { min: 4, max: 15 }, medio: { min: 15, max: 30 },
 export const CONDUCCION_M = { min: 2, max: 25 } as const;
 /** Mezcla de pases (fracción de cortos/largos sobre el corpus) — banda de realismo. */
 export const PASE_MEZCLA = { cortosMin: 0.5, cortosMax: 0.75, largosMin: 0.05, largosMax: 0.15 } as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 015 — magnitudes del tiro: distancia al arco (m) y velocidad del disparo (km/h).
+// Bandas de credibilidad y coherencia: ÚNICA fuente (invariantes, suite estadística, V8).
+// ---------------------------------------------------------------------------------
+
+/** Distancia por zona de origen, en metros enteros, [min, max] inclusivos. El penal: 11 exacto. */
+export const DISTANCIA_ZONA: Record<ZonaOrigen, { min: number; max: number }> = {
+  area_chica: { min: 2, max: 6 },
+  punto_penal: { min: 11, max: 11 },
+  frontal_del_area: { min: 16, max: 22 },
+  banda_izquierda: { min: 10, max: 24 },
+  banda_derecha: { min: 10, max: 24 },
+  media_distancia: { min: 20, max: 32 },
+};
+
+/** Coherencia distancia↔xG (el penal queda exento): un xG alto exige cerca; lejos exige xG bajo. */
+export const XG_ALTO = { xgMin: 0.3, distanciaMax: 12 } as const;
+export const TIRO_LEJANO = { distanciaMin: 20, xgMax: 0.15 } as const;
+
+
+/** Velocidad del disparo: rango absoluto (jamás un «8 km/h»), penal y tiros lejanos. */
+export const VELOCIDAD = { min: 60, max: 125 } as const;
+export const VELOCIDAD_PENAL = { min: 75, max: 110 } as const;
+export const VELOCIDAD_LEJANO = { distanciaMin: 20, min: 80 } as const;
+
+/** Suite estadística: media de velocidad y colas (fracción de tiros por encima/debajo). */
+export const VELOCIDAD_STATS = { mediaMin: 85, mediaMax: 95, colaAltaKmh: 110, colaBajaKmh: 70, colaMin: 0.02, colaMax: 0.15 } as const;
+
+/** V8 computable (brief 015): «desde fuera del área» desde esta distancia; «un misil» desde esta velocidad. */
+export const FUERA_DEL_AREA_M = 17;
+export const MISIL_KMH = 100;

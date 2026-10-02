@@ -572,3 +572,16 @@ export const FRASES_CANAL: Record<Lengua, [string, RegExp][]> = {
     ["centro", palabras(["the middle", "through the middle", "down the middle", "the centre", "the center", "through the centre", "through the center", "central channel"])],
   ],
 };
+
+/**
+ * Brief 015 — magnitudes del tiro, COMPUTABLES (V8): «desde fuera del área» solo si el hecho
+ * principal registra distancia ≥ FUERA_DEL_AREA_M; «un misil» solo con velocidad ≥ MISIL_KMH.
+ */
+export const FUERA_DEL_AREA: Record<Lengua, RegExp> = {
+  es: palabras(["desde fuera del área", "fuera del área", "desde afuera del área", "desde lejos", "desde larga distancia", "de media distancia"]),
+  en: palabras(["from outside the box", "outside the box", "from outside the area", "outside the area", "from long range", "from distance", "from range"]),
+};
+export const MISIL: Record<Lengua, RegExp> = {
+  es: palabras(["un misil", "misil", "un cañonazo", "cañonazo", "un obús", "obús", "un zapatazo", "zapatazo"]),
+  en: palabras(["a rocket", "rocket", "a thunderbolt", "thunderbolt", "a piledriver", "piledriver"]),
+};

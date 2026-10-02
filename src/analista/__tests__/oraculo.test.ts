@@ -118,6 +118,9 @@ function esperados(p: Partido): Map<string, Esperado> {
         penal: tiro.penal === true ? "si" : "no",
         marcador_local: m.local,
         marcador_visita: m.visita,
+        // Brief 015: las magnitudes de SU tiro, tal cual.
+        ...(tiro.distanciaM !== undefined ? { distancia_m: tiro.distanciaM } : {}),
+        ...(tiro.velocidadKmh !== undefined ? { velocidad_kmh: tiro.velocidadKmh } : {}),
       },
       cifras: [...cifrasDe(mt(g.minuto)), xg, String(m.local), String(m.visita)],
       nombres: [g.jugador as string, nombre.local, nombre.visita],

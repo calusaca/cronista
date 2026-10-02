@@ -21,13 +21,16 @@ const ROL: Record<PasoJugada["rol"], string> = {
   gol: "Goal",
 };
 
+/** Brief 015: las mediciones del tiro (son del evento, no coordenadas): « · 18 m · 97 km/h». */
+const magnitudesTxt = (e: Evento) => `${e.distanciaM !== undefined ? ` · ${e.distanciaM} m` : ""}${e.velocidadKmh !== undefined ? ` · ${e.velocidadKmh} km/h` : ""}`;
+
 const apellido = (n?: string) => (n ? n.split(" ").slice(1).join(" ") || n : "");
 
 /** Lo que el paso agrega del detalle espacial registrado (texto, no dibujo). */
 function detalleEspacial(p: PasoJugada): string {
   const e = p.evento;
   if (p.rol === "tiro" && e.zonaOrigen) {
-    const partes = [ZONA_EN[e.zonaOrigen]];
+    const partes = [`${ZONA_EN[e.zonaOrigen]}${magnitudesTxt(e)}`];
     if (e.destino) partes.push(`→ ${DESTINO_EN[e.destino]}${e.altura ? `, ${ALTURA_EN[e.altura]}` : ""}`);
     return ` · ${partes.join(" ")}`;
   }
@@ -105,6 +108,12 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
     );
   };
   const iRemate = geo.origen ? 1 : 0;
+  // El rótulo del palo va del lado contrario a la jugada (el origen si hay; si no, el remate).
+  const ladoRotulo = geo.origen && geo.origen.x !== 50 ? geo.origen.x : geo.remate.x;
+  // Rótulo del remate (dos líneas): debajo del punto si está arriba en la cancha; si está lejos
+  // del arco (la línea sube), al costado izquierdo, para no cruzar la trayectoria ni el pie.
+  const rotulo: { x: number; y: number; anchor: "middle" | "end" } =
+    geo.remate.y > 28 ? { x: geo.remate.x - 3, y: geo.remate.y - 0.6, anchor: "end" } : { x: Math.min(76, Math.max(24, geo.remate.x)), y: geo.remate.y + 4.6, anchor: "middle" };
 
   return (
     <>
@@ -136,16 +145,23 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
           <>
             <circle cx={geo.remate.x} cy={geo.remate.y} r="1.6" fill="var(--accent)" />
             {tirador?.jugador && (
+              // Brief 015: dos líneas centradas bajo el remate (quién · zona / mediciones), para
+              // que las magnitudes no se salgan del dibujo.
               <text
-                x={geo.remate.x + (geo.remate.x > 70 ? -2.4 : 2.4)}
-                y={geo.remate.y + 1}
+                x={rotulo.x}
+                y={rotulo.y}
                 fontSize="2.8"
                 fill="var(--ink)"
-                textAnchor={geo.remate.x > 70 ? "end" : "start"}
+                textAnchor={rotulo.anchor}
                 data-testid="pitch-zona"
               >
-                {apellido(tirador.jugador)} · {ZONA_EN[geo.zona]}
-                {tirador.xg !== undefined ? ` · xG ${tirador.xg.toFixed(2)}` : ""}
+                <tspan>
+                  {apellido(tirador.jugador)} · {ZONA_EN[geo.zona]}
+                </tspan>
+                <tspan x={rotulo.x} dy="3.2" fill="var(--muted)">
+                  {magnitudesTxt(tirador).replace(/^ · /, "")}
+                  {tirador.xg !== undefined ? ` · xG ${tirador.xg.toFixed(2)}` : ""}
+                </tspan>
               </text>
             )}
           </>
@@ -155,11 +171,11 @@ function PizarraDatos({ geo, tirador, pasador }: { geo: GeometriaJugada; tirador
             <circle cx={geo.arco.x} cy={geo.arco.y + 0.6} r="1.2" fill="none" stroke="var(--accent)" strokeWidth="0.5" data-testid="pitch-target" />
             {/* Al costado del arco, del lado CONTRARIO al remate (así no pisa la trayectoria). */}
             <text
-              x={geo.remate.x > 50 ? 43 : 57}
+              x={ladoRotulo > 50 ? 43 : 57}
               y={5.4}
               fontSize="2.6"
               fill="var(--ink)"
-              textAnchor={geo.remate.x > 50 ? "end" : "start"}
+              textAnchor={ladoRotulo > 50 ? "end" : "start"}
               data-testid="pitch-destino"
             >
               {DESTINO_EN[geo.destino]}

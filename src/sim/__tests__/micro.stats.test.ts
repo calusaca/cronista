@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { analizar } from "../../analista/analista";
 import { RAREZA_MICRO_MAX } from "../../analista/umbrales";
 import type { TipoHecho } from "../../analista/tipos";
-import { MICRO_ATT, MICRO_PASES, MICRO_REGATES_EXITO, MICRO_TOTAL, N_ESTADISTICA, PASE_M, PASE_MEZCLA } from "../limites";
+import { DISTANCIA_ZONA, MICRO_ATT, MICRO_PASES, MICRO_REGATES_EXITO, MICRO_TOTAL, N_ESTADISTICA, PASE_M, PASE_MEZCLA, VELOCIDAD_STATS } from "../limites";
 import { micro } from "../micro";
 import { simular } from "../motor";
 import { configDeSemilla } from "../plantillas";
@@ -83,4 +83,34 @@ describe(`013 · capa micro, N = ${N_ESTADISTICA}`, () => {
       expect(n / N_ESTADISTICA).toBeLessThanOrEqual(RAREZA_MICRO_MAX);
     },
   );
+});
+
+describe(`015 · magnitudes del tiro, N = ${N_ESTADISTICA}`, () => {
+  const tiros = corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "tiro"));
+
+  it("velocidad: media en VELOCIDAD_STATS y colas razonables (ni todo misil ni todo blando)", () => {
+    const v = tiros.map((e) => e.velocidadKmh as number);
+    const m = media(v);
+    const alta = v.filter((x) => x >= VELOCIDAD_STATS.colaAltaKmh).length / v.length;
+    const baja = v.filter((x) => x <= VELOCIDAD_STATS.colaBajaKmh).length / v.length;
+    const ord = [...v].sort((a, b) => a - b);
+    informe("velocidad media · p5 · p95", `${m.toFixed(1)} · ${ord[Math.floor(ord.length * 0.05)]} · ${ord[Math.floor(ord.length * 0.95)]}`);
+    informe(`colas ≥${VELOCIDAD_STATS.colaAltaKmh} · ≤${VELOCIDAD_STATS.colaBajaKmh}`, `${alta.toFixed(3)} · ${baja.toFixed(3)}`);
+    expect(m).toBeGreaterThanOrEqual(VELOCIDAD_STATS.mediaMin);
+    expect(m).toBeLessThanOrEqual(VELOCIDAD_STATS.mediaMax);
+    for (const c of [alta, baja]) {
+      expect(c).toBeGreaterThanOrEqual(VELOCIDAD_STATS.colaMin);
+      expect(c).toBeLessThanOrEqual(VELOCIDAD_STATS.colaMax);
+    }
+  });
+
+  it("distancias por zona: cada zona poblada y su media dentro de su banda", () => {
+    for (const z of Object.keys(DISTANCIA_ZONA) as (keyof typeof DISTANCIA_ZONA)[]) {
+      const d = tiros.filter((e) => e.zonaOrigen === z).map((e) => e.distanciaM as number);
+      informe(`distancia ${z} (n · media · min–max)`, `${d.length} · ${media(d).toFixed(1)} · ${Math.min(...d)}–${Math.max(...d)}`);
+      expect(d.length).toBeGreaterThan(0);
+      expect(media(d)).toBeGreaterThanOrEqual(DISTANCIA_ZONA[z].min);
+      expect(media(d)).toBeLessThanOrEqual(DISTANCIA_ZONA[z].max);
+    }
+  });
 });

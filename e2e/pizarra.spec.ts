@@ -52,6 +52,9 @@ test("penal: el remate sale del punto penal registrado", async ({ page }) => {
   await expect(svg).toHaveAttribute("data-zona", "punto_penal");
   await expect(svg).toHaveAttribute("data-anim", "terminada", { timeout: 6000 });
   await expect(tarjeta.getByTestId("pitch-zona")).toContainText(ZONA_EN.punto_penal as string);
+  // Brief 015: la medición del penal es 11 m exactos, visible en el rótulo del remate.
+  await expect(tarjeta.getByTestId("pitch-zona")).toContainText(/(^|[^0-9])11 m · \d+ km\/h/);
+  await expect(tarjeta.getByTestId("pitch-zona")).toContainText("km/h");
 });
 
 test("prefers-reduced-motion: pizarra estática directa, sin animación", async ({ browser }) => {

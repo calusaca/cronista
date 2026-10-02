@@ -146,6 +146,11 @@ export const ESPACIAL = {
   /** Pase clave desde el último tercio (desde el medio es siempre media distancia). */
   paseAtaque: { banda_izquierda: 0.35, banda_derecha: 0.35, frontal_del_area: 0.3 },
   banda: { izquierda: 0.5, derecha: 0.5 },
+  /** Brief 015 — velocidad del disparo (km/h): media, dispersión y +km/h por metro de distancia. */
+  velocidadMedia: 89,
+  velocidadSigma: 11,
+  velocidadPorMetro: 0.6,
+  velocidadMetroRef: 14,
 } as const;
 
 /**

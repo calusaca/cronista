@@ -21,6 +21,7 @@
 
 import { z } from "zod";
 import type { Hecho } from "../analista/tipos";
+import { FUERA_DEL_AREA_M, MISIL_KMH } from "../sim/limites";
 import type { Partido } from "../sim/tipos";
 import {
   BALANCE_POSTERIOR,
@@ -29,6 +30,8 @@ import {
   CUENTA_GOLES,
   FRANJAS,
   FRASES_CANAL,
+  FUERA_DEL_AREA,
+  MISIL,
   FRASES_INFERIORIDAD,
   FRASES_PERIODO,
   FRASES_SIEMPRE,
@@ -420,6 +423,15 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
         return ganador !== undefined && ganador === equipo;
       });
     if (!ok) h.push({ regla: "V8", detalle: `«${m[0]}»: ese gol no fue el último del partido dejando al ganador por delante` });
+  });
+  // Brief 015 — magnitudes del tiro computables.
+  s = quitar(s, FUERA_DEL_AREA[lengua], (m) => {
+    if (!ctx.hechos.some((x) => typeof x.datos.distancia_m === "number" && x.datos.distancia_m >= FUERA_DEL_AREA_M))
+      h.push({ regla: "V8", detalle: `«${m[0]}»: el hecho no registra un tiro desde ${FUERA_DEL_AREA_M} m o más` });
+  });
+  s = quitar(s, MISIL[lengua], (m) => {
+    if (!ctx.hechos.some((x) => typeof x.datos.velocidad_kmh === "number" && x.datos.velocidad_kmh >= MISIL_KMH))
+      h.push({ regla: "V8", detalle: `«${m[0]}»: el hecho no registra un disparo de ${MISIL_KMH} km/h o más` });
   });
   s = quitar(s, VALLA_INVICTA[lengua], (m) => {
     const equipos = ctx.hechos.map((x) => x.datos.equipo).filter((x): x is string => typeof x === "string");

@@ -78,10 +78,15 @@ export interface Evento {
   ladoPortero?: LadoPortero;
   /** corner: desde qué banda se sacó (no confundir con `Lado`, que es local/visita). */
   banda?: Banda;
+  /** Brief 015 — tiro (y su gol/atajada): distancia al arco en metros enteros. */
+  distanciaM?: number;
+  /** Brief 015 — tiro (y su gol/atajada): velocidad del disparo en km/h enteros. */
+  velocidadKmh?: number;
 }
 
 /** Brief 011: los campos espaciales (la proyección legado los borra). */
-export const CAMPOS_ESPACIALES = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda"] as const;
+// Brief 015: la lista se extiende CONSCIENTEMENTE con las magnitudes del tiro (tercera extensión).
+export const CAMPOS_ESPACIALES = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda", "distanciaM", "velocidadKmh"] as const;
 
 export interface Partido {
   config: SimConfig;

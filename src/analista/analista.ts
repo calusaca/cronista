@@ -179,6 +179,9 @@ function golesAnotados(c: Ctx): Borrador[] {
       penal: penal ? "si" : "no",
       marcador_local: g.marcador.local,
       marcador_visita: g.marcador.visita,
+      // Brief 015: las magnitudes del tiro (si el partido las trae) para que V3/V6 las verifiquen.
+      ...(tiro?.distanciaM !== undefined ? { distancia_m: tiro.distanciaM } : {}),
+      ...(tiro?.velocidadKmh !== undefined ? { velocidad_kmh: tiro.velocidadKmh } : {}),
     });
   });
 }

@@ -5,7 +5,7 @@
 import { MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
-import { ALTURAS, BANDAS, CANALES, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
+import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
 export function verificarMinutos(p: Partido): string[] {
@@ -249,6 +249,35 @@ export function verificarEspacial(p: Partido): string[] {
         const b = ZONA_XG_BANDAS[e.zonaOrigen];
         err.push(`${e.id}: ${e.zonaOrigen} con xG ${xg} (banda [${b.min}, ${b.max}${b.incluyeMax ? "]" : ")"})`);
       }
+    }
+    // Brief 015 — magnitudes del tiro: dónde pueden estar y credibilidad cruzada.
+    for (const k of ["distanciaM", "velocidadKmh"] as const) {
+      const v = e[k];
+      if (v === undefined) continue;
+      if (!["tiro", "gol", "atajada"].includes(e.tipo)) err.push(`${e.id}: ${k} en ${e.tipo}`);
+      if (!Number.isInteger(v)) err.push(`${e.id}: ${k} no entero (${v})`);
+    }
+    if (e.tipo === "tiro" && e.distanciaM !== undefined) {
+      const d = e.distanciaM;
+      const xg = e.xg ?? 0;
+      if (e.penal === true) {
+        if (d !== DISTANCIA_ZONA.punto_penal.min) err.push(`${e.id}: penal desde ${d} m`);
+      } else {
+        const z = e.zonaOrigen;
+        if (z && (d < DISTANCIA_ZONA[z].min || d > DISTANCIA_ZONA[z].max)) err.push(`${e.id}: ${z} a ${d} m`);
+        if (xg >= XG_ALTO.xgMin && d > XG_ALTO.distanciaMax) err.push(`${e.id}: xG ${xg} desde ${d} m`);
+        if (d >= TIRO_LEJANO.distanciaMin && Math.round(xg * 100) > Math.round(TIRO_LEJANO.xgMax * 100)) err.push(`${e.id}: ${d} m con xG ${xg}`);
+      }
+    }
+    if (e.tipo === "tiro" && e.velocidadKmh !== undefined) {
+      const v = e.velocidadKmh;
+      const b = e.penal === true ? VELOCIDAD_PENAL : VELOCIDAD;
+      if (v < b.min || v > b.max) err.push(`${e.id}: ${v} km/h fuera de [${b.min}, ${b.max}]`);
+      if (e.penal !== true && (e.distanciaM ?? 0) >= VELOCIDAD_LEJANO.distanciaMin && v < VELOCIDAD_LEJANO.min) err.push(`${e.id}: ${v} km/h desde ${e.distanciaM} m`);
+    }
+    if ((e.tipo === "gol" || e.tipo === "atajada") && e.relacionadoCon) {
+      const t = porId.get(e.relacionadoCon);
+      for (const k of ["distanciaM", "velocidadKmh"] as const) if (t && t[k] !== undefined && e[k] !== t[k]) err.push(`${e.id}: ${k} ${String(e[k])} ≠ su tiro (${t[k]})`);
     }
     if (e.tipo === "pase_clave" && e.zonaOrigen !== undefined && !ZONAS_ORIGEN_PASE.includes(e.zonaOrigen))
       err.push(`${e.id}: pase clave desde ${e.zonaOrigen}`);

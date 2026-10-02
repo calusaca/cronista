@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { proyeccionLegado } from "../espacial";
 import { verificarEspacial, VERIFICADORES } from "../invariantes";
-import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN } from "../limites";
+import { ALTURAS, BANDAS, DESTINOS, DISTANCIA_ZONA, LADO_PORTERO_DE, LADOS_PORTERO, TIRO_LEJANO, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN } from "../limites";
 import { cornerDelTiro, enBanda } from "../espacial";
 import { simular } from "../motor";
 import { configDeSemilla } from "../plantillas";
@@ -161,10 +161,10 @@ describe("011 · mutaciones de control sobre verificarEspacial", () => {
     const t = ev(p, (e, i) => e.tipo === "tiro" && !e.penal && !conGol.has(e.id) && cornerDelTiro(p.eventos, i) === undefined);
     t.zonaOrigen = "area_chica";
     t.xg = ZONA_XG_BANDAS.area_chica.min - 0.01;
-    expect(verificarEspacial(p)).toEqual([expect.stringContaining(`${t.id}: area_chica con xG ${t.xg} (banda`)]);
+    expect(verificarEspacial(p)).toContainEqual(expect.stringContaining(`${t.id}: area_chica con xG ${t.xg} (banda`));
     t.zonaOrigen = "media_distancia";
     t.xg = ZONA_XG_BANDAS.media_distancia.max;
-    expect(verificarEspacial(p)).toEqual([expect.stringContaining(`${t.id}: media_distancia con xG ${t.xg} (banda`)]);
+    expect(verificarEspacial(p)).toContainEqual(expect.stringContaining(`${t.id}: media_distancia con xG ${t.xg} (banda`));
   });
   it("detecta un portero tirado al lado equivocado", () => {
     const p = clonar(base);
@@ -195,12 +195,12 @@ describe("011 · mutaciones de control sobre verificarEspacial", () => {
 describe("012 §E · P12 — bandas xG por zona, con COPIA INDEPENDIENTE de las del brief 012 §F1", () => {
   // Copia literal del brief (NO importada de limites.ts): si el generador y el invariante se
   // mueven juntos (los dos leen ZONA_XG_BANDAS), esta prueba se pone roja.
-  // área chica [0.15, 1.0] · punto penal = xG del penal (0.76) · frontal [0.01, 0.50) (rev 1.1) ·
+  // área chica [0.15, 1.0] · punto penal = xG del penal (0.76) · frontal [0.01, 0.30) (rev 1.1 del 012 + 015) ·
   // bandas [0.01, 0.30) · media distancia [0.01, 0.15)  — en centésimas.
   const BRIEF: Record<string, (c: number) => boolean> = {
     area_chica: (c) => c >= 15 && c <= 100,
     punto_penal: (c) => c === 76,
-    frontal_del_area: (c) => c >= 1 && c < 50,
+    frontal_del_area: (c) => c >= 1 && c < 30,
     banda_izquierda: (c) => c >= 1 && c < 30,
     banda_derecha: (c) => c >= 1 && c < 30,
     media_distancia: (c) => c >= 1 && c < 15,
@@ -221,7 +221,7 @@ describe("012 §E · P12 — bandas xG por zona, con COPIA INDEPENDIENTE de las 
     expect(ZONA_XG_BANDAS).toEqual({
       area_chica: { min: 0.15, max: 1.0, incluyeMax: true },
       punto_penal: { min: 0.76, max: 0.76, incluyeMax: true },
-      frontal_del_area: { min: 0.01, max: 0.5, incluyeMax: false },
+      frontal_del_area: { min: 0.01, max: 0.3, incluyeMax: false },
       banda_izquierda: { min: 0.01, max: 0.3, incluyeMax: false },
       banda_derecha: { min: 0.01, max: 0.3, incluyeMax: false },
       media_distancia: { min: 0.01, max: 0.15, incluyeMax: false },
@@ -240,5 +240,90 @@ describe("012 · el sorteo respeta la intención, no solo la banda", () => {
     }
     const orden = Object.entries(cuenta).sort((a, b) => b[1] - a[1]);
     expect(orden[0]?.[0]).toBe("area_chica");
+  });
+});
+
+describe("015 · magnitudes del tiro (distancia y velocidad)", () => {
+  const corpus = partidos;
+  const tiros = corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "tiro"));
+
+  it("completitud: todo tiro, gol y atajada lleva distanciaM y velocidadKmh enteros (y gol/atajada = su tiro)", () => {
+    const faltan = corpus.flatMap((p) => p.eventos.filter((e) => ["tiro", "gol", "atajada"].includes(e.tipo) && (!Number.isInteger(e.distanciaM) || !Number.isInteger(e.velocidadKmh))));
+    expect(faltan.slice(0, 5)).toEqual([]);
+  });
+
+  it("invariantes de credibilidad en el corpus 1..1000 (verificarEspacial)", () => {
+    const fallas = corpus.flatMap((p) => verificarEspacial(p).map((e) => `seed ${p.config.seed}: ${e}`));
+    expect(fallas.slice(0, 10)).toEqual([]);
+  });
+
+  it("fixture: todo penal es a 11 m exactos y con velocidad de penal", () => {
+    const penales = tiros.filter((e) => e.penal);
+    expect(penales.length).toBeGreaterThan(0);
+    expect(new Set(penales.map((e) => e.distanciaM))).toEqual(new Set([DISTANCIA_ZONA.punto_penal.min]));
+    for (const e of penales) expect(e.velocidadKmh!).toBeGreaterThanOrEqual(VELOCIDAD_PENAL.min);
+  });
+
+  it("fixture: un gol de media distancia es desde ≥ TIRO_LEJANO.distanciaMin m y con xG ≤ TIRO_LEJANO.xgMax", () => {
+    const goles = corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "gol" && e.zonaOrigen === "media_distancia"));
+    expect(goles.length).toBeGreaterThan(0);
+    for (const g of goles) {
+      expect(g.distanciaM!).toBeGreaterThanOrEqual(TIRO_LEJANO.distanciaMin);
+      expect(g.xg!).toBeLessThanOrEqual(TIRO_LEJANO.xgMax);
+    }
+  });
+
+  it("la proyección legado borra también las magnitudes (extensión consciente del 015)", () => {
+    expect(CAMPOS_ESPACIALES).toContain("distanciaM");
+    expect(CAMPOS_ESPACIALES).toContain("velocidadKmh");
+    for (const e of proyeccionLegado(corpus[0] as Partido).eventos) {
+      expect(e.distanciaM).toBeUndefined();
+      expect(e.velocidadKmh).toBeUndefined();
+    }
+  });
+
+  describe("mutaciones de control sobre las magnitudes", () => {
+    const base = corpus[245] as Partido;
+    const t = (p: Partido, pred: (e: Evento) => boolean) => p.eventos.find((e) => e.tipo === "tiro" && pred(e)) as Evento;
+    it("detecta un penal que no es a 11 m", () => {
+      const p = clonar(base);
+      t(p, (e) => e.penal === true).distanciaM = 12;
+      expect(verificarEspacial(p).some((m) => m.includes("penal desde 12 m"))).toBe(true);
+    });
+    it("detecta distancia fuera de la banda de su zona y la incoherencia con el xG", () => {
+      const p = clonar(base);
+      const a = t(p, (e) => e.zonaOrigen === "area_chica");
+      a.distanciaM = DISTANCIA_ZONA.area_chica.max + 4;
+      const lejos = t(p, (e) => !e.penal && (e.xg ?? 0) > TIRO_LEJANO.xgMax && e.zonaOrigen !== "area_chica");
+      lejos.distanciaM = TIRO_LEJANO.distanciaMin;
+      const err = verificarEspacial(p);
+      expect(err.some((m) => m.includes(`area_chica a ${DISTANCIA_ZONA.area_chica.max + 4} m`))).toBe(true);
+      expect(err.some((m) => m.includes(`${TIRO_LEJANO.distanciaMin} m con xG`))).toBe(true);
+    });
+    it("detecta una velocidad imposible y un tiro lejano blando", () => {
+      const p = clonar(base);
+      t(p, (e) => !e.penal).velocidadKmh = 8;
+      const lejano = t(p, (e) => (e.distanciaM ?? 0) >= VELOCIDAD_LEJANO.distanciaMin);
+      lejano.velocidadKmh = VELOCIDAD_LEJANO.min - 1;
+      const err = verificarEspacial(p);
+      expect(err.some((m) => m.includes("8 km/h fuera de"))).toBe(true);
+      expect(err.some((m) => m.includes(`${VELOCIDAD_LEJANO.min - 1} km/h desde`))).toBe(true);
+    });
+    it("detecta un gol que no hereda las magnitudes de su tiro", () => {
+      const p = clonar(base);
+      const g = p.eventos.find((e) => e.tipo === "gol") as Evento;
+      g.velocidadKmh = (g.velocidadKmh ?? 0) + 1;
+      expect(verificarEspacial(p).some((m) => m.includes("velocidadKmh") && m.includes("su tiro"))).toBe(true);
+    });
+  });
+});
+
+describe("015 · las magnitudes no tocan lo que ya sorteaba el 011", () => {
+  it("los campos del 011 (zona, destino, altura, lado del portero, banda) son los de la referencia (regenerada con la decisión (a) del 015)", () => {
+    const f = JSON.parse(readFileSync(fileURLToPath(new URL("../__fixtures__/hashes-011.json", import.meta.url)), "utf8")) as { total: string; porSemilla: string[] };
+    const CAMPOS = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda"] as const;
+    const por = partidos.slice(0, f.porSemilla.length).map((p) => sha256hex(JSON.stringify(p.eventos.map((e) => [e.id, ...CAMPOS.map((k) => e[k] ?? null)]))));
+    expect(por.flatMap((h, i) => (h === f.porSemilla[i] ? [] : [`seed ${i + 1}`]))).toEqual([]);
+    expect(sha256hex(por.join("\n"))).toBe(f.total);
   });
 });

@@ -134,7 +134,8 @@ export function lineaRemate(p: Partido, tiro: Evento): string {
   const destino = tiro.destino ? ` → ${DESTINO_TXT[tiro.destino]}${tiro.altura ? `, ${ALTURA_TXT[tiro.altura]}` : ""}` : "";
   const fin =
     desenlace?.tipo === "gol" ? " — goal" : desenlace?.tipo === "atajada" ? ` — saved${desenlace.ladoPortero ? ` (keeper dives ${PORTERO_TXT[desenlace.ladoPortero]})` : ""}` : " — off target";
-  return `${tiro.jugador} shoots${tiro.xg !== undefined ? ` · xG ${tiro.xg.toFixed(2)}` : ""}${destino}${fin}`;
+  const magnitudes = `${tiro.distanciaM !== undefined ? ` · ${tiro.distanciaM} m` : ""}${tiro.velocidadKmh !== undefined ? ` · ${tiro.velocidadKmh} km/h` : ""}`;
+  return `${tiro.jugador} shoots${magnitudes}${tiro.xg !== undefined ? ` · xG ${tiro.xg.toFixed(2)}` : ""}${destino}${fin}`;
 }
 
 /**

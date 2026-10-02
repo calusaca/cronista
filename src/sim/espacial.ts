@@ -11,7 +11,20 @@
 // - un penal nunca es «tras córner».
 
 import { ESPACIAL } from "./parametros";
-import { LADO_PORTERO_DE, TIPOS_ATAQUE, TRAS_CORNER_MAX_MIN, ZONA_XG_BANDAS, type Destino, type ZonaOrigen } from "./limites";
+import {
+  DISTANCIA_ZONA,
+  LADO_PORTERO_DE,
+  TIPOS_ATAQUE,
+  TIRO_LEJANO,
+  TRAS_CORNER_MAX_MIN,
+  VELOCIDAD,
+  VELOCIDAD_LEJANO,
+  VELOCIDAD_PENAL,
+  XG_ALTO,
+  ZONA_XG_BANDAS,
+  type Destino,
+  type ZonaOrigen,
+} from "./limites";
 import { prngDerivado, type Rng } from "./prng";
 import { CAMPOS_ESPACIALES, type Evento, type Partido } from "./tipos";
 
@@ -93,6 +106,9 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
         e.zonaOrigen = zonaDelTiro(rng, origen, e.xg ?? 0);
         e.destino = sortear(rng, ESPACIAL.destino) as Destino;
         e.altura = sortear(rng, ESPACIAL.altura);
+        // Brief 015: magnitudes del mismo stream derivado, DESPUÉS de los sorteos del 011
+        // (así zona, destino y altura no cambian).
+        Object.assign(e, magnitudes(rng, e.zonaOrigen, e.xg ?? 0, e.penal === true));
         break;
       }
       case "pase_clave":
@@ -114,8 +130,44 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
       if (tiro.destino) e.destino = tiro.destino;
       if (tiro.altura) e.altura = tiro.altura;
     }
+    // Brief 015: el gol y la atajada heredan las magnitudes de su tiro.
+    if ((e.tipo === "gol" || e.tipo === "atajada") && tiro.distanciaM !== undefined) {
+      e.distanciaM = tiro.distanciaM;
+      if (tiro.velocidadKmh !== undefined) e.velocidadKmh = tiro.velocidadKmh;
+    }
     if (e.tipo === "atajada" && tiro.destino) e.ladoPortero = LADO_PORTERO_DE[tiro.destino as Destino];
   }
+}
+
+/**
+ * Brief 015 — rango de distancia admisible para un tiro: la banda de su zona, recortada por la
+ * coherencia con el xG (xG alto ⇒ cerca; xG > TIRO_LEJANO.xgMax ⇒ menos de TIRO_LEJANO.distanciaMin).
+ * El penal: 11 exacto (exento de la coherencia).
+ */
+export function rangoDistancia(zona: ZonaOrigen, xg: number, penal: boolean): { min: number; max: number } {
+  const b = DISTANCIA_ZONA[zona];
+  if (penal || zona === "punto_penal") return { min: b.min, max: b.max };
+  // «xG alto ⇒ cerca» no necesita recorte aquí: con las bandas xG (frontal < 0.30 desde el 015)
+  // solo el área chica (≤ 6 m) admite xG ≥ XG_ALTO.xgMin. El invariante lo vigila.
+  let max = b.max;
+  if (Math.round(xg * 100) > Math.round(TIRO_LEJANO.xgMax * 100)) max = Math.min(max, TIRO_LEJANO.distanciaMin - 1);
+  return { min: b.min, max: Math.max(b.min, max) };
+}
+
+/** Distancia y velocidad de un tiro: dentro de sus bandas, más lejos cuanto menor el xG, más fuerte desde lejos. */
+function magnitudes(rng: Rng, zona: ZonaOrigen | undefined, xg: number, penal: boolean): { distanciaM: number; velocidadKmh: number } {
+  const r = rangoDistancia(zona ?? "frontal_del_area", xg, penal);
+  const cerca = Math.min(1, xg / XG_ALTO.xgMin); // 1 = ocasión clara
+  const t = 0.35 * (1 - cerca) + 0.65 * rng.next();
+  const distanciaM = Math.min(r.max, Math.floor(r.min + t * (r.max - r.min + 1)));
+  let velocidadKmh: number;
+  if (penal) velocidadKmh = rng.int(VELOCIDAD_PENAL.min, VELOCIDAD_PENAL.max);
+  else {
+    const v = ESPACIAL.velocidadMedia + ESPACIAL.velocidadSigma * rng.normal() + ESPACIAL.velocidadPorMetro * (distanciaM - ESPACIAL.velocidadMetroRef);
+    const piso = distanciaM >= VELOCIDAD_LEJANO.distanciaMin ? VELOCIDAD_LEJANO.min : VELOCIDAD.min;
+    velocidadKmh = Math.round(Math.min(VELOCIDAD.max, Math.max(piso, v)));
+  }
+  return { distanciaM, velocidadKmh };
 }
 
 /** Proyección legado: el partido SIN los campos espaciales (clon profundo). */
