@@ -46,6 +46,17 @@ intacto SIN cambiar su proyección (no hay campos nuevos que borrar).
   `micro(prefijo(partido, m))` es EXACTAMENTE el prefijo de `micro(partido)` —
   propiedad verificable, necesaria para el modo en vivo y las stats «so far».
 - **IDs:** `m0001…` en orden de minuto, deterministas.
+- **Magnitudes físicas (rev 1.1, pedido de Carlos):** cada pase lleva su
+  distancia en metros y cada conducción sus metros recorridos, sorteados del
+  mismo stream derivado dentro de bandas creíbles en `limites.ts` (pase corto
+  4–15 m, medio 15–30, largo 30–55 — mezcla realista; conducción 2–25 m), y
+  coherentes con el canal y la zona. Nada de coordenadas exactas: son
+  mediciones de evento, como en los feeds profesionales.
+- **Continuidad causal (rev 1.1):** dentro de una posesión, el receptor del
+  pase es el actor del siguiente evento (conduce, regatea, pasa o remata) —
+  invariante. Así el feed se lee como fútbol: «Castro pasa a Doraena (14 m) →
+  Doraena conduce 8 m → Doraena remata». Las cadenas rotas (pasa A→B y
+  aparece C) son un bug, no una rareza.
 - **Volumen y realismo (umbrales en `limites.ts`, atacables):** total micro por
   partido en [1.800, 2.600] con promedio ≥2.000; pases totales ~850–1.000 con
   ~78–85 % completados; el equipo con más ataque (ATT) completa más; regates

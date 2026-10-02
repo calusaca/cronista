@@ -21,6 +21,12 @@ Nuevo panel en la vista de partido (debajo de Ratings, mismos tokens del 010):
   micro-eventos exactos para los hechos acotados (lista con minuto y canal), el
   desglose recomputable para los agregados (como el panel de Ratings). Rotulado
   honesto: «computed from 2,000+ simulated match events».
+- **La evidencia se lee como jugada a jugada (rev 1.1):** el cajón de
+  evidencia muestra los micro-eventos en formato de relato profesional, una
+  línea por evento con minuto, actor, acción y magnitud — «12' Castro pasa a
+  Doraena · banda derecha · 14 m», «12' Doraena conduce 8 m», «13' Doraena
+  remata — ataja Mora (abajo, a su derecha)». Es el formato que pidió Carlos y
+  el que un juez reconoce como feed de datos real.
 - **En vivo**: las stats evolucionan con el prefijo y se rotulan «so far»
   (gratis por la propiedad de prefijo del 013).
 - A 360 px cabe sin desbordes (medido, como siempre).
