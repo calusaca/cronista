@@ -14,6 +14,7 @@
 // - `inicio_periodo` / `fin_periodo` llevan el equipo que sacó de centro en ese periodo.
 
 import { ESTILO_ATAQUE, ESTILO_DEFENSA, P, PESOS } from "./parametros";
+import { enriquecerEspacial, type OrigenTiro } from "./espacial";
 import { crearRng, type Rng } from "./prng";
 import {
   FUERZA_MAX,
@@ -154,6 +155,8 @@ const ESTILOS_VALIDOS: readonly string[] = ["posesion", "contragolpe", "presion"
 class Simulacion {
   private readonly rng: Rng;
   private readonly eventos: Evento[] = [];
+  /** Brief 011: origen de cada tiro (lo sabe el motor). No toca el stream principal. */
+  private readonly origenes = new Map<string, OrigenTiro>();
   private readonly equipos: Record<Lado, EstadoEquipo>;
   private t = 0;
   private periodo: 1 | 2 = 1;
@@ -278,10 +281,11 @@ class Simulacion {
     atk: EstadoEquipo,
     tirador: Jugador,
     xg: number,
-    opciones: { penal: boolean; profundidad: number },
+    opciones: { penal: boolean; profundidad: number; origen: OrigenTiro },
   ): boolean {
     const xgR = clamp(redondear2(xg), P.xgMin, P.xgMax);
     const idTiro = this.emitir("tiro", atk.lado, { jugador: tirador.nombre, zona: "ataque", xg: xgR, penal: opciones.penal });
+    this.origenes.set(idTiro, opciones.origen);
     const u = this.rng.next();
     if (u < xgR) {
       this.emitir("gol", atk.lado, { jugador: tirador.nombre, zona: "ataque", xg: xgR, relacionadoCon: idTiro });
@@ -313,7 +317,7 @@ class Simulacion {
     if (!cabeceador) return false;
     this.avanzar(P.pasoEvento);
     const { xgShift } = this.factores(atk, def);
-    return this.tiro(atk, cabeceador, this.sortearXg(P.xgMuCabezazo, xgShift), { penal: false, profundidad });
+    return this.tiro(atk, cabeceador, this.sortearXg(P.xgMuCabezazo, xgShift), { penal: false, profundidad, origen: "corner" });
   }
 
   /** Juega una posesión del lado `lado`; devuelve quién tiene la siguiente. */
@@ -353,7 +357,7 @@ class Simulacion {
               this.avanzar(P.pasoEvento);
             }
           }
-          gol = this.tiro(atk, tirador, this.sortearXg(P.xgMu, xgShift), { penal: false, profundidad: 0 });
+          gol = this.tiro(atk, tirador, this.sortearXg(P.xgMu, xgShift), { penal: false, profundidad: 0, origen: "jugada" });
         }
       } else if (r < cOffside) {
         const j = this.elegir(atk, PESOS.fueraDeJuego as Record<Posicion, number>);
@@ -365,10 +369,10 @@ class Simulacion {
           this.avanzar(P.pasoEvento);
           if (esPenal) {
             const lanzador = this.lanzadorPenal(atk);
-            if (lanzador) gol = this.tiro(atk, lanzador, P.xgPenal, { penal: true, profundidad: 0 });
+            if (lanzador) gol = this.tiro(atk, lanzador, P.xgPenal, { penal: true, profundidad: 0, origen: "penal" });
           } else if (this.rng.chance(P.pTiroLibreTrasFalta)) {
             const j = this.elegir(atk, PESOS.tiroLibre as Record<Posicion, number>);
-            if (j) gol = this.tiro(atk, j, this.sortearXg(P.xgMuTiroLibre, xgShift), { penal: false, profundidad: 0 });
+            if (j) gol = this.tiro(atk, j, this.sortearXg(P.xgMuTiroLibre, xgShift), { penal: false, profundidad: 0, origen: "tiro_libre" });
           }
         }
       } else if (r < cCorner) {
@@ -425,6 +429,8 @@ class Simulacion {
     const saque: Lado = this.rng.chance(0.5) ? "local" : "visita";
     this.jugarPeriodo(1, saque);
     this.jugarPeriodo(2, this.rival(saque));
+    // Brief 011: detalle espacial DESPUÉS de simular, desde streams derivados por (semilla, id).
+    enriquecerEspacial(this.eventos, this.config.seed, this.origenes);
     return { config: this.config, eventos: this.eventos };
   }
 }

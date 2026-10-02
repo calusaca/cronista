@@ -1289,8 +1289,12 @@ main {
     grid-template-columns: minmax(0, 1fr) auto;
   }
   .sim-form select.field {
-    grid-column: 1 / -1;
     width: 100%;
+  }
+  /* Brief 011: fila 1 = historia | al azar; fila 2 = semilla | simular. */
+  .sim-form .random-match {
+    grid-row: 1;
+    grid-column: 2;
   }
   .sim-form .seed-input {
     width: 100%;
@@ -1358,4 +1362,17 @@ main {
   .process-grid {
     grid-auto-columns: minmax(260px, 1fr);
   }
+}
+
+/* ---------- pizarra del gol (brief 011) ---------- */
+
+.pitch-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.pitch-tools .btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }

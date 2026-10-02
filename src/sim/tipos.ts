@@ -1,6 +1,8 @@
 // Contrato del simulador — brief 001 (docs/disenos/001-simulador.md).
 // Los nombres y propiedades de este archivo NO se cambian sin actualizar el brief.
 
+import type { Altura, Banda, Destino, LadoPortero, ZonaOrigen } from "./limites";
+
 export type Estilo = "posesion" | "contragolpe" | "presion";
 
 export type Posicion = "POR" | "DEF" | "MED" | "DEL";
@@ -63,7 +65,23 @@ export interface Evento {
    * En un cambio, `jugador` es el que entra.
    */
   sale?: string;
+  // --- Brief 011 (rev 1.1): detalle espacial OPCIONAL. Sale de un stream derivado por
+  // (semilla, id) — nunca del stream principal —, así que la proyección sin estos campos
+  // es el partido de siempre, byte a byte. `zona` (arriba) NO se reusa. Vocabularios en limites.ts.
+  /** tiro, gol (copiado de su tiro) y pase_clave: de dónde sale. */
+  zonaOrigen?: ZonaOrigen;
+  /** tiro y gol: a qué parte del arco, visto desde el tirador. */
+  destino?: Destino;
+  /** tiro y gol. */
+  altura?: Altura;
+  /** atajada: hacia dónde se tiró el portero (coherente con el destino del tiro). */
+  ladoPortero?: LadoPortero;
+  /** corner: desde qué banda se sacó (no confundir con `Lado`, que es local/visita). */
+  banda?: Banda;
 }
+
+/** Brief 011: los campos espaciales (la proyección legado los borra). */
+export const CAMPOS_ESPACIALES = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda"] as const;
 
 export interface Partido {
   config: SimConfig;

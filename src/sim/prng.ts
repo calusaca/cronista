@@ -68,3 +68,18 @@ export function crearRng(seed: number): Rng {
   };
   return rng;
 }
+
+/**
+ * Brief 011: stream DERIVADO por (semilla, clave) — típicamente el id de un evento. Es
+ * independiente del stream principal: usarlo no consume ni un `next()` de crearRng(seed),
+ * así que los partidos existentes no cambian. Hash FNV-1a de 32 bits sobre "semilla:clave".
+ */
+export function prngDerivado(semilla: number, clave: string): Rng {
+  let h = 0x811c9dc5;
+  const texto = `${semilla >>> 0}:${clave}`;
+  for (let i = 0; i < texto.length; i++) {
+    h ^= texto.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return crearRng(h);
+}

@@ -121,3 +121,26 @@ export const PESOS: Record<string, Record<Posicion, number>> = {
   tiroLibre: { POR: 0, DEF: 1, MED: 4, DEL: 3 },
   saleCambio: { POR: 0, DEF: 2, MED: 3, DEL: 4 },
 };
+
+/**
+ * Brief 011 — pesos del detalle espacial (perillas; las bandas que los acotan viven en
+ * limites.ts). Se sortean con prngDerivado(semilla, id): nunca tocan el stream principal.
+ */
+export const ESPACIAL = {
+  /** Destino del tiro (visto desde el tirador). */
+  destino: { palo_izquierdo: 0.4, palo_derecho: 0.4, centro_del_arco: 0.2 },
+  altura: { raso: 0.45, media: 0.3, alta: 0.25 },
+  /** Tiro de jugada con ocasión clara (xG ≥ banda de área chica). */
+  jugadaClara: { area_chica: 0.55, frontal_del_area: 0.3, banda_izquierda: 0.075, banda_derecha: 0.075 },
+  /** Tiro de jugada intermedio (entre las dos bandas). */
+  jugadaMedia: { frontal_del_area: 0.6, banda_izquierda: 0.2, banda_derecha: 0.2 },
+  /** Tiro de jugada lejano (xG ≤ banda de media distancia). */
+  jugadaLejana: { media_distancia: 0.5, frontal_del_area: 0.2, banda_izquierda: 0.15, banda_derecha: 0.15 },
+  /** Cabezazo de córner con ocasión clara; si no, frontal del área. */
+  cornerClaro: { area_chica: 0.7, frontal_del_area: 0.3 },
+  /** Tiro libre lejano; si no, frontal del área. */
+  libreLejano: { media_distancia: 0.6, frontal_del_area: 0.4 },
+  /** Pase clave desde el último tercio (desde el medio es siempre media distancia). */
+  paseAtaque: { banda_izquierda: 0.35, banda_derecha: 0.35, frontal_del_area: 0.3 },
+  banda: { izquierda: 0.5, derecha: 0.5 },
+} as const;

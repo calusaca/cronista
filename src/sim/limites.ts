@@ -74,3 +74,52 @@ export const ESTILOS = {
   xgPorTiroContragolpeRatioMin: 1.1,
   faltasPresionRatioMin: 1.15,
 } as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 011 (rev 1.1) — detalle espacial. Vocabularios cerrados y bandas de coherencia:
+// ÚNICA fuente. Las invariantes y las pruebas los importan; el auditor los puede atacar.
+// ---------------------------------------------------------------------------------
+
+/** Zona de origen de un tiro (y su gol) o de un pase clave. */
+export const ZONAS_ORIGEN = ["area_chica", "punto_penal", "frontal_del_area", "banda_izquierda", "banda_derecha", "media_distancia"] as const;
+export type ZonaOrigen = (typeof ZONAS_ORIGEN)[number];
+
+/** A qué parte del arco fue el tiro, visto DESDE EL TIRADOR. */
+export const DESTINOS = ["palo_izquierdo", "palo_derecho", "centro_del_arco"] as const;
+export type Destino = (typeof DESTINOS)[number];
+
+export const ALTURAS = ["raso", "media", "alta"] as const;
+export type Altura = (typeof ALTURAS)[number];
+
+/** Lado hacia el que se tiró el portero, visto DESDE EL PORTERO. */
+export const LADOS_PORTERO = ["su_izquierda", "su_derecha", "centro"] as const;
+export type LadoPortero = (typeof LADOS_PORTERO)[number];
+
+/** Banda desde la que se saca un córner. */
+export const BANDAS = ["izquierda", "derecha"] as const;
+export type Banda = (typeof BANDAS)[number];
+
+/**
+ * Tabla fija destino del tiro → lado del portero (el tirador y el portero se miran de
+ * frente: el palo izquierdo del tirador es la derecha del portero).
+ */
+export const LADO_PORTERO_DE: Record<Destino, LadoPortero> = {
+  palo_izquierdo: "su_derecha",
+  palo_derecho: "su_izquierda",
+  centro_del_arco: "centro",
+};
+
+/** Zonas «de área»: un tiro nacido de un córner (cabezazo) solo puede salir de aquí. */
+export const ZONAS_AREA: readonly ZonaOrigen[] = ["area_chica", "frontal_del_area"];
+
+/** Zonas posibles de un pase clave (nadie da un pase clave desde el punto penal ni el área chica). */
+export const ZONAS_ORIGEN_PASE: readonly ZonaOrigen[] = ["banda_izquierda", "banda_derecha", "frontal_del_area", "media_distancia"];
+
+/**
+ * Coherencia zona↔xG por bandas (con holgura). Medido en el corpus 1..1000 antes de
+ * implementar: el xG de los tiros de juego tiene p25 0.04, p50 0.07, p75 0.12, p95 0.30.
+ * - `area_chica` solo con xG ≥ `areaChicaXgMin` (una ocasión clara: cuartil alto).
+ * - `media_distancia` solo con xG ≤ `mediaDistanciaXgMax` (un remate lejano: mitad baja).
+ * Entre ambas bandas solo caben zonas intermedias (frontal, bandas).
+ */
+export const ZONA_XG = { areaChicaXgMin: 0.15, mediaDistanciaXgMax: 0.08 } as const;

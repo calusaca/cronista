@@ -3,6 +3,7 @@
 // La prop. 1 (determinismo) se prueba directamente en la suite.
 
 import { MAX_CAMBIOS, TITULARES, type Lado, type Partido } from "./tipos";
+import { ALTURAS, BANDAS, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
 export function verificarMinutos(p: Partido): string[] {
@@ -200,6 +201,69 @@ export function verificarContrato(p: Partido): string[] {
   return err;
 }
 
+/**
+ * Brief 011 — coherencia del detalle espacial. Los campos son OPCIONALES (un partido sin
+ * ellos, como los fixtures hechos a mano, es válido); si están, tienen que cuadrar:
+ * - vocabulario cerrado y solo en los tipos de evento que corresponden;
+ * - penal ⇔ zonaOrigen = punto_penal;
+ * - tiro nacido de un córner (el tiro inmediatamente posterior a un córner del mismo
+ *   equipo: así lo emite el motor, cabezazo tras el saque) ⇒ zona de área;
+ * - zona↔xG por bandas (ZONA_XG);
+ * - el gol repite zona/destino/altura de su tiro; la atajada, el lado del portero que
+ *   corresponde al destino del tiro (LADO_PORTERO_DE); pase clave solo desde ZONAS_ORIGEN_PASE.
+ */
+export function verificarEspacial(p: Partido): string[] {
+  const err: string[] = [];
+  const porId = new Map(p.eventos.map((e) => [e.id, e] as const));
+  const en = (tipos: string[], e: Partido["eventos"][number]) => tipos.includes(e.tipo);
+  p.eventos.forEach((e, i) => {
+    if (e.zonaOrigen !== undefined) {
+      if (!ZONAS_ORIGEN.includes(e.zonaOrigen)) err.push(`${e.id}: zonaOrigen fuera de vocabulario (${String(e.zonaOrigen)})`);
+      if (!en(["tiro", "gol", "pase_clave"], e)) err.push(`${e.id}: zonaOrigen en ${e.tipo}`);
+    }
+    if (e.destino !== undefined) {
+      if (!DESTINOS.includes(e.destino)) err.push(`${e.id}: destino fuera de vocabulario (${String(e.destino)})`);
+      if (!en(["tiro", "gol"], e)) err.push(`${e.id}: destino en ${e.tipo}`);
+    }
+    if (e.altura !== undefined) {
+      if (!ALTURAS.includes(e.altura)) err.push(`${e.id}: altura fuera de vocabulario (${String(e.altura)})`);
+      if (!en(["tiro", "gol"], e)) err.push(`${e.id}: altura en ${e.tipo}`);
+    }
+    if (e.ladoPortero !== undefined) {
+      if (!LADOS_PORTERO.includes(e.ladoPortero)) err.push(`${e.id}: ladoPortero fuera de vocabulario (${String(e.ladoPortero)})`);
+      if (e.tipo !== "atajada") err.push(`${e.id}: ladoPortero en ${e.tipo}`);
+    }
+    if (e.banda !== undefined) {
+      if (!BANDAS.includes(e.banda)) err.push(`${e.id}: banda fuera de vocabulario (${String(e.banda)})`);
+      if (e.tipo !== "corner") err.push(`${e.id}: banda en ${e.tipo}`);
+    }
+    if (e.tipo === "tiro" && e.zonaOrigen !== undefined) {
+      if (e.penal === true && e.zonaOrigen !== "punto_penal") err.push(`${e.id}: penal con zonaOrigen ${e.zonaOrigen}`);
+      if (e.penal !== true && e.zonaOrigen === "punto_penal") err.push(`${e.id}: punto_penal en un tiro que no es penal`);
+      const prev = p.eventos[i - 1];
+      if (prev?.tipo === "corner" && prev.equipo === e.equipo && !ZONAS_AREA.includes(e.zonaOrigen))
+        err.push(`${e.id}: tiro de córner desde ${e.zonaOrigen} (fuera del área)`);
+      const xg = e.xg ?? 0;
+      if (e.zonaOrigen === "area_chica" && xg < ZONA_XG.areaChicaXgMin) err.push(`${e.id}: area_chica con xG ${xg}`);
+      if (e.zonaOrigen === "media_distancia" && xg > ZONA_XG.mediaDistanciaXgMax) err.push(`${e.id}: media_distancia con xG ${xg}`);
+    }
+    if (e.tipo === "pase_clave" && e.zonaOrigen !== undefined && !ZONAS_ORIGEN_PASE.includes(e.zonaOrigen))
+      err.push(`${e.id}: pase clave desde ${e.zonaOrigen}`);
+    const tiro = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+    if (e.tipo === "gol" && tiro) {
+      if (tiro.destino !== undefined && e.destino === undefined) err.push(`${e.id}: gol sin destino (su tiro lo tiene)`);
+      for (const k of ["zonaOrigen", "destino", "altura"] as const)
+        if (e[k] !== undefined && e[k] !== tiro[k]) err.push(`${e.id}: gol con ${k} ${String(e[k])} ≠ su tiro (${String(tiro[k])})`);
+    }
+    if (e.tipo === "atajada" && tiro) {
+      if (tiro.destino !== undefined && e.ladoPortero === undefined) err.push(`${e.id}: atajada sin ladoPortero (su tiro tiene destino)`);
+      if (e.ladoPortero !== undefined && tiro.destino !== undefined && e.ladoPortero !== LADO_PORTERO_DE[tiro.destino])
+        err.push(`${e.id}: portero a ${e.ladoPortero} con tiro al ${tiro.destino}`);
+    }
+  });
+  return err;
+}
+
 export const VERIFICADORES = {
   minutos: verificarMinutos,
   relaciones: verificarRelaciones,
@@ -209,4 +273,5 @@ export const VERIFICADORES = {
   desenlaces: verificarDesenlaces,
   salidas: verificarSalidas,
   contrato: verificarContrato,
+  espacial: verificarEspacial,
 } as const;

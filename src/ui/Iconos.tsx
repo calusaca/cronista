@@ -141,3 +141,15 @@ export function IconoHistoria({ size = 14 }: P) {
     </svg>
   );
 }
+
+/** Brief 011: dado (partido al azar). */
+export function IconoDado({ size = 16 }: P) {
+  return (
+    <svg {...base(size)}>
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <circle cx="9" cy="9" r="0.9" fill="currentColor" />
+      <circle cx="15" cy="15" r="0.9" fill="currentColor" />
+      <circle cx="12" cy="12" r="0.9" fill="currentColor" />
+    </svg>
+  );
+}

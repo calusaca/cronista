@@ -6,6 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import type { Preset } from "../vista/servidor";
+import { IconoDado } from "./Iconos";
+
+/** Brief 011: rango del partido al azar (Math.random está bien aquí: es UI, no src/sim). */
+const AZAR_MAX = 99999;
 
 const SEED_MAX = 4294967295;
 
@@ -58,6 +62,15 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
         />
         <button type="submit" className="btn btn-primary" data-testid="simulate">
           Simulate match
+        </button>
+        <button
+          type="button"
+          className="btn random-match"
+          data-testid="random-match"
+          onClick={() => router.push(`/match/${1 + Math.floor(Math.random() * AZAR_MAX)}`)}
+        >
+          <IconoDado />
+          Random match
         </button>
         {error && (
           <span role="alert" style={{ color: "var(--danger)", fontSize: 14 }}>

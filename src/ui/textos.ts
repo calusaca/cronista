@@ -91,3 +91,20 @@ export const MOTIVO_VALORACION_EN: Record<string, string> = {
 };
 
 export const POSICION_EN: Record<string, string> = { POR: "GK", DEF: "DF", MED: "MF", DEL: "FW" };
+
+/** Brief 011: rótulos del detalle espacial (chrome en inglés). */
+export const ZONA_EN: Record<string, string> = {
+  area_chica: "six-yard box",
+  punto_penal: "penalty spot",
+  frontal_del_area: "edge of the box",
+  banda_izquierda: "left flank",
+  banda_derecha: "right flank",
+  media_distancia: "long range",
+};
+export const DESTINO_EN: Record<string, string> = {
+  palo_izquierdo: "left post",
+  palo_derecho: "right post",
+  centro_del_arco: "centre of goal",
+};
+export const ALTURA_EN: Record<string, string> = { raso: "low", media: "mid-height", alta: "high" };
+export const BANDA_EN: Record<string, string> = { izquierda: "left", derecha: "right" };
