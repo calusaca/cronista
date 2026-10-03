@@ -96,6 +96,22 @@ export function IconoEvento({ tipo, size = 16 }: { tipo: TipoEvento } & P) {
           <path d="M12 8v8M8 12h8" />
         </svg>
       );
+    case "subida_portero":
+      // flecha hacia arriba (brief 025: el portero sube al área)
+      return (
+        <svg {...base(size)}>
+          <path d="M12 20V5" />
+          <path d="M6.5 10.5L12 5l5.5 5.5" />
+        </svg>
+      );
+    case "interrupcion":
+      // pausa (brief 025: el juego se detiene)
+      return (
+        <svg {...base(size)}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M10 8.5v7M14 8.5v7" />
+        </svg>
+      );
     default:
       return (
         <svg {...base(size)}>

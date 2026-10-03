@@ -13,9 +13,9 @@
 // - `pase_clave` se emite solo cuando le sigue un tiro del mismo equipo (definición Opta).
 // - `inicio_periodo` / `fin_periodo` llevan el equipo que sacó de centro en ese periodo.
 
-import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, NIVELES, P, PESOS } from "./parametros";
+import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, INSOLITOS, LESIONES, NIVELES, P, PESOS } from "./parametros";
 import { deltaNivel } from "./niveles";
-import { LESION_SEVERIDAD } from "./limites";
+import { CAUSAS_INTERRUPCION, DURACION_INTERRUPCION, LESION_SEVERIDAD, SUBIDA_MINUTO_MIN, XG_OLIMPICO } from "./limites";
 import { prngDerivado } from "./prng";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
 import { erroresCondiciones, factorAtaque, factorCornerTrasAtajada, factorFaltas } from "./condiciones";
@@ -49,7 +49,7 @@ interface EstadoEquipo {
   goles: number;
 }
 
-type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale" | "baja" | "autogol">>;
+type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale" | "baja" | "autogol" | "causa" | "duracion">>;
 
 function clamp(x: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, x));
@@ -238,6 +238,8 @@ class Simulacion {
     if (extra.sale !== undefined) ev.sale = extra.sale;
     if (extra.baja !== undefined) ev.baja = extra.baja;
     if (extra.autogol !== undefined) ev.autogol = extra.autogol;
+    if (extra.causa !== undefined) ev.causa = extra.causa;
+    if (extra.duracion !== undefined) ev.duracion = extra.duracion;
     this.eventos.push(ev);
     return id;
   }
@@ -261,6 +263,11 @@ class Simulacion {
       if (protagonista && this.niveles) w *= Math.max(NIVELES.factorMin, 1 + NIVELES.kProtagonista * deltaNivel(j, est.eq));
       return w;
     });
+  }
+
+  /** Brief 025: ¿el partido admite insólitos? */
+  private get insolitos(): boolean {
+    return this.config.variantes?.insolitos === true;
   }
 
   /** Brief 024: ¿el partido usa los niveles? */
@@ -399,11 +406,29 @@ class Simulacion {
   /** Corner y posible cabezazo. Devuelve true si terminó en gol. */
   private corner(atk: EstadoEquipo, profundidad: number): boolean {
     this.avanzar(P.pasoEvento);
-    const lanzador = this.elegir(atk, PESOS.corner as Record<Posicion, number>, undefined, false, true);
-    this.emitir("corner", atk.lado, lanzador ? { jugador: lanzador.nombre, zona: "ataque" } : { zona: "ataque" });
-    if (profundidad > 2 || !this.rng.chance(P.pTiroCorner)) return false;
     const def = this.equipos[this.rival(atk.lado)];
-    const cabeceador = this.elegir(atk, PESOS.cabezazo as Record<Posicion, number>, lanzador?.nombre, false, true);
+    // Brief 025 · 2: con el partido al final y perdiendo por uno, el portero puede subir a ESTE córner
+    // (sorteo derivado: sin subida, el stream no cambia).
+    let portero: Jugador | undefined;
+    if (this.insolitos && this.periodo === 2 && this.minutoActual() >= SUBIDA_MINUTO_MIN && def.goles - atk.goles === 1) {
+      const por = atk.enCampo.find((j) => j.posicion === "POR");
+      if (por && prngDerivado(this.config.seed, `subida:${this.eventos.length}`).chance(INSOLITOS.pSubida)) {
+        this.emitir("subida_portero", atk.lado, { jugador: por.nombre });
+        portero = por;
+      }
+    }
+    const lanzador = this.elegir(atk, PESOS.corner as Record<Posicion, number>, undefined, false, true);
+    const idCorner = this.emitir("corner", atk.lado, lanzador ? { jugador: lanzador.nombre, zona: "ataque" } : { zona: "ataque" });
+    // Brief 025 · 1: el córner que entra directo (gol olímpico): el gol cuelga del córner, sin tiro.
+    if (this.insolitos && lanzador && prngDerivado(this.config.seed, `olimpico:${idCorner}`).chance(INSOLITOS.pOlimpico)) {
+      this.emitir("gol", atk.lado, { jugador: lanzador.nombre, zona: "ataque", xg: XG_OLIMPICO, relacionadoCon: idCorner });
+      atk.goles += 1;
+      return true;
+    }
+    if (profundidad > 2 || !this.rng.chance(P.pTiroCorner)) return false;
+    // Con el portero arriba, entra a los pesos del cabezazo de ESTE córner (y solo de este).
+    const pesos = portero ? { ...(PESOS.cabezazo as Record<Posicion, number>), POR: INSOLITOS.pesoPorteroSubida } : (PESOS.cabezazo as Record<Posicion, number>);
+    const cabeceador = this.elegir(atk, pesos, lanzador?.nombre, false, true);
     if (!cabeceador) return false;
     this.avanzar(P.pasoEvento);
     const { xgShift } = this.factores(atk, def);
@@ -513,13 +538,33 @@ class Simulacion {
         : this.rng.int(P.descuento2.min, P.descuento2.max);
     this.finPeriodo = (periodo === 1 ? 45 : 90) + descuento;
     if (periodo === 2) this.minutoFinal = this.finPeriodo;
+    // Brief 025 · 4: una interrupción breve (causa ficticia) que SE SUMA al descuento de este tiempo.
+    // Solo en el 2.º tiempo: el 1.º se sella en el 45 y «se sumó al descuento» no sería verificable.
+    const parada = this.insolitos && periodo === 2 ? this.interrupcionDe(periodo) : undefined;
+    if (parada) {
+      this.finPeriodo += parada.duracion;
+      if (periodo === 2) this.minutoFinal = this.finPeriodo;
+    }
     this.emitir("inicio_periodo", saque, {}, periodo === 1 ? 0 : 45);
     let poseedor: Lado = saque;
+    let parado = false;
     while (this.t < this.finPeriodo) {
       if (periodo === 2) this.procesarCambios();
+      if (parada && !parado && this.t >= parada.minuto) {
+        parado = true;
+        this.emitir("interrupcion", poseedor, { causa: parada.causa, duracion: parada.duracion });
+      }
       poseedor = this.posesion(poseedor);
     }
     this.emitir("fin_periodo", saque, {}, periodo === 1 ? 45 : this.minutoFinal);
+  }
+
+  /** Brief 025: ¿se interrumpe este tiempo? Minuto de juego, causa y duración, del sorteo derivado. */
+  private interrupcionDe(periodo: 1 | 2): { minuto: number; causa: (typeof CAUSAS_INTERRUPCION)[number]; duracion: number } | undefined {
+    const rng = prngDerivado(this.config.seed, `interrupcion:${periodo}`);
+    if (!rng.chance(INSOLITOS.pInterrupcion)) return undefined;
+    const base = periodo === 1 ? 0 : 45;
+    return { minuto: base + rng.int(3, 42), causa: rng.pick(CAUSAS_INTERRUPCION), duracion: rng.int(DURACION_INTERRUPCION.min, DURACION_INTERRUPCION.max) };
   }
 
   correr(): Partido {
@@ -527,7 +572,7 @@ class Simulacion {
     this.jugarPeriodo(1, saque);
     this.jugarPeriodo(2, this.rival(saque));
     // Brief 011: detalle espacial DESPUÉS de simular, desde streams derivados por (semilla, id).
-    enriquecerEspacial(this.eventos, this.config.seed, this.origenes, this.config.condiciones);
+    enriquecerEspacial(this.eventos, this.config.seed, this.origenes, this.config.condiciones, this.config.variantes);
     return { config: this.config, eventos: this.eventos };
   }
 }

@@ -24,8 +24,8 @@
 
 import { ladoDelJugador, type Evento, type Lado, type Partido } from "../sim/tipos";
 import { micro, type MicroPartido } from "../sim/micro";
-import { CANAL_TEXTO, CANCHA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
-import { medirCalor, medirCancha, medirPresion } from "./condiciones";
+import { CANAL_TEXTO, CANCHA_TEXTO, CAUSA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { medirCalor, medirCancha, medirNiebla, medirPresion } from "./condiciones";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
 import {
@@ -168,8 +168,9 @@ function marcadorPorPeriodo(c: Ctx): Borrador[] {
 }
 
 function golesAnotados(c: Ctx): Borrador[] {
-  // Brief 020: el autogol no es «X marcó» (va como autogol, hecho propio).
-  return c.goles.filter((g) => g.ev.autogol !== true).map((g) => {
+  // Brief 020: el autogol no es «X marcó» (va como autogol, hecho propio). Brief 025: el olímpico
+  // tampoco va como gol de tiro (no hay tiro): tiene su hecho `gol_olimpico`.
+  return c.goles.filter((g) => g.ev.autogol !== true && g.ev.definicion !== "olimpico").map((g) => {
     const tiro = g.ev.relacionadoCon ? c.porId.get(g.ev.relacionadoCon) : undefined;
     const penal = tiro?.penal === true;
     return hecho(c, "gol_anotado", penal ? "gol_penal" : "gol", [g.ev.id, tiro?.id], {
@@ -658,6 +659,53 @@ function presionQueAhoga(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
   return [hechoMicro("presion_que_ahoga", "presion_que_ahoga", x.ids, { ...equipos(c), equipo: c.nombre[x.lado], presion: "alta", perdidas: x.ids.length, limite: x.limite })];
 }
 
+// ---------------- brief 025: los insólitos ----------------
+
+function insolitos(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
+  const out: Borrador[] = [];
+  for (const g of c.goles) {
+    if (g.ev.definicion !== "olimpico") continue;
+    out.push(
+      hecho(c, "gol_olimpico", "gol_olimpico", [g.ev.relacionadoCon, g.ev.id], {
+        ...equipos(c),
+        jugador: g.ev.jugador ?? "",
+        equipo: c.nombre[g.ev.equipo],
+        minuto: minutoTxt(g.ev.minuto),
+        definicion: "olimpico",
+        marcador_local: g.marcador.local,
+        marcador_visita: g.marcador.visita,
+      }),
+    );
+  }
+  c.ev.forEach((e, i) => {
+    if (e.tipo === "subida_portero" && e.jugador) {
+      // el remate de su córner (si lo hubo) y su gol
+      const corner = c.ev[i + 1];
+      const tiro = c.ev.slice(i + 2).find((x, k) => x.tipo === "tiro" && x.jugador === e.jugador && c.ev.slice(i + 2, i + 2 + k).every((y) => !["tiro", "corner", "pase_clave", "fuera_de_juego"].includes(y.tipo)));
+      const gol = tiro ? c.ev.find((x) => x.tipo === "gol" && x.relacionadoCon === tiro.id) : undefined;
+      out.push(
+        hecho(c, "subida_portero", gol ? "subida_portero_gol" : tiro ? "subida_portero_remate" : "subida_portero", [e.id, corner?.id, tiro?.id, gol?.id], {
+          jugador: e.jugador,
+          equipo: c.nombre[e.equipo],
+          minuto: minutoTxt(e.minuto),
+          remate: tiro ? "si" : "no",
+          gol: gol ? "si" : "no",
+        }),
+      );
+    }
+    if (e.tipo === "tiro" && e.alPalo !== undefined && e.jugador) {
+      out.push(hecho(c, "doble_palo", e.alPalo === 2 ? "doble_palo" : "al_palo", [e.id], { jugador: e.jugador, equipo: c.nombre[e.equipo], minuto: minutoTxt(e.minuto), palos: e.alPalo }));
+    }
+    if (e.tipo === "interrupcion" && e.causa && e.duracion !== undefined) {
+      const t = CAUSA_TEXTO[e.causa] as { es: string; en: string };
+      out.push(hecho(c, "interrupcion", "interrupcion", [e.id], { minuto: minutoTxt(e.minuto), duracion: e.duracion, causa: e.causa, causa_es: t.es, causa_en: t.en }));
+    }
+  });
+  const niebla = medirNiebla(p, m);
+  if (niebla?.efecto) out.push(hechoMicro("efecto_niebla", "efecto_niebla", inicios(c), { ...equipos(c), completados: niebla.completados, intentados: niebla.intentados, porcentaje: niebla.porcentaje }));
+  return out;
+}
+
 // ---------------- brief 019: consecuencias ----------------
 
 /** `lesion_en_partido`: cada lesión del partido (cita la lesión, su cambio forzado y la falta, si la hubo). */
@@ -780,6 +828,8 @@ export function analizar(partido: Partido): Hecho[] {
   const subsumidos = new Set<Lado>(presionAlta?.efecto ? [presionAlta.lado] : []);
   borradores.push(...duelos(c, m), ...perdidasEnSalida(c, m, subsumidos), ...dominioGlobal(c, m), ...dominioPorCanal(c, m));
   // Brief 018: solo si el partido registra condiciones (los partidos sueltos no las tienen).
+  // Brief 025: los insólitos (solo con la variante) y el efecto medido de la niebla.
+  borradores.push(...insolitos(partido, c, m));
   // Brief 019: lesiones (solo con la variante) y las bajas del registro (solo partidos de liga).
   borradores.push(...lesiones(c), ...bajasDelPartido(partido, c));
   borradores.push(...condicionesDelPartido(partido, c), ...efectoCalor(partido, c, m), ...canchaIncomoda(partido, c, m), ...presionQueAhoga(partido, c, m));

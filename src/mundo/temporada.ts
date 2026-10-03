@@ -66,7 +66,8 @@ export function condicionesDePartido(liga: Liga, cruce: Cruce, seed: number): Co
   const rng = prngDerivado(seed, "condiciones:clima");
   const p = PROB_CLIMA[liga.clima];
   const u = rng.next();
-  const clima: ClimaPartido = u < p.calor ? "calor" : u < p.calor + p.lluvia ? "lluvia" : u < p.calor + p.lluvia + p.frio ? "frio" : "despejado";
+  const clima: ClimaPartido =
+    u < p.calor ? "calor" : u < p.calor + p.lluvia ? "lluvia" : u < p.calor + p.lluvia + p.frio ? "frio" : u < p.calor + p.lluvia + p.frio + p.niebla ? "niebla" : "despejado";
   const cancha = (liga.equipos[cruce.local] as Liga["equipos"][number]).cancha;
   const local = PRESION_LOCAL_POR_LIGA[liga.id];
   if (!local) throw new Error(`liga sin presión definida: ${liga.id} (PRESION_LOCAL_POR_LIGA)`);
@@ -148,7 +149,7 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
         local: conSusNiveles(eqL, new Set(bl.map((b) => b.jugador))),
         visita: conSusNiveles(eqV, new Set(bv.map((b) => b.jugador))),
         condiciones: condicionesDePartido(liga, cruce, seed),
-        variantes: { lesiones: true, autogoles: true, niveles: true },
+        variantes: { lesiones: true, autogoles: true, niveles: true, insolitos: true },
         ...(bl.length > 0 || bv.length > 0 ? { bajas } : {}),
       };
       const p = simular(config);

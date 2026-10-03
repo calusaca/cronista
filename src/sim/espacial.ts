@@ -10,7 +10,7 @@
 //   con la pizarra;
 // - un penal nunca es «tras córner».
 
-import { DEFINICION, ESPACIAL } from "./parametros";
+import { DEFINICION, ESPACIAL, INSOLITOS } from "./parametros";
 import {
   DEF_CABEZAZO,
   DEF_MANO_A_MANO,
@@ -32,7 +32,7 @@ import {
 } from "./limites";
 import { extraVelocidad, factorMediaDistancia } from "./condiciones";
 import { prngDerivado, type Rng } from "./prng";
-import { CAMPOS_ESPACIALES, type Condiciones, type Evento, type Partido } from "./tipos";
+import { CAMPOS_ESPACIALES, type Condiciones, type Evento, type Partido, type Variantes } from "./tipos";
 
 export type OrigenTiro = "penal" | "corner" | "tiro_libre" | "jugada";
 
@@ -107,7 +107,7 @@ function zonaDelTiro(rng: Rng, origen: OrigenTiro, xg: number, condiciones?: Con
  * origen informado por el motor; «tras córner» se decide con `cornerDelTiro` (la definición
  * única), y un penal manda sobre todo.
  */
-export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes: ReadonlyMap<string, OrigenTiro>, condiciones?: Condiciones): void {
+export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes: ReadonlyMap<string, OrigenTiro>, condiciones?: Condiciones, variantes?: Variantes): void {
   const porId = new Map(eventos.map((e) => [e.id, e] as const));
   eventos.forEach((e, i) => {
     const rng = prngDerivado(semilla, e.id);
@@ -139,6 +139,15 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
   // Gol y atajada heredan de su tiro (que siempre va antes en el stream).
   for (const e of eventos) {
     const tiro = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+    // Brief 025 · 1: el gol olímpico cuelga del córner — entra en el área chica, al palo del lado del
+    // córner (vista del atacante: el de la izquierda entra por el palo izquierdo), alto.
+    if (e.tipo === "gol" && tiro?.tipo === "corner") {
+      e.definicion = "olimpico";
+      e.zonaOrigen = "area_chica";
+      e.destino = tiro.banda === "derecha" ? "palo_derecho" : "palo_izquierdo";
+      e.altura = "alta";
+      continue;
+    }
     if (!tiro || tiro.tipo !== "tiro") continue;
     // Brief 020: la atajada hereda la definición; el gol también, salvo el autogol (no es del tirador).
     if (tiro.definicion !== undefined && (e.tipo === "atajada" || (e.tipo === "gol" && e.autogol !== true))) e.definicion = tiro.definicion;
@@ -153,6 +162,16 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
       if (tiro.velocidadKmh !== undefined) e.velocidadKmh = tiro.velocidadKmh;
     }
     if (e.tipo === "atajada" && tiro.destino) e.ladoPortero = LADO_PORTERO_DE[tiro.destino as Destino];
+  }
+  // Brief 025 · 3: un tiro desviado (sin gol ni atajada) apuntado a un palo puede dar en él, o en los
+  // dos. Sorteo derivado PROPIO (después de todo lo anterior: nada de lo ya sorteado cambia).
+  if (variantes?.insolitos === true) {
+    const conDesenlace = new Set(eventos.filter((e) => (e.tipo === "gol" || e.tipo === "atajada") && e.relacionadoCon).map((e) => e.relacionadoCon));
+    for (const e of eventos) {
+      if (e.tipo !== "tiro" || e.penal === true || conDesenlace.has(e.id) || (e.destino !== "palo_izquierdo" && e.destino !== "palo_derecho")) continue;
+      const rng = prngDerivado(semilla, `palo:${e.id}`);
+      if (rng.chance(INSOLITOS.pAlPalo)) e.alPalo = rng.chance(INSOLITOS.pDoblePalo) ? 2 : 1;
+    }
   }
 }
 
@@ -253,6 +272,8 @@ export function admite(def: Definicion, e: Evento, o: OrigenDefinicion): boolean
       return enArea(e.zonaOrigen) && (o.filtrado || o.atras) && Math.round(xg * 100) >= Math.round(DEF_MANO_A_MANO.xgMin * 100);
     case "vaselina":
       return admite("mano_a_mano", e, o) && e.altura === "alta" && (e.distanciaM ?? 0) < VELOCIDAD_LEJANO.distanciaMin;
+    case "olimpico":
+      return false; // brief 025: no es un tiro — el gol cuelga del córner
   }
 }
 

@@ -49,6 +49,8 @@ export const MEDIO_CAMPO_M = 52.5;
 const yDeMetros = (m: number) => 2 + m * UNIDADES_POR_M;
 
 export interface GeometriaJugada {
+  /** Brief 025: el remate dio en un palo (1) o en los dos (2): el balón no entra, rebota. */
+  palos?: 1 | 2;
   /** Brief 020: la definición registrada del tiro y, si fue en propia puerta, dónde la tocó el autor. */
   definicion?: string;
   autor?: Punto;
@@ -74,13 +76,27 @@ export interface GeometriaJugada {
  * texto), y un córner solo se dibuja si el tiro es «tras córner» según LA definición del
  * generador (`cornerDelTiro`). Un penal no dibuja origen (la falta no tiene zona).
  */
+/** Brief 025: los postes del arco en la pizarra (el borde de la boca, x 45 y 55). */
+export const POS_POSTE: Record<"palo_izquierdo" | "palo_derecho", Punto> = { palo_izquierdo: { x: 45, y: 2.2 }, palo_derecho: { x: 55, y: 2.2 } };
+
 export function geometriaJugada(pasos: PasoJugada[], eventos: readonly Evento[]): GeometriaJugada | undefined {
   const tiro = pasos.find((p) => p.rol === "tiro")?.evento;
+  // Brief 025: el gol olímpico — del banderín registrado al palo registrado, sin remate intermedio.
+  const golOlimpico = pasos.find((p) => p.rol === "gol" && p.evento.definicion === "olimpico")?.evento;
+  const cornerOlimpico = pasos.find((p) => p.rol === "corner")?.evento;
+  if (!tiro && golOlimpico?.destino && cornerOlimpico?.banda) {
+    return { remate: POS_CORNER[cornerOlimpico.banda], arco: POS_DESTINO[golOlimpico.destino], zona: "area_chica", destino: golOlimpico.destino, ...(golOlimpico.altura ? { altura: golOlimpico.altura } : {}), definicion: "olimpico", alto: 48 };
+  }
   if (!tiro?.zonaOrigen || !tiro.destino) return undefined;
   // Brief 020: la media cancha se dibuja a su distancia registrada (no a la de su zona).
   const remate = tiro.definicion === "media_cancha" && tiro.distanciaM !== undefined ? { x: 50, y: yDeMetros(tiro.distanciaM) } : POS_ZONA[tiro.zonaOrigen];
   const geo: GeometriaJugada = { remate, arco: POS_DESTINO[tiro.destino], zona: tiro.zonaOrigen, destino: tiro.destino, alto: remate.y > 40 ? 76 : 48 };
   if (tiro.definicion && tiro.definicion !== "jugada") geo.definicion = tiro.definicion;
+  // Brief 025: al palo — el balón termina en el poste registrado (y en el otro, si fueron los dos).
+  if (tiro.alPalo !== undefined && (tiro.destino === "palo_izquierdo" || tiro.destino === "palo_derecho")) {
+    geo.palos = tiro.alPalo;
+    geo.arco = POS_POSTE[tiro.destino];
+  }
   // Brief 020: en propia puerta, el autor la toca en el área chica, camino del arco.
   const gol = pasos.find((p) => p.rol === "gol")?.evento;
   if (gol?.autogol === true) geo.autor = { x: geo.arco.x + (remate.x >= 50 ? -3 : 3), y: 6 };
@@ -103,9 +119,18 @@ export function geometriaJugada(pasos: PasoJugada[], eventos: readonly Evento[])
   return geo;
 }
 
-/** Los puntos que recorre el balón, en orden (máximo 3: origen → remate → arco). */
+/**
+ * Los puntos que recorre el balón, en orden (origen → remate → [autor] → arco). Brief 025: si el
+ * remate dio en el palo, sigue el rebote (al otro poste si fueron dos, y fuera del arco).
+ */
 export function recorrido(geo: GeometriaJugada): Punto[] {
-  return [...(geo.origen ? [geo.origen] : []), geo.remate, ...(geo.autor ? [geo.autor] : []), geo.arco];
+  // Brief 025: con dos palos, el balón cruza la boca de un poste al otro y sale despedido.
+  const otro = geo.palos === 2 ? (geo.arco.x < 50 ? POS_POSTE.palo_derecho : POS_POSTE.palo_izquierdo) : undefined;
+  const fuera = geo.palos !== undefined ? { x: (otro ?? geo.arco).x + ((otro ?? geo.arco).x < 50 ? -5 : 5), y: 9 } : undefined;
+  // Brief 025: el olímpico no va por la línea de fondo: se cierra desde el banderín (un punto de
+  // curva esquemático, a mitad de camino y dentro del campo; no es una coordenada registrada).
+  const curva = geo.definicion === "olimpico" ? [{ x: (geo.remate.x + geo.arco.x) / 2, y: Math.max(geo.remate.y, geo.arco.y) + 7 }] : [];
+  return [...(geo.origen ? [geo.origen] : []), geo.remate, ...curva, ...(geo.autor ? [geo.autor] : []), geo.arco, ...(otro ? [otro] : []), ...(fuera ? [fuera] : [])];
 }
 
 /**

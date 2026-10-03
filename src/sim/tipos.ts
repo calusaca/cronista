@@ -1,7 +1,7 @@
 // Contrato del simulador — brief 001 (docs/disenos/001-simulador.md).
 // Los nombres y propiedades de este archivo NO se cambian sin actualizar el brief.
 
-import type { Altura, Banda, Cesped, ClimaPartido, Definicion, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
+import type { Altura, Banda, CausaInterrupcion, Cesped, ClimaPartido, Definicion, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
 
 export type Estilo = "posesion" | "contragolpe" | "presion";
 
@@ -56,6 +56,8 @@ export interface Variantes {
   autogoles?: boolean;
   /** Brief 024: el nivel de cada jugador cambia probabilidades (cinco efectos, dentro del equipo). */
   niveles?: boolean;
+  /** Brief 025: los cinco insólitos (olímpico, subida del portero, palos, interrupción; la niebla es un clima). */
+  insolitos?: boolean;
 }
 
 /** Brief 019 — una baja que el registro de la temporada trae al partido (no juega: no está en la plantilla). */
@@ -92,7 +94,10 @@ export type TipoEvento =
   | "fuera_de_juego"
   | "cambio"
   // Brief 019: solo con config.variantes.lesiones. La sigue SIEMPRE un `cambio` con `sale` = el lesionado.
-  | "lesion";
+  | "lesion"
+  // Brief 025 (solo con config.variantes.insolitos): el portero sube al córner que sigue; el juego se para.
+  | "subida_portero"
+  | "interrupcion";
 
 export type Lado = "local" | "visita";
 export type Zona = "defensa" | "medio" | "ataque";
@@ -139,6 +144,11 @@ export interface Evento {
    * el que SUMA el gol; `jugador` es el autor, del OTRO equipo (el que lo sufre).
    */
   autogol?: boolean;
+  /** Brief 025 — tiro no convertido que dio en un palo (1) o en los dos (2). */
+  alPalo?: 1 | 2;
+  /** Brief 025 — interrupcion: la causa (ficticia, lista cerrada) y los minutos que se suman al descuento. */
+  causa?: CausaInterrupcion;
+  duracion?: number;
 }
 
 /** Brief 020: el lado del jugador que nombra un evento (en un autogol, el del equipo que lo sufre). */

@@ -5,7 +5,8 @@
 import { ladoDelJugador, MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda, origenDelTiro } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
-import { NIVEL } from "./limites";
+import { CAUSAS_INTERRUPCION, DURACION_INTERRUPCION, NIVEL, SUBIDA_MINUTO_MIN, TIPOS_ATAQUE } from "./limites";
+import { P } from "./parametros";
 import { CESPEDES, CLIMAS_PARTIDO, DEF_CABEZAZO, DEF_MANO_A_MANO, DEF_MEDIA_CANCHA, DEF_VASELINA, DEFINICIONES, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
@@ -31,8 +32,11 @@ export function verificarRelaciones(p: Partido): string[] {
   const err: string[] = [];
   const indice = new Map(p.eventos.map((e, i) => [e.id, i] as const));
   p.eventos.forEach((e, i) => {
+    // Brief 025: el gol olímpico cuelga de su CÓRNER (no hay tiro): extensión consciente del 001.
     const necesita =
-      e.tipo === "gol" || e.tipo === "atajada"
+      e.tipo === "gol" && e.definicion === "olimpico"
+        ? "corner"
+        : e.tipo === "gol" || e.tipo === "atajada"
         ? "tiro"
         : e.tipo === "tarjeta_amarilla" || e.tipo === "tarjeta_roja"
           ? "falta"
@@ -50,7 +54,7 @@ export function verificarRelaciones(p: Partido): string[] {
     }
     if (j >= i) err.push(`${e.id} (${e.tipo}): relacionadoCon ${ref.id} no es anterior`);
     if (ref.tipo !== necesita) err.push(`${e.id} (${e.tipo}): apunta a ${ref.tipo}, se esperaba ${necesita}`);
-    if (necesita === "tiro" && ref.equipo !== e.equipo) err.push(`${e.id} (${e.tipo}): el tiro ${ref.id} es del otro equipo`);
+    if ((necesita === "tiro" || necesita === "corner") && ref.equipo !== e.equipo) err.push(`${e.id} (${e.tipo}): el ${necesita} ${ref.id} es del otro equipo`);
   });
   return err;
 }
@@ -205,7 +209,8 @@ export function verificarContrato(p: Partido): string[] {
     if (e.tipo === "lesion" ? !Number.isInteger(e.baja) || (e.baja as number) < LESION_JORNADAS.min || (e.baja as number) > LESION_JORNADAS.max : e.baja !== undefined)
       err.push(`${e.id}: baja ${String(e.baja)} en ${e.tipo}`);
     if (e.tipo === "gol" && e.relacionadoCon) {
-      const t = porId.get(e.relacionadoCon);
+      const r = porId.get(e.relacionadoCon);
+      const t = r?.tipo === "tiro" ? r : undefined; // brief 025: el olímpico no hereda de un tiro
       if (t && t.xg !== e.xg) err.push(`${e.id}: gol no hereda el xg de su tiro`);
       if (t && e.autogol !== true && t.jugador !== e.jugador) err.push(`${e.id}: gol de otro jugador que el del tiro`);
     }
@@ -302,7 +307,7 @@ export function verificarEspacial(p: Partido): string[] {
       if (!["tiro", "gol", "atajada"].includes(e.tipo)) err.push(`${e.id}: definicion en ${e.tipo}`);
       if (e.tipo === "gol" && e.autogol === true) err.push(`${e.id}: un autogol no lleva la definición del tirador`);
       const t = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
-      if ((e.tipo === "gol" || e.tipo === "atajada") && t && t.definicion !== e.definicion) err.push(`${e.id}: definicion ≠ su tiro`);
+      if ((e.tipo === "gol" || e.tipo === "atajada") && t?.tipo === "tiro" && t.definicion !== e.definicion) err.push(`${e.id}: definicion ≠ su tiro`);
     }
     if (e.tipo === "tiro" && e.definicion !== undefined && e.definicion !== "jugada") {
       const o = origenDelTiro(p.eventos, i);
@@ -337,7 +342,8 @@ export function verificarEspacial(p: Partido): string[] {
     }
     if (e.tipo === "pase_clave" && e.zonaOrigen !== undefined && !ZONAS_ORIGEN_PASE.includes(e.zonaOrigen))
       err.push(`${e.id}: pase clave desde ${e.zonaOrigen}`);
-    const tiro = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+    const rel = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+    const tiro = rel?.tipo === "tiro" ? rel : undefined; // brief 025: el olímpico no tiene tiro
     if (e.tipo === "gol" && tiro) {
       if (tiro.destino !== undefined && e.destino === undefined) err.push(`${e.id}: gol sin destino (su tiro lo tiene)`);
       for (const k of ["zonaOrigen", "destino", "altura"] as const)
@@ -405,6 +411,85 @@ export function verificarLesiones(p: Partido): string[] {
   return err;
 }
 
+/**
+ * Brief 025 — los insólitos (implementación propia, independiente del motor):
+ * - olímpico: gol que cuelga del córner INMEDIATAMENTE anterior, del mismo equipo, del que lo sacó,
+ *   desde el área chica; y la definición «olimpico» solo ahí;
+ * - subida: la sigue su córner (mismo equipo y minuto), minuto ≥ SUBIDA_MINUTO_MIN, perdiendo por 1;
+ *   el POR jamás remata sin subida, y fuera de ese córner no tiene eventos de campo;
+ * - palo: solo en tiros sin gol ni atajada, apuntados a un palo, 1 o 2;
+ * - interrupción: causa y duración de lista, a lo sumo una por tiempo, y el RELOJ ajustado
+ *   conscientemente: en el 2.º tiempo, fin − 90 − Σ duraciones ∈ [P.descuento2.min, P.descuento2.max].
+ */
+export function verificarInsolitos(p: Partido): string[] {
+  const err: string[] = [];
+  const ev = p.eventos;
+  const on = p.config.variantes?.insolitos === true;
+  const pos = new Map<string, string>();
+  for (const l of ["local", "visita"] as const) for (const j of p.config[l].jugadores) pos.set(`${l}|${j.nombre}`, j.posicion);
+  const marcador = { local: 0, visita: 0 };
+  const disparosDeSubida = new Set<string>(); // tiros (y sus goles) que una subida justifica
+  // La niebla es clima del 025: solo existe con la variante (la liga la enciende).
+  if (!on && p.config.condiciones?.clima === "niebla") err.push("niebla sin la variante de insólitos");
+  ev.forEach((e, i) => {
+    if (e.tipo === "gol") marcador[e.equipo]++;
+    if (!on && (e.tipo === "subida_portero" || e.tipo === "interrupcion" || e.alPalo !== undefined || e.definicion === "olimpico")) err.push(`${e.id}: ${e.tipo} insólito sin la variante`);
+    if (e.tipo === "gol" && (e.definicion === "olimpico" || ev.find((x) => x.id === e.relacionadoCon)?.tipo === "corner")) {
+      const c = ev[i - 1];
+      if (e.definicion !== "olimpico" || !c || c.tipo !== "corner" || c.id !== e.relacionadoCon || c.equipo !== e.equipo || c.jugador !== e.jugador || e.zonaOrigen !== "area_chica")
+        err.push(`${e.id}: gol olímpico sin su córner inmediato (o de otro, o fuera del área chica)`);
+    }
+    if (e.definicion === "olimpico" && e.tipo !== "gol") err.push(`${e.id}: olímpico en ${e.tipo}`);
+    if (e.tipo === "subida_portero") {
+      const c = ev[i + 1];
+      const rival = e.equipo === "local" ? "visita" : "local";
+      if (!c || c.tipo !== "corner" || c.equipo !== e.equipo || c.minuto !== e.minuto) err.push(`${e.id}: subida sin su córner`);
+      if (pos.get(`${e.equipo}|${e.jugador}`) !== "POR") err.push(`${e.id}: sube alguien que no es el portero`);
+      if (e.minuto < SUBIDA_MINUTO_MIN || marcador[rival] - marcador[e.equipo] !== 1) err.push(`${e.id}: subida fuera de su situación (minuto ${e.minuto}, ${marcador[e.equipo]}–${marcador[rival]})`);
+      // el remate de ese córner (si lo hubo) y su gol
+      for (let k = i + 2; k < ev.length; k++) {
+        const t = ev[k] as Evento;
+        if (TIPOS_ATAQUE.includes(t.tipo) && t.tipo !== "tiro") break;
+        if (t.tipo === "tiro") {
+          if (t.jugador === e.jugador && cornerDelTiro(ev, k)?.id === c?.id) {
+            disparosDeSubida.add(t.id);
+            for (const g of ev) if (g.relacionadoCon === t.id) disparosDeSubida.add(g.id);
+          }
+          break;
+        }
+      }
+    }
+    if (e.alPalo !== undefined) {
+      const desenlace = ev.some((x) => (x.tipo === "gol" || x.tipo === "atajada") && x.relacionadoCon === e.id);
+      if (e.tipo !== "tiro" || (e.alPalo !== 1 && e.alPalo !== 2) || desenlace || (e.destino !== "palo_izquierdo" && e.destino !== "palo_derecho")) err.push(`${e.id}: alPalo ${String(e.alPalo)} incoherente`);
+    }
+    if (e.tipo === "interrupcion") {
+      if (!CAUSAS_INTERRUPCION.includes(e.causa as (typeof CAUSAS_INTERRUPCION)[number])) err.push(`${e.id}: causa ${String(e.causa)}`);
+      if (!Number.isInteger(e.duracion) || (e.duracion as number) < DURACION_INTERRUPCION.min || (e.duracion as number) > DURACION_INTERRUPCION.max) err.push(`${e.id}: duración ${String(e.duracion)}`);
+    }
+  });
+  // El POR no tiene eventos de campo salvo el remate (y su gol) de un córner al que subió.
+  for (const e of ev) {
+    if (!e.jugador || !["tiro", "gol", "pase_clave", "corner", "fuera_de_juego"].includes(e.tipo) || e.autogol === true) continue;
+    if (pos.get(`${e.equipo}|${e.jugador}`) === "POR" && !disparosDeSubida.has(e.id)) err.push(`${e.id}: el portero ${e.jugador} en un ${e.tipo} sin subida registrada`);
+  }
+  // Interrupciones: a lo sumo una por tiempo; el reloj del 2.º tiempo, ajustado por ellas.
+  const segundo = ev.findIndex((e, i) => i > 0 && e.tipo === "inicio_periodo");
+  const delTiempo = (a: number, b: number) => ev.slice(a, b).filter((e) => e.tipo === "interrupcion");
+  if (segundo > 0) {
+    // Solo en el 2.º tiempo (el 1.º se sella en el 45: su descuento no se ve en el reloj) y a lo sumo una.
+    if (delTiempo(0, segundo).length > 0) err.push("interrupción en el 1.er tiempo (su descuento no es verificable)");
+    if (delTiempo(segundo, ev.length).length > 1) err.push("más de una interrupción en el 2.º tiempo");
+    const fin = [...ev].reverse().find((e) => e.tipo === "fin_periodo");
+    const suma = delTiempo(segundo, ev.length).reduce((s, e) => s + (e.duracion ?? 0), 0);
+    if (fin) {
+      const descuento = fin.minuto - 90 - suma;
+      if (descuento < P.descuento2.min || descuento > P.descuento2.max) err.push(`reloj: el 2.º tiempo termina en ${fin.minuto} con ${suma}' de interrupción (descuento ${descuento} fuera de [${P.descuento2.min}, ${P.descuento2.max}])`);
+    }
+  }
+  return err;
+}
+
 /** Brief 024 — con la variante de niveles, cada jugador trae su nivel entero en NIVEL (implementación propia). */
 export function verificarNiveles(p: Partido): string[] {
   if (p.config.variantes?.niveles !== true) return [];
@@ -430,6 +515,8 @@ export const VERIFICADORES = {
   lesiones: verificarLesiones,
   // Brief 024.
   niveles: verificarNiveles,
+  // Brief 025.
+  insolitos: verificarInsolitos,
   // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
   micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;

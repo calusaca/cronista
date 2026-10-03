@@ -22,6 +22,8 @@ const ROL: Record<PasoJugada["rol"], string> = {
   pase_clave: "Key pass",
   tiro: "Shot",
   gol: "Goal",
+  subida: "The goalkeeper goes up for the corner",
+  atajada: "Saved",
 };
 
 /** Brief 015: las mediciones del tiro (son del evento, no coordenadas): « · 18 m · 97 km/h». */
@@ -123,7 +125,12 @@ function PizarraDatos({ geo, tirador, pasador, autor, fx }: { geo: GeometriaJuga
   // Rótulo del remate (dos líneas): debajo del punto si está arriba en la cancha; si está lejos
   // del arco (la línea sube), al costado izquierdo, para no cruzar la trayectoria ni el pie.
   const rotulo: { x: number; y: number; anchor: "middle" | "end" } =
-    geo.remate.y > 28 ? { x: geo.remate.x - 3, y: geo.remate.y - 0.6, anchor: "end" } : { x: Math.min(76, Math.max(24, geo.remate.x)), y: geo.remate.y + 4.6, anchor: "middle" };
+    geo.definicion === "olimpico"
+      ? // Brief 025: el remate es el banderín; el rótulo va debajo de la curva, no encima.
+        { x: Math.min(76, Math.max(24, geo.remate.x)), y: geo.remate.y + 13, anchor: "middle" }
+      : geo.remate.y > 28
+        ? { x: geo.remate.x - 3, y: geo.remate.y - 0.6, anchor: "end" }
+        : { x: Math.min(76, Math.max(24, geo.remate.x)), y: geo.remate.y + 4.6, anchor: "middle" };
 
   return (
     <>
@@ -131,7 +138,7 @@ function PizarraDatos({ geo, tirador, pasador, autor, fx }: { geo: GeometriaJuga
         rotulo="POSITIONS BY ZONE, FROM MATCH DATA"
         fuente="datos"
         alto={geo.alto}
-        extra={{ "data-anim": terminada ? "terminada" : "corriendo", "data-zona": geo.zona, "data-destino": geo.destino, ...(geo.definicion ? { "data-definicion": geo.definicion } : {}), ...(geo.autor ? { "data-autogol": "true" } : {}) }}
+        extra={{ "data-anim": terminada ? "terminada" : "corriendo", "data-zona": geo.zona, "data-destino": geo.destino, ...(geo.definicion ? { "data-definicion": geo.definicion } : {}), ...(geo.autor ? { "data-autogol": "true" } : {}), ...(geo.palos ? { "data-palos": String(geo.palos) } : {}) }}
       >
         {Array.from({ length: tramos }, (_, k) => tramo(k, k === tramos - 1))}
         {geo.origen && (
@@ -198,7 +205,7 @@ function PizarraDatos({ geo, tirador, pasador, autor, fx }: { geo: GeometriaJuga
               textAnchor={ladoRotulo > 50 ? "end" : "start"}
               data-testid="pitch-destino"
             >
-              {DESTINO_EN[geo.destino]}
+              {geo.palos === 2 ? "Both posts!" : geo.palos === 1 ? "Off the post" : DESTINO_EN[geo.destino]}
               {geo.altura ? ` · ${ALTURA_EN[geo.altura]}` : ""}
             </text>
           </>
@@ -275,8 +282,12 @@ export function TarjetaGol({
   const fx = (xg: number) => formatoXg(xg, modo, lengua);
   const pasos = jugadaDelGol(eventos, golId);
   const gol = pasos.find((p) => p.rol === "gol")?.evento;
+  // Brief 025: la tarjeta de la subida del portero (abierta desde ella) y la de un tiro al palo.
+  const subida = eventos.find((e) => e.id === golId)?.tipo === "subida_portero" ? pasos[0]?.evento : undefined;
+  const alPalo = !gol ? pasos.find((p) => p.rol === "tiro")?.evento : undefined;
   const geo = geometriaJugada(pasos, eventos);
-  const tirador = pasos.find((p) => p.rol === "tiro")?.evento;
+  // Brief 025: en el olímpico no hay tiro: el rótulo del remate nombra a quien sacó el córner.
+  const tirador = pasos.find((p) => p.rol === "tiro")?.evento ?? (geo?.definicion === "olimpico" ? pasos.find((p) => p.rol === "corner")?.evento : undefined);
   const pasador = geo?.origenRol ? pasos.find((p) => p.rol === geo.origenRol)?.evento : undefined;
   // Brief 021: la vista 3D (opcional; la 2D es el default). Solo para goles con detalle espacial,
   // y la tarjeta solo existe para goles ya emitidos (en vivo, sin clarividencia).
@@ -294,10 +305,22 @@ export function TarjetaGol({
       <aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="gol-titulo" data-testid="goal-card">
         <div className="layer-head">
           <div>
-            <div className="overline">How the goal happened</div>
+            <div className="overline">{subida ? "The goalkeeper goes up" : gol ? "How the goal happened" : "How the shot hit the woodwork"}</div>
             <h2 className="layer-title tnum" id="gol-titulo">
-              {gol?.jugador}
-              {gol?.autogol ? " (own goal)" : ""} · {gol ? fmtMinuto(gol.minuto) : ""}
+              {subida ? (
+                <>
+                  {subida.jugador} · up for the corner · {fmtMinuto(subida.minuto)}
+                </>
+              ) : gol ? (
+                <>
+                  {gol.jugador}
+                  {gol.autogol ? " (own goal)" : ""} · {fmtMinuto(gol.minuto)}
+                </>
+              ) : alPalo ? (
+                <>
+                  {alPalo.jugador} · {alPalo.alPalo === 2 ? "hit both posts" : "off the post"} · {fmtMinuto(alPalo.minuto)}
+                </>
+              ) : null}
             </h2>
           </div>
           <button type="button" className="btn btn-quiet" onClick={onCerrar} aria-label="Close">

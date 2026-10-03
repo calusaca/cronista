@@ -32,7 +32,13 @@ export type TipoHecho =
   | "lesion_en_partido"
   | "bajas_del_partido"
   // Brief 020: gol en propia puerta (solo con la variante de autogoles).
-  | "autogol";
+  | "autogol"
+  // Brief 025: los insólitos (solo con la variante) y el efecto medido de la niebla.
+  | "gol_olimpico"
+  | "subida_portero"
+  | "doble_palo"
+  | "interrupcion"
+  | "efecto_niebla";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
@@ -71,6 +77,11 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "lesion_en_partido",
   "bajas_del_partido",
   "autogol",
+  "gol_olimpico",
+  "subida_portero",
+  "doble_palo",
+  "interrupcion",
+  "efecto_niebla",
 ];
 
 /**
@@ -79,4 +90,4 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
  */
 export const TIPOS_HECHO_CONDICIONES: readonly TipoHecho[] = ["condiciones_del_partido", "efecto_calor", "cancha_incomoda", "presion_que_ahoga"];
 /** Brief 019: los que solo existen en la temporada (lesiones gated por variantes; bajas del registro). */
-export const TIPOS_HECHO_TEMPORADA: readonly TipoHecho[] = ["lesion_en_partido", "bajas_del_partido", "autogol"];
+export const TIPOS_HECHO_TEMPORADA: readonly TipoHecho[] = ["lesion_en_partido", "bajas_del_partido", "autogol", "gol_olimpico", "subida_portero", "doble_palo", "interrupcion", "efecto_niebla"];

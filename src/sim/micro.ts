@@ -161,7 +161,8 @@ function segmentoVacio(ancla: Evento, prev: Evento | undefined): boolean {
   if (ancla.tipo === "inicio_periodo") return true;
   if (!prev) return false;
   // Brief 019: la lesión es consecuencia directa de su falta (o un instante del juego): tramo vacío.
-  if (["gol", "atajada", "tarjeta_amarilla", "tarjeta_roja", "lesion"].includes(ancla.tipo)) return true;
+  // Brief 025: la subida del portero es un instante antes de su córner (tramo vacío).
+  if (["gol", "atajada", "tarjeta_amarilla", "tarjeta_roja", "lesion", "subida_portero"].includes(ancla.tipo)) return true;
   const directo = ancla.minuto - prev.minuto <= 1;
   if (ancla.tipo === "tiro" && directo && ["pase_clave", "corner", "falta", "tarjeta_amarilla", "tarjeta_roja"].includes(prev.tipo)) return true;
   if (ancla.tipo === "corner" && directo && ["tiro", "atajada"].includes(prev.tipo)) return true;

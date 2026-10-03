@@ -138,6 +138,12 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   bajas_del_partido: 45,
   // Brief 020: el autogol es LA anécdota del partido (y, ≥ COBERTURA, la crónica debe narrarlo).
   autogol: 82,
+  // Brief 025: el olímpico ES la anécdota; la subida del portero se narra siempre (≥ COBERTURA).
+  gol_olimpico: 85,
+  subida_portero: 70,
+  efecto_niebla: 56,
+  doble_palo: 55,
+  interrupcion: 40,
 };
 
 /**
@@ -184,6 +190,11 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   lesion_en_partido: "lesion",
   bajas_del_partido: "inicio_periodo",
   autogol: "gol",
+  gol_olimpico: "gol",
+  subida_portero: "subida_portero",
+  doble_palo: "tiro",
+  interrupcion: "interrupcion",
+  efecto_niebla: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -288,13 +299,15 @@ export const PROB_CESPED_ALTO = 0.5;
  * (despejado = el resto). El frío no tiene efecto en el brief (los seis efectos no lo incluyen):
  * se registra y se muestra, nada más.
  */
-export const PROB_CLIMA: Record<Clima, { calor: number; lluvia: number; frio: number }> = {
-  tropical: { calor: 0.4, lluvia: 0.3, frio: 0 },
-  desertico: { calor: 0.55, lluvia: 0.03, frio: 0.05 },
-  templado: { calor: 0.2, lluvia: 0.2, frio: 0.1 },
-  nordico: { calor: 0, lluvia: 0.2, frio: 0.45 },
-  lluvioso: { calor: 0.03, lluvia: 0.55, frio: 0.1 },
-  de_altura: { calor: 0.02, lluvia: 0.15, frio: 0.35 },
+// Brief 025: + niebla, rara y solo en los perfiles nórdico, lluvioso y de altura. Se toma de lo que
+// antes era «despejado» (al final del intervalo): los demás climas sorteados no cambian.
+export const PROB_CLIMA: Record<Clima, { calor: number; lluvia: number; frio: number; niebla: number }> = {
+  tropical: { calor: 0.4, lluvia: 0.3, frio: 0, niebla: 0 },
+  desertico: { calor: 0.55, lluvia: 0.03, frio: 0.05, niebla: 0 },
+  templado: { calor: 0.2, lluvia: 0.2, frio: 0.1, niebla: 0 },
+  nordico: { calor: 0, lluvia: 0.2, frio: 0.45, niebla: 0.08 },
+  lluvioso: { calor: 0.03, lluvia: 0.55, frio: 0.1, niebla: 0.08 },
+  de_altura: { calor: 0.02, lluvia: 0.15, frio: 0.35, niebla: 0.08 },
 };
 
 /**
@@ -333,6 +346,14 @@ export const SANCION_JORNADAS = { doble_amarilla: 1, roja_directa: 2 } as const;
 export const RATING_PARTIDOS_MIN = 5;
 /** Filas del top del rating en la pestaña Players. */
 export const RATING_TOP = 15;
+
+/**
+ * `efecto_niebla` (brief 025): completación de los pases LARGOS (≥ 30 m) del partido ≤ este % con
+ * niebla registrada, sobre una muestra mínima. Calibrado el 3 oct (N=500): sin niebla el 3,4 % de los
+ * partidos ya queda ahí (mediana 68 %); con niebla, el 23,4 % (mediana 60 %).
+ */
+export const NIEBLA_LARGOS_MAX = 54;
+export const NIEBLA_LARGOS_MUESTRA_MIN = 30;
 
 /** Rareza de los hechos de efecto sobre el corpus de liga (las 8 ligas, temporada 1): como en el 013, ≤ 35 %. */
 export const RAREZA_CONDICION_MAX = 0.35;

@@ -18,6 +18,8 @@ export const NOMBRE_EVENTO: Record<Evento["tipo"], string> = {
   fuera_de_juego: "Offside",
   cambio: "Substitution",
   lesion: "Injury",
+  subida_portero: "Goalkeeper goes up",
+  interrupcion: "Play stopped",
 };
 
 /** Brief 010: rótulo corto del chip de cada evento en la línea de tiempo (se muestra en versalitas). */
@@ -35,6 +37,8 @@ export const CHIP_EVENTO: Record<Evento["tipo"], string> = {
   fuera_de_juego: "Offside",
   cambio: "Sub",
   lesion: "Injury",
+  subida_portero: "GK up",
+  interrupcion: "Stop",
 };
 
 /** Qué rechaza cada regla del Verificador, en palabras (006: «la regla con su explicación»). */
@@ -80,7 +84,7 @@ export function describirEvento(e: Evento, modo: ModoXg = "analista", lengua: Le
   switch (e.tipo) {
     case "tiro":
       // Brief 015: la distancia del tiro (la velocidad queda para la pizarra: la línea no se satura).
-      return `${NOMBRE_EVENTO.tiro}${e.penal ? " (penalty)" : ""} · ${quien} · ${formatoXg(e.xg ?? 0, modo, lengua)}${e.distanciaM !== undefined ? ` · ${e.distanciaM} m` : ""}`;
+      return `${NOMBRE_EVENTO.tiro}${e.penal ? " (penalty)" : ""} · ${quien} · ${formatoXg(e.xg ?? 0, modo, lengua)}${e.distanciaM !== undefined ? ` · ${e.distanciaM} m` : ""}${e.alPalo === 2 ? " · hit both posts!" : e.alPalo === 1 ? " · off the post" : ""}`;
     case "gol":
       // Brief 020: el autogol dice que es en propia puerta (el autor es del otro equipo).
       return e.autogol === true ? `Own goal · ${quien}` : `${NOMBRE_EVENTO.gol} · ${quien}${e.definicion && e.definicion !== "jugada" ? ` · ${DEFINICION_EN[e.definicion]}` : ""}`;
@@ -88,6 +92,10 @@ export function describirEvento(e: Evento, modo: ModoXg = "analista", lengua: Le
       return "Shot saved";
     case "cambio":
       return `On ${quien}${e.sale ? `, off ${e.sale}` : ""}`;
+    case "subida_portero":
+      return `${NOMBRE_EVENTO.subida_portero} for the corner · ${quien}`;
+    case "interrupcion":
+      return `${NOMBRE_EVENTO.interrupcion} · ${e.causa === "perro" ? "a dog on the pitch" : e.causa === "objeto" ? "object thrown on" : "balloons in the box"} · +${e.duracion ?? 0}′ added`;
     case "lesion":
       // Brief 019: cuántas jornadas se pierde (el registro de la temporada lo usa).
       return `${NOMBRE_EVENTO.lesion} · ${quien}${e.baja !== undefined ? ` · out ${e.baja} matchday${e.baja === 1 ? "" : "s"}` : ""}`;
@@ -133,6 +141,7 @@ export const DEFINICION_EN: Record<string, string> = {
   chilena: "Bicycle kick!",
   tijera: "Scissor kick!",
   media_cancha: "From the halfway line!",
+  olimpico: "Straight from the corner!",
 };
 
 export const POSICION_EN: Record<string, string> = { POR: "GK", DEF: "DF", MED: "MF", DEL: "FW" };

@@ -133,6 +133,39 @@ export const PLANTILLAS = {
     es: "En el césped alto de la cancha de {local}, {equipo} completó el {porcentaje} % de sus pases cortos ({completados} de {intentados}).",
     en: "On the long grass at {local}'s ground, {equipo} completed {porcentaje}% of their short passes ({completados} of {intentados}).",
   },
+  // Brief 025: los insólitos.
+  gol_olimpico: {
+    es: "{jugador} ({equipo}) marcó un gol olímpico en el minuto {minuto}, directo del córner; {local} {marcador_local}–{marcador_visita} {visita}.",
+    en: "{jugador} ({equipo}) scored straight from a corner in minute {minuto}; {local} {marcador_local}–{marcador_visita} {visita}.",
+  },
+  subida_portero: {
+    es: "En el minuto {minuto}, con su equipo perdiendo por uno, el portero {jugador} ({equipo}) subió al área para un córner.",
+    en: "In minute {minuto}, with his side one goal down, goalkeeper {jugador} ({equipo}) went up for a corner.",
+  },
+  subida_portero_remate: {
+    es: "En el minuto {minuto}, con su equipo perdiendo por uno, el portero {jugador} ({equipo}) subió al área para un córner y llegó a rematar.",
+    en: "In minute {minuto}, with his side one goal down, goalkeeper {jugador} ({equipo}) went up for a corner and got a shot away.",
+  },
+  subida_portero_gol: {
+    es: "En el minuto {minuto}, con su equipo perdiendo por uno, el portero {jugador} ({equipo}) subió al área para un córner y marcó.",
+    en: "In minute {minuto}, with his side one goal down, goalkeeper {jugador} ({equipo}) went up for a corner and scored.",
+  },
+  al_palo: {
+    es: "{jugador} ({equipo}) estrelló un remate en el palo en el minuto {minuto}.",
+    en: "{jugador} ({equipo}) hit the post in minute {minuto}.",
+  },
+  doble_palo: {
+    es: "{jugador} ({equipo}) estrelló un remate en los dos palos en el minuto {minuto}.",
+    en: "{jugador} ({equipo}) hit both posts in minute {minuto}.",
+  },
+  interrupcion: {
+    es: "El partido se interrumpió {duracion} min en el minuto {minuto} por {causa_es}; se sumaron al descuento.",
+    en: "Play was stopped for {duracion} min in minute {minuto} ({causa_en}); the time was added on.",
+  },
+  efecto_niebla: {
+    es: "La niebla pesó en los pases largos: {completados} de {intentados} completados ({porcentaje} %).",
+    en: "In the fog, long passes suffered: {completados} of {intentados} completed ({porcentaje}%).",
+  },
   // Brief 020: sin verbos de mérito («marcó»): el autor no anotó para su equipo.
   autogol: {
     es: "En el minuto {minuto}, un gol en propia puerta de {jugador} ({equipo}) sumó para {beneficiado}: {local} {marcador_local}–{marcador_visita} {visita}.",
@@ -191,6 +224,14 @@ export const temperaturaTxt = (c: number): string => (c < 0 ? `−${-c}` : Strin
 export const CLIMA_TEXTO: Record<string, { es: string; en: string }> = {
   despejado: { es: "cielo despejado", en: "clear skies" },
   lluvia: { es: "lluvia", en: "rain" },
+  // Brief 025 (sin «la niebla / the fog»: esas frases las paga solo el efecto medido).
+  niebla: { es: "niebla", en: "fog" },
+};
+/** Brief 025: las causas FICTICIAS de una interrupción, en los textos de los hechos. */
+export const CAUSA_TEXTO: Record<string, { es: string; en: string }> = {
+  perro: { es: "un perro en la cancha", en: "a dog on the pitch" },
+  objeto: { es: "un objeto lanzado al campo", en: "an object thrown onto the pitch" },
+  globos: { es: "globos en el área", en: "balloons in the box" },
 };
 export const CANCHA_TEXTO: Record<string, { es: string; en: string }> = {
   natural_corto: { es: "césped natural corto", en: "short natural grass" },

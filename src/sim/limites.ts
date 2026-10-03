@@ -222,7 +222,8 @@ export const MISIL_KMH = 100;
 // de su banda y se pone rojo.
 // ---------------------------------------------------------------------------------
 
-export const CLIMAS_PARTIDO = ["despejado", "calor", "lluvia", "frio"] as const;
+// Brief 025: + niebla (rara: solo perfiles nórdico, lluvioso y de altura).
+export const CLIMAS_PARTIDO = ["despejado", "calor", "lluvia", "frio", "niebla"] as const;
 export type ClimaPartido = (typeof CLIMAS_PARTIDO)[number];
 export const SUPERFICIES = ["natural", "sintetica"] as const;
 export type Superficie = (typeof SUPERFICIES)[number];
@@ -240,6 +241,44 @@ export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max
  * propia copia en parametros.ts (CONDICIONES.presionHastaMin).
  */
 export const SALIDA_TEMPRANA_MIN = 25;
+
+// ---------------------------------------------------------------------------------
+// Brief 025 — eventos insólitos (solo con config.variantes.insolitos). Vocabularios, coherencias
+// y rarezas: ÚNICA fuente. Las probabilidades que las producen viven en parametros.INSOLITOS.
+// ---------------------------------------------------------------------------------
+
+/** Interrupción breve: causas FICTICIAS de lista cerrada y su duración (min), que se suma al descuento. */
+export const CAUSAS_INTERRUPCION = ["perro", "objeto", "globos"] as const;
+export type CausaInterrupcion = (typeof CAUSAS_INTERRUPCION)[number];
+export const DURACION_INTERRUPCION = { min: 1, max: 3 } as const;
+/** El portero solo sube a un córner desde este minuto, con su equipo perdiendo por exactamente 1. */
+export const SUBIDA_MINUTO_MIN = 88;
+/** xG que registra un gol olímpico (no hay tiro del que heredarlo: es la probabilidad de un córner directo). */
+export const XG_OLIMPICO = 0.01;
+/**
+ * Rarezas objetivo (brief 025), medidas en el corpus de liga:
+ * - olímpico: fracción de los goles; subida: fracción de los córners elegibles;
+ * - alPalo: fracción de los tiros no gol (atajados incluidos); doble: fracción de los tiros al palo;
+ * - interrupción: fracción de los partidos.
+ * Medido el 3 oct (liga, 720 partidos, temporada actual): olímpico 1 de 1.934 goles (0,05 %); subida
+ * 2 de 132 córners elegibles (1,52 %), 0 goles de portero (no tiene banda: «la que salga»); al palo
+ * 520 de 16.301 tiros no gol (3,19 %); doble 6 de 520 (1,15 %); interrupción 12 de 720 (1,67 %) con
+ * los dos tiempos; tras el delta (solo 2.º tiempo, pInterrupcion 0,016): 11 de 720 (1,53 %).
+ * Semillas sueltas 1..6000 con la variante: 8 olímpicos de 16.523 goles (0,05 %), 30 subidas, 1
+ * remate de portero, 0 goles de portero, 49 dobles, 83 interrupciones. Ninguna banda vacía.
+ */
+export const RAREZA_INSOLITOS = {
+  olimpico: { min: 0.0002, max: 0.001 },
+  subida: { min: 0.01, max: 0.03 },
+  alPalo: { min: 0.02, max: 0.05 },
+  doblePalo: { min: 0.005, max: 0.02 },
+  interrupcion: { min: 0.01, max: 0.02 },
+} as const;
+/**
+ * A/B de la niebla (N_AB, banda aparte de parametros): completación de pases LARGOS (diferencia) y la
+ * de los cortos (sin efecto). Medido: largos −0,0791, cortos 0,0000.
+ */
+export const AB_NIEBLA = { largos: { min: -0.12, max: -0.04 }, cortosTolerancia: 0.01 } as const;
 
 // ---------------------------------------------------------------------------------
 // Brief 024 — nivel por jugador. Bandas de los A/B DENTRO del equipo (tercil alto − tercil bajo
@@ -305,7 +344,8 @@ export const PRESUPUESTO_CHUNK_3D_KB = 180;
 // rarezas: ÚNICA fuente. Las definiciones ANIDAN dentro del contrato del 015 (60–125 km/h).
 // ---------------------------------------------------------------------------------
 
-export const DEFINICIONES = ["jugada", "cabezazo", "mano_a_mano", "vaselina", "chilena", "tijera", "media_cancha"] as const;
+// Brief 025: + olimpico (el córner entra directo: el gol cuelga del córner, sin tiro).
+export const DEFINICIONES = ["jugada", "cabezazo", "mano_a_mano", "vaselina", "chilena", "tijera", "media_cancha", "olimpico"] as const;
 export type Definicion = (typeof DEFINICIONES)[number];
 
 /** Coherencias duras (brief 020 rev 1.1). Velocidades dentro de VELOCIDAD (el «jamás» del 015 no se reabre). */

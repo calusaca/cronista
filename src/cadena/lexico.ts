@@ -729,3 +729,53 @@ export function trasMeritoPropiaPuerta(lengua: Lengua): RegExp {
   const alts = [...PROPIA_PUERTA[lengua]].sort((a, b) => b.length - a.length).map((a) => escapar(a).replace(/ /g, "\\s+"));
   return new RegExp(`^\\s*(?:(?:an?|un|uno|el|su|his|their)\\s+)?(?:gol\\s+)?(?:${alts.join("|")})(?![\\p{L}\\p{N}])`, "iu");
 }
+
+// ---------------------------------------------------------------------------------
+// Brief 025 — los insólitos: cada frase SOLO con su hecho (y el palo, computable: «doble palo / hit
+// both posts» exige dos palos registrados). Se juzgan antes de V7 (como las consecuencias).
+// ---------------------------------------------------------------------------------
+
+export const FRASES_INSOLITOS = {
+  olimpico: {
+    // Sin «olímpico» suelto: «Olímpico» es prefijo de nombres de club (Olímpico Castana…).
+    es: ["gol olímpico", "un olímpico", "de córner directo", "directo del córner", "directamente del córner", "directo de córner"],
+    en: ["olympic goal", "straight from a corner", "straight from the corner", "directly from a corner", "direct from the corner"],
+  },
+  subida: {
+    es: ["el portero subió", "subió el portero", "subió a rematar", "subió al área"],
+    en: ["went up for a corner", "went up for the corner", "goalkeeper went up", "keeper went up", "goalkeeper came up"],
+  },
+  palo: {
+    // «al palo» (la del brief) NO cuando sigue el lado: «cruzó al palo izquierdo / largo» describe el
+    // destino de un gol honesto (el del 011), no un remate al poste (ver PALO_NO_DESTINO).
+    es: ["al palo", "en el palo", "dio en el palo", "pegó en el palo", "estrelló", "el poste", "la madera"],
+    en: ["hit the post", "off the post", "the woodwork", "hit the woodwork", "struck the post"],
+  },
+  doblePalo: {
+    es: ["doble palo", "los dos palos", "ambos palos"],
+    en: ["hit both posts", "both posts"],
+  },
+  interrupcion: {
+    es: ["se interrumpió", "interrumpido", "interrupción", "se paró el partido", "se detuvo el juego"],
+    en: ["play was stopped", "was interrupted", "interruption", "play was halted"],
+  },
+  niebla: {
+    es: ["la niebla", "por la niebla", "entre la niebla", "en la niebla"],
+    en: ["in the fog", "the fog", "fog-bound"],
+  },
+} as const satisfies Record<string, Record<Lengua, readonly string[]>>;
+
+const palos = (h: Hecho) => (h.tipo === "doble_palo" ? Number(h.datos.palos) : 0);
+/** «al palo izquierdo / derecho / largo / corto / contrario» es un destino, no el poste. */
+const PALO_NO_DESTINO = "(?!\\s+(?:izquierdo|derecho|largo|corto|contrario|cercano|lejano))";
+const paloEs = new RegExp(`${palabras(FRASES_INSOLITOS.palo.es.filter((f) => f !== "al palo")).source}|${palabras(["al palo"], PALO_NO_DESTINO).source}`, "giu");
+
+export const INSOLITOS_JUICIO: EntradaJuicio[] = [
+  { id: "olimpico", es: palabras(FRASES_INSOLITOS.olimpico.es), en: palabras(FRASES_INSOLITOS.olimpico.en), habilita: (h) => h.tipo === "gol_olimpico", requisito: "«olímpico / straight from the corner» exige el hecho gol_olimpico como principal" },
+  { id: "subida", es: palabras(FRASES_INSOLITOS.subida.es), en: palabras(FRASES_INSOLITOS.subida.en), habilita: (h) => h.tipo === "subida_portero", requisito: "«el portero subió / went up for a corner» exige el hecho subida_portero como principal" },
+  // los dos palos ANTES que un palo: «los dos palos» no se lee como «el palo»
+  { id: "doble_palo", es: palabras(FRASES_INSOLITOS.doblePalo.es), en: palabras(FRASES_INSOLITOS.doblePalo.en), habilita: (h) => palos(h) === 2, requisito: "«doble palo / hit both posts» exige un remate registrado en los dos palos" },
+  { id: "palo", es: paloEs, en: palabras(FRASES_INSOLITOS.palo.en), habilita: (h) => palos(h) >= 1, requisito: "«al palo / hit the post» exige un remate registrado en el palo" },
+  { id: "interrupcion", es: palabras(FRASES_INSOLITOS.interrupcion.es), en: palabras(FRASES_INSOLITOS.interrupcion.en), habilita: (h) => h.tipo === "interrupcion", requisito: "«se interrumpió / play was stopped» exige el hecho interrupcion como principal" },
+  { id: "niebla", es: palabras(FRASES_INSOLITOS.niebla.es), en: palabras(FRASES_INSOLITOS.niebla.en), habilita: (h) => h.tipo === "efecto_niebla", requisito: "«la niebla / in the fog» exige el efecto medido (efecto_niebla) como principal" },
+];

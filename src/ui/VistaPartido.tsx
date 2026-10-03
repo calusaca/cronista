@@ -217,7 +217,8 @@ export function VistaPartido({
     setUpdateSel(null);
     setRatingSel(null);
     setEventoSel((prev) => (prev === e.id && e.tipo !== "gol" ? null : e.id));
-    if (e.tipo === "gol") setCapa({ tipo: "gol", id: e.id });
+    // Brief 025: un tiro al palo también abre su tarjeta (la pizarra dibuja el poste).
+    if (e.tipo === "gol" || e.tipo === "subida_portero" || (e.tipo === "tiro" && e.alPalo !== undefined)) setCapa({ tipo: "gol", id: e.id });
   }, []);
 
   // Brief 024: los niveles de la alineación (solo si el partido los usa).

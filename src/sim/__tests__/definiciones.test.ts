@@ -51,7 +51,9 @@ describe("020 · coherencias duras de cada definición (corpus 1..1000)", () => 
   it("toda definición del vocabulario existe en el corpus (ninguna banda vacía, ni en tiros ni en goles)", () => {
     const tiros = new Set(corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "tiro").map((e) => e.definicion)));
     const goles = new Set(corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "gol").map((e) => e.definicion)));
-    for (const d of DEFINICIONES) {
+    // Brief 025: el olímpico solo existe con la variante de insólitos (liga): aquí, jamás.
+    expect(tiros.has("olimpico") || goles.has("olimpico")).toBe(false);
+    for (const d of DEFINICIONES.filter((x) => x !== "olimpico")) {
       expect(tiros.has(d), `tiro ${d}`).toBe(true);
       if (d !== "tijera") expect(goles.has(d), `gol ${d}`).toBe(true);
     }

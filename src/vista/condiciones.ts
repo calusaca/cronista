@@ -8,13 +8,16 @@ import { CALOR_PASES_2T_MAX, CANCHA_CORTOS_MAX, PRESION_PERDIDAS_MIN } from "../
 import { micro, type MicroPartido } from "../sim/micro";
 import type { Condiciones, Lado, Partido } from "../sim/tipos";
 
+/** Los niveles de presión en el chrome (inglés): nunca el valor crudo de la config. */
+const PRESION_EN: Record<Condiciones["presion"]["local"], string> = { baja: "low", media: "medium", alta: "high" };
+
 const temp = (c: number) => (c < 0 ? `−${-c}` : String(c));
 
 /** Las piezas del chip («34 °C · long natural grass · away side under high pressure»). */
 export function piezasChip(c: Condiciones): string[] {
-  const clima = c.temperaturaC !== undefined ? `${temp(c.temperaturaC)} °C` : c.clima === "lluvia" ? "Rain" : "Clear skies";
+  const clima = c.temperaturaC !== undefined ? `${temp(c.temperaturaC)} °C` : c.clima === "lluvia" ? "Rain" : c.clima === "niebla" ? "Fog" : "Clear skies";
   const cancha = c.superficie === "sintetica" ? "artificial pitch" : c.cesped === "alto" ? "long natural grass" : "short natural grass";
-  const presion = c.presion.visita === "alta" ? "away side under high pressure" : `${c.presion.local} pressure at home, ${c.presion.visita} away`;
+  const presion = c.presion.visita === "alta" ? "away side under high pressure" : `${PRESION_EN[c.presion.local]} pressure at home, ${PRESION_EN[c.presion.visita]} away`;
   return [clima, cancha, presion];
 }
 

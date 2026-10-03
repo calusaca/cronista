@@ -12,7 +12,7 @@
 //   6 presión alta ⇒ salida nerviosa del presionado en los primeros minutos
 
 import { CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
-import { CONDICIONES } from "./parametros";
+import { CONDICIONES, INSOLITOS } from "./parametros";
 import type { Condiciones, Lado, Zona } from "./tipos";
 
 /** Intensidad del calor en [0, 1] (0 si no hay calor registrado). */
@@ -70,6 +70,8 @@ export function castigoPase(
   if (!c) return 0;
   let k = 0;
   if (c.clima === "lluvia") k += CONDICIONES.lluviaPase;
+  // Brief 025 · 5: con niebla no se ve lejos — solo los pases LARGOS pierden precisión.
+  if (c.clima === "niebla" && clase === "largo") k += INSOLITOS.nieblaPaseLargo;
   if (lado === "visita" && c.superficie === "natural" && c.cesped === "alto" && clase === "corto") k += CONDICIONES.cespedAltoCortoVisita;
   if (c.presion[lado] === "alta" && zona === "defensa" && minutoAncla < CONDICIONES.presionHastaMin) k += CONDICIONES.presionAltaSalida;
   return k;

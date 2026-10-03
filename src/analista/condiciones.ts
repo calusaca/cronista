@@ -6,7 +6,7 @@
 import { PASE_M, SALIDA_TEMPRANA_MIN } from "../sim/limites";
 import type { MicroPartido } from "../sim/micro";
 import type { Lado, Partido } from "../sim/tipos";
-import { CALOR_PASES_2T_MAX, CANCHA_CORTOS_MAX, CANCHA_CORTOS_MUESTRA_MIN, PRESION_PERDIDAS_MIN } from "./umbrales";
+import { CALOR_PASES_2T_MAX, CANCHA_CORTOS_MAX, CANCHA_CORTOS_MUESTRA_MIN, NIEBLA_LARGOS_MAX, NIEBLA_LARGOS_MUESTRA_MIN, PRESION_PERDIDAS_MIN } from "./umbrales";
 
 const pct = (a: number, b: number) => (b === 0 ? 0 : Math.round((a * 100) / b));
 
@@ -96,4 +96,20 @@ export function medirPresion(p: Partido, m: MicroPartido): MedicionPresion | und
   if (!lado) return undefined;
   const ids = m.eventos.filter((x) => x.tipo === "perdida" && x.equipo === lado && x.zona === "defensa" && x.minuto < SALIDA_TEMPRANA_MIN).map((x) => x.id);
   return { lado, ids, limite: SALIDA_TEMPRANA_MIN, efecto: ids.length >= PRESION_PERDIDAS_MIN };
+}
+
+export interface MedicionNiebla {
+  completados: number;
+  intentados: number;
+  porcentaje: number;
+  efecto: boolean;
+}
+
+/** Brief 025 — pases LARGOS (la banda larga del 013) completados del partido, solo con niebla registrada. */
+export function medirNiebla(p: Partido, m: MicroPartido): MedicionNiebla | undefined {
+  if (p.config.condiciones?.clima !== "niebla") return undefined;
+  const largos = m.eventos.filter((x) => x.tipo === "pase" && x.distanciaM !== undefined && x.distanciaM >= PASE_M.largo.min);
+  const completados = largos.filter((x) => x.completado).length;
+  const efecto = largos.length >= NIEBLA_LARGOS_MUESTRA_MIN && completados * 100 <= NIEBLA_LARGOS_MAX * largos.length;
+  return { completados, intentados: largos.length, porcentaje: pct(completados, largos.length), efecto };
 }

@@ -29,6 +29,7 @@ import {
   CIERRE_EN_VIVO_EXCEPTO,
   CONSECUENCIAS,
   CUENTA_GOLES,
+  INSOLITOS_JUICIO,
   EFECTOS_CONDICION,
   FRANJAS,
   GRADOS_C,
@@ -468,7 +469,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   });
   // Brief 018 — el color de las condiciones, solo con su efecto medido como principal (antes de
   // V7: «nunca se acomodó / never settled» describe la medición, no niega un suceso).
-  for (const e of [...EFECTOS_CONDICION, ...CONSECUENCIAS]) {
+  for (const e of [...INSOLITOS_JUICIO, ...EFECTOS_CONDICION, ...CONSECUENCIAS]) {
     s = quitar(s, e[lengua], (m) => {
       if (!ctx.hechos.some((x) => e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
     });

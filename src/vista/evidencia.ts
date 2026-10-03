@@ -3,6 +3,7 @@
 // y la jugada de un gol. Todo sale de datos reales — nunca de un mapeo hecho a mano.
 // Sin React ni DOM: se prueba con vitest.
 
+import { cornerDelTiro } from "../sim/espacial";
 import { TIPOS_ATAQUE, TRAS_CORNER_MAX_MIN } from "../sim/limites";
 import type { Hecho } from "../analista/tipos";
 import type { CronicaVerificada, IntentoAudit, Motivo, Oracion } from "../cadena/tipos";
@@ -139,7 +140,7 @@ export function porPeriodo(eventos: Evento[]): Periodo[] {
 
 export interface PasoJugada {
   evento: Evento;
-  rol: "falta" | "corner" | "pase_clave" | "tiro" | "gol";
+  rol: "falta" | "corner" | "pase_clave" | "tiro" | "gol" | "subida" | "atajada";
 }
 
 /**
@@ -153,11 +154,32 @@ export interface PasoJugada {
  */
 export function jugadaDelGol(eventos: Evento[], golId: string): PasoJugada[] {
   const idx = new Map(eventos.map((e, i) => [e.id, i] as const));
-  const gol = eventos[idx.get(golId) ?? -1];
-  if (!gol || gol.tipo !== "gol") return [];
-  const ti = idx.get(gol.relacionadoCon ?? "");
+  const evento = eventos[idx.get(golId) ?? -1];
+  // Brief 025: la jugada de la SUBIDA del portero — la subida, su córner y, si lo hubo, el remate de
+  // ese córner (de quien sea) con su desenlace. Nada que los eventos no digan.
+  if (evento?.tipo === "subida_portero") {
+    const i = idx.get(evento.id) as number;
+    const corner = eventos[i + 1];
+    if (!corner || corner.tipo !== "corner") return [{ evento, rol: "subida" }];
+    const pasos: PasoJugada[] = [{ evento, rol: "subida" }, { evento: corner, rol: "corner" }];
+    const sig = eventos[i + 2];
+    if (sig?.tipo === "gol" && sig.relacionadoCon === corner.id) return [...pasos, { evento: sig, rol: "gol" }];
+    if (sig?.tipo !== "tiro" || cornerDelTiro(eventos, i + 2)?.id !== corner.id) return pasos;
+    const fin = eventos.find((x) => (x.tipo === "gol" || x.tipo === "atajada") && x.relacionadoCon === sig.id);
+    return [...pasos, { evento: sig, rol: "tiro" }, ...(fin ? [{ evento: fin, rol: fin.tipo === "gol" ? ("gol" as const) : ("atajada" as const) }] : [])];
+  }
+  // Brief 025: también la jugada de un tiro AL PALO (no hay gol: la tarjeta cuenta ese remate).
+  const esTiroAlPalo = evento?.tipo === "tiro" && evento.alPalo !== undefined;
+  if (!evento || (evento.tipo !== "gol" && !esTiroAlPalo)) return [];
+  const gol = esTiroAlPalo ? undefined : evento;
+  const ti = esTiroAlPalo ? idx.get(evento.id) : idx.get(evento.relacionadoCon ?? "");
   const tiro = ti !== undefined ? eventos[ti] : undefined;
-  if (!tiro || ti === undefined) return [{ evento: gol, rol: "gol" }];
+  // Brief 025: el gol olímpico cuelga de su córner (sin tiro); si el portero había subido, va su paso.
+  if (gol && tiro?.tipo === "corner" && ti !== undefined) {
+    const sub = eventos[ti - 1]?.tipo === "subida_portero" ? [{ evento: eventos[ti - 1] as Evento, rol: "subida" as const }] : [];
+    return [...sub, { evento: tiro, rol: "corner" }, { evento: gol, rol: "gol" }];
+  }
+  if (!tiro || ti === undefined || tiro.tipo !== "tiro") return gol ? [{ evento: gol, rol: "gol" }] : [];
   const previos: PasoJugada[] = [];
   for (let k = ti - 1; k >= 0 && previos.length < 2; k--) {
     const e = eventos[k] as Evento;
@@ -172,5 +194,9 @@ export function jugadaDelGol(eventos: Evento[], golId: string): PasoJugada[] {
     else if (e.tipo === "corner" && e.equipo === tiro.equipo) previos.unshift({ evento: e, rol: "corner" });
     else break;
   }
-  return [...previos, { evento: tiro, rol: "tiro" }, { evento: gol, rol: "gol" }];
+  // Brief 025: si el córner del remate tuvo la subida del portero, va primero.
+  const primero = previos[0];
+  const iPrimero = primero ? idx.get(primero.evento.id) : undefined;
+  const subida = iPrimero !== undefined && eventos[iPrimero - 1]?.tipo === "subida_portero" ? [{ evento: eventos[iPrimero - 1] as Evento, rol: "subida" as const }] : [];
+  return [...subida, ...previos, { evento: tiro, rol: "tiro" }, ...(gol ? [{ evento: gol, rol: "gol" as const }] : [])];
 }

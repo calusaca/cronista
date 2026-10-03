@@ -182,6 +182,30 @@ export const CONDICIONES = {
 } as const;
 
 /**
+ * Brief 025 — perillas de los insólitos (las rarezas que las acotan viven en limites.RAREZA_INSOLITOS).
+ * Todo con sorteos derivados (por córner, por tiro, por periodo): sin la variante, nada cambia.
+ */
+export const INSOLITOS = {
+  /** Gol olímpico: probabilidad de que un córner entre directo. */
+  pOlimpico: 0.00012,
+  /** Subida del portero a un córner elegible (≥ SUBIDA_MINUTO_MIN, perdiendo por 1). */
+  pSubida: 0.025,
+  /** Peso del portero en el cabezazo de ESE córner (los de campo: PESOS.cabezazo). */
+  pesoPorteroSubida: 2,
+  /** Palo: probabilidad de que un tiro desviado (sin gol ni atajada) dé en un palo; y de que dé en los dos. */
+  pAlPalo: 0.055,
+  pDoblePalo: 0.012,
+  /**
+   * Interrupción: probabilidad por partido, SOLO en el 2.º tiempo (delta de Fable, 3 oct: el 1.º se
+   * sella en el 45 y su descuento no es verificable). Era 0,0075 por tiempo; con solo el 2.º daba
+   * 0,69 % en liga (5 de 720, bajo el piso de 1 %) ⇒ subido a 0,016: 11 de 720 (1,53 %).
+   */
+  pInterrupcion: 0.016,
+  /** Niebla: completación de los pases LARGOS − k (no se ve lejos). */
+  nieblaPaseLargo: 0.08,
+} as const;
+
+/**
  * Brief 024 — los CINCO efectos del nivel (ni uno más), con delta = (nivel − media del equipo)/100;
  * las bandas que los acotan (A/B dentro del equipo) viven en limites.ts (AB_NIVELES), escritas aparte.
  * Todos modifican probabilidades existentes sin sorteos propios: sin la variante, nada cambia.

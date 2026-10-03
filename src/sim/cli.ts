@@ -104,6 +104,8 @@ const ETIQUETA: Record<Evento["tipo"], string> = {
   fuera_de_juego: "fuera de juego",
   cambio: "entra",
   lesion: "LESIÓN",
+  subida_portero: "SUBE EL PORTERO",
+  interrupcion: "INTERRUPCIÓN",
 };
 
 console.log(todo ? "Línea de tiempo (todos los eventos):" : "Línea de tiempo (goles, tarjetas, cambios, ocasiones xG ≥ 0.30, penales):");
