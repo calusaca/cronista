@@ -11,6 +11,7 @@
     "analizar": "tsx src/analista/cli.ts",
     "cronica": "tsx src/cadena/cli.ts",
     "presets": "tsx src/vista/cli-presets.ts",
+    "eval": "tsx src/eval/cli.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
