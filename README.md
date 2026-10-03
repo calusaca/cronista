@@ -46,10 +46,37 @@ One sentence narrates exactly **one fact**. The Verifier checks, per sentence:
 schema (V1), citations exist (V2), every number — digits or words — appears in
 the narrated fact (V3), every proper name belongs to it (V4), every required
 fact is narrated, not just cited (V5), negations must be backed by a recorded
-zero (V7), and strong claims ("dominated", "match-winner", "clean sheet") are
-allowed only when the fact's data pays for them (V8). ES and EN must agree on
-every figure (V6). 141 red-team-crafted lies live in the permanent test battery;
-all are rejected.
+zero (V7), and strong claims are allowed only when the fact's data pays for
+them (V8) — "dominated" needs the possession, "match-winner" needs the score
+sequence, "wilted in the heat" needs the measured second-half drop in **that**
+match, "bicycle kick" needs the recorded shot type, and an own goal forbids
+crediting "scored" to the rival. ES and EN must agree on every figure (V6).
+Red-team lie batteries crafted across five adversarial audit rounds ship as
+permanent tests; all are rejected.
+
+## A living fictional world
+
+Everything runs on a fully synthetic world — 8 fictional countries with
+climates, one league each (10 teams, double round-robin), all navigable:
+
+- **League mode**: standings, matchdays, top scorers; every result opens the
+  full report.
+- **Conditions that really bite**: heat slows the second half, rain degrades
+  passing, synthetic turf speeds up shots, tall grass bogs down the visitors —
+  each effect statistically proven (A/B over 500 matches), and the chronicle
+  may only mention an effect **measured in that match**.
+- **Consequences across matchdays**: red cards suspend, injuries sideline for
+  1–4 matchdays, lineups adjust — and every player accrues a season rating
+  that unfolds, click by click, into the per-match ratings that produced it.
+- **Goals with soul**: headers, one-on-ones, chips, bicycle kicks (0.25% of
+  goals), halfway-line screamers (0.14%), own goals under the FIFA rule — each
+  with hard coherence constraints on distance, speed, and origin.
+- **Live replays** of any match, minute by minute, with a no-clairvoyance
+  guarantee: the ticker at minute M cites nothing from the future.
+- **The goal as a diorama**: every goal card offers a 2D tactics board and a
+  3D scene — procedural, lazy-loaded (133 KB), where **only the ball moves**,
+  because only the ball's trajectory is recorded data. Player pieces stay
+  still in their recorded zones. The label says so, always.
 
 ## Microsoft technologies
 
@@ -58,7 +85,7 @@ all are rejected.
 |---|---|
 | Microsoft Foundry (Claude / Azure OpenAI deployment) | `src/lib/llm-foundry.ts` |
 | Azure Container Apps (demo hosting) | <!-- PLACEHOLDER: deploy notes --> |
-| GitHub Actions (CI: 500+ tests + Playwright e2e) | `.github/workflows/ci.yml` |
+| GitHub Actions (CI: 1,100+ tests + Playwright e2e) | `.github/workflows/ci.yml` |
 | GitHub CLI | repo management |
 
 ## Quick start (no API key needed)
@@ -69,64 +96,25 @@ npm run dev        # offline stub mode → http://localhost:3000
 ```
 
 The stub writer is deterministic, so the full pipeline — simulator, analyst,
-verifier, Glass Box, live replay — runs offline. Real prose: set
-`CRONISTA_LLM=foundry` and the variables in `.env.example`.
+verifier, Glass Box, league mode, live replay, 3D board — runs offline. Real
+prose: set `CRONISTA_LLM=foundry` and the variables in `.env.example`.
 
 ```bash
-npm test           # 500+ unit/invariant/oracle/lie-battery tests
-npm run test:stats # statistical realism of the simulator, N=1000 matches
-npm run e2e        # the judge's path, driven with a real mouse (Playwright)
+npm test           # 1,137 unit/invariant/oracle/lie-battery tests
+npm run test:stats # statistical realism: N=1000 matches + A/B condition proofs
+npm run e2e        # 41 journeys driven with a real mouse (Playwright)
 ```
-
-## Live replay & broadcast overlay
-
-**Watch live** on any match view replays the simulated match minute by minute
-(labeled **Replay** — it is a deterministic match played back, not a live
-broadcast). At each key moment (goal, red card, half-time, full time) the Writer
-produces a short update from the facts known *up to that minute* — the Analyst
-runs on the event prefix — and the update passes the same Verifier (V1–V8)
-before it reaches the ticker. No clairvoyance: an update at minute M cites only
-events with minute ≤ M and no figure from the future (tested over seeds 1–100).
-If the Writer's drafts are rejected after retries, the ticker shows the fact's
-template instead. Speed ×1 / ×5 / pause, and **Skip to full-time** opens the full
-chronicle.
-
-**Integration point for studios / streaming overlays:** the same verified updates
-are served as timed, machine-readable JSON (the ticker consumes this endpoint, so
-what the viewer sees and what an overlay receives are the same data):
-
-```
-GET /api/overlay/{seed}[?perspectiva=local|visita]
-```
-
-```json
-{
-  "seed": 246, "replay": true, "llm": "stub", "modo": "neutral",
-  "local": "…", "visita": "…",
-  "actualizaciones": [
-    { "minuto": 3, "texto_es": "…", "texto_en": "…", "hecho": "h02",
-      "eventos": ["e004", "e005"], "momento": "gol-e005", "tipo": "gol",
-      "verificacion": "llm", "intentos": 1 }
-  ]
-}
-```
-
-`actualizaciones` is ordered by `minuto`; each entry is one verified sentence
-(`hecho` is the fact it narrates — facts are computed on the event prefix, so
-fact IDs are local to their `momento`; `eventos` are global match event IDs that
-back the sentence, all at minute ≤ `minuto`). `verificacion` is `llm` (written by the Writer, approved) or
-`plantilla` (the fact's template after rejected drafts). The schema is
-`esquemaOverlay` in `src/vivo/overlay.ts` (zod). Updates are cached per
-(seed, moment, deployment, perspective): with a real model, ~5–8 calls per match,
-once.
 
 ## Synthetic data
 
 No real match footage or data is used anywhere. The simulator generates
-football-realistic matches (seeded, byte-for-byte reproducible) whose realism is
-enforced by a statistical test suite over 1,000 matches: ~2.9 goals per match,
-the stronger team wins 63%, red cards in 12.5%, three distinguishable play
-styles. All teams and players are fictional.
+football-realistic matches (seeded, byte-for-byte reproducible): ~2.9 goals
+per match, the stronger team wins 63%, red cards in 12.5%, ~25% draws (Premier
+League: ~24%), three distinguishable play styles, and **~2,100 micro-events
+per match** (passes with 79.6% completion, dribbles, duels) with causal
+continuity — the receiver of a pass is the next actor. Realism is enforced by
+a statistical test suite over 1,000 matches plus per-condition A/B proofs.
+All countries, leagues, teams and players are fictional.
 
 ## Responsible AI & known limitations
 
@@ -134,12 +122,19 @@ styles. All teams and players are fictional.
 - **No unverified sentence reaches the reader.** When the Verifier cannot back a
   sentence after retries, it is omitted or the chronicle falls back to a
   template-based report — visibly labeled, never disguised.
+- **Causal honesty, not just factual honesty.** "They never settled on the tall
+  grass" is blocked when it also rained — the rain, not the grass, could
+  explain the drop. The same losses are never narrated twice under two names.
 - **Honest limits:** verification of numbers, names, structure and listed strong
   claims is deterministic and tested; a novel rhetorical figure outside the
   maintained lexicon could pass. The Glass Box makes every published sentence
   inspectable, and the lie battery grows with every red-team round.
 - Player ratings are computed from events with a clickable breakdown — auditable
-  arithmetic, not AI opinion.
+  arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
+  averaged, with the full list one click away.
 
 <!-- PLACEHOLDER: GitHub tooling section (Copilot review if enabled) -->
 <!-- PLACEHOLDER: screenshots / live replay GIF -->
+<!-- Nota al congelar: reconciliar TODAS las cifras contra la suite real del
+     momento (hoy: 1137 unit, 36 stats, 41 e2e; conteo de mentiras pendiente
+     de recuento exacto) y llenar los placeholders de URLs, eval y GIF. -->
