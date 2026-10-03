@@ -39,7 +39,21 @@ export const POS_DESTINO: Record<Destino, Punto> = {
   centro_del_arco: { x: 50, y: 2.4 },
 };
 
+/**
+ * Brief 020: unidades de la pizarra por metro, para dibujar a escala lo que la zona no alcanza
+ * (la media cancha recorre su distancia REAL). Calibrada con la tabla de zonas: la media distancia
+ * (20–32 m) cae en y ≈ 36. La línea de medio campo queda a 52,5 m del arco.
+ */
+export const UNIDADES_POR_M = 1.22;
+export const MEDIO_CAMPO_M = 52.5;
+const yDeMetros = (m: number) => 2 + m * UNIDADES_POR_M;
+
 export interface GeometriaJugada {
+  /** Brief 020: la definición registrada del tiro y, si fue en propia puerta, dónde la tocó el autor. */
+  definicion?: string;
+  autor?: Punto;
+  /** Alto del dibujo (la media cancha necesita la cancha hasta el medio campo). */
+  alto: number;
   /** Punto del paso que preparó el remate (córner o pase clave con zona registrada). */
   origen?: Punto;
   origenRol?: "corner" | "pase_clave";
@@ -63,8 +77,13 @@ export interface GeometriaJugada {
 export function geometriaJugada(pasos: PasoJugada[], eventos: readonly Evento[]): GeometriaJugada | undefined {
   const tiro = pasos.find((p) => p.rol === "tiro")?.evento;
   if (!tiro?.zonaOrigen || !tiro.destino) return undefined;
-  const remate = POS_ZONA[tiro.zonaOrigen];
-  const geo: GeometriaJugada = { remate, arco: POS_DESTINO[tiro.destino], zona: tiro.zonaOrigen, destino: tiro.destino };
+  // Brief 020: la media cancha se dibuja a su distancia registrada (no a la de su zona).
+  const remate = tiro.definicion === "media_cancha" && tiro.distanciaM !== undefined ? { x: 50, y: yDeMetros(tiro.distanciaM) } : POS_ZONA[tiro.zonaOrigen];
+  const geo: GeometriaJugada = { remate, arco: POS_DESTINO[tiro.destino], zona: tiro.zonaOrigen, destino: tiro.destino, alto: remate.y > 40 ? 76 : 48 };
+  if (tiro.definicion && tiro.definicion !== "jugada") geo.definicion = tiro.definicion;
+  // Brief 020: en propia puerta, el autor la toca en el área chica, camino del arco.
+  const gol = pasos.find((p) => p.rol === "gol")?.evento;
+  if (gol?.autogol === true) geo.autor = { x: geo.arco.x + (remate.x >= 50 ? -3 : 3), y: 6 };
   if (tiro.altura) geo.altura = tiro.altura;
   // Un penal no dibuja origen: jugadaDelGol solo le da la falta (que no tiene zona) — §F2.
   const inmediato = [...pasos].reverse().find((p) => p.rol === "corner" || p.rol === "pase_clave");
@@ -86,7 +105,7 @@ export function geometriaJugada(pasos: PasoJugada[], eventos: readonly Evento[])
 
 /** Los puntos que recorre el balón, en orden (máximo 3: origen → remate → arco). */
 export function recorrido(geo: GeometriaJugada): Punto[] {
-  return [...(geo.origen ? [geo.origen] : []), geo.remate, geo.arco];
+  return [...(geo.origen ? [geo.origen] : []), geo.remate, ...(geo.autor ? [geo.autor] : []), geo.arco];
 }
 
 /**

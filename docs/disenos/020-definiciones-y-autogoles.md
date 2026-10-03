@@ -14,15 +14,36 @@ conscientemente; `hashes-legado.json` ni se toca.
 
 Vocabulario cerrado y su coherencia (todo en `limites.ts`):
 
+**Rev 1.1 (2026-10-02, Fable):** las bandas de velocidad originales de cabezazo
+(40–75) y vaselina (40–70) chocaban con el piso absoluto de 60 km/h que el 015
+juró («jamás un 8 km/h») — error de diseño de este brief, detectado por Opus
+antes de escribir código. Resolución: **las definiciones anidan DENTRO del
+contrato del 015** (el contrato jurado y probado no se reabre): cabezazo 60–75,
+vaselina 60–70. La vaselina real suele ser más lenta, pero ninguna frase
+narrable depende de la velocidad (V8 de vaselina paga por la altura y el mano a
+mano, no por km/h), así que no hay mentira posible; queda como simplificación
+anotada. La altura es campo del 011 y se FILTRA, jamás se reescribe
+(`hashes-011` intacto). mano_a_mano baja su xG a ≥ 0.20 (sigue siendo ocasión
+clara) porque con 0.25 el corpus solo ofrece 6,3 % de goles elegibles y el
+objetivo es 8–14; si re-medido sigue bajo 8 %, se acepta además el pase atrás
+al área chica desde banda (un pase recibido solo frente al portero ES un mano a
+mano), manteniendo las demás coherencias.
+
 | `definicion` | Rareza objetivo (entre GOLES) | Coherencia dura |
 |---|---|---|
 | `jugada` (default) | resto | — |
-| `cabezazo` | 12–18 % | nace de córner o centro (banda), área, altura ≠ rasa, velocidad 40–75 |
-| `mano_a_mano` | 8–14 % | nace de pase clave filtrado, zona central (área chica/frontal), xG ≥ 0.25 |
-| `vaselina` | 1–3 % | altura alta, velocidad 40–70, mano a mano o salida del portero |
+| `cabezazo` | 12–18 % | nace de córner o centro (banda), área, altura ≠ rasa, velocidad 60–75 (reescrita dentro del 015) |
+| `mano_a_mano` | 8–14 % | nace de pase clave filtrado, zona central (área chica/frontal), xG ≥ 0.20 (fallback rev 1.1: + pase atrás al área chica) |
+| `vaselina` | 1–3 % | altura alta (filtrada, no reescrita), velocidad 60–70 (reescrita dentro del 015), mano a mano o salida del portero |
 | `chilena` | 0.1–0.4 % | área chica, nace de centro (banda/córner), altura alta de origen |
 | `tijera` | dentro de la banda de chilena | variante de chilena (cae junta en la rareza) |
-| `media_cancha` | 0.05–0.25 % | `distanciaM` 40–55 (cola nueva SOLO con esta definición), xG ≤ 0.03, velocidad ≥ 85 |
+| `media_cancha` | 0.05–0.25 % | `distanciaM` 40–55 y velocidad ≥ 85 reescritas (cola nueva SOLO con esta definición, exenta de `DISTANCIA_ZONA.media_distancia`), xG ≤ 0.03 |
+
+Fixture de orden: `hashes-015.json` grabado desde 90d37a0 (magnitudes del 015,
+semillas 1..300, con el porqué anotado); la prueba compara todos los tiros
+salvo los que el 020 reescribe a propósito (cabezazo, vaselina, media cancha).
+Costo estadístico aceptado: cola < 70 km/h ~5 % → ~9 % (techo 15 %), media
+92,4 → ~91 (banda 85–95).
 
 - La rareza se mide en la suite estadística (bandas arriba, N = 1000); las
   definiciones también existen en tiros NO convertidos (más frecuentes:

@@ -182,6 +182,30 @@ export const CONDICIONES = {
 } as const;
 
 /**
+ * Brief 020 — perillas de las definiciones y de los autogoles (las rarezas y coherencias que las
+ * acotan viven en limites.ts). La definición se sortea entre las que el tiro ADMITE (coherencia),
+ * en este orden de prioridad, cada una con su probabilidad.
+ */
+export const DEFINICION = {
+  pMediaCancha: 0.12,
+  pChilena: 0.1,
+  /** De las chilenas, cuántas son de tijera. */
+  pTijera: 0.4,
+  pCabezazo: 1,
+  pVaselina: 0.75,
+  pManoAMano: 0.9,
+  /** Velocidad reescrita de la media cancha: [mínimo coherente, este techo]. */
+  velocidadMediaCanchaMax: 112,
+} as const;
+
+export const AUTOGOL = {
+  /** Probabilidad de que el gol de un tiro (no penal) vaya a propia puerta. */
+  p: 0.026,
+  /** Peso por posición del autor (del equipo que lo sufre): sobre todo defensores. */
+  peso: { POR: 0.3, DEF: 6, MED: 2, DEL: 0.5 },
+} as const;
+
+/**
  * Brief 019 — perillas de las lesiones (la banda que las acota, LESIONES_MEDIA, vive en limites).
  * Se sortean con prngDerivado (por falta / por posesión): sin la variante no se consume nada.
  */

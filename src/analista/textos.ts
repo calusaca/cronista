@@ -133,6 +133,11 @@ export const PLANTILLAS = {
     es: "En el césped alto de la cancha de {local}, {equipo} completó el {porcentaje} % de sus pases cortos ({completados} de {intentados}).",
     en: "On the long grass at {local}'s ground, {equipo} completed {porcentaje}% of their short passes ({completados} of {intentados}).",
   },
+  // Brief 020: sin verbos de mérito («marcó»): el autor no anotó para su equipo.
+  autogol: {
+    es: "En el minuto {minuto}, un gol en propia puerta de {jugador} ({equipo}) sumó para {beneficiado}: {local} {marcador_local}–{marcador_visita} {visita}.",
+    en: "In minute {minuto}, an own goal by {jugador} ({equipo}) counted for {beneficiado}: {local} {marcador_local}–{marcador_visita} {visita}.",
+  },
   // Brief 019.
   lesion: {
     es: "{jugador} ({equipo}) se retiró lesionado en el minuto {minuto} (baja de {baja_es}).",

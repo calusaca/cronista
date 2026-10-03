@@ -82,7 +82,8 @@ export function describirEvento(e: Evento, modo: ModoXg = "analista", lengua: Le
       // Brief 015: la distancia del tiro (la velocidad queda para la pizarra: la línea no se satura).
       return `${NOMBRE_EVENTO.tiro}${e.penal ? " (penalty)" : ""} · ${quien} · ${formatoXg(e.xg ?? 0, modo, lengua)}${e.distanciaM !== undefined ? ` · ${e.distanciaM} m` : ""}`;
     case "gol":
-      return `${NOMBRE_EVENTO.gol} · ${quien}`;
+      // Brief 020: el autogol dice que es en propia puerta (el autor es del otro equipo).
+      return e.autogol === true ? `Own goal · ${quien}` : `${NOMBRE_EVENTO.gol} · ${quien}${e.definicion && e.definicion !== "jugada" ? ` · ${DEFINICION_EN[e.definicion]}` : ""}`;
     case "atajada":
       return "Shot saved";
     case "cambio":
@@ -119,6 +120,19 @@ export const MOTIVO_VALORACION_EN: Record<string, string> = {
   atajada: "Save",
   xg_atajado: "xG of the saved shot",
   gol_recibido: "Goal conceded",
+  definicion: "Finish of the matchday (bicycle kick, halfway line, chip)",
+  autogol: "Own goal",
+};
+
+/** Brief 020: cómo se rotula cada definición (chrome en inglés). */
+export const DEFINICION_EN: Record<string, string> = {
+  jugada: "",
+  cabezazo: "Header",
+  mano_a_mano: "One-on-one",
+  vaselina: "Chip",
+  chilena: "Bicycle kick!",
+  tijera: "Scissor kick!",
+  media_cancha: "From the halfway line!",
 };
 
 export const POSICION_EN: Record<string, string> = { POR: "GK", DEF: "DF", MED: "MF", DEL: "FW" };

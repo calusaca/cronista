@@ -33,6 +33,10 @@ import {
   FRANJAS,
   GRADOS_C,
   FRASES_CANAL,
+  FRASES_DEFINICION,
+  MERITO,
+  PROPIA_PUERTA,
+  trasMeritoPropiaPuerta,
   FUERA_DEL_AREA,
   MISIL,
   FRASES_INFERIORIDAD,
@@ -429,6 +433,23 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
       });
     if (!ok) h.push({ regla: "V8", detalle: `«${m[0]}»: ese gol no fue el último del partido dejando al ganador por delante` });
   });
+  // Brief 020 — con un autogol como principal, ningún verbo de mérito salvo «… en propia puerta».
+  if (ctx.hechos.some((x) => x.tipo === "autogol")) {
+    const sigue = trasMeritoPropiaPuerta(lengua);
+    for (const m of s.matchAll(new RegExp(MERITO[lengua].source, MERITO[lengua].flags))) {
+      const tras = s.slice((m.index as number) + m[0].length, (m.index as number) + m[0].length + 40);
+      if (!sigue.test(tras)) h.push({ regla: "V8", detalle: `«${m[0]}»: el autogol no se le acredita a nadie como mérito (solo «${m[0]} en propia puerta / own goal»)` });
+    }
+  }
+  s = quitar(s, palabras(PROPIA_PUERTA[lengua]), (m) => {
+    if (!ctx.hechos.some((x) => x.tipo === "autogol")) h.push({ regla: "V8", detalle: `«${m[0]}» exige el hecho autogol como principal` });
+  });
+  // Brief 020 — definiciones computables: la frase solo con esa definición registrada.
+  for (const [def, fr] of Object.entries(FRASES_DEFINICION)) {
+    s = quitar(s, palabras(fr[lengua]), (m) => {
+      if (!ctx.hechos.some((x) => x.datos.definicion === def)) h.push({ regla: "V8", detalle: `«${m[0]}»: el hecho principal no registra la definición ${def}` });
+    });
+  }
   // Brief 015 — magnitudes del tiro computables.
   s = quitar(s, FUERA_DEL_AREA[lengua], (m) => {
     if (!ctx.hechos.some((x) => typeof x.datos.distancia_m === "number" && x.datos.distancia_m >= FUERA_DEL_AREA_M))

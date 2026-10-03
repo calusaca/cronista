@@ -2,10 +2,10 @@
 // Cada función devuelve la lista de violaciones encontradas (vacía = cumple).
 // La prop. 1 (determinismo) se prueba directamente en la suite.
 
-import { MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
-import { cornerDelTiro, enBanda } from "./espacial";
+import { ladoDelJugador, MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
+import { cornerDelTiro, enBanda, origenDelTiro } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
-import { CESPEDES, CLIMAS_PARTIDO, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
+import { CESPEDES, CLIMAS_PARTIDO, DEF_CABEZAZO, DEF_MANO_A_MANO, DEF_MEDIA_CANCHA, DEF_VASELINA, DEFINICIONES, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
@@ -66,7 +66,7 @@ export function verificarExpulsados(p: Partido): string[] {
       if (exp !== undefined) err.push(`${e.id} (${e.tipo}): ${e.sale} sale en un cambio tras su expulsión en ${exp}`);
     }
     if (!e.jugador) continue;
-    const clave = `${e.equipo}|${e.jugador}`;
+    const clave = `${ladoDelJugador(e)}|${e.jugador}`;
     const exp = fuera.get(clave);
     if (exp !== undefined) err.push(`${e.id} (${e.tipo}): ${e.jugador} aparece tras su expulsión en ${exp}`);
     if (e.tipo === "tarjeta_roja") fuera.set(clave, e.id);
@@ -89,12 +89,14 @@ export function verificarJugadores(p: Partido): string[] {
   const entraron = new Set<string>();
   for (const e of p.eventos) {
     if (!e.jugador) continue;
-    const idx = plantilla[e.equipo].indexOf(e.jugador);
+    // Brief 020: el autor de un autogol es del equipo que lo SUFRE.
+    const lado = ladoDelJugador(e);
+    const idx = plantilla[lado].indexOf(e.jugador);
     if (idx < 0) {
-      err.push(`${e.id} (${e.tipo}): ${e.jugador} no está en la plantilla ${e.equipo}`);
+      err.push(`${e.id} (${e.tipo}): ${e.jugador} no está en la plantilla ${lado}`);
       continue;
     }
-    const clave = `${e.equipo}|${e.jugador}`;
+    const clave = `${lado}|${e.jugador}`;
     const esSuplente = idx >= TITULARES;
     if (e.tipo === "cambio") {
       if (!esSuplente) err.push(`${e.id}: cambio con titular ${e.jugador} como entrante`);
@@ -162,7 +164,7 @@ export function verificarSalidas(p: Partido): string[] {
   for (const e of p.eventos) {
     for (const nombre of [e.jugador, e.sale]) {
       if (nombre === undefined) continue;
-      const previo = salieron.get(`${e.equipo}|${nombre}`);
+      const previo = salieron.get(`${nombre === e.jugador ? ladoDelJugador(e) : e.equipo}|${nombre}`);
       if (previo !== undefined) err.push(`${e.id} (${e.tipo}): ${nombre} aparece tras salir en ${previo}`);
     }
     if (e.tipo !== "cambio" || e.sale === undefined) continue;
@@ -191,13 +193,20 @@ export function verificarContrato(p: Partido): string[] {
     if ((e.tipo === "tiro" || e.tipo === "gol") && !xgValido(e.xg)) err.push(`${e.id}: ${e.tipo} con xg inválido (${String(e.xg)})`);
     if (e.tipo === "cambio" && (typeof e.sale !== "string" || e.sale === "")) err.push(`${e.id}: cambio sin sale`);
     if (e.tipo !== "cambio" && e.sale !== undefined) err.push(`${e.id}: sale en ${e.tipo}`);
+    // Brief 020: `autogol` solo en gol, solo con la variante, nunca de penal.
+    if (e.autogol !== undefined) {
+      if (e.tipo !== "gol" || e.autogol !== true) err.push(`${e.id}: autogol en ${e.tipo}`);
+      if (p.config.variantes?.autogoles !== true) err.push(`${e.id}: autogol sin la variante`);
+      const t = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+      if (t?.penal === true) err.push(`${e.id}: autogol de un penal`);
+    }
     // Brief 019: `baja` solo en lesion, y siempre en lesion.
     if (e.tipo === "lesion" ? !Number.isInteger(e.baja) || (e.baja as number) < LESION_JORNADAS.min || (e.baja as number) > LESION_JORNADAS.max : e.baja !== undefined)
       err.push(`${e.id}: baja ${String(e.baja)} en ${e.tipo}`);
     if (e.tipo === "gol" && e.relacionadoCon) {
       const t = porId.get(e.relacionadoCon);
       if (t && t.xg !== e.xg) err.push(`${e.id}: gol no hereda el xg de su tiro`);
-      if (t && t.jugador !== e.jugador) err.push(`${e.id}: gol de otro jugador que el del tiro`);
+      if (t && e.autogol !== true && t.jugador !== e.jugador) err.push(`${e.id}: gol de otro jugador que el del tiro`);
     }
     if ((e.tipo === "tarjeta_amarilla" || e.tipo === "tarjeta_roja") && e.relacionadoCon) {
       const f = porId.get(e.relacionadoCon);
@@ -268,7 +277,10 @@ export function verificarEspacial(p: Partido): string[] {
         if (d !== DISTANCIA_ZONA.punto_penal.min) err.push(`${e.id}: penal desde ${d} m`);
       } else {
         const z = e.zonaOrigen;
-        if (z && (d < DISTANCIA_ZONA[z].min || d > DISTANCIA_ZONA[z].max)) err.push(`${e.id}: ${z} a ${d} m`);
+        // Brief 020: la cola nueva (media cancha) es la ÚNICA exenta de la banda de su zona.
+        if (e.definicion === "media_cancha") {
+          if (d < DEF_MEDIA_CANCHA.distancia.min || d > DEF_MEDIA_CANCHA.distancia.max) err.push(`${e.id}: media cancha a ${d} m`);
+        } else if (z && (d < DISTANCIA_ZONA[z].min || d > DISTANCIA_ZONA[z].max)) err.push(`${e.id}: ${z} a ${d} m`);
         if (xg >= XG_ALTO.xgMin && d > XG_ALTO.distanciaMax) err.push(`${e.id}: xG ${xg} desde ${d} m`);
         if (d >= TIRO_LEJANO.distanciaMin && Math.round(xg * 100) > Math.round(TIRO_LEJANO.xgMax * 100)) err.push(`${e.id}: ${d} m con xG ${xg}`);
       }
@@ -282,6 +294,45 @@ export function verificarEspacial(p: Partido): string[] {
     if ((e.tipo === "gol" || e.tipo === "atajada") && e.relacionadoCon) {
       const t = porId.get(e.relacionadoCon);
       for (const k of ["distanciaM", "velocidadKmh"] as const) if (t && t[k] !== undefined && e[k] !== t[k]) err.push(`${e.id}: ${k} ${String(e[k])} ≠ su tiro (${t[k]})`);
+    }
+    // Brief 020 (rev 1.1) — la definición: vocabulario, dónde vive y su coherencia dura.
+    if (e.definicion !== undefined) {
+      if (!DEFINICIONES.includes(e.definicion)) err.push(`${e.id}: definicion fuera de vocabulario (${String(e.definicion)})`);
+      if (!["tiro", "gol", "atajada"].includes(e.tipo)) err.push(`${e.id}: definicion en ${e.tipo}`);
+      if (e.tipo === "gol" && e.autogol === true) err.push(`${e.id}: un autogol no lleva la definición del tirador`);
+      const t = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
+      if ((e.tipo === "gol" || e.tipo === "atajada") && t && t.definicion !== e.definicion) err.push(`${e.id}: definicion ≠ su tiro`);
+    }
+    if (e.tipo === "tiro" && e.definicion !== undefined && e.definicion !== "jugada") {
+      const o = origenDelTiro(p.eventos, i);
+      const v = e.velocidadKmh ?? 0;
+      const xgc = Math.round((e.xg ?? 0) * 100);
+      const area = e.zonaOrigen === "area_chica" || e.zonaOrigen === "frontal_del_area";
+      const mal = (m: string) => err.push(`${e.id}: ${e.definicion} ${m}`);
+      if (e.penal === true) mal("en un penal");
+      switch (e.definicion) {
+        case "cabezazo":
+          if (!area || !o.centro) mal("sin centro al área");
+          if (e.altura === "raso") mal("a ras del suelo");
+          if (v < DEF_CABEZAZO.velocidad.min || v > DEF_CABEZAZO.velocidad.max) mal(`a ${v} km/h`);
+          break;
+        case "mano_a_mano":
+        case "vaselina":
+          if (!area || !(o.filtrado || o.atras)) mal("sin pase filtrado ni pase atrás al área");
+          if (xgc < Math.round(DEF_MANO_A_MANO.xgMin * 100)) mal(`con xG ${e.xg}`);
+          if (e.definicion === "vaselina" && e.altura !== "alta") mal(`con altura ${String(e.altura)}`);
+          if (e.definicion === "vaselina" && (v < DEF_VASELINA.velocidad.min || v > DEF_VASELINA.velocidad.max)) mal(`a ${v} km/h`);
+          break;
+        case "chilena":
+        case "tijera":
+          if (e.zonaOrigen !== "area_chica" || !o.centro || e.altura !== "alta") mal("sin centro alto al área chica");
+          break;
+        case "media_cancha":
+          if (e.zonaOrigen !== "media_distancia") mal(`desde ${String(e.zonaOrigen)}`);
+          if (xgc > Math.round(DEF_MEDIA_CANCHA.xgMax * 100)) mal(`con xG ${e.xg}`);
+          if (v < DEF_MEDIA_CANCHA.velocidadMin) mal(`a ${v} km/h`);
+          break;
+      }
     }
     if (e.tipo === "pase_clave" && e.zonaOrigen !== undefined && !ZONAS_ORIGEN_PASE.includes(e.zonaOrigen))
       err.push(`${e.id}: pase clave desde ${e.zonaOrigen}`);
@@ -337,7 +388,7 @@ export function verificarLesiones(p: Partido): string[] {
     if (p.config.variantes?.lesiones !== true) err.push(`${e.id}: lesion sin la variante`);
     const sig = p.eventos[i + 1];
     if (!sig || sig.tipo !== "cambio" || sig.equipo !== e.equipo || sig.sale !== e.jugador || sig.minuto !== e.minuto) err.push(`${e.id}: lesion de ${String(e.jugador)} sin su cambio forzado`);
-    for (const x of p.eventos.slice(i + 2)) if ((x.jugador === e.jugador || x.sale === e.jugador) && x.equipo === e.equipo) err.push(`${x.id}: ${String(e.jugador)} reaparece tras lesionarse en ${e.id}`);
+    for (const x of p.eventos.slice(i + 2)) if ((x.jugador === e.jugador && ladoDelJugador(x) === e.equipo) || (x.sale === e.jugador && x.equipo === e.equipo)) err.push(`${x.id}: ${String(e.jugador)} reaparece tras lesionarse en ${e.id}`);
     if (e.relacionadoCon !== undefined) {
       const j = porId.get(e.relacionadoCon);
       const f = j === undefined ? undefined : p.eventos[j];

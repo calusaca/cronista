@@ -697,3 +697,35 @@ export const CONSECUENCIAS: EntradaJuicio[] = [
     requisito: `«diezmado / depleted» exige bajas_del_partido con ${BAJAS_DIEZMADO_MIN} bajas o más`,
   },
 ];
+
+// ---------------------------------------------------------------------------------
+// Brief 020 — definiciones y autogoles, COMPUTABLES (V8). «de chilena / bicycle kick» solo si el
+// hecho principal registra esa `definicion`; «en propia puerta / own goal» solo con el hecho
+// `autogol`; y con un autogol como principal, un verbo de mérito («marcó / scored») solo vale
+// seguido de la propia puerta («marcó en propia puerta»): jamás se le acredita el gol al rival.
+// ---------------------------------------------------------------------------------
+
+export const FRASES_DEFINICION: Record<"cabezazo" | "mano_a_mano" | "vaselina" | "chilena" | "tijera" | "media_cancha", Record<Lengua, readonly string[]>> = {
+  chilena: { es: ["de chilena", "chilena"], en: ["bicycle kick", "overhead kick", "overhead"] },
+  tijera: { es: ["de tijera", "tijera", "tijereta"], en: ["scissor kick", "scissors kick"] },
+  media_cancha: { es: ["desde media cancha", "desde el medio campo", "desde su propio campo"], en: ["from the halfway line", "from inside his own half", "from halfway"] },
+  vaselina: { es: ["de vaselina", "vaselina", "por encima del portero"], en: ["chipped the keeper", "chipped", "a chip", "lobbed"] },
+  mano_a_mano: { es: ["mano a mano"], en: ["one-on-one", "one on one"] },
+  cabezazo: { es: ["de cabeza", "cabezazo", "con la cabeza"], en: ["header", "headed", "with his head"] },
+};
+
+export const PROPIA_PUERTA: Record<Lengua, readonly string[]> = {
+  es: ["en propia puerta", "en su propia puerta", "en propia meta", "en su propia meta", "autogol"],
+  en: ["own goal", "own-goal", "into his own net", "into their own net", "own net"],
+};
+
+export const MERITO: Record<Lengua, RegExp> = {
+  es: palabras(["marcó", "anotó", "convirtió", "firmó", "metió"]),
+  en: palabras(["scored", "netted", "converted", "struck", "fired home"]),
+};
+
+/** «(un|an) (gol)? en propia puerta / own goal» AL INICIO de un texto: lo que puede seguir a un verbo de mérito con un autogol. */
+export function trasMeritoPropiaPuerta(lengua: Lengua): RegExp {
+  const alts = [...PROPIA_PUERTA[lengua]].sort((a, b) => b.length - a.length).map((a) => escapar(a).replace(/ /g, "\\s+"));
+  return new RegExp(`^\\s*(?:(?:an?|un|uno|el|su|his|their)\\s+)?(?:gol\\s+)?(?:${alts.join("|")})(?![\\p{L}\\p{N}])`, "iu");
+}

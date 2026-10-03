@@ -262,14 +262,16 @@ describe("016 · oráculo de la tabla y de los goleadores", () => {
     const cuenta = new Map<string, number>();
     for (const { p } of simulados)
       for (const e of p.eventos)
-        if (e.tipo === "gol") {
+        // Brief 020 (regla FIFA): el autogol no es del goleador — ni del autor ni del rival.
+        if (e.tipo === "gol" && e.autogol !== true) {
           const k = `${(e.equipo === "local" ? p.config.local : p.config.visita).nombre}|${e.jugador}`;
           cuenta.set(k, (cuenta.get(k) ?? 0) + 1);
         }
     const desdeTemporada = new Map(temporada.goleadores.map((g) => [`${g.equipo}|${g.jugador}`, g.goles]));
     expect(desdeTemporada).toEqual(cuenta);
     const total = [...cuenta.values()].reduce((a, b) => a + b, 0);
-    expect(total).toBe(marcadoresDeEventos.reduce((s, x) => s + x.gl + x.gv, 0));
+    const autogoles = simulados.reduce((n, { p }) => n + p.eventos.filter((e) => e.tipo === "gol" && e.autogol === true).length, 0);
+    expect(total + autogoles).toBe(marcadoresDeEventos.reduce((s, x) => s + x.gl + x.gv, 0));
     // Orden: goles desc; el primero es el máximo.
     const g = temporada.goleadores;
     for (let i = 1; i < g.length; i++) expect(g[i - 1]!.goles).toBeGreaterThanOrEqual(g[i]!.goles);

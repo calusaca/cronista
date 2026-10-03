@@ -22,7 +22,7 @@
 // - Brief 009: el portero en el arco (`porteros`) vive ahora en valoracion.ts, que lo
 //   comparte con la valoración de jugadores; la regla es la misma.
 
-import type { Evento, Lado, Partido } from "../sim/tipos";
+import { ladoDelJugador, type Evento, type Lado, type Partido } from "../sim/tipos";
 import { micro, type MicroPartido } from "../sim/micro";
 import { CANAL_TEXTO, CANCHA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
 import { medirCalor, medirCancha, medirPresion } from "./condiciones";
@@ -168,7 +168,8 @@ function marcadorPorPeriodo(c: Ctx): Borrador[] {
 }
 
 function golesAnotados(c: Ctx): Borrador[] {
-  return c.goles.map((g) => {
+  // Brief 020: el autogol no es «X marcó» (va como autogol, hecho propio).
+  return c.goles.filter((g) => g.ev.autogol !== true).map((g) => {
     const tiro = g.ev.relacionadoCon ? c.porId.get(g.ev.relacionadoCon) : undefined;
     const penal = tiro?.penal === true;
     return hecho(c, "gol_anotado", penal ? "gol_penal" : "gol", [g.ev.id, tiro?.id], {
@@ -183,14 +184,33 @@ function golesAnotados(c: Ctx): Borrador[] {
       // Brief 015: las magnitudes del tiro (si el partido las trae) para que V3/V6 las verifiquen.
       ...(tiro?.distanciaM !== undefined ? { distancia_m: tiro.distanciaM } : {}),
       ...(tiro?.velocidadKmh !== undefined ? { velocidad_kmh: tiro.velocidadKmh } : {}),
+      // Brief 020: la definición registrada (V8 la exige para «de chilena», «mano a mano»…).
+      ...(tiro?.definicion !== undefined ? { definicion: tiro.definicion } : {}),
     });
   });
+}
+
+/** Brief 020: `autogol` — el autor es del equipo que lo SUFRE; cita el gol y el tiro rival. */
+function autogoles(c: Ctx): Borrador[] {
+  return c.goles
+    .filter((g) => g.ev.autogol === true)
+    .map((g) =>
+      hecho(c, "autogol", "autogol", [g.ev.id, g.ev.relacionadoCon], {
+        ...equipos(c),
+        jugador: g.ev.jugador ?? "",
+        equipo: c.nombre[ladoDelJugador(g.ev)],
+        beneficiado: c.nombre[g.ev.equipo],
+        minuto: minutoTxt(g.ev.minuto),
+        marcador_local: g.marcador.local,
+        marcador_visita: g.marcador.visita,
+      }),
+    );
 }
 
 function dobletes(c: Ctx): Borrador[] {
   const porJugador = new Map<string, GolCtx[]>();
   for (const g of c.goles) {
-    if (!g.ev.jugador) continue;
+    if (!g.ev.jugador || g.ev.autogol === true) continue;
     const clave = `${g.ev.equipo}|${g.ev.jugador}`;
     porJugador.set(clave, [...(porJugador.get(clave) ?? []), g]);
   }
@@ -254,6 +274,7 @@ function remontadas(c: Ctx): Borrador[] {
 function golesTempranosYTardios(c: Ctx): Borrador[] {
   const out: Borrador[] = [];
   for (const g of c.goles) {
+    if (g.ev.autogol === true) continue; // brief 020: «X marcó en el minuto…» no es de un autogol
     const tipo: TipoHecho | undefined =
       g.ev.minuto < GOL_TEMPRANO_ANTES_DE ? "gol_temprano" : g.ev.minuto > GOL_TARDIO_DESPUES_DE ? "gol_tardio" : undefined;
     if (!tipo) continue;
@@ -740,6 +761,7 @@ export function analizar(partido: Partido): Hecho[] {
     ...resultadoFinal(c),
     ...marcadorPorPeriodo(c),
     ...golesAnotados(c),
+    ...autogoles(c),
     ...dobletes(c),
     ...remontadas(c),
     ...golesTempranosYTardios(c),

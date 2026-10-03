@@ -20,7 +20,7 @@
 //   plantilla, luego local antes que visita. Si la mayor nota tiene el desglose vacío
 //   (nadie hizo nada medible), no hay figura: no se inventa.
 
-import type { Evento, Lado, Partido, Posicion } from "../sim/tipos";
+import { ladoDelJugador, type Evento, type Lado, type Partido, type Posicion } from "../sim/tipos";
 import { VALORACION } from "./umbrales";
 
 export type MotivoValoracion =
@@ -35,7 +35,10 @@ export type MotivoValoracion =
   | "fuera_de_juego"
   | "atajada"
   | "xg_atajado"
-  | "gol_recibido";
+  | "gol_recibido"
+  // Brief 020.
+  | "definicion"
+  | "autogol";
 
 export interface EntradaDesglose {
   evento: string; // ID de un evento real del partido
@@ -70,6 +73,9 @@ const C = {
   fuera_de_juego: cent(VALORACION.fuera_de_juego),
   atajada: cent(VALORACION.atajada),
   gol_recibido: cent(VALORACION.gol_recibido),
+  definicion_legendaria: cent(VALORACION.definicion_legendaria),
+  definicion_vaselina: cent(VALORACION.definicion_vaselina),
+  autogol: cent(VALORACION.autogol),
 };
 
 /**
@@ -130,10 +136,19 @@ export function valorar(p: Partido): Valoracion[] {
   }
 
   ev.forEach((e, i) => {
-    if (e.jugador !== undefined) participa.add(`${e.equipo}|${e.jugador}`);
+    if (e.jugador !== undefined) participa.add(`${ladoDelJugador(e)}|${e.jugador}`);
     switch (e.tipo) {
       case "gol": {
+        if (e.autogol === true) {
+          // Brief 020: el autor (del equipo que lo sufre) resta; su portero recibe el gol.
+          poner(ladoDelJugador(e), e.jugador, e, C.autogol, "autogol");
+          poner(rival(e.equipo), gk[rival(e.equipo)][i], e, C.gol_recibido, "gol_recibido");
+          break;
+        }
         poner(e.equipo, e.jugador, e, C.gol, "gol");
+        // Brief 020: la jugada de la jornada suma (chilena / tijera / media cancha; vaselina).
+        if (e.definicion === "chilena" || e.definicion === "tijera" || e.definicion === "media_cancha") poner(e.equipo, e.jugador, e, C.definicion_legendaria, "definicion");
+        else if (e.definicion === "vaselina") poner(e.equipo, e.jugador, e, C.definicion_vaselina, "definicion");
         const xg = cent(e.xg ?? porId.get(e.relacionadoCon ?? "")?.xg ?? 0);
         if (xg < C.gol_dificil_xg_max) poner(e.equipo, e.jugador, e, C.gol_dificil, "gol_dificil");
         poner(rival(e.equipo), gk[rival(e.equipo)][i], e, C.gol_recibido, "gol_recibido");

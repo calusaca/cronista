@@ -60,8 +60,10 @@ export type Calendario = Cruce[][];
 
 export interface GolLiga {
   jugador: string;
-  equipo: string; // nombre del equipo que anota
+  equipo: string; // nombre del equipo que SUMA el gol
   minuto: number;
+  /** Brief 020: en propia puerta (el autor es del otro equipo; no cuenta para goleadores). */
+  autogol?: true;
 }
 
 export interface PartidoLiga {

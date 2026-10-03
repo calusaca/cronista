@@ -121,6 +121,8 @@ function esperados(p: Partido): Map<string, Esperado> {
         // Brief 015: las magnitudes de SU tiro, tal cual.
         ...(tiro.distanciaM !== undefined ? { distancia_m: tiro.distanciaM } : {}),
         ...(tiro.velocidadKmh !== undefined ? { velocidad_kmh: tiro.velocidadKmh } : {}),
+        // Brief 020: la definición de SU tiro, tal cual.
+        ...(tiro.definicion !== undefined ? { definicion: tiro.definicion } : {}),
       },
       cifras: [...cifrasDe(mt(g.minuto)), xg, String(m.local), String(m.visita)],
       nombres: [g.jugador as string, nombre.local, nombre.visita],
@@ -363,6 +365,9 @@ function esperados(p: Partido): Map<string, Esperado> {
       if (e.tipo === "gol") {
         sumar(e.equipo, e.jugador, e, C(V.gol), true);
         if (cen(e.xg) < C(V.gol_dificil_xg_max)) sumar(e.equipo, e.jugador, e, C(V.gol_dificil), true);
+        // Brief 020: el bonus de la definición (no entra al desempate por goles).
+        if (["chilena", "tijera", "media_cancha"].includes(e.definicion ?? "")) sumar(e.equipo, e.jugador, e, C(V.definicion_legendaria));
+        if (e.definicion === "vaselina") sumar(e.equipo, e.jugador, e, C(V.definicion_vaselina));
         sumar(def, arco[def], e, C(V.gol_recibido));
       }
       if (e.tipo === "tiro" && atajado.has(e.id)) sumar(e.equipo, e.jugador, e, C(V.tiro_atajado));

@@ -10,8 +10,13 @@
 //   con la pizarra;
 // - un penal nunca es «tras córner».
 
-import { ESPACIAL } from "./parametros";
+import { DEFINICION, ESPACIAL } from "./parametros";
 import {
+  DEF_CABEZAZO,
+  DEF_MANO_A_MANO,
+  DEF_MEDIA_CANCHA,
+  DEF_VASELINA,
+  type Definicion,
   DISTANCIA_ZONA,
   LADO_PORTERO_DE,
   TIPOS_ATAQUE,
@@ -116,6 +121,9 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
         // Brief 015: magnitudes del mismo stream derivado, DESPUÉS de los sorteos del 011
         // (así zona, destino y altura no cambian).
         Object.assign(e, magnitudes(rng, e.zonaOrigen, e.xg ?? 0, e.penal === true, extraVelocidad(condiciones)));
+        // Brief 020: la definición, del MISMO stream, DESPUÉS de los sorteos del 015 (así las
+        // magnitudes de los demás tiros no cambian; las reescrituras son a propósito y acotadas).
+        definir(rng, e, origenDelTiro(eventos, i));
         break;
       }
       case "pase_clave":
@@ -132,6 +140,8 @@ export function enriquecerEspacial(eventos: Evento[], semilla: number, origenes:
   for (const e of eventos) {
     const tiro = e.relacionadoCon ? porId.get(e.relacionadoCon) : undefined;
     if (!tiro || tiro.tipo !== "tiro") continue;
+    // Brief 020: la atajada hereda la definición; el gol también, salvo el autogol (no es del tirador).
+    if (tiro.definicion !== undefined && (e.tipo === "atajada" || (e.tipo === "gol" && e.autogol !== true))) e.definicion = tiro.definicion;
     if (e.tipo === "gol") {
       if (tiro.zonaOrigen) e.zonaOrigen = tiro.zonaOrigen;
       if (tiro.destino) e.destino = tiro.destino;
@@ -184,4 +194,81 @@ export function proyeccionLegado(p: Partido): Partido {
   const c = JSON.parse(JSON.stringify(p)) as Partido;
   for (const e of c.eventos) for (const k of CAMPOS_ESPACIALES) delete e[k];
   return c;
+}
+
+// ---------------------------------------------------------------------------------
+// Brief 020 (rev 1.1) — la definición del tiro. UNA definición de los orígenes (la comparten el
+// generador, el invariante y la pizarra, como cornerDelTiro).
+// ---------------------------------------------------------------------------------
+
+export interface OrigenDefinicion {
+  /** Tiro «tras córner» (cornerDelTiro). */
+  corner: boolean;
+  /** El pase clave inmediatamente anterior, del mismo equipo (si lo hay). */
+  pase?: Evento;
+  /** Centro: tras córner o tras un pase clave desde banda. */
+  centro: boolean;
+  /** Pase filtrado: pase clave por el centro (frontal o media distancia), no tras córner. */
+  filtrado: boolean;
+  /** Pase atrás: pase clave desde banda a un remate del área chica, no tras córner (rev 1.1). */
+  atras: boolean;
+}
+
+const BANDA_PASE = new Set<string>(["banda_izquierda", "banda_derecha"]);
+
+export function origenDelTiro(eventos: readonly Evento[], i: number): OrigenDefinicion {
+  const tiro = eventos[i] as Evento;
+  const corner = cornerDelTiro(eventos, i) !== undefined;
+  const prev = eventos[i - 1];
+  const pase = prev?.tipo === "pase_clave" && prev.equipo === tiro.equipo ? prev : undefined;
+  const desdeBanda = pase !== undefined && BANDA_PASE.has(pase.zonaOrigen ?? "");
+  return {
+    corner,
+    ...(pase ? { pase } : {}),
+    centro: corner || desdeBanda,
+    filtrado: !corner && pase !== undefined && (pase.zonaOrigen === "frontal_del_area" || pase.zonaOrigen === "media_distancia"),
+    atras: !corner && desdeBanda && tiro.zonaOrigen === "area_chica",
+  };
+}
+
+const enArea = (z: ZonaOrigen | undefined) => z === "area_chica" || z === "frontal_del_area";
+
+/** ¿El tiro admite esta definición? (coherencias de la tabla del brief, sobre lo ya sorteado; altura FILTRADA). */
+export function admite(def: Definicion, e: Evento, o: OrigenDefinicion): boolean {
+  if (e.penal === true) return def === "jugada";
+  const xg = e.xg ?? 0;
+  switch (def) {
+    case "jugada":
+      return true;
+    case "media_cancha":
+      return e.zonaOrigen === "media_distancia" && Math.round(xg * 100) <= Math.round(DEF_MEDIA_CANCHA.xgMax * 100);
+    case "chilena":
+    case "tijera":
+      return e.zonaOrigen === "area_chica" && o.centro && e.altura === "alta";
+    case "cabezazo":
+      // Anidado en el 015: un remate lento (≤ 75 km/h) solo de cerca — desde VELOCIDAD_LEJANO.distanciaMin
+      // el 015 exige ≥ 80 km/h.
+      return enArea(e.zonaOrigen) && o.centro && e.altura !== undefined && e.altura !== "raso" && (e.distanciaM ?? 0) < VELOCIDAD_LEJANO.distanciaMin;
+    case "mano_a_mano":
+      return enArea(e.zonaOrigen) && (o.filtrado || o.atras) && Math.round(xg * 100) >= Math.round(DEF_MANO_A_MANO.xgMin * 100);
+    case "vaselina":
+      return admite("mano_a_mano", e, o) && e.altura === "alta" && (e.distanciaM ?? 0) < VELOCIDAD_LEJANO.distanciaMin;
+  }
+}
+
+/** Sortea la definición y hace las reescrituras acotadas del brief (rev 1.1). */
+function definir(rng: Rng, e: Evento, o: OrigenDefinicion): void {
+  let def: Definicion = "jugada";
+  if (admite("media_cancha", e, o) && rng.chance(DEFINICION.pMediaCancha)) def = "media_cancha";
+  else if (admite("chilena", e, o) && rng.chance(DEFINICION.pChilena)) def = rng.chance(DEFINICION.pTijera) ? "tijera" : "chilena";
+  else if (admite("cabezazo", e, o) && rng.chance(DEFINICION.pCabezazo)) def = "cabezazo";
+  else if (admite("vaselina", e, o) && rng.chance(DEFINICION.pVaselina)) def = "vaselina";
+  else if (admite("mano_a_mano", e, o) && rng.chance(DEFINICION.pManoAMano)) def = "mano_a_mano";
+  e.definicion = def;
+  if (def === "cabezazo") e.velocidadKmh = rng.int(DEF_CABEZAZO.velocidad.min, DEF_CABEZAZO.velocidad.max);
+  if (def === "vaselina") e.velocidadKmh = rng.int(DEF_VASELINA.velocidad.min, DEF_VASELINA.velocidad.max);
+  if (def === "media_cancha") {
+    e.distanciaM = rng.int(DEF_MEDIA_CANCHA.distancia.min, DEF_MEDIA_CANCHA.distancia.max);
+    e.velocidadKmh = rng.int(DEF_MEDIA_CANCHA.velocidadMin, DEFINICION.velocidadMediaCanchaMax);
+  }
 }

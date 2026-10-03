@@ -29,14 +29,18 @@ const EVENTO_DE: Record<MotivoValoracion, { tipo: Evento["tipo"]; delJugador: bo
   atajada: { tipo: "atajada", delJugador: false },
   xg_atajado: { tipo: "atajada", delJugador: false },
   gol_recibido: { tipo: "gol", delJugador: false },
+  // Brief 020: el bonus de definición es del goleador; el autogol, del AUTOR (equipo que lo sufre: se revisa aparte).
+  definicion: { tipo: "gol", delJugador: true },
+  autogol: { tipo: "gol", delJugador: true },
 };
 
 /** Peso esperado de cada motivo (desde umbrales); el xG atajado depende del tiro. */
 function pesoEsperado(m: MotivoValoracion, e: Evento, p: Partido): number {
   if (m === "xg_atajado") return Math.round(C(p.eventos.find((x) => x.id === e.relacionadoCon)?.xg ?? 0) * V.xg_atajado_factor);
-  const pesos: Record<Exclude<MotivoValoracion, "xg_atajado">, number> = {
+  if (m === "definicion") return C(e.definicion === "vaselina" ? V.definicion_vaselina : V.definicion_legendaria);
+  const pesos: Record<Exclude<MotivoValoracion, "xg_atajado" | "definicion">, number> = {
     gol: V.gol, gol_dificil: V.gol_dificil, tiro_atajado: V.tiro_atajado, pase_clave: V.pase_clave, corner: V.corner, amarilla: V.amarilla,
-    roja: V.roja, falta: V.falta, fuera_de_juego: V.fuera_de_juego, atajada: V.atajada, gol_recibido: V.gol_recibido,
+    roja: V.roja, falta: V.falta, fuera_de_juego: V.fuera_de_juego, atajada: V.atajada, gol_recibido: V.gol_recibido, autogol: V.autogol,
   };
   return C(pesos[m]);
 }
@@ -67,7 +71,8 @@ describe("009 · cálculo", () => {
             continue;
           }
           if (e.tipo !== regla.tipo) fallas.push(`${p.config.seed} ${v.jugador}: ${d.motivo} cita un ${e.tipo}`);
-          if (regla.delJugador && (e.jugador !== v.jugador || e.equipo !== v.lado)) fallas.push(`${p.config.seed} ${v.jugador}: ${d.evento} no es suyo`);
+          const ladoEv = e.autogol === true ? (e.equipo === "local" ? "visita" : "local") : e.equipo;
+          if (regla.delJugador && (e.jugador !== v.jugador || ladoEv !== v.lado)) fallas.push(`${p.config.seed} ${v.jugador}: ${d.evento} no es suyo`);
           if (!regla.delJugador && (e.equipo === v.lado || v.posicion === undefined)) fallas.push(`${p.config.seed} ${v.jugador}: ${d.evento} debía ser del rival`);
           if (C(d.delta) !== pesoEsperado(d.motivo, e, p)) fallas.push(`${p.config.seed} ${v.jugador}: ${d.motivo} vale ${d.delta}`);
         }

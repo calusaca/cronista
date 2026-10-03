@@ -136,6 +136,8 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   // Sanciones: 0,117 por partido (53 por doble amarilla, 31 por roja directa).
   lesion_en_partido: 66,
   bajas_del_partido: 45,
+  // Brief 020: el autogol es LA anécdota del partido (y, ≥ COBERTURA, la crónica debe narrarlo).
+  autogol: 82,
 };
 
 /**
@@ -181,6 +183,7 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   presion_que_ahoga: "inicio_periodo",
   lesion_en_partido: "lesion",
   bajas_del_partido: "inicio_periodo",
+  autogol: "gol",
 };
 
 // ---------------------------------------------------------------------------------
@@ -219,6 +222,10 @@ export const VALORACION = {
   atajada: 0.1,
   xg_atajado_factor: 1.0,
   gol_recibido: -0.3,
+  /** Brief 020: definiciones legendarias (chilena, tijera, media cancha), vaselina, y el autor de un autogol. */
+  definicion_legendaria: 0.5,
+  definicion_vaselina: 0.2,
+  autogol: -1.0,
 } as const;
 
 // ---------------------------------------------------------------------------------

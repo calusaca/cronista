@@ -9,7 +9,7 @@ import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import type { Evento, Partido } from "../../sim/tipos";
 import { jugadaDelGol } from "../evidencia";
-import { geometriaJugada, posicionBalon, POS_CORNER, POS_DESTINO, POS_ZONA, recorrido } from "../pizarra";
+import { geometriaJugada, posicionBalon, POS_CORNER, POS_DESTINO, POS_ZONA, recorrido, UNIDADES_POR_M } from "../pizarra";
 
 const corpus: Partido[] = Array.from({ length: 1000 }, (_, i) => simular(configDeSemilla(i + 1)));
 const goles = corpus.flatMap((p) => p.eventos.filter((e) => e.tipo === "gol").map((g) => ({ p, g })));
@@ -47,11 +47,16 @@ describe("011 · geometría desde los datos", () => {
     expect(geo.origen!.x).toBe(POS_ZONA[pase.zonaOrigen!].x);
   });
 
-  it("todo gol del corpus: el remate es el punto de SU zona y el arco el de SU destino; máximo 3 pasos", () => {
+  it("todo gol del corpus: el remate es el punto de SU zona (la media cancha, a su distancia real) y el arco el de SU destino; máximo 3 pasos", () => {
     for (const { p, g } of goles) {
       const geo = geoDe(p, g)!;
       const t = tiroDe(p, g);
-      expect(geo.remate).toEqual(POS_ZONA[t.zonaOrigen!]);
+      // Brief 020: la media cancha se dibuja a su distancia REAL (más lejos que la media distancia).
+      if (t.definicion === "media_cancha") {
+        expect(geo.remate.y).toBeCloseTo(2 + t.distanciaM! * UNIDADES_POR_M, 6);
+        expect(geo.remate.y).toBeGreaterThan(POS_ZONA.media_distancia.y);
+        expect(geo.remate.y).toBeLessThan(geo.alto);
+      } else expect(geo.remate).toEqual(POS_ZONA[t.zonaOrigen!]);
       expect(geo.arco).toEqual(POS_DESTINO[t.destino!]);
       expect(recorrido(geo).length).toBeLessThanOrEqual(3);
     }

@@ -51,6 +51,7 @@ export function goleadores(partidos: readonly PartidoLiga[]): Goleador[] {
   const cuenta = new Map<string, Goleador>();
   for (const p of partidos) {
     for (const g of p.goles) {
+      if (g.autogol) continue; // brief 020 (regla FIFA): un autogol no es del goleador rival
       const k = `${g.equipo}|${g.jugador}`;
       const actual = cuenta.get(k) ?? { jugador: g.jugador, equipo: g.equipo, goles: 0 };
       actual.goles++;

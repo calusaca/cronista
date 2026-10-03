@@ -59,5 +59,6 @@ export function hechoDeMomento(momento: Momento, hechos: Hecho[]): Hecho | undef
   const tipo = HECHO_DEL_MOMENTO[momento.tipo];
   if (momento.tipo === "descanso") return hechos.find((h) => h.tipo === tipo && h.datos.periodo === 1);
   if (momento.tipo === "final") return hechos.find((h) => h.tipo === tipo);
-  return hechos.find((h) => h.tipo === tipo && h.eventos.includes(momento.eventoId));
+  // Brief 020: el gol en propia puerta se narra con su hecho `autogol`.
+  return hechos.find((h) => (h.tipo === tipo || (momento.tipo === "gol" && h.tipo === "autogol")) && h.eventos.includes(momento.eventoId));
 }

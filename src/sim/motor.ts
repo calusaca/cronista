@@ -13,7 +13,7 @@
 // - `pase_clave` se emite solo cuando le sigue un tiro del mismo equipo (definición Opta).
 // - `inicio_periodo` / `fin_periodo` llevan el equipo que sacó de centro en ese periodo.
 
-import { ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, P, PESOS } from "./parametros";
+import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, P, PESOS } from "./parametros";
 import { LESION_SEVERIDAD } from "./limites";
 import { prngDerivado } from "./prng";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
@@ -48,7 +48,7 @@ interface EstadoEquipo {
   goles: number;
 }
 
-type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale" | "baja">>;
+type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale" | "baja" | "autogol">>;
 
 function clamp(x: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, x));
@@ -228,6 +228,7 @@ class Simulacion {
     if (extra.relacionadoCon !== undefined) ev.relacionadoCon = extra.relacionadoCon;
     if (extra.sale !== undefined) ev.sale = extra.sale;
     if (extra.baja !== undefined) ev.baja = extra.baja;
+    if (extra.autogol !== undefined) ev.autogol = extra.autogol;
     this.eventos.push(ev);
     return id;
   }
@@ -338,7 +339,11 @@ class Simulacion {
     this.origenes.set(idTiro, opciones.origen);
     const u = this.rng.next();
     if (u < xgR) {
-      this.emitir("gol", atk.lado, { jugador: tirador.nombre, zona: "ataque", xg: xgR, relacionadoCon: idTiro });
+      // Brief 020: con la variante, el gol de un tiro (no penal) puede ir a propia puerta — el autor,
+      // un defensor en cancha del que lo sufre. Sorteo derivado por el tiro: sin autogol, nada cambia.
+      const autor = !opciones.penal && this.config.variantes?.autogoles === true ? this.autorDeAutogol(idTiro) : undefined;
+      if (autor) this.emitir("gol", atk.lado, { jugador: autor.nombre, zona: "ataque", xg: xgR, relacionadoCon: idTiro, autogol: true });
+      else this.emitir("gol", atk.lado, { jugador: tirador.nombre, zona: "ataque", xg: xgR, relacionadoCon: idTiro });
       atk.goles += 1;
       return true;
     }
@@ -351,6 +356,15 @@ class Simulacion {
       return this.corner(atk, opciones.profundidad + 1);
     }
     return false;
+  }
+
+  /** Brief 020: ¿este gol va a propia puerta? Devuelve el autor (del equipo que defiende) o undefined. */
+  private autorDeAutogol(idTiro: string): Jugador | undefined {
+    const rng = prngDerivado(this.config.seed, `autogol:${idTiro}`);
+    if (!rng.chance(AUTOGOL.p)) return undefined;
+    const tiro = this.eventos.find((e) => e.id === idTiro);
+    const def = this.equipos[this.rival(tiro?.equipo ?? "local")];
+    return rng.weighted(def.enCampo, (j) => AUTOGOL.peso[j.posicion]);
   }
 
   private sortearXg(mu: number, shift: number): number {

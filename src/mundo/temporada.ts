@@ -144,7 +144,7 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
         local: alineacion(eqL, new Set(bl.map((b) => b.jugador))),
         visita: alineacion(eqV, new Set(bv.map((b) => b.jugador))),
         condiciones: condicionesDePartido(liga, cruce, seed),
-        variantes: { lesiones: true },
+        variantes: { lesiones: true, autogoles: true },
         ...(bl.length > 0 || bv.length > 0 ? { bajas } : {}),
       };
       const p = simular(config);
@@ -217,7 +217,7 @@ export function resultadoDe(partido: Partido, jornada: number, indice: number): 
   const nombre = { local: local.nombre, visita: visita.nombre };
   const goles = partido.eventos
     .filter((e) => e.tipo === "gol")
-    .map((e) => ({ jugador: e.jugador ?? "", equipo: nombre[e.equipo], minuto: e.minuto }));
+    .map((e) => ({ jugador: e.jugador ?? "", equipo: nombre[e.equipo], minuto: e.minuto, ...(e.autogol ? { autogol: true as const } : {}) }));
   return {
     jornada,
     indice,

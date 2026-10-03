@@ -10,9 +10,9 @@ import { useEffect, useState } from "react";
 import type { Evento } from "../sim/tipos";
 import { EXPLICA_XG, formatoXg, type LenguaXg, type ModoXg } from "./textos";
 import { fmtMinuto, jugadaDelGol, type PasoJugada } from "../vista/evidencia";
-import { DURACION_ANIMACION_MS, geometriaJugada, type GeometriaJugada, posicionBalon, recorrido, type Punto } from "../vista/pizarra";
+import { DURACION_ANIMACION_MS, geometriaJugada, type GeometriaJugada, MEDIO_CAMPO_M, posicionBalon, recorrido, type Punto, UNIDADES_POR_M } from "../vista/pizarra";
 import { IconoCerrar, IconoEvento, IconoHistoria } from "./Iconos";
-import { ALTURA_EN, BANDA_EN, DESTINO_EN, ZONA_EN } from "./textos";
+import { ALTURA_EN, BANDA_EN, DEFINICION_EN, DESTINO_EN, ZONA_EN } from "./textos";
 
 const ROL: Record<PasoJugada["rol"], string> = {
   falta: "Foul in the box — penalty",
@@ -31,7 +31,9 @@ const apellido = (n?: string) => (n ? n.split(" ").slice(1).join(" ") || n : "")
 function detalleEspacial(p: PasoJugada): string {
   const e = p.evento;
   if (p.rol === "tiro" && e.zonaOrigen) {
-    const partes = [`${ZONA_EN[e.zonaOrigen]}${magnitudesTxt(e)}`];
+    // Brief 020: la definición se nombra en el paso («Bicycle kick! · six-yard box · 4 m»).
+    const def = e.definicion && e.definicion !== "jugada" ? `${DEFINICION_EN[e.definicion]} · ` : "";
+    const partes = [e.definicion === "media_cancha" ? `${def}${magnitudesTxt(e).replace(/^ · /, "")}` : `${def}${ZONA_EN[e.zonaOrigen]}${magnitudesTxt(e)}`];
     if (e.destino) partes.push(`→ ${DESTINO_EN[e.destino]}${e.altura ? `, ${ALTURA_EN[e.altura]}` : ""}`);
     return ` · ${partes.join(" ")}`;
   }
@@ -57,6 +59,10 @@ function Cancha({ children, rotulo, fuente, extra, alto = 72 }: { children: Reac
       <text x="4" y={alto - 5} fontSize="2.6" fill="var(--muted)" letterSpacing="0.4">
         {rotulo}
       </text>
+      {alto > 60 && (
+        // Brief 020: con la cancha hasta el medio campo, la línea de medio campo a escala.
+        <line x1="2" y1={2 + MEDIO_CAMPO_M * UNIDADES_POR_M} x2="98" y2={2 + MEDIO_CAMPO_M * UNIDADES_POR_M} stroke={linea} strokeWidth="0.4" />
+      )}
       {children}
     </svg>
   );
@@ -68,7 +74,7 @@ function prefiereSinMovimiento(): boolean {
 }
 
 /** Pizarra desde los datos, con el balón animado por el recorrido registrado. */
-function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tirador?: Evento; pasador?: Evento; fx: (xg: number) => string }) {
+function PizarraDatos({ geo, tirador, pasador, autor, fx }: { geo: GeometriaJugada; tirador?: Evento; pasador?: Evento; autor?: Evento; fx: (xg: number) => string }) {
   const [sinMovimiento] = useState(prefiereSinMovimiento);
   const [t, setT] = useState(sinMovimiento ? 1 : 0);
   const [ronda, setRonda] = useState(0);
@@ -109,6 +115,7 @@ function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tir
     );
   };
   const iRemate = geo.origen ? 1 : 0;
+  const etiquetaDef = geo.definicion ? DEFINICION_EN[geo.definicion] : "";
   // El rótulo del palo va del lado contrario a la jugada (el origen si hay; si no, el remate).
   const ladoRotulo = geo.origen && geo.origen.x !== 50 ? geo.origen.x : geo.remate.x;
   // Rótulo del remate (dos líneas): debajo del punto si está arriba en la cancha; si está lejos
@@ -121,8 +128,8 @@ function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tir
       <Cancha
         rotulo="POSITIONS BY ZONE, FROM MATCH DATA"
         fuente="datos"
-        alto={48}
-        extra={{ "data-anim": terminada ? "terminada" : "corriendo", "data-zona": geo.zona, "data-destino": geo.destino }}
+        alto={geo.alto}
+        extra={{ "data-anim": terminada ? "terminada" : "corriendo", "data-zona": geo.zona, "data-destino": geo.destino, ...(geo.definicion ? { "data-definicion": geo.definicion } : {}), ...(geo.autor ? { "data-autogol": "true" } : {}) }}
       >
         {Array.from({ length: tramos }, (_, k) => tramo(k, k === tramos - 1))}
         {geo.origen && (
@@ -157,7 +164,8 @@ function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tir
                 data-testid="pitch-zona"
               >
                 <tspan>
-                  {apellido(tirador.jugador)} · {ZONA_EN[geo.zona]}
+                  {/* Brief 020: con definición, «¡Chilena! · Apellido» (la zona va en el paso: el rótulo no se alarga). */}
+                  {etiquetaDef ? `${etiquetaDef} · ${apellido(tirador.jugador)}` : `${apellido(tirador.jugador)} · ${ZONA_EN[geo.zona]}`}
                 </tspan>
                 <tspan x={rotulo.x} dy="3.2" fill="var(--muted)">
                   {magnitudesTxt(tirador).replace(/^ · /, "")}
@@ -165,6 +173,15 @@ function PizarraDatos({ geo, tirador, pasador, fx }: { geo: GeometriaJugada; tir
                 </tspan>
               </text>
             )}
+          </>
+        )}
+        {geo.autor && llego(iRemate + 1) && (
+          // Brief 020: el autor del autogol, en señal (no acento): es del equipo que lo SUFRE.
+          <>
+            <circle cx={geo.autor.x} cy={geo.autor.y} r="1.5" fill="var(--danger)" data-testid="pitch-autor" />
+            <text x={geo.autor.x + (geo.autor.x < 50 ? -2.4 : 2.4)} y={geo.autor.y + 4.2} fontSize="2.8" fill="var(--danger)" textAnchor={geo.autor.x < 50 ? "end" : "start"}>
+              Own goal · {apellido(autor?.jugador)}
+            </text>
           </>
         )}
         {terminada && (
@@ -268,7 +285,8 @@ export function TarjetaGol({
           <div>
             <div className="overline">How the goal happened</div>
             <h2 className="layer-title tnum" id="gol-titulo">
-              {gol?.jugador} · {gol ? fmtMinuto(gol.minuto) : ""}
+              {gol?.jugador}
+              {gol?.autogol ? " (own goal)" : ""} · {gol ? fmtMinuto(gol.minuto) : ""}
             </h2>
           </div>
           <button type="button" className="btn btn-quiet" onClick={onCerrar} aria-label="Close">
@@ -286,7 +304,7 @@ export function TarjetaGol({
                   <IconoEvento tipo={p.evento.tipo} />
                 </span>
                 <span>
-                  {ROL[p.rol]}
+                  {p.rol === "gol" && p.evento.autogol ? "Own goal — into his own net" : ROL[p.rol]}
                   {p.evento.jugador ? ` · ${p.evento.jugador}` : ""}
                   {p.rol === "tiro" && p.evento.xg !== undefined ? <span className="tnum"> · {fx(p.evento.xg)}</span> : null}
                   {detalleEspacial(p)}
@@ -294,7 +312,7 @@ export function TarjetaGol({
               </li>
             ))}
           </ol>
-          {geo ? <PizarraDatos key={golId} geo={geo} fx={fx} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} /> : <PizarraConvencional pasos={pasos} fx={fx} />}
+          {geo ? <PizarraDatos key={golId} geo={geo} fx={fx} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} {...(gol?.autogol ? { autor: gol } : {})} /> : <PizarraConvencional pasos={pasos} fx={fx} />}
           <p className="caption">
             {geo
               ? "Schematic: positions by zone, from match data. Each event records its zone, the post and the height of the shot — zones, not exact coordinates."

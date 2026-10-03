@@ -242,6 +242,43 @@ export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max
 export const SALIDA_TEMPRANA_MIN = 25;
 
 // ---------------------------------------------------------------------------------
+// Brief 020 (rev 1.1) — definiciones del tiro y autogoles. Vocabulario, coherencias duras y
+// rarezas: ÚNICA fuente. Las definiciones ANIDAN dentro del contrato del 015 (60–125 km/h).
+// ---------------------------------------------------------------------------------
+
+export const DEFINICIONES = ["jugada", "cabezazo", "mano_a_mano", "vaselina", "chilena", "tijera", "media_cancha"] as const;
+export type Definicion = (typeof DEFINICIONES)[number];
+
+/** Coherencias duras (brief 020 rev 1.1). Velocidades dentro de VELOCIDAD (el «jamás» del 015 no se reabre). */
+export const DEF_CABEZAZO = { velocidad: { min: 60, max: 75 } } as const;
+export const DEF_VASELINA = { velocidad: { min: 60, max: 70 } } as const;
+export const DEF_MANO_A_MANO = { xgMin: 0.2 } as const;
+/** La cola nueva de distancia: SOLO media_cancha pasa del máximo de DISTANCIA_ZONA. */
+export const DEF_MEDIA_CANCHA = { distancia: { min: 40, max: 55 }, xgMax: 0.03, velocidadMin: 85 } as const;
+
+/**
+ * Rareza objetivo ENTRE LOS GOLES (sin autogoles), suite estadística N=1000: fracción [min, max].
+ * Chilena y tijera caen juntas en una banda (la tijera es su variante).
+ * Medido el 2 oct (2.855 goles, semillas 1..1000): cabezazo 13,56 % · mano a mano 9,11 % · vaselina
+ * 1,65 % · chilena o tijera 0,25 % (7 goles: 6 + 1) · media cancha 0,14 % (4 goles). Mano a mano:
+ * con xG ≥ 0,20 solo 7,96 % de goles elegibles (< 8 %) ⇒ se aceptó además el pase atrás (rev 1.1).
+ * Velocidad del corpus tras las reescrituras: media 90,4 km/h, p5 66 (cola < 70: 8,0 %).
+ */
+export const RAREZA_DEFINICION = {
+  cabezazo: { min: 0.12, max: 0.18 },
+  mano_a_mano: { min: 0.08, max: 0.14 },
+  vaselina: { min: 0.01, max: 0.03 },
+  chilena_o_tijera: { min: 0.001, max: 0.004 },
+  media_cancha: { min: 0.0005, max: 0.0025 },
+} as const;
+
+/**
+ * Autogoles (solo con config.variantes.autogoles): rareza entre los goles (brief: ~2–3 %). Medido:
+ * 2,84 % (semillas sueltas con la variante) y 2,88 % en la liga (55 de 1.913 goles; ~7,6 % de los partidos).
+ */
+export const RAREZA_AUTOGOL = { min: 0.015, max: 0.035 } as const;
+
+// ---------------------------------------------------------------------------------
 // Brief 019 — lesiones (solo con config.variantes.lesiones). Severidad y rareza: ÚNICA fuente.
 // ---------------------------------------------------------------------------------
 

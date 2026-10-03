@@ -1,7 +1,7 @@
 // Contrato del simulador — brief 001 (docs/disenos/001-simulador.md).
 // Los nombres y propiedades de este archivo NO se cambian sin actualizar el brief.
 
-import type { Altura, Banda, Cesped, ClimaPartido, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
+import type { Altura, Banda, Cesped, ClimaPartido, Definicion, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
 
 export type Estilo = "posesion" | "contragolpe" | "presion";
 
@@ -50,6 +50,8 @@ export interface Condiciones {
  */
 export interface Variantes {
   lesiones?: boolean;
+  /** Brief 020: autogoles (un gol de un tiro rival puede ir a propia puerta). */
+  autogoles?: boolean;
 }
 
 /** Brief 019 — una baja que el registro de la temporada trae al partido (no juega: no está en la plantilla). */
@@ -126,11 +128,24 @@ export interface Evento {
   velocidadKmh?: number;
   /** Brief 019 — lesion: jornadas de baja (LESION_JORNADAS). `relacionadoCon` = la falta, si la hubo. */
   baja?: number;
+  /** Brief 020 — tiro (y su atajada; su gol salvo autogol): cómo se definió. Sale del stream derivado DESPUÉS del 015. */
+  definicion?: Definicion;
+  /**
+   * Brief 020 — gol en propia puerta (solo con config.variantes.autogoles). `equipo` sigue siendo
+   * el que SUMA el gol; `jugador` es el autor, del OTRO equipo (el que lo sufre).
+   */
+  autogol?: boolean;
+}
+
+/** Brief 020: el lado del jugador que nombra un evento (en un autogol, el del equipo que lo sufre). */
+export function ladoDelJugador(e: Pick<Evento, "equipo" | "autogol">): Lado {
+  return e.autogol === true ? (e.equipo === "local" ? "visita" : "local") : e.equipo;
 }
 
 /** Brief 011: los campos espaciales (la proyección legado los borra). */
 // Brief 015: la lista se extiende CONSCIENTEMENTE con las magnitudes del tiro (tercera extensión).
-export const CAMPOS_ESPACIALES = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda", "distanciaM", "velocidadKmh"] as const;
+// Brief 020: y la definición del tiro (cuarta extensión consciente; hashes-legado no se toca).
+export const CAMPOS_ESPACIALES = ["zonaOrigen", "destino", "altura", "ladoPortero", "banda", "distanciaM", "velocidadKmh", "definicion"] as const;
 
 export interface Partido {
   config: SimConfig;
