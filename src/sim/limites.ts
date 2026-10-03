@@ -242,6 +242,40 @@ export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max
 export const SALIDA_TEMPRANA_MIN = 25;
 
 // ---------------------------------------------------------------------------------
+// Brief 024 — nivel por jugador. Bandas de los A/B DENTRO del equipo (tercil alto − tercil bajo
+// del plantel, mismos partidos, con la variante), escritas ANTES de calibrar y aparte de los
+// modificadores (parametros.NIVELES): la técnica de la copia independiente.
+// ---------------------------------------------------------------------------------
+
+export const NIVEL = { min: 1, max: 100 } as const;
+/** El «tercil» de un plantel de 16 en los A/B y en la figura: los 6 de más nivel / los 6 de menos (⌈16/3⌉). */
+export const TERCIL_PLANTEL = 6;
+export const N_AB_NIVELES = 500;
+export const AB_NIVELES = {
+  /** Completación de pases (diferencia alto − bajo). */
+  pases: { min: 0.02, max: 0.08 },
+  /** Éxito en regates y duelos (diferencia). */
+  regatesDuelos: { min: 0.035, max: 0.12 },
+  /** Remates por jugador y partido (cociente alto / bajo). */
+  remates: { min: 1.3, max: 2.3 },
+  /** xG medio por remate (cociente alto / bajo). */
+  xgPorRemate: { min: 1.05, max: 1.35 },
+  /** Atajadas sobre tiros no convertidos: porteros por encima de su media vs por debajo (diferencia). */
+  atajadas: { min: 0.03, max: 0.13 },
+  /** Sin la variante, la misma medición tiene que dar ~0 (|diferencia| ≤, o cociente en [1/x, x]). */
+  controlDiferencia: 0.012,
+  controlCociente: 1.08,
+} as const;
+/**
+ * La figura del partido (009) cae en el tercil alto de su plantel en al menos esta fracción de los partidos de liga.
+ * Medido el 3 oct (720 partidos): 56,8 % (sin niveles sería ~1/3). Los A/B: pases +0,034 · regates/duelos
+ * +0,065 · remates ×1,87 · xG por remate ×1,17 · atajadas +0,085 (control sin variante: ~0). Totales de liga
+ * contra las MISMAS configs sin la variante: goles 2,657 → 2,682 (+0,9 %), xG 2,697 → 2,739 (+1,6 %),
+ * amarillas 3,97 → 3,95, partidos con roja 10,4 → 11,0 % — dentro de las bandas de siempre.
+ */
+export const FIGURA_TERCIL_ALTO_MIN = 0.55;
+
+// ---------------------------------------------------------------------------------
 // Brief 021 — la pizarra 3D. Las magnitudes de la ESCENA (no del partido): cómo se traduce cada
 // campo registrado a metros y segundos. Única fuente; las pruebas las importan.
 // ---------------------------------------------------------------------------------

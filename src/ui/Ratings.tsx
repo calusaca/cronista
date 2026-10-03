@@ -26,6 +26,8 @@ interface Props {
   enVivo: boolean;
   /** Brief 017: idioma del formateador de xG (el modo sale de `expandido`: Analista). */
   lengua: LenguaXg;
+  /** Brief 024: nivel de cada jugador (clave «lado|nombre»), si el partido los usa. */
+  niveles?: Record<string, number>;
 }
 
 const fmtDelta = (d: number) => `${d >= 0 ? "+" : "−"}${Math.abs(d).toFixed(2)}`;
@@ -60,7 +62,7 @@ function Desglose({ v, eventos, modo, lengua }: { v: Valoracion; eventos: Evento
   );
 }
 
-export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, onSeleccion, expandido, enVivo, lengua }: Props) {
+export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, onSeleccion, expandido, enVivo, lengua, niveles }: Props) {
   const teclado = (k: string) => (ev: KeyboardEvent) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
@@ -72,6 +74,12 @@ export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, 
       <div className="panel-head">
         <span className="overline">Ratings · computed from match events{enVivo ? " · so far" : ""}</span>
         <span className="ratings-note">Base {VALORACION.base.toFixed(1)} plus or minus each action. Click a rating to see why.</span>
+        {niveles && (
+          // Brief 024: el nivel es un atributo GENERADO, no un suceso: causa eventos, no compra la nota.
+          <span className="ratings-note" data-testid="level-note">
+            Level 1–100 is a generated attribute of each player (it changes how often and how well he plays); the rating still counts only match events.
+          </span>
+        )}
       </div>
       <div className="ratings-cols">
         {(["local", "visita"] as const).map((lado) => (
@@ -107,7 +115,14 @@ export function Ratings({ valoraciones, eventos, nombres, figura, seleccionada, 
                           {v.jugador}
                           {esFigura && <span className="rating-potm"> · Player of the match</span>}
                         </span>
-                        <span className="rating-pos">{POSICION_EN[v.posicion] ?? v.posicion}</span>
+                        <span className="rating-pos">
+                          {niveles?.[k] !== undefined && (
+                            <span className="rating-level tnum" data-testid="player-level" data-nivel={niveles[k]}>
+                              Level {niveles[k]} ·{" "}
+                            </span>
+                          )}
+                          {POSICION_EN[v.posicion] ?? v.posicion}
+                        </span>
                       </div>
                       {(sel || expandido) && <Desglose v={v} eventos={eventos} modo={expandido ? "analista" : "aficionado"} lengua={lengua} />}
                     </li>

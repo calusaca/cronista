@@ -16,6 +16,8 @@ export interface Jugador {
   nombre: string; // ficticio
   dorsal: number;
   posicion: Posicion;
+  /** Brief 024: nivel 1–100 (atributo generado; solo lo lee el motor con config.variantes.niveles). */
+  nivel?: number;
 }
 
 export interface Equipo {
@@ -52,6 +54,8 @@ export interface Variantes {
   lesiones?: boolean;
   /** Brief 020: autogoles (un gol de un tiro rival puede ir a propia puerta). */
   autogoles?: boolean;
+  /** Brief 024: el nivel de cada jugador cambia probabilidades (cinco efectos, dentro del equipo). */
+  niveles?: boolean;
 }
 
 /** Brief 019 — una baja que el registro de la temporada trae al partido (no juega: no está en la plantilla). */

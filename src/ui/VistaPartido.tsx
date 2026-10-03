@@ -220,6 +220,13 @@ export function VistaPartido({
     if (e.tipo === "gol") setCapa({ tipo: "gol", id: e.id });
   }, []);
 
+  // Brief 024: los niveles de la alineación (solo si el partido los usa).
+  const niveles = useMemo(() => {
+    if (datos.config.variantes?.niveles !== true) return undefined;
+    const out: Record<string, number> = {};
+    for (const l of ["local", "visita"] as const) for (const j of datos.config[l].jugadores) if (j.nivel !== undefined) out[`${l}|${j.nombre}`] = j.nivel;
+    return out;
+  }, [datos.config]);
   const final = hechos.find((h) => h.tipo === "resultado_final")?.datos;
   // En el replay, el marcador es el del minuto del reloj: nada del futuro en pantalla.
   const ultimoVisible = eventosVisibles[eventosVisibles.length - 1];
@@ -382,6 +389,7 @@ export function VistaPartido({
         expandido={modo === "analista"}
         enVivo={vivo && !terminado}
         lengua={lengua}
+        {...(niveles ? { niveles } : {})}
       />
 
       {/* Brief 014: Match stats de la capa micro (lo visto: en el replay, el prefijo). */}

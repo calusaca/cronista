@@ -182,6 +182,29 @@ export const CONDICIONES = {
 } as const;
 
 /**
+ * Brief 024 — los CINCO efectos del nivel (ni uno más), con delta = (nivel − media del equipo)/100;
+ * las bandas que los acotan (A/B dentro del equipo) viven en limites.ts (AB_NIVELES), escritas aparte.
+ * Todos modifican probabilidades existentes sin sorteos propios: sin la variante, nada cambia.
+ */
+export const NIVELES = {
+  /** Generación: dispersión dentro del equipo y recorte alrededor de la media. */
+  sigma: 8,
+  recorte: 20,
+  /** 1 · Protagonista: el peso de PESOS × (1 + k·delta) en remates, pases clave, córners y tiros libres. */
+  kProtagonista: 4.5,
+  /** 2 · Micro pase: completación + k·delta del que pasa. */
+  kPase: 0.25,
+  /** 3 · Micro regate / duelo: éxito + k·delta del que lo intenta. */
+  kRegate: 0.4,
+  /** 4 · xG: log-xG + k·delta del tirador (pequeño). */
+  kXg: 1,
+  /** 5 · Atajada: probabilidad + k·delta del portero en el arco. */
+  kAtajada: 0.6,
+  /** El factor del protagonista nunca baja de esto (un peso nunca se anula por el nivel). */
+  factorMin: 0.2,
+} as const;
+
+/**
  * Brief 020 — perillas de las definiciones y de los autogoles (las rarezas y coherencias que las
  * acotan viven en limites.ts). La definición se sortea entre las que el tiro ADMITE (coherencia),
  * en este orden de prioridad, cada una con su probabilidad.

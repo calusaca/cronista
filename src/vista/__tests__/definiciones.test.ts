@@ -27,8 +27,9 @@ describe("020 · los goles del smoke y del e2e", () => {
     expect(geo.alto).toBe(76);
   });
 
-  it("liga visible 2/2: un autogol con su hecho (relevancia de cobertura) y la pizarra con el autor", () => {
-    const p = simular(configDePartidoLiga(ligaVisible(), TEMPORADA_ACTUAL, 2, 2));
+  // Brief 024: los niveles cambian los partidos de liga; el autogol del e2e pasó de la 2/2 a la 2/1.
+  it("liga visible 2/1: un autogol con su hecho (relevancia de cobertura) y la pizarra con el autor", () => {
+    const p = simular(configDePartidoLiga(ligaVisible(), TEMPORADA_ACTUAL, 2, 1));
     const g = p.eventos.filter((e) => e.tipo === "gol" && e.autogol === true);
     expect(g).toHaveLength(1);
     expect(analizar(p).some((h) => h.tipo === "autogol" && h.eventos.includes(g[0]!.id))).toBe(true);

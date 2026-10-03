@@ -5,6 +5,7 @@
 import { ladoDelJugador, MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda, origenDelTiro } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
+import { NIVEL } from "./limites";
 import { CESPEDES, CLIMAS_PARTIDO, DEF_CABEZAZO, DEF_MANO_A_MANO, DEF_MEDIA_CANCHA, DEF_VASELINA, DEFINICIONES, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
@@ -404,6 +405,15 @@ export function verificarLesiones(p: Partido): string[] {
   return err;
 }
 
+/** Brief 024 — con la variante de niveles, cada jugador trae su nivel entero en NIVEL (implementación propia). */
+export function verificarNiveles(p: Partido): string[] {
+  if (p.config.variantes?.niveles !== true) return [];
+  const err: string[] = [];
+  for (const lado of ["local", "visita"] as const)
+    for (const j of p.config[lado].jugadores) if (!Number.isInteger(j.nivel) || (j.nivel as number) < NIVEL.min || (j.nivel as number) > NIVEL.max) err.push(`${lado}: ${j.nombre} con nivel ${String(j.nivel)}`);
+  return err;
+}
+
 export const VERIFICADORES = {
   minutos: verificarMinutos,
   relaciones: verificarRelaciones,
@@ -418,6 +428,8 @@ export const VERIFICADORES = {
   condiciones: verificarCondiciones,
   // Brief 019.
   lesiones: verificarLesiones,
+  // Brief 024.
+  niveles: verificarNiveles,
   // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
   micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;

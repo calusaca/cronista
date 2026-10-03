@@ -1,6 +1,6 @@
 // Brief 020 — definiciones con alma y autogoles en la UI. Los goles los fija
 // src/vista/__tests__/definiciones.test.ts: la chilena de la semilla 116 (e094), el gol de media
-// cancha de la semilla 246 (e050, la portada) y el autogol del partido de liga 2/2.
+// cancha de la semilla 246 (e050, la portada) y el autogol del partido de liga 2/1 (desde el 024).
 import { expect, type Page, test } from "@playwright/test";
 
 async function abrirGol(page: Page, eventoId: string) {
@@ -32,8 +32,8 @@ test("media cancha (la portada, 246): la pizarra llega al medio campo y el baló
   await expect(tarjeta.getByTestId("goal-step").filter({ hasText: "Shot" })).toContainText(/From the halfway line! · \d{2} m/);
 });
 
-test("autogol de liga (2/2): la línea dice «Own goal», la crónica lo narra en propia puerta y la pizarra marca al autor", async ({ page }) => {
-  await page.goto("/liga/2/2");
+test("autogol de liga (2/1): la línea dice «Own goal», la crónica lo narra en propia puerta y la pizarra marca al autor", async ({ page }) => {
+  await page.goto("/liga/2/1");
   const ev = page.locator('[data-testid="timeline-event"][data-tipo="gol"]', { hasText: "Own goal" });
   await expect(ev).toHaveCount(1);
   await expect(page.getByTestId("sentence").filter({ hasText: "own goal" })).toHaveCount(1);

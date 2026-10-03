@@ -21,6 +21,8 @@
 
 import { CANALES, CONDUCCION_M, PASE_M, type Canal, type TipoMicro } from "./limites";
 import { castigoPase, factorRitmo } from "./condiciones";
+import { deltaNivel } from "./niveles";
+import { NIVELES } from "./parametros";
 import { MICRO } from "./parametros";
 import { prngDerivado, type Rng } from "./prng";
 import type { Evento, Jugador, Lado, Partido, Posicion, Zona } from "./tipos";
@@ -183,6 +185,9 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
   const pref: Record<Lado, Canal> = { local: canalPreferido(semilla, "local"), visita: canalPreferido(semilla, "visita") };
   const cfg = p.config;
   const fuerza = (l: Lado) => (cfg[l].ataque - cfg[rival(l)].defensa) / 100;
+  // Brief 024: el delta de nivel del jugador dentro de su equipo (0 exacto sin la variante).
+  const conNiveles = cfg.variantes?.niveles === true;
+  const deltaDe = (l: Lado, nombre: string): number => (conNiveles ? deltaNivel(cancha[l].find((j) => j.nombre === nombre), cfg[l]) : 0);
   // Brief 018: el periodo del tramo (el de su ancla) para el cansancio del calor.
   const periodo: 1 | 2 = p.eventos.slice(0, k + 1).filter((x) => x.tipo === "inicio_periodo").length >= 2 ? 2 : 1;
 
@@ -234,7 +239,7 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
     const ajuste = clase === "corto" ? 0.06 : clase === "largo" ? -0.2 : -0.03;
     // Brief 018 · efectos 3, 5 y 6: lluvia, césped alto (visitante, cortos) y presión alta en la
     // salida temprana restan completación; sin condiciones el castigo es 0 exacto.
-    const pc = MICRO.paseBase + MICRO.paseKFuerza * fuerza(e.equipo) + MICRO.paseEstilo[cfg[e.equipo].estilo] + MICRO.paseZona[e.zona] + ajuste - castigoPase(cfg.condiciones, e.equipo, e.zona, clase, ancla.minuto);
+    const pc = MICRO.paseBase + MICRO.paseKFuerza * fuerza(e.equipo) + MICRO.paseEstilo[cfg[e.equipo].estilo] + MICRO.paseZona[e.zona] + ajuste - castigoPase(cfg.condiciones, e.equipo, e.zona, clase, ancla.minuto) + NIVELES.kPase * deltaDe(e.equipo, e.actor); // brief 024 · efecto 2
     const completado = forzarCompletado || rng.chance(pc);
     emitir({ tipo: "pase", jugador: e.actor, receptor, completado, distanciaM });
     if (!completado) return perder();
@@ -262,13 +267,13 @@ function segmento(p: Partido, k: number, semilla: number): { eventos: Borrador[]
     if (r < pReg) {
       recienRegateo = true;
       const d = defensor();
-      const exito = rng.chance(MICRO.regateBase + MICRO.regateKFuerza * fuerza(e.equipo));
+      const exito = rng.chance(MICRO.regateBase + MICRO.regateKFuerza * fuerza(e.equipo) + NIVELES.kRegate * deltaDe(e.equipo, e.actor)); // brief 024 · efecto 3
       emitir({ tipo: "regate", jugador: e.actor, rival: d, exito });
       if (!exito) perder(d);
       else if (e.zona !== "ataque" && rng.chance(0.4)) e.zona = subir(e.zona);
     } else if (r < pReg + MICRO.pDuelo * riesgo) {
       const d = defensor();
-      const exito = rng.chance(MICRO.dueloBase);
+      const exito = rng.chance(MICRO.dueloBase + NIVELES.kRegate * deltaDe(e.equipo, e.actor)); // brief 024 · efecto 3
       emitir({ tipo: "duelo", jugador: e.actor, rival: d, exito });
       if (!exito) perder(d);
     } else if (r < pReg + MICRO.pDuelo * riesgo + MICRO.pConduccion) {

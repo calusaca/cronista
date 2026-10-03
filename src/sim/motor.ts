@@ -13,7 +13,8 @@
 // - `pase_clave` se emite solo cuando le sigue un tiro del mismo equipo (definición Opta).
 // - `inicio_periodo` / `fin_periodo` llevan el equipo que sacó de centro en ese periodo.
 
-import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, P, PESOS } from "./parametros";
+import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, NIVELES, P, PESOS } from "./parametros";
+import { deltaNivel } from "./niveles";
 import { LESION_SEVERIDAD } from "./limites";
 import { prngDerivado } from "./prng";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
@@ -151,6 +152,14 @@ export function validarConfig(config: SimConfig): void {
       nombres.add(j.nombre);
     }
   }
+  // Brief 024: con la variante de niveles, cada jugador trae su nivel entero en [1, 100].
+  if (config.variantes?.niveles === true) {
+    for (const lado of ["local", "visita"] as const) {
+      for (const j of config[lado].jugadores) {
+        if (!Number.isInteger(j.nivel) || (j.nivel as number) < 1 || (j.nivel as number) > 100) throw new Error(`config inválida: ${j.nombre} sin nivel válido (${String(j.nivel)})`);
+      }
+    }
+  }
   // Brief 019: una baja no juega — no puede estar en la plantilla de su equipo.
   for (const lado of ["local", "visita"] as const) {
     for (const b of config.bajas?.[lado] ?? []) {
@@ -242,13 +251,26 @@ class Simulacion {
     pesos: Record<Posicion, number>,
     excluir?: string,
     cautela = false,
+    protagonista = false,
   ): Jugador | undefined {
     return this.rng.weighted(est.enCampo, (j) => {
       if (j.nombre === excluir) return 0;
       let w = pesos[j.posicion];
       if (cautela && est.amonestados.has(j.nombre)) w *= P.cautelaAmonestado;
+      // Brief 024 · efecto 1: el crack protagoniza más (factor 1 exacto sin la variante).
+      if (protagonista && this.niveles) w *= Math.max(NIVELES.factorMin, 1 + NIVELES.kProtagonista * deltaNivel(j, est.eq));
       return w;
     });
+  }
+
+  /** Brief 024: ¿el partido usa los niveles? */
+  private get niveles(): boolean {
+    return this.config.variantes?.niveles === true;
+  }
+
+  /** Brief 024 · efecto 4: desplazamiento de log-xG del tirador (0 exacto sin la variante). */
+  private xgDelTirador(est: EstadoEquipo, j: Jugador): number {
+    return this.niveles ? NIVELES.kXg * deltaNivel(j, est.eq) : 0;
   }
 
   private lanzadorPenal(est: EstadoEquipo): Jugador | undefined {
@@ -347,7 +369,10 @@ class Simulacion {
       atk.goles += 1;
       return true;
     }
-    const pAtajada = opciones.penal ? P.pAtajadaPenal : P.pAtajada;
+    // Brief 024 · efecto 5: el portero EN EL ARCO del que defiende ataja según su nivel (0 sin la variante).
+    const def = this.equipos[this.rival(atk.lado)];
+    const portero = this.niveles ? def.enCampo.find((j) => j.posicion === "POR") : undefined;
+    const pAtajada = (opciones.penal ? P.pAtajadaPenal : P.pAtajada) + (portero ? NIVELES.kAtajada * deltaNivel(portero, def.eq) : 0);
     if (this.rng.chance(pAtajada)) {
       this.emitir("atajada", atk.lado, { zona: "ataque", relacionadoCon: idTiro });
       // Brief 018 · efecto 3: con lluvia, el portero retiene menos (factor 1 exacto sin lluvia).
@@ -374,15 +399,15 @@ class Simulacion {
   /** Corner y posible cabezazo. Devuelve true si terminó en gol. */
   private corner(atk: EstadoEquipo, profundidad: number): boolean {
     this.avanzar(P.pasoEvento);
-    const lanzador = this.elegir(atk, PESOS.corner as Record<Posicion, number>);
+    const lanzador = this.elegir(atk, PESOS.corner as Record<Posicion, number>, undefined, false, true);
     this.emitir("corner", atk.lado, lanzador ? { jugador: lanzador.nombre, zona: "ataque" } : { zona: "ataque" });
     if (profundidad > 2 || !this.rng.chance(P.pTiroCorner)) return false;
     const def = this.equipos[this.rival(atk.lado)];
-    const cabeceador = this.elegir(atk, PESOS.cabezazo as Record<Posicion, number>, lanzador?.nombre);
+    const cabeceador = this.elegir(atk, PESOS.cabezazo as Record<Posicion, number>, lanzador?.nombre, false, true);
     if (!cabeceador) return false;
     this.avanzar(P.pasoEvento);
     const { xgShift } = this.factores(atk, def);
-    return this.tiro(atk, cabeceador, this.sortearXg(P.xgMuCabezazo, xgShift), { penal: false, profundidad, origen: "corner" });
+    return this.tiro(atk, cabeceador, this.sortearXg(P.xgMuCabezazo, xgShift + this.xgDelTirador(atk, cabeceador)), { penal: false, profundidad, origen: "corner" });
   }
 
   /** Juega una posesión del lado `lado`; devuelve quién tiene la siguiente. */
@@ -419,17 +444,17 @@ class Simulacion {
       const cFalta = cOffside + P.pFaltaArea * mFaltasDef;
       const cCorner = cFalta + P.pCornerDirecto;
       if (r < cTiro) {
-        const tirador = this.elegir(atk, PESOS.tiro as Record<Posicion, number>);
+        const tirador = this.elegir(atk, PESOS.tiro as Record<Posicion, number>, undefined, false, true);
         if (tirador) {
           if (this.rng.chance(ESTILO_ATAQUE[atk.eq.estilo].paseClave)) {
-            const asistente = this.elegir(atk, PESOS.paseClave as Record<Posicion, number>, tirador.nombre);
+            const asistente = this.elegir(atk, PESOS.paseClave as Record<Posicion, number>, tirador.nombre, false, true);
             if (asistente) {
               const zona: Zona = atk.eq.estilo === "contragolpe" && this.rng.chance(0.4) ? "medio" : "ataque";
               this.emitir("pase_clave", atk.lado, { jugador: asistente.nombre, zona });
               this.avanzar(P.pasoEvento);
             }
           }
-          gol = this.tiro(atk, tirador, this.sortearXg(P.xgMu, xgShift), { penal: false, profundidad: 0, origen: "jugada" });
+          gol = this.tiro(atk, tirador, this.sortearXg(P.xgMu, xgShift + this.xgDelTirador(atk, tirador)), { penal: false, profundidad: 0, origen: "jugada" });
         }
       } else if (r < cOffside) {
         const j = this.elegir(atk, PESOS.fueraDeJuego as Record<Posicion, number>);
@@ -443,8 +468,8 @@ class Simulacion {
             const lanzador = this.lanzadorPenal(atk);
             if (lanzador) gol = this.tiro(atk, lanzador, P.xgPenal, { penal: true, profundidad: 0, origen: "penal" });
           } else if (this.rng.chance(P.pTiroLibreTrasFalta)) {
-            const j = this.elegir(atk, PESOS.tiroLibre as Record<Posicion, number>);
-            if (j) gol = this.tiro(atk, j, this.sortearXg(P.xgMuTiroLibre, xgShift), { penal: false, profundidad: 0, origen: "tiro_libre" });
+            const j = this.elegir(atk, PESOS.tiroLibre as Record<Posicion, number>, undefined, false, true);
+            if (j) gol = this.tiro(atk, j, this.sortearXg(P.xgMuTiroLibre, xgShift + this.xgDelTirador(atk, j)), { penal: false, profundidad: 0, origen: "tiro_libre" });
           }
         }
       } else if (r < cCorner) {

@@ -11,6 +11,7 @@ import { PRESION_LOCAL_POR_LIGA, PROB_CLIMA, SANCION_JORNADAS } from "../analist
 import { nivelSiguiente } from "../sim/condiciones";
 import { TEMPERATURA_C, type ClimaPartido } from "../sim/limites";
 import { simular } from "../sim/motor";
+import { conNiveles, nivelesDe } from "../sim/niveles";
 import { prngDerivado } from "../sim/prng";
 import { SUPLENTES, TITULARES, type Baja, type Condiciones, type Equipo, type Jugador, type Partido, type SimConfig } from "../sim/tipos";
 import { calendarioCirculo } from "./calendario";
@@ -128,6 +129,9 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
   const sanciones: Sancion[] = [];
   const lesiones: LesionLiga[] = [];
   const registro = new Map<string, Activa[]>(); // equipo|jugador → bajas
+  // Brief 024: los niveles de cada equipo del mundo (plantel de 16 con tope + reservas), una vez.
+  const niveles = new Map(liga.equipos.map((e) => [e.equipo.nombre, nivelesDe(e.equipo, e.reservas)] as const));
+  const conSusNiveles = (eq: EquipoMundo, fuera: Set<string>) => conNiveles(alineacion(eq, fuera), niveles.get(eq.equipo.nombre) as Map<string, number>);
   const anotar = (equipo: string, jugador: string, a: Activa) => registro.set(`${equipo}|${jugador}`, [...(registro.get(`${equipo}|${jugador}`) ?? []), a]);
   calendarioDeLiga(liga).forEach((jornada, jIdx) => {
     const j = jIdx + 1;
@@ -141,10 +145,10 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
       const bajas = { ...(bl.length > 0 ? { local: bl } : {}), ...(bv.length > 0 ? { visita: bv } : {}) };
       const config: SimConfig = {
         seed,
-        local: alineacion(eqL, new Set(bl.map((b) => b.jugador))),
-        visita: alineacion(eqV, new Set(bv.map((b) => b.jugador))),
+        local: conSusNiveles(eqL, new Set(bl.map((b) => b.jugador))),
+        visita: conSusNiveles(eqV, new Set(bv.map((b) => b.jugador))),
         condiciones: condicionesDePartido(liga, cruce, seed),
-        variantes: { lesiones: true, autogoles: true },
+        variantes: { lesiones: true, autogoles: true, niveles: true },
         ...(bl.length > 0 || bv.length > 0 ? { bajas } : {}),
       };
       const p = simular(config);
