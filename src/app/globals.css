@@ -2023,3 +2023,36 @@ button.stats-row:hover {
   align-self: center;
   font-size: 13px;
 }
+
+/* ---------- brief 021: pizarra 3D ---------- */
+
+.pitch-vistas {
+  margin: 6px 0 10px;
+}
+
+.pitch-3d {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-board);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.pitch-3d-lienzo {
+  width: 100%;
+  min-height: 220px;
+}
+
+.pitch-3d-lienzo canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.pitch-3d-rotulo {
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}

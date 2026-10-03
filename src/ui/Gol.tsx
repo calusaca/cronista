@@ -6,12 +6,14 @@
 // registrada hasta el palo registrado. Con prefers-reduced-motion, pizarra estática directa.
 // Un partido sin detalle espacial cae a la pizarra convencional de antes, con su rótulo.
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Evento } from "../sim/tipos";
 import { EXPLICA_XG, formatoXg, type LenguaXg, type ModoXg } from "./textos";
 import { fmtMinuto, jugadaDelGol, type PasoJugada } from "../vista/evidencia";
 import { DURACION_ANIMACION_MS, geometriaJugada, type GeometriaJugada, MEDIO_CAMPO_M, posicionBalon, recorrido, type Punto, UNIDADES_POR_M } from "../vista/pizarra";
 import { IconoCerrar, IconoEvento, IconoHistoria } from "./Iconos";
+import { escenaDelGol } from "../vista/escena3d";
+import { Pizarra3D } from "./Pizarra3D";
 import { ALTURA_EN, BANDA_EN, DEFINICION_EN, DESTINO_EN, ZONA_EN } from "./textos";
 
 const ROL: Record<PasoJugada["rol"], string> = {
@@ -276,6 +278,15 @@ export function TarjetaGol({
   const geo = geometriaJugada(pasos, eventos);
   const tirador = pasos.find((p) => p.rol === "tiro")?.evento;
   const pasador = geo?.origenRol ? pasos.find((p) => p.rol === geo.origenRol)?.evento : undefined;
+  // Brief 021: la vista 3D (opcional; la 2D es el default). Solo para goles con detalle espacial,
+  // y la tarjeta solo existe para goles ya emitidos (en vivo, sin clarividencia).
+  // Memo por el CONTENIDO de la jugada: en vivo los eventos crecen cada minuto, la jugada del gol no.
+  const clavePasos = JSON.stringify(pasos);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const escena = useMemo(() => escenaDelGol(eventos, pasos), [clavePasos]);
+  const [vista, setVista] = useState<"2d" | "3d">("2d");
+  const [sinWebGL, setSinWebGL] = useState(false);
+  const alSinWebGL = useCallback(() => setSinWebGL(true), []);
   const citado = citas > 0 ? ` Cited by ${citas} ${citas === 1 ? "sentence" : "sentences"} of the report.` : "";
   return (
     <>
@@ -312,7 +323,24 @@ export function TarjetaGol({
               </li>
             ))}
           </ol>
-          {geo ? <PizarraDatos key={golId} geo={geo} fx={fx} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} {...(gol?.autogol ? { autor: gol } : {})} /> : <PizarraConvencional pasos={pasos} fx={fx} />}
+          {escena && (
+            <div className="lang-toggle pitch-vistas" role="group" aria-label="Diagram view">
+              <button type="button" className="perspective-option" aria-pressed={vista === "2d"} data-testid="pitch-2d" onClick={() => setVista("2d")}>
+                2D
+              </button>
+              <button type="button" className="perspective-option" aria-pressed={vista === "3d"} data-testid="pitch-3d-btn" onClick={() => setVista("3d")}>
+                3D
+              </button>
+            </div>
+          )}
+          {vista === "3d" && sinWebGL && (
+            <p className="caption" data-testid="sin-webgl">
+              3D needs WebGL, which this browser does not offer — showing the 2D board.
+            </p>
+          )}
+          {vista === "3d" && escena && !sinWebGL ? (
+            <Pizarra3D key={golId} escena={escena} onSinWebGL={alSinWebGL} />
+          ) : geo ? <PizarraDatos key={golId} geo={geo} fx={fx} {...(tirador ? { tirador } : {})} {...(pasador ? { pasador } : {})} {...(gol?.autogol ? { autor: gol } : {})} /> : <PizarraConvencional pasos={pasos} fx={fx} />}
           <p className="caption">
             {geo
               ? "Schematic: positions by zone, from match data. Each event records its zone, the post and the height of the shot — zones, not exact coordinates."

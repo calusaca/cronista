@@ -242,6 +242,31 @@ export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max
 export const SALIDA_TEMPRANA_MIN = 25;
 
 // ---------------------------------------------------------------------------------
+// Brief 021 — la pizarra 3D. Las magnitudes de la ESCENA (no del partido): cómo se traduce cada
+// campo registrado a metros y segundos. Única fuente; las pruebas las importan.
+// ---------------------------------------------------------------------------------
+
+/** Altura (m) a la que entra el balón según la `altura` registrada (el travesaño está a 2,44 m). */
+export const ALTURA_DESTINO_M = { raso: 0.25, media: 1.2, alta: 2.1 } as const;
+export const ARCO_3D = { anchoM: 7.32, altoM: 2.44 } as const;
+/** Altura del balón al salir: del suelo; de cabeza o de chilena/tijera, a la altura del remate aéreo. */
+export const SALIDA_M = { suelo: 0.2, cabezazo: 1.9, chilena: 1.6 } as const;
+/** Comba (m por encima de la recta) de cada tramo según la altura o la definición registradas. */
+// Calibrado a ojo en el smoke del 2 oct: un remate «alto» no es una vaselina (con 2 m de comba el
+// penal parecía bombeado); la altura ya la da el destino registrado.
+export const COMBA_M = { raso: 0.1, media: 0.35, alta: 0.7, vaselina: 4.2, media_cancha: 9.0, pase: 1.2 } as const;
+/**
+ * Cámara lenta de la escena: la duración del vuelo es distanciaM / velocidad (m/s) × este factor
+ * (un remate dura < 1 s: a velocidad real no se ve). El pase previo no tiene velocidad registrada:
+ * dura PASE_3D_S (convención de la escena, rotulada como tal en sus fuentes).
+ */
+export const CAMARA_LENTA = 4;
+export const PASE_3D_S = 1.4;
+/** Tolerancia de la prueba de duración (s) y presupuesto del chunk 3D (KB gzip). */
+export const DURACION_3D_TOLERANCIA_S = 0.01;
+export const PRESUPUESTO_CHUNK_3D_KB = 180;
+
+// ---------------------------------------------------------------------------------
 // Brief 020 (rev 1.1) — definiciones del tiro y autogoles. Vocabulario, coherencias duras y
 // rarezas: ÚNICA fuente. Las definiciones ANIDAN dentro del contrato del 015 (60–125 km/h).
 // ---------------------------------------------------------------------------------
