@@ -6,7 +6,7 @@
 // equipos y plantillas, de `generarEquipo` — el mismo de siempre.
 
 import { EQUIPOS_POR_LIGA, MUNDO_SEMILLA, N_PAISES, PROB_CANCHA_SINTETICA, PROB_CESPED_ALTO } from "../analista/umbrales";
-import { generarEquipo, PREFIJOS, SILABAS_INICIO } from "../sim/plantillas";
+import { generarEquipo, generarPlantilla, PREFIJOS, SILABAS_INICIO } from "../sim/plantillas";
 import { prngDerivado, type Rng } from "../sim/prng";
 import { CLIMAS, type Clima, type EquipoMundo, type Liga, type Mundo, type Pais } from "./tipos";
 
@@ -56,6 +56,14 @@ function nombreUnico(rng: Rng, usados: Set<string>, armar: (r: Rng) => string): 
   }
 }
 
+/** Brief 019: de una plantilla extra se toman un POR, un DEF, un MED y un DEL (índices de la plantilla 1-4-3-3), con dorsales 18–21. */
+const RESERVAS: readonly [number, number][] = [
+  [0, 18],
+  [1, 19],
+  [5, 20],
+  [8, 21],
+];
+
 const nombrePais = (r: Rng) => r.pick(SILABAS_INICIO) + r.pick(VOCAL_PAIS) + r.pick(SUFIJO_PAIS);
 const nombreCiudad = (r: Rng) => r.pick(SILABAS_INICIO) + r.pick(MEDIO_CIUDAD) + r.pick(FIN_CIUDAD);
 
@@ -93,10 +101,19 @@ export function crearMundo(semilla: number = MUNDO_SEMILLA): Mundo {
           superficie: rng.chance(PROB_CANCHA_SINTETICA) ? "sintetica" : "natural",
           cesped: rng.chance(PROB_CESPED_ALTO) ? "alto" : "corto",
         },
+        reservas: [],
       });
     }
     return { id, nombre: nombreLiga, pais: pais.id, clima: pais.clima, equipos };
   });
+  // Brief 019: las reservas se generan DESPUÉS de todo lo demás, con su propio flujo derivado,
+  // para que el mundo del 016 (nombres, plantillas, canchas) no cambie ni una letra.
+  for (const liga of ligas) {
+    liga.equipos.forEach((eq, i) => {
+      const extra = generarPlantilla(prngDerivado(semilla, `reservas:${liga.id}:${i}`), usadosJugador);
+      eq.reservas = RESERVAS.map(([idx, dorsal]) => ({ ...(extra[idx] as (typeof extra)[number]), dorsal }));
+    });
+  }
   return { semilla, paises, ligas };
 }
 

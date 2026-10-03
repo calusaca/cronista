@@ -2,7 +2,7 @@
 // El motor no se entera: un equipo del mundo ENVUELVE un `Equipo` de siempre, y un partido
 // de liga es un `SimConfig` estándar con semilla `semillaDePartido(...)`.
 
-import type { Equipo } from "../sim/tipos";
+import type { Equipo, Jugador, SimConfig } from "../sim/tipos";
 
 /** Perfil climático del país (se consume en el 018; aquí es identidad). */
 export type Clima = "tropical" | "desertico" | "templado" | "nordico" | "lluvioso" | "de_altura";
@@ -27,6 +27,11 @@ export interface EquipoMundo {
   liga: string; // id de la liga
   /** Identidad de la cancha local (desde el 018, entra a las condiciones de sus partidos de local). */
   cancha: Cancha;
+  /**
+   * Brief 019 — el plantel extendido: reservas (POR, DEF, MED, DEL) fuera de la plantilla de 16
+   * del partido; entran cuando un sancionado o un lesionado no puede jugar.
+   */
+  reservas: Jugador[];
 }
 
 export interface Liga {
@@ -88,10 +93,34 @@ export interface Goleador {
   goles: number;
 }
 
+/** Brief 019 — una sanción del registro: se la pierde las `jornadas` siguientes de su equipo. */
+export interface Sancion {
+  jugador: string;
+  equipo: string;
+  motivo: "doble_amarilla" | "roja_directa";
+  jornada: number; // en la que la vio
+  jornadas: number; // de suspensión
+  evento: string; // id de la tarjeta_roja
+}
+
+/** Brief 019 — una lesión del registro: fuera las `jornadas` siguientes. */
+export interface LesionLiga {
+  jugador: string;
+  equipo: string;
+  jornada: number;
+  minuto: number;
+  jornadas: number;
+  evento: string; // id del evento lesion
+}
+
 export interface Temporada {
   liga: string; // id
   temporada: number;
   partidos: PartidoLiga[]; // en orden de jornada e índice
   tabla: FilaTabla[];
   goleadores: Goleador[];
+  /** Brief 019: la config con la que se jugó cada partido (alineaciones, condiciones, bajas), alineada con `partidos`. */
+  configs: SimConfig[];
+  sanciones: Sancion[];
+  lesiones: LesionLiga[];
 }

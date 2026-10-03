@@ -27,7 +27,10 @@ export type TipoHecho =
   | "condiciones_del_partido"
   | "efecto_calor"
   | "cancha_incomoda"
-  | "presion_que_ahoga";
+  | "presion_que_ahoga"
+  // Brief 019: consecuencias (lesión en el partido; bajas que trae el registro de la temporada).
+  | "lesion_en_partido"
+  | "bajas_del_partido";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
@@ -63,6 +66,8 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "efecto_calor",
   "cancha_incomoda",
   "presion_que_ahoga",
+  "lesion_en_partido",
+  "bajas_del_partido",
 ];
 
 /**
@@ -70,3 +75,5 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
  * corpus de semillas sueltas (configDeSemilla) no las tiene: allí estos tipos no aparecen nunca.
  */
 export const TIPOS_HECHO_CONDICIONES: readonly TipoHecho[] = ["condiciones_del_partido", "efecto_calor", "cancha_incomoda", "presion_que_ahoga"];
+/** Brief 019: los que solo existen en la temporada (lesiones gated por variantes; bajas del registro). */
+export const TIPOS_HECHO_TEMPORADA: readonly TipoHecho[] = ["lesion_en_partido", "bajas_del_partido"];

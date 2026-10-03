@@ -44,12 +44,32 @@ export interface Condiciones {
   presion: Record<"local" | "visita", NivelPresion>;
 }
 
+/**
+ * Brief 019 — variantes del motor, GATED: ausentes ⇒ el partido de siempre, byte a byte. Hoy
+ * una sola: las lesiones (evento `lesion` + cambio forzado). Solo la temporada las enciende.
+ */
+export interface Variantes {
+  lesiones?: boolean;
+}
+
+/** Brief 019 — una baja que el registro de la temporada trae al partido (no juega: no está en la plantilla). */
+export interface Baja {
+  jugador: string;
+  motivo: "suspension" | "lesion";
+  /** Jornadas que le quedan fuera, contando esta. */
+  jornadas: number;
+}
+
 export interface SimConfig {
   seed: number;
   local: Equipo;
   visita: Equipo;
   /** Brief 018: opcional y aditivo. */
   condiciones?: Condiciones;
+  /** Brief 019: opcional y gated (ausente ⇒ byte-idéntico). */
+  variantes?: Variantes;
+  /** Brief 019: las bajas del registro de la temporada (dato puro: el motor no las lee). */
+  bajas?: Partial<Record<"local" | "visita", Baja[]>>;
 }
 
 export type TipoEvento =
@@ -64,7 +84,9 @@ export type TipoEvento =
   | "tarjeta_roja"
   | "corner"
   | "fuera_de_juego"
-  | "cambio";
+  | "cambio"
+  // Brief 019: solo con config.variantes.lesiones. La sigue SIEMPRE un `cambio` con `sale` = el lesionado.
+  | "lesion";
 
 export type Lado = "local" | "visita";
 export type Zona = "defensa" | "medio" | "ataque";
@@ -102,6 +124,8 @@ export interface Evento {
   distanciaM?: number;
   /** Brief 015 — tiro (y su gol/atajada): velocidad del disparo en km/h enteros. */
   velocidadKmh?: number;
+  /** Brief 019 — lesion: jornadas de baja (LESION_JORNADAS). `relacionadoCon` = la falta, si la hubo. */
+  baja?: number;
 }
 
 /** Brief 011: los campos espaciales (la proyección legado los borra). */

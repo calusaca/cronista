@@ -241,6 +241,18 @@ export function VistaPartido({
             <span className="conditions-note">{EXPLICA_CONDICIONES}</span>
           </div>
         )}
+        {/* Brief 019: las bajas del registro de la temporada (no juegan: no están en la plantilla). */}
+        {datos.config.bajas && (
+          <div className="conditions" data-testid="bajas">
+            {(["local", "visita"] as const).flatMap((l) =>
+              (datos.config.bajas?.[l] ?? []).map((b) => (
+                <span key={`${l}|${b.jugador}`} className="conditions-chip" data-testid="baja" data-motivo={b.motivo}>
+                  {(l === "local" ? local : visita).nombre}: {b.jugador} out · {b.motivo === "suspension" ? "suspended" : "injured"}
+                </span>
+              )),
+            )}
+          </div>
+        )}
         <div className="scoreline">
           <div className="team home">
             {local.nombre}

@@ -10,7 +10,7 @@ import type { Partido } from "../../sim/tipos";
 import { EQUIPO_LOCAL, EQUIPO_VISITA } from "../__fixtures__/constructor";
 import * as F from "../__fixtures__/partidos";
 import { analizar, claveRelevancia } from "../analista";
-import { TIPOS_HECHO, TIPOS_HECHO_CONDICIONES, type Hecho, type TipoHecho } from "../tipos";
+import { TIPOS_HECHO, TIPOS_HECHO_CONDICIONES, TIPOS_HECHO_TEMPORADA, type Hecho, type TipoHecho } from "../tipos";
 import {
   DESEMPATE_EVENTO,
   DOBLETE_MIN_GOLES,
@@ -433,8 +433,10 @@ describe(`propiedades de corpus (semillas 1..${CORPUS})`, () => {
     const vistos = new Set(analisis.flat().map((h) => h.tipo));
     // Brief 018: los de condiciones solo existen en partidos de liga (su corpus los prueba aparte,
     // src/analista/__tests__/condiciones.test.ts); aquí, al revés: jamás aparecen sin condiciones.
-    expect(TIPOS_HECHO.filter((t) => !vistos.has(t) && !TIPOS_HECHO_CONDICIONES.includes(t))).toEqual([]);
-    expect(TIPOS_HECHO_CONDICIONES.filter((t) => vistos.has(t))).toEqual([]);
+    // Brief 019: igual con los de la temporada (lesiones gated por variantes, bajas del registro).
+    const soloLiga = [...TIPOS_HECHO_CONDICIONES, ...TIPOS_HECHO_TEMPORADA];
+    expect(TIPOS_HECHO.filter((t) => !vistos.has(t) && !soloLiga.includes(t))).toEqual([]);
+    expect(soloLiga.filter((t) => vistos.has(t))).toEqual([]);
   });
 
   it("los nombres de jugadores en datos pertenecen a la plantilla del partido", () => {

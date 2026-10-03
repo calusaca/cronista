@@ -5,7 +5,7 @@
 // ser cerradas. Lo que no está aquí, el Verificador no lo deja pasar.
 
 import type { Hecho } from "../analista/tipos";
-import { GOLEADA_MARGEN_MIN } from "./umbrales";
+import { BAJAS_DIEZMADO_MIN, GOLEADA_MARGEN_MIN } from "./umbrales";
 
 export type Lengua = "es" | "en";
 
@@ -323,7 +323,7 @@ export const JUICIO: EntradaJuicio[] = [
     es: palabras([
       "monólogo", "paliza", "baile", "bailó", "vapuleo", "vapuleó", "humillación", "humilló", "masacre", "aplastó", "aplastante", "épico", "épica",
       "histórico", "histórica", "milagro", "milagroso", "robo", "escándalo", "escandaloso", "agresión", "agredió", "codazo", "insultó", "insulto",
-      "protestó", "lesión", "lesionado", "var", "árbitro", "infame", "vergonzoso",
+      "protestó", "var", "árbitro", "infame", "vergonzoso",
       // rev. 3.2 — muletillas típicas de un LLM (lista mantenida; el lenguaje abierto no se cierra)
       "golazo", "golazos", "polémico", "polémica", "polémicamente", "de forma polémica", "controvertido", "controvertida", "gracias a",
       "por culpa de", "error del portero", "error del arquero", "error de la defensa", "error defensivo", "el mejor de la tarde",
@@ -332,8 +332,7 @@ export const JUICIO: EntradaJuicio[] = [
     ]),
     en: palabras([
       "one-man show", "masterclass", "humiliation", "humiliated", "massacre", "demolition", "demolished", "crushed", "crushing", "epic", "historic",
-      "miracle", "miraculous", "robbery", "scandal", "scandalous", "violent conduct", "elbow", "elbowed", "insulted", "insult", "protested", "injury",
-      "injured", "var", "referee", "shameful", "disgrace",
+      "miracle", "miraculous", "robbery", "scandal", "scandalous", "violent conduct", "elbow", "elbowed", "insulted", "insult", "protested", "var", "referee", "shameful", "disgrace",
       // rev. 3.2
       "controversially", "controversial", "thanks to", "due to an error", "because of an error", "error by", "goalkeeping error",
       "defensive error", "stunner", "screamer", "wonder goal", "worldie", "best goal", "standout", "unfair", "fair",
@@ -639,3 +638,62 @@ export const EFECTOS_CONDICION: EntradaJuicio[] = (Object.keys(FRASES_EFECTO) as
 
 /** Brief 018: «°C» es una unidad, no un nombre propio (V4); la cifra la sigue juzgando V3. */
 export const GRADOS_C = /°\s?C(?![\p{L}\p{N}])/gu;
+
+// ---------------------------------------------------------------------------------
+// Brief 019 — consecuencias. Las palabras de lesión y de sanción (antes «fuera de tabla»:
+// ningún hecho las pagaba) las paga AHORA el hecho que las registra; «llegó sin / were without»
+// (con su «sin» que no niega un suceso: describe la baja) solo con bajas_del_partido, y
+// «diezmado / depleted» solo con BAJAS_DIEZMADO_MIN bajas o más. Se juzgan antes de V7.
+// ---------------------------------------------------------------------------------
+
+export const FRASES_CONSECUENCIA = {
+  sin: {
+    es: ["llegó sin", "llega sin", "jugó sin", "juega sin", "sin poder contar con", "no pudo contar con", "no contó con"],
+    en: ["were without", "was without", "are without", "is without", "played without", "had to do without"],
+  },
+  suspension: {
+    es: ["suspendido", "suspendidos", "suspendida", "sancionado", "sancionados", "suspensión"],
+    en: ["suspended", "suspension", "banned", "serving a ban"],
+  },
+  lesion: {
+    es: ["se retiró lesionado", "lesionado", "lesionados", "lesionada", "lesión", "lesiones"],
+    en: ["went off injured", "injured", "injury", "injuries"],
+  },
+  diezmado: {
+    es: ["diezmado", "diezmados", "diezmada", "mermado", "mermados"],
+    en: ["depleted", "decimated", "understrength", "under-strength"],
+  },
+} as const satisfies Record<string, Record<Lengua, readonly string[]>>;
+
+const conBajas = (h: Hecho, motivo?: "suspendidos" | "lesionados") => h.tipo === "bajas_del_partido" && (motivo === undefined || Number(h.datos[motivo]) > 0);
+
+export const CONSECUENCIAS: EntradaJuicio[] = [
+  {
+    id: "bajas_sin",
+    es: palabras(FRASES_CONSECUENCIA.sin.es),
+    en: palabras(FRASES_CONSECUENCIA.sin.en),
+    habilita: (h) => conBajas(h),
+    requisito: "«llegó sin / were without» exige el hecho bajas_del_partido como principal",
+  },
+  {
+    id: "suspension",
+    es: palabras(FRASES_CONSECUENCIA.suspension.es),
+    en: palabras(FRASES_CONSECUENCIA.suspension.en),
+    habilita: (h) => conBajas(h, "suspendidos"),
+    requisito: "«suspendido / suspended» exige bajas_del_partido con algún suspendido como principal",
+  },
+  {
+    id: "lesion",
+    es: palabras(FRASES_CONSECUENCIA.lesion.es),
+    en: palabras(FRASES_CONSECUENCIA.lesion.en),
+    habilita: (h) => h.tipo === "lesion_en_partido" || conBajas(h, "lesionados"),
+    requisito: "«lesionado / injured» exige lesion_en_partido, o bajas_del_partido con algún lesionado, como principal",
+  },
+  {
+    id: "diezmado",
+    es: palabras(FRASES_CONSECUENCIA.diezmado.es),
+    en: palabras(FRASES_CONSECUENCIA.diezmado.en),
+    habilita: (h) => conBajas(h) && Number(h.datos.bajas) >= BAJAS_DIEZMADO_MIN,
+    requisito: `«diezmado / depleted» exige bajas_del_partido con ${BAJAS_DIEZMADO_MIN} bajas o más`,
+  },
+];

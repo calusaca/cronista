@@ -241,6 +241,20 @@ export const TEMPERATURA_C = { calor: { min: 29, max: 41 }, frio: { min: -8, max
  */
 export const SALIDA_TEMPRANA_MIN = 25;
 
+// ---------------------------------------------------------------------------------
+// Brief 019 — lesiones (solo con config.variantes.lesiones). Severidad y rareza: ÚNICA fuente.
+// ---------------------------------------------------------------------------------
+
+/** Jornadas de baja de una lesión [min, max] y su reparto (severidad sorteada; leve la mayoría). */
+export const LESION_JORNADAS = { min: 1, max: 4 } as const;
+export const LESION_SEVERIDAD: Record<1 | 2 | 3 | 4, number> = { 1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1 };
+/**
+ * Rareza (brief: ~0,3 lesiones por partido): media del corpus dentro de esta banda. Medido el 2 oct:
+ * liga completa (720) 0,301; semillas sueltas 1..1000 con la variante, 0,371. Severidad en liga:
+ * 86 / 72 / 39 / 20 lesiones de 1 / 2 / 3 / 4 jornadas.
+ */
+export const LESIONES_MEDIA = { min: 0.2, max: 0.4 } as const;
+
 /** Tamaño de cada brazo de los A/B del brief 018 (condición vs control, mismas semillas). */
 export const N_AB = 500;
 

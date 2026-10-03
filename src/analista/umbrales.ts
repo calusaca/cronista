@@ -130,6 +130,12 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   efecto_calor: 58,
   cancha_incomoda: 56,
   condiciones_del_partido: 25,
+  // Brief 019: la lesión, debajo del gol (no obliga a narrarla); las bajas, contexto de la previa.
+  // Rareza medida en liga (720, 2 oct): lesion_en_partido 26,1 % de los partidos; bajas_del_partido
+  // 49,6 % (es contexto, como las condiciones); un equipo con 2+ bajas («diezmado») en el 9,2 %.
+  // Sanciones: 0,117 por partido (53 por doble amarilla, 31 por roja directa).
+  lesion_en_partido: 66,
+  bajas_del_partido: 45,
 };
 
 /**
@@ -173,6 +179,8 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   efecto_calor: "inicio_periodo",
   cancha_incomoda: "inicio_periodo",
   presion_que_ahoga: "inicio_periodo",
+  lesion_en_partido: "lesion",
+  bajas_del_partido: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -296,7 +304,7 @@ export const CALOR_PASES_2T_MAX = 90;
  * alto, ~14 %. Muestra mínima para un prefijo (en vivo): CANCHA_CORTOS_MUESTRA_MIN pases cortos.
  * Verificación de Fable (2 oct): además, SIN lluvia — con lluvia la caída salía en el 55 % de los
  * partidos de césped alto (14 % en seco): la lluvia, no el césped, podía explicarla. Re-medido en
- * liga (720): 4,4 % de los partidos, 16,4 % de los 195 de césped alto sin lluvia.
+ * liga (720): 4,4 % de los partidos, 16,4 % de los 195 de césped alto sin lluvia (con el 019: 4,3 % y 15,9 %).
  */
 export const CANCHA_CORTOS_MAX = 73;
 export const CANCHA_CORTOS_MUESTRA_MIN = 60;
@@ -306,9 +314,19 @@ export const CANCHA_CORTOS_MUESTRA_MIN = 60;
  * ahí y llega a 8 en el 1,6 % de los partidos; con presión alta, 4,6 de media y 8+ en el 18,8 %.
  * Verificación de Fable (2 oct): SUBSUME a `perdidas_en_salida` del mismo equipo (mismas pérdidas,
  * con su causa: no se narran dos veces). Re-medido en liga (720): perdidas_en_salida pasa de 35,4 %
- * a 27,5 % (29,7 % con presión alta; 25,3 % sin), bajo RAREZA_MICRO_MAX.
+ * a 27,5 % (29,7 % con presión alta; 25,3 % sin), bajo RAREZA_MICRO_MAX (con el 019: 26,4 %).
  */
 export const PRESION_PERDIDAS_MIN = 8;
+// ---------------------------------------------------------------------------------
+// Brief 019 — consecuencias: sanciones y rating de temporada. Una sola fuente.
+// ---------------------------------------------------------------------------------
+/** Jornadas de suspensión (brief §1). Acumulación de amarillas: fuera de alcance v1. */
+export const SANCION_JORNADAS = { doble_amarilla: 1, roja_directa: 2 } as const;
+/** Rating general (brief §3): mínimo de partidos jugados para entrar al top. */
+export const RATING_PARTIDOS_MIN = 5;
+/** Filas del top del rating en la pestaña Players. */
+export const RATING_TOP = 15;
+
 /** Rareza de los hechos de efecto sobre el corpus de liga (las 8 ligas, temporada 1): como en el 013, ≤ 35 %. */
 export const RAREZA_CONDICION_MAX = 0.35;
 

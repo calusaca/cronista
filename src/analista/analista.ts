@@ -24,7 +24,7 @@
 
 import type { Evento, Lado, Partido } from "../sim/tipos";
 import { micro, type MicroPartido } from "../sim/micro";
-import { CANAL_TEXTO, CANCHA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { CANAL_TEXTO, CANCHA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
 import { medirCalor, medirCancha, medirPresion } from "./condiciones";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
@@ -637,6 +637,54 @@ function presionQueAhoga(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
   return [hechoMicro("presion_que_ahoga", "presion_que_ahoga", x.ids, { ...equipos(c), equipo: c.nombre[x.lado], presion: "alta", perdidas: x.ids.length, limite: x.limite })];
 }
 
+// ---------------- brief 019: consecuencias ----------------
+
+/** `lesion_en_partido`: cada lesión del partido (cita la lesión, su cambio forzado y la falta, si la hubo). */
+function lesiones(c: Ctx): Borrador[] {
+  const out: Borrador[] = [];
+  c.ev.forEach((e, i) => {
+    if (e.tipo !== "lesion" || !e.jugador || e.baja === undefined) return;
+    const cambio = c.ev[i + 1]?.tipo === "cambio" ? c.ev[i + 1] : undefined;
+    const falta = e.relacionadoCon ? c.porId.get(e.relacionadoCon) : undefined;
+    const j = jornadasTxt(e.baja);
+    out.push(
+      hecho(c, "lesion_en_partido", falta?.jugador ? "lesion_falta" : "lesion", [e.id, cambio?.id, falta?.id], {
+        jugador: e.jugador,
+        equipo: c.nombre[e.equipo],
+        minuto: minutoTxt(e.minuto),
+        jornadas: e.baja,
+        baja_es: j.es,
+        baja_en: j.en,
+        ...(falta?.jugador ? { infractor: falta.jugador } : {}),
+      }),
+    );
+  });
+  return out;
+}
+
+/** `bajas_del_partido`: las bajas que el registro de la temporada trae a este partido (por equipo). */
+function bajasDelPartido(p: Partido, c: Ctx): Borrador[] {
+  const inicio = c.ev.find((e) => e.tipo === "inicio_periodo");
+  if (!inicio) return [];
+  const out: Borrador[] = [];
+  for (const lado of LADOS) {
+    const bs = p.config.bajas?.[lado] ?? [];
+    if (bs.length === 0) continue;
+    const l = listaBajas(bs);
+    out.push(
+      hecho(c, "bajas_del_partido", "bajas_del_partido", [inicio.id], {
+        equipo: c.nombre[lado],
+        bajas: bs.length,
+        suspendidos: bs.filter((b) => b.motivo === "suspension").length,
+        lesionados: bs.filter((b) => b.motivo === "lesion").length,
+        lista_es: l.es,
+        lista_en: l.en,
+      }),
+    );
+  }
+  return out;
+}
+
 // ---------------- orden y API ----------------
 
 /**
@@ -710,6 +758,8 @@ export function analizar(partido: Partido): Hecho[] {
   const subsumidos = new Set<Lado>(presionAlta?.efecto ? [presionAlta.lado] : []);
   borradores.push(...duelos(c, m), ...perdidasEnSalida(c, m, subsumidos), ...dominioGlobal(c, m), ...dominioPorCanal(c, m));
   // Brief 018: solo si el partido registra condiciones (los partidos sueltos no las tienen).
+  // Brief 019: lesiones (solo con la variante) y las bajas del registro (solo partidos de liga).
+  borradores.push(...lesiones(c), ...bajasDelPartido(partido, c));
   borradores.push(...condicionesDelPartido(partido, c), ...efectoCalor(partido, c, m), ...canchaIncomoda(partido, c, m), ...presionQueAhoga(partido, c, m));
   borradores.sort(comparar(c, m));
   return borradores.map((b, i) => ({ id: `h${String(i + 1).padStart(2, "0")}`, ...b }));

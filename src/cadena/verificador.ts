@@ -27,6 +27,7 @@ import {
   BALANCE_POSTERIOR,
   CIERRE_EN_VIVO,
   CIERRE_EN_VIVO_EXCEPTO,
+  CONSECUENCIAS,
   CUENTA_GOLES,
   EFECTOS_CONDICION,
   FRANJAS,
@@ -135,6 +136,8 @@ function plantel(p: Partido): Plantel {
   const equipos = [p.config.local.nombre, p.config.visita.nombre];
   const equipoDe = new Map<string, string>();
   for (const lado of ["local", "visita"] as const) for (const j of p.config[lado].jugadores) equipoDe.set(j.nombre, p.config[lado].nombre);
+  // Brief 019: las bajas del registro también son nombres del partido (no juegan, pero se nombran).
+  for (const lado of ["local", "visita"] as const) for (const b of p.config.bajas?.[lado] ?? []) equipoDe.set(b.jugador, p.config[lado].nombre);
   const nombres = [...equipos, ...equipoDe.keys()].sort((a, b) => b.length - a.length);
   const alias = new Map<string, string>();
   const prefijos = equipos.map((e) => e.split(/\s+/)[0] as string);
@@ -444,7 +447,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   });
   // Brief 018 — el color de las condiciones, solo con su efecto medido como principal (antes de
   // V7: «nunca se acomodó / never settled» describe la medición, no niega un suceso).
-  for (const e of EFECTOS_CONDICION) {
+  for (const e of [...EFECTOS_CONDICION, ...CONSECUENCIAS]) {
     s = quitar(s, e[lengua], (m) => {
       if (!ctx.hechos.some((x) => e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
     });

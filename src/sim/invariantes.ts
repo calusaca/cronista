@@ -5,7 +5,7 @@
 import { MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
-import { CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
+import { CESPEDES, CLIMAS_PARTIDO, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
 
 /** Prop. 2 — minutos enteros, monótonos no decrecientes y dentro de [0, fin_periodo final]. */
@@ -191,6 +191,9 @@ export function verificarContrato(p: Partido): string[] {
     if ((e.tipo === "tiro" || e.tipo === "gol") && !xgValido(e.xg)) err.push(`${e.id}: ${e.tipo} con xg inválido (${String(e.xg)})`);
     if (e.tipo === "cambio" && (typeof e.sale !== "string" || e.sale === "")) err.push(`${e.id}: cambio sin sale`);
     if (e.tipo !== "cambio" && e.sale !== undefined) err.push(`${e.id}: sale en ${e.tipo}`);
+    // Brief 019: `baja` solo en lesion, y siempre en lesion.
+    if (e.tipo === "lesion" ? !Number.isInteger(e.baja) || (e.baja as number) < LESION_JORNADAS.min || (e.baja as number) > LESION_JORNADAS.max : e.baja !== undefined)
+      err.push(`${e.id}: baja ${String(e.baja)} en ${e.tipo}`);
     if (e.tipo === "gol" && e.relacionadoCon) {
       const t = porId.get(e.relacionadoCon);
       if (t && t.xg !== e.xg) err.push(`${e.id}: gol no hereda el xg de su tiro`);
@@ -320,6 +323,36 @@ export function verificarCondiciones(p: Partido): string[] {
   return err;
 }
 
+/**
+ * Brief 019 — lesiones. Solo con la variante; cada `lesion` la sigue, en el mismo minuto, un
+ * `cambio` de su equipo cuyo `sale` es el lesionado (y el lesionado no reaparece: lo vigila además
+ * verificarSalidas); si cita una falta, es una falta ANTERIOR del rival. Las bajas del registro
+ * (config.bajas) no están en la plantilla de su equipo ni aparecen en el partido.
+ */
+export function verificarLesiones(p: Partido): string[] {
+  const err: string[] = [];
+  const porId = new Map(p.eventos.map((e, i) => [e.id, i] as const));
+  p.eventos.forEach((e, i) => {
+    if (e.tipo !== "lesion") return;
+    if (p.config.variantes?.lesiones !== true) err.push(`${e.id}: lesion sin la variante`);
+    const sig = p.eventos[i + 1];
+    if (!sig || sig.tipo !== "cambio" || sig.equipo !== e.equipo || sig.sale !== e.jugador || sig.minuto !== e.minuto) err.push(`${e.id}: lesion de ${String(e.jugador)} sin su cambio forzado`);
+    for (const x of p.eventos.slice(i + 2)) if ((x.jugador === e.jugador || x.sale === e.jugador) && x.equipo === e.equipo) err.push(`${x.id}: ${String(e.jugador)} reaparece tras lesionarse en ${e.id}`);
+    if (e.relacionadoCon !== undefined) {
+      const j = porId.get(e.relacionadoCon);
+      const f = j === undefined ? undefined : p.eventos[j];
+      if (!f || f.tipo !== "falta" || f.equipo === e.equipo || (j as number) >= i) err.push(`${e.id}: relacionadoCon ${e.relacionadoCon} no es una falta previa del rival`);
+    }
+  });
+  for (const lado of ["local", "visita"] as const) {
+    for (const b of p.config.bajas?.[lado] ?? []) {
+      if (p.config[lado].jugadores.some((j) => j.nombre === b.jugador)) err.push(`baja ${b.jugador} en la plantilla ${lado}`);
+      if (p.eventos.some((e) => e.equipo === lado && (e.jugador === b.jugador || e.sale === b.jugador))) err.push(`baja ${b.jugador} aparece en el partido`);
+    }
+  }
+  return err;
+}
+
 export const VERIFICADORES = {
   minutos: verificarMinutos,
   relaciones: verificarRelaciones,
@@ -332,6 +365,8 @@ export const VERIFICADORES = {
   espacial: verificarEspacial,
   // Brief 018.
   condiciones: verificarCondiciones,
+  // Brief 019.
+  lesiones: verificarLesiones,
   // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
   micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;

@@ -182,6 +182,20 @@ export const CONDICIONES = {
 } as const;
 
 /**
+ * Brief 019 — perillas de las lesiones (la banda que las acota, LESIONES_MEDIA, vive en limites).
+ * Se sortean con prngDerivado (por falta / por posesión): sin la variante no se consume nada.
+ */
+export const LESIONES = {
+  /** Probabilidad de que una falta lesione al que la recibe. */
+  pPorFalta: 0.008,
+  /** Sobreesfuerzo por posesión: base × (1 + k·cansancio). */
+  pSobreesfuerzo: 0.00065,
+  kSobreesfuerzo: 3,
+  /** Peso por posición de quién se lesiona. */
+  peso: { POR: 0.2, DEF: 1, MED: 1.2, DEL: 1.4 },
+} as const;
+
+/**
  * Brief 013 — perillas de la capa micro (los umbrales que las acotan viven en limites.ts).
  * Todo se sortea con prngDerivado(semilla, "micro:" + id del ancla): nunca el stream principal.
  */

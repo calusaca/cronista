@@ -1,9 +1,10 @@
 // Brief 016 §4 — datos de la liga para la UI (solo servidor). La UI muestra UNA liga (la
 // primera del mundo); las demás existen y esperan. La temporada se simula una vez por proceso.
 
-import { LIGA_DESTACADA, TEMPORADA_ACTUAL } from "../analista/umbrales";
+import { LIGA_DESTACADA, RATING_PARTIDOS_MIN, RATING_TOP, TEMPORADA_ACTUAL } from "../analista/umbrales";
 import { mundo } from "../mundo/mundo";
-import { configDePartidoLiga, jornadasDe, partidosPorJornada, simularTemporada } from "../mundo/temporada";
+import { partidosDeTemporada, ratingsDeTemporada, tarjetasDeTemporada, topRating, type RatingJugador, type TarjetasJugador } from "../mundo/rating";
+import { configDePartidoLiga, jornadasDe, partidosPorJornada, temporadaDe } from "../mundo/temporada";
 import type { Liga, Temporada } from "../mundo/tipos";
 import { type DatosPartido, type Perspectiva, cargarOverlayDeConfig, cargarPartidoDeConfig } from "./servidor";
 
@@ -28,10 +29,44 @@ export function ligaVisible(): Liga {
   return l;
 }
 
-let temporadaCache: Temporada | undefined;
+/** Brief 019: la temporada con su registro, memorizada (la misma de las configs de cada partido). */
 export function temporadaVisible(): Temporada {
-  temporadaCache ??= simularTemporada(ligaVisible(), TEMPORADA_ACTUAL);
-  return temporadaCache;
+  return temporadaDe(ligaVisible(), TEMPORADA_ACTUAL);
+}
+
+export interface JugadoresLiga {
+  top: RatingJugador[];
+  tarjetas: TarjetasJugador[];
+  minPartidos: number;
+}
+
+let jugadoresCache: JugadoresLiga | undefined;
+/** Brief 019 §3: la pestaña Players (top del rating con sus notas, tarjetas). */
+export function jugadoresVisibles(): JugadoresLiga {
+  if (jugadoresCache) return jugadoresCache;
+  const t = temporadaVisible();
+  const ps = partidosDeTemporada(t);
+  jugadoresCache = { top: topRating(ratingsDeTemporada(t, ps), RATING_PARTIDOS_MIN, RATING_TOP), tarjetas: tarjetasDeTemporada(ps), minPartidos: RATING_PARTIDOS_MIN };
+  return jugadoresCache;
+}
+
+export interface BajaVisible {
+  equipo: string;
+  jugador: string;
+  motivo: "suspension" | "lesion";
+  jornadas: number;
+}
+
+/** Brief 019: quiénes no juegan la jornada j (las bajas con que se armaron sus alineaciones). */
+export function bajasDeJornada(j: number): BajaVisible[] {
+  const t = temporadaVisible();
+  const out: BajaVisible[] = [];
+  t.partidos.forEach((p, k) => {
+    if (p.jornada !== j) return;
+    const c = t.configs[k];
+    for (const lado of ["local", "visita"] as const) for (const b of c?.bajas?.[lado] ?? []) out.push({ equipo: lado === "local" ? p.local : p.visita, ...b });
+  });
+  return out;
 }
 
 export const rutaPartidoLiga = (r: RefPartido) => `/liga/${r.jornada}/${r.indice}`;

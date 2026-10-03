@@ -1904,3 +1904,122 @@ button.stats-row:hover {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* ---------- brief 019: pestañas de liga, rating de temporada, bajas ---------- */
+
+.liga-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.liga-tab {
+  font-weight: 700;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--surface);
+}
+
+.liga-tab[aria-current="page"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.rating-temporada,
+.rt-desglose,
+.bajas-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rating-temporada > li {
+  border-bottom: 1px solid var(--line);
+}
+
+.rating-temporada summary {
+  display: grid;
+  grid-template-columns: 3.2em minmax(0, 1fr) auto;
+  grid-template-areas: "nota jugador partidos" "nota equipo partidos";
+  column-gap: 10px;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+
+.rt-nota {
+  grid-area: nota;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  align-self: center;
+}
+
+.rt-jugador {
+  grid-area: jugador;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.rt-equipo {
+  grid-area: equipo;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.rt-partidos {
+  grid-area: partidos;
+  color: var(--muted);
+  font-size: 13px;
+  align-self: center;
+}
+
+.rt-desglose {
+  padding: 0 4px 10px 3.2em;
+}
+
+.rt-desglose a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.rt-desglose a:hover {
+  color: var(--accent);
+}
+
+.rt-nota-partido {
+  font-weight: 700;
+}
+
+.bajas-lista {
+  padding: 0 16px;
+}
+
+.bajas-lista li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.bajas-lista .gol-equipo {
+  grid-column: 1;
+}
+
+.bajas-lista .gol-n {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 13px;
+}

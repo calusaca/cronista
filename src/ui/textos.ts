@@ -17,6 +17,7 @@ export const NOMBRE_EVENTO: Record<Evento["tipo"], string> = {
   corner: "Corner",
   fuera_de_juego: "Offside",
   cambio: "Substitution",
+  lesion: "Injury",
 };
 
 /** Brief 010: rótulo corto del chip de cada evento en la línea de tiempo (se muestra en versalitas). */
@@ -33,6 +34,7 @@ export const CHIP_EVENTO: Record<Evento["tipo"], string> = {
   corner: "Corner",
   fuera_de_juego: "Offside",
   cambio: "Sub",
+  lesion: "Injury",
 };
 
 /** Qué rechaza cada regla del Verificador, en palabras (006: «la regla con su explicación»). */
@@ -85,6 +87,9 @@ export function describirEvento(e: Evento, modo: ModoXg = "analista", lengua: Le
       return "Shot saved";
     case "cambio":
       return `On ${quien}${e.sale ? `, off ${e.sale}` : ""}`;
+    case "lesion":
+      // Brief 019: cuántas jornadas se pierde (el registro de la temporada lo usa).
+      return `${NOMBRE_EVENTO.lesion} · ${quien}${e.baja !== undefined ? ` · out ${e.baja} matchday${e.baja === 1 ? "" : "s"}` : ""}`;
     default:
       return quien ? `${NOMBRE_EVENTO[e.tipo]} · ${quien}` : NOMBRE_EVENTO[e.tipo];
   }

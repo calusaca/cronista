@@ -11,6 +11,7 @@ import {
   verificarEspacial,
   verificarExpulsados,
   verificarJugadores,
+  verificarLesiones,
   verificarMinutos,
   verificarRelaciones,
   verificarSalidas,
@@ -131,7 +132,9 @@ describe("016 · temporada", () => {
   it("cada partido de liga es un partido normal: config estándar y contrato/invariantes del motor", () => {
     for (const { p } of simulados) {
       // Brief 018: la config estándar del 016 más sus condiciones (el brief 016 lo anunciaba).
-      expect(Object.keys(p.config).sort()).toEqual(["condiciones", "local", "seed", "visita"]);
+      // Brief 019: más las lesiones encendidas y, si el registro las trae, las bajas.
+      const claves = Object.keys(p.config).sort();
+      expect(claves.filter((k) => k !== "bajas")).toEqual(["condiciones", "local", "seed", "variantes", "visita"]);
       const errores = [
         ...verificarContrato(p),
         ...verificarMinutos(p),
@@ -143,6 +146,7 @@ describe("016 · temporada", () => {
         ...verificarSalidas(p),
         ...verificarEspacial(p),
         ...verificarCondiciones(p),
+        ...verificarLesiones(p),
       ];
       expect(errores, String(p.config.seed)).toEqual([]);
     }

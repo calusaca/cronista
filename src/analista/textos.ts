@@ -133,6 +133,19 @@ export const PLANTILLAS = {
     es: "En el césped alto de la cancha de {local}, {equipo} completó el {porcentaje} % de sus pases cortos ({completados} de {intentados}).",
     en: "On the long grass at {local}'s ground, {equipo} completed {porcentaje}% of their short passes ({completados} of {intentados}).",
   },
+  // Brief 019.
+  lesion: {
+    es: "{jugador} ({equipo}) se retiró lesionado en el minuto {minuto} (baja de {baja_es}).",
+    en: "{jugador} ({equipo}) went off injured in minute {minuto} (out for {baja_en}).",
+  },
+  lesion_falta: {
+    es: "{jugador} ({equipo}) se retiró lesionado en el minuto {minuto}, tras una falta de {infractor} (baja de {baja_es}).",
+    en: "{jugador} ({equipo}) went off injured in minute {minuto} after a foul by {infractor} (out for {baja_en}).",
+  },
+  bajas_del_partido: {
+    es: "{equipo} llegó sin {lista_es}.",
+    en: "{equipo} were without {lista_en}.",
+  },
   presion_que_ahoga: {
     es: "Con presión alta, {equipo} perdió el balón {perdidas} veces en su salida antes del minuto {limite}.",
     en: "Under high pressure, {equipo} lost the ball {perdidas} times playing out before minute {limite}.",
@@ -184,6 +197,17 @@ export const PRESION_TEXTO: Record<string, { es: string; en: string }> = {
   media: { es: "media", en: "medium" },
   alta: { es: "alta", en: "high" },
 };
+
+/** Brief 019: «1 jornada / 3 jornadas», «1 matchday / 3 matchdays». */
+export const jornadasTxt = (n: number) => ({ es: `${n} ${n === 1 ? "jornada" : "jornadas"}`, en: `${n} ${n === 1 ? "matchday" : "matchdays"}` });
+/** Brief 019: «A (suspendido), B (lesionado) y C (lesionado)» / «… and …». */
+export function listaBajas(bajas: readonly { jugador: string; motivo: "suspension" | "lesion" }[]): { es: string; en: string } {
+  const unir = (xs: string[], y: string) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${y} ${xs[xs.length - 1]}`);
+  return {
+    es: unir(bajas.map((b) => `${b.jugador} (${b.motivo === "suspension" ? "suspendido" : "lesionado"})`), "y"),
+    en: unir(bajas.map((b) => `${b.jugador} (${b.motivo === "suspension" ? "suspended" : "injured"})`), "and"),
+  };
+}
 
 /** Brief 013: cómo se dice cada canal en los textos de los hechos. */
 export const CANAL_TEXTO: Record<string, { es: string; en: string }> = {

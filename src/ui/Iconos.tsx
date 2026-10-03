@@ -88,6 +88,14 @@ export function IconoEvento({ tipo, size = 16 }: { tipo: TipoEvento } & P) {
           <path d="M17 20V6M13.5 9.5L17 6l3.5 3.5" />
         </svg>
       );
+    case "lesion":
+      // cruz de asistencia (brief 019)
+      return (
+        <svg {...base(size)}>
+          <rect x="4" y="4" width="16" height="16" rx="3" />
+          <path d="M12 8v8M8 12h8" />
+        </svg>
+      );
     default:
       return (
         <svg {...base(size)}>

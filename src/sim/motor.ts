@@ -13,7 +13,9 @@
 // - `pase_clave` se emite solo cuando le sigue un tiro del mismo equipo (definición Opta).
 // - `inicio_periodo` / `fin_periodo` llevan el equipo que sacó de centro en ese periodo.
 
-import { ESTILO_ATAQUE, ESTILO_DEFENSA, P, PESOS } from "./parametros";
+import { ESTILO_ATAQUE, ESTILO_DEFENSA, LESIONES, P, PESOS } from "./parametros";
+import { LESION_SEVERIDAD } from "./limites";
+import { prngDerivado } from "./prng";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
 import { erroresCondiciones, factorAtaque, factorCornerTrasAtajada, factorFaltas } from "./condiciones";
 import { crearRng, type Rng } from "./prng";
@@ -46,7 +48,7 @@ interface EstadoEquipo {
   goles: number;
 }
 
-type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale">>;
+type ExtraEvento = Partial<Pick<Evento, "jugador" | "zona" | "xg" | "penal" | "relacionadoCon" | "sale" | "baja">>;
 
 function clamp(x: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, x));
@@ -149,6 +151,13 @@ export function validarConfig(config: SimConfig): void {
       nombres.add(j.nombre);
     }
   }
+  // Brief 019: una baja no juega — no puede estar en la plantilla de su equipo.
+  for (const lado of ["local", "visita"] as const) {
+    for (const b of config.bajas?.[lado] ?? []) {
+      if (config[lado].jugadores.some((j) => j.nombre === b.jugador)) throw new Error(`config inválida: la baja ${b.jugador} está en la plantilla ${lado}`);
+      if (!Number.isInteger(b.jornadas) || b.jornadas < 1 || (b.motivo !== "suspension" && b.motivo !== "lesion")) throw new Error(`config inválida: baja ${b.jugador} mal formada`);
+    }
+  }
   // Brief 018: las condiciones son opcionales; si vienen, cumplen su contrato.
   if (config.condiciones !== undefined) {
     const err = erroresCondiciones(config.condiciones);
@@ -165,6 +174,8 @@ class Simulacion {
   private readonly origenes = new Map<string, OrigenTiro>();
   private readonly equipos: Record<Lado, EstadoEquipo>;
   private t = 0;
+  /** Brief 019: número de posesión (la clave del sorteo derivado del sobreesfuerzo). */
+  private nPosesion = 0;
   private periodo: 1 | 2 = 1;
   private finPeriodo = 45;
   private minutoFinal = 90;
@@ -216,6 +227,7 @@ class Simulacion {
     if (extra.penal !== undefined) ev.penal = extra.penal;
     if (extra.relacionadoCon !== undefined) ev.relacionadoCon = extra.relacionadoCon;
     if (extra.sale !== undefined) ev.sale = extra.sale;
+    if (extra.baja !== undefined) ev.baja = extra.baja;
     this.eventos.push(ev);
     return id;
   }
@@ -281,7 +293,32 @@ class Simulacion {
         est.amonestados.add(j.nombre);
       }
     }
+    // Brief 019: una falta dura puede lesionar al que la recibe (sorteo derivado por la falta).
+    if (this.config.variantes?.lesiones === true) {
+      const rng = prngDerivado(this.config.seed, `lesion:${idFalta}`);
+      if (rng.chance(LESIONES.pPorFalta)) this.lesionar(this.equipos[this.rival(est.lado)], rng, idFalta);
+    }
     return idFalta;
+  }
+
+  /**
+   * Brief 019 — lesión: elige al lesionado (en cancha), sortea su baja y lo saca con un cambio
+   * FORZADO (lesion + cambio, mismo minuto). Sin cambios disponibles o sin suplente, el
+   * jugador sigue (no hay lesión que registrar): el lesionado siempre sale, nunca juega lesionado.
+   */
+  private lesionar(est: EstadoEquipo, rng: Rng, idFalta?: string): void {
+    if (est.cambios >= MAX_CAMBIOS) return;
+    const victima = rng.weighted(est.enCampo, (j) => LESIONES.peso[j.posicion]);
+    if (!victima) return;
+    const candidatos = est.suplentes.filter((s) => (victima.posicion === "POR" ? s.posicion === "POR" : s.posicion !== "POR"));
+    if (candidatos.length === 0) return;
+    const entra = candidatos.find((s) => s.posicion === victima.posicion) ?? (candidatos[0] as Jugador);
+    const baja = rng.weighted([1, 2, 3, 4] as const, (k) => LESION_SEVERIDAD[k]) ?? 1;
+    this.emitir("lesion", est.lado, { jugador: victima.nombre, baja, ...(idFalta ? { relacionadoCon: idFalta } : {}) });
+    est.suplentes = est.suplentes.filter((s) => s.nombre !== entra.nombre);
+    est.enCampo = est.enCampo.map((j) => (j.nombre === victima.nombre ? entra : j));
+    est.cambios += 1;
+    this.emitir("cambio", est.lado, { jugador: entra.nombre, sale: victima.nombre });
   }
 
   private expulsar(est: EstadoEquipo, j: Jugador): void {
@@ -344,6 +381,13 @@ class Simulacion {
     const { pAtaque, xgShift } = this.factores(atk, def);
     const mFaltasDef = ESTILO_DEFENSA[def.eq.estilo].faltas * (1 + P.fatigaFaltas * this.fatiga()) * this.factorFaltas();
     let gol = false;
+
+    // Brief 019: sobreesfuerzo — más probable con el cansancio (sorteo derivado por posesión).
+    this.nPosesion += 1;
+    if (this.config.variantes?.lesiones === true) {
+      const rng = prngDerivado(this.config.seed, `lesion:posesion:${this.nPosesion}`);
+      if (rng.chance(LESIONES.pSobreesfuerzo * (1 + LESIONES.kSobreesfuerzo * this.fatiga()))) this.lesionar(atk, rng);
+    }
 
     this.avanzar(P.pasoEvento);
     if (!this.rng.chance(pAtaque)) {

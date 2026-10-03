@@ -6,19 +6,21 @@ import { CLIMA_EN } from "../../ui/textos";
 import { Simulador } from "../../ui/Simulador";
 import { mundo } from "../../mundo/mundo";
 import { jornadasDe } from "../../mundo/temporada";
-import { ligaVisible, rutaPartidoLiga, temporadaVisible } from "../../vista/liga";
+import { bajasDeJornada, jugadoresVisibles, ligaVisible, rutaPartidoLiga, temporadaVisible } from "../../vista/liga";
 import { presets } from "../../vista/servidor";
 
 export const dynamic = "force-dynamic";
 
 const GOLEADORES_VISIBLES = 10;
 
-export default async function PaginaLiga({ searchParams }: { searchParams: Promise<{ j?: string }> }) {
+export default async function PaginaLiga({ searchParams }: { searchParams: Promise<{ j?: string; tab?: string }> }) {
   const liga = ligaVisible();
   const pais = mundo().paises.find((p) => p.id === liga.pais);
   const t = temporadaVisible();
   const total = jornadasDe(liga);
-  const crudo = Number((await searchParams).j);
+  const sp = await searchParams;
+  const crudo = Number(sp.j);
+  const tab = sp.tab === "players" ? "players" : "liga";
   const j = Number.isInteger(crudo) && crudo >= 1 && crudo <= total ? crudo : 1;
   const partidos = t.partidos.filter((p) => p.jornada === j);
   const top = t.goleadores.slice(0, GOLEADORES_VISIBLES);
@@ -38,6 +40,18 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
           </p>
         </header>
 
+        <nav className="liga-tabs" aria-label="League sections" data-testid="league-tabs">
+          <Link href={`/liga?j=${j}`} className="liga-tab" aria-current={tab === "liga" ? "page" : undefined} data-testid="tab-league" prefetch={false} scroll={false}>
+            Standings &amp; matchdays
+          </Link>
+          <Link href={`/liga?tab=players&j=${j}`} className="liga-tab" aria-current={tab === "players" ? "page" : undefined} data-testid="tab-players" prefetch={false} scroll={false}>
+            Players
+          </Link>
+        </nav>
+
+        {tab === "players" ? (
+          <Jugadores j={j} total={total} />
+        ) : (
         <div className="liga-grid">
           <section className="liga-panel" aria-labelledby="tabla-titulo">
             <div className="panel-head">
@@ -158,10 +172,101 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
             </ol>
           </section>
         </div>
+        )}
       </main>
       <footer className="footer">
         <span>Every match is simulated. Countries, leagues, teams and players are fictitious; no real match data is used.</span>
       </footer>
     </>
+  );
+}
+
+/** Brief 019 §3 — la pestaña Players: top del rating (con su desglose por partido), tarjetas y bajas de la jornada. */
+function Jugadores({ j, total }: { j: number; total: number }) {
+  const { top, tarjetas, minPartidos } = jugadoresVisibles();
+  const bajas = bajasDeJornada(j);
+  return (
+    <div className="liga-grid" data-testid="players-tab">
+      <section className="liga-panel" aria-labelledby="rating-titulo">
+        <div className="panel-head">
+          <h2 className="overline" id="rating-titulo">
+            Season rating
+          </h2>
+          <span className="ratings-note">
+            The average of each player&apos;s match ratings (minimum {minPartidos} matches). Open a player to see every rating behind it; each links to its match.
+          </span>
+        </div>
+        <ol className="rating-temporada tnum" data-testid="season-ratings">
+          {top.map((r) => (
+            <li key={`${r.equipo}|${r.jugador}`} data-testid="rating-row" data-rating={r.rating.toFixed(1)} data-partidos={r.partidos}>
+              <details>
+                <summary>
+                  <span className="rt-nota">{r.rating.toFixed(1)}</span>
+                  <span className="rt-jugador">{r.jugador}</span>
+                  <span className="rt-equipo">{r.equipo}</span>
+                  <span className="rt-partidos">in {r.partidos} matches</span>
+                </summary>
+                <ol className="rt-desglose" data-testid="rating-breakdown">
+                  {r.notas.map((n) => (
+                    <li key={`${n.jornada}-${n.indice}`}>
+                      <Link href={rutaPartidoLiga(n)} data-testid="rating-match-link" data-nota={n.nota.toFixed(1)} prefetch={false}>
+                        <span>Matchday {n.jornada} · vs {n.rival}</span>
+                        <span className="rt-nota-partido">{n.nota.toFixed(1)}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="liga-panel" aria-labelledby="bajas-titulo">
+        <div className="panel-head">
+          <h2 className="overline" id="bajas-titulo">
+            Unavailable for matchday {j}
+          </h2>
+          <span className="ratings-note">Red card: one matchday for a second yellow, two for a straight red. Injuries: 1–4 matchdays.</span>
+        </div>
+        <nav className="jornadas" aria-label="Choose a matchday" data-testid="players-matchday-nav">
+          {Array.from({ length: total }, (_, k) => k + 1).map((n) => (
+            <Link key={n} href={`/liga?tab=players&j=${n}`} className="jornada-pill tnum" aria-current={n === j ? "page" : undefined} prefetch={false} scroll={false}>
+              {n}
+            </Link>
+          ))}
+        </nav>
+        {bajas.length === 0 ? (
+          <p className="stats-vacio">Every squad is complete for this matchday.</p>
+        ) : (
+          <ul className="bajas-lista" data-testid="unavailable">
+            {bajas.map((b) => (
+              <li key={`${b.equipo}|${b.jugador}`} data-testid="unavailable-player" data-motivo={b.motivo}>
+                <span className="gol-jugador">{b.jugador}</span>
+                <span className="gol-equipo">{b.equipo}</span>
+                <span className="gol-n">
+                  {b.motivo === "suspension" ? "Suspended" : "Injured"} · {b.jornadas === 1 ? "this matchday" : `${b.jornadas} matchdays`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="panel-head goleadores-head">
+          <h2 className="overline">Cards</h2>
+        </div>
+        <ol className="goleadores tnum" data-testid="cards">
+          {tarjetas.slice(0, 10).map((x) => (
+            <li key={`${x.equipo}|${x.jugador}`}>
+              <span className="gol-jugador">{x.jugador}</span>
+              <span className="gol-equipo">{x.equipo}</span>
+              <span className="gol-n">
+                {x.amarillas} Y · {x.rojas} R
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
   );
 }

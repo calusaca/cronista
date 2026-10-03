@@ -19,6 +19,9 @@ export const MAX_REINTENTOS = 2;
  */
 export const GOLEADA_MARGEN_MIN = 3;
 
+/** Brief 019 — V8: «diezmado / depleted» solo con al menos este número de bajas (brief: ≥ 2). */
+export const BAJAS_DIEZMADO_MIN = 2;
+
 /**
  * Un marcador «x–y» se reconoce como tal solo si ambos números son ≤ este tope;
  * «55-64» es un rango de minutos, no un marcador (sus números se verifican sueltos).
