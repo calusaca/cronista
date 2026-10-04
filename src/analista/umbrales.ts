@@ -144,6 +144,8 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   efecto_niebla: 56,
   doble_palo: 55,
   interrupcion: 40,
+  // Brief 026: el olé de la grada, color (< COBERTURA: no obliga a narrarlo).
+  ole_de_la_grada: 50,
 };
 
 /**
@@ -195,6 +197,8 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   doble_palo: "tiro",
   interrupcion: "interrupcion",
   efecto_niebla: "inicio_periodo",
+  // Brief 026: cita micro-eventos (los pases de la racha), como duelo_ganado.
+  ole_de_la_grada: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -354,6 +358,46 @@ export const RATING_TOP = 15;
  */
 export const NIEBLA_LARGOS_MAX = 54;
 export const NIEBLA_LARGOS_MUESTRA_MIN = 30;
+
+// ---------------------------------------------------------------------------------
+// Brief 026 — la grada: reacciones DERIVADAS de los datos (capa de vista pura, sin RNG salvo la
+// identidad de la afición). Única fuente de umbrales y de las listas cerradas.
+// ---------------------------------------------------------------------------------
+
+/**
+ * ¡Olé!: racha de pases completados consecutivos del mismo equipo (misma posesión), desde este minuto
+ * y en ventaja. Delta de Fable (3 oct): 12 ⇒ 15, el olé tiene que sentirse ocasión. Medido: con 12,
+ * 29,6 % de los partidos de liga (30,5 % sueltos); con 15, 10,0 % de liga (77 olés en 720) y 11,6 %
+ * de sueltos 1..1000; mediana de la racha 16. Abrazado por los dos lados en las pruebas: semilla 23
+ * (racha máxima exacta 15 ⇒ olé) y semilla 35 (máxima 14 ⇒ sin olé).
+ */
+export const OLE_RACHA_MIN = 15;
+export const OLE_MINUTO_MIN = 60;
+/** Ovación: el mejor valorado HASTA ese momento sale sustituido con al menos esta nota. */
+export const OVACION_NOTA_MIN = 7.5;
+/** Aliento: al llegar a este minuto, el local pierde por exactamente esta diferencia. */
+export const ALIENTO_MINUTO = 75;
+export const ALIENTO_DIFERENCIA = 1;
+/** Las seis reacciones (lista cerrada), en el orden en que se emiten a igual momento. */
+export const TIPOS_REACCION = ["ole", "rugido", "grito_visitante", "silbidos_descanso", "ovacion", "aliento"] as const;
+/** Semilla de la identidad de la afición (flujo derivado por nombre de equipo: el mundo no cambia). */
+export const AFICION_SEMILLA = 2026;
+/** Identidad de la afición: colectivo + palabra de sílabas propias (ficción declarada). */
+export const AFICION_COLECTIVOS = ["Marea", "Peña", "Coro", "Tribuna", "Muralla", "Oleaje"] as const;
+export const AFICION_SILABAS = ["da", "ri", "no", "ve", "la", "so", "ta", "mi", "lu", "ce", "ra", "bo"] as const;
+export const AFICION_FINALES = ["na", "ra", "ta", "sa"] as const;
+/**
+ * Cánticos: plantillas CERRADAS de una línea, letra 100 % original escrita para CRONISTA (cero
+ * melodías ni letras adaptadas de nada real). {n} = el nombre propio del equipo; {s} = su sector.
+ */
+export const CANTICOS = [
+  { es: "¡{n}, {n}, nadie te para!", en: "{n}, {n}, nobody can stop you!" },
+  { es: "¡Somos {s} y no nos cansamos!", en: "We are {s} and we never tire!" },
+  { es: "¡Una más, {n}, una más!", en: "One more, {n}, one more!" },
+  { es: "¡De punta a punta, {n} manda!", en: "End to end, {n} is in charge!" },
+  { es: "¡Toca, {n}, toca, que la tarde es tuya!", en: "Pass it, {n}, pass it, the afternoon is yours!" },
+  { es: "¡Arriba, {n}, que la grada empuja!", en: "Up, {n}, the stand is pushing!" },
+] as const;
 
 /** Rareza de los hechos de efecto sobre el corpus de liga (las 8 ligas, temporada 1): como en el 013, ≤ 35 %. */
 export const RAREZA_CONDICION_MAX = 0.35;

@@ -17,7 +17,8 @@ const hechos = analizar(simular(configDeSemilla(SEMILLA_MENTIRAS)));
 export const ESPERADO_246: Record<string, Hecho["tipo"]> = {
   h01: "expulsion_y_efecto", h02: "doblete_o_mas", h03: "resultado_final", h04: "figura_del_partido", h05: "gol_anotado", h06: "gol_anotado",
   h07: "gol_anotado", h08: "gol_anotado", h09: "gol_anotado", h10: "portero_destacado", h11: "justicia_xg",
-  h12: "marcador_por_periodo", h13: "marcador_por_periodo", h14: "gol_temprano", h15: "presion_sostenida", h16: "disciplina",
+  // Brief 026: el olé de la grada (h13) entra entre los dos marcadores por periodo; los de después corren uno.
+  h12: "marcador_por_periodo", h13: "ole_de_la_grada", h14: "marcador_por_periodo", h15: "gol_temprano", h16: "presion_sostenida", h17: "disciplina",
 };
 
 export const O = (es: string, en: string, hecho: string, ...apoyo: string[]): Oracion => ({ texto_es: es, texto_en: en, hecho, ...(apoyo.length ? { apoyo } : {}) });
@@ -85,8 +86,8 @@ export const MENTIRAS: Mentira[] = [
   { id: "F21", regla: "V4", nota: "penal atribuido al equipo equivocado", reemplaza: "h08",
     oracion: O("Bruno Toroino (Juventud Islaverde Sur) marcó de penal en el minuto 60.", "Bruno Toroino (Juventud Islaverde Sur) scored a penalty in minute 60.", "h08", "h03") },
   // 6. Citar todo para permitirlo todo
-  { id: "F22", regla: "V4", nota: "oración con TODOS los hechos en apoyo: cualquier cifra/nombre", reemplaza: "h15",
-    oracion: O("Leo Fenaido marcó de penal en el minuto 4 y Aarón Celoón fue expulsado en el 31.", "Leo Fenaido scored a penalty in minute 4 and Aarón Celoón was sent off in the 31st.", "h15", ...hechos.map((h) => h.id)) },
+  { id: "F22", regla: "V4", nota: "oración con TODOS los hechos en apoyo: cualquier cifra/nombre", reemplaza: "h16",
+    oracion: O("Leo Fenaido marcó de penal en el minuto 4 y Aarón Celoón fue expulsado en el 31.", "Leo Fenaido scored a penalty in minute 4 and Aarón Celoón was sent off in the 31st.", "h16", ...hechos.map((h) => h.id)) },
   { id: "F24", regla: "V4", nota: "ES y EN cuentan goleadores distintos", reemplaza: "h05",
     oracion: O("Darío Mariosa marcó en el minuto 3.", "Dante Doraena scored in minute 3.", "h05", "h09") },
   // 7. Citar sin narrar

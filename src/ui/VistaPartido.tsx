@@ -20,6 +20,10 @@ import { claveValoracion, Ratings } from "./Ratings";
 import { Stats } from "./Stats";
 import { EXPLICA_CONDICIONES, piezasChip } from "../vista/condiciones";
 import { figura as figuraDe, valorar } from "../analista/valoracion";
+import { micro } from "../sim/micro";
+import { reacciones } from "../vista/grada";
+import { EvidenciaGrada } from "./Grada";
+import { formatoXg } from "./textos";
 
 type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | null;
 
@@ -46,6 +50,12 @@ export function VistaPartido({
   const { cronica, hechos, eventos, local, visita } = datos;
   // Jurado internacional: la crónica abre en inglés; el español queda en el toggle.
   const [lengua, setLengua] = useState<Lengua>("en");
+  // Brief 026: micro-evento citado ⇒ su evento ancla (para resaltar en la línea de tiempo la
+  // oración de un hecho de la capa micro, como el olé). Sobre el partido entero (la crónica lo es).
+  const anclaDe = useMemo(() => {
+    const m = new Map(micro({ config: datos.config, eventos }).eventos.map((x) => [x.id, x.ancla] as const));
+    return (id: string) => m.get(id);
+  }, [datos.config, eventos]);
   // Brief 007: Aficionado ↔ Analista es solo render (estado del cliente): cero llamadas al LLM.
   const [modo, setModo] = useState<ModoRender>("aficionado");
   const equipoPerspectiva = datos.perspectiva === "local" ? local.nombre : datos.perspectiva === "visita" ? visita.nombre : undefined;
@@ -65,6 +75,8 @@ export function VistaPartido({
   const [reloj, setReloj] = useState(0);
   const [velocidad, setVelocidad] = useState<Velocidad>("x1");
   const [updateSel, setUpdateSel] = useState<number | null>(null);
+  // Brief 026: reacción de la grada seleccionada en el ticker.
+  const [reaccionSel, setReaccionSel] = useState<number | null>(null);
   const minutoFinal = eventos[eventos.length - 1]?.minuto ?? 0;
   const terminado = reloj >= minutoFinal;
   const eventosVisibles = useMemo(() => (vivo ? eventos.filter((e) => e.minuto <= reloj) : eventos), [vivo, eventos, reloj]);
@@ -75,6 +87,7 @@ export function VistaPartido({
     setReloj(0);
     setVelocidad("x1");
     setUpdateSel(null);
+    setReaccionSel(null);
     setOracionSel(null);
     setEventoSel(null);
     setCapa(null);
@@ -115,6 +128,15 @@ export function VistaPartido({
 
   // Brief 014: el partido tal como se ve (en el replay, el prefijo) para la capa micro.
   const partidoVisto = useMemo(() => ({ config: datos.config, eventos: eventosVisibles }), [datos.config, eventosVisibles]);
+  // Brief 026: la grada de lo visto (en el replay, el prefijo: el olé al minuto M solo usa pases ≤ M).
+  const microVisto = useMemo(() => micro(partidoVisto), [partidoVisto]);
+  const gradaVista = useMemo(() => (vivo ? reacciones(partidoVisto, microVisto) : []), [vivo, partidoVisto, microVisto]);
+  const alReaccion = useCallback((j: number) => {
+    setUpdateSel(null);
+    setEventoSel(null);
+    setRatingSel(null);
+    setReaccionSel((prev) => (prev === j ? null : j));
+  }, []);
   // Brief 009: valoraciones de lo visto (en el replay, el prefijo): función pura de los eventos.
   const valoraciones = useMemo(() => valorar({ config: datos.config, eventos: eventosVisibles }), [datos.config, eventosVisibles]);
   const claveFigura = useMemo(() => {
@@ -130,13 +152,15 @@ export function VistaPartido({
   const eventosResaltados = useMemo(() => {
     if (ratingSel) return new Set(eventosDeRating);
     if (vivo) {
+      const r = reaccionSel !== null ? gradaVista[reaccionSel] : undefined;
+      if (r) return new Set([...r.eventos, r.disparo]);
       if (updateSel !== null) return new Set(updatesVisibles[updateSel]?.eventos ?? []);
       return new Set<string>(eventoSel ? [eventoSel] : []);
     }
-    if (oracionSel !== null) return new Set(eventosDeOracion(cronica, hechos, oracionSel));
+    if (oracionSel !== null) return new Set(eventosDeOracion(cronica, hechos, oracionSel, anclaDe));
     if (eventoSel) return new Set([eventoSel]);
     return new Set<string>();
-  }, [cronica, hechos, oracionSel, eventoSel, vivo, updateSel, updatesVisibles, ratingSel, eventosDeRating]);
+  }, [cronica, hechos, oracionSel, eventoSel, vivo, updateSel, updatesVisibles, ratingSel, eventosDeRating, reaccionSel, gradaVista, anclaDe]);
 
   // Clic en una nota: lleva la línea de tiempo al primer evento de su desglose.
   useEffect(() => {
@@ -171,36 +195,40 @@ export function VistaPartido({
   }, [updateSel, updatesVisibles]);
 
   const alUpdate = useCallback((i: number) => {
+    setReaccionSel(null);
     setEventoSel(null);
     setRatingSel(null);
     setUpdateSel((prev) => (prev === i ? null : i));
   }, []);
 
   const eventosHover = useMemo(
-    () => (oracionHover !== null && oracionHover !== oracionSel ? new Set(eventosDeOracion(cronica, hechos, oracionHover)) : new Set<string>()),
-    [cronica, hechos, oracionHover, oracionSel],
+    () => (oracionHover !== null && oracionHover !== oracionSel ? new Set(eventosDeOracion(cronica, hechos, oracionHover, anclaDe)) : new Set<string>()),
+    [cronica, hechos, oracionHover, oracionSel, anclaDe],
   );
 
   const oracionesResaltadas = useMemo(() => {
-    if (eventoSel) return new Set(oracionesDeEvento(cronica, hechos, eventoSel));
+    if (eventoSel) return new Set(oracionesDeEvento(cronica, hechos, eventoSel, anclaDe));
     if (oracionSel !== null) return new Set([oracionSel]);
     return new Set<number>();
-  }, [cronica, hechos, eventoSel, oracionSel]);
+  }, [cronica, hechos, eventoSel, oracionSel, anclaDe]);
 
   // Scroll al primer evento resaltado, DENTRO de la línea de tiempo (sin mover la página).
   useEffect(() => {
     if (oracionSel === null) return;
-    const primero = eventosDeOracion(cronica, hechos, oracionSel)[0];
+    const primero = eventosDeOracion(cronica, hechos, oracionSel, anclaDe)[0];
     const cont = linea.current;
     if (!primero || !cont) return;
     const fila = cont.querySelector<HTMLElement>(`[data-event-id="${primero}"]`);
     if (fila) cont.scrollTo({ top: Math.max(0, fila.offsetTop - cont.clientHeight / 3), behavior: "smooth" });
-  }, [oracionSel, cronica, hechos]);
+  }, [oracionSel, cronica, hechos, anclaDe]);
 
   // Escape cierra la capa abierta.
   useEffect(() => {
     const cerrar = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setCapa(null);
+      if (e.key === "Escape") {
+        setCapa(null);
+        setReaccionSel(null);
+      }
     };
     window.addEventListener("keydown", cerrar);
     return () => window.removeEventListener("keydown", cerrar);
@@ -357,9 +385,13 @@ export function VistaPartido({
               onActualizacion={alUpdate}
               cargando={overlay === null && errorOverlay === null}
               error={errorOverlay}
+              reacciones={gradaVista}
+              reaccionSel={reaccionSel}
+              onReaccion={alReaccion}
             />
           ) : (
           <Cronica
+            anclaDe={anclaDe}
             cronica={cronica}
             hechos={hechos}
             eventos={eventos}
@@ -396,10 +428,20 @@ export function VistaPartido({
       {/* Brief 014: Match stats de la capa micro (lo visto: en el replay, el prefijo). */}
       <Stats partido={partidoVisto} nombres={{ local: local.nombre, visita: visita.nombre }} enVivo={vivo && !terminado} analista={modo === "analista"} lengua={lengua} />
 
+      {vivo && reaccionSel !== null && gradaVista[reaccionSel] && (
+        <EvidenciaGrada
+          reaccion={gradaVista[reaccionSel]}
+          partido={partidoVisto}
+          m={microVisto}
+          lengua={lengua}
+          fx={(xg) => formatoXg(xg, modo === "analista" ? "analista" : "aficionado", lengua)}
+          onCerrar={() => setReaccionSel(null)}
+        />
+      )}
       {capa?.tipo === "historia" && <HistoriaFrase cronica={cronica} i={capa.i} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "proceso" && <Proceso cronica={cronica} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "gol" && (
-        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} />
+        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id, anclaDe).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} />
       )}
     </div>
   );

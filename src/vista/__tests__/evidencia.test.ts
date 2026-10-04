@@ -7,6 +7,7 @@ import { generarCronica } from "../../cadena/cadena";
 import type { CronicaVerificada } from "../../cadena/tipos";
 import { crearLlmEnsayo } from "../../lib/llm-ensayo";
 import { crearLlmStub } from "../../lib/llm-stub";
+import { micro } from "../../sim/micro";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import type { Evento } from "../../sim/tipos";
@@ -53,15 +54,31 @@ describe("eventosDeOracion", () => {
     expect(evs).toEqual([...evs].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))));
   });
 
+  // Brief 026: un hecho que cita micro-eventos (el olé) se resuelve a sus eventos ancla con la capa
+  // micro, como hace la vista; sin ella, sus micro quedan fuera (no son de la línea de tiempo).
+  const anclaDe = (() => {
+    const m = new Map(micro(p).eventos.map((x) => [x.id, x.ancla] as const));
+    return (id: string) => m.get(id);
+  })();
+
   it("nunca vacío para una oración real: todo hecho cita ≥1 evento (contrato del 002)", () => {
     const acta = { ...borradorActa(hechos), intentos: 0, frasesOmitidas: 0, modo: "acta" as const, audit: [] };
-    acta.oraciones.forEach((_, i) => expect(eventosDeOracion(acta, hechos, i).length).toBeGreaterThan(0));
+    acta.oraciones.forEach((_, i) => expect(eventosDeOracion(acta, hechos, i, anclaDe).length).toBeGreaterThan(0));
+  });
+
+  it("brief 026: la oración del olé resalta el evento ancla de su racha; sin capa micro, nada que no sea de la línea de tiempo", () => {
+    const acta = { ...borradorActa(hechos), intentos: 0, frasesOmitidas: 0, modo: "acta" as const, audit: [] };
+    const i = acta.oraciones.findIndex((o) => hechos.find((h) => h.id === o.hecho)?.tipo === "ole_de_la_grada");
+    expect(i).toBeGreaterThanOrEqual(0);
+    const h = hechos.find((x) => x.id === acta.oraciones[i]!.hecho)!;
+    expect(eventosDeOracion(acta, hechos, i, anclaDe)).toEqual([...new Set(h.eventos.map(anclaDe))]);
+    expect(eventosDeOracion(acta, hechos, i)).toEqual([]);
   });
 
   it("todos los ids devueltos existen en el partido", () => {
     const acta = { ...borradorActa(hechos), intentos: 0, frasesOmitidas: 0, modo: "acta" as const, audit: [] };
     const ids = new Set(p.eventos.map((e) => e.id));
-    for (let i = 0; i < acta.oraciones.length; i++) for (const e of eventosDeOracion(acta, hechos, i)) expect(ids.has(e)).toBe(true);
+    for (let i = 0; i < acta.oraciones.length; i++) for (const e of [...eventosDeOracion(acta, hechos, i), ...eventosDeOracion(acta, hechos, i, anclaDe)]) expect(ids.has(e)).toBe(true);
   });
 
   it("índice fuera de rango ⇒ []", () => {

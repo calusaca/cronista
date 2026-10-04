@@ -26,6 +26,7 @@ import { ladoDelJugador, type Evento, type Lado, type Partido } from "../sim/tip
 import { micro, type MicroPartido } from "../sim/micro";
 import { CANAL_TEXTO, CANCHA_TEXTO, CAUSA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
 import { medirCalor, medirCancha, medirNiebla, medirPresion } from "./condiciones";
+import { rachasOle } from "./grada";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
 import {
@@ -706,6 +707,19 @@ function insolitos(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
   return out;
 }
 
+// ---------------- brief 026: la grada ----------------
+
+/** `ole_de_la_grada`: cada racha del olé (src/analista/grada.ts). Cita los pases de la racha (micro, contrato del 013). */
+function oleDeLaGrada(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
+  return rachasOle(p, m).map((r) =>
+    hechoMicro("ole_de_la_grada", "ole_de_la_grada", r.pases.map((x) => x.id), {
+      equipo: c.nombre[r.equipo],
+      pases: r.pases.length,
+      minuto: minutoTxt((r.pases[r.pases.length - 1] as MicroPartido["eventos"][number]).minuto),
+    }),
+  );
+}
+
 // ---------------- brief 019: consecuencias ----------------
 
 /** `lesion_en_partido`: cada lesión del partido (cita la lesión, su cambio forzado y la falta, si la hubo). */
@@ -830,6 +844,7 @@ export function analizar(partido: Partido): Hecho[] {
   // Brief 018: solo si el partido registra condiciones (los partidos sueltos no las tienen).
   // Brief 025: los insólitos (solo con la variante) y el efecto medido de la niebla.
   borradores.push(...insolitos(partido, c, m));
+  borradores.push(...oleDeLaGrada(partido, c, m));
   // Brief 019: lesiones (solo con la variante) y las bajas del registro (solo partidos de liga).
   borradores.push(...lesiones(c), ...bajasDelPartido(partido, c));
   borradores.push(...condicionesDelPartido(partido, c), ...efectoCalor(partido, c, m), ...canchaIncomoda(partido, c, m), ...presionQueAhoga(partido, c, m));

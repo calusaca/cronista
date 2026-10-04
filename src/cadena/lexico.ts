@@ -779,3 +779,18 @@ export const INSOLITOS_JUICIO: EntradaJuicio[] = [
   { id: "interrupcion", es: palabras(FRASES_INSOLITOS.interrupcion.es), en: palabras(FRASES_INSOLITOS.interrupcion.en), habilita: (h) => h.tipo === "interrupcion", requisito: "«se interrumpió / play was stopped» exige el hecho interrupcion como principal" },
   { id: "niebla", es: palabras(FRASES_INSOLITOS.niebla.es), en: palabras(FRASES_INSOLITOS.niebla.en), habilita: (h) => h.tipo === "efecto_niebla", requisito: "«la niebla / in the fog» exige el efecto medido (efecto_niebla) como principal" },
 ];
+
+// ---------------------------------------------------------------------------------
+// Brief 026 — la grada: «olé / la grada rugió / the crowd roared» SOLO con el hecho
+// ole_de_la_grada (la racha registrada lo paga). Se juzga antes de V7, como los insólitos.
+// ---------------------------------------------------------------------------------
+export const FRASES_GRADA = {
+  ole: {
+    es: ["olé", "ole", "la grada rugió", "rugió la grada", "la grada coreó", "coreó el olé"],
+    en: ["olé", "ole", "the crowd roared", "roared olé", "the fans roared", "the stands roared"],
+  },
+} as const satisfies Record<string, Record<Lengua, readonly string[]>>;
+
+export const GRADA_JUICIO: EntradaJuicio[] = [
+  { id: "ole", es: palabras(FRASES_GRADA.ole.es), en: palabras(FRASES_GRADA.ole.en), habilita: (h) => h.tipo === "ole_de_la_grada", requisito: "«olé / the crowd roared» exige el hecho ole_de_la_grada como principal" },
+];

@@ -11,6 +11,8 @@ import { micro } from "../sim/micro";
 import type { Lado, Partido } from "../sim/tipos";
 import { CANAL_TXT, estadisticas, relato } from "../vista/stats";
 import { efectosMedidos } from "../vista/condiciones";
+import { reacciones } from "../vista/grada";
+import { BloqueGrada, EvidenciaGrada } from "./Grada";
 import { IconoCerrar } from "./Iconos";
 import { EXPLICA_XG, formatoXg, type LenguaXg } from "./textos";
 
@@ -44,11 +46,17 @@ export function Stats({
   const s = useMemo(() => estadisticas(partido, m), [partido, m]);
   // Brief 018: las mediciones de los efectos de las condiciones (solo partidos de liga).
   const efectos = useMemo(() => (partido.config.condiciones ? efectosMedidos(partido, nombres, m) : undefined), [partido, nombres, m]);
+  // Brief 026: la grada, derivada de lo visto (en el replay, el prefijo).
+  const grada = useMemo(() => reacciones(partido, m), [partido, m]);
+  const [reaccionSel, setReaccionSel] = useState<number | null>(null);
   const [ev, setEv] = useState<Evidencia>(null);
 
   useEffect(() => {
     const cerrar = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setEv(null);
+      if (e.key === "Escape") {
+        setEv(null);
+        setReaccionSel(null);
+      }
     };
     window.addEventListener("keydown", cerrar);
     return () => window.removeEventListener("keydown", cerrar);
@@ -169,8 +177,12 @@ export function Stats({
             ))}
           </div>
         )}
+        <BloqueGrada lista={grada} lengua={lengua} onReaccion={setReaccionSel} />
       </div>
 
+      {reaccionSel !== null && grada[reaccionSel] && (
+        <EvidenciaGrada reaccion={grada[reaccionSel]} partido={partido} m={m} lengua={lengua} fx={fx} onCerrar={() => setReaccionSel(null)} />
+      )}
       {ev && <EvidenciaStats ev={ev} partido={partido} m={m} s={s} nombres={nombres} fx={fx} efectos={efectos ?? []} onCerrar={() => setEv(null)} />}
     </section>
   );

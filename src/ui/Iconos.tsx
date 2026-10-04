@@ -140,6 +140,18 @@ export function IconoCorregida({ size = 16 }: P) {
   );
 }
 
+/** Brief 026: la grada (gradas escalonadas con público). */
+export function IconoGrada({ size = 16 }: P) {
+  return (
+    <svg {...base(size)} aria-hidden="true">
+      <path d="M3 20h18M3 20v-4h6v-4h6V8h6v12" />
+      <circle cx="6" cy="13.5" r="1.2" />
+      <circle cx="12" cy="9.5" r="1.2" />
+      <circle cx="18" cy="5.5" r="1.2" />
+    </svg>
+  );
+}
+
 export function IconoActa({ size = 16 }: P) {
   return (
     <svg {...base(size)}>

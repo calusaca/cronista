@@ -16,25 +16,34 @@ export function hechosDeOracion(o: Oracion): string[] {
 
 /** Orden del stream a partir del id secuencial («e042» ⇒ 42). */
 const ordenEvento = (id: string) => Number(id.slice(1));
+/** Id de evento macro («e042»); los micro son «m0042» (MicroEvento.id). */
+const esMacro = (id: string) => /^e\d+$/.test(id);
 
 /**
  * Eventos que respaldan la oración i (brief 004): los de su hecho principal y los de su
  * apoyo, SIN duplicados (dos hechos pueden citar el mismo evento) y en orden del partido.
  */
-export function eventosDeOracion(cronica: CronicaVerificada, hechos: Hecho[], i: number): string[] {
+export function eventosDeOracion(cronica: CronicaVerificada, hechos: Hecho[], i: number, anclaDe?: (microId: string) => string | undefined): string[] {
   const o = cronica.oraciones[i];
   if (!o) return [];
   const porId = new Map(hechos.map((h) => [h.id, h] as const));
   const ids = new Set<string>();
-  for (const hid of hechosDeOracion(o)) for (const e of porId.get(hid)?.eventos ?? []) ids.add(e);
+  // Solo ids MACRO (los de la línea de tiempo). Un micro-evento citado («m0042») se resuelve a su
+  // evento ancla si la vista da la capa micro (`anclaDe`); si no, queda fuera (su evidencia jugada a
+  // jugada vive en el panel de stats y en la grada). Brief 026.
+  for (const hid of hechosDeOracion(o))
+    for (const e of porId.get(hid)?.eventos ?? []) {
+      const macro = esMacro(e) ? e : anclaDe?.(e);
+      if (macro) ids.add(macro);
+    }
   return [...ids].sort((a, b) => ordenEvento(a) - ordenEvento(b));
 }
 
 /** Inversa: índices de las oraciones que citan (vía sus hechos) un evento. */
-export function oracionesDeEvento(cronica: CronicaVerificada, hechos: Hecho[], eventoId: string): number[] {
+export function oracionesDeEvento(cronica: CronicaVerificada, hechos: Hecho[], eventoId: string, anclaDe?: (microId: string) => string | undefined): number[] {
   const out: number[] = [];
   cronica.oraciones.forEach((_, i) => {
-    if (eventosDeOracion(cronica, hechos, i).includes(eventoId)) out.push(i);
+    if (eventosDeOracion(cronica, hechos, i, anclaDe).includes(eventoId)) out.push(i);
   });
   return out;
 }

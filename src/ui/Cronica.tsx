@@ -20,6 +20,8 @@ export type ModoRender = "aficionado" | "analista";
 export type Lengua = "es" | "en";
 
 interface Props {
+  /** Brief 026: resuelve un micro-evento citado a su evento ancla (la línea de tiempo). */
+  anclaDe?: (microId: string) => string | undefined;
   cronica: CronicaVerificada;
   hechos: Hecho[];
   eventos: Evento[];
@@ -51,12 +53,12 @@ function IconoEstado({ estado }: { estado: EstadoOracion }) {
 }
 
 /** Lo que el modo Analista agrega bajo cada frase: hecho, datos duros, eventos citados, historia. */
-function DetalleAnalista({ cronica, hechos, eventos, i, equipoPerspectiva, delta }: { cronica: CronicaVerificada; hechos: Hecho[]; eventos: Evento[]; i: number; equipoPerspectiva?: string; delta: number }) {
+function DetalleAnalista({ cronica, hechos, eventos, i, equipoPerspectiva, delta, anclaDe }: { cronica: CronicaVerificada; hechos: Hecho[]; eventos: Evento[]; i: number; equipoPerspectiva?: string; delta: number; anclaDe?: (microId: string) => string | undefined }) {
   const o = cronica.oraciones[i];
   const h = hechos.find((x) => x.id === o?.hecho);
   if (!o || !h) return null;
   const porId = new Map(eventos.map((e) => [e.id, e] as const));
-  const citados = eventosDeOracion(cronica, hechos, i)
+  const citados = eventosDeOracion(cronica, hechos, i, anclaDe)
     .map((id) => porId.get(id))
     .filter((e): e is Evento => e !== undefined);
   const datos = datosDuros(h);
@@ -100,7 +102,7 @@ function DetalleAnalista({ cronica, hechos, eventos, i, equipoPerspectiva, delta
 }
 
 export function Cronica(props: Props) {
-  const { cronica, hechos, eventos, equipoPerspectiva, deltaMiEquipo, modo, onModo, lengua, onLengua, resaltadas, seleccionada, onOracion, onHover, onHistoria, onProceso } = props;
+  const { anclaDe, cronica, hechos, eventos, equipoPerspectiva, deltaMiEquipo, modo, onModo, lengua, onLengua, resaltadas, seleccionada, onOracion, onHover, onHistoria, onProceso } = props;
   const r = resumenVerificacion(cronica);
   const titulo = lengua === "es" ? cronica.titulo_es : cronica.titulo_en;
   const noUsados = modo === "analista" ? hechosNoUsados(cronica, hechos) : [];
@@ -230,7 +232,7 @@ export function Cronica(props: Props) {
                     </button>
                   </div>
                   {modo === "analista" && (
-                    <DetalleAnalista cronica={cronica} hechos={hechos} eventos={eventos} i={i} equipoPerspectiva={equipoPerspectiva} delta={deltaMiEquipo} />
+                    <DetalleAnalista cronica={cronica} hechos={hechos} eventos={eventos} i={i} {...(anclaDe ? { anclaDe } : {})} equipoPerspectiva={equipoPerspectiva} delta={deltaMiEquipo} />
                   )}
                 </div>
               </div>

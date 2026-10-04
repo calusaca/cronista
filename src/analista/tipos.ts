@@ -38,7 +38,8 @@ export type TipoHecho =
   | "subida_portero"
   | "doble_palo"
   | "interrupcion"
-  | "efecto_niebla";
+  | "efecto_niebla"
+  | "ole_de_la_grada";
 
 export interface Hecho {
   id: string; // "h07", secuencial por relevancia descendente
@@ -82,6 +83,7 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "doble_palo",
   "interrupcion",
   "efecto_niebla",
+  "ole_de_la_grada",
 ];
 
 /**

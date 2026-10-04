@@ -897,6 +897,36 @@ main {
   color: var(--accent);
 }
 
+.ticker-crowd {
+  border-style: dashed;
+}
+
+.ticker-crowd .ticker-kind,
+.ticker-crowd .ticker-state {
+  color: var(--muted);
+}
+
+/* Brief 026: una reacción por fila, apilada (etiqueta arriba, sin cortar; el texto debajo). */
+.stats-crowd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.stats-crowd-etiqueta {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.stats-crowd-texto {
+  font-size: 14px;
+  color: var(--ink);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
 .ticker-state.acta {
   color: var(--muted);
 }

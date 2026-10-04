@@ -9,7 +9,9 @@ import { fmtMinuto } from "../vista/evidencia";
 import type { EntradaOverlay } from "../vivo/overlay";
 import type { Velocidad } from "../vivo/umbrales";
 import type { Lengua } from "./Cronica";
-import { IconoCorregida, IconoVerificada, IconoActa } from "./Iconos";
+import type { Reaccion } from "../vista/grada";
+import { ETIQUETA_REACCION, ROTULO_GRADA } from "./Grada";
+import { IconoCorregida, IconoGrada, IconoVerificada, IconoActa } from "./Iconos";
 
 const ETIQUETA_TIPO: Record<EntradaOverlay["tipo"], string> = { gol: "Goal", roja: "Red card", descanso: "Half-time", final: "Full time" };
 
@@ -63,8 +65,15 @@ export function Ticker({
   onActualizacion,
   cargando,
   error,
+  reacciones = [],
+  reaccionSel = null,
+  onReaccion,
 }: {
   actualizaciones: EntradaOverlay[];
+  /** Brief 026: la grada de lo visto, intercalada por minuto (no es una update verificada: se rotula). */
+  reacciones?: Reaccion[];
+  reaccionSel?: number | null;
+  onReaccion?: (j: number) => void;
   lengua: Lengua;
   onLengua: (l: Lengua) => void;
   seleccionada: number | null;
@@ -73,12 +82,16 @@ export function Ticker({
   cargando: boolean;
   error: string | null;
 }) {
-  const teclado = (i: number) => (ev: KeyboardEvent) => {
+  const teclado = (i: number, f: (i: number) => void = onActualizacion) => (ev: KeyboardEvent) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
-      onActualizacion(i);
+      f(i);
     }
   };
+  // Brief 026: updates y reacciones de la grada, en orden de minuto (a igual minuto, la update primero).
+  const filas = [...actualizaciones.map((a, i) => ({ k: "u" as const, i, minuto: a.minuto })), ...reacciones.map((r, i) => ({ k: "r" as const, i, minuto: r.minuto }))].sort(
+    (a, b) => a.minuto - b.minuto || (a.k === b.k ? a.i - b.i : a.k === "u" ? -1 : 1),
+  );
   return (
     <div>
       <div className="panel-head">
@@ -101,9 +114,41 @@ export function Ticker({
             Could not load the updates: {error}
           </p>
         )}
-        {!cargando && !error && actualizaciones.length === 0 && <p className="ticker-empty">Nothing yet — the first update arrives with the first goal, red card or half-time.</p>}
+        {!cargando && !error && actualizaciones.length === 0 && reacciones.length === 0 && <p className="ticker-empty">Nothing yet — the first update arrives with the first goal, red card or half-time.</p>}
         <ol className="ticker-list">
-          {actualizaciones.map((a, i) => {
+          {filas.map((f) => {
+            if (f.k === "r") {
+              const r = reacciones[f.i] as Reaccion;
+              const j = f.i;
+              return (
+                <li
+                  key={`r-${r.tipo}-${r.disparo}-${j}`}
+                  className="ticker-item ticker-crowd"
+                  data-testid="ticker-reaccion"
+                  data-tipo={r.tipo}
+                  data-minuto={r.minuto}
+                  data-selected={reaccionSel === j ? "true" : "false"}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={reaccionSel === j}
+                  onClick={() => onReaccion?.(j)}
+                  onKeyDown={teclado(j, (x) => onReaccion?.(x))}
+                >
+                  <span className="ticker-min tnum">{fmtMinuto(r.minuto)}</span>
+                  <span className="ticker-body">
+                    <span className="ticker-kind overline">
+                      {ETIQUETA_REACCION[r.tipo]} · {ROTULO_GRADA}
+                    </span>
+                    <span className="ticker-text">{lengua === "es" ? r.texto_es : r.texto_en}</span>
+                  </span>
+                  <span className="ticker-state" title="Crowd reaction derived from the match data — not a verified sentence">
+                    <IconoGrada />
+                  </span>
+                </li>
+              );
+            }
+            const i = f.i;
+            const a = actualizaciones[i] as EntradaOverlay;
             const corregida = a.verificacion === "llm" && a.intentos > 1;
             return (
               <li

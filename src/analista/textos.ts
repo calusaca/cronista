@@ -162,6 +162,10 @@ export const PLANTILLAS = {
     es: "El partido se interrumpió {duracion} min en el minuto {minuto} por {causa_es}; se sumaron al descuento.",
     en: "Play was stopped for {duracion} min in minute {minuto} ({causa_en}); the time was added on.",
   },
+  ole_de_la_grada: {
+    es: "La grada coreó el olé en el minuto {minuto}: {equipo} encadenó {pases} pases seguidos.",
+    en: "The crowd roared olé in minute {minuto}: {equipo} strung together {pases} passes in a row.",
+  },
   efecto_niebla: {
     es: "La niebla pesó en los pases largos: {completados} de {intentados} completados ({porcentaje} %).",
     en: "In the fog, long passes suffered: {completados} of {intentados} completed ({porcentaje}%).",

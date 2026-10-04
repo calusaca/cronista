@@ -453,6 +453,44 @@ function esperados(p: Partido): Map<string, Esperado> {
         claveRelevancia: "perdidas_en_salida",
       });
     }
+    // Brief 026 — ole_de_la_grada, recontado por OTRO camino: se recorren las posesiones (no la
+    // lista de pases), y en cada una se parten los pases en tramos de completados consecutivos;
+    // el marcador se recuenta desde los goles con índice anterior al ancla.
+    {
+      const golesAntesDe = (ancla: string) => {
+        const k = ev.findIndex((e) => e.id === ancla);
+        const g: Record<Lado, number> = { local: 0, visita: 0 };
+        for (const e of ev.slice(0, k)) if (e.tipo === "gol") g[e.equipo]++;
+        return g;
+      };
+      const rachas: { l: Lado; ids: string[]; ultimo: number }[] = [];
+      for (const ps of m.posesiones) {
+        const delEquipo = m.eventos.filter((x) => x.posesion === ps.n && x.tipo === "pase");
+        let tramo: typeof delEquipo = [];
+        const cortar = () => {
+          if (tramo.length >= U.OLE_RACHA_MIN) rachas.push({ l: ps.equipo, ids: tramo.map((x) => x.id), ultimo: (tramo[tramo.length - 1] as { minuto: number }).minuto });
+          tramo = [];
+        };
+        for (const x of delEquipo) {
+          const g = golesAntesDe(x.ancla);
+          const enVentaja = g[x.equipo] > g[otro(x.equipo)];
+          if (x.equipo === ps.equipo && x.completado === true && x.minuto >= U.OLE_MINUTO_MIN && enVentaja) tramo.push(x);
+          else cortar();
+        }
+        cortar();
+      }
+      for (const r of rachas) {
+        const minuto = mt(r.ultimo);
+        poner(`ole_de_la_grada|${r.ids[0]}`, {
+          tipo: "ole_de_la_grada",
+          eventos: r.ids,
+          datos: { equipo: nombre[r.l], pases: r.ids.length, minuto },
+          cifras: [...cifrasDe(minuto), String(r.ids.length)],
+          nombres: [nombre[r.l]],
+          claveRelevancia: "ole_de_la_grada",
+        });
+      }
+    }
     // dominio_global: % de pases intentados, con su desglose por periodo
     const pases = m.eventos.filter((x) => x.tipo === "pase");
     const perDe = (ancla: string) => per(by.get(ancla) as Evento);
@@ -555,6 +593,8 @@ function claveDe(p: Partido, h: Hecho): string {
       return `${h.tipo}|${citado("tarjeta_roja")}`;
     case "duelo_ganado":
       return `${h.tipo}|${lado(h.datos.equipo)}|${h.datos.jugador}|${h.datos.rival}`;
+    case "ole_de_la_grada":
+      return `${h.tipo}|${h.eventos[0]}`;
     default:
       return `${h.tipo}|${lado(h.datos.equipo)}`;
   }
@@ -740,7 +780,7 @@ describe("paridad ES/EN sobre el corpus (rev. 2.3)", () => {
 
   it("no hay palabras con mayúscula fuera del vocabulario fijo de las plantillas (ningún nombre inventado)", () => {
     // Vocabulario capitalizado que las plantillas usan al inicio de frase.
-    const VOCABULARIO = new Set(["Resultado", "Full", "Al", "Half", "Segundo", "Second", "Goles", "Goals", "El", "The", "En", "In"]);
+    const VOCABULARIO = new Set(["Resultado", "Full", "Al", "Half", "Segundo", "Second", "Goles", "Goals", "El", "The", "En", "In", "La"]);
     const raros = new Map<string, string>();
     partidos.forEach((p, i) => {
       const todos = [p.config.local.nombre, p.config.visita.nombre, ...p.config.local.jugadores.map((j) => j.nombre), ...p.config.visita.jugadores.map((j) => j.nombre)].sort(
