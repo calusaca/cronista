@@ -76,7 +76,14 @@ export function aficionDe(equipo: string): Aficion {
 }
 
 /** Las reacciones del partido (o del prefijo visto), en el orden en que suenan. */
+/** Brief 027: ¿se juega a puerta cerrada? (sanción de club del registro, con su variante). */
+export function aPuertaCerrada(p: Partido): boolean {
+  return p.config.variantes?.sanciones === true && (p.config.sancionesClub ?? []).some((s) => s.tipo === "puerta_cerrada");
+}
+
 export function reacciones(p: Partido, m: MicroPartido = micro(p)): Reaccion[] {
+  // Brief 027: a puerta cerrada no hay público — ninguna reacción, de nadie (tampoco la visitante).
+  if (aPuertaCerrada(p)) return [];
   const ev = p.eventos;
   const idx = new Map(ev.map((e, i) => [e.id, i] as const));
   const antes = marcadorAntes(p);

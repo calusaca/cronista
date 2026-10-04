@@ -19,6 +19,7 @@ import { ControlesReplay, Ticker } from "./Vivo";
 import { claveValoracion, Ratings } from "./Ratings";
 import { Stats } from "./Stats";
 import { EXPLICA_CONDICIONES, piezasChip } from "../vista/condiciones";
+import { chipsSancion } from "../vista/sanciones";
 import { figura as figuraDe, valorar } from "../analista/valoracion";
 import { micro } from "../sim/micro";
 import { reacciones } from "../vista/grada";
@@ -275,6 +276,16 @@ export function VistaPartido({
               {piezasChip(datos.config.condiciones).join(" · ")}
             </span>
             <span className="conditions-note">{EXPLICA_CONDICIONES}</span>
+          </div>
+        )}
+        {/* Brief 027: las sanciones de club del registro (puerta cerrada, banco limitado, deducción). */}
+        {chipsSancion(datos.config).length > 0 && (
+          <div className="conditions" data-testid="club-sanctions">
+            {chipsSancion(datos.config).map((c) => (
+              <span key={c.texto} className={`conditions-chip${c.tipo === "puerta_cerrada" ? " chip-cerrada" : ""}`} data-testid={c.tipo === "puerta_cerrada" ? "closed-doors-chip" : "club-sanction-chip"} data-tipo={c.tipo}>
+                {c.texto}
+              </span>
+            ))}
           </div>
         )}
         {/* Brief 019: las bajas del registro de la temporada (no juegan: no están en la plantilla). */}

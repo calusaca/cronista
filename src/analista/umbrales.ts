@@ -146,6 +146,8 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   interrupcion: 40,
   // Brief 026: el olé de la grada, color (< COBERTURA: no obliga a narrarlo).
   ole_de_la_grada: 50,
+  // Brief 027: la sanción de club, la previa del partido afectado.
+  sancion_de_club: 48,
 };
 
 /**
@@ -199,6 +201,8 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   efecto_niebla: "inicio_periodo",
   // Brief 026: cita micro-eventos (los pases de la racha), como duelo_ganado.
   ole_de_la_grada: "inicio_periodo",
+  // Brief 027: cita el inicio del partido (el dato es del registro, como bajas_del_partido).
+  sancion_de_club: "inicio_periodo",
 };
 
 // ---------------------------------------------------------------------------------
@@ -398,6 +402,25 @@ export const CANTICOS = [
   { es: "¡Toca, {n}, toca, que la tarde es tuya!", en: "Pass it, {n}, pass it, the afternoon is yours!" },
   { es: "¡Arriba, {n}, que la grada empuja!", en: "Up, {n}, the stand is pushing!" },
 ] as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 027 — sanciones de club: el sorteo por temporada (rangos y probabilidades del generador).
+// La banda de rareza va aparte, en sim/limites (RAREZA_SANCIONES_CLUB).
+// ---------------------------------------------------------------------------------
+
+/** Clubes sancionados por liga y temporada: probabilidad de 0, 1 y 2 (esperanza 0,8). */
+export const PROB_CLUBES_SANCIONADOS = [0.4, 0.4, 0.2] as const;
+export const DEDUCCION_PUNTOS = { min: 3, max: 9 } as const;
+/** Puerta cerrada: partidos de LOCAL consecutivos. */
+export const PUERTA_CERRADA_PARTIDOS = { min: 1, max: 3 } as const;
+/** Límite de banco: jornadas consecutivas. */
+export const LIMITE_BANCO_JORNADAS = { min: 2, max: 4 } as const;
+/** La causa de cada tipo (coherente: el público cierra la puerta; lo administrativo, puntos y banco). */
+export const CAUSAS_POR_TIPO = {
+  deduccion: ["irregularidad_financiera", "alineacion_indebida"],
+  puerta_cerrada: ["incidentes_de_publico"],
+  limite_banco: ["alineacion_indebida", "irregularidad_financiera"],
+} as const;
 
 /** Rareza de los hechos de efecto sobre el corpus de liga (las 8 ligas, temporada 1): como en el 013, ≤ 35 %. */
 export const RAREZA_CONDICION_MAX = 0.35;

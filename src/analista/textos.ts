@@ -162,6 +162,19 @@ export const PLANTILLAS = {
     es: "El partido se interrumpió {duracion} min en el minuto {minuto} por {causa_es}; se sumaron al descuento.",
     en: "Play was stopped for {duracion} min in minute {minuto} ({causa_en}); the time was added on.",
   },
+  // Brief 027: la sanción de club, la previa del partido afectado (cita el registro).
+  sancion_deduccion: {
+    es: "{equipo} arrastra una deducción de {puntos} puntos por {causa_es}.",
+    en: "{equipo} were docked {puntos} points for {causa_en}.",
+  },
+  sancion_puerta_cerrada: {
+    es: "{equipo} juega a puerta cerrada (partido {partido} de {de}) por {causa_es}.",
+    en: "{equipo} play behind closed doors (match {partido} of {de}) for {causa_en}.",
+  },
+  sancion_limite_banco: {
+    es: "{equipo} tiene el banco limitado a {suplentes} suplentes (partido {partido} de {de}) por {causa_es}.",
+    en: "{equipo} have a limited bench of {suplentes} substitutes (match {partido} of {de}) for {causa_en}.",
+  },
   ole_de_la_grada: {
     es: "La grada coreó el olé en el minuto {minuto}: {equipo} encadenó {pases} pases seguidos.",
     en: "The crowd roared olé in minute {minuto}: {equipo} strung together {pases} passes in a row.",
@@ -232,6 +245,13 @@ export const CLIMA_TEXTO: Record<string, { es: string; en: string }> = {
   niebla: { es: "niebla", en: "fog" },
 };
 /** Brief 025: las causas FICTICIAS de una interrupción, en los textos de los hechos. */
+/** Brief 027: las causas FICTICIAS de las sanciones de club. */
+export const CAUSA_SANCION_TEXTO: Record<string, { es: string; en: string }> = {
+  irregularidad_financiera: { es: "irregularidades financieras", en: "financial irregularities" },
+  alineacion_indebida: { es: "alineación indebida", en: "fielding an ineligible player" },
+  incidentes_de_publico: { es: "incidentes de público", en: "crowd trouble" },
+};
+
 export const CAUSA_TEXTO: Record<string, { es: string; en: string }> = {
   perro: { es: "un perro en la cancha", en: "a dog on the pitch" },
   objeto: { es: "un objeto lanzado al campo", en: "an object thrown onto the pitch" },

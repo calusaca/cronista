@@ -420,3 +420,24 @@ export const AB_CONDICIONES = {
   presionSalidaTemprana: { min: 1.3, max: 2.6 },
   presionSalidaDespues: { min: 0.9, max: 1.1 },
 } as const;
+
+// ---------------------------------------------------------------------------------
+// Brief 027 — sanciones de club (solo liga, con config.variantes.sanciones). Vocabularios y
+// contrato: ÚNICA fuente. Los rangos y probabilidades del sorteo viven en analista/umbrales.
+// ---------------------------------------------------------------------------------
+
+/** Los tres tipos (lista cerrada). */
+export const TIPOS_SANCION_CLUB = ["deduccion", "puerta_cerrada", "limite_banco"] as const;
+export type TipoSancionClub = (typeof TIPOS_SANCION_CLUB)[number];
+/** Causas FICTICIAS de lista cerrada (cero casos reales). */
+export const CAUSAS_SANCION_CLUB = ["irregularidad_financiera", "alineacion_indebida", "incidentes_de_publico"] as const;
+export type CausaSancionClub = (typeof CAUSAS_SANCION_CLUB)[number];
+/** Límite de banco: suplentes disponibles (los primeros del banco) en vez de los 5. */
+export const BANCO_LIMITADO = 3;
+/**
+ * Rareza (banda aparte del generador): clubes sancionados por liga y temporada — media en banda
+ * (esperanza del brief ~0,8) y nunca más de `max`.
+ */
+export const RAREZA_SANCIONES_CLUB = { media: { min: 0.6, max: 1.0 }, max: 2 } as const;
+/** A/B de la puerta cerrada (N_AB): pérdidas tempranas del visitante con presión alta vs puerta cerrada, cociente sobre la base. */
+export const AB_PUERTA_CERRADA = { cocienteBase: { min: 0.9, max: 1.1 } } as const;

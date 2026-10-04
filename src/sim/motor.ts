@@ -15,7 +15,7 @@
 
 import { AUTOGOL, ESTILO_ATAQUE, ESTILO_DEFENSA, INSOLITOS, LESIONES, NIVELES, P, PESOS } from "./parametros";
 import { deltaNivel } from "./niveles";
-import { CAUSAS_INTERRUPCION, DURACION_INTERRUPCION, LESION_SEVERIDAD, SUBIDA_MINUTO_MIN, XG_OLIMPICO } from "./limites";
+import { BANCO_LIMITADO, CAUSAS_INTERRUPCION, DURACION_INTERRUPCION, LESION_SEVERIDAD, SUBIDA_MINUTO_MIN, XG_OLIMPICO } from "./limites";
 import { prngDerivado } from "./prng";
 import { enriquecerEspacial, type OrigenTiro } from "./espacial";
 import { erroresCondiciones, factorAtaque, factorCornerTrasAtajada, factorFaltas } from "./condiciones";
@@ -169,7 +169,7 @@ export function validarConfig(config: SimConfig): void {
   }
   // Brief 018: las condiciones son opcionales; si vienen, cumplen su contrato.
   if (config.condiciones !== undefined) {
-    const err = erroresCondiciones(config.condiciones);
+    const err = erroresCondiciones(config.condiciones, config.variantes?.sanciones === true && (config.sancionesClub ?? []).some((s) => s.tipo === "puerta_cerrada"));
     if (err.length > 0) throw new Error(`config inválida: condiciones — ${err.join("; ")}`);
   }
 }
@@ -197,6 +197,11 @@ class Simulacion {
     };
   }
 
+  /** Brief 027: ¿este lado juega con el banco limitado? (solo con la variante de sanciones). */
+  private bancoLimitado(lado: Lado): boolean {
+    return this.config.variantes?.sanciones === true && (this.config.sancionesClub ?? []).some((s) => s.lado === lado && s.tipo === "limite_banco");
+  }
+
   private estadoInicial(lado: Lado, eq: Equipo): EstadoEquipo {
     const n = this.rng.weighted([0, 1, 2, 3], (k) => P.pesosCambios[k] ?? 0) ?? 0;
     const plan: number[] = [];
@@ -207,7 +212,8 @@ class Simulacion {
       lado,
       eq,
       enCampo: eq.jugadores.slice(0, TITULARES),
-      suplentes: eq.jugadores.slice(TITULARES),
+      // Brief 027: con el banco limitado (registro de la temporada), solo los primeros BANCO_LIMITADO.
+      suplentes: this.bancoLimitado(lado) ? eq.jugadores.slice(TITULARES, TITULARES + BANCO_LIMITADO) : eq.jugadores.slice(TITULARES),
       amonestados: new Set(),
       expulsados: 0,
       cambios: 0,

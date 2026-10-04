@@ -897,6 +897,23 @@ main {
   color: var(--accent);
 }
 
+/* Brief 027: la deducción en la tabla y la puerta cerrada en la cabecera. */
+.tabla-asterisco {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+.tabla-nota {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.chip-cerrada {
+  border-color: var(--danger);
+}
+
 .ticker-crowd {
   border-style: dashed;
 }

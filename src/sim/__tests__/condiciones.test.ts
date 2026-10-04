@@ -100,9 +100,12 @@ describe("018 · determinismo con condiciones", () => {
     for (const liga of mundo().ligas) {
       for (let j = 1; j <= 18; j++) {
         for (let i = 1; i <= 5; i++) {
-          const a = configDePartidoLiga(liga, TEMPORADA_ACTUAL, j, i).condiciones as Condiciones;
-          const b = condicionesDePartido(liga, cruceDe(liga, j, i)!, configDePartidoLiga(liga, TEMPORADA_ACTUAL, j, i).seed);
-          expect(b).toEqual(a);
+          const cfg = configDePartidoLiga(liga, TEMPORADA_ACTUAL, j, i);
+          const a = cfg.condiciones as Condiciones;
+          const b = condicionesDePartido(liga, cruceDe(liga, j, i)!, cfg.seed);
+          // Brief 027: a puerta cerrada, lo único que cambia es la presión (baja para ambos).
+          const cerrada = (cfg.sancionesClub ?? []).some((s) => s.tipo === "puerta_cerrada");
+          expect(cerrada ? { ...b, presion: { local: "baja", visita: "baja" } } : b).toEqual(a);
           vistos.add(a.clima);
         }
       }
@@ -114,11 +117,14 @@ describe("018 · determinismo con condiciones", () => {
     for (const liga of mundo().ligas) {
       for (let j = 1; j <= 18; j++) {
         for (let i = 1; i <= 5; i++) {
-          const c = configDePartidoLiga(liga, TEMPORADA_ACTUAL, j, i).condiciones as Condiciones;
+          const cfg = configDePartidoLiga(liga, TEMPORADA_ACTUAL, j, i);
+          const c = cfg.condiciones as Condiciones;
           const cancha = liga.equipos[cruceDe(liga, j, i)!.local]!.cancha;
           expect(c.superficie).toBe(cancha.superficie);
           expect(c.cesped).toBe(cancha.superficie === "natural" ? cancha.cesped : undefined);
-          expect(NIVELES_PRESION.indexOf(c.presion.visita)).toBe(NIVELES_PRESION.indexOf(c.presion.local) + 1);
+          // Brief 027 (extensión consciente): a puerta cerrada, sin público, presión baja para AMBOS.
+          if ((cfg.sancionesClub ?? []).some((s) => s.tipo === "puerta_cerrada")) expect(c.presion).toEqual({ local: "baja", visita: "baja" });
+          else expect(NIVELES_PRESION.indexOf(c.presion.visita)).toBe(NIVELES_PRESION.indexOf(c.presion.local) + 1);
         }
       }
     }

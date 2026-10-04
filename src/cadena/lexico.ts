@@ -794,3 +794,25 @@ export const FRASES_GRADA = {
 export const GRADA_JUICIO: EntradaJuicio[] = [
   { id: "ole", es: palabras(FRASES_GRADA.ole.es), en: palabras(FRASES_GRADA.ole.en), habilita: (h) => h.tipo === "ole_de_la_grada", requisito: "«olé / the crowd roared» exige el hecho ole_de_la_grada como principal" },
 ];
+
+// ---------------------------------------------------------------------------------
+// Brief 027 — las sanciones de club: «puerta cerrada / behind closed doors / docked points» SOLO
+// con el hecho sancion_de_club como principal. «sancionado / suspended» sigue siendo de los
+// jugadores suspendidos (019, CONSECUENCIAS): no se duplica aquí.
+// ---------------------------------------------------------------------------------
+export const FRASES_SANCION_CLUB = {
+  sancion: {
+    es: ["puerta cerrada", "sin público", "castigado", "castigada", "deducción", "le restaron", "le descontaron", "puntos de sanción", "sanción de club", "banco limitado"],
+    en: ["behind closed doors", "docked", "points deduction", "points deducted", "deduction", "sanctioned", "punished", "crowd ban", "limited bench"],
+  },
+} as const satisfies Record<string, Record<Lengua, readonly string[]>>;
+
+export const SANCION_CLUB_JUICIO: EntradaJuicio[] = [
+  {
+    id: "sancion_club",
+    es: palabras(FRASES_SANCION_CLUB.sancion.es),
+    en: palabras(FRASES_SANCION_CLUB.sancion.en),
+    habilita: (h) => h.tipo === "sancion_de_club",
+    requisito: "«puerta cerrada / behind closed doors / docked points» exige el hecho sancion_de_club como principal",
+  },
+];

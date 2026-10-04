@@ -5,7 +5,7 @@
 import { ladoDelJugador, MAX_CAMBIOS, TITULARES, type Evento, type Lado, type Partido } from "./tipos";
 import { cornerDelTiro, enBanda, origenDelTiro } from "./espacial";
 import { micro, type MicroPartido } from "./micro";
-import { CAUSAS_INTERRUPCION, DURACION_INTERRUPCION, NIVEL, SUBIDA_MINUTO_MIN, TIPOS_ATAQUE } from "./limites";
+import { BANCO_LIMITADO, CAUSAS_INTERRUPCION, CAUSAS_SANCION_CLUB, DURACION_INTERRUPCION, NIVEL, SUBIDA_MINUTO_MIN, TIPOS_ATAQUE, TIPOS_SANCION_CLUB } from "./limites";
 import { P } from "./parametros";
 import { CESPEDES, CLIMAS_PARTIDO, DEF_CABEZAZO, DEF_MANO_A_MANO, DEF_MEDIA_CANCHA, DEF_VASELINA, DEFINICIONES, LESION_JORNADAS, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "./limites";
 import { ALTURAS, BANDAS, CANALES, DISTANCIA_ZONA, TIRO_LEJANO, VELOCIDAD, VELOCIDAD_LEJANO, VELOCIDAD_PENAL, XG_ALTO, CONDUCCION_M, PASE_M, TIPOS_MICRO, DESTINOS, LADO_PORTERO_DE, LADOS_PORTERO, ZONA_XG_BANDAS, ZONAS_AREA, ZONAS_ORIGEN, ZONAS_ORIGEN_PASE } from "./limites";
@@ -377,7 +377,11 @@ export function verificarCondiciones(p: Partido): string[] {
   if (c.superficie === "natural" ? c.cesped === undefined || !CESPEDES.includes(c.cesped) : c.cesped !== undefined) err.push(`condiciones: césped ${String(c.cesped)} en ${c.superficie}`);
   const nl = NIVELES_PRESION.indexOf(c.presion?.local);
   const nv = NIVELES_PRESION.indexOf(c.presion?.visita);
-  if (nl < 0 || nv < 0 || nv !== nl + 1) err.push(`condiciones: presión ${String(c.presion?.local)}/${String(c.presion?.visita)}`);
+  // Brief 027: a puerta cerrada no hay público: presión baja para AMBOS (extensión consciente del 018).
+  const cerrada = p.config.variantes?.sanciones === true && (p.config.sancionesClub ?? []).some((s) => s.tipo === "puerta_cerrada");
+  if (cerrada) {
+    if (c.presion?.local !== "baja" || c.presion?.visita !== "baja") err.push(`condiciones: puerta cerrada con presión ${String(c.presion?.local)}/${String(c.presion?.visita)}`);
+  } else if (nl < 0 || nv < 0 || nv !== nl + 1) err.push(`condiciones: presión ${String(c.presion?.local)}/${String(c.presion?.visita)}`);
   return err;
 }
 
@@ -490,6 +494,36 @@ export function verificarInsolitos(p: Partido): string[] {
   return err;
 }
 
+/**
+ * Brief 027 — sanciones de club (implementación propia): solo con la variante; tipo y causa de
+ * lista cerrada; la puerta se cierra en el estadio del sancionado (local); con el banco limitado,
+ * TODO el que entra (cambio táctico o forzado por lesión) sale de los primeros BANCO_LIMITADO del
+ * banco de la config. (MAX_CAMBIOS ya impide un cuarto cambio: el invariante útil es DE DÓNDE sale
+ * cada suplente.)
+ */
+export function verificarSancionesClub(p: Partido): string[] {
+  const err: string[] = [];
+  const sc = p.config.sancionesClub ?? [];
+  if (sc.length > 0 && p.config.variantes?.sanciones !== true) err.push("sanciones de club sin la variante");
+  const lados = new Set<string>();
+  for (const s of sc) {
+    if (!TIPOS_SANCION_CLUB.includes(s.tipo)) err.push(`sanción de club: tipo ${String(s.tipo)}`);
+    if (!CAUSAS_SANCION_CLUB.includes(s.causa)) err.push(`sanción de club: causa ${String(s.causa)}`);
+    if (s.lado !== "local" && s.lado !== "visita") err.push(`sanción de club: lado ${String(s.lado)}`);
+    if (lados.has(s.lado)) err.push(`sanción de club: dos sanciones para ${s.lado} (máximo una por club)`);
+    lados.add(s.lado);
+    if (s.tipo === "deduccion") {
+      if (!Number.isInteger(s.puntos) || (s.puntos as number) < 1) err.push(`deducción de ${String(s.puntos)} puntos`);
+    } else if (!Number.isInteger(s.partido) || !Number.isInteger(s.de) || (s.partido as number) < 1 || (s.partido as number) > (s.de as number)) err.push(`${s.tipo}: partido ${String(s.partido)} de ${String(s.de)}`);
+    if (s.tipo === "puerta_cerrada" && s.lado !== "local") err.push("puerta cerrada para el visitante (se cierra el estadio del sancionado)");
+    if (s.tipo === "limite_banco") {
+      const disponibles = new Set(p.config[s.lado].jugadores.slice(TITULARES, TITULARES + BANCO_LIMITADO).map((j) => j.nombre));
+      for (const e of p.eventos) if (e.tipo === "cambio" && e.equipo === s.lado && e.jugador && !disponibles.has(e.jugador)) err.push(`${e.id}: ${e.jugador} entra con el banco limitado a ${BANCO_LIMITADO} (no es de los disponibles)`);
+    }
+  }
+  return err;
+}
+
 /** Brief 024 — con la variante de niveles, cada jugador trae su nivel entero en NIVEL (implementación propia). */
 export function verificarNiveles(p: Partido): string[] {
   if (p.config.variantes?.niveles !== true) return [];
@@ -517,6 +551,8 @@ export const VERIFICADORES = {
   niveles: verificarNiveles,
   // Brief 025.
   insolitos: verificarInsolitos,
+  // Brief 027.
+  sancionesClub: verificarSancionesClub,
   // Brief 013: la capa micro derivada también se verifica (es función pura del partido).
   micro: (p: Partido) => verificarMicro(p, micro(p)),
 } as const;

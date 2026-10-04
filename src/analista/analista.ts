@@ -24,9 +24,10 @@
 
 import { ladoDelJugador, type Evento, type Lado, type Partido } from "../sim/tipos";
 import { micro, type MicroPartido } from "../sim/micro";
-import { CANAL_TEXTO, CANCHA_TEXTO, CAUSA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla } from "./textos";
+import { CANAL_TEXTO, CANCHA_TEXTO, CAUSA_TEXTO, CLIMA_TEXTO, PRESION_TEXTO, jornadasTxt, listaBajas, minutoTxt, temperaturaTxt, textos, xgTxt, type ClavePlantilla, CAUSA_SANCION_TEXTO } from "./textos";
 import { medirCalor, medirCancha, medirNiebla, medirPresion } from "./condiciones";
 import { rachasOle } from "./grada";
+import { BANCO_LIMITADO } from "../sim/limites";
 import { TIPOS_HECHO, type Hecho, type TipoHecho } from "./tipos";
 import { figura, notaTxt, porteros } from "./valoracion";
 import {
@@ -707,6 +708,25 @@ function insolitos(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
   return out;
 }
 
+// ---------------- brief 027: sanciones de club ----------------
+
+/** `sancion_de_club`: cada sanción de club que el registro trae a este partido (cita su inicio). */
+function sancionesDeClub(p: Partido, c: Ctx): Borrador[] {
+  const inicio = c.ev.find((e) => e.tipo === "inicio_periodo");
+  if (!inicio) return [];
+  return (p.config.sancionesClub ?? []).map((s) => {
+    const t = CAUSA_SANCION_TEXTO[s.causa] as { es: string; en: string };
+    const base = { equipo: c.nombre[s.lado], tipo: s.tipo, causa: s.causa, causa_es: t.es, causa_en: t.en };
+    if (s.tipo === "deduccion") return hecho(c, "sancion_de_club", "sancion_deduccion", [inicio.id], { ...base, puntos: s.puntos as number });
+    return hecho(c, "sancion_de_club", s.tipo === "puerta_cerrada" ? "sancion_puerta_cerrada" : "sancion_limite_banco", [inicio.id], {
+      ...base,
+      partido: s.partido as number,
+      de: s.de as number,
+      ...(s.tipo === "limite_banco" ? { suplentes: BANCO_LIMITADO } : {}),
+    });
+  });
+}
+
 // ---------------- brief 026: la grada ----------------
 
 /** `ole_de_la_grada`: cada racha del olé (src/analista/grada.ts). Cita los pases de la racha (micro, contrato del 013). */
@@ -845,6 +865,7 @@ export function analizar(partido: Partido): Hecho[] {
   // Brief 025: los insólitos (solo con la variante) y el efecto medido de la niebla.
   borradores.push(...insolitos(partido, c, m));
   borradores.push(...oleDeLaGrada(partido, c, m));
+  borradores.push(...sancionesDeClub(partido, c));
   // Brief 019: lesiones (solo con la variante) y las bajas del registro (solo partidos de liga).
   borradores.push(...lesiones(c), ...bajasDelPartido(partido, c));
   borradores.push(...condicionesDelPartido(partido, c), ...efectoCalor(partido, c, m), ...canchaIncomoda(partido, c, m), ...presionQueAhoga(partido, c, m));

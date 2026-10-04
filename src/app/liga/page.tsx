@@ -8,6 +8,7 @@ import { mundo } from "../../mundo/mundo";
 import { jornadasDe } from "../../mundo/temporada";
 import { bajasDeJornada, jugadoresVisibles, ligaVisible, rutaPartidoLiga, temporadaVisible } from "../../vista/liga";
 import { presets } from "../../vista/servidor";
+import { notaDeduccion } from "../../vista/sanciones";
 
 export const dynamic = "force-dynamic";
 
@@ -96,9 +97,21 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
                 </thead>
                 <tbody>
                   {t.tabla.map((f, i) => (
-                    <tr key={f.equipo} data-testid="league-row" data-equipo={f.equipo} data-pts={f.pts} data-dg={f.dg}>
+                    <tr key={f.equipo} data-testid="league-row" data-equipo={f.equipo} data-pts={f.pts} data-dg={f.dg} {...(f.deduccion ? { "data-deduccion": f.deduccion.puntos } : {})}>
                       <td>{i + 1}</td>
-                      <td className="tabla-equipo">{f.equipo}</td>
+                      <td className="tabla-equipo">
+                        {f.equipo}
+                        {f.deduccion && (
+                          <>
+                            <span className="tabla-asterisco" aria-hidden="true">
+                              *
+                            </span>
+                            <span className="tabla-nota" data-testid="league-deduction">
+                              {notaDeduccion(f)}
+                            </span>
+                          </>
+                        )}
+                      </td>
                       <td>{f.pj}</td>
                       <td>{f.g}</td>
                       <td>{f.e}</td>
@@ -112,6 +125,11 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
                 </tbody>
               </table>
             </div>
+            {t.tabla.some((f) => f.deduccion) && (
+              <p className="ratings-note" data-testid="league-deduction-legend">
+                * Points deducted by a club sanction this season (fictional cause): the points shown are already net of the deduction.
+              </p>
+            )}
           </section>
 
           <section className="liga-panel" aria-labelledby="jornada-titulo">

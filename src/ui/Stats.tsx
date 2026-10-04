@@ -11,7 +11,7 @@ import { micro } from "../sim/micro";
 import type { Lado, Partido } from "../sim/tipos";
 import { CANAL_TXT, estadisticas, relato } from "../vista/stats";
 import { efectosMedidos } from "../vista/condiciones";
-import { reacciones } from "../vista/grada";
+import { aPuertaCerrada, reacciones } from "../vista/grada";
 import { BloqueGrada, EvidenciaGrada } from "./Grada";
 import { IconoCerrar } from "./Iconos";
 import { EXPLICA_XG, formatoXg, type LenguaXg } from "./textos";
@@ -177,7 +177,7 @@ export function Stats({
             ))}
           </div>
         )}
-        <BloqueGrada lista={grada} lengua={lengua} onReaccion={setReaccionSel} />
+        <BloqueGrada lista={grada} lengua={lengua} onReaccion={setReaccionSel} cerrada={aPuertaCerrada(partido)} />
       </div>
 
       {reaccionSel !== null && grada[reaccionSel] && (

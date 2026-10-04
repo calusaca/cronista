@@ -26,11 +26,15 @@ export const ROTULO_GRADA = "Crowd · derived from match data";
 export const textoReaccion = (r: Reaccion, lengua: LenguaXg) => (lengua === "es" ? r.texto_es : r.texto_en);
 
 /** Bloque «Crowd» del panel de stats: las reacciones de lo visto, cada una abre su evidencia. */
-export function BloqueGrada({ lista, lengua, onReaccion }: { lista: Reaccion[]; lengua: LenguaXg; onReaccion: (i: number) => void }) {
+export function BloqueGrada({ lista, lengua, onReaccion, cerrada = false }: { lista: Reaccion[]; lengua: LenguaXg; onReaccion: (i: number) => void; cerrada?: boolean }) {
   return (
-    <div className="stats-block" data-testid="stats-crowd">
+    <div className="stats-block" data-testid="stats-crowd" data-cerrada={cerrada ? "true" : "false"}>
       <div className="stats-title">Crowd · derived from match data</div>
-      {lista.length === 0 && <p className="stats-vacio">The crowd has had nothing in the data to react to yet.</p>}
+      {cerrada ? (
+        <p className="stats-vacio">Behind closed doors (club sanction): no crowd in the stadium, so no reactions.</p>
+      ) : (
+        lista.length === 0 && <p className="stats-vacio">The crowd has had nothing in the data to react to yet.</p>
+      )}
       {lista.map((r, i) => (
         <button key={`${r.tipo}-${r.disparo}-${i}`} type="button" className="stats-row stats-crowd" data-testid="stat-reaccion" data-tipo={r.tipo} data-minuto={r.minuto} onClick={() => onReaccion(i)}>
           <span className="stats-crowd-etiqueta overline">

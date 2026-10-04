@@ -12,3 +12,7 @@ coverage/
 test-results/
 playwright-report/
 next-env.d.ts
+
+# directorio accidental de cache de compilacion de node (redireccion perdida)
+/1/
+/2/

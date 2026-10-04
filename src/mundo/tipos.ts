@@ -1,6 +1,7 @@
 // Brief 016 — el mundo ficticio: países con clima, ligas, equipos con cancha, temporadas.
 // El motor no se entera: un equipo del mundo ENVUELVE un `Equipo` de siempre, y un partido
 // de liga es un `SimConfig` estándar con semilla `semillaDePartido(...)`.
+import type { CausaSancionClub, TipoSancionClub } from "../sim/limites";
 
 import type { Equipo, Jugador, SimConfig } from "../sim/tipos";
 
@@ -87,6 +88,19 @@ export interface FilaTabla {
   gc: number;
   dg: number;
   pts: number;
+  /** Brief 027: deducción de puntos de la temporada (pts = ptsBrutos − puntos). Solo en la fila sancionada. */
+  deduccion?: { puntos: number; causa: CausaSancionClub };
+  ptsBrutos?: number;
+}
+
+/** Brief 027 — una sanción de club del registro de la temporada. */
+export interface SancionClub {
+  equipo: string;
+  tipo: TipoSancionClub;
+  causa: CausaSancionClub;
+  /** Jornadas en las que pesa (deducción: la del anuncio; puerta cerrada: sus partidos de local; banco: su ventana). */
+  jornadas: number[];
+  puntos?: number;
 }
 
 export interface Goleador {
@@ -125,4 +139,6 @@ export interface Temporada {
   configs: SimConfig[];
   sanciones: Sancion[];
   lesiones: LesionLiga[];
+  /** Brief 027: solo con las sanciones de club encendidas (sin ellas, la temporada es la de siempre). */
+  sancionesClub?: SancionClub[];
 }

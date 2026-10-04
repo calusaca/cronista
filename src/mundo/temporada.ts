@@ -7,16 +7,16 @@
 // jornada siguiente se arma sin las bajas (entra el suplente de su posición, o una reserva del
 // plantel extendido) y el partido lleva sus bajas en la config (dato del registro, citable).
 
-import { PRESION_LOCAL_POR_LIGA, PROB_CLIMA, SANCION_JORNADAS } from "../analista/umbrales";
+import { CAUSAS_POR_TIPO, DEDUCCION_PUNTOS, LIMITE_BANCO_JORNADAS, PRESION_LOCAL_POR_LIGA, PROB_CLIMA, PROB_CLUBES_SANCIONADOS, PUERTA_CERRADA_PARTIDOS, SANCION_JORNADAS } from "../analista/umbrales";
 import { nivelSiguiente } from "../sim/condiciones";
-import { TEMPERATURA_C, type ClimaPartido } from "../sim/limites";
+import { TEMPERATURA_C, TIPOS_SANCION_CLUB, type ClimaPartido } from "../sim/limites";
 import { simular } from "../sim/motor";
 import { conNiveles, nivelesDe } from "../sim/niveles";
 import { prngDerivado } from "../sim/prng";
-import { SUPLENTES, TITULARES, type Baja, type Condiciones, type Equipo, type Jugador, type Partido, type SimConfig } from "../sim/tipos";
+import { SUPLENTES, TITULARES, type Baja, type Condiciones, type Equipo, type Jugador, type Partido, type SancionClubPartido, type SimConfig } from "../sim/tipos";
 import { calendarioCirculo } from "./calendario";
 import { goleadores, tablaDePosiciones } from "./tabla";
-import type { Calendario, Cruce, EquipoMundo, LesionLiga, Liga, PartidoLiga, Sancion, Temporada } from "./tipos";
+import type { Calendario, Cruce, EquipoMundo, LesionLiga, Liga, PartidoLiga, Sancion, SancionClub, Temporada } from "./tipos";
 
 /**
  * Semilla de un partido de liga: FNV-1a de 32 bits sobre la clave, con un mezclado final
@@ -121,10 +121,79 @@ function bajasEn(registro: Map<string, Activa[]>, equipo: string, j: number): Ba
 }
 
 /**
- * La temporada completa, jornada a jornada, con su registro (brief 019). Pura y determinista:
- * dos veces ⇒ idéntica, sanciones y lesiones incluidas.
+ * Brief 027 — el sorteo de las sanciones de club de una temporada (antes de jugarla): 0–2 clubes,
+ * a lo sumo una sanción por club, tipo y causa de listas cerradas. Flujo derivado propio por liga
+ * y temporada: no toca ningún otro sorteo.
  */
-export function simularTemporada(liga: Liga, temporada: number): Temporada {
+export function sorteoSancionesClub(liga: Liga, temporada: number): SancionClub[] {
+  const rng = prngDerivado(temporada, `sanciones-club:${liga.id}`);
+  const cal = calendarioDeLiga(liga);
+  const total = cal.length;
+  const u = rng.next();
+  let n = 0;
+  let acum = 0;
+  for (let k = 0; k < PROB_CLUBES_SANCIONADOS.length; k++) {
+    acum += PROB_CLUBES_SANCIONADOS[k] as number;
+    if (u < acum) {
+      n = k;
+      break;
+    }
+  }
+  const libres = liga.equipos.map((_, i) => i);
+  const out: SancionClub[] = [];
+  for (let s = 0; s < n; s++) {
+    const idx = libres.splice(rng.int(0, libres.length - 1), 1)[0] as number;
+    const equipo = (liga.equipos[idx] as EquipoMundo).equipo.nombre;
+    const tipo = rng.pick(TIPOS_SANCION_CLUB);
+    const causa = rng.pick(CAUSAS_POR_TIPO[tipo]);
+    if (tipo === "deduccion") {
+      out.push({ equipo, tipo, causa, jornadas: [rng.int(1, total)], puntos: rng.int(DEDUCCION_PUNTOS.min, DEDUCCION_PUNTOS.max) });
+    } else if (tipo === "puerta_cerrada") {
+      const deLocal = cal.flatMap((jj, k) => (jj.some((c) => c.local === idx) ? [k + 1] : []));
+      const k = rng.int(PUERTA_CERRADA_PARTIDOS.min, PUERTA_CERRADA_PARTIDOS.max);
+      const desde = rng.int(0, deLocal.length - k);
+      out.push({ equipo, tipo, causa, jornadas: deLocal.slice(desde, desde + k) });
+    } else {
+      const k = rng.int(LIMITE_BANCO_JORNADAS.min, LIMITE_BANCO_JORNADAS.max);
+      const desde = rng.int(1, total - k + 1);
+      out.push({ equipo, tipo, causa, jornadas: Array.from({ length: k }, (_, x) => desde + x) });
+    }
+  }
+  return out;
+}
+
+/** Brief 027: a puerta cerrada no hay público ⇒ la presión del 018 pasa a baja para AMBOS. */
+export function sinPublico(c: Condiciones): Condiciones {
+  return { ...c, presion: { local: "baja", visita: "baja" } };
+}
+
+/** Las sanciones de club de un partido (el lado sancionado y su dato citable). */
+function sancionesDelPartido(registro: readonly SancionClub[], nombres: Record<"local" | "visita", string>, j: number): SancionClubPartido[] {
+  const out: SancionClubPartido[] = [];
+  for (const s of registro) {
+    const k = s.jornadas.indexOf(j);
+    if (k < 0) continue;
+    const lado = s.equipo === nombres.local ? "local" : s.equipo === nombres.visita ? "visita" : undefined;
+    if (!lado) continue;
+    // (la puerta cerrada solo trae jornadas de LOCAL del club: el sorteo lo garantiza y el invariante lo exige)
+    out.push({ lado, tipo: s.tipo, causa: s.causa, ...(s.tipo === "deduccion" ? { puntos: s.puntos as number } : { partido: k + 1, de: s.jornadas.length }) });
+  }
+  return out;
+}
+
+/** Opciones de la temporada (brief 027): las sanciones de club, encendidas por defecto en la liga. */
+export interface OpcionesTemporada {
+  sanciones?: boolean;
+}
+
+/**
+ * La temporada completa, jornada a jornada, con su registro (brief 019). Pura y determinista:
+ * dos veces ⇒ idéntica, sanciones y lesiones incluidas. Brief 027: con `sanciones: false`, la
+ * temporada es byte a byte la de antes de las sanciones de club (fixture reina temporada-026).
+ */
+export function simularTemporada(liga: Liga, temporada: number, opciones: OpcionesTemporada = {}): Temporada {
+  const conSanciones = opciones.sanciones !== false;
+  const sancionesClub = conSanciones ? sorteoSancionesClub(liga, temporada) : [];
   const partidos: PartidoLiga[] = [];
   const configs: SimConfig[] = [];
   const sanciones: Sancion[] = [];
@@ -144,13 +213,17 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
       const bl = bajasEn(registro, eqL.equipo.nombre, j);
       const bv = bajasEn(registro, eqV.equipo.nombre, j);
       const bajas = { ...(bl.length > 0 ? { local: bl } : {}), ...(bv.length > 0 ? { visita: bv } : {}) };
+      // Brief 027: las sanciones de club de este partido; a puerta cerrada, presión baja para AMBOS.
+      const sc = conSanciones ? sancionesDelPartido(sancionesClub, { local: eqL.equipo.nombre, visita: eqV.equipo.nombre }, j) : [];
+      const cond = condicionesDePartido(liga, cruce, seed);
       const config: SimConfig = {
         seed,
         local: conSusNiveles(eqL, new Set(bl.map((b) => b.jugador))),
         visita: conSusNiveles(eqV, new Set(bv.map((b) => b.jugador))),
-        condiciones: condicionesDePartido(liga, cruce, seed),
-        variantes: { lesiones: true, autogoles: true, niveles: true, insolitos: true },
+        condiciones: sc.some((x) => x.tipo === "puerta_cerrada") ? sinPublico(cond) : cond,
+        variantes: { lesiones: true, autogoles: true, niveles: true, insolitos: true, ...(conSanciones ? { sanciones: true } : {}) },
         ...(bl.length > 0 || bv.length > 0 ? { bajas } : {}),
+        ...(sc.length > 0 ? { sancionesClub: sc } : {}),
       };
       const p = simular(config);
       configs.push(p.config);
@@ -180,11 +253,13 @@ export function simularTemporada(liga: Liga, temporada: number): Temporada {
     tabla: tablaDePosiciones(
       liga.equipos.map((e) => e.equipo.nombre),
       partidos,
+      sancionesClub.filter((s) => s.tipo === "deduccion").map((s) => ({ equipo: s.equipo, puntos: s.puntos as number, causa: s.causa })),
     ),
     goleadores: goleadores(partidos),
     configs,
     sanciones,
     lesiones,
+    ...(conSanciones ? { sancionesClub } : {}),
   };
 }
 

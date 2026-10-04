@@ -83,7 +83,8 @@ export function nivelSiguiente(n: (typeof NIVELES_PRESION)[number]): (typeof NIV
 }
 
 /** Violaciones del contrato de unas condiciones (vacía = válidas). */
-export function erroresCondiciones(c: Condiciones): string[] {
+/** `aPuertaCerrada` (brief 027): sin público, la presión es baja para AMBOS (extensión consciente del 018). */
+export function erroresCondiciones(c: Condiciones, aPuertaCerrada = false): string[] {
   const err: string[] = [];
   if (!CLIMAS_PARTIDO.includes(c.clima)) err.push(`clima fuera de vocabulario (${String(c.clima)})`);
   if (c.clima === "calor" || c.clima === "frio") {
@@ -95,7 +96,9 @@ export function erroresCondiciones(c: Condiciones): string[] {
   if (c.superficie === "natural" && (c.cesped === undefined || !CESPEDES.includes(c.cesped))) err.push(`césped natural sin altura válida (${String(c.cesped)})`);
   if (c.superficie === "sintetica" && c.cesped !== undefined) err.push("césped con altura en una cancha sintética");
   if (!c.presion || !NIVELES_PRESION.includes(c.presion.local) || !NIVELES_PRESION.includes(c.presion.visita)) err.push("presión fuera de vocabulario");
-  else if (c.presion.local === "alta" || c.presion.visita !== nivelSiguiente(c.presion.local))
+  else if (aPuertaCerrada) {
+    if (c.presion.local !== "baja" || c.presion.visita !== "baja") err.push(`presión ${c.presion.local}/${c.presion.visita} a puerta cerrada (sin público: baja para ambos)`);
+  } else if (c.presion.local === "alta" || c.presion.visita !== nivelSiguiente(c.presion.local))
     err.push(`presión ${c.presion.local}/${c.presion.visita}: el visitante va siempre un nivel por encima del local`);
   return err;
 }

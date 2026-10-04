@@ -1,14 +1,22 @@
 // Brief 016 §2 — tabla de posiciones y goleadores: funciones PURAS de los resultados.
 // Puntos 3/1/0; desempate puntos → diferencia de gol → goles a favor → orden alfabético.
 
+import type { CausaSancionClub } from "../sim/limites";
 import type { FilaTabla, Goleador, PartidoLiga } from "./tipos";
+
+/** Brief 027: una deducción de puntos de la temporada. */
+export interface Deduccion {
+  equipo: string;
+  puntos: number;
+  causa: CausaSancionClub;
+}
 
 export const PUNTOS_VICTORIA = 3;
 export const PUNTOS_EMPATE = 1;
 
 const alfabetico = (a: string, b: string) => a.localeCompare(b, "es");
 
-export function tablaDePosiciones(equipos: readonly string[], partidos: readonly PartidoLiga[]): FilaTabla[] {
+export function tablaDePosiciones(equipos: readonly string[], partidos: readonly PartidoLiga[], deducciones: readonly Deduccion[] = []): FilaTabla[] {
   const filas = new Map<string, FilaTabla>(
     equipos.map((e) => [e, { equipo: e, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }]),
   );
@@ -43,6 +51,13 @@ export function tablaDePosiciones(equipos: readonly string[], partidos: readonly
   }
   const out = [...filas.values()];
   for (const f of out) f.dg = f.gf - f.gc;
+  // Brief 027: la deducción se resta de los puntos y queda a la vista en la fila (pts = brutos − deducción).
+  for (const d of deducciones) {
+    const f = fila(d.equipo);
+    f.ptsBrutos = f.pts;
+    f.pts -= d.puntos;
+    f.deduccion = { puntos: d.puntos, causa: d.causa };
+  }
   return out.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf || alfabetico(a.equipo, b.equipo));
 }
 

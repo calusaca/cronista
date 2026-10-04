@@ -1,7 +1,7 @@
 // Contrato del simulador — brief 001 (docs/disenos/001-simulador.md).
 // Los nombres y propiedades de este archivo NO se cambian sin actualizar el brief.
 
-import type { Altura, Banda, CausaInterrupcion, Cesped, ClimaPartido, Definicion, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
+import type { Altura, Banda, CausaInterrupcion, CausaSancionClub, TipoSancionClub, Cesped, ClimaPartido, Definicion, Destino, LadoPortero, NivelPresion, Superficie, ZonaOrigen } from "./limites";
 
 export type Estilo = "posesion" | "contragolpe" | "presion";
 
@@ -58,6 +58,20 @@ export interface Variantes {
   niveles?: boolean;
   /** Brief 025: los cinco insólitos (olímpico, subida del portero, palos, interrupción; la niebla es un clima). */
   insolitos?: boolean;
+  /** Brief 027: sanciones de club del registro de la temporada (banco limitado; puerta cerrada). */
+  sanciones?: boolean;
+}
+
+/** Brief 027 — una sanción de club que el registro de la temporada trae a ESTE partido (dato citable). */
+export interface SancionClubPartido {
+  lado: "local" | "visita";
+  tipo: TipoSancionClub;
+  causa: CausaSancionClub;
+  /** deduccion: los puntos restados (anunciada en este partido). */
+  puntos?: number;
+  /** puerta_cerrada / limite_banco: este es el partido `partido` de `de`. */
+  partido?: number;
+  de?: number;
 }
 
 /** Brief 019 — una baja que el registro de la temporada trae al partido (no juega: no está en la plantilla). */
@@ -78,6 +92,8 @@ export interface SimConfig {
   variantes?: Variantes;
   /** Brief 019: las bajas del registro de la temporada (dato puro: el motor no las lee). */
   bajas?: Partial<Record<"local" | "visita", Baja[]>>;
+  /** Brief 027: las sanciones de club de este partido (puerta cerrada: presión baja para AMBOS; banco limitado). */
+  sancionesClub?: SancionClubPartido[];
 }
 
 export type TipoEvento =

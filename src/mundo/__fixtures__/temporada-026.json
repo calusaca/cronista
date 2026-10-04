@@ -1,0 +1,15 @@
+{
+  "comentario": "Fixture reina del brief 027: sha256 de JSON.stringify(simularTemporada(liga, TEMPORADA_ACTUAL)) por liga, generado desde el commit a92abf8 ANTES de implementar las sanciones de club. Con las sanciones apagadas, la temporada debe reproducirlo byte a byte. No se regenera.",
+  "commit": "a92abf8",
+  "temporada": 1,
+  "porLiga": {
+    "liga-del-sol-alto": "2d3e6802fa395864e491dab36331cb60a5dd7c44741203b807cb0125c4f47171",
+    "liga-de-las-dunas": "17ad042034dc2573868ea30bab100db10870575af60c87368acc2c79f172f11b",
+    "liga-de-los-valles": "213f828838808399a31fa3c78c1c0203a3a0ebeb71394174dca2ed5ef78e50e3",
+    "liga-del-norte-blanco": "18d3d27e480d5644de87c06a76cb39308bc379e2bfe6bdb63e6dfc426b920a9d",
+    "liga-de-la-bruma": "ed5dc212075ff3bd7114a965b834ee026004a7df8d73b613736467d44b5320d4",
+    "liga-de-las-cumbres": "324ee20b16820a8744004cfc67c9190d9e5a01b2c0c885d3a4210fca0a9d9247",
+    "liga-del-oasis-hondo": "d83b6584db43bcea3031ac7026f6b82b209dc2adac0ffee81ad7dd2e54ccf04e",
+    "liga-de-los-fiordos": "596515daea8cf4c5a867b06ca0dc417145dcd23a3f8d06bf5c73eb8683f96b47"
+  }
+}
