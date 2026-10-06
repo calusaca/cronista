@@ -1,0 +1,42 @@
+{
+  "comando": "npm run dataset",
+  "modo": {
+    "tipo": "semillas",
+    "n": 100
+  },
+  "partidos": 100,
+  "eventosPorPartido": 100.7,
+  "microPorPartido": 2094,
+  "hechosPorPartido": 13,
+  "golesPorPartido": 3.03,
+  "bandasCorrida": {
+    "total": 34,
+    "enBanda": 30,
+    "consistentes": 4,
+    "fuera": 0
+  },
+  "experimentos": {
+    "total": 18,
+    "enBanda": 18
+  },
+  "comprobaciones": {
+    "total": 1500,
+    "violaciones": 0,
+    "lineasInvalidas": 0
+  },
+  "muestra": {
+    "archivo": "muestra-10.jsonl",
+    "semillas": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  }
+}

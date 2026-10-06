@@ -1,0 +1,101 @@
+﻿id,semilla,local,visita,goles_local,goles_visita,xg_local,xg_visita,tiros_local,tiros_visita,amarillas_local,amarillas_visita,rojas_local,rojas_visita,clima,temperatura_c,superficie,cesped,presion_local,presion_visita,racha_pases_max_local,racha_pases_max_visita,oles,olimpicos,al_palo,doble_palo,subidas_portero,interrupciones,autogoles,lesiones,micro_eventos,hechos
+s1,1,Deportivo Valdecristal,Sporting Ventolera,2,1,1.43,1.53,17,15,0,4,0,0,,,,,,,12,13,0,0,0,0,0,0,0,0,2183,10
+s2,2,Racing Arenablanca,Deportivo Pradoalto,2,0,1.04,0.36,9,9,6,0,1,0,,,,,,,14,9,0,0,0,0,0,0,0,1,2164,11
+s3,3,Juventud Torreluna,Unión Brezal,1,2,0.78,1.08,9,13,0,1,0,0,,,,,,,13,15,1,0,0,0,0,0,0,1,2098,12
+s4,4,Deportivo Marisal,Unión Brezal,1,1,0.61,1.35,5,13,2,3,0,0,,,,,,,11,14,0,0,0,0,0,0,0,0,2113,9
+s5,5,Deportivo Montefrío Bajo,Atlético Arenablanca,1,3,0.59,1.84,7,15,1,2,0,1,,,,,,,15,11,0,0,0,0,0,0,0,0,2137,14
+s6,6,Club Nebrisa,Deportivo Brezal,1,1,0.81,2.00,11,19,3,2,0,0,,,,,,,14,15,0,0,1,0,0,0,0,0,2118,10
+s7,7,Juventud Valdecristal,Racing Pradoalto,1,3,1.26,3.10,13,15,0,4,0,0,,,,,,,15,18,0,0,0,0,0,0,0,0,1924,13
+s8,8,Racing Brezal,Juventud Puertoscuro,0,2,0.68,1.27,10,12,3,1,0,0,,,,,,,9,13,0,0,2,0,0,0,0,0,2229,11
+s9,9,Racing Ventolera,Olímpico Arenablanca,0,0,0.60,0.22,8,7,2,2,0,0,,,,,,,11,11,0,0,1,0,0,0,0,1,2275,10
+s10,10,Olímpico Torreluna,Club Ormidia,1,2,1.51,1.42,15,19,2,1,0,0,,,,,,,17,14,0,0,0,0,0,0,0,0,2033,13
+s11,11,Unión Caleteo,Sporting Puertoscuro,3,2,2.19,1.54,15,20,4,1,0,0,,,,,,,9,10,0,0,1,0,0,0,0,0,2158,18
+s12,12,Olímpico Ormidia,Deportivo Valdecristal,2,2,0.80,3.14,10,25,3,4,1,0,,,,,,,16,17,1,0,2,0,0,0,0,0,2005,18
+s13,13,Sporting Ventolera,Atlético Brezal,2,2,0.85,2.65,6,17,1,1,0,0,,,,,,,10,21,0,0,2,0,0,0,0,0,2003,18
+s14,14,Deportivo Puertoscuro,Atlético Brezal,2,0,2.41,0.95,22,11,2,2,1,0,,,,,,,17,14,1,0,2,0,0,0,0,0,2108,14
+s15,15,Club Pradoalto,Olímpico Lumbrera,1,2,2.05,2.41,10,17,3,1,0,0,,,,,,,11,8,0,0,0,0,0,0,0,1,2198,10
+s16,16,Club Torreluna,Racing Ormidia,1,1,0.46,0.57,9,10,4,5,0,0,,,,,,,12,12,0,0,0,0,0,0,0,1,2263,18
+s17,17,Deportivo Ormidia,Club Quebralta,1,0,0.61,1.67,10,15,1,0,0,0,,,,,,,14,12,0,0,0,0,0,0,0,1,2027,8
+s18,18,Deportivo Pradoalto,Racing Solcanto,3,2,1.72,1.61,9,15,0,2,0,0,,,,,,,14,9,0,0,1,0,0,0,0,1,2122,15
+s19,19,Unión Pradoalto,Juventud Torreluna,2,4,1.54,1.95,19,12,1,0,0,0,,,,,,,18,10,0,0,0,0,0,0,0,0,2199,13
+s20,20,Sporting Ormidia,Unión Lumbrera,0,0,1.71,2.51,16,18,3,2,0,0,,,,,,,17,16,0,0,1,0,0,0,0,0,1893,8
+s21,21,Deportivo Arenablanca,Unión Islaverde Sur,1,0,1.57,1.54,12,13,1,0,0,0,,,,,,,15,17,0,0,1,0,0,0,0,0,1995,8
+s22,22,Olímpico Lumbrera,Sporting Valdecristal,3,1,1.35,1.16,10,18,1,2,0,0,,,,,,,16,15,1,0,0,0,0,0,0,0,1954,12
+s23,23,Club Torreluna,Atlético Arenablanca,4,4,2.20,2.06,16,17,2,2,0,0,,,,,,,20,20,0,0,0,0,0,0,0,0,2016,22
+s24,24,Olímpico Marisal,Atlético Lumbrera,3,1,2.61,0.76,19,8,3,4,1,1,,,,,,,17,9,0,0,2,0,0,0,0,0,2233,18
+s25,25,Racing Nebrisa,Juventud Arenablanca,1,1,0.37,0.74,8,11,2,1,0,0,,,,,,,10,14,0,0,2,0,0,0,0,1,2052,15
+s26,26,Olímpico Puertoscuro,Unión Marisal,0,1,0.17,1.07,5,10,1,2,0,0,,,,,,,9,15,0,0,0,0,0,0,0,1,2122,7
+s27,27,Sporting Marisal,Deportivo Puertoscuro,2,3,1.36,0.74,19,7,0,1,0,0,,,,,,,15,8,0,0,2,0,0,0,0,0,2176,15
+s28,28,Sporting Lumbrera,Olímpico Islaverde Sur,2,3,1.45,1.06,10,13,1,2,0,0,,,,,,,18,15,0,0,0,0,0,0,1,0,1987,13
+s29,29,Racing Ventolera,Sporting Solcanto,2,2,1.64,1.13,12,13,0,1,0,0,,,,,,,10,17,0,0,4,0,0,0,0,1,2018,18
+s30,30,Unión Ormidia,Racing Islaverde Sur,0,1,1.35,2.10,14,13,0,3,0,1,,,,,,,10,9,0,0,0,0,0,0,0,0,2191,8
+s31,31,Sporting Pradoalto,Unión Islaverde Sur,0,0,0.50,0.88,7,8,0,1,0,0,,,,,,,10,11,0,0,0,0,0,0,0,1,2159,7
+s32,32,Deportivo Puertoscuro,Club Valdecristal,3,3,1.34,1.33,16,14,2,1,0,0,,,,,,,11,14,0,0,0,0,0,0,1,0,2048,13
+s33,33,Olímpico Ventolera,Atlético Arenablanca,3,1,2.06,0.42,12,7,4,4,0,0,,,,,,,10,10,0,0,0,0,0,0,0,1,2277,17
+s34,34,Deportivo Pradoalto,Deportivo Puertoscuro,1,1,1.32,1.80,13,14,1,4,1,0,,,,,,,20,11,2,0,0,0,0,0,0,0,2195,12
+s35,35,Club Ormidia,Club Arenablanca,1,1,0.46,0.82,8,15,0,0,0,0,,,,,,,10,12,0,0,1,0,0,0,0,0,2056,13
+s36,36,Unión Arenablanca,Sporting Solcanto,0,1,1.44,1.70,18,21,2,1,0,0,,,,,,,18,16,1,0,1,0,0,0,0,0,1882,9
+s37,37,Olímpico Ormidia,Juventud Pradoalto,2,1,1.72,0.92,11,9,1,3,0,0,,,,,,,15,10,0,0,3,1,0,0,0,0,2158,16
+s38,38,Atlético Caleteo,Unión Lumbrera,1,3,0.61,1.23,14,10,2,0,0,0,,,,,,,11,15,0,0,2,0,0,0,0,1,2077,15
+s39,39,Unión Ormidia,Atlético Arenablanca,1,2,0.31,1.93,5,22,1,1,0,0,,,,,,,9,22,0,0,0,0,0,0,0,0,2210,12
+s40,40,Olímpico Lumbrera,Juventud Lumbrera,0,3,1.78,1.28,15,15,2,0,1,0,,,,,,,18,11,0,0,0,0,0,0,0,0,2117,15
+s41,41,Club Arenablanca,Club Ventolera,2,0,1.38,0.55,11,8,2,4,0,1,,,,,,,17,8,0,0,0,0,0,0,0,0,2293,10
+s42,42,Sporting Montefrío Bajo,Olímpico Brezal,1,1,1.16,1.60,17,13,1,0,0,0,,,,,,,14,16,0,0,1,0,0,0,0,0,1982,12
+s43,43,Atlético Ormidia,Olímpico Caleteo,0,3,0.83,2.18,8,14,0,3,0,0,,,,,,,9,12,0,0,1,0,0,0,0,0,2114,13
+s44,44,Sporting Quebralta,Juventud Puertoscuro,3,3,2.42,2.30,15,14,2,4,0,0,,,,,,,13,12,0,0,0,0,0,0,1,1,2042,16
+s45,45,Deportivo Quebralta,Juventud Ormidia,0,5,0.55,1.57,10,21,4,4,0,0,,,,,,,9,11,0,0,1,0,0,0,0,0,2109,16
+s46,46,Deportivo Islaverde Sur,Olímpico Ormidia,1,2,3.04,1.42,20,12,0,4,0,0,,,,,,,14,12,0,0,0,0,0,0,0,0,2258,10
+s47,47,Atlético Ventolera,Racing Caleteo,1,1,1.34,0.73,16,15,2,3,0,0,,,,,,,12,13,0,0,0,0,0,0,0,0,2251,10
+s48,48,Sporting Solcanto,Olímpico Montefrío Bajo,1,1,0.95,0.65,12,11,2,3,0,1,,,,,,,13,10,0,0,0,0,0,0,0,0,2127,10
+s49,49,Deportivo Ventolera,Juventud Torreluna,2,0,0.55,0.39,7,5,1,3,0,1,,,,,,,10,17,0,0,0,0,0,0,0,1,2102,12
+s50,50,Deportivo Caleteo,Atlético Nebrisa,0,4,0.65,2.23,9,19,1,1,0,0,,,,,,,9,16,1,0,1,0,0,1,0,1,2195,14
+s51,51,Racing Solcanto,Sporting Ormidia,1,1,1.12,1.95,12,13,1,1,0,0,,,,,,,14,7,0,0,1,0,0,0,0,1,2226,10
+s52,52,Unión Arenablanca,Unión Pradoalto,2,2,1.31,1.98,8,15,3,2,0,0,,,,,,,17,14,1,0,0,0,0,0,1,0,2032,16
+s53,53,Club Caleteo,Juventud Nebrisa,3,2,1.18,1.03,16,12,0,4,0,0,,,,,,,13,10,0,0,1,0,0,0,0,1,1927,15
+s54,54,Atlético Nebrisa,Deportivo Valdecristal,2,2,0.46,1.92,7,12,1,0,0,0,,,,,,,19,20,0,0,0,0,0,0,0,0,2044,11
+s55,55,Juventud Nebrisa,Olímpico Lumbrera,1,1,2.45,2.00,12,14,2,4,0,1,,,,,,,13,15,0,0,0,0,0,0,0,2,2256,13
+s56,56,Deportivo Pradoalto,Club Montefrío Bajo,3,0,1.53,0.86,16,14,4,1,0,0,,,,,,,12,13,0,0,1,0,0,0,0,0,2171,13
+s57,57,Unión Solcanto,Club Lumbrera,0,1,0.78,1.40,9,14,3,1,0,0,,,,,,,11,12,0,0,2,0,0,0,0,0,2106,10
+s58,58,Olímpico Nebrisa,Sporting Torreluna,4,0,3.05,0.86,20,14,4,0,1,0,,,,,,,14,10,0,0,2,0,0,0,1,0,2152,19
+s59,59,Juventud Marisal,Sporting Valdecristal,2,2,0.81,0.88,10,12,0,1,1,0,,,,,,,12,14,0,0,0,0,0,0,0,0,2138,14
+s60,60,Deportivo Solcanto,Unión Solcanto,0,0,0.73,0.69,11,9,1,2,0,0,,,,,,,15,8,0,0,0,0,0,0,0,0,2139,7
+s61,61,Racing Arenablanca,Juventud Torreluna,0,2,0.97,2.52,8,20,2,1,0,0,,,,,,,16,17,0,0,0,0,0,0,0,1,1975,9
+s62,62,Deportivo Lumbrera,Olímpico Pradoalto,3,4,3.00,2.40,18,19,1,0,0,0,,,,,,,14,18,0,0,1,0,0,0,0,0,1917,22
+s63,63,Atlético Marisal,Club Torreluna,2,1,0.47,1.18,8,12,1,0,0,0,,,,,,,13,15,0,0,0,0,0,0,0,0,2084,11
+s64,64,Deportivo Nebrisa,Juventud Arenablanca,0,1,1.17,1.40,14,8,4,3,0,0,,,,,,,9,11,0,0,0,0,0,0,0,1,2174,12
+s65,65,Juventud Caleteo,Sporting Arenablanca,1,2,1.76,1.99,11,20,0,1,0,0,,,,,,,9,23,2,0,4,0,0,0,0,0,2067,18
+s66,66,Deportivo Islaverde Sur,Juventud Lumbrera,4,3,3.43,2.67,21,20,2,4,0,0,,,,,,,16,14,0,0,0,0,0,0,1,0,1972,21
+s67,67,Olímpico Solcanto,Deportivo Torreluna,2,1,0.48,1.68,9,16,1,1,0,0,,,,,,,10,15,0,0,0,0,0,0,0,0,1983,12
+s68,68,Juventud Torreluna,Racing Caleteo,1,0,0.86,0.83,13,6,2,0,0,0,,,,,,,19,22,0,0,0,0,0,0,0,0,1946,8
+s69,69,Olímpico Ormidia,Atlético Islaverde Sur,0,0,0.72,1.72,7,17,2,4,0,0,,,,,,,9,10,0,0,1,0,0,0,0,1,2175,10
+s70,70,Sporting Quebralta,Sporting Ormidia,1,0,0.97,0.75,7,12,3,3,0,0,,,,,,,12,11,0,0,2,0,0,0,0,0,2160,8
+s71,71,Atlético Nebrisa,Olímpico Arenablanca,5,0,1.86,1.58,18,12,4,1,0,0,,,,,,,8,14,0,0,0,0,0,0,0,1,1979,14
+s72,72,Sporting Montefrío Bajo,Sporting Solcanto,1,4,2.05,1.35,8,14,1,3,0,0,,,,,,,12,10,0,0,0,0,0,0,0,1,2213,14
+s73,73,Racing Pradoalto,Sporting Solcanto,0,2,1.50,2.14,12,19,2,4,1,0,,,,,,,12,12,0,0,2,0,0,0,0,0,2059,12
+s74,74,Sporting Montefrío Bajo,Sporting Nebrisa,1,4,1.26,2.72,10,24,3,3,0,0,,,,,,,11,13,0,0,1,0,0,0,0,2,2025,19
+s75,75,Racing Lumbrera,Atlético Islaverde Sur,3,0,2.35,1.11,14,11,3,1,0,0,,,,,,,17,13,3,0,0,0,0,0,0,0,2007,14
+s76,76,Unión Islaverde Sur,Juventud Puertoscuro,2,1,1.74,0.79,16,7,4,2,0,0,,,,,,,13,11,0,0,2,0,0,0,0,2,2172,14
+s77,77,Unión Ventolera,Unión Lumbrera,2,1,0.80,0.79,11,13,2,0,0,0,,,,,,,14,23,0,0,0,0,0,0,0,0,2047,12
+s78,78,Club Caleteo,Juventud Quebralta,1,5,1.03,2.53,10,15,1,2,0,0,,,,,,,8,12,0,0,2,0,0,0,1,1,2084,20
+s79,79,Racing Nebrisa,Olímpico Arenablanca,1,0,0.87,0.97,8,10,2,4,0,0,,,,,,,11,9,0,0,1,0,0,0,0,0,2117,10
+s80,80,Racing Ormidia,Olímpico Pradoalto,2,1,1.22,0.83,12,12,2,1,0,0,,,,,,,10,14,0,0,0,0,0,0,0,1,2045,14
+s81,81,Unión Ormidia,Racing Ormidia,1,0,2.34,1.47,13,14,1,1,0,0,,,,,,,18,11,1,0,1,0,0,0,0,0,1865,12
+s82,82,Olímpico Montefrío Bajo,Sporting Valdecristal,4,5,2.58,3.49,19,17,4,2,0,0,,,,,,,15,10,0,0,2,0,0,0,0,0,2085,23
+s83,83,Unión Puertoscuro,Sporting Ventolera,2,0,2.03,0.52,20,9,3,2,0,1,,,,,,,23,11,0,0,0,0,0,0,0,1,2178,12
+s84,84,Atlético Islaverde Sur,Olímpico Torreluna,2,1,1.48,0.46,13,8,0,2,0,0,,,,,,,18,11,0,0,0,0,0,0,0,0,1993,12
+s85,85,Atlético Marisal,Atlético Brezal,1,2,1.19,1.32,12,15,4,3,0,0,,,,,,,9,13,0,0,1,0,0,0,1,1,2233,12
+s86,86,Club Lumbrera,Deportivo Arenablanca,1,0,0.50,0.75,10,11,3,1,0,0,,,,,,,13,9,0,0,1,0,0,0,0,0,2274,9
+s87,87,Atlético Valdecristal,Juventud Quebralta,1,1,0.24,1.52,6,14,2,0,1,0,,,,,,,11,15,0,0,0,0,0,0,0,3,1865,15
+s88,88,Deportivo Marisal,Sporting Ventolera,2,2,2.19,0.87,20,13,3,1,0,0,,,,,,,18,9,0,0,2,0,0,0,0,0,1981,16
+s89,89,Racing Ormidia,Racing Caleteo,2,1,0.71,3.48,13,23,0,0,0,0,,,,,,,11,34,0,0,4,0,0,0,1,0,1961,18
+s90,90,Sporting Puertoscuro,Olímpico Nebrisa,0,1,0.56,0.69,8,5,1,2,0,1,,,,,,,10,17,0,0,0,0,0,0,0,0,2179,8
+s91,91,Atlético Montefrío Bajo,Sporting Ormidia,0,3,1.97,1.39,10,15,3,1,0,0,,,,,,,10,15,1,0,1,0,0,0,0,0,2148,12
+s92,92,Sporting Valdecristal,Racing Brezal,1,2,0.78,1.67,8,16,1,1,0,0,,,,,,,13,13,0,0,1,0,0,0,0,0,2041,13
+s93,93,Sporting Valdecristal,Deportivo Caleteo,2,2,2.13,1.23,21,7,3,6,0,0,,,,,,,13,13,0,0,0,0,0,0,0,1,2097,17
+s94,94,Racing Caleteo,Racing Puertoscuro,0,1,1.20,0.54,14,7,2,3,0,0,,,,,,,15,11,0,0,0,0,0,0,0,0,2036,9
+s95,95,Juventud Caleteo,Club Brezal,4,4,2.84,1.74,12,15,0,3,0,1,,,,,,,14,16,0,0,0,0,0,0,1,0,1997,21
+s96,96,Atlético Ventolera,Deportivo Solcanto,0,3,1.44,1.74,14,18,4,4,0,0,,,,,,,18,11,0,0,0,0,0,0,0,0,2031,12
+s97,97,Club Ormidia,Atlético Quebralta,1,0,1.12,1.40,16,9,0,2,0,0,,,,,,,15,14,0,0,0,0,0,0,0,0,2054,8
+s98,98,Racing Pradoalto,Racing Ormidia,0,2,0.82,1.83,10,16,1,3,0,0,,,,,,,9,11,0,0,1,0,0,0,0,0,2170,8
+s99,99,Club Solcanto,Sporting Valdecristal,1,1,1.06,0.36,11,6,0,3,0,0,,,,,,,10,18,0,0,1,0,0,0,0,1,2028,11
+s100,100,Racing Brezal,Atlético Arenablanca,2,1,1.28,0.92,17,12,0,5,0,0,,,,,,,19,11,0,0,0,0,0,0,0,1,2098,13

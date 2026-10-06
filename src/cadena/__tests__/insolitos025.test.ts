@@ -62,7 +62,7 @@ describe("025 · oráculo de los hechos insólitos", () => {
       const ol = ev.filter((e) => e.definicion === "olimpico");
       expect(c.hs.filter((h) => h.tipo === "gol_olimpico").map((h) => h.eventos.at(-1))).toEqual(ol.map((e) => e.id));
       expect(c.hs.filter((h) => h.tipo === "subida_portero").map((h) => h.eventos[0])).toEqual(ev.filter((e) => e.tipo === "subida_portero").map((e) => e.id));
-      expect(c.hs.filter((h) => h.tipo === "doble_palo").map((h) => `${h.eventos[0]}:${String(h.datos.palos)}`)).toEqual(ev.filter((e) => e.alPalo !== undefined).map((e) => `${e.id}:${e.alPalo}`));
+      expect(c.hs.filter((h) => h.tipo === "tiro_al_palo").map((h) => `${h.eventos[0]}:${String(h.datos.palos)}`)).toEqual(ev.filter((e) => e.alPalo !== undefined).map((e) => `${e.id}:${e.alPalo}`));
       expect(c.hs.filter((h) => h.tipo === "interrupcion").map((h) => `${h.eventos[0]}:${String(h.datos.duracion)}`)).toEqual(ev.filter((e) => e.tipo === "interrupcion").map((e) => `${e.id}:${e.duracion}`));
       // el olímpico no es además un gol_anotado (no se narra dos veces)
       for (const e of ol) expect(c.hs.some((h) => h.tipo === "gol_anotado" && h.eventos.includes(e.id))).toBe(false);
@@ -93,8 +93,8 @@ describe("025 · oráculo de los hechos insólitos", () => {
       [subida, (h) => h.tipo === "subida_portero"],
       [subidaRemate, (h) => h.tipo === "subida_portero"],
       [subidaGol, (h) => h.tipo === "subida_portero"],
-      [olimpico, (h) => h.tipo === "doble_palo" && h.datos.palos === 1],
-      [doble, (h) => h.tipo === "doble_palo" && h.datos.palos === 2],
+      [olimpico, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 1],
+      [doble, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 2],
       [interrupcion, (h) => h.tipo === "interrupcion"],
       [conNiebla, (h) => h.tipo === "efecto_niebla"],
     ];
@@ -112,8 +112,8 @@ describe("025 · batería V8 (cada frase solo con SU hecho como principal)", () 
   const habilitante: Record<keyof typeof FRASES_INSOLITOS, [Caso, (h: Hecho) => boolean]> = {
     olimpico: [olimpico, (h) => h.tipo === "gol_olimpico"],
     subida: [subidaRemate, (h) => h.tipo === "subida_portero"],
-    palo: [olimpico, (h) => h.tipo === "doble_palo" && h.datos.palos === 1],
-    doblePalo: [doble, (h) => h.tipo === "doble_palo" && h.datos.palos === 2],
+    palo: [olimpico, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 1],
+    doblePalo: [doble, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 2],
     interrupcion: [interrupcion, (h) => h.tipo === "interrupcion"],
     niebla: [conNiebla, (h) => h.tipo === "efecto_niebla"],
   };
@@ -134,7 +134,7 @@ describe("025 · batería V8 (cada frase solo con SU hecho como principal)", () 
   }
 
   it("«doble palo / hit both posts» con UN solo palo registrado ⇒ V8 (ES y EN); «al palo» con dos ⇒ pasa", () => {
-    const uno = de(olimpico, (h) => h.tipo === "doble_palo" && h.datos.palos === 1);
+    const uno = de(olimpico, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 1);
     const req = INSOLITOS_JUICIO.find((e) => e.id === "doble_palo")!.requisito;
     for (const lengua of ["es", "en"] as const) {
       for (const f of FRASES_INSOLITOS.doblePalo[lengua]) {
@@ -143,7 +143,7 @@ describe("025 · batería V8 (cada frase solo con SU hecho como principal)", () 
       }
     }
     // la plantilla del doble palo, citando el hecho de UN palo ⇒ V8
-    const dos = de(doble, (h) => h.tipo === "doble_palo" && h.datos.palos === 2);
+    const dos = de(doble, (h) => h.tipo === "tiro_al_palo" && h.datos.palos === 2);
     const falsa = (t: string) => t.replace(String(dos.datos.jugador), String(uno.datos.jugador)).replace(String(dos.datos.equipo), String(uno.datos.equipo)).replace(String(dos.datos.minuto), String(uno.datos.minuto));
     expect(motivos(olimpico, uno, falsa(dos.texto_es), falsa(dos.texto_en)).some((m) => m.regla === "V8")).toBe(true);
     expect(motivos(doble, dos, `${sin(dos.texto_es)}; dio en el palo.`, `${sin(dos.texto_en)}; off the post.`)).toEqual([]);

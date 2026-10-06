@@ -2103,3 +2103,114 @@ button.stats-row:hover {
   color: var(--muted);
   border-top: 1px solid var(--line);
 }
+
+/* ---------- Brief 028: /datos, el dataset (tokens del 010) ---------- */
+
+.topbar-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.datos-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--chip);
+  border-radius: 4px;
+  padding: 1px 5px;
+  overflow-wrap: anywhere;
+}
+
+.datos-cifras {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.datos-cifra {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-board);
+  background: var(--surface);
+}
+
+.datos-num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1.1;
+}
+
+.datos-etq {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.datos-panel {
+  padding: 16px 20px;
+}
+
+.datos-panel p {
+  margin: 10px 0;
+}
+
+.datos-descarga {
+  margin: 6px 0 4px;
+  text-decoration: none;
+  white-space: normal;
+  text-align: center;
+}
+
+.datos-tabla th,
+.datos-tabla td {
+  text-align: left;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.datos-tabla td:first-child,
+.datos-tabla th:first-child {
+  text-align: left;
+  width: auto;
+  color: var(--ink);
+}
+
+/* La descripción puede partir tokens largos («<league>/<season>/…») para caber en 360 px. */
+.datos-tabla td + td {
+  overflow-wrap: anywhere;
+}
+
+/* El nombre del campo no se parte nunca (es un identificador); la columna toma su ancho. */
+.datos-tabla td:first-child .datos-code {
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.datos-pie {
+  margin: 16px 0 8px;
+}
+
+@media (max-width: 900px) {
+  /* El panel no puede crecer con su tabla (que scrollea en su contenedor). */
+  .datos .liga-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .datos-cifras {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .datos-num {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 520px) {
+  .datos-cifras {
+    grid-template-columns: 1fr;
+  }
+}

@@ -765,7 +765,7 @@ export const FRASES_INSOLITOS = {
   },
 } as const satisfies Record<string, Record<Lengua, readonly string[]>>;
 
-const palos = (h: Hecho) => (h.tipo === "doble_palo" ? Number(h.datos.palos) : 0);
+const palos = (h: Hecho) => (h.tipo === "tiro_al_palo" ? Number(h.datos.palos) : 0);
 /** «al palo izquierdo / derecho / largo / corto / contrario» es un destino, no el poste. */
 const PALO_NO_DESTINO = "(?!\\s+(?:izquierdo|derecho|largo|corto|contrario|cercano|lejano))";
 const paloEs = new RegExp(`${palabras(FRASES_INSOLITOS.palo.es.filter((f) => f !== "al palo")).source}|${palabras(["al palo"], PALO_NO_DESTINO).source}`, "giu");

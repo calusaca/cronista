@@ -3,10 +3,22 @@
 // Si un umbral parece mal, se reporta a Fable; no se mueve para que una prueba pase.
 //
 // Referencias de orden de magnitud: ligas top europeas de las últimas temporadas
-// (goles ~2.7–2.9/partido, xG total ~2.7–3.0, amarillas ~3.5–4.5, roja en ~10–15 %
-// de los partidos, ~20–23 % de los goles en el último cuarto de hora con descuento).
-// Las cifras que el brief da como "~" se respetan; las que no da las fijó el
-// implementador ANTES de calibrar el motor (pendientes de validación por Fable).
+// (REFERENCIA_LIGAS_TOP, abajo: goles, xG, amarillas, partidos con roja y goles en el último
+// cuarto de hora con descuento). Las cifras que el brief da como "~" se respetan; las que no da
+// las fijó el implementador ANTES de calibrar el motor (pendientes de validación por Fable).
+
+/**
+ * Brief 028: las referencias de orden de magnitud de este comentario, como dato (el DATASHEET las
+ * muestra junto a lo medido; antes vivían solo en el comentario). Son aproximadas («~»): NO son
+ * bandas de ninguna prueba.
+ */
+export const REFERENCIA_LIGAS_TOP = {
+  golesPorPartido: { min: 2.7, max: 2.9 },
+  xgPorPartido: { min: 2.7, max: 3.0 },
+  amarillasPorPartido: { min: 3.5, max: 4.5 },
+  partidosConRoja: { min: 0.1, max: 0.15 },
+  golesUltimoCuartoDeHora: { min: 0.2, max: 0.23 },
+} as const;
 
 /** Tamaño del corpus de la suite estadística: semillas 1..N (brief, sección Estadísticas). */
 export const N_ESTADISTICA = 1000;

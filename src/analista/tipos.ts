@@ -36,7 +36,8 @@ export type TipoHecho =
   // Brief 025: los insólitos (solo con la variante) y el efecto medido de la niebla.
   | "gol_olimpico"
   | "subida_portero"
-  | "doble_palo"
+  // Brief 028 (antes «doble_palo»: dispara en TODO tiro al palo; `datos.palos` 1|2 distingue el doble).
+  | "tiro_al_palo"
   | "interrupcion"
   | "efecto_niebla"
   | "ole_de_la_grada"
@@ -81,7 +82,7 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
   "autogol",
   "gol_olimpico",
   "subida_portero",
-  "doble_palo",
+  "tiro_al_palo",
   "interrupcion",
   "efecto_niebla",
   "ole_de_la_grada",
@@ -94,4 +95,4 @@ export const TIPOS_HECHO: readonly TipoHecho[] = [
  */
 export const TIPOS_HECHO_CONDICIONES: readonly TipoHecho[] = ["condiciones_del_partido", "efecto_calor", "cancha_incomoda", "presion_que_ahoga"];
 /** Brief 019: los que solo existen en la temporada (lesiones gated por variantes; bajas del registro). */
-export const TIPOS_HECHO_TEMPORADA: readonly TipoHecho[] = ["lesion_en_partido", "bajas_del_partido", "autogol", "gol_olimpico", "subida_portero", "doble_palo", "interrupcion", "efecto_niebla", "sancion_de_club"];
+export const TIPOS_HECHO_TEMPORADA: readonly TipoHecho[] = ["lesion_en_partido", "bajas_del_partido", "autogol", "gol_olimpico", "subida_portero", "tiro_al_palo", "interrupcion", "efecto_niebla", "sancion_de_club"];

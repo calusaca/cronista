@@ -728,10 +728,13 @@ describe("oráculo independiente (rev. 2.3)", () => {
     expect(atribucionesFalsas(p, `${L.nombre} recibió 4 tarjetas amarillas (minutos 3, 9).`)).toEqual([]);
   });
 
+  // Brief 028 (clase A autorizada por Fable): 120 s solo para ESTE test, el patrón de juez.spec. Es la
+  // prueba larga por diseño (oráculo completo sobre el corpus 1..CORPUS) y medía 52–60 s contra el
+  // límite global de 60 s: 2 timeouts en 5 corridas bajo carga paralela. No afloja ninguna aserción.
   it(`corpus 1..${CORPUS}: cada hecho coincide con el recálculo (completitud, eventos, datos, cifras, nombres, orden)`, () => {
     const fallas = partidos.flatMap((p, i) => oraculo(p, analisis[i] as Hecho[]).map((e) => `seed ${p.config.seed} ${e}`));
     expect(fallas.slice(0, 15)).toEqual([]);
-  });
+  }, 120_000);
 
   it(`semilla ${SEMILLA_AUDITORIA} (explícita)`, () => {
     const p = simular(configDeSemilla(SEMILLA_AUDITORIA));

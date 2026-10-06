@@ -43,10 +43,16 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
         <span className="brand-tag">Match reports where every sentence shows its evidence</span>
       </Link>
       <div className="topbar-acciones">
-      {/* Brief 016: la liga ficticia completa. */}
-      <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode">
-        League mode
-      </Link>
+      <nav className="topbar-links" aria-label="Sections">
+        {/* Brief 016: la liga ficticia completa. */}
+        <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode">
+          League mode
+        </Link>
+        {/* Brief 028: el dataset descargable. */}
+        <Link href="/datos" className="league-link" prefetch={false} data-testid="data-link">
+          Data
+        </Link>
+      </nav>
       <form className="sim-form" onSubmit={simular} aria-label="Simulate a match">
         <select
           className="field"

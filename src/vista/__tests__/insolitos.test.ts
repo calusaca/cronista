@@ -108,7 +108,7 @@ describe("025 · los casos del smoke y del e2e (liga visible)", () => {
     const p = simular(configDePartidoLiga(ligaVisible(), TEMPORADA_ACTUAL, 7, 4));
     const t = p.eventos.find((e) => e.id === "e071")!;
     expect([t.tipo, t.alPalo, t.jugador]).toEqual(["tiro", 2, "Teo Rosiena"]);
-    expect(analizar(p).some((h) => h.tipo === "doble_palo" && h.datos.palos === 2 && h.eventos.includes("e071"))).toBe(true);
+    expect(analizar(p).some((h) => h.tipo === "tiro_al_palo" && h.datos.palos === 2 && h.eventos.includes("e071"))).toBe(true);
     expect(geometriaJugada(jugadaDelGol(p.eventos, "e071"), p.eventos)?.palos).toBe(2);
   });
 });

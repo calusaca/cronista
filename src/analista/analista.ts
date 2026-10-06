@@ -696,7 +696,7 @@ function insolitos(p: Partido, c: Ctx, m: MicroPartido): Borrador[] {
       );
     }
     if (e.tipo === "tiro" && e.alPalo !== undefined && e.jugador) {
-      out.push(hecho(c, "doble_palo", e.alPalo === 2 ? "doble_palo" : "al_palo", [e.id], { jugador: e.jugador, equipo: c.nombre[e.equipo], minuto: minutoTxt(e.minuto), palos: e.alPalo }));
+      out.push(hecho(c, "tiro_al_palo", e.alPalo === 2 ? "doble_palo" : "al_palo", [e.id], { jugador: e.jugador, equipo: c.nombre[e.equipo], minuto: minutoTxt(e.minuto), palos: e.alPalo }));
     }
     if (e.tipo === "interrupcion" && e.causa && e.duracion !== undefined) {
       const t = CAUSA_TEXTO[e.causa] as { es: string; en: string };

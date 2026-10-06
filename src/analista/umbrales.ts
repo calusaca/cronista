@@ -142,7 +142,7 @@ export const RELEVANCIA: Record<ClaveRelevancia, number> = {
   gol_olimpico: 85,
   subida_portero: 70,
   efecto_niebla: 56,
-  doble_palo: 55,
+  tiro_al_palo: 55,
   interrupcion: 40,
   // Brief 026: el olé de la grada, color (< COBERTURA: no obliga a narrarlo).
   ole_de_la_grada: 50,
@@ -196,7 +196,7 @@ export const DESEMPATE_EVENTO: Record<TipoHecho, TipoEvento> = {
   autogol: "gol",
   gol_olimpico: "gol",
   subida_portero: "subida_portero",
-  doble_palo: "tiro",
+  tiro_al_palo: "tiro",
   interrupcion: "interrupcion",
   efecto_niebla: "inicio_periodo",
   // Brief 026: cita micro-eventos (los pases de la racha), como duelo_ganado.
