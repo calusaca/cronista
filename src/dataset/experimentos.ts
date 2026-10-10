@@ -5,7 +5,7 @@
 // Criterio del veredicto: el valor puntual dentro de la banda, como en `npm run test:stats`.
 
 import { AB_CONDICIONES as B, AB_NIEBLA, ESTILOS, N_AB, N_ESTADISTICA, PASE_M, SALIDA_TEMPRANA_MIN, TEMPERATURA_C, VENTAJA_FUERTE } from "../sim/limites";
-import { micro, type MicroPartido } from "../sim/micro";
+import { micro, type MicroEvento } from "../sim/micro";
 import { simular } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { resumir } from "../sim/resumen";
@@ -83,9 +83,27 @@ export function estilosYVentaja(n: number): Experimento[] {
   ];
 }
 
+interface PasesContados {
+  total: number;
+  completados: number;
+}
+
+/** Solo se retienen sumas; los partidos y sus micro-eventos no se conservan entre iteraciones. */
 interface Brazo {
-  p: Partido;
-  m: MicroPartido;
+  pases2T: number;
+  tiros2T: number;
+  faltas2T: number;
+  pases: PasesContados;
+  cortos: Record<"local" | "visita", PasesContados>;
+  largos: PasesContados;
+  cortosNiebla: PasesContados;
+  atajadas: number;
+  cornersTrasAtajada: number;
+  tirosSinPenal: number;
+  velocidadTotal: number;
+  mediaDistancia: number;
+  perdidasTempranas: number;
+  perdidasPosteriores: number;
 }
 
 function periodos(p: Partido): Map<string, 1 | 2> {
@@ -98,26 +116,62 @@ function periodos(p: Partido): Map<string, 1 | 2> {
   return out;
 }
 
-export function condicionesAB(n: number): Experimento[] {
-  const brazo = (c?: Condiciones, insolitos = false): Brazo[] =>
-    Array.from({ length: n }, (_, i) => {
-      const cfg = configDeSemilla(i + 1);
-      const p = simular({ ...cfg, ...(c ? { condiciones: c } : {}), ...(insolitos ? { variantes: { insolitos: true } } : {}) });
-      return { p, m: micro(p) };
+const contarPase = (cuenta: PasesContados, pase: MicroEvento): void => {
+  cuenta.total++;
+  if (pase.completado) cuenta.completados++;
+};
+const completacion = (cuenta: PasesContados): number => cuenta.completados / cuenta.total;
+
+/** Mismas semillas y recuentos del A/B, con memoria acotada al tamaño de UN partido. */
+function medirBrazo(n: number, c?: Condiciones, insolitos = false): Brazo {
+  const vacio = (): PasesContados => ({ total: 0, completados: 0 });
+  const b: Brazo = {
+    pases2T: 0, tiros2T: 0, faltas2T: 0,
+    pases: vacio(), cortos: { local: vacio(), visita: vacio() }, largos: vacio(), cortosNiebla: vacio(),
+    atajadas: 0, cornersTrasAtajada: 0, tirosSinPenal: 0, velocidadTotal: 0, mediaDistancia: 0,
+    perdidasTempranas: 0, perdidasPosteriores: 0,
+  };
+  for (let i = 0; i < n; i++) {
+    const cfg = configDeSemilla(i + 1);
+    const p = simular({ ...cfg, ...(c ? { condiciones: c } : {}), ...(insolitos ? { variantes: { insolitos: true } } : {}) });
+    const pp = periodos(p);
+    p.eventos.forEach((e, k) => {
+      if (pp.get(e.id) === 2) {
+        if (e.tipo === "tiro") b.tiros2T++;
+        if (e.tipo === "falta") b.faltas2T++;
+      }
+      if (e.tipo === "atajada") {
+        b.atajadas++;
+        const sig = p.eventos[k + 1];
+        if (sig?.tipo === "corner" && sig.equipo === e.equipo) b.cornersTrasAtajada++;
+      }
+      if (e.tipo === "tiro" && e.penal !== true) {
+        b.tirosSinPenal++;
+        b.velocidadTotal += e.velocidadKmh ?? 0;
+        if (e.zonaOrigen === "media_distancia") b.mediaDistancia++;
+      }
     });
-  const suma = (xs: Brazo[], f: (b: Brazo) => number) => xs.reduce((s, b) => s + f(b), 0);
-  const pasesDel = (b: Brazo, per: 1 | 2) => {
-    const pp = periodos(b.p);
-    return b.m.eventos.filter((x) => x.tipo === "pase" && pp.get(x.ancla) === per).length;
-  };
-  const macroDel = (b: Brazo, tipo: string, per: 1 | 2) => {
-    const pp = periodos(b.p);
-    return b.p.eventos.filter((e) => e.tipo === tipo && pp.get(e.id) === per).length;
-  };
-  const completacion = (xs: Brazo[], f: (x: MicroPartido["eventos"][number]) => boolean) => {
-    const ps = xs.flatMap((b) => b.m.eventos.filter((x) => x.tipo === "pase" && f(x)));
-    return ps.filter((x) => x.completado).length / ps.length;
-  };
+    for (const x of micro(p).eventos) {
+      if (x.tipo === "pase") {
+        if (pp.get(x.ancla) === 2) b.pases2T++;
+        contarPase(b.pases, x);
+        if ((x.distanciaM ?? 0) < PASE_M.corto.max) contarPase(b.cortos[x.equipo], x);
+        if (x.distanciaM !== undefined) {
+          if (x.distanciaM >= PASE_M.largo.min) contarPase(b.largos, x);
+          if (x.distanciaM < PASE_M.corto.max) contarPase(b.cortosNiebla, x);
+        }
+      }
+      if (x.tipo === "perdida" && x.equipo === "visita" && x.zona === "defensa") {
+        if (x.minuto < SALIDA_TEMPRANA_MIN) b.perdidasTempranas++;
+        else b.perdidasPosteriores++;
+      }
+    }
+  }
+  return b;
+}
+
+export function condicionesAB(n: number): Experimento[] {
+  const brazo = (c?: Condiciones, insolitos = false) => medirBrazo(n, c, insolitos);
   const control = brazo();
   const calor = brazo({ ...NEUTRAS, clima: "calor", temperaturaC: TEMPERATURA_C.calor.max });
   const tibio = brazo({ ...NEUTRAS, clima: "calor", temperaturaC: B.calorTemperaturaBaja });
@@ -126,25 +180,11 @@ export function condicionesAB(n: number): Experimento[] {
   const alto = brazo({ ...NEUTRAS, cesped: "alto" });
   const presion = brazo({ ...NEUTRAS, presion: { local: "media", visita: "alta" } });
 
-  const p2 = (xs: Brazo[]) => suma(xs, (b) => pasesDel(b, 2)) / suma(control, (b) => pasesDel(b, 2));
-  const sueltas = (xs: Brazo[]) => {
-    let a = 0;
-    let c = 0;
-    for (const b of xs)
-      b.p.eventos.forEach((e, i) => {
-        if (e.tipo !== "atajada") return;
-        a++;
-        const sig = b.p.eventos[i + 1];
-        if (sig?.tipo === "corner" && sig.equipo === e.equipo) c++;
-      });
-    return c / a;
-  };
-  const tiros = (xs: Brazo[]) => xs.flatMap((b) => b.p.eventos.filter((e) => e.tipo === "tiro" && e.penal !== true));
-  const vel = (xs: Brazo[]) => tiros(xs).reduce((s, e) => s + (e.velocidadKmh ?? 0), 0) / tiros(xs).length;
-  const md = (xs: Brazo[]) => tiros(xs).filter((e) => e.zonaOrigen === "media_distancia").length / tiros(xs).length;
-  const corto = (lado: "local" | "visita") => (x: MicroPartido["eventos"][number]) => x.equipo === lado && (x.distanciaM ?? 0) < PASE_M.corto.max;
-  const perd = (xs: Brazo[], temprano: boolean) =>
-    suma(xs, (b) => b.m.eventos.filter((x) => x.tipo === "perdida" && x.equipo === "visita" && x.zona === "defensa" && x.minuto < SALIDA_TEMPRANA_MIN === temprano).length);
+  const p2 = (b: Brazo) => b.pases2T / control.pases2T;
+  const sueltas = (b: Brazo) => b.cornersTrasAtajada / b.atajadas;
+  const vel = (b: Brazo) => b.velocidadTotal / b.tirosSinPenal;
+  const md = (b: Brazo) => b.mediaDistancia / b.tirosSinPenal;
+  const perd = (b: Brazo, temprano: boolean) => temprano ? b.perdidasTempranas : b.perdidasPosteriores;
 
   const cal = TEMPERATURA_C.calor.max;
   const r3 = { tipo: "dec", d: 3 } as const;
@@ -153,20 +193,20 @@ export function condicionesAB(n: number): Experimento[] {
   const out: Experimento[] = [
     exp("condiciones", "calorPases2T", t`Heat ${cal} °C: second-half passes (ratio)`, "AB_CONDICIONES.calorPases2T", B.calorPases2T, p2(calor), r3, n, u),
     exp("condiciones", "calorGradiente", t`Heat ${B.calorTemperaturaBaja} °C: second-half passes (ratio; must sit between the ${cal} °C ratio and no effect)`, "AB_CONDICIONES.calorTemperaturaBaja", { min: p2(calor), max: 1 }, p2(tibio), r3, n, u),
-    exp("condiciones", "calorTiros2T", t`Heat ${cal} °C: second-half shots (ratio)`, "AB_CONDICIONES.calorTiros2T", B.calorTiros2T, suma(calor, (b) => macroDel(b, "tiro", 2)) / suma(control, (b) => macroDel(b, "tiro", 2)), r3, n, u),
-    exp("condiciones", "calorFaltas2T", t`Heat ${cal} °C: second-half fouls (ratio)`, "AB_CONDICIONES.calorFaltas2T", B.calorFaltas2T, suma(calor, (b) => macroDel(b, "falta", 2)) / suma(control, (b) => macroDel(b, "falta", 2)), r3, n, u),
-    exp("condiciones", "lluviaCompletacion", t`Rain: pass completion (difference)`, "AB_CONDICIONES.lluviaCompletacion", B.lluviaCompletacion, completacion(lluvia, () => true) - completacion(control, () => true), d4, n, u),
+    exp("condiciones", "calorTiros2T", t`Heat ${cal} °C: second-half shots (ratio)`, "AB_CONDICIONES.calorTiros2T", B.calorTiros2T, calor.tiros2T / control.tiros2T, r3, n, u),
+    exp("condiciones", "calorFaltas2T", t`Heat ${cal} °C: second-half fouls (ratio)`, "AB_CONDICIONES.calorFaltas2T", B.calorFaltas2T, calor.faltas2T / control.faltas2T, r3, n, u),
+    exp("condiciones", "lluviaCompletacion", t`Rain: pass completion (difference)`, "AB_CONDICIONES.lluviaCompletacion", B.lluviaCompletacion, completacion(lluvia.pases) - completacion(control.pases), d4, n, u),
     exp("condiciones", "lluviaCorner", t`Rain: saves that end in a corner (ratio)`, "AB_CONDICIONES.lluviaCornerTrasAtajada", B.lluviaCornerTrasAtajada, sueltas(lluvia) / sueltas(control), r3, n, u),
     exp("condiciones", "sinteticaVelocidad", t`Artificial turf: mean shot speed (difference, km/h)`, "AB_CONDICIONES.sinteticaVelocidadKmh", B.sinteticaVelocidadKmh, vel(sintetica) - vel(control), { tipo: "dec", d: 2 }, n, u),
     exp("condiciones", "sinteticaMediaDistancia", t`Artificial turf: share of long-range shots (ratio)`, "AB_CONDICIONES.sinteticaMediaDistancia", B.sinteticaMediaDistancia, md(sintetica) / md(control), r3, n, u),
-    exp("condiciones", "cespedVisita", t`Long grass: away short-pass completion (difference)`, "AB_CONDICIONES.cespedVisitaCortos", B.cespedVisitaCortos, completacion(alto, corto("visita")) - completacion(control, corto("visita")), d4, n, u),
+    exp("condiciones", "cespedVisita", t`Long grass: away short-pass completion (difference)`, "AB_CONDICIONES.cespedVisitaCortos", B.cespedVisitaCortos, completacion(alto.cortos.visita) - completacion(control.cortos.visita), d4, n, u),
     exp(
       "condiciones",
       "cespedLocal",
       t`Long grass: home short-pass completion (difference; must stay near zero)`,
       "AB_CONDICIONES.cespedLocalTolerancia",
       { min: -B.cespedLocalTolerancia, max: B.cespedLocalTolerancia },
-      completacion(alto, corto("local")) - completacion(control, corto("local")),
+      completacion(alto.cortos.local) - completacion(control.cortos.local),
       d4,
       n,
       u,
@@ -178,11 +218,9 @@ export function condicionesAB(n: number): Experimento[] {
   // Niebla (025): necesita la variante de insólitos (es un clima de esa variante).
   const cNiebla = brazo(NEUTRAS, true);
   const niebla = brazo({ ...NEUTRAS, clima: "niebla" }, true);
-  const largo = (x: MicroPartido["eventos"][number]) => x.distanciaM !== undefined && x.distanciaM >= PASE_M.largo.min;
-  const cortoN = (x: MicroPartido["eventos"][number]) => x.distanciaM !== undefined && x.distanciaM < PASE_M.corto.max;
-  out.push(exp("condiciones", "nieblaLargos", t`Fog: long-pass completion (difference)`, "AB_NIEBLA.largos", AB_NIEBLA.largos, completacion(niebla, largo) - completacion(cNiebla, largo), d4, n, u));
+  out.push(exp("condiciones", "nieblaLargos", t`Fog: long-pass completion (difference)`, "AB_NIEBLA.largos", AB_NIEBLA.largos, completacion(niebla.largos) - completacion(cNiebla.largos), d4, n, u));
   out.push(
-    exp("condiciones", "nieblaCortos", t`Fog: short-pass completion (difference; must stay near zero)`, "AB_NIEBLA.cortosTolerancia", { min: -AB_NIEBLA.cortosTolerancia, max: AB_NIEBLA.cortosTolerancia }, completacion(niebla, cortoN) - completacion(cNiebla, cortoN), d4, n, u),
+    exp("condiciones", "nieblaCortos", t`Fog: short-pass completion (difference; must stay near zero)`, "AB_NIEBLA.cortosTolerancia", { min: -AB_NIEBLA.cortosTolerancia, max: AB_NIEBLA.cortosTolerancia }, completacion(niebla.cortosNiebla) - completacion(cNiebla.cortosNiebla), d4, n, u),
   );
   return out;
 }
