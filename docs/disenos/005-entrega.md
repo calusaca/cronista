@@ -5,13 +5,17 @@
 
 ## Cuenta Azure (actualizado el 10 de octubre de 2026)
 
-El usuario informa **US$150 de crédito disponible**. Falta confirmar el programa
-de origen, renovación/vencimiento, cobertura y cuota del modelo. Esta información
-sustituye la hipótesis anterior de una cuenta gratuita con US$200 durante 30 días;
-no se verificó el saldo desde la cuenta Azure.
+La captura aportada por el usuario el 10 oct muestra **Visual Studio Enterprise
+Subscription**, estado **Active** y **US$150 de crédito restante**. El período
+de facturación mostrado es `10/8/2026–11/7/2026`. El origen del beneficio queda
+confirmado por la captura; renovación efectiva, cobertura del deployment y cuota
+siguen pendientes de comprobación. No se consultó la cuenta directamente.
+Esta información sustituye la hipótesis anterior de una cuenta gratuita con
+US$200 durante 30 días. No guardar identificadores de suscripción ni datos de
+contacto de la captura en la documentación.
 
-1. Confirmar en la suscripción el tipo de oferta, vigencia del crédito y servicios
-   elegibles. Si procede de Visual Studio, Microsoft indica que sus créditos
+1. Confirmar la renovación del crédito y servicios
+   elegibles. Para el beneficio de Visual Studio, Microsoft indica que sus créditos
    cubren Azure OpenAI, sujetos a acceso y disponibilidad del servicio:
    [elegibilidad Dev/Test](https://learn.microsoft.com/en-us/visualstudio/subscriptions/vs-azure-eligibility).
 2. Priorizar **Azure OpenAI** con un deployment cubierto por el beneficio y
@@ -46,7 +50,7 @@ configurar un presupuesto con alertas al 80 % y 100 %, si la suscripción lo adm
 Los presupuestos de Cost Management **avisan, no detienen el consumo**, y sus datos
 se actualizan con retraso: [documentación de presupuestos](https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/tutorial-acm-create-budgets).
 
-Si el beneficio es de Visual Studio, está destinado a desarrollo/pruebas y tiene
+El beneficio de Visual Studio está destinado a desarrollo/pruebas y tiene
 restricciones de continuidad. Confirmar la aptitud de la oferta para mantener la
 demo accesible durante la evaluación antes de elegir el hosting:
 [condiciones del crédito](https://azure.microsoft.com/en-us/pricing/member-offers/credit-for-visual-studio-subscribers/).

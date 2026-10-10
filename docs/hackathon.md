@@ -54,7 +54,7 @@ La conversión de noviembre contempla el cambio de horario del Pacífico; Costa 
 | Proyecto en la plataforma | Creación confirmada por el usuario el 10 oct | Completar materiales y verificar el envío final; crear el proyecto no confirma la entrega. |
 | Fecha de creación | Primer commit: 30 sep, 18:08 Costa Rica (`3c46f0f`) | Conservar historial y procedencia; git respalda la cronología, no prueba por sí solo toda la autoría. |
 | Datos sintéticos | Generador y dataset disponibles | Mostrar [DATASHEET](dataset/DATASHEET.md), límites y cómo reproducirlo. |
-| Crédito Azure | US$150 disponibles según el usuario, 10 oct; origen y vigencia pendientes de confirmar | Verificar cobertura y cuota; distribución propuesta en [005 — Entrega](disenos/005-entrega.md). |
+| Crédito Azure | Captura del 10 oct: Visual Studio Enterprise, suscripción activa y US$150 restantes | Verificar renovación, cobertura y cuota del deployment; distribución propuesta en [005 — Entrega](disenos/005-entrega.md). |
 | Integración Microsoft | Adaptadores Foundry y Azure OpenAI implementados y probados con transporte simulado | Guardar una corrida real sin caché con deployment y backend identificados. |
 | Calidad de ejecución | [CI de `fix/dataset-memory` en verde](https://github.com/calusaca/cronista/actions/runs/38095123207): typecheck, 1.350 unitarias, 55 estadísticas y 47 e2e; dataset idéntico bajo 512 MiB de old space | Integrar la rama a `main` y mantener estas comprobaciones en cada cambio. |
 | Repositorio público | `calusaca/cronista` existe pero GitHub devuelve `PRIVATE` | Preparar publicación del código y revisar contenido e historial antes de cambiar visibilidad. |

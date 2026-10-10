@@ -123,8 +123,9 @@ en la plataforma. Añadir el enlace directo de CRONISTA y conservar el comproban
 
 Creación del proyecto en la plataforma del hackathon confirmada por el usuario el 10 oct; el envío final sigue pendiente de comprobación.
 
-Crédito Azure informado por el usuario el 10 oct: **US$150**. Saldo no comprobado
-en el portal; programa, renovación/vencimiento, cobertura y cuotas pendientes.
+La captura aportada el 10 oct confirma **Visual Studio Enterprise**, estado activo
+y **US$150 restantes**. Renovación efectiva, cobertura y cuota del deployment
+pendientes; no hubo acceso directo a la cuenta Azure.
 El plan de cuenta y presupuesto de `docs/disenos/005-entrega.md` sustituye la
 hipótesis anterior de US$200 de prueba y prioriza un deployment Azure OpenAI elegible.
 
@@ -138,8 +139,8 @@ hipótesis anterior de US$200 de prueba y prioriza un deployment Azure OpenAI el
   oración («Pérez marcó») no es distinguible de una palabra normal sin diccionario.
   Mitigación natural: el oráculo del 002 y las citas obligatorias acotan el daño.
 
-- **Configuración Azure pendiente de confirmar** — hay US$150 de crédito informado;
-  verificar el beneficio, cuotas, región, deployment y precios de la cuenta antes del
+- **Configuración Azure pendiente de confirmar** — la captura muestra US$150 de
+  Visual Studio Enterprise; verificar renovación, cuotas, región, deployment y precios antes del
   smoke. Los topes propuestos en `docs/disenos/005-entrega.md` no son costos medidos.
 - **Azure CLI no instalado** en la máquina (se instala cuando toque el deploy).
 - Repo de GitHub ya creado: `calusaca/cronista`, PRIVATE al 10 oct. Publicación
