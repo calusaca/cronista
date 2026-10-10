@@ -48,4 +48,19 @@ La prueba adicional de `dataset.stats.test.ts` ejecuta el CLI en un subproceso
 con old space de 512 MiB y compara los cuatro archivos de referencia. Evita
 depender de la memoria disponible en la máquina que ejecuta Vitest.
 
-Validación de suites completas y nueva CI: pendiente de cierre de las ejecuciones.
+## Validación
+
+- Typecheck local con Node 22.23.3: salida 0.
+- Suite focalizada `dataset.stats.test.ts`, old space de 2.048 MiB:
+  **7/7 pruebas**, salida 0, incluida la regeneración en subproceso de 512 MiB.
+- [CI completa 38095123207](https://github.com/calusaca/cronista/actions/runs/38095123207),
+  commit `26c84f926fbea4db546361581bcb4b7b22b31e08`, Ubuntu y Node 22.23.3:
+  typecheck correcto, **1.350/1.350 unitarias** (51 archivos), **55/55 estadísticas**
+  (11 archivos) y **47/47 e2e**. Ambos jobs terminaron con `success`.
+
+La primera suite unitaria completa local con Node 22 y concurrencia automática
+terminó con 1.346 aprobadas y cuatro fallos por timeout o subproceso sin código
+de salida. Los casos afectados fueron el oráculo y CLIs existentes; no se
+cambiaron sus aserciones ni sus límites. La CI completa pasó con su configuración
+normal. La repetición local con `--maxWorkers=2` terminó con **1.350/1.350**,
+51 archivos y salida 0. No se modificó la configuración de CI.

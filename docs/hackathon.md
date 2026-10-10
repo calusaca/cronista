@@ -38,7 +38,7 @@ La conversión de noviembre contempla el cambio de horario del Pacífico; Costa 
 | Fecha de creación | Primer commit: 30 sep, 18:08 Costa Rica (`3c46f0f`) | Conservar historial y procedencia; git respalda la cronología, no prueba por sí solo toda la autoría. |
 | Datos sintéticos | Generador y dataset disponibles | Mostrar [DATASHEET](dataset/DATASHEET.md), límites y cómo reproducirlo. |
 | Integración Microsoft | Adaptadores Foundry y Azure OpenAI implementados y probados con transporte simulado | Guardar una corrida real sin caché con deployment y backend identificados. |
-| Calidad de ejecución | 1.350 unitarias y 54 estadísticas pasan localmente; 47 e2e pasan en CI, pero el workflow falla por memoria en dataset | Resolver memoria y verificar el workflow completo en el runner. |
+| Calidad de ejecución | [CI de `fix/dataset-memory` en verde](https://github.com/calusaca/cronista/actions/runs/38095123207): typecheck, 1.350 unitarias, 55 estadísticas y 47 e2e; dataset idéntico bajo 512 MiB de old space | Integrar la rama a `main` y mantener estas comprobaciones en cada cambio. |
 | Repositorio público | `calusaca/cronista` existe pero GitHub devuelve `PRIVATE` | Preparar publicación del código y revisar contenido e historial antes de cambiar visibilidad. |
 | Demo accesible | README sin URL; no hay evidencia de despliegue ni infraestructura versionada | Desplegar, probar desde otra red y mantener disponibilidad durante la evaluación. |
 | Video | Guion EN; sin URL ni grabación final | Grabar el producto real, usar un rechazo real si se muestra, medir duración y publicar. |

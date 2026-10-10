@@ -112,6 +112,8 @@
 
 | 2026-10-10 | Revisión | Cinco links oficiales incorporados a README y `docs/hackathon.md`; reporte del commit `c27518d` en `docs/revision-2026-10-10.md`. Typecheck, unitarias 1350/1350 y estadísticas 54/54 vistos correr localmente; audit de producción 0 hallazgos. CI remoto 38088012063: e2e 47/47, workflow FALLÓ por heap agotado en dataset.stats (Node 22). GitHub confirma repo PRIVATE; inscripción anotada como realizada el 30 sep. Sonda publicada sin respaldo («techo retráctil») reproducida en `docs/evidencia/verificador-2026-10-10.md`; README/pitch/guion acotan garantía a V1–V8 y hosting a planificado; CLAUDE refleja alcance real y orquestación TS. No se usó Azure real ni se publicó/envió el proyecto | Codex | ✅ revisión; pendientes explícitos en el reporte |
 
+| 2026-10-10 | Implementación | Memoria del brief 028 corregida en `26c84f9`: brazos A/B acumulan contadores por partido y conservan semillas, muestras y fórmulas. Código base aborta con old space de 2048 MiB; arreglo regenera con 512 MiB, pico RSS local 199,6 MiB, cuatro archivos byte-idénticos y 18/18 experimentos en banda. Nueva regresión fuerza ese presupuesto en el CLI. [CI 38095123207](https://github.com/calusaca/cronista/actions/runs/38095123207) verde en Ubuntu/Node 22.23.3: typecheck, 1350 unitarias, 55 estadísticas y 47 e2e. Validación local Node 22: typecheck, dataset 7/7 y unitarias 1350/1350 con dos workers, tras cuatro timeouts con concurrencia automática. Evidencia en `docs/evidencia/ci-memoria-2026-10-10.md`; smoke preparado para ambos backends Azure, corrida real pendiente. Rama `fix/dataset-memory` publicada, integración a `main` pendiente | Codex | ✅ |
+
 ## Deudas conocidas (honestas)
 
 Creación del proyecto en la plataforma del hackathon confirmada por el usuario el 10 oct; el envío final sigue pendiente de comprobación.
@@ -120,8 +122,6 @@ Creación del proyecto en la plataforma del hackathon confirmada por el usuario 
   documentado en `docs/smoke-foundry.md`, evidencia irá a `docs/evidencia/`.
 - `llm-azure-openai.ts` y sus variables ya están implementados; falta validar un
   deployment real y sus parámetros. La revisión local no confirma el estado de la cuenta Azure.
-- CI del commit `c27518d` falla por memoria en la suite estadística del dataset,
-  aunque pasa localmente. Prioridad y evidencia en `docs/revision-2026-10-10.md`.
 - V1–V8 no cubren toda la semántica de prosa libre: la sonda del techo retráctil se
   publica sin motivos. Evaluación semántica independiente pendiente.
 - Límite conocido de V4: un apellido inventado de una sola palabra AL INICIO de

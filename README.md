@@ -123,6 +123,12 @@ npm run test:stats # statistical realism: N=1000 matches + A/B condition proofs
 npm run e2e        # judge's journeys in Chromium (Playwright, rehearsal writer)
 ```
 
+[CI at commit `26c84f9`](https://github.com/calusaca/cronista/actions/runs/38095123207)
+passed typecheck, 1,350 unit tests, 55 statistical tests and 47 e2e tests on
+Node 22.23.3. The dataset memory fix preserves all four reference files and
+adds a full regeneration test with 512 MiB of old space; see the
+[measurements](docs/evidencia/ci-memoria-2026-10-10.md).
+
 ## Synthetic data
 
 No real match footage or data is used anywhere. The simulator generates
