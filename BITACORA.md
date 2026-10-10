@@ -123,6 +123,11 @@ en la plataforma. Añadir el enlace directo de CRONISTA y conservar el comproban
 
 Creación del proyecto en la plataforma del hackathon confirmada por el usuario el 10 oct; el envío final sigue pendiente de comprobación.
 
+Crédito Azure informado por el usuario el 10 oct: **US$150**. Saldo no comprobado
+en el portal; programa, renovación/vencimiento, cobertura y cuotas pendientes.
+El plan de cuenta y presupuesto de `docs/disenos/005-entrega.md` sustituye la
+hipótesis anterior de US$200 de prueba y prioriza un deployment Azure OpenAI elegible.
+
 - Corrida real contra Foundry/Azure OpenAI sin evidencia al 10 oct; smoke manual
   documentado en `docs/smoke-foundry.md`, evidencia irá a `docs/evidencia/`.
 - `llm-azure-openai.ts` y sus variables ya están implementados; falta validar un
@@ -133,10 +138,9 @@ Creación del proyecto en la plataforma del hackathon confirmada por el usuario 
   oración («Pérez marcó») no es distinguible de una palabra normal sin diccionario.
   Mitigación natural: el oráculo del 002 y las citas obligatorias acotan el daño.
 
-- **Configuración Azure pendiente de confirmar** — el plan del 6 oct no tiene
-  evidencia de cierre en el repo. Verificar cuotas, región, disponibilidad del modelo
-  y precios vigentes en la cuenta antes del smoke; los montos del plan histórico
-  en `docs/disenos/005-entrega.md` no son una medición actual.
+- **Configuración Azure pendiente de confirmar** — hay US$150 de crédito informado;
+  verificar el beneficio, cuotas, región, deployment y precios de la cuenta antes del
+  smoke. Los topes propuestos en `docs/disenos/005-entrega.md` no son costos medidos.
 - **Azure CLI no instalado** en la máquina (se instala cuando toque el deploy).
 - Repo de GitHub ya creado: `calusaca/cronista`, PRIVATE al 10 oct. Publicación
   preparada y cambio de visibilidad pendientes antes de la entrega.
