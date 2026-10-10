@@ -116,6 +116,11 @@
 
 ## Deudas conocidas (honestas)
 
+Portal oficial incorporado el 10 oct a README, CLAUDE y `docs/hackathon.md`:
+[Microsoft Innovation Studio](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon).
+Respuesta HTTP 200 comprobada; contenido dinámico del evento pendiente de revisión
+en la plataforma. Añadir el enlace directo de CRONISTA y conservar el comprobante del envío final.
+
 Creación del proyecto en la plataforma del hackathon confirmada por el usuario el 10 oct; el envío final sigue pendiente de comprobación.
 
 - Corrida real contra Foundry/Azure OpenAI sin evidencia al 10 oct; smoke manual

@@ -6,6 +6,7 @@ Revisado el **10 de octubre de 2026**. El estado del código y las prioridades e
 
 | Documento | Para qué consultarlo |
 | --- | --- |
+| [Portal oficial — Microsoft Innovation Studio](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon) | Referencia del evento en la plataforma donde el usuario confirmó la creación del proyecto. |
 | [OFFICIAL RULES.md](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md) | Calendario, elegibilidad, reto, categorías, entrega y evaluación. |
 | [CODE OF CONDUCT.md](https://github.com/microsoft/insidethegamehackathon/blob/main/CODE%20OF%20CONDUCT.md) | Convivencia, respeto, privacidad y reporte de conductas inapropiadas. |
 | [LICENSE.md](https://github.com/microsoft/insidethegamehackathon/blob/main/LICENSE.md) | Licencia MIT del repositorio de Microsoft; conservar sus avisos si se reutiliza material suyo. |
@@ -13,6 +14,22 @@ Revisado el **10 de octubre de 2026**. El estado del código y las prioridades e
 | [SECURITY.md](https://github.com/microsoft/insidethegamehackathon/blob/main/SECURITY.md) | Canal privado para vulnerabilidades de repositorios Microsoft; no reportarlas en issues públicos. |
 
 La licencia del evento no sustituye la [licencia propia de CRONISTA](../LICENSE). Las playlists son recursos de aprendizaje, no una lista de tecnologías que debamos implementar. SECURITY.md describe el canal de Microsoft; no establece automáticamente un canal para vulnerabilidades de CRONISTA.
+
+## Portal del evento y proyecto CRONISTA
+
+El [portal de Inside the Game Developer Hackathon](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon)
+queda registrado como punto de acceso al evento. El usuario confirmó la creación
+del proyecto el **10 de octubre de 2026**. Añadir también el enlace directo a la
+ficha de CRONISTA cuando esté disponible y conservar la confirmación del envío final.
+
+Antes de entregar, revisar los campos y avisos de la plataforma y contrastarlos
+con OFFICIAL RULES.md. La matriz de preparación de este documento reúne las
+acciones pendientes de código público, demo, video, pitch e instrucciones de prueba.
+
+**Verificación del enlace (10 oct):** respondió HTTP 200 con el documento inicial
+de Innovation Studio. El contenido dinámico del evento no pudo leerse desde esta
+sesión; los requisitos y fechas resumidos abajo proceden de las reglas oficiales
+ya revisadas. Los avisos específicos del portal quedan pendientes de comprobación.
 
 ## Requisitos oficiales resumidos
 

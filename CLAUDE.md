@@ -5,6 +5,7 @@ Agente multi-etapa que convierte eventos sintéticos de fútbol en crónicas bil
 El reto oficial pide "explainable match intelligence"; este proyecto ataca esa palabra.
 
 Fuentes oficiales: [reglas, conducta, licencia, formación y seguridad](docs/hackathon.md).
+Portal del evento: [Microsoft Innovation Studio](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon).
 Estado revisado y prioridades: [revisión del 10 de octubre](docs/revision-2026-10-10.md).
 Las reglas V1–V8 no prueban toda afirmación de prosa libre: [reproducción](docs/evidencia/verificador-2026-10-10.md).
 
