@@ -110,23 +110,31 @@
 
 | 2026-10-05 | Implementación | Brief 028 implementado y verificado: `npm run dataset` (partidos.jsonl esquema cronista/1 con config verbatim, eventos, hechos y microCitados; resumen.csv de 32 columnas con BOM; micro.jsonl.gz con --micro, **gzip RFC 1952 a mano con MTIME 0/OS 255** para bytes idénticos entre máquinas; --liga exporta una temporada). Determinismo verificado por TRES vías: dos corridas de Opus, dos corridas propias de Fable y los archivos commiteados — mismo sha256 en todo. DATASHEET estilo Gebru generado íntegro (cifras marcadas mecánicamente + prueba de huérfanas; regeneración byte a byte): 1.500 comprobaciones de invariantes con 0 violaciones; 34 bandas re-medidas con IC 95 % Wilson (30 en banda, 4 «consistent at this N» — todos eventos raros irresolubles a N=100, dicho en vez de escondido —, 0 fuera); 18/18 experimentos controlados; espacio 2^32 como tamaño, no como unicidad; **leído completo por Fable como revisor: lo firmaría**. /datos («Data» en la barra) con descarga real de 237 KB (= salida del CLI, con prueba) y el rótulo de que seed N ≠ /match/N. **Delta de Fable:** hecho `doble_palo` → `tiro_al_palo` (disparaba en TODO tiro al palo — un nombre que miente es deuda seria en un dataset público; ids conservados por posición, batería K5 intacta, `doble_palo` queda solo donde significa doble); `oraculo.test` a 120 s (clase A: tardó 63,9 s en una corrida — el límite de 60 lo habría tumbado); **LICENSE MIT agregado por Fable** y recogido por el DATASHEET vía su propia prueba de regeneración. Mutaciones D1–D13 mueren (D2 sobrevivió primero por corpus sin autogoles: corregida con semillas dedicadas). npm test 1350/1350 y stats 54/54 vistos por Fable; **e2e 47/47 × 3**. Smoke a ojo: /datos de catálogo. Deuda aceptada: seed N del dataset ≠ /match/N (rotulado en ambos lados). **Brief 028 CERRADO** | Opus/Fable | ✅ |
 
+| 2026-10-10 | Revisión | Cinco links oficiales incorporados a README y `docs/hackathon.md`; reporte del commit `c27518d` en `docs/revision-2026-10-10.md`. Typecheck, unitarias 1350/1350 y estadísticas 54/54 vistos correr localmente; audit de producción 0 hallazgos. CI remoto 38088012063: e2e 47/47, workflow FALLÓ por heap agotado en dataset.stats (Node 22). GitHub confirma repo PRIVATE; inscripción anotada como realizada el 30 sep. Sonda publicada sin respaldo («techo retráctil») reproducida en `docs/evidencia/verificador-2026-10-10.md`; README/pitch/guion acotan garantía a V1–V8 y hosting a planificado; CLAUDE refleja alcance real y orquestación TS. No se usó Azure real ni se publicó/envió el proyecto | Codex | ✅ revisión; pendientes explícitos en el reporte |
+
 ## Deudas conocidas (honestas)
 
-- Corrida real contra Foundry pendiente de la cuenta Azure (6 oct); smoke manual
+Creación del proyecto en la plataforma del hackathon confirmada por el usuario el 10 oct; el envío final sigue pendiente de comprobación.
+
+- Corrida real contra Foundry/Azure OpenAI sin evidencia al 10 oct; smoke manual
   documentado en `docs/smoke-foundry.md`, evidencia irá a `docs/evidencia/`.
-- `llm-azure-openai.ts` (candidato GPT-6.1 Sol del bake-off) pendiente de que el
-  brief 003 fije variables de entorno y SDK; la costura lo deja en 1 archivo + 1 case.
+- `llm-azure-openai.ts` y sus variables ya están implementados; falta validar un
+  deployment real y sus parámetros. La revisión local no confirma el estado de la cuenta Azure.
+- CI del commit `c27518d` falla por memoria en la suite estadística del dataset,
+  aunque pasa localmente. Prioridad y evidencia en `docs/revision-2026-10-10.md`.
+- V1–V8 no cubren toda la semántica de prosa libre: la sonda del techo retráctil se
+  publica sin motivos. Evaluación semántica independiente pendiente.
 - Límite conocido de V4: un apellido inventado de una sola palabra AL INICIO de
   oración («Pérez marcó») no es distinguible de una palabra normal sin diccionario.
   Mitigación natural: el oráculo del 002 y las citas obligatorias acotan el daño.
 
-- **Cuenta de Azure pendiente** — Carlos, **el 6 de octubre** (no antes: los $200
-  caducan en 30 días). El día 1: upgrade a Pay-As-You-Go (free trial = cuota 0 en
-  LLMs) y recurso Foundry en eastus2. El crédito NO paga Claude: la tarjeta verá un
-  gasto pequeño (< $10 con Sonnet/Haiku). Detalle en `docs/disenos/005-entrega.md`.
+- **Configuración Azure pendiente de confirmar** — el plan del 6 oct no tiene
+  evidencia de cierre en el repo. Verificar cuotas, región, disponibilidad del modelo
+  y precios vigentes en la cuenta antes del smoke; los montos del plan histórico
+  en `docs/disenos/005-entrega.md` no son una medición actual.
 - **Azure CLI no instalado** en la máquina (se instala cuando toque el deploy).
-- Repo de GitHub (público) se crea cerca de la entrega; git local ya inicializado
-  para fechar la evidencia de que todo es posterior al 29 sep.
+- Repo de GitHub ya creado: `calusaca/cronista`, PRIVATE al 10 oct. Publicación
+  preparada y cambio de visibilidad pendientes antes de la entrega.
 - El descuento del primer tiempo queda sellado al minuto 45 (para no romper la
   monotonía con el arranque del segundo tiempo).
 - `Evento.sale` es opcional en el tipo TS y obligatorio vía `verificarContrato`;
