@@ -18,7 +18,8 @@ resource environment 'Microsoft.App/managedEnvironments@2025-01-01' = {
   name: '${appName}-env'
   location: location
   properties: {
-    appLogsConfiguration: { destination: 'none' }
+    // La CLI traduce --logs-destination none a null en ARM; la cadena 'none' se rechaza.
+    appLogsConfiguration: null
     workloadProfiles: [{ name: 'Consumption', workloadProfileType: 'Consumption' }]
   }
 }
