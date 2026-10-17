@@ -103,6 +103,12 @@ permanent tests; all are rejected.
 Everything runs on a fully synthetic world — 8 fictional countries with
 climates, one league each (10 teams, double round-robin), all navigable:
 
+- **Full match, pass by pass**: open every recorded pass, carry, dribble, duel,
+  recovery and match event in chronological order, in English or Spanish.
+  Search players and receivers, filter by half/team/action, jump to a minute,
+  and download the entire commentary as text. This view uses the match's recorded
+  events and makes no additional model calls. Times are minute-level and locations
+  are zones; off-ball movement and exact-second tracking are not recorded.
 - **League mode**: standings, matchdays, top scorers; every result opens the
   full report.
 - **Conditions that really bite**: heat slows the second half, rain degrades
@@ -152,9 +158,9 @@ The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker ima
 Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
-npm test           # 1,385 unit/invariant/oracle/lie-battery tests
+npm test           # 1,400 unit/invariant/oracle/lie-battery tests
 npm run test:stats # 55 checks: N=1000 matches + A/B condition proofs
-npm run e2e        # 48 browser journeys against the production standalone build
+npm run e2e        # 51 browser journeys against the production standalone build
 npm run test:deploy # deployment context and artifact credential checks
 ```
 
@@ -188,8 +194,8 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 55 statistical
-checks, 48 browser journeys, and two deployment packaging checks. The standalone
+Validated locally on 17 October 2026: typecheck, 1,400 unit tests, 55 statistical
+checks, 51 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
 [Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39069277109),
 including Bicep compilation, the Docker image, an HTTP smoke,

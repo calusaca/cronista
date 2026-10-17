@@ -1089,6 +1089,78 @@ main {
   color: var(--muted);
 }
 
+/* ---------- partido completo (029) ---------- */
+
+.full-match {
+  width: min(1080px, calc(100vw - 32px));
+  height: calc(100dvh - 32px);
+  max-width: none;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-board);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.full-match[open] { display: flex; flex-direction: column; }
+.full-match::backdrop { background: var(--scrim); }
+.full-match .layer-head { flex: none; }
+.full-match-teams { margin: 5px 0 0; font-size: 14px; color: var(--muted); }
+.full-match-tools { padding: 12px 20px; border-bottom: 1px solid var(--line); flex: none; }
+.full-match-summary, .full-match-navigation { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.full-match-summary .caption { flex: 1; margin: 0; }
+.full-match-note { margin: 10px 0; font-size: 13px; color: var(--muted); line-height: 1.4; }
+.full-match-filters { display: grid; grid-template-columns: 1.4fr .8fr 1fr 1fr; gap: 10px; }
+.full-match-filters label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); min-width: 0; }
+.full-match input, .full-match select { min-width: 0; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font: inherit; }
+.full-match-navigation { margin-top: 10px; font-size: 13px; }
+.full-match-navigation output { margin-left: auto; }
+.full-match-jump { display: flex; align-items: center; gap: 6px; }
+.full-match-jump input { width: 65px; }
+.full-match-jump label { color: var(--muted); }
+.full-match-list { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; padding: 0 20px; margin: 0; }
+.full-match-row { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 12px; padding: 15px 8px; border-bottom: 1px solid var(--line); }
+.full-match-clock { display: flex; flex-direction: column; gap: 3px; font-size: 14px; padding-top: 2px; }
+.full-match-clock span { color: var(--muted); font-size: 11px; }
+.full-match-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+.full-match-action-body { min-width: 0; overflow-wrap: anywhere; }
+.full-match-action-body p { margin: 7px 0 4px; font-size: 15px; line-height: 1.5; }
+.full-match-location { color: var(--muted); font-size: 12px; }
+.full-match-score { margin-left: auto; color: var(--ink); font-size: 15px; }
+.full-match-goal { background: var(--hl); border-left: 3px solid var(--accent); }
+.full-match-goal .full-match-meta, .full-match-goal .full-match-location { color: var(--ink); }
+.full-match-target { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--hl); }
+.full-match-empty { padding: 30px 8px; color: var(--muted); }
+.full-match-pages { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 12px; border-top: 1px solid var(--line); flex: none; font-size: 13px; }
+.full-match .btn:disabled { opacity: .45; cursor: default; }
+
+@media (max-width: 600px) {
+  .full-match { width: 100vw; height: 100dvh; border-radius: 0; border: 0; }
+  .full-match .layer-head { padding: 12px; gap: 6px; }
+  .full-match .overline { font-size: 10px; }
+  .full-match-teams { font-size: 12px; }
+  .full-match-tools { padding: 8px 12px; }
+  .full-match-summary { gap: 6px; }
+  .full-match-summary .caption { flex-basis: 100%; font-size: 12px; }
+  .full-match-summary > .btn { margin-left: auto; }
+  .full-match .btn { padding: 7px 9px; font-size: 12px; }
+  .full-match-note { font-size: 11px; margin: 7px 0; }
+  .full-match-filters { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .full-match-search { grid-column: 1 / -1; }
+  .full-match-filters label { font-size: 11px; gap: 2px; }
+  .full-match input, .full-match select { padding: 6px; font-size: 12px; }
+  .full-match-navigation { gap: 6px; margin-top: 7px; }
+  .full-match-navigation output { flex-basis: 100%; margin-left: 0; }
+  .full-match-list { padding: 0 10px; }
+  .full-match-row { grid-template-columns: 33px minmax(0, 1fr); gap: 8px; padding: 12px 3px; }
+  .full-match-meta { font-size: 11px; gap: 5px; }
+  .full-match-action-body p { font-size: 14px; }
+  .full-match-pages { padding: 9px 6px; gap: 5px; font-size: 12px; }
+}
+
 /* ---------- capas (Caja de cristal, proceso, gol) ---------- */
 
 .scrim {

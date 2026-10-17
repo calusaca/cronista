@@ -29,8 +29,8 @@ coherence constraints, auditable player ratings, verified live replays, and a
 is recorded data. Readers click any sentence to see its evidence and switch
 language, fan/analyst view, or team perspective — personalizing the story,
 never the truth. We red-teamed our own verifier across five adversarial
-rounds; the crafted lies it rejects ship as a permanent battery within 1,385
-unit tests. Another 55 statistical checks and 48 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
+rounds; the crafted lies it rejects ship as a permanent battery within 1,400
+unit tests. Another 55 statistical checks and 51 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
 and published pipeline output had zero sentence-level Verifier findings
 (0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
 findings with the pipeline. Independent semantic evaluation is still needed

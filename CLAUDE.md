@@ -35,10 +35,10 @@ Las reglas V1–V8 no prueban toda afirmación de prosa libre: [reproducción](d
 
 ## Alcance
 
-Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–028. Tres pilares:
+Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–029. Tres pilares:
 simulador determinista, cadena Analista→Cronista→Verificador y UI de explicabilidad.
 Ya existen personalización, replay incremental, overlay JSON, ligas, condiciones,
-consecuencias, pizarra 3D y exportación de dataset. El replay es simulado, sin un feed
+consecuencias, pizarra 3D, relato completo pase por pase y exportación de dataset. El replay es simulado, sin un feed
 externo en vivo. No hay Fabric ni AKS y los idiomas son ES/EN. No se agrega alcance
 sin actualizar el diseño correspondiente.
 

@@ -10,17 +10,21 @@ deterministic Writer.
 1. The home page opens a featured synthetic match, seed **246**, with its report
    already loaded. Click a report sentence: its cited match events light up in
    the timeline. Click an event to inspect the sentences that cite it.
-2. Choose **View process** to inspect the actual drafts and verdicts. The recorded
+2. Choose **Full match** for the complete play-by-play log: every recorded pass,
+   receiver, distance, carry, duel and match event. Switch EN/ES inside the window,
+   search a player, jump to a minute or download the entire log. It makes no extra
+   model calls; the times and positions have minute/zone precision.
+3. Choose **View process** to inspect the actual drafts and verdicts. The recorded
    public report passed on its first attempt: 11 sentence pairs, zero omissions.
    The earlier local video shows a separate generation with 12 pairs. New
    generations can differ. An approved draft is a successful check, not a correction.
-3. Switch **EN / ES**, then **Fan / Analyst**. Analyst view exposes fact IDs,
+4. Switch **EN / ES**, then **Fan / Analyst**. Analyst view exposes fact IDs,
    numbers and event citations. These views reuse the same report. A team
    perspective requests a separately generated version and may take longer.
-4. Click a goal in the timeline and choose **3D**. The ball follows its recorded
+5. Click a goal in the timeline and choose **3D**. The ball follows its recorded
    trajectory; player pieces stay in their schematic zones. WebGL is optional:
    the 2D view remains available when 3D is unsupported.
-5. Open **Data** for the dataset methodology, statistical results and a download
+6. Open **Data** for the dataset methodology, statistical results and a download
    of ten synthetic matches. Dataset seed N uses a documented variant
    configuration and is not the same configuration as the UI's `/match/N`.
 
