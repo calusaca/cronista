@@ -2,12 +2,15 @@
 
 **AI match chronicles with a clickable evidence trail.**
 
-![A real GPT-6.1 Sol report with a selected sentence and its match evidence](docs/entrega/capturas/evidencia.png)
+[Try the live demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io) · [One-minute walkthrough](docs/entrega/judges-guide.md)
 
-Local production build with real Azure OpenAI output: 12 sentence pairs approved
-on the first attempt. [Recorded report](docs/evidencia/portada-azure-openai.json).
-[Video preview](docs/entrega/demo-en-borrador.mp4): 1:50, English captions, no audio.
-Public demo and final video: pending publication.
+![The public demo: a real GPT-6.1 Sol report with a selected sentence and its match evidence](docs/entrega/capturas/publica-evidencia.png)
+
+Hosted on Azure Container Apps with real Azure OpenAI output: the first public
+report passed with 11 sentence pairs on its first attempt, with zero omissions.
+[Public browser checks](docs/evidencia/smoke-browser-public.json).
+[Video preview](docs/entrega/demo-en-borrador.mp4): a local recording, 1:50,
+English captions, no audio. Final video publication is pending.
 
 An AI recap can sound convincing even when a detail lacks supporting evidence.
 Readers need a way to inspect its claims.
@@ -125,6 +128,8 @@ climates, one league each (10 teams, double round-robin), all navigable:
 | Technology | Where |
 |---|---|
 | Microsoft Foundry / Azure OpenAI (GPT-6.1 Sol, tested live) | `src/lib/llm-azure-openai.ts` |
+| Azure Container Apps Consumption (public HTTPS demo) | `infra/app.bicep` |
+| Azure Container Registry / managed identity (remote build and image pull) | `infra/registry.bicep`, `scripts/deploy-azure.mjs` |
 | GitHub Actions (unit/statistical tests + Playwright workflow) | `.github/workflows/ci.yml` |
 | GitHub CLI | repo management |
 
@@ -142,7 +147,7 @@ verifier, Glass Box, league mode, live replay, 3D board — runs offline. Real
 prose: copy `.env.example` to a local `.env`, then set `CRONISTA_LLM=azure-openai`,
 the Azure variables and `AZURE_OPENAI_REASONING_EFFORT=low` there. The optional Claude
 adapter uses `CRONISTA_LLM=foundry`; its deployment is currently blocked by
-Marketplace subscription eligibility. Public demo hosting is still pending.
+Marketplace subscription eligibility. The public demo uses Azure OpenAI.
 The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker image,
 Bicep templates, and a command that builds remotely in ACR without local Docker.
 
@@ -186,7 +191,11 @@ All countries, leagues, teams and players are fictional.
 Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 55 statistical
 checks, 48 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
-[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39065597667),
+[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39069277109),
 including Bicep compilation, the Docker image, an HTTP smoke,
-non-root execution and writable cache. Public Azure hosting awaits `az login`. The browser suite uses a labeled rehearsal fixture; the
-screenshots above and the local real-model smoke use GPT-6.1 Sol.
+non-root execution and writable cache. The [public Azure deployment](docs/evidencia/deploy-azure.json)
+passed separate [HTTP checks with the real model](docs/evidencia/smoke-web-public.json)
+and a browser walkthrough, including 3D and a 360px mobile viewport.
+The CI browser suite uses a labeled rehearsal fixture; the public demo and
+screenshot above use GPT-6.1 Sol. A fresh report took about 31 seconds;
+the replica's cache is ephemeral, so scale-to-zero can require a new generation.

@@ -1,5 +1,5 @@
 {
-  "checkedUtc": "2026-10-17T20:21:59.670095+00:00",
+  "checkedUtc": "2026-10-17T21:24:39.936017+00:00",
   "baseCommit": "c27518de36f0b90a291d2a506908b36118029845",
   "local": {
     "typecheck": {
@@ -72,7 +72,11 @@
       "historicalCommitsScannedAfterMerge": 46,
       "historyFindingsAfterMerge": 0,
       "knownCredentialMatchesInCandidateFiles": 0,
-      "publishedHistoryHead": "ff54c0550b56a676ffbad5c793f60d73fdbb6bcf"
+      "publishedHistoryHead": "b6becd314fc90b45fcb2173c44cecab3fdab07d9",
+      "historicalCommitsScannedAfterDeploy": 48,
+      "historyFindingsAfterDeploy": 0,
+      "candidateFindingsAfterDeploy": 0,
+      "knownCredentialFilesCheckedAfterDeploy": 302
     },
     "datasetUnitAfterMerge": {
       "passed": 25,
@@ -91,7 +95,7 @@
       "cli": "2.91.0",
       "bicep": "0.48.1",
       "activation": ".cache/azure-cli-env.sh",
-      "authenticated": false
+      "authenticated": true
     }
   },
   "remote": {
@@ -100,6 +104,43 @@
       "repository": "calusaca/cronista",
       "private": true,
       "ci": {
+        "run": "https://github.com/calusaca/cronista/actions/runs/39069277109",
+        "commit": "b6becd314fc90b45fcb2173c44cecab3fdab07d9",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "name": "Unit, invariants & statistics",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T21:02:57Z",
+            "completedUtc": "2026-10-17T21:12:04Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39069277109/job/117503303712"
+          },
+          {
+            "name": "Judge's path (Playwright)",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T21:02:56Z",
+            "completedUtc": "2026-10-17T21:06:30Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39069277109/job/117503303863"
+          },
+          {
+            "name": "Production container & Azure templates",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T21:02:57Z",
+            "completedUtc": "2026-10-17T21:04:00Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39069277109/job/117503304035"
+          }
+        ],
+        "unitTests": 1385,
+        "statisticalTests": 55,
+        "playwrightTests": 48,
+        "packagingTests": 2
+      },
+      "earlierContainerProbe": {
+        "run": "https://github.com/calusaca/cronista/actions/runs/39065404803",
+        "issue": "Initial HTTP probe received connection reset while the container started; other suites cancelled when superseded.",
+        "fix": "curl --retry-all-errors; final run succeeded."
+      },
+      "previousCi": {
         "run": "https://github.com/calusaca/cronista/actions/runs/39065597667",
         "commit": "ff54c0550b56a676ffbad5c793f60d73fdbb6bcf",
         "conclusion": "success",
@@ -130,19 +171,29 @@
         "statisticalTests": 55,
         "playwrightTests": 48,
         "packagingTests": 2
-      },
-      "earlierContainerProbe": {
-        "run": "https://github.com/calusaca/cronista/actions/runs/39065404803",
-        "issue": "Initial HTTP probe received connection reset while the container started; other suites cancelled when superseded.",
-        "fix": "curl --retry-all-errors; final run succeeded."
       }
     },
     "azure": {
-      "hosting": "not deployed",
-      "preflight": "Azure CLI 2.91.0 installed locally; account show: Please run az login to setup account",
+      "hosting": "deployed",
+      "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "location": "East US 2",
+      "preflight": "Authenticated account enabled; source context and model configuration passed",
       "whatIf": false,
-      "resourcesCreated": false,
-      "localCliBicepBuild": true
+      "resourcesCreated": true,
+      "localCliBicepBuild": true,
+      "provisioningState": "Succeeded",
+      "runningStatus": "Running",
+      "deploymentEvidence": "deploy-azure.json",
+      "httpEvidence": "smoke-web-public.json",
+      "browserEvidence": "smoke-browser-public.json",
+      "publicReport": {
+        "seed": 246,
+        "sentencePairs": 11,
+        "attempts": 1,
+        "omitted": 0
+      },
+      "mobileWidth": 360,
+      "pageErrors": 0
     }
   },
   "sourceSha256": {
@@ -157,7 +208,7 @@
     "src/cadena/lexico.ts": "df5ac92a7ff453e5f3a8d642b92bd1c5011df5b32ab5e86e9d2c5c09808d5b51",
     "src/vista/servidor.ts": "6b04a72258c2922b81db90c9692591f4fe61ca03c92c0e59ad24a66a90f18a23",
     "src/app/api/health/route.ts": "26096423be79f86464f8d265c165ca51ee11391f15ce15cdd84200d366fb50e9",
-    "infra/app.bicep": "0fdadb3e0ee8f0c524062985f620c4a7abc5920e2f18ae3966fd4cafbcfd2117",
+    "infra/app.bicep": "e52caeea51ccd77a6e3967b9a987009f6040d065362a1c2dcfdc0854de1c7f83",
     "infra/registry.bicep": "d4a40b180c4bdd6b4acaf76076f9e585a06f425078a9e606e88c5e9ef491135b",
     "scripts/deploy-azure.mjs": "46118c8592a57f7edc41b49d821ab65bbc5403d8a768f39ac02922414c6b1b9e",
     "scripts/prepare-standalone.mjs": "becd9adf14d492dc4f832dd8abe2d76a00dad63de8b5478d70dd9588d40ced1a",
@@ -170,8 +221,8 @@
   "limits": [
     "Real evaluation 0/163 vs 0/167: no factual advantage demonstrated",
     "Historical evaluator frozen; later verifier replay is offline",
-    "Local real-model HTTP success is not public hosting",
-    "Final human video review and public links still pending"
+    "Public smoke ran from the development machine; independent human/network review remains separate",
+    "Final human video review, public repository/video links and submission still pending"
   ],
   "mergedExistingBranch": {
     "branch": "fix/dataset-memory",

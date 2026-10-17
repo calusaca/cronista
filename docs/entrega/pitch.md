@@ -35,7 +35,9 @@ and published pipeline output had zero sentence-level Verifier findings
 (0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
 findings with the pipeline. Independent semantic evaluation is still needed
 for unrestricted prose. Built with Microsoft Foundry / Azure OpenAI
-and GitHub Actions; public demo hosting is pending.
+and GitHub Actions, hosted on Azure Container Apps.
+
+[Try the public demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io).
 
 Resultado y límites: `docs/evidencia/eval-gpt-6.1-sol/informe.txt`.
 El único rechazo de la cadena fue un falso positivo V8; no presentarlo como

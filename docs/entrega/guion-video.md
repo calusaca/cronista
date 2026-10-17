@@ -3,6 +3,8 @@
 Actualizado el 17 de octubre de 2026. Borrador de pantalla montado: `demo-en-borrador.mp4`,
 1:50 exactos, 1280×900, subtítulos EN quemados y sin audio. Decodificado completo
 sin errores; fotogramas revisados. Es una demo local con caché, no un despliegue público.
+El [servicio público](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io)
+ya pasó el recorrido funcional por separado; el video conserva su captura local original.
 La narración propuesta tiene 233 palabras; puede añadirse voz o conservar subtítulos.
 Se muestra una crónica real de GPT-6.1 Sol, sus citas y el proceso que realmente
 ocurrió. **No se necesita encontrar un error del modelo para terminar el video.**

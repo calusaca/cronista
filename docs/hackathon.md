@@ -3,8 +3,9 @@
 > Actualización del 17 oct: integración real con GPT-6.1 Sol completada; evaluación
 > 0/163 frente a 0/167, sin reducción observada. [Evidencia actual](evidencia/validacion-entrega.json),
 > [video local de 1:50](entrega/demo-en-borrador.mp4), [guía EN para jueces](entrega/judges-guide.md)
-> y [paquete de despliegue](entrega/despliegue.md). Hosting público, publicación final
-> del repositorio/video y confirmación del envío siguen pendientes. La tabla de
+> y [despliegue](entrega/despliegue.md). [Demo pública en Azure](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io)
+> comprobada con HTTP y navegador. Publicación final del repositorio/video,
+> revisión humana desde otra red y confirmación del envío siguen pendientes. La tabla de
 > revisión del 10 oct se conserva debajo como historial.
 
 

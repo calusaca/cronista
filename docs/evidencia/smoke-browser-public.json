@@ -1,0 +1,48 @@
+{
+  "checkedUtc": "2026-10-17T21:20:07.349Z",
+  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "browser": "Chromium / Playwright",
+  "writer": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+  "verification": "11/11 sentences verified\n1 attempt\n0 corrected\n0 omitted\nView process",
+  "sentencePairs": 11,
+  "checks": [
+    "public home and real-provider report",
+    "sentence selection highlights cited events",
+    "original drafts and verifier process opens",
+    "Spanish and English views",
+    "Analyst and Fan views",
+    "goal board and WebGL 3D canvas",
+    "Data navigation",
+    "mobile 360px without horizontal overflow"
+  ],
+  "screenshots": [
+    "01-home.png",
+    "02-evidence.png",
+    "03-process.png",
+    "04-spanish.png",
+    "05-analyst.png",
+    "06-goal-2d.png",
+    "07-goal-3d.png",
+    "08-dataset.png",
+    "09-mobile.png"
+  ],
+  "pageErrors": [],
+  "httpServerErrors": [],
+  "mobileWidth": 360,
+  "note": "Browser exercised the public HTTPS deployment from the development machine; an independent human/network review remains separate.",
+  "localScreenshotDirectory": ".cache/public-browser",
+  "reviewedScreenshots": [
+    {
+      "file": "docs/entrega/capturas/publica-evidencia.png",
+      "sha256": "ddfd2a2b8ac450b1d84ee21c590a7cfabeaca081db4518fa2aeecf8d2b2dd024"
+    },
+    {
+      "file": "docs/entrega/capturas/publica-gol-3d.png",
+      "sha256": "7727a3a862a17362241f8af117db55f287c8f0991daf32c486c0133e90922a02"
+    },
+    {
+      "file": "docs/entrega/capturas/publica-movil.png",
+      "sha256": "4133af200a3905ef1f76131380aba28f1da76e32e3c08450799b3a3e60538d1e"
+    }
+  ]
+}

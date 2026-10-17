@@ -1,16 +1,19 @@
 # Try CRONISTA in one minute
 
-Public hosting is pending. To try the complete interface locally without an API
-key, run `npm ci` and `npm run dev`, then open `http://localhost:3000`.
-The local default uses a visibly labeled deterministic Writer. The recorded
-video and screenshots use real GPT-6.1 Sol output through Azure OpenAI.
+Open the [public demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io).
+It runs on Azure Container Apps with real GPT-6.1 Sol output through Azure OpenAI.
+A new report can take tens of seconds; the first public generation took about 31.
+To try the interface locally without an API key, run `npm ci` and `npm run dev`,
+then open `http://localhost:3000`. The local default uses a visibly labeled
+deterministic Writer.
 
 1. The home page opens a featured synthetic match, seed **246**, with its report
    already loaded. Click a report sentence: its cited match events light up in
    the timeline. Click an event to inspect the sentences that cite it.
 2. Choose **View process** to inspect the actual drafts and verdicts. The recorded
-   real-model report passed on its first attempt: 12 sentence pairs, zero
-   omissions. An approved draft is a successful check, not a correction.
+   public report passed on its first attempt: 11 sentence pairs, zero omissions.
+   The earlier local video shows a separate generation with 12 pairs. New
+   generations can differ. An approved draft is a successful check, not a correction.
 3. Switch **EN / ES**, then **Fan / Analyst**. Analyst view exposes fact IDs,
    numbers and event citations. These views reuse the same report. A team
    perspective requests a separately generated version and may take longer.

@@ -126,6 +126,8 @@
 
 | 2026-10-17 | Validación remota y cierre de preparación | Cambios e integración subidos a main del repositorio privado. [CI 39065597667](https://github.com/calusaca/cronista/actions/runs/39065597667) **verde**, revisión `ff54c05`: typecheck, 1385 unitarias, 55 estadísticas (incluido heap 512 MiB), 48 Playwright sobre standalone y 2 pruebas de empaquetado. Bicep y Docker construidos; contenedor real probado con stub explícito: HTTP, assets, dataset, descargas, 404, usuario no root y caché escribible. Primera sonda de arranque recibió reset; corregido con reintento de errores y confirmado en la corrida final; intento anterior cancelado al sustituirlo. Evidencia HTTP en `container-ci.json`; smoke del modelo real permanece separado en `smoke-web-local.json`. Audit de dependencias de producción: 0 hallazgos; Gitleaks del historial hasta la revisión probada: 46 commits no merge, 0 hallazgos; claves conocidas ausentes de los archivos candidatos. Reproducción offline de eval histórica vuelve a coincidir, 0 red. Azure CLI 2.91 instalado en venv local y Bicep 0.48.1 probado también desde az; perfil ignorado `.cache/azure-cli-env.sh`, sin instalar paquetes del sistema. Preflight termina con «Please run az login»: falta sesión administrativa, no se crearon recursos Azure. Video local de 1:50 y capturas guardados, guía EN para jueces y runbook listos. Pendientes: hosting/smoke desde otra red, publicación final del repo y video, revisión humana final y confirmación de entrega | Codex | ✅ |
 
+| 2026-10-17 | Despliegue público | Carlos completó `az login`; preflight aprobado. Proveedores registrados, ACR Basic privado e identidad `AcrPull` creados; build remoto `ch1` aprobado, 190 archivos permitidos sin `.env` ni claves conocidas. Preflight del entorno rechazó la cadena de logs `none`; corregido a `null` en `b6becd3`, reutilizando la misma imagen. [CI 39069277109](https://github.com/calusaca/cronista/actions/runs/39069277109) verde: typecheck, 1385 unitarias, 55 estadísticas, 48 Playwright y 2 empaquetado, más Docker/Bicep. Container App `cronista` en East US 2: `Succeeded` / `Running`, HTTPS público en https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io. Smoke real: salud, portada, JS, Data, DATASHEET, descarga de 10 registros y 404 correctos; primera portada 31,1 s. Crónica pública 246: 11 frases ES/EN, un intento, cero omisiones; generación distinta de la local del video (12). Chromium público: citas resaltadas, proceso, ES/EN, Fan/Analyst, 2D/3D, Data y móvil 360 px aprobados, cero errores JS/HTTP 5xx; tres capturas revisadas. Gitleaks del historial de 48 commits y del candidato sin hallazgos; 302 archivos revisados contra las claves conocidas, cero coincidencias. Los 190 archivos del contexto siguen coincidiendo con la imagen desplegada. Evidencia en `deploy-azure.json`, `smoke-web-public.json`, `smoke-browser-public.json`; README, pitch, guía y runbook actualizados. El entorno original tardó en crearse sin error de capacidad reportado (cuota Consumption 100, uso 0 al consultar); intento alternativo East US cancelado y retirada iniciada. Caché efímera, presupuesto real y revisión desde otra red siguen explícitos; repo aún privado, video final y envío pendientes | Carlos/Codex | ✅ |
+
 ## Deudas conocidas (honestas)
 
 Portal oficial y creación del proyecto en la plataforma documentados en la
@@ -149,12 +151,13 @@ Enterprise, US$150; cobertura, renovación y factura siguen sin comprobarse.
   oración («Pérez marcó») no es distinguible de una palabra normal sin diccionario.
   Mitigación natural: el oráculo del 002 y las citas obligatorias acotan el daño.
 
-- **Cuenta de Azure disponible** — Carlos desplegó GPT-6.1 Sol en Foundry el 17 oct;
-  conectada y probada desde CRONISTA. Hosting público y verificación de costos reales
-  de la demo pendientes (el diseño de entrega original es `docs/disenos/005-entrega.md`).
+- **Demo pública en Azure Container Apps**, conectada a GPT-6.1 Sol y probada con
+  HTTP y navegador el 17 oct. Falta la revisión humana desde otra red y verificar
+  costos/factura. Caché efímera: escalar a cero puede generar nuevas llamadas;
+  una réplica máxima no es un límite de gasto de inferencia.
 - **Azure CLI 2.91 instalado localmente**, con Bicep 0.48.1 y perfil
-  `.cache/azure-cli-env.sh`. Preflight: falta `az login`; la autenticación
-  administrativa es el bloqueo actual del hosting.
+  `.cache/azure-cli-env.sh`. Inicio de sesión, preflight y despliegue aprobados;
+  la sesión local puede expirar y requerir `az login` de nuevo.
 - Repositorio de GitHub existente, privado (`calusaca/cronista`); acceso confirmado
   el 17 oct fuera del aislamiento de red. Publicación para jueces pendiente.
   La primera consulta local de autenticación dio un falso diagnóstico de token

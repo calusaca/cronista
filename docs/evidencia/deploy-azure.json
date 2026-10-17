@@ -1,0 +1,58 @@
+{
+  "checkedUtc": "2026-10-17T21:24:39.936017+00:00",
+  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "group": "rg-cronista-demo",
+  "appName": "cronista",
+  "registryName": "crcronistae1734ecca5ff",
+  "imageTag": "demo-20261017205855",
+  "deployedUtc": "2026-10-17T21:18:55.296Z",
+  "location": "East US 2",
+  "templateCommit": "b6becd314fc90b45fcb2173c44cecab3fdab07d9",
+  "image": {
+    "createdUtc": "2026-10-17T21:01:08.7622149Z",
+    "digest": "sha256:9a9b2a6a3ef35aaf92edec1b4343b24e590d5df11b65532843ae181dc1884307",
+    "updatedUtc": "2026-10-17T21:01:08.7622149Z",
+    "buildRun": "ch1",
+    "sourceCommit": "765ea7e4909586c5acccea532230122f09a49337",
+    "sourceFiles": 190,
+    "sourceManifestSha256": "95652c0a83a63fc6aea3f0b01780054f207c8c1c8466ec737c2b268c8459ac71",
+    "currentApplicationSourceMatchesManifest": true
+  },
+  "runtime": {
+    "fqdn": "cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261017205855",
+    "latestReadyRevision": "cronista--zc366ol",
+    "location": "East US 2",
+    "name": "cronista",
+    "resources": {
+      "cpu": 0.5,
+      "ephemeralStorage": "2Gi",
+      "memory": "1Gi"
+    },
+    "runningStatus": "Running",
+    "scale": {
+      "cooldownPeriod": 300,
+      "maxReplicas": 1,
+      "minReplicas": 0,
+      "pollingInterval": 30,
+      "rules": null
+    },
+    "state": "Succeeded"
+  },
+  "publicHttpEvidence": "smoke-web-public.json",
+  "publicBrowserEvidence": "smoke-browser-public.json",
+  "recovery": {
+    "initialPreflightError": "AppLogsConfiguration.Destination rejects the literal string none",
+    "fix": "appLogsConfiguration: null",
+    "imageRebuiltForTemplateFix": false,
+    "firstEnvironmentCreation": "East US 2 succeeded after waiting; no capacity error was reported",
+    "alternateEastUsDeployment": "Canceled after primary became healthy",
+    "alternateEnvironmentCleanup": "deleting"
+  },
+  "limits": [
+    "Cache is ephemeral and can be lost on scale-to-zero or revision changes",
+    "One maximum replica does not cap inference spending",
+    "No Azure invoice or credit eligibility calculation",
+    "Public HTTP and browser checks ran from the development machine; independent human/network review is separate"
+  ]
+}
