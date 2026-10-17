@@ -1,0 +1,65 @@
+{
+  "checkedUtc": "2026-10-17T20:11:34.016Z",
+  "url": "http://127.0.0.1:3419",
+  "modelCheck": "offline-stub",
+  "results": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "bytes": 36,
+      "elapsedMs": 66
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 180456,
+      "elapsedMs": 765
+    },
+    {
+      "path": "/_next/static/chunks/1u5zan5bs9a7v.js",
+      "status": 200,
+      "bytes": 23558,
+      "elapsedMs": 12
+    },
+    {
+      "path": "/datos",
+      "status": 200,
+      "bytes": 22314,
+      "elapsedMs": 31
+    },
+    {
+      "path": "/datos/datasheet",
+      "status": 200,
+      "bytes": 24525,
+      "elapsedMs": 12
+    },
+    {
+      "path": "/muestra-10.jsonl",
+      "status": 200,
+      "bytes": 241833,
+      "elapsedMs": 11
+    },
+    {
+      "path": "/match/not-a-number",
+      "status": 404,
+      "bytes": 6817,
+      "elapsedMs": 38
+    }
+  ],
+  "note": "HTTP smoke; no sustituye la inspección visual ni una prueba desde otra red.",
+  "ci": {
+    "run": "https://github.com/calusaca/cronista/actions/runs/39065597667",
+    "commit": "ff54c0550b56a676ffbad5c793f60d73fdbb6bcf",
+    "containerJobPassed": true,
+    "image": "cronista-ci",
+    "checks": [
+      "Bicep compilation",
+      "Docker build",
+      "HTTP endpoints and assets",
+      "dataset and downloads",
+      "non-root uid",
+      "writable cache",
+      "no root .env in image"
+    ]
+  }
+}

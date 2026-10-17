@@ -1,12 +1,32 @@
 # Publicación de la demo en Azure
 
 Preparado el 17 de octubre de 2026. La inferencia con GPT-6.1 Sol ya está
-probada; **el hosting público todavía no está creado**. Esta máquina no tiene
-Azure CLI ni sesión administrativa de Azure. GitHub sí está conectado y el
-repositorio existente es privado. La clave de inferencia no concede permisos
+probada; **el hosting público todavía no está creado**. Azure CLI 2.91 y Bicep
+0.48.1 están instalados localmente en `.cache/`, sin cambios del sistema.
+El preflight pide `az login`; falta esa sesión administrativa. GitHub está
+conectado y el repositorio existente sigue privado. La clave de inferencia no concede permisos
 para crear infraestructura.
 
-## Publicar desde el checkout local
+## Continuar en esta máquina
+
+Las herramientas y la suscripción están preparadas en un perfil local ignorado
+por git. Desde la raíz del proyecto:
+
+```bash
+source .cache/azure-cli-env.sh
+az login
+npm run deploy:azure -- --check
+npm run deploy:azure
+```
+
+El inicio de sesión requiere la cuenta de Carlos; no se ha iniciado un login
+interactivo mientras estaba ausente. La sesión se guarda en `.cache/azure-account/`.
+Las plantillas ya compilaron tanto con Bicep directo como mediante `az bicep build`.
+La imagen Docker se construyó y ejecutó en [CI verde](https://github.com/calusaca/cronista/actions/runs/39065597667): salud, home offline, assets,
+descargas, usuario sin privilegios y caché escribible aprobados. El backend real
+se comprobó por separado en el standalone local; el hosting Azure aún no está probado.
+
+## Publicar desde otro checkout
 
 Requisitos: Node 24, [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli),
 y permisos sobre una suscripción para crear recursos y asignar `AcrPull` a una
@@ -83,8 +103,8 @@ almacenamiento/coordinación antes de ampliar el despliegue.
 
 Las dos plantillas compilan con Bicep CLI 0.48.1. El contexto permitido y la
 retirada del `.env` que Next copia al standalone tienen pruebas locales. Esto no
-equivale a un `what-if`, una compilación Docker ni un despliegue real: esos pasos
-siguen pendientes de acceso administrativo. Los resultados de las suites y el
+equivale a un `what-if` ni a un despliegue real en Azure. La compilación y ejecución
+Docker sí pasaron en CI; el `what-if` y el hosting siguen pendientes de iniciar sesión. Los resultados de las suites y el
 smoke local se registran en `BITACORA.md` y `docs/evidencia/validacion-entrega.json`.
 
 El código puede subirse al repositorio privado con la sesión de GitHub actual.

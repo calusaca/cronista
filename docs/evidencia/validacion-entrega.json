@@ -1,5 +1,5 @@
 {
-  "checkedUtc": "2026-10-17T20:07:16.005203+00:00",
+  "checkedUtc": "2026-10-17T20:21:59.670095+00:00",
   "baseCommit": "c27518de36f0b90a291d2a506908b36118029845",
   "local": {
     "typecheck": {
@@ -68,11 +68,30 @@
       "historicalCommits": 44,
       "historyFindings": 0,
       "candidateFindings": 0,
-      "scope": "Committed history and a copy of intended delivery files; excludes local env, unrelated .primos and caches. Heuristic scanner, not a guarantee."
+      "scope": "Committed history and a copy of intended delivery files; excludes local env, unrelated .primos and caches. Heuristic scanner, not a guarantee.",
+      "historicalCommitsScannedAfterMerge": 46,
+      "historyFindingsAfterMerge": 0,
+      "knownCredentialMatchesInCandidateFiles": 0,
+      "publishedHistoryHead": "ff54c0550b56a676ffbad5c793f60d73fdbb6bcf"
     },
     "datasetUnitAfterMerge": {
       "passed": 25,
       "seconds": 3.5
+    },
+    "productionAudit": {
+      "evidence": "dependencias-produccion.json",
+      "findings": 0
+    },
+    "archivedEvaluationReplay": {
+      "passed": true,
+      "networkCalls": 0,
+      "metricsMatch": true
+    },
+    "azureTools": {
+      "cli": "2.91.0",
+      "bicep": "0.48.1",
+      "activation": ".cache/azure-cli-env.sh",
+      "authenticated": false
     }
   },
   "remote": {
@@ -80,13 +99,50 @@
       "authenticated": true,
       "repository": "calusaca/cronista",
       "private": true,
-      "ci": "pending push"
+      "ci": {
+        "run": "https://github.com/calusaca/cronista/actions/runs/39065597667",
+        "commit": "ff54c0550b56a676ffbad5c793f60d73fdbb6bcf",
+        "conclusion": "success",
+        "jobs": [
+          {
+            "name": "Judge's path (Playwright)",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T20:10:36Z",
+            "completedUtc": "2026-10-17T20:14:27Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39065597667/job/117492466561"
+          },
+          {
+            "name": "Unit, invariants & statistics",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T20:10:36Z",
+            "completedUtc": "2026-10-17T20:19:36Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39065597667/job/117492466768"
+          },
+          {
+            "name": "Production container & Azure templates",
+            "conclusion": "success",
+            "startedUtc": "2026-10-17T20:10:36Z",
+            "completedUtc": "2026-10-17T20:11:37Z",
+            "url": "https://github.com/calusaca/cronista/actions/runs/39065597667/job/117492466799"
+          }
+        ],
+        "unitTests": 1385,
+        "statisticalTests": 55,
+        "playwrightTests": 48,
+        "packagingTests": 2
+      },
+      "earlierContainerProbe": {
+        "run": "https://github.com/calusaca/cronista/actions/runs/39065404803",
+        "issue": "Initial HTTP probe received connection reset while the container started; other suites cancelled when superseded.",
+        "fix": "curl --retry-all-errors; final run succeeded."
+      }
     },
     "azure": {
       "hosting": "not deployed",
-      "preflight": "Azure CLI unavailable; no administrative session or service principal credentials",
+      "preflight": "Azure CLI 2.91.0 installed locally; account show: Please run az login to setup account",
       "whatIf": false,
-      "resourcesCreated": false
+      "resourcesCreated": false,
+      "localCliBicepBuild": true
     }
   },
   "sourceSha256": {
@@ -95,7 +151,7 @@
     "next.config.ts": "a8ae4f911967fef25abdf1a9df1c3ce3ccb3b1658b7d23c18be2f77942063af4",
     "package.json": "afa56ecdbf26f7f0c4f3061661a2ee693076e6dd6d077da1db706264f6188d8f",
     "playwright.config.ts": "934db71b24f7a742bc6a508fd6e45b79f93563c5169f0bf45da0da341c92174f",
-    ".github/workflows/ci.yml": "519db1005b67ba69703faf9a29c2c430bfe94dc92117e2bc67c4cbf335cc0791",
+    ".github/workflows/ci.yml": "cba77104110e3bfeccdb3a5d6480fb86a81e7834402db2d69b076e59f7671b6b",
     "src/lib/llm-azure-openai.ts": "6311eff541aa290a71ff78ea1b4cfbb79c5487c92eba48343dd33ea8345f4b13",
     "src/cadena/verificador.ts": "212b7b99f3eafbbccdfb5e055b822cf9d8b6fd6f208bf1b272c4f643ebe816b4",
     "src/cadena/lexico.ts": "df5ac92a7ff453e5f3a8d642b92bd1c5011df5b32ab5e86e9d2c5c09808d5b51",
@@ -115,7 +171,6 @@
     "Real evaluation 0/163 vs 0/167: no factual advantage demonstrated",
     "Historical evaluator frozen; later verifier replay is offline",
     "Local real-model HTTP success is not public hosting",
-    "Docker image execution awaits remote CI",
     "Final human video review and public links still pending"
   ],
   "mergedExistingBranch": {

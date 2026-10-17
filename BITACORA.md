@@ -124,6 +124,8 @@
 
 | 2026-10-17 | Integración de rama existente | Integrada `fix/dataset-memory` (6 commits que aún no estaban en main): acumulación A/B por partido y regresión de presupuesto de heap; documentación oficial, crédito y límites semánticos conservados. Conflictos documentales resueltos manteniendo la evidencia nueva y la revisión del 10 oct, incluido el contraejemplo del techo retráctil. Typecheck aprobado; 25 pruebas unitarias de dataset y **55/55 estadísticas** vistas tras integrar; el CLI con 512 MiB regenera los cuatro archivos byte a byte. Nueva guía EN de 60 segundos para jueces. Sin cambios al simulador ni a las respuestas originales del modelo | Codex | ✅ |
 
+| 2026-10-17 | Validación remota y cierre de preparación | Cambios e integración subidos a main del repositorio privado. [CI 39065597667](https://github.com/calusaca/cronista/actions/runs/39065597667) **verde**, revisión `ff54c05`: typecheck, 1385 unitarias, 55 estadísticas (incluido heap 512 MiB), 48 Playwright sobre standalone y 2 pruebas de empaquetado. Bicep y Docker construidos; contenedor real probado con stub explícito: HTTP, assets, dataset, descargas, 404, usuario no root y caché escribible. Primera sonda de arranque recibió reset; corregido con reintento de errores y confirmado en la corrida final; intento anterior cancelado al sustituirlo. Evidencia HTTP en `container-ci.json`; smoke del modelo real permanece separado en `smoke-web-local.json`. Audit de dependencias de producción: 0 hallazgos; Gitleaks del historial hasta la revisión probada: 46 commits no merge, 0 hallazgos; claves conocidas ausentes de los archivos candidatos. Reproducción offline de eval histórica vuelve a coincidir, 0 red. Azure CLI 2.91 instalado en venv local y Bicep 0.48.1 probado también desde az; perfil ignorado `.cache/azure-cli-env.sh`, sin instalar paquetes del sistema. Preflight termina con «Please run az login»: falta sesión administrativa, no se crearon recursos Azure. Video local de 1:50 y capturas guardados, guía EN para jueces y runbook listos. Pendientes: hosting/smoke desde otra red, publicación final del repo y video, revisión humana final y confirmación de entrega | Codex | ✅ |
+
 ## Deudas conocidas (honestas)
 
 Portal oficial y creación del proyecto en la plataforma documentados en la
@@ -150,7 +152,9 @@ Enterprise, US$150; cobertura, renovación y factura siguen sin comprobarse.
 - **Cuenta de Azure disponible** — Carlos desplegó GPT-6.1 Sol en Foundry el 17 oct;
   conectada y probada desde CRONISTA. Hosting público y verificación de costos reales
   de la demo pendientes (el diseño de entrega original es `docs/disenos/005-entrega.md`).
-- **Azure CLI no instalado** en la máquina (se instala cuando toque el deploy).
+- **Azure CLI 2.91 instalado localmente**, con Bicep 0.48.1 y perfil
+  `.cache/azure-cli-env.sh`. Preflight: falta `az login`; la autenticación
+  administrativa es el bloqueo actual del hosting.
 - Repositorio de GitHub existente, privado (`calusaca/cronista`); acceso confirmado
   el 17 oct fuera del aislamiento de red. Publicación para jueces pendiente.
   La primera consulta local de autenticación dio un falso diagnóstico de token

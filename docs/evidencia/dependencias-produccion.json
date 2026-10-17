@@ -1,0 +1,14 @@
+{
+  "checkedDate": "2026-10-17",
+  "command": "npm audit --omit=dev --json",
+  "packageLockSha256": "b0426f0b5d2d327f379d6bdd35a9dfe8b4783e26461fff15e45882fc6bf2e443",
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "note": "Snapshot of registry advisories, not a guarantee of security."
+}

@@ -1,5 +1,13 @@
 # Smoke manual — CRONISTA contra Foundry o Azure OpenAI
 
+> Actualización del 17 oct: smoke y caché reales completados con GPT-6.1 Sol en
+> Azure OpenAI; ver [primera corrida](evidencia/primera-corrida-azure-openai.json),
+> [caché](evidencia/cache-azure-openai.json) y [evaluación real](evidencia/eval-gpt-6.1-sol/informe.txt).
+> Usar `AZURE_OPENAI_REASONING_EFFORT=low` para ese deployment. Claude permanece
+> bloqueado por Marketplace. El procedimiento original del 10 oct se conserva
+> debajo; el [runbook de hosting](entrega/despliegue.md) contiene los pasos vigentes.
+
+
 **Estado al 10 oct:** adaptadores probados offline; corrida real pendiente de
 configuración y evidencia. Este procedimiento comprueba el deployment elegido,
 la cadena y la caché. No sustituye una evaluación independiente de fidelidad.

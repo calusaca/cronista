@@ -9,8 +9,8 @@ on the first attempt. [Recorded report](docs/evidencia/portada-azure-openai.json
 [Video preview](docs/entrega/demo-en-borrador.mp4): 1:50, English captions, no audio.
 Public demo and final video: pending publication.
 
-Most AI-generated sports recaps have a problem nobody can see: they invent
-details — a wrong minute, a goal that never happened, a penalty that never was.
+An AI recap can sound convincing even when a detail lacks supporting evidence.
+Readers need a way to inspect its claims.
 CRONISTA generates bilingual (EN/ES) football match chronicles from synthetic
 match events. **Every published sentence passes the defined V1–V8 checks**:
 a deterministic Verifier checks structure, citations, numbers, names and
@@ -170,8 +170,8 @@ All countries, leagues, teams and players are fictional.
 - **Every published sentence passes V1–V8.** When a sentence fails those checks
   after retries, it is omitted or the chronicle falls back to a template-based
   report — visibly labeled. Assertions outside the maintained rules can pass;
-  [a reproduced example](docs/evidencia/verificador-2026-10-10.md) and independent
-  evaluation are documented in the project review.
+  [a reproduced example](docs/evidencia/verificador-2026-10-10.md) demonstrates
+  that limit. Independent semantic evaluation remains needed.
 - **Causal honesty, not just factual honesty.** "They never settled on the tall
   grass" is blocked when it also rained — the rain, not the grass, could
   explain the drop. The same losses are never narrated twice under two names.
@@ -186,6 +186,7 @@ All countries, leagues, teams and players are fictional.
 Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 55 statistical
 checks, 48 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
-Bicep templates compile; Docker image execution and public Azure hosting await
-administrative access. The browser suite uses a labeled rehearsal fixture; the
+[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39065597667),
+including Bicep compilation, the Docker image, an HTTP smoke,
+non-root execution and writable cache. Public Azure hosting awaits `az login`. The browser suite uses a labeled rehearsal fixture; the
 screenshots above and the local real-model smoke use GPT-6.1 Sol.
