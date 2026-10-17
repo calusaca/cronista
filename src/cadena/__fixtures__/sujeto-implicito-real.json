@@ -1,0 +1,54 @@
+{
+  "seed": 7,
+  "deployment": "gpt-6.1-sol",
+  "recordedUtc": "2026-10-17T18:35:58.826Z",
+  "requestHash": "bc3a412e5ec8f0d3baec4c8c2a14de86a81cd7bbb15c4243e49b9f56ba83a51c",
+  "draft": {
+    "titulo_es": "Racing Pradoalto ganó 3–1 ante Juventud Valdecristal",
+    "titulo_en": "Racing Pradoalto won 3–1 against Juventud Valdecristal",
+    "oraciones": [
+      {
+        "texto_es": "Racing Pradoalto remontó ante Juventud Valdecristal: perdía 0–1 en el minuto 8 y ganó 3–1.",
+        "texto_en": "Racing Pradoalto came from behind against Juventud Valdecristal: they were 0–1 down in minute 8 and won 3–1.",
+        "hecho": "h01",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Emilio Castoino abrió el marcador para Juventud Valdecristal en el minuto 8 con un tiro de 0.02 xg que dejó el resultado en 1–0 ante Racing Pradoalto.",
+        "texto_en": "Emilio Castoino opened the scoring for Juventud Valdecristal in minute 8 with a 0.02 xg shot that made the score 1–0 against Racing Pradoalto.",
+        "hecho": "h04",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Vicente Fenales marcó de cabeza para Racing Pradoalto en el minuto 44 con un remate de 0.24 xg que puso el 1–1 ante Juventud Valdecristal.",
+        "texto_en": "Vicente Fenales scored a header for Racing Pradoalto in minute 44 with a 0.24 xg attempt that made it 1–1 against Juventud Valdecristal.",
+        "hecho": "h05",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Joel Ulvarueta marcó para Racing Pradoalto en el minuto 83 con un tiro de 0.48 xg que dejó el marcador en Juventud Valdecristal 1–2 Racing Pradoalto.",
+        "texto_en": "Joel Ulvarueta scored for Racing Pradoalto in minute 83 with a 0.48 xg shot that made the score Juventud Valdecristal 1–2 Racing Pradoalto.",
+        "hecho": "h06",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Bruno Marouz marcó de cabeza para Racing Pradoalto en el minuto 90+3 con un remate de 0.24 xg que puso el marcador en Juventud Valdecristal 1–3 Racing Pradoalto.",
+        "texto_en": "Bruno Marouz scored a header for Racing Pradoalto in minute 90+3 with a 0.24 xg attempt that made the score Juventud Valdecristal 1–3 Racing Pradoalto.",
+        "hecho": "h07",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Racing Pradoalto ganó 3–1 ante Juventud Valdecristal.",
+        "texto_en": "Racing Pradoalto won 3–1 against Juventud Valdecristal.",
+        "hecho": "h02",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Emilio Castoino fue la figura del partido con una nota de 8.3.",
+        "texto_en": "Emilio Castoino was the player of the match with a rating of 8.3.",
+        "hecho": "h03",
+        "apoyo": []
+      }
+    ]
+  }
+}

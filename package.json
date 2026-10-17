@@ -16,7 +16,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "package:standalone": "node scripts/prepare-standalone.mjs",
+    "test:deploy": "node --test scripts/*.test.mjs",
+    "deploy:azure": "node scripts/deploy-azure.mjs",
+    "smoke:public": "node scripts/smoke-public.mjs",
+    "capture:demo": "node scripts/capture-demo.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

@@ -13,7 +13,7 @@ import { mensajeInicial } from "../../cadena/prompt";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import { crearLlmDesdeEnv } from "../llm";
-import { API_VERSION_AZURE_OPENAI, crearLlmAzureOpenAI, MAX_TOKENS_AZURE_OPENAI, TEMPERATURA_AZURE_OPENAI, urlAzureOpenAI } from "../llm-azure-openai";
+import { API_VERSION_AZURE_OPENAI, crearLlmAzureOpenAI, MAX_TOKENS_AZURE_OPENAI, MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI, TEMPERATURA_AZURE_OPENAI, urlAzureOpenAI } from "../llm-azure-openai";
 import { borradorDesdeHechos } from "../llm-stub";
 
 const ENV = {
@@ -53,6 +53,9 @@ describe("023 · fábrica por CRONISTA_LLM=azure-openai", () => {
     expect(urlAzureOpenAI({ endpoint: "https://x.openai.azure.com", deployment: "d" })).toContain(`api-version=${API_VERSION_AZURE_OPENAI}`);
     expect(urlAzureOpenAI({ endpoint: "https://x.openai.azure.com", deployment: "d", apiVersion: "2099-01-01-preview" })).toContain("api-version=2099-01-01-preview");
   });
+  it("esfuerzo inválido ⇒ error de configuración antes de llamar al servicio", () => {
+    expect(() => crearLlmDesdeEnv({ ...ENV, AZURE_OPENAI_REASONING_EFFORT: "none" })).toThrow(/AZURE_OPENAI_REASONING_EFFORT/);
+  });
 });
 
 describe("023 · la petición y la respuesta (fetch inyectado)", () => {
@@ -87,6 +90,23 @@ describe("023 · la petición y la respuesta (fetch inyectado)", () => {
     const { f, llamadas } = fetchFalso(okCon("{}"));
     await crearLlmAzureOpenAI(cfg(f, { apiVersion: "2099-01-01-preview" })).completar("s", [{ rol: "user", contenido: "x" }]);
     expect((llamadas[0] as Llamada).url).toMatch(/\?api-version=2099-01-01-preview$/);
+  });
+
+  it("GPT-6.1 Sol con deployment de nombre libre: esfuerzo de env, sin temperature y con presupuesto para razonar", async () => {
+    const { f, llamadas } = fetchFalso(okCon(cronicaStub));
+    const llm = crearLlmDesdeEnv({ ...ENV, AZURE_OPENAI_DEPLOYMENT: "cronista", AZURE_OPENAI_REASONING_EFFORT: " low " });
+    // La fábrica valida y conserva el esfuerzo; el transporte se inyecta en la misma config.
+    expect(llm.id).toBe("azure-openai:cronista:reasoning-low");
+    const modelo = crearLlmAzureOpenAI({ ...cfg(f), deployment: "cronista", reasoningEffort: "low" });
+    expect(modelo.id).toBe(llm.id);
+    const { cronica } = await generarCronica(partido, { llm: modelo });
+    expect(cronica.modo).toBe("llm");
+    expect(cronica.intentos).toBe(1);
+    const body = JSON.parse(String(llamadas[0]?.init.body));
+    expect(body.reasoning_effort).toBe("low");
+    expect(body).not.toHaveProperty("temperature");
+    expect(body.max_completion_tokens).toBe(MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI);
+    expect(body.response_format).toEqual({ type: "json_object" });
   });
 
   it.each([
@@ -133,6 +153,12 @@ describe("023 · la caché distingue el deployment (y el backend)", () => {
     expect((await generarCronica(partido, { llm: crearLlmAzureOpenAI(cfg(a.f)), cache })).desdeCache).toBe(false);
     expect((await generarCronica(partido, { llm: crearLlmAzureOpenAI(cfg(a.f)), cache })).desdeCache).toBe(true);
     expect(a.llamadas).toHaveLength(1);
+    const razonamiento = fetchFalso(okCon(cronicaStub));
+    const conRazonamiento = await generarCronica(partido, { llm: crearLlmAzureOpenAI({ ...cfg(razonamiento.f), reasoningEffort: "low" }), cache });
+    expect([conRazonamiento.desdeCache, razonamiento.llamadas.length]).toEqual([false, 1]);
+    const otroEsfuerzo = fetchFalso(okCon(cronicaStub));
+    const conOtroEsfuerzo = await generarCronica(partido, { llm: crearLlmAzureOpenAI({ ...cfg(otroEsfuerzo.f), reasoningEffort: "medium" }), cache });
+    expect([conOtroEsfuerzo.desdeCache, otroEsfuerzo.llamadas.length]).toEqual([false, 1]);
     const b = fetchFalso(okCon(cronicaStub));
     const otro = await generarCronica(partido, { llm: crearLlmAzureOpenAI({ ...cfg(b.f), deployment: "gpt-otro" }), cache });
     expect([otro.desdeCache, b.llamadas.length]).toEqual([false, 1]);

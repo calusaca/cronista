@@ -1,0 +1,177 @@
+{
+  "recordedUtc": "2026-10-17T19:55:02.313Z",
+  "description": "Portada servida por el paquete standalone local, backend real de Azure OpenAI; primer acceso HTTP sin cache de cronica, siguientes visitas desde cache. No es un hosting publico.",
+  "httpSmoke": "smoke-web-local.json",
+  "version": 2,
+  "clave": {
+    "seed": 246,
+    "deployment": "azure-openai:gpt-6.1-sol:reasoning-low",
+    "modo": "neutral"
+  },
+  "hechos": "5edf060f052ef65d4c5fd8a0206f9616e21dd5e1c856a58031e723c87fe10032",
+  "cronica": {
+    "titulo_es": "Juventud Islaverde Sur ganó 4–1 a Atlético Montefrío Bajo",
+    "titulo_en": "Juventud Islaverde Sur beat Atlético Montefrío Bajo 4–1",
+    "oraciones": [
+      {
+        "texto_es": "Juventud Islaverde Sur ganó 4–1 a Atlético Montefrío Bajo.",
+        "texto_en": "Juventud Islaverde Sur beat Atlético Montefrío Bajo 4–1.",
+        "hecho": "h03",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Darío Celeloya marcó un doblete para Juventud Islaverde Sur en los minutos 31 y 48.",
+        "texto_en": "Darío Celeloya scored a brace for Juventud Islaverde Sur in minutes 31 and 48.",
+        "hecho": "h02",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Darío Mariosa marcó para Juventud Islaverde Sur en el minuto 3 con un tiro de 0.11 xg que puso el 1–0 ante Atlético Montefrío Bajo.",
+        "texto_en": "Darío Mariosa scored for Juventud Islaverde Sur in minute 3 with a 0.11 xg shot to make it 1–0 against Atlético Montefrío Bajo.",
+        "hecho": "h05",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Darío Celeloya marcó de penal para Juventud Islaverde Sur en el minuto 31 con un tiro de 0.76 xg que puso el 2–0 ante Atlético Montefrío Bajo.",
+        "texto_en": "Darío Celeloya scored a penalty for Juventud Islaverde Sur in minute 31 with a 0.76 xg shot to make it 2–0 against Atlético Montefrío Bajo.",
+        "hecho": "h06",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Al descanso, Juventud Islaverde Sur estaba 2–0 ante Atlético Montefrío Bajo.",
+        "texto_en": "At half time, Juventud Islaverde Sur led Atlético Montefrío Bajo 2–0.",
+        "hecho": "h12",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Darío Celeloya marcó desde media cancha para Juventud Islaverde Sur en el minuto 48 con un tiro de 0.03 xg que puso el 3–0 ante Atlético Montefrío Bajo.",
+        "texto_en": "Darío Celeloya scored from halfway for Juventud Islaverde Sur in minute 48 with a 0.03 xg shot to make it 3–0 against Atlético Montefrío Bajo.",
+        "hecho": "h07",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Bruno Toroino marcó de penal para Atlético Montefrío Bajo en el minuto 60 con un tiro de 0.76 xg que dejó el marcador en Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo.",
+        "texto_en": "Bruno Toroino scored a penalty for Atlético Montefrío Bajo in minute 60 with a 0.76 xg shot to leave the score at Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo.",
+        "hecho": "h08",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Leo Fenaido, de Atlético Montefrío Bajo, fue expulsado por doble amarilla en el minuto 66 con el marcador en Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo; después, Juventud Islaverde Sur marcó 1 y Atlético Montefrío Bajo 0.",
+        "texto_en": "Leo Fenaido, of Atlético Montefrío Bajo, was sent off for a second yellow card in minute 66 with the score at Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo; afterwards, Juventud Islaverde Sur scored 1 and Atlético Montefrío Bajo 0.",
+        "hecho": "h01",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Dante Doraena marcó para Juventud Islaverde Sur en el minuto 67 con un tiro de 0.16 xg que puso el 4–1 ante Atlético Montefrío Bajo.",
+        "texto_en": "Dante Doraena scored for Juventud Islaverde Sur in minute 67 with a 0.16 xg shot to make it 4–1 against Atlético Montefrío Bajo.",
+        "hecho": "h09",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Aarón Celoón, de Juventud Islaverde Sur, hizo 8 atajadas a tiros que sumaban 1.08 de xg.",
+        "texto_en": "Aarón Celoón, of Juventud Islaverde Sur, made 8 saves from shots totalling 1.08 xg.",
+        "hecho": "h10",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Juventud Islaverde Sur ganó con 1.75 de xg frente a los 2.45 de Atlético Montefrío Bajo.",
+        "texto_en": "Juventud Islaverde Sur won with 1.75 xg against Atlético Montefrío Bajo's 2.45.",
+        "hecho": "h11",
+        "apoyo": []
+      },
+      {
+        "texto_es": "Darío Celeloya fue la figura del partido con una nota de 9.4.",
+        "texto_en": "Darío Celeloya was the player of the match with a rating of 9.4.",
+        "hecho": "h04",
+        "apoyo": []
+      }
+    ],
+    "intentos": 1,
+    "frasesOmitidas": 0,
+    "modo": "llm",
+    "audit": [
+      {
+        "n": 1,
+        "borrador": {
+          "titulo_es": "Juventud Islaverde Sur ganó 4–1 a Atlético Montefrío Bajo",
+          "titulo_en": "Juventud Islaverde Sur beat Atlético Montefrío Bajo 4–1",
+          "oraciones": [
+            {
+              "texto_es": "Juventud Islaverde Sur ganó 4–1 a Atlético Montefrío Bajo.",
+              "texto_en": "Juventud Islaverde Sur beat Atlético Montefrío Bajo 4–1.",
+              "hecho": "h03",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Darío Celeloya marcó un doblete para Juventud Islaverde Sur en los minutos 31 y 48.",
+              "texto_en": "Darío Celeloya scored a brace for Juventud Islaverde Sur in minutes 31 and 48.",
+              "hecho": "h02",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Darío Mariosa marcó para Juventud Islaverde Sur en el minuto 3 con un tiro de 0.11 xg que puso el 1–0 ante Atlético Montefrío Bajo.",
+              "texto_en": "Darío Mariosa scored for Juventud Islaverde Sur in minute 3 with a 0.11 xg shot to make it 1–0 against Atlético Montefrío Bajo.",
+              "hecho": "h05",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Darío Celeloya marcó de penal para Juventud Islaverde Sur en el minuto 31 con un tiro de 0.76 xg que puso el 2–0 ante Atlético Montefrío Bajo.",
+              "texto_en": "Darío Celeloya scored a penalty for Juventud Islaverde Sur in minute 31 with a 0.76 xg shot to make it 2–0 against Atlético Montefrío Bajo.",
+              "hecho": "h06",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Al descanso, Juventud Islaverde Sur estaba 2–0 ante Atlético Montefrío Bajo.",
+              "texto_en": "At half time, Juventud Islaverde Sur led Atlético Montefrío Bajo 2–0.",
+              "hecho": "h12",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Darío Celeloya marcó desde media cancha para Juventud Islaverde Sur en el minuto 48 con un tiro de 0.03 xg que puso el 3–0 ante Atlético Montefrío Bajo.",
+              "texto_en": "Darío Celeloya scored from halfway for Juventud Islaverde Sur in minute 48 with a 0.03 xg shot to make it 3–0 against Atlético Montefrío Bajo.",
+              "hecho": "h07",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Bruno Toroino marcó de penal para Atlético Montefrío Bajo en el minuto 60 con un tiro de 0.76 xg que dejó el marcador en Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo.",
+              "texto_en": "Bruno Toroino scored a penalty for Atlético Montefrío Bajo in minute 60 with a 0.76 xg shot to leave the score at Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo.",
+              "hecho": "h08",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Leo Fenaido, de Atlético Montefrío Bajo, fue expulsado por doble amarilla en el minuto 66 con el marcador en Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo; después, Juventud Islaverde Sur marcó 1 y Atlético Montefrío Bajo 0.",
+              "texto_en": "Leo Fenaido, of Atlético Montefrío Bajo, was sent off for a second yellow card in minute 66 with the score at Juventud Islaverde Sur 3–1 Atlético Montefrío Bajo; afterwards, Juventud Islaverde Sur scored 1 and Atlético Montefrío Bajo 0.",
+              "hecho": "h01",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Dante Doraena marcó para Juventud Islaverde Sur en el minuto 67 con un tiro de 0.16 xg que puso el 4–1 ante Atlético Montefrío Bajo.",
+              "texto_en": "Dante Doraena scored for Juventud Islaverde Sur in minute 67 with a 0.16 xg shot to make it 4–1 against Atlético Montefrío Bajo.",
+              "hecho": "h09",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Aarón Celoón, de Juventud Islaverde Sur, hizo 8 atajadas a tiros que sumaban 1.08 de xg.",
+              "texto_en": "Aarón Celoón, of Juventud Islaverde Sur, made 8 saves from shots totalling 1.08 xg.",
+              "hecho": "h10",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Juventud Islaverde Sur ganó con 1.75 de xg frente a los 2.45 de Atlético Montefrío Bajo.",
+              "texto_en": "Juventud Islaverde Sur won with 1.75 xg against Atlético Montefrío Bajo's 2.45.",
+              "hecho": "h11",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Darío Celeloya fue la figura del partido con una nota de 9.4.",
+              "texto_en": "Darío Celeloya was the player of the match with a rating of 9.4.",
+              "hecho": "h04",
+              "apoyo": []
+            }
+          ]
+        },
+        "veredicto": []
+      }
+    ]
+  }
+}

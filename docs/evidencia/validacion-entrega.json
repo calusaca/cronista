@@ -1,0 +1,112 @@
+{
+  "checkedUtc": "2026-10-17T20:03:32.084295+00:00",
+  "baseCommit": "c27518de36f0b90a291d2a506908b36118029845",
+  "local": {
+    "typecheck": {
+      "checkout": "passed",
+      "isolatedDockerInput": "passed"
+    },
+    "unit": {
+      "passed": 1385,
+      "files": 52,
+      "seconds": 41.37,
+      "backend": "stub"
+    },
+    "statistics": {
+      "passed": 54,
+      "files": 11,
+      "seconds": 29.34
+    },
+    "browser": {
+      "passed": 48,
+      "secondsApprox": 72,
+      "server": "Next standalone production artifact",
+      "backend": "labeled ensayo fixture",
+      "mobile": true
+    },
+    "packaging": {
+      "passed": 2,
+      "covers": [
+        "credential leakage into build context",
+        "symlinks in allowed context",
+        "Next copied env removal",
+        "embedded known credentials",
+        "preserving original local env"
+      ]
+    },
+    "bicep": {
+      "version": "0.48.1",
+      "templates": [
+        "infra/app.bicep",
+        "infra/registry.bicep"
+      ],
+      "compiled": true,
+      "azureWhatIf": false
+    },
+    "realModelWeb": {
+      "evidence": "smoke-web-local.json",
+      "report": "portada-azure-openai.json",
+      "seed": 246,
+      "sentencePairs": 12,
+      "attempts": 1,
+      "omitted": 0,
+      "pageErrors": 0,
+      "mobileWidth": 360
+    },
+    "video": {
+      "evidence": "video-local.json",
+      "durationSeconds": 110,
+      "decodedFrames": 2750,
+      "audio": false,
+      "published": false
+    },
+    "secretScan": {
+      "tool": "gitleaks 8.30.1",
+      "historicalCommits": 44,
+      "historyFindings": 0,
+      "candidateFindings": 0,
+      "scope": "Committed history and a copy of intended delivery files; excludes local env, unrelated .primos and caches. Heuristic scanner, not a guarantee."
+    }
+  },
+  "remote": {
+    "github": {
+      "authenticated": true,
+      "repository": "calusaca/cronista",
+      "private": true,
+      "ci": "pending push"
+    },
+    "azure": {
+      "hosting": "not deployed",
+      "preflight": "Azure CLI unavailable; no administrative session or service principal credentials",
+      "whatIf": false,
+      "resourcesCreated": false
+    }
+  },
+  "sourceSha256": {
+    "Dockerfile": "54960a6a2447996ebf15dd492cab0e5755013e2d8525e614932d46e0739bd904",
+    ".dockerignore": "c52bdbb64051fe7f721927fc2065a830bff6da345430ac58827d8dd018afcae8",
+    "next.config.ts": "a8ae4f911967fef25abdf1a9df1c3ce3ccb3b1658b7d23c18be2f77942063af4",
+    "package.json": "afa56ecdbf26f7f0c4f3061661a2ee693076e6dd6d077da1db706264f6188d8f",
+    "playwright.config.ts": "934db71b24f7a742bc6a508fd6e45b79f93563c5169f0bf45da0da341c92174f",
+    ".github/workflows/ci.yml": "519db1005b67ba69703faf9a29c2c430bfe94dc92117e2bc67c4cbf335cc0791",
+    "src/lib/llm-azure-openai.ts": "6311eff541aa290a71ff78ea1b4cfbb79c5487c92eba48343dd33ea8345f4b13",
+    "src/cadena/verificador.ts": "212b7b99f3eafbbccdfb5e055b822cf9d8b6fd6f208bf1b272c4f643ebe816b4",
+    "src/cadena/lexico.ts": "df5ac92a7ff453e5f3a8d642b92bd1c5011df5b32ab5e86e9d2c5c09808d5b51",
+    "src/vista/servidor.ts": "6b04a72258c2922b81db90c9692591f4fe61ca03c92c0e59ad24a66a90f18a23",
+    "src/app/api/health/route.ts": "26096423be79f86464f8d265c165ca51ee11391f15ce15cdd84200d366fb50e9",
+    "infra/app.bicep": "0fdadb3e0ee8f0c524062985f620c4a7abc5920e2f18ae3966fd4cafbcfd2117",
+    "infra/registry.bicep": "d4a40b180c4bdd6b4acaf76076f9e585a06f425078a9e606e88c5e9ef491135b",
+    "scripts/deploy-azure.mjs": "46118c8592a57f7edc41b49d821ab65bbc5403d8a768f39ac02922414c6b1b9e",
+    "scripts/prepare-standalone.mjs": "becd9adf14d492dc4f832dd8abe2d76a00dad63de8b5478d70dd9588d40ced1a",
+    "scripts/smoke-public.mjs": "ef950e2e709c0b2cea27c8a4356f2ba7721f7b9b8c7894473812b0d88b9a5a2b",
+    "scripts/capture-demo.mjs": "89acda9edb53b0a869849ead35bb333b15c4550d09380a9e69c1e5b74410ec36",
+    "scripts/render-demo.py": "0c6aae0779d8fc28b65b0b2089fd3d9b9d4bcbf3ce95a1308c5e9628fddd61e2"
+  },
+  "limits": [
+    "Real evaluation 0/163 vs 0/167: no factual advantage demonstrated",
+    "Historical evaluator frozen; later verifier replay is offline",
+    "Local real-model HTTP success is not public hosting",
+    "Docker image execution awaits remote CI",
+    "Final human video review and public links still pending"
+  ]
+}

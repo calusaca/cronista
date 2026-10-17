@@ -387,6 +387,23 @@ export const PREPOSICIONES: Record<Lengua, Set<string>> = {
   en: new Set(["against", "versus", "vs", "to", "by", "over", "for", "with", "of", "from", "past", "beat", "beats", "on"]),
 };
 
+/**
+ * Elipsis acotada tras «A remontó ante B: … ganó». Los nombres se sustituyen por
+ * #equipo#; el verificador exige un único sujeto, distinto de los complementos.
+ * El segmento siguiente solo admite el resultado inmediato o la desventaja
+ * temporal de esa remontada. Otras construcciones siguen exigiendo sujeto explícito.
+ */
+export const ELIPSIS_REMONTADA: Record<Lengua, { antes: RegExp; despues: RegExp }> = {
+  es: {
+    antes: /^#equipo#\s+(?:remontó|remontaron)(?:\s+(?:ante|contra)\s+#equipo#)?$/iu,
+    despues: /^\s*(?:(?:perdía|perdían)\s+(?<propios>\d+)\s*[-–]\s*(?<rival>\d+)\s+en\s+el\s+minuto\s+(?<minuto>\d+(?:\+\d+)?)\s+y\s+)?$/iu,
+  },
+  en: {
+    antes: /^#equipo#\s+(?:came from behind|came back|fought back|turned it around)(?:\s+against\s+#equipo#)?$/iu,
+    despues: /^\s*(?:they\s+)?(?:were\s+(?<propios>\d+)\s*[-–]\s*(?<rival>\d+)\s+down\s+in\s+minute\s+(?<minuto>\d+(?:\+\d+)?)\s+and\s+)?$/iu,
+  },
+};
+
 // ---------------------------------------------------------------------------------
 // Rev. 3.2 — afirmaciones COMPUTABLES (V8): se verifican contra datos del hecho principal.
 // ---------------------------------------------------------------------------------

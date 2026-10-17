@@ -1,0 +1,89 @@
+1
+00:00:00,000 --> 00:00:05,330
+An AI match report can sound convincing. But can you prove what
+
+2
+00:00:05,330 --> 00:00:12,000
+it says? CRONISTA makes every published sentence inspectable, right down to
+the events behind it.
+
+3
+00:00:12,000 --> 00:00:17,840
+Our simulator creates fictional football matches. A deterministic Analyst
+extracts facts and
+
+4
+00:00:17,840 --> 00:00:23,680
+links them to events. The Writer turns those facts into English and
+
+5
+00:00:23,680 --> 00:00:30,000
+Spanish. Then the Verifier checks citations, numbers, names, and supported
+claims before publication.
+
+6
+00:00:30,000 --> 00:00:35,290
+The Writer runs on Microsoft Foundry through Azure OpenAI. This view shows
+
+7
+00:00:35,290 --> 00:00:40,590
+its actual drafts and verdicts. Rejected output gets feedback and a limited
+
+8
+00:00:40,590 --> 00:00:45,000
+retry; unresolved failures lead to an explicitly labeled analyst record.
+
+9
+00:00:45,000 --> 00:00:50,450
+Click a sentence and its evidence lights up. Switch languages or inspect
+
+10
+00:00:50,450 --> 00:00:55,910
+the underlying facts. Player ratings also unfold into the events that earned
+
+11
+00:00:55,910 --> 00:01:00,000
+them. The story changes; the recorded match does not.
+
+12
+00:01:00,000 --> 00:01:06,580
+A goal becomes a tactics board, including a three-dimensional view. Only the
+
+13
+00:01:06,580 --> 00:01:13,160
+ball moves, because that trajectory is recorded. Player pieces stay in their
+
+14
+00:01:13,160 --> 00:01:17,000
+recorded zones. We make the limits visible.
+
+15
+00:01:17,000 --> 00:01:23,210
+Everything is synthetic: teams, players, events. The downloadable dataset
+includes its methodology
+
+16
+00:01:23,210 --> 00:01:29,410
+and statistical checks. Automated tests exercise the simulator, verification
+rules, and the
+
+17
+00:01:29,410 --> 00:01:32,000
+reader's path through the application.
+
+18
+00:01:32,000 --> 00:01:37,140
+Across twenty real-model matches, both the baseline and pipeline passed these
+checks.
+
+19
+00:01:37,140 --> 00:01:42,290
+That sample showed no reduction in findings, and our verifier has documented
+
+20
+00:01:42,290 --> 00:01:47,430
+limits. What readers gain is an audit trail they can inspect. CRONISTA:
+
+21
+00:01:47,430 --> 00:01:50,000
+personalize the story. Never the truth.

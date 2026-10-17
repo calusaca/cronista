@@ -1,35 +1,60 @@
-# Guion del video — palabra por palabra (máx. 1:50)
+# Guion del video — versión realizable con la evidencia actual
 
-**Estado:** borrador listo para ensayar. Se congela cuando existan (a) la
-cifra real de la eval y (b) el momento de rechazo REAL cazado con el LLM de
-Foundry (lunes 6). **Regla dura:** el rechazo del video tiene que ser un
-rechazo real del Verificador a prosa real del LLM — jamás fabricado ni del
-modo ensayo. Cero features no entregadas. Sin música con copyright (silencio
-o voz sola). Todo en inglés con subtítulos EN.
+Actualizado el 17 de octubre de 2026. Borrador de pantalla montado: `demo-en-borrador.mp4`,
+1:50 exactos, 1280×900, subtítulos EN quemados y sin audio. Decodificado completo
+sin errores; fotogramas revisados. Es una demo local con caché, no un despliegue público.
+La narración propuesta tiene 233 palabras; puede añadirse voz o conservar subtítulos.
+Se muestra una crónica real de GPT-6.1 Sol, sus citas y el proceso que realmente
+ocurrió. **No se necesita encontrar un error del modelo para terminar el video.**
+No usar el modo `ensayo`, una frase falsa de maqueta ni el falso positivo histórico
+de la semilla 7 como si fueran una alucinación atrapada. El resultado 0/163 frente
+a 0/167 se muestra sin atribuir una ventaja factual que no observamos.
 
-Narración total: ~240 palabras ≈ 1:45 a ritmo calmado. Ensayar con
-cronómetro; si pasa de 1:48, cortar del tramo 0:55–1:10 (los toggles).
-
-| Tiempo | En pantalla | Voz (exacta) |
+| Tiempo | En pantalla | Voz EN |
 |---|---|---|
-| 0:00–0:08 | Crónica de IA genérica (maqueta propia, rotulada "AI recap — unverified") con un dato falso resaltado en rojo: un minuto que no coincide con la línea de tiempo al lado. | AI match reports have a problem nobody can see: they make things up. A wrong minute. A goal that never happened. And readers can't tell. |
-| 0:08–0:15 | Corte a CRONISTA. La portada con el titular y el badge «16/16 sentences verified». | This is CRONISTA. Every sentence here was verified against the match events — before any reader saw it. |
-| 0:15–0:40 | **EL MOMENTO DEL RECHAZO** <!-- PLACEHOLDER: semilla y frase reales del LLM de Foundry, lunes 6 -->. Caja de cristal abierta: el borrador del Writer con la frase marcada, la regla (p. ej. V3) y el evento real al lado; luego la reescritura aprobada. | Watch it work. The Writer — a large language model on Microsoft Foundry — just wrote this sentence. The Verifier checked it against the events… and blocked it: [PLACEHOLDER: leer el motivo real, p. ej. "that number appears nowhere in the match"]. It sends the error back, the Writer retries, and only the corrected sentence gets published. Nothing unverified ever reaches the page. |
-| 0:40–0:55 | Clic en una frase de la crónica → los eventos que la respaldan se resaltan en la línea de tiempo. Clic en una nota de jugador → desglose. | Every sentence is a claim you can check: click it, and the evidence lights up. Even player ratings unfold into the exact events that earned them. |
-| 0:55–1:10 | Toggle EN→ES, Fan→Analyst, perspectiva «mi equipo». Luego el modo liga: tabla, suspensiones, clima en la cabecera. | Fans in any market: two languages, fan or analyst view, your team's perspective — the story adapts, the facts never do. It runs a living league: suspensions carry over, and when the chronicle says the heat told, the drop was measured in that match. |
-| 1:10–1:25 | La pizarra del gol 2D → botón 3D: el diorama con el gol de media cancha (46 m) volando hasta el palo. | Every goal becomes a tactics board — in 3D if you like. Only the ball moves, because only the ball's path is in the data. We never animate what we didn't record. |
-| 1:25–1:40 | Diagrama de arquitectura (mermaid del README) con los nombres exactos: Microsoft Foundry, Azure Container Apps, GitHub Actions. 5 s del simulador: `npm run sim` en terminal + «~2,100 micro-events per match, statistically validated». | Under the hood: a four-agent pipeline — Simulator, Analyst, Writer on Microsoft Foundry, Verifier — deployed on Azure Container Apps, tested by over a thousand checks in GitHub Actions, on fully synthetic data: two thousand micro-events per match, statistically validated. |
-| 1:40–1:50 | La cifra de la eval, grande: «<!-- PLACEHOLDER: X % --> of unverified sentences contained unsupported claims. Our pipeline published zero.» Cierre con el lema. | Without the Verifier, [PLACEHOLDER: X] percent of sentences contained unsupported claims. Our pipeline published zero — reproducibly. CRONISTA: personalize the story. Never the truth. |
+| 0:00–0:12 | Home real, semilla 246. Cursor sobre una frase; clic para iluminar sus eventos. | An AI match report can sound convincing. But can you prove what it says? CRONISTA makes every published sentence inspectable, right down to the events behind it. |
+| 0:12–0:30 | Frase seleccionada y eventos resaltados. Abrir Analyst para exponer hecho, números e IDs. | Our simulator creates fictional football matches. A deterministic Analyst extracts facts and links them to events. The Writer turns those facts into English and Spanish. Then the Verifier checks citations, numbers, names, and supported claims before publication. |
+| 0:30–0:45 | View process: intentos registrados del partido. Mantener visibles sus estados reales. | The Writer runs on Microsoft Foundry through Azure OpenAI. This view shows its actual drafts and verdicts. Rejected output gets feedback and a limited retry; unresolved failures lead to an explicitly labeled analyst record. |
+| 0:45–1:00 | EN → ES; volver a EN. Fan ↔ Analyst. | Click a sentence and its evidence lights up. Switch languages or inspect the underlying facts. Player ratings also unfold into the events that earned them. The story changes; the recorded match does not. |
+| 1:00–1:17 | Gol de la portada → pizarra 2D → 3D. Esperar el trayecto del balón; rótulo de posiciones estáticas visible. | A goal becomes a tactics board, including a three-dimensional view. Only the ball moves, because that trajectory is recorded. Player pieces stay in their recorded zones. We make the limits visible. |
+| 1:17–1:32 | Data: cifras y enlace de descarga. Plano breve del diagrama de arquitectura del README. | Everything is synthetic: teams, players, events. The downloadable dataset includes its methodology and statistical checks. Automated tests exercise the simulator, verification rules, and the reader's path through the application. |
+| 1:32–1:50 | Cartela: “20 matches · baseline 0/163 flagged · pipeline 0/167 flagged · no reduction demonstrated”. Cierre en la home. | Across twenty real-model matches, both the baseline and pipeline passed these checks. That sample showed no reduction in findings, and our verifier has documented limits. What readers gain is an audit trail they can inspect. CRONISTA: personalize the story. Never the truth. |
 
-## Checklist antes de grabar
+## Preparación y montaje
 
-- [ ] Cifra real de la eval en el tramo final (de `npm run eval` con Foundry).
-- [ ] Semilla del rechazo real elegida y ensayada (el motivo se lee EN VOZ).
-- [ ] La crónica falsa del arranque es maqueta PROPIA rotulada — ningún medio
-      real, ninguna marca.
-- [ ] Pantalla a 1280, tema claro, cursor visible y lento.
-- [ ] Cronómetro: ≤ 1:50 con margen (los jueces cortan a 2:00).
-- [ ] Ver el video terminado contra la regla §4.3: todo lo mostrado funciona
-      tal cual en la demo pública.
-- [ ] Subtítulos EN quemados o del reproductor; sin música.
-- [ ] Prueba del espectador frío ANTES de publicar (005 §prueba fría).
+1. Arrancar con la configuración real de Azure, nunca con `CRONISTA_LLM=ensayo`.
+   El pie debe identificar Microsoft Foundry y la crónica debe estar en modo LLM.
+2. `npm run capture:demo -- http://127.0.0.1:3418` guarda capturas y un clip de
+   pantalla sin voz en `.cache/demo-recording/`. Son material de montaje local,
+   no una demo pública ni el video final de entrega. Se capturan acciones reales;
+   no se modifican las respuestas ni los estados del DOM.
+3. Las capturas aprobadas visualmente se pueden copiar a `docs/entrega/capturas/`.
+   Evitar capturar Azure Portal, claves, correo o pestañas personales.
+4. Grabar o añadir voz EN al montaje, y subtítulos EN. Sin música ni metraje de terceros.
+   Leer los textos del proceso tal como aparezcan; no llamar «corrección» a un
+   primer intento aprobado ni «alucinación» a una regla demasiado estricta.
+5. Ensayar y medir la narración. Cortar pausas y planos secundarios para conservar
+   margen bajo dos minutos. Ver el archivo final completo y probar la URL pública
+   antes de declarar la entrega terminada.
+
+No afirmar que está desplegado en Azure Container Apps hasta que exista el hosting
+y pase el smoke externo. No afirmar Microsoft Agent Framework: la orquestación
+actual es TypeScript propio. El registro original de 41 llamadas y su falso
+positivo permanece reproducible; la revalidación posterior usa las respuestas
+guardadas, sin llamar de nuevo al modelo.
+
+## Reproducir el montaje offline
+
+Después de `capture:demo`, con FFmpeg disponible y soporte libx264/libass:
+
+```bash
+CRONISTA_FFMPEG=/ruta/a/ffmpeg python3 scripts/render-demo.py
+```
+
+El resultado queda en `.cache/demo-edit/cronista-demo-en.mp4`; la copia de revisión
+está en `docs/entrega/demo-en-borrador.mp4`. El script genera `subtitulos-en.srt`
+desde la columna de narración y usa las cartelas de `tarjetas-video.html`.
+Los clips se ralentizan y las capturas se mantienen para dar tiempo de lectura;
+no se cambia ningún dato, borrador o veredicto. La captura fuente sin montaje
+permanece en `.cache/demo-recording/` (no se versiona). Los subtítulos corresponden
+al montaje de 110 segundos, no al clip fuente de unos veinte segundos.

@@ -7,8 +7,8 @@
 //        ?api-version={AZURE_OPENAI_API_VERSION, por defecto API_VERSION_AZURE_OPENAI}
 //   cabecera api-key: {AZURE_OPENAI_API_KEY}
 //
-// Sin cuenta todavía: se prueba OFFLINE con `fetch` inyectado (el patrón de llm-foundry.ts). La
-// clave llega por env y jamás sale del servidor.
+// Transporte probado offline con `fetch` inyectado y smoke real con GPT-6.1 Sol en
+// docs/evidencia/primera-corrida-azure-openai.json. La clave llega por env y queda en el servidor.
 
 import { z } from "zod";
 import type { Llm, Mensaje } from "./llm";
@@ -16,14 +16,14 @@ import type { Llm, Mensaje } from "./llm";
 // ---- umbrales del backend (config del cliente, no del simulador) ----
 /** api-version por defecto (la GA de chat completions; se sobreescribe con AZURE_OPENAI_API_VERSION). */
 export const API_VERSION_AZURE_OPENAI = "2024-10-21";
-/**
- * Temperatura EXPLÍCITA. A diferencia de Claude 5.x en Foundry (que rechaza `temperature`), GPT en
- * Azure OpenAI la admite: baja, porque el Cronista redacta desde hechos y el Verificador castiga la
- * invención; no cero, para que los reintentos con feedback no repitan el mismo texto.
- */
+/** Solo para modelos sin razonamiento configurado; GPT-6.1 Sol no acepta esta temperatura. */
 export const TEMPERATURA_AZURE_OPENAI = 0.3;
 /** Techo de tokens de salida (una crónica completa con su JSON). */
 export const MAX_TOKENS_AZURE_OPENAI = 4000;
+/** Mismo techo que Foundry: incluye razonamiento y el JSON bilingüe de salida. */
+export const MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI = 16_000;
+export const ESFUERZOS_AZURE_OPENAI = ["low", "medium", "high", "xhigh", "max"] as const;
+export type EsfuerzoAzureOpenAI = (typeof ESFUERZOS_AZURE_OPENAI)[number];
 
 export interface ConfigAzureOpenAI {
   apiKey: string;
@@ -33,6 +33,8 @@ export interface ConfigAzureOpenAI {
   deployment: string;
   /** Por defecto API_VERSION_AZURE_OPENAI. */
   apiVersion?: string;
+  /** Configurar para GPT-6.1 Sol; omite temperature y envía reasoning_effort. */
+  reasoningEffort?: EsfuerzoAzureOpenAI;
   /** Solo para pruebas: transporte HTTP inyectado. */
   fetch?: typeof fetch;
 }
@@ -57,15 +59,16 @@ export function urlAzureOpenAI(cfg: Pick<ConfigAzureOpenAI, "endpoint" | "deploy
 export function crearLlmAzureOpenAI(cfg: ConfigAzureOpenAI): Llm {
   const transporte = cfg.fetch ?? fetch;
   return {
-    id: `azure-openai:${cfg.deployment}`,
+    id: `azure-openai:${cfg.deployment}${cfg.reasoningEffort ? `:reasoning-${cfg.reasoningEffort}` : ""}`,
     async completar(system: string, mensajes: Mensaje[]): Promise<string> {
       const r = await transporte(urlAzureOpenAI(cfg), {
         method: "POST",
         headers: { "content-type": "application/json", "api-key": cfg.apiKey },
         body: JSON.stringify({
           messages: [{ role: "system", content: system }, ...mensajes.map((m) => ({ role: m.rol, content: m.contenido }))],
-          temperature: TEMPERATURA_AZURE_OPENAI,
-          max_completion_tokens: MAX_TOKENS_AZURE_OPENAI,
+          ...(cfg.reasoningEffort
+            ? { reasoning_effort: cfg.reasoningEffort, max_completion_tokens: MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI }
+            : { temperature: TEMPERATURA_AZURE_OPENAI, max_completion_tokens: MAX_TOKENS_AZURE_OPENAI }),
           // El prompt del 003 exige «únicamente un objeto JSON válido»: se le pide al servicio.
           response_format: { type: "json_object" },
         }),

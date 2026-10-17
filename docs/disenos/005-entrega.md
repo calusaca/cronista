@@ -1,5 +1,15 @@
 # 005 — Entrega: deploy, video y pitch
 
+> Actualización 2026-10-17: la integración validada es GPT-6.1 Sol en Azure
+> OpenAI; Claude quedó bloqueado por Marketplace. La eval real no mostró
+> reducción de hallazgos (0/163 frente a 0/167). El único rechazo fue un falso
+> positivo, ya corregido. El guion actual muestra citas y auditoría reales,
+> sin esperar una alucinación ni fabricar un rechazo. El plan operativo vigente
+> es `docs/entrega/despliegue.md`; hosting aún pendiente. Orquestación TypeScript
+> propia: no declarar Microsoft Agent Framework. Las propuestas originales
+> siguientes se conservan como historial, no como evidencia de lo entregado.
+
+
 **Fecha:** 2026-09-30 · **Diseña:** Fable · **Ejecuta:** Opus (deploy) + Carlos
 (cuenta Azure, grabación, registro) · **Semana 3** · **Estado:** cerrado
 

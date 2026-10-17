@@ -54,6 +54,7 @@ export function etiquetaLlm(id: string): { etiqueta: string; fixture: boolean } 
   if (id === "stub") return { etiqueta: "Offline stub — sentences reuse the analyst's templates", fixture: false };
   if (id === "ensayo") return { etiqueta: "Rehearsal fixture — a scripted writer with one deliberate error (test only)", fixture: true };
   if (id.startsWith("foundry:")) return { etiqueta: `Microsoft Foundry · ${id.slice("foundry:".length)}`, fixture: false };
+  if (id.startsWith("azure-openai:")) return { etiqueta: `Microsoft Foundry · ${id.slice("azure-openai:".length).split(":reasoning-")[0]}`, fixture: false };
   return { etiqueta: id, fixture: false };
 }
 

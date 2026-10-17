@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>CRONISTA · video cards</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f6f1;color:#202921;font:24px Arial,sans-serif}main{width:1280px;height:800px;padding:72px;position:relative}.brand{font-size:24px;font-weight:900;color:#187d49;letter-spacing:.02em}.overline{font-size:16px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#66725f;margin:36px 0 12px}h1{font-size:54px;letter-spacing:-.03em;line-height:1.08;margin:12px 0 36px;max-width:1000px}p{line-height:1.5;max-width:1000px}.flow{display:flex;align-items:stretch;gap:10px;margin:42px 0}.box{background:white;border:1px solid #deded0;border-radius:12px;padding:26px 20px;flex:1;min-height:150px}.box strong{display:block;font-size:26px;margin-bottom:16px}.box small{font-size:18px;line-height:1.5;color:#5f6c5e}.writer{border-color:#187d49;background:#eef6ec}.arrow{align-self:center;color:#187d49}.foot{position:absolute;bottom:54px;left:72px;right:72px;color:#64705f;font-size:17px;line-height:1.5}.metrics{display:flex;gap:24px}.metric{background:white;border:1px solid #deded0;border-radius:12px;padding:28px 38px;flex:1}.value{font-size:76px;font-weight:800;letter-spacing:-.05em;color:#187d49}.label{font-size:24px;margin-top:8px}.limits{font-size:21px;color:#566351;margin-top:26px}.tag{display:inline-block;background:#e9efe4;padding:8px 14px;border-radius:6px;font-size:17px}
+</style>
+<main id="architecture">
+  <div class="brand">CRONISTA</div>
+  <div class="overline">How a report becomes inspectable</div>
+  <h1>One model. Explicit checks.<br>Evidence at every handoff.</h1>
+  <div class="flow">
+    <div class="box"><strong>Simulator</strong><small>Synthetic events<br>Seeded, reproducible</small></div><div class="arrow">→</div>
+    <div class="box"><strong>Analyst</strong><small>Deterministic facts<br>Event citations</small></div><div class="arrow">→</div>
+    <div class="box writer"><strong>Writer</strong><small>Microsoft Foundry<br>Azure OpenAI</small></div><div class="arrow">→</div>
+    <div class="box"><strong>Verifier</strong><small>Deterministic rules<br>Feedback / fallback</small></div>
+  </div>
+  <p>Readers can trace each sentence back to its facts and match events.<br>The audit view preserves the actual drafts and verdicts.</p>
+  <div class="foot">Only the Writer uses an LLM. Orchestration is TypeScript. All football data is synthetic.</div>
+</main>
+<main id="evaluation">
+  <div class="brand">CRONISTA</div>
+  <div class="overline">Recorded real-model evaluation · GPT-6.1 Sol</div>
+  <h1>20 matches.<br>No measured reduction in findings.</h1>
+  <div class="metrics">
+    <div class="metric"><div class="value">0 / 163</div><div class="label">First-draft baseline</div></div>
+    <div class="metric"><div class="value">0 / 167</div><div class="label">Published pipeline</div></div>
+  </div>
+  <p class="limits">Bilingual sentence pairs flagged by CRONISTA's Verifier.<br>These heuristic checks are not an independent accuracy score.</p>
+  <div class="tag">Personalize the story. Never the truth.</div>
+  <div class="foot">Local demo with real Azure OpenAI output, served from cache. Public hosting pending.<br>Original evaluation archived; a later verifier correction was rechecked offline.</div>
+</main>
+</html>

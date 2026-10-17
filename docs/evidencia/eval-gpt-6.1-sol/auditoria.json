@@ -1,0 +1,95 @@
+{
+  "respuestasRevisadas": 41,
+  "hallazgos": [
+    {
+      "seed": 7,
+      "phase": "pipeline",
+      "n": 2,
+      "motivos": [
+        {
+          "oracion": 0,
+          "regla": "V8",
+          "detalle": "«ganó» no coincide con el resultado que afirma el hecho (ES)"
+        },
+        {
+          "oracion": 0,
+          "regla": "V8",
+          "detalle": "«won» no coincide con el resultado que afirma el hecho (EN)"
+        }
+      ],
+      "oraciones": [
+        {
+          "oracion": {
+            "texto_es": "Racing Pradoalto remontó ante Juventud Valdecristal: perdía 0–1 en el minuto 8 y ganó 3–1.",
+            "texto_en": "Racing Pradoalto came from behind against Juventud Valdecristal: they were 0–1 down in minute 8 and won 3–1.",
+            "hecho": "h01",
+            "apoyo": []
+          },
+          "hecho": {
+            "id": "h01",
+            "tipo": "remontada",
+            "texto_es": "Racing Pradoalto perdía 0–1 contra Juventud Valdecristal en el minuto 8 y ganó 3–1.",
+            "texto_en": "Racing Pradoalto were 0–1 down against Juventud Valdecristal in minute 8 and won 3–1.",
+            "eventos": [
+              "e011",
+              "e046",
+              "e076",
+              "e088"
+            ],
+            "relevancia": 90,
+            "datos": {
+              "equipo": "Racing Pradoalto",
+              "rival": "Juventud Valdecristal",
+              "desventaja_max": 1,
+              "minuto_desventaja": "8",
+              "desventaja_propios": 0,
+              "desventaja_rival": 1,
+              "final_propios": 3,
+              "final_rival": 1,
+              "desenlace": "victoria"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "revisionDelUnicoRechazo": {
+    "clasificacion": "falso_positivo",
+    "motivo": "La oración afirma que Racing Pradoalto perdía 0–1 al minuto 8 y ganó 3–1; coincide con el hecho h01. V8 separa segmentos en los dos puntos y no reconoce el sujeto elíptico de ganó/won en el segmento siguiente.",
+    "noUsarComoEjemploDeAlucinacion": true,
+    "alcance": "Se revisó humanamente la oración señalada, no se hizo una auditoría humana de todas las frases aceptadas."
+  },
+  "consumoApiPorMetodo": {
+    "baseline": {
+      "llamadas": 20,
+      "entrada": 64246,
+      "salida": 15791,
+      "entradaCacheada": 0,
+      "escrituraCache": 64186
+    },
+    "pipeline": {
+      "llamadas": 21,
+      "entrada": 68486,
+      "salida": 16916,
+      "entradaCacheada": 67529,
+      "escrituraCache": 894
+    }
+  },
+  "metodologia": {
+    "muestra": "20 semillas fijas del brief 022; una corrida por modelo y configuración.",
+    "unidad": "Cada oración del contrato contiene texto ES y EN: se cuenta una sola unidad bilingüe.",
+    "baseline": "Primer borrador, con el mismo prompt informado de las reglas y los mismos hechos que la cadena.",
+    "pipeline": "Generación independiente con reintentos y fallback de producción; sin caché de crónicas.",
+    "juez": "Verificador determinista V1–V8; la tasa de hallazgos no equivale a una tasa de alucinación anotada independientemente.",
+    "reproducibilidad": "Las respuestas reales fueron reproducidas sin red por el mismo harness; nuevas llamadas al modelo pueden generar otros textos."
+  },
+  "correccionPosterior": {
+    "aplicada": true,
+    "evidencia": "revalidacion-v8.json",
+    "metodo": "Reevaluación offline de respuestas registradas con el código actual; no es una nueva corrida del modelo.",
+    "pruebasNuevas": 33,
+    "suiteUnitariaAprobada": 1385,
+    "comprobacionDeTipos": "aprobada",
+    "alcance": "Sujeto elíptico de una remontada tras dos puntos, con encabezado y continuación acotados y datos temporales del hecho comprobados."
+  }
+}

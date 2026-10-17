@@ -1,0 +1,102 @@
+{
+  "estado": "bloqueado_habilitacion_marketplace",
+  "registrado_utc": "2026-10-17T04:55:47.090Z",
+  "backend": "foundry",
+  "deployment": "claude-sonnet-5-5",
+  "semilla": 42,
+  "cache": false,
+  "corridas": [
+    {
+      "modo": "acta",
+      "intentos": 3,
+      "intentosConBorrador": 0,
+      "veredictos": [
+        {
+          "intento": 1,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        },
+        {
+          "intento": 3,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "modo": "acta",
+      "intentos": 3,
+      "intentosConBorrador": 0,
+      "veredictos": [
+        {
+          "intento": 1,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        },
+        {
+          "intento": 3,
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "el LLM falló: 400 {\"error\":{\"code\":\"DeploymentError\",\"message\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\",\"details\":\"The API deployment for the resource is not ready, please wait until provisioningState becomes Succeeded.\"}}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validacionLocal": {
+    "typecheck": "aprobado",
+    "pruebasAdaptador": {
+      "aprobadas": 10,
+      "total": 10
+    }
+  },
+  "siguientePaso": "Solicitar a soporte de Microsoft revisión de elegibilidad Marketplace y allowlisting HIT; aún no se recibió texto del modelo.",
+  "diagnosticoPortal": {
+    "eventoUtc": "2026-10-17T18:05:13.4886955Z",
+    "codigo": "ResourceOperationFailure",
+    "detalles": [
+      {
+        "code": "MarketplaceSubscriptionCannotBeCompleted",
+        "message": "Unable to create a model deployment for model claude-sonnet-5-5. If the error persists, please contact HIT (Human Intelligence Team) via this link: https://go.microsoft.com/fwlink/?linkid=2101400&clcid=0x409 and request to allowlist the Azure subscription."
+      }
+    ]
+  }
+}

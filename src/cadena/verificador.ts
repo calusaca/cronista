@@ -33,6 +33,7 @@ import {
   GRADA_JUICIO,
   SANCION_CLUB_JUICIO,
   EFECTOS_CONDICION,
+  ELIPSIS_REMONTADA,
   FRANJAS,
   GRADOS_C,
   FRASES_CANAL,
@@ -372,15 +373,39 @@ function precedidoDePreposicion(t: string, i: number, lengua: Lengua): boolean {
 /**
  * Sujeto de un verbo de resultado (rev. 3.2): la mención de equipo inmediatamente anterior
  * al verbo en su frase que NO esté precedida de preposición («Ante J, A ganó» ⇒ A); si no
- * hay, la primera posterior sin preposición delante.
+ * hay, la primera posterior sin preposición delante. Para una remontada permite la
+ * elipsis acotada «A remontó ante B: [perdía … y] ganó», con datos temporales verificados.
  */
-function sujetoDe(t: string, verbo: number, lengua: Lengua, pl: Plantel): string | undefined {
+function sujetoDe(t: string, verbo: number, lengua: Lengua, pl: Plantel, remontada?: Hecho): string | undefined {
   const [a, b] = segmentoDe(t, verbo);
   const ms = menciones(t, a, b, pl);
   const antes = ms.filter((m) => m.fin <= verbo).reverse();
   for (const m of antes) if (!precedidoDePreposicion(t, m.i, lengua)) return m.equipo;
   for (const m of ms.filter((m) => m.i > verbo)) if (!precedidoDePreposicion(t, m.i, lengua)) return m.equipo;
-  return undefined;
+  if (remontada?.tipo !== "remontada" || a < 2 || t[a - 1] !== ":") return undefined;
+
+  // La frase real «A remontó ante B: perdía … y ganó» conserva el sujeto A.
+  // No se elige el ganador de los datos: se recupera el único sujeto del texto,
+  // solo dentro de esta construcción cerrada y sin cruzar otros signos o segmentos.
+  const [desde] = segmentoDe(t, a - 2);
+  const anteriores = menciones(t, desde, a - 1, pl);
+  const sujetos = anteriores.filter((m) => !precedidoDePreposicion(t, m.i, lengua));
+  if (sujetos.length !== 1) return undefined;
+  let encabezado = t.slice(desde, a - 1);
+  for (const m of [...anteriores].reverse()) {
+    const i = m.i - desde;
+    encabezado = encabezado.slice(0, i) + "#equipo#" + encabezado.slice(m.fin - desde);
+  }
+  const patron = ELIPSIS_REMONTADA[lengua];
+  const situacion = patron.despues.exec(t.slice(a, verbo));
+  if (!patron.antes.test(encabezado.trim().replace(/\s+/g, " ")) || !situacion) return undefined;
+  const datos = situacion.groups;
+  if (datos?.propios !== undefined && (
+    Number(datos.propios) !== remontada.datos.desventaja_propios ||
+    Number(datos.rival) !== remontada.datos.desventaja_rival ||
+    datos.minuto !== String(remontada.datos.minuto_desventaja)
+  )) return undefined;
+  return sujetos[0]?.equipo;
 }
 
 function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: boolean): Analisis {
@@ -512,7 +537,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   const verbos = VERBOS_RESULTADO[lengua];
   const r = ctx.resultado;
   const juzgar = (clase: "gana" | "pierde" | "empata", m: RegExpMatchArray, texto: string) => {
-    const sujeto = sujetoDe(texto, m.index as number, lengua, ctx.pl);
+    const sujeto = sujetoDe(texto, m.index as number, lengua, ctx.pl, !esTitulo && ctx.hechos.length === 1 ? ctx.hechos[0] : undefined);
     // Brief 012 §C: con un GOL como principal, «empató / equalised» es computable: el marcador
     // tras ese gol (datos del hecho) queda igualado.
     const empateDeGol = ctx.hechos.some((x) => x.tipo === "gol_anotado" && typeof x.datos.marcador_local === "number" && x.datos.marcador_local === x.datos.marcador_visita);

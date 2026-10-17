@@ -2,8 +2,12 @@
 
 **AI match chronicles where every sentence can be proven with a click.**
 
-<!-- PLACEHOLDER: GIF of the rejection moment (Glass Box catching a lie) -->
-<!-- PLACEHOLDER: ▶ Try it live: [demo URL] · 🎬 2-minute video: [video URL] -->
+![A real GPT-6.1 Sol report with a selected sentence and its match evidence](docs/entrega/capturas/evidencia.png)
+
+Local production build with real Azure OpenAI output: 12 sentence pairs approved
+on the first attempt. [Recorded report](docs/evidencia/portada-azure-openai.json).
+[Video preview](docs/entrega/demo-en-borrador.mp4): 1:50, English captions, no audio.
+Public demo and final video: pending publication.
 
 Most AI-generated sports recaps have a problem nobody can see: they invent
 details — a wrong minute, a goal that never happened, a penalty that never was.
@@ -38,7 +42,28 @@ flowchart LR
 | Shared state | The event log and the fact list are the single source of truth every agent reads and cites |
 | Effective handoffs | Facts carry event citations; sentences carry fact citations; the audit trail records every handoff |
 | Recover from failures | Rejected sentences trigger retries with rule-specific feedback (max 2); unrecoverable output falls back to a 100%-faithful template chronicle — never a lie |
-| Outcome a single agent could not achieve | A lone LLM publishes unsupported claims; our pipeline publishes zero. Reproducible comparison: `npm run eval` <!-- PLACEHOLDER: eval headline number --> |
+| Outcome compared with a single agent | Real GPT-6.1 Sol evaluation, 20 fixed matches: 0/163 baseline sentence pairs flagged by the Verifier; 0/167 published pipeline pairs flagged. This run did not demonstrate a reduction in findings. [Recorded evaluation](docs/evidencia/eval-gpt-6.1-sol/informe.txt) |
+
+The baseline and pipeline use the same rules-aware prompt and verified facts,
+with independent model generations. Each counted unit contains ES and EN text.
+The pipeline retried one factually supported sentence (seed 7): V8 did not resolve
+its implicit subject after a colon. This is a **false positive**, not a caught
+hallucination. That specific false positive has since been corrected. An
+[offline recheck of the recorded responses](docs/evidencia/eval-gpt-6.1-sol/revalidacion-v8.json)
+accepts all 20 first pipeline drafts, including seed 7, without new model calls.
+This recheck is not a new real-model run. Findings measure the product's maintained
+rules, rather than an independent human assessment of factual accuracy.
+[Audit and actual token usage](docs/evidencia/eval-gpt-6.1-sol/auditoria.json).
+
+To reproduce the recorded results without credentials or network calls:
+
+```bash
+node --import tsx docs/evidencia/eval-gpt-6.1-sol/reproducir.mjs
+```
+
+Fresh model generations can differ. The historical replay uses the archived
+original evaluator and checks its hash; it preserves the original result after
+the V8 correction. `npm run eval` performs a new real-model run when configured.
 
 ## How verification works
 
@@ -83,9 +108,8 @@ climates, one league each (10 teams, double round-robin), all navigable:
 <!-- Map each to its file; list ONLY what is actually used. -->
 | Technology | Where |
 |---|---|
-| Microsoft Foundry (Claude / Azure OpenAI deployment) | `src/lib/llm-foundry.ts` |
-| Azure Container Apps (demo hosting) | <!-- PLACEHOLDER: deploy notes --> |
-| GitHub Actions (CI: 1,100+ tests + Playwright e2e) | `.github/workflows/ci.yml` |
+| Microsoft Foundry / Azure OpenAI (GPT-6.1 Sol, tested live) | `src/lib/llm-azure-openai.ts` |
+| GitHub Actions (unit/statistical tests + Playwright workflow) | `.github/workflows/ci.yml` |
 | GitHub CLI | repo management |
 
 ## Quick start (no API key needed)
@@ -97,12 +121,18 @@ npm run dev        # offline stub mode → http://localhost:3000
 
 The stub writer is deterministic, so the full pipeline — simulator, analyst,
 verifier, Glass Box, league mode, live replay, 3D board — runs offline. Real
-prose: set `CRONISTA_LLM=foundry` and the variables in `.env.example`.
+prose: copy `.env.example` to a local `.env`, then set `CRONISTA_LLM=azure-openai`,
+the Azure variables and `AZURE_OPENAI_REASONING_EFFORT=low` there. The optional Claude
+adapter uses `CRONISTA_LLM=foundry`; its deployment is currently blocked by
+Marketplace subscription eligibility. Public demo hosting is still pending.
+The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker image,
+Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
-npm test           # 1,137 unit/invariant/oracle/lie-battery tests
-npm run test:stats # statistical realism: N=1000 matches + A/B condition proofs
-npm run e2e        # 41 journeys driven with a real mouse (Playwright)
+npm test           # 1,385 unit/invariant/oracle/lie-battery tests
+npm run test:stats # 54 checks: N=1000 matches + A/B condition proofs
+npm run e2e        # 48 browser journeys against the production standalone build
+npm run test:deploy # deployment context and artifact credential checks
 ```
 
 ## Synthetic data
@@ -133,8 +163,9 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-<!-- PLACEHOLDER: GitHub tooling section (Copilot review if enabled) -->
-<!-- PLACEHOLDER: screenshots / live replay GIF -->
-<!-- Nota al congelar: reconciliar TODAS las cifras contra la suite real del
-     momento (hoy: 1137 unit, 36 stats, 41 e2e; conteo de mentiras pendiente
-     de recuento exacto) y llenar los placeholders de URLs, eval y GIF. -->
+Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 54 statistical
+checks, 48 browser journeys, and two deployment packaging checks. The standalone
+server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
+Bicep templates compile; Docker image execution and public Azure hosting await
+administrative access. The browser suite uses a labeled rehearsal fixture; the
+screenshots above and the local real-model smoke use GPT-6.1 Sol.

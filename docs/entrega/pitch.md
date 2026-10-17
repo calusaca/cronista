@@ -1,6 +1,18 @@
 # Elevator pitch (borrador — se congela al entregar)
 
-**EN (para el formulario de la plataforma):**
+**EN corto (96 palabras; adaptar al límite real del formulario):**
+
+CRONISTA turns synthetic football events into bilingual match reports with
+clickable evidence. A deterministic Analyst supplies cited facts, a Writer on
+Microsoft Foundry produces prose, and a deterministic Verifier checks each
+sentence before publication. Readers inspect the original drafts, switch
+languages, explore player ratings, and replay goals in 3D. Every team and player
+is fictional. Our recorded 20-match evaluation found zero flagged sentence
+pairs in both baseline and pipeline output; it did not demonstrate a reduction.
+The contribution is inspectable evidence and an explicit recovery path, with
+documented limits. Built with Azure OpenAI and automated tests.
+
+**EN ampliado:**
 
 CRONISTA generates bilingual football match chronicles where every sentence can
 be proven with a click. A multi-agent pipeline — deterministic Analyst, LLM
@@ -17,12 +29,19 @@ coherence constraints, auditable player ratings, verified live replays, and a
 is recorded data. Readers click any sentence to see its evidence and switch
 language, fan/analyst view, or team perspective — personalizing the story,
 never the truth. We red-teamed our own verifier across five adversarial
-rounds; the crafted lies it rejects ship as a permanent battery (1,100+ tests,
-CI). A single agent publishes unsupported claims; our pipeline publishes
-zero — reproducibly (`npm run eval`). Built with Microsoft Foundry, Azure
-Container Apps and GitHub Actions.
+rounds; the crafted lies it rejects ship as a permanent battery within 1,385
+unit tests. Another 54 statistical checks and 48 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
+and published pipeline output had zero sentence-level Verifier findings
+(0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
+findings with the pipeline. Built with Microsoft Foundry / Azure OpenAI
+and GitHub Actions; public demo hosting is pending.
 
-<!-- PLACEHOLDER: cifra real de la eval cuando exista -->
+Resultado y límites: `docs/evidencia/eval-gpt-6.1-sol/informe.txt`.
+El único rechazo de la cadena fue un falso positivo V8; no presentarlo como
+una alucinación atrapada. Ese falso positivo ya fue corregido; la evaluación
+original se conserva con su evaluador archivado y la revalidación posterior es
+offline, sin una nueva corrida del modelo. El resultado de ensayo del 7,6 % no
+corresponde al LLM real.
 <!-- Nota: verificar al congelar que todo lo afirmado siga siendo cierto
      (regla: el pitch promete solo lo entregado) y que quepa en el límite
      del formulario; reconciliar cifras con la suite del momento. -->

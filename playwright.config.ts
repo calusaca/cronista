@@ -20,11 +20,13 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
   webServer: {
-    command: `npm run build && npx next start -p ${PUERTO} -H 127.0.0.1`,
+    command: "npm run build && npm run package:standalone && node .next/standalone/server.js",
     url: `http://127.0.0.1:${PUERTO}`,
     reuseExistingServer: false,
     timeout: 300_000,
     env: {
+      PORT: String(PUERTO),
+      HOSTNAME: "127.0.0.1",
       CRONISTA_LLM: "ensayo",
       CRONISTA_CACHE_DIR: ".cache/e2e",
     },

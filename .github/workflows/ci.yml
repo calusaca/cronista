@@ -16,6 +16,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run test:deploy
       - run: npm test
       - run: npm run test:stats
 
@@ -37,3 +38,43 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  container:
+    name: Production container & Azure templates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Compile Bicep (no Azure account needed)
+        run: |
+          curl --fail --location --silent --show-error https://github.com/Azure/bicep/releases/download/v0.48.1/bicep-linux-x64 --output /tmp/bicep
+          chmod +x /tmp/bicep
+          /tmp/bicep build infra/registry.bicep --outfile /tmp/registry.json
+          /tmp/bicep build infra/app.bicep --outfile /tmp/app.json
+      - run: docker build --tag cronista-ci .
+      - name: Start the production image offline
+        run: |
+          docker run --detach --name cronista-ci --publish 127.0.0.1:3419:3000 --env CRONISTA_LLM=stub cronista-ci
+          curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 --max-time 5 http://127.0.0.1:3419/api/health
+      - name: Verify HTTP, dataset, assets, non-root user and writable cache
+        run: |
+          node scripts/smoke-public.mjs http://127.0.0.1:3419 --stub > /tmp/container-smoke.json
+          docker exec cronista-ci node -e 'const fs=require("node:fs"); if(process.getuid()===0) throw Error("root user"); fs.accessSync("/app/.cache/cronicas",fs.constants.W_OK); if(fs.existsSync("/app/.env")) throw Error("env in image");'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: container-smoke
+          path: /tmp/container-smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Container logs
+        if: failure()
+        run: docker logs cronista-ci
+      - name: Remove container
+        if: always()
+        run: docker rm --force cronista-ci || true

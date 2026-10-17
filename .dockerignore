@@ -1,0 +1,16 @@
+# Contexto cerrado: ni .env, cachés, evidencia privada, .git ni carpetas personales.
+**
+!Dockerfile
+!.dockerignore
+!package.json
+!package-lock.json
+!tsconfig.json
+!next.config.ts
+!src/
+!src/**
+!public/
+!public/**
+!docs/
+!docs/dataset/
+!docs/dataset/ficha.json
+!docs/dataset/DATASHEET.md

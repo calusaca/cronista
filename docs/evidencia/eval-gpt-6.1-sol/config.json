@@ -1,0 +1,40 @@
+{
+  "backend": "azure-openai:gpt-6.1-sol:reasoning-low",
+  "semillas": [
+    246,
+    116,
+    834,
+    289,
+    1,
+    3,
+    4,
+    5,
+    7,
+    8,
+    10,
+    11,
+    12,
+    19,
+    22,
+    23,
+    27,
+    32,
+    34,
+    40
+  ],
+  "apiVersion": "2024-10-21",
+  "sourceHashes": {
+    "src/eval/eval.ts": "e27abece00fa7a16e0b49b86e07b9d60be00e133023c5d411804cb32fb27226d",
+    "src/eval/umbrales-eval.ts": "22d47fd7c62a50072bd4ed5495ba404b3a524371cb40a9219b268e4e7b3837d1",
+    "src/cadena/prompt.ts": "7f328b99d0a607636be3f634db80ce8b096521d9d55a2e5720ab9f4025dd58be",
+    "src/cadena/verificador.ts": "7208eee29fbbcdabdb2dd74781096883f1d451bf259092d63ab7d80455727210",
+    "src/lib/llm-azure-openai.ts": "6311eff541aa290a71ff78ea1b4cfbb79c5487c92eba48343dd33ea8345f4b13"
+  },
+  "harnessArchive": {
+    "path": "harness-original.mjs",
+    "sha256": "8ce2d5d6a76fae137f0b5ae293676890f2f74fc291457d0d10a58a9946ff6132",
+    "packageLockSha256": "b0426f0b5d2d327f379d6bdd35a9dfe8b4783e26461fff15e45882fc6bf2e443",
+    "bundler": "esbuild 0.28.2",
+    "originalSourceHashesVerified": true
+  }
+}

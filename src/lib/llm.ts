@@ -6,7 +6,7 @@
 // GPT-6.1 Sol) es: un archivo `llm-<nombre>.ts` que devuelva un `Llm`, y un `case`
 // en `crearLlmDesdeEnv`. La cadena no cambia una línea.
 
-import { crearLlmAzureOpenAI } from "./llm-azure-openai";
+import { crearLlmAzureOpenAI, ESFUERZOS_AZURE_OPENAI, type EsfuerzoAzureOpenAI } from "./llm-azure-openai";
 import { crearLlmEnsayo } from "./llm-ensayo";
 import { crearLlmFoundry } from "./llm-foundry";
 import { crearLlmStub } from "./llm-stub";
@@ -59,11 +59,16 @@ export function crearLlmDesdeEnv(env: Env = process.env): Llm {
       });
     case "azure-openai": {
       const apiVersion = opcional(env, "AZURE_OPENAI_API_VERSION");
+      const reasoningEffort = opcional(env, "AZURE_OPENAI_REASONING_EFFORT");
+      if (reasoningEffort && !(ESFUERZOS_AZURE_OPENAI as readonly string[]).includes(reasoningEffort)) {
+        throw new Error(`AZURE_OPENAI_REASONING_EFFORT debe ser ${ESFUERZOS_AZURE_OPENAI.join(" | ")}`);
+      }
       return crearLlmAzureOpenAI({
         apiKey: requerida(env, "AZURE_OPENAI_API_KEY", "azure-openai"),
         endpoint: requerida(env, "AZURE_OPENAI_ENDPOINT", "azure-openai"),
         deployment: requerida(env, "AZURE_OPENAI_DEPLOYMENT", "azure-openai"),
         ...(apiVersion ? { apiVersion } : {}),
+        ...(reasoningEffort ? { reasoningEffort: reasoningEffort as EsfuerzoAzureOpenAI } : {}),
       });
     }
     default:

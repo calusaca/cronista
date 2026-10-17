@@ -1,0 +1,53 @@
+# CRONISTA eval — single agent vs pipeline
+
+Backend: `azure-openai:gpt-6.1-sol:reasoning-low` · 20 fixed seeds (src/eval/umbrales-eval.ts) · judge: the existing Verifier (rules V1–V8), unchanged.
+
+**0.0% of unverified sentences contained unsupported claims; the pipeline published 0.**
+
+| Seed | Score | Single agent: sentences | with findings | % | rules | Pipeline: sentences | with findings | mode · attempts |
+|---:|:---:|---:|---:|---:|:---|---:|---:|:---|
+| 246 | 4–1 | 11 | 0 | 0.0 | — | 11 | 0 | llm · 1 |
+| 116 | 2–0 | 8 | 0 | 0.0 | — | 8 | 0 | llm · 1 |
+| 834 | 0–0 | 7 | 0 | 0.0 | — | 8 | 0 | llm · 1 |
+| 289 | 0–1 | 7 | 0 | 0.0 | — | 7 | 0 | llm · 1 |
+| 1 | 2–1 | 9 | 0 | 0.0 | — | 8 | 0 | llm · 1 |
+| 3 | 1–2 | 8 | 0 | 0.0 | — | 8 | 0 | llm · 1 |
+| 4 | 1–1 | 7 | 0 | 0.0 | — | 7 | 0 | llm · 1 |
+| 5 | 1–4 | 10 | 0 | 0.0 | — | 10 | 0 | llm · 1 |
+| 7 | 1–3 | 7 | 0 | 0.0 | — | 7 | 0 | llm · 2 |
+| 8 | 0–2 | 4 | 0 | 0.0 | — | 7 | 0 | llm · 1 |
+| 10 | 1–0 | 6 | 0 | 0.0 | — | 6 | 0 | llm · 1 |
+| 11 | 3–2 | 9 | 0 | 0.0 | — | 9 | 0 | llm · 1 |
+| 12 | 2–2 | 9 | 0 | 0.0 | — | 9 | 0 | llm · 1 |
+| 19 | 2–4 | 9 | 0 | 0.0 | — | 9 | 0 | llm · 1 |
+| 22 | 3–1 | 6 | 0 | 0.0 | — | 8 | 0 | llm · 1 |
+| 23 | 4–4 | 11 | 0 | 0.0 | — | 11 | 0 | llm · 1 |
+| 27 | 2–3 | 9 | 0 | 0.0 | — | 9 | 0 | llm · 1 |
+| 32 | 3–3 | 9 | 0 | 0.0 | — | 9 | 0 | llm · 1 |
+| 34 | 4–3 | 10 | 0 | 0.0 | — | 10 | 0 | llm · 1 |
+| 40 | 0–3 | 7 | 0 | 0.0 | — | 6 | 0 | llm · 1 |
+| **Total** | | **163** | **0** | **0.0** | | **167** | **0** | |
+
+Estimated tokens: 121,273 (≈ 4 characters per token, both arms) · estimated cost: price not set for this backend yet.
+
+Interpretation and limits
+
+Both methods had zero sentence-level Verifier findings in this run (0/163 baseline; 0/167 pipeline). This sample did not demonstrate fewer findings with the pipeline. The baseline uses the same rules-aware prompt as the pipeline. Each counted unit contains both ES and EN text.
+
+The pipeline retried one factually supported sentence in seed 7: V8 failed to resolve its implicit subject after a colon. This is a false positive, not an example of a hallucination being caught. See auditoria.json.
+
+API-reported usage across 41 successful calls: 132,732 prompt tokens (67,529 cached) and 32,707 completion tokens, including 144 reasoning tokens. Azure billing cost was not calculated. The character-based estimate above omits hidden reasoning and differs from actual API usage.
+
+Replay without credentials or network:
+node --import tsx docs/evidencia/eval-gpt-6.1-sol/reproducir.mjs
+
+Recorded-response replay reproduces this run exactly; fresh model generations can differ. These automated findings are not an independently labeled hallucination rate.
+
+Subsequent V8 correction
+
+The false positive in seed 7 has been corrected. This report preserves the original real-model run and its historical retry. Its replay now uses harness-original.mjs, archived from verified original sources before the correction and checked by SHA-256.
+
+A separate offline recheck with the current evaluator accepts all 20 recorded first pipeline drafts: 0/163 baseline and 0/167 pipeline units flagged, with 20 pipeline attempts. It makes zero network calls and is not a fresh model evaluation. See revalidacion-v8.json.
+
+Recheck with the current evaluator:
+node --import tsx docs/evidencia/eval-gpt-6.1-sol/revalidar-actual.mjs

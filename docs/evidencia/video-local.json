@@ -1,0 +1,20 @@
+{
+  "video": "docs/entrega/demo-en-borrador.mp4",
+  "seconds": 110,
+  "size": [
+    1280,
+    900
+  ],
+  "fps": 25,
+  "audio": false,
+  "subtitles": "docs/entrega/subtitulos-en.srt",
+  "sha256": "3c28d48d586b2b3484fa851997f55793b14de66261a3701cfa25368034fcc64b",
+  "sourceCapture": ".cache/demo-recording/manifest.json",
+  "editing": "Real local model output; clips slowed and stills held; captions and original cards added. No app data, drafts or verdicts modified. Not publicly hosted or submitted.",
+  "decodeCheck": {
+    "frames": 2750,
+    "durationSeconds": 110.0,
+    "decodedWithoutError": true
+  },
+  "visualCheck": "Fotogramas revisados en 6, 25, 76 y 105 segundos; revisión humana final de montaje/voz pendiente."
+}
