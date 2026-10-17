@@ -1,6 +1,6 @@
 # CRONISTA
 
-**AI match chronicles where every sentence can be proven with a click.**
+**AI match chronicles with a clickable evidence trail.**
 
 ![A real GPT-6.1 Sol report with a selected sentence and its match evidence](docs/entrega/capturas/evidencia.png)
 
@@ -12,14 +12,26 @@ Public demo and final video: pending publication.
 Most AI-generated sports recaps have a problem nobody can see: they invent
 details — a wrong minute, a goal that never happened, a penalty that never was.
 CRONISTA generates bilingual (EN/ES) football match chronicles from synthetic
-match events, and **no unverified sentence ever reaches the reader**: a
-deterministic Verifier checks every sentence against the match events before
-publication, and the Glass Box lets you watch it work — including the drafts it
-rejected and why.
+match events. **Every published sentence passes the defined V1–V8 checks**:
+a deterministic Verifier checks structure, citations, numbers, names and
+maintained claim patterns before publication. The Glass Box lets you inspect
+the evidence and the drafts it rejected. These checks do not prove every
+possible assertion in unrestricted prose; see the [review evidence](docs/evidencia/verificador-2026-10-10.md).
 
 Built for the **Inside the Game** hackathon (Microsoft × Premier League):
 explainable match intelligence, real-time narratives, and automated match recaps,
 flexible enough for fans in any market.
+
+## Hackathon documentation
+
+- [Official event portal — Microsoft Innovation Studio](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon)
+- [Official rules](https://github.com/microsoft/insidethegamehackathon/blob/main/OFFICIAL%20RULES.md)
+- [Code of conduct](https://github.com/microsoft/insidethegamehackathon/blob/main/CODE%20OF%20CONDUCT.md)
+- [Microsoft repository license](https://github.com/microsoft/insidethegamehackathon/blob/main/LICENSE.md)
+- [Resource playlists](https://github.com/microsoft/insidethegamehackathon/blob/main/RESOURCE%20PLAYLISTS.md)
+- [Microsoft repository security policy](https://github.com/microsoft/insidethegamehackathon/blob/main/SECURITY.md)
+
+[Submission preparation](docs/hackathon.md) · [Project review — October 10, 2026](docs/revision-2026-10-10.md)
 
 ## Architecture
 
@@ -41,7 +53,7 @@ flowchart LR
 | Distinct roles | Simulator (data), Analyst (deterministic facts), Writer (LLM prose), Verifier (deterministic judge) — no role overlaps |
 | Shared state | The event log and the fact list are the single source of truth every agent reads and cites |
 | Effective handoffs | Facts carry event citations; sentences carry fact citations; the audit trail records every handoff |
-| Recover from failures | Rejected sentences trigger retries with rule-specific feedback (max 2); unrecoverable output falls back to a 100%-faithful template chronicle — never a lie |
+| Recover from failures | Rejected sentences trigger retries with rule-specific feedback (max 2); unrecoverable output falls back to a visibly labeled report from the Analyst’s templates |
 | Outcome compared with a single agent | Real GPT-6.1 Sol evaluation, 20 fixed matches: 0/163 baseline sentence pairs flagged by the Verifier; 0/167 published pipeline pairs flagged. This run did not demonstrate a reduction in findings. [Recorded evaluation](docs/evidencia/eval-gpt-6.1-sol/informe.txt) |
 
 The baseline and pipeline use the same rules-aware prompt and verified facts,
@@ -64,6 +76,10 @@ node --import tsx docs/evidencia/eval-gpt-6.1-sol/reproducir.mjs
 Fresh model generations can differ. The historical replay uses the archived
 original evaluator and checks its hash; it preserves the original result after
 the V8 correction. `npm run eval` performs a new real-model run when configured.
+
+The orchestration is implemented in TypeScript. The Writer uses an LLM; the
+Analyst and Verifier are deterministic stages. Microsoft Agent Framework,
+MCP and A2A are not implemented in this repository.
 
 ## How verification works
 
@@ -112,6 +128,8 @@ climates, one league each (10 teams, double round-robin), all navigable:
 | GitHub Actions (unit/statistical tests + Playwright workflow) | `.github/workflows/ci.yml` |
 | GitHub CLI | repo management |
 
+[One-minute walkthrough for judges](docs/entrega/judges-guide.md)
+
 ## Quick start (no API key needed)
 
 ```bash
@@ -130,7 +148,7 @@ Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
 npm test           # 1,385 unit/invariant/oracle/lie-battery tests
-npm run test:stats # 54 checks: N=1000 matches + A/B condition proofs
+npm run test:stats # 55 checks: N=1000 matches + A/B condition proofs
 npm run e2e        # 48 browser journeys against the production standalone build
 npm run test:deploy # deployment context and artifact credential checks
 ```
@@ -149,9 +167,11 @@ All countries, leagues, teams and players are fictional.
 ## Responsible AI & known limitations
 
 - **100% synthetic data; no real people, clubs, or trademarks.**
-- **No unverified sentence reaches the reader.** When the Verifier cannot back a
-  sentence after retries, it is omitted or the chronicle falls back to a
-  template-based report — visibly labeled, never disguised.
+- **Every published sentence passes V1–V8.** When a sentence fails those checks
+  after retries, it is omitted or the chronicle falls back to a template-based
+  report — visibly labeled. Assertions outside the maintained rules can pass;
+  [a reproduced example](docs/evidencia/verificador-2026-10-10.md) and independent
+  evaluation are documented in the project review.
 - **Causal honesty, not just factual honesty.** "They never settled on the tall
   grass" is blocked when it also rained — the rain, not the grass, could
   explain the drop. The same losses are never narrated twice under two names.
@@ -163,7 +183,7 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 54 statistical
+Validated locally on 17 October 2026: typecheck, 1,385 unit tests, 55 statistical
 checks, 48 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
 Bicep templates compile; Docker image execution and public Azure hosting await

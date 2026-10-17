@@ -3,8 +3,10 @@
 // ficha.json, partidos.jsonl y resumen.csv. Una cifra editada a mano en el DATASHEET (o un archivo
 // de datos desactualizado) pone esto en rojo. `npm run test:stats`.
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { promisify } from "node:util";
 import { afterAll, describe, expect, it } from "vitest";
 import { LIGA_DESTACADA, TEMPORADA_ACTUAL } from "../../analista/umbrales";
 import { renderDatasheet } from "../datasheet";
@@ -16,6 +18,7 @@ import { ARCHIVOS, N_PRUEBA_RAPIDA, SALIDA_POR_DEFECTO } from "../umbrales-datas
 const tmp = mkdtempSync(join(tmpdir(), "cronista-dataset-ref-"));
 afterAll(() => rmSync(tmp, { recursive: true, force: true }));
 const commiteado = (f: string) => readFileSync(join(process.cwd(), SALIDA_POR_DEFECTO, f));
+const ejecutar = promisify(execFile);
 
 describe("028 · la corrida de referencia, regenerada", async () => {
   const r = await generarDataset(OPCIONES_POR_DEFECTO, tmp);
@@ -40,6 +43,20 @@ describe("028 · la corrida de referencia, regenerada", async () => {
     expect(r.modelo.experimentos.filter((m) => m.veredicto !== "en_banda").map((m) => m.clave)).toEqual([]);
     expect(r.modelo.estructura.violaciones).toBe(0);
     expect(r.modelo.estructura.lineasInvalidas).toBe(0);
+  });
+});
+
+describe("028 · memoria de la regeneración completa", () => {
+  it("el CLI con 512 MiB de heap regenera los cuatro archivos sin cambiar un byte", async () => {
+    const dir = join(tmp, "heap-512");
+    // Un proceso aparte fija el presupuesto incluso si el worker de Vitest tiene más memoria.
+    // El código previo retenía los nueve brazos A/B y abortaba incluso con 2048 MiB.
+    await ejecutar(process.execPath, [
+      "--max-old-space-size=512", "--import", "tsx", "src/dataset/cli.ts", "--out", dir,
+    ], { cwd: process.cwd(), timeout: 300_000 });
+    for (const f of [ARCHIVOS.datasheet, ARCHIVOS.ficha, ARCHIVOS.partidos, ARCHIVOS.resumen]) {
+      expect(readFileSync(join(dir, f)).equals(commiteado(f)), f).toBe(true);
+    }
   });
 });
 

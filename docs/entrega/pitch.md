@@ -14,11 +14,11 @@ documented limits. Built with Azure OpenAI and automated tests.
 
 **EN ampliado:**
 
-CRONISTA generates bilingual football match chronicles where every sentence can
-be proven with a click. A multi-agent pipeline — deterministic Analyst, LLM
+CRONISTA generates bilingual football match chronicles with a clickable evidence
+trail. A staged pipeline — deterministic Analyst, LLM
 Writer on Microsoft Foundry, deterministic Verifier — turns synthetic match
-events into explainable match intelligence: the Verifier blocks any sentence
-whose numbers, names or claims the events don't back, retries with feedback,
+events into explainable match intelligence: the Verifier checks citations,
+numbers, names and maintained claim patterns, and retries failures with feedback,
 and the Glass Box shows every draft it rejected and why. It runs a living
 fictional world: eight countries, leagues with standings and suspensions that
 carry across matchdays, weather that provably slows the second half (A/B over
@@ -30,10 +30,11 @@ is recorded data. Readers click any sentence to see its evidence and switch
 language, fan/analyst view, or team perspective — personalizing the story,
 never the truth. We red-teamed our own verifier across five adversarial
 rounds; the crafted lies it rejects ship as a permanent battery within 1,385
-unit tests. Another 54 statistical checks and 48 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
+unit tests. Another 55 statistical checks and 48 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
 and published pipeline output had zero sentence-level Verifier findings
 (0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
-findings with the pipeline. Built with Microsoft Foundry / Azure OpenAI
+findings with the pipeline. Independent semantic evaluation is still needed
+for unrestricted prose. Built with Microsoft Foundry / Azure OpenAI
 and GitHub Actions; public demo hosting is pending.
 
 Resultado y límites: `docs/evidencia/eval-gpt-6.1-sol/informe.txt`.

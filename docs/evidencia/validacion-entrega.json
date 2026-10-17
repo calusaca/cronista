@@ -1,5 +1,5 @@
 {
-  "checkedUtc": "2026-10-17T20:03:32.084295+00:00",
+  "checkedUtc": "2026-10-17T20:07:16.005203+00:00",
   "baseCommit": "c27518de36f0b90a291d2a506908b36118029845",
   "local": {
     "typecheck": {
@@ -13,9 +13,12 @@
       "backend": "stub"
     },
     "statistics": {
-      "passed": 54,
+      "passed": 55,
       "files": 11,
-      "seconds": 29.34
+      "seconds": 50.77,
+      "afterMerge": true,
+      "heapBudgetMiB": 512,
+      "datasetArtifactsByteIdentical": true
     },
     "browser": {
       "passed": 48,
@@ -66,6 +69,10 @@
       "historyFindings": 0,
       "candidateFindings": 0,
       "scope": "Committed history and a copy of intended delivery files; excludes local env, unrelated .primos and caches. Heuristic scanner, not a guarantee."
+    },
+    "datasetUnitAfterMerge": {
+      "passed": 25,
+      "seconds": 3.5
     }
   },
   "remote": {
@@ -100,7 +107,9 @@
     "scripts/prepare-standalone.mjs": "becd9adf14d492dc4f832dd8abe2d76a00dad63de8b5478d70dd9588d40ced1a",
     "scripts/smoke-public.mjs": "ef950e2e709c0b2cea27c8a4356f2ba7721f7b9b8c7894473812b0d88b9a5a2b",
     "scripts/capture-demo.mjs": "89acda9edb53b0a869849ead35bb333b15c4550d09380a9e69c1e5b74410ec36",
-    "scripts/render-demo.py": "0c6aae0779d8fc28b65b0b2089fd3d9b9d4bcbf3ce95a1308c5e9628fddd61e2"
+    "scripts/render-demo.py": "0c6aae0779d8fc28b65b0b2089fd3d9b9d4bcbf3ce95a1308c5e9628fddd61e2",
+    "src/dataset/experimentos.ts": "2ea794ac8e527369b6181ab49095e189b4c511f7f049a04137fc212f02eab5a5",
+    "src/dataset/__tests__/dataset.stats.test.ts": "6b4dd8efa47808953856786a0fb5ecdb909e7ea0b0f3f7988f4a05c80547b19f"
   },
   "limits": [
     "Real evaluation 0/163 vs 0/167: no factual advantage demonstrated",
@@ -108,5 +117,11 @@
     "Local real-model HTTP success is not public hosting",
     "Docker image execution awaits remote CI",
     "Final human video review and public links still pending"
-  ]
+  ],
+  "mergedExistingBranch": {
+    "branch": "fix/dataset-memory",
+    "head": "853b4599faeed918f00de9dad029e7cdaa5584dc",
+    "commits": 6,
+    "includes": "Bounded dataset memory and historical rules/readiness review; semantic counterexample preserved"
+  }
 }

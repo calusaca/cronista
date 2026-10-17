@@ -20,6 +20,11 @@ a 0/167 se muestra sin atribuir una ventaja factual que no observamos.
 | 1:17–1:32 | Data: cifras y enlace de descarga. Plano breve del diagrama de arquitectura del README. | Everything is synthetic: teams, players, events. The downloadable dataset includes its methodology and statistical checks. Automated tests exercise the simulator, verification rules, and the reader's path through the application. |
 | 1:32–1:50 | Cartela: “20 matches · baseline 0/163 flagged · pipeline 0/167 flagged · no reduction demonstrated”. Cierre en la home. | Across twenty real-model matches, both the baseline and pipeline passed these checks. That sample showed no reduction in findings, and our verifier has documented limits. What readers gain is an audit trail they can inspect. CRONISTA: personalize the story. Never the truth. |
 
+La [sonda del 10 oct](../evidencia/verificador-2026-10-10.md) ya mostró una
+frase ajena a los hechos que pasa las reglas. Cero hallazgos del mismo verificador
+no equivale a cero alucinaciones; la evaluación semántica independiente sigue
+pendiente. El video hace explícitos los límites y no afirma una garantía universal.
+
 ## Preparación y montaje
 
 1. Arrancar con la configuración real de Azure, nunca con `CRONISTA_LLM=ensayo`.

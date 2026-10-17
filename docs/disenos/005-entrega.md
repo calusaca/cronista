@@ -13,24 +13,62 @@
 **Fecha:** 2026-09-30 · **Diseña:** Fable · **Ejecuta:** Opus (deploy) + Carlos
 (cuenta Azure, grabación, registro) · **Semana 3** · **Estado:** cerrado
 
-## Cuenta Azure (Carlos — el orden importa, sale de la investigación del 30-sep)
+## Cuenta Azure (actualizado el 10 de octubre de 2026)
 
-1. Crear la cuenta **el 6 de octubre, no antes**: los $200 de crédito caducan a los
-   30 días y así cubren hasta la entrega.
-2. **Upgradear a Pay-As-You-Go el día 1.** Una free trial tiene cuota **cero** para
-   todos los LLMs aunque tenga los $200; el upgrade conserva el crédito restante y
-   desbloquea las cuotas.
-3. Saber de antemano: **el crédito NO paga Claude** (es oferta de Marketplace: se
-   cobra a la tarjeta). Presupuesto real esperado: **menos de $10** con Sonnet/Haiku
-   y la caché. El crédito sí paga el hosting (Container Apps).
-4. Crear el recurso Foundry en **eastus2** (todas las variantes de Claude viven ahí)
-   y verificar la página *Quota* apenas exista el recurso.
-5. Alerta de presupuesto en Azure a $20: si suena, algo anda mal y se investiga.
+La captura aportada por el usuario el 10 oct muestra **Visual Studio Enterprise
+Subscription**, estado **Active** y **US$150 de crédito restante**. El período
+de facturación mostrado es `10/8/2026–11/7/2026`. El origen del beneficio queda
+confirmado por la captura; renovación efectiva, cobertura del deployment y cuota
+siguen pendientes de comprobación. No se consultó la cuenta directamente.
+Esta información sustituye la hipótesis anterior de una cuenta gratuita con
+US$200 durante 30 días. No guardar identificadores de suscripción ni datos de
+contacto de la captura en la documentación.
 
-## Deploy de la demo
+1. Confirmar la renovación del crédito y servicios
+   elegibles. Para el beneficio de Visual Studio, Microsoft indica que sus créditos
+   cubren Azure OpenAI, sujetos a acceso y disponibilidad del servicio:
+   [elegibilidad Dev/Test](https://learn.microsoft.com/en-us/visualstudio/subscriptions/vs-azure-eligibility).
+2. Priorizar **Azure OpenAI** con un deployment cubierto por el beneficio y
+   compatible con `llm-azure-openai.ts`. Confirmar cuota disponible antes de crear
+   el deployment: el saldo no acredita capacidad de inferencia.
+   [Cuotas y límites](https://learn.microsoft.com/en-us/azure/foundry/openai/quotas-limits).
+3. Claude queda como alternativa de facturación separada: Microsoft requiere una
+   suscripción con modalidad de pago elegible y señala que puede cobrar a la tarjeta
+   en lugar de aplicar créditos. No cambiar de oferta de suscripción como paso
+   automático para usar los US$150.
+   [Requisitos y facturación de Claude](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/use-foundry-models-claude).
+4. Elegir región, modelo y modalidad de deployment según la disponibilidad real de
+   la cuenta. La recomendación histórica de `eastus2` no fija la región de todos los
+   backends ni confirma sus cuotas.
+5. Ejecutar primero el [smoke real](../smoke-foundry.md), revisar su salida y costo,
+   y después la evaluación de 20 semillas. Los precios de la evaluación se completan
+   con el modelo y tarifa observados; el importe del crédito no es un precio por token.
 
-**Azure Container Apps** (eastus2, mismo resource group): Dockerfile de Next.js en
-modo standalone; `FOUNDRY_API_KEY` como secret de la app, jamás en la imagen ni en el
+### Distribución propuesta del crédito
+
+Estos importes son **topes de planificación**, pendientes de confirmar la cobertura
+del beneficio y la tarifa del deployment; no son una predicción del costo real.
+
+| Uso | Importe propuesto |
+| --- | --- |
+| Smoke, integración y evaluación | Hasta US$20 |
+| Hosting de la demo, si la oferta permite el uso previsto | Hasta US$30 |
+| Reserva | US$100 |
+
+Objetivo inicial: consumir como máximo US$50. Revisar consumo después del smoke y
+configurar un presupuesto con alertas al 80 % y 100 %, si la suscripción lo admite.
+Los presupuestos de Cost Management **avisan, no detienen el consumo**, y sus datos
+se actualizan con retraso: [documentación de presupuestos](https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/tutorial-acm-create-budgets).
+
+El beneficio de Visual Studio está destinado a desarrollo/pruebas y tiene
+restricciones de continuidad. Confirmar la aptitud de la oferta para mantener la
+demo accesible durante la evaluación antes de elegir el hosting:
+[condiciones del crédito](https://azure.microsoft.com/en-us/pricing/member-offers/credit-for-visual-studio-subscribers/).
+
+## Deploy planificado de la demo
+
+**Azure Container Apps** (región por confirmar, mismo resource group): Dockerfile de Next.js en
+modo standalone; la clave del backend elegido como secret de la app, jamás en la imagen ni en el
 repo. URL pública para los jueces. Verificación honesta: abrirla desde una red
 distinta a la de la casa (el puerto local ocupado ya nos mintió antes) y correr una
 semilla nueva de punta a punta en producción.

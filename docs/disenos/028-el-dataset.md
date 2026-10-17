@@ -86,3 +86,16 @@ Formatos parquet/arrow, API de descarga dinámica, dataset multi-temporada.
 Suites + e2e vistos por Fable; `npm run dataset` corrido dos veces por Fable
 con hash idéntico; DATASHEET leído completo por Fable («¿lo firmaría como
 revisor de datasets?»); smoke de `/datos` a ojo.
+
+## Revisión 28.1 · Memoria del A/B (2026-10-10)
+
+CI en Node 22 agotó el heap al conservar simultáneamente los nueve brazos de
+condiciones, cada uno con N_AB partidos y todos sus micro-eventos. La revisión
+acumula las medidas partido por partido; conserva semillas, tamaños de muestra,
+criterios y orden de las mediciones. Solo los contadores sobreviven a cada partido.
+
+Propiedad adicional: el CLI completo, ejecutado en un subproceso con
+`--max-old-space-size=512`, debe regenerar DATASHEET, ficha, partidos y CSV
+idénticos a los archivos de referencia. La exportación mantiene su contrato;
+no se regeneran fixtures para aceptar diferencias. Evidencia y comandos en
+[ci-memoria-2026-10-10.md](../evidencia/ci-memoria-2026-10-10.md).

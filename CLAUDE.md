@@ -4,6 +4,11 @@ Agente multi-etapa que convierte eventos sintéticos de fútbol en crónicas bil
 **verificables**: cada frase del texto está respaldada por eventos concretos del partido.
 El reto oficial pide "explainable match intelligence"; este proyecto ataca esa palabra.
 
+Fuentes oficiales: [reglas, conducta, licencia, formación y seguridad](docs/hackathon.md).
+Portal del evento: [Microsoft Innovation Studio](https://innovationstudio.microsoft.com/hackathons/insidethegamedeveloperhackathon).
+Estado revisado y prioridades: [revisión del 10 de octubre](docs/revision-2026-10-10.md).
+Las reglas V1–V8 no prueban toda afirmación de prosa libre: [reproducción](docs/evidencia/verificador-2026-10-10.md).
+
 ## Fechas duras (hora del Pacífico)
 
 - **20 oct 2026, 12:00 PM** — cierra el registro (https://aka.ms/insidethegame).
@@ -16,22 +21,26 @@ El reto oficial pide "explainable match intelligence"; este proyecto ataca esa p
 
 ## Reglas del evento que nos atan
 
-- **Prohibido** usar datos, metraje o material real de partidos. Todo dato sale de
-  nuestro simulador. Tampoco nombres reales de clubes ni jugadores (marcas registradas):
-  equipos y jugadores ficticios.
-- Entrega: repo **público** en GitHub + video demo ≤ 2 min + elevator pitch corto +
+- El dataset debe ser sintético. Por decisión de este proyecto, todo dato sale del
+  simulador y los equipos/jugadores son ficticios; no usamos metraje real. Las reglas
+  permiten material audiovisual ajeno si se tienen los derechos necesarios (§4.7).
+- Entrega: repo **público** en GitHub + video demo < 2 min + elevator pitch corto +
   acceso para que los jueces prueben el proyecto.
-- Debe usar tecnología Microsoft. Nuestra elección: **Azure AI Foundry** (inferencia LLM)
-  y **Microsoft Agent Framework** (orquestación de agentes). Todo acceso a LLM pasa por
-  una sola costura (`src/lib/llm.ts`); en desarrollo corre un stub determinista.
+- Tecnología implementada: adaptadores **Microsoft Foundry** y **Azure OpenAI**.
+  GPT-6.1 Sol en Azure OpenAI probado con inferencia real el 17 oct; evidencia en
+  `docs/evidencia/`. Claude sigue bloqueado por Marketplace. La orquestación actual es TypeScript
+  propia; **Microsoft Agent Framework no está implementado**. Todo acceso a LLM pasa
+  por una sola costura (`src/lib/llm.ts`); en desarrollo corre un stub determinista.
 - Categoría objetivo: **Best Multi-Agent System**, optando también al Grand Prize.
 
 ## Alcance
 
-Cerrado en `docs/disenos/000-alcance.md`. Tres pilares: simulador determinista,
-cadena Analista→Cronista→Verificador, UI de explicabilidad. **No hay** tiempo real,
-personalización, Fabric, AKS, ni más idiomas que ES/EN. No se agrega alcance sin
-actualizar el 000 primero.
+Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–028. Tres pilares:
+simulador determinista, cadena Analista→Cronista→Verificador y UI de explicabilidad.
+Ya existen personalización, replay incremental, overlay JSON, ligas, condiciones,
+consecuencias, pizarra 3D y exportación de dataset. El replay es simulado, sin un feed
+externo en vivo. No hay Fabric ni AKS y los idiomas son ES/EN. No se agrega alcance
+sin actualizar el diseño correspondiente.
 
 ## Forma de trabajo
 
@@ -40,7 +49,8 @@ actualizar el 000 primero.
 - `BITACORA.md`: tabla `Fecha | Fase | Entrada | Responsable | Estado` más la sección
   «Deudas conocidas (honestas)». ✅ solo con `npm test` o smoke **visto correr**.
 - El Analista (detección de momentos clave y patrones) es **código determinista con
-  tests, no un LLM**. El Verificador rechaza cualquier frase sin evento que la respalde.
+  tests, no un LLM**. El Verificador rechaza los incumplimientos de V1–V8; una
+  afirmación fuera de las reglas mantenidas puede pasar y debe declararse como límite.
 - Stack: Next.js + TypeScript, local-first. Azure aparece solo detrás de la costura LLM
   y en el despliegue final de la demo.
 - Los umbrales estadísticos del simulador viven en un único archivo comentado
