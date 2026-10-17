@@ -109,6 +109,7 @@ climates, one league each (10 teams, double round-robin), all navigable:
   and download the entire commentary as text. This view uses the match's recorded
   events and makes no additional model calls. Times are minute-level and locations
   are zones; off-ball movement and exact-second tracking are not recorded.
+  [Public desktop and mobile checks](docs/evidencia/partido-completo.json).
 - **League mode**: standings, matchdays, top scorers; every result opens the
   full report.
 - **Conditions that really bite**: heat slows the second half, rain degrades
@@ -194,14 +195,15 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated locally on 17 October 2026: typecheck, 1,400 unit tests, 55 statistical
-checks, 51 browser journeys, and two deployment packaging checks. The standalone
+Validated locally on 17 October 2026: typecheck, 1,400 unit tests,
+51 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
-[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39069277109),
-including Bicep compilation, the Docker image, an HTTP smoke,
-non-root execution and writable cache. The [public Azure deployment](docs/evidencia/deploy-azure.json)
-passed separate [HTTP checks with the real model](docs/evidencia/smoke-web-public.json)
-and a browser walkthrough, including 3D and a 360px mobile viewport.
+[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39076053895),
+including all 55 statistical checks, Bicep compilation, the Docker image, an HTTP
+smoke, non-root execution and writable cache. The [full-match Azure release](docs/evidencia/partido-completo.json)
+passed separate [HTTP checks with the real model](docs/evidencia/smoke-web-partido-completo.json)
+and a public browser walkthrough: both languages, search, minute jump, full TXT
+download, dark mode and a 360px mobile viewport.
 The CI browser suite uses a labeled rehearsal fixture; the public demo and
 screenshot above use GPT-6.1 Sol. A fresh report took about 31 seconds;
 the replica's cache is ephemeral, so scale-to-zero can require a new generation.

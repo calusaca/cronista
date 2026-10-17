@@ -1,0 +1,206 @@
+{
+  "checkedUtc": "2026-10-17T22:50:36.404Z",
+  "sourceCommit": "8e29665615a4b04f9ac07351b573b25d5f25919e",
+  "design": "../disenos/029-partido-completo.md",
+  "feature": {
+    "entry": "Full match / Partido completo, next to Watch live in a completed match",
+    "languages": [
+      "es",
+      "en"
+    ],
+    "featuredSeed": 246,
+    "totalActions": 2215,
+    "passes": 917,
+    "rowsPerPage": 80,
+    "scope": "Every recorded macro and micro event from the displayed match configuration; fictional simulated football",
+    "controls": [
+      "Player/team search including pass receivers and opponents",
+      "Half, team and action filters",
+      "Jump to minute",
+      "First, previous, next and last page",
+      "Download every action as TXT even with active filters"
+    ]
+  },
+  "local": {
+    "typecheck": "passed",
+    "unit": {
+      "passed": 1400,
+      "files": 53,
+      "seconds": 87.8,
+      "newTests": 15,
+      "backend": "offline stub"
+    },
+    "browser": {
+      "passed": 51,
+      "seconds": 58.8,
+      "newJourneys": 3,
+      "backend": "labeled ensayo fixture",
+      "server": "Next production standalone",
+      "coverage": [
+        "All event IDs included exactly once and in causal order",
+        "Progressive score, own goals and active goalkeeper attribution",
+        "Actual league configuration and lineups",
+        "Both languages and whole-match TXT while filtered",
+        "Mobile 360px, keyboard focus cycle and Escape",
+        "No extra API requests",
+        "Full match hidden during replay"
+      ]
+    },
+    "packaging": {
+      "passed": 2,
+      "sourceFiles": 193,
+      "knownCredentialsExcluded": true
+    },
+    "statistics": "Not rerun locally for this presentation-only change; 55 checks ran in remote CI",
+    "recovery": [
+      "Initial sandbox unit run blocked eight child-process CLI cases with EPERM; complete run outside that restriction passed",
+      "Initial browser run exposed Shift+Tab focus leaving the dialog; explicit focus cycling fixed it, then all 51 journeys passed"
+    ]
+  },
+  "ci": {
+    "run": "https://github.com/calusaca/cronista/actions/runs/39076053895",
+    "commit": "8e29665615a4b04f9ac07351b573b25d5f25919e",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Production container & Azure templates",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T22:40:53Z",
+        "completedUtc": "2026-10-17T22:41:57Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39076053895/job/117523321340"
+      },
+      {
+        "name": "Unit, invariants & statistics",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T22:40:53Z",
+        "completedUtc": "2026-10-17T22:49:48Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39076053895/job/117523321523"
+      },
+      {
+        "name": "Judge's path (Playwright)",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T22:40:53Z",
+        "completedUtc": "2026-10-17T22:44:45Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39076053895/job/117523321560"
+      }
+    ],
+    "unitTests": 1400,
+    "statisticalTests": 55,
+    "playwrightTests": 51,
+    "packagingTests": 2,
+    "container": "Docker build, HTTP smoke with explicit offline stub, non-root runtime and writable cache; Azure Bicep templates compiled",
+    "containerHttpEvidence": "container-partido-completo.json"
+  },
+  "deployment": {
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "group": "rg-cronista-demo",
+    "appName": "cronista",
+    "registryName": "crcronistae1734ecca5ff",
+    "imageTag": "demo-20261017224237",
+    "deployedUtc": "2026-10-17T22:45:10.511Z",
+    "sourceCommit": "8e29665615a4b04f9ac07351b573b25d5f25919e",
+    "sourceFiles": 193,
+    "sourceManifestSha256": "bef69c3bd348a64fc66c55e0758c66077379c2c9a0fa351c528ceffdca318bba",
+    "currentApplicationSourceMatchesManifest": true,
+    "provider": "azure-openai",
+    "image": {
+      "createdUtc": "2026-10-17T22:44:34.1217851Z",
+      "digest": "sha256:c634e42d09156e8a8203d37621e13ff7bb219f1f31930161089b289a4c663e7c",
+      "updatedUtc": "2026-10-17T22:44:34.1217851Z"
+    },
+    "runtime": {
+      "fqdn": "cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261017224237",
+      "latestReadyRevision": "cronista--0000001",
+      "location": "East US 2",
+      "name": "cronista",
+      "resources": {
+        "cpu": 0.5,
+        "ephemeralStorage": "2Gi",
+        "memory": "1Gi"
+      },
+      "runningStatus": "Running",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 1,
+        "minReplicas": 0,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "state": "Succeeded"
+    }
+  },
+  "publicChecks": {
+    "httpEvidence": "smoke-web-partido-completo.json",
+    "browser": {
+      "checkedUtc": "2026-10-17T22:46:10.060Z",
+      "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "writer": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+      "totalActions": 2215,
+      "passes": 917,
+      "search": {
+        "player": "Benja Celiánez",
+        "matchedPasses": 138
+      },
+      "minuteJump": {
+        "requested": 48,
+        "selected": 48
+      },
+      "download": {
+        "language": "es",
+        "filteredBy": "pase",
+        "actions": 2215,
+        "uniqueActions": 2215
+      },
+      "lastAction": "90+2′\n2T\nFIN DEL TIEMPO\nAtlético Montefrío Bajo\n4–1\n\nFinal del partido. Marcador: Juventud Islaverde Sur 4–1 Atlético Montefrío Bajo.",
+      "viewports": [
+        1440,
+        360
+      ],
+      "pageErrors": [],
+      "apiCallsAfterOpening": [],
+      "screenshots": [
+        "es-pases.png",
+        "es-minuto48.png",
+        "es-final.png",
+        "es-movil.png",
+        "es-oscuro.png",
+        "en-dark.png"
+      ]
+    },
+    "screenshots": [
+      {
+        "path": "docs/entrega/capturas/partido-completo.png",
+        "sha256": "ba2aec624b23a73cbf33134c13970cbc995ee4f8c3df9630c69a58aa1856de07",
+        "origin": "Public Azure demo; real Azure OpenAI report loaded before opening full match"
+      },
+      {
+        "path": "docs/entrega/capturas/partido-completo-movil.png",
+        "sha256": "1015beb206c969c1c4d14510f337969cd60463dfacc9684d47a5acdf81334424",
+        "origin": "Public Azure demo; real Azure OpenAI report loaded before opening full match"
+      },
+      {
+        "path": "docs/entrega/capturas/full-match-dark.png",
+        "sha256": "2ee024d22ddd03eec5bcaaeb061b3a8e77b59c2d675266e0e96cb955eb1b64f8",
+        "origin": "Public Azure demo; real Azure OpenAI report loaded before opening full match"
+      }
+    ]
+  },
+  "sourceSha256": {
+    "src/ui/PartidoCompleto.tsx": "369673b3e2c5d9edaeaf2547eb4e71591df1970c803fffecff4db94d0385f4e1",
+    "src/vista/partido-completo.ts": "c6d87bfeac5f7122a69289562fca21df97ac6596b2e9c0e89810b6ab63073aea",
+    "src/ui/VistaPartido.tsx": "c3417298e915a5a3f95a5e9667acbe8ed7f392b7246eadf2958526cbb8cc1afe",
+    "src/app/globals.css": "b9fa0739585559ef505ee5aba4d100c841b62a66dd83f49adc41028833898418",
+    "src/vista/__tests__/partido-completo.test.ts": "2d8f47c2367abc9022c478bd0affc1245c4cf5d504139dfb3b71e1a618655e4f",
+    "e2e/partido-completo.spec.ts": "203eac79705eb39e67ecf541a06467e22f3f76cde81b1e7b5769c6b2eb0420a8"
+  },
+  "limits": [
+    "Only recorded on-ball actions; no invented exact seconds, off-ball movement or continuous tracking",
+    "Detailed play-by-play uses deterministic templates and makes no new model calls",
+    "Local and CI browser suites use a labeled rehearsal; the separate public checks load the real Azure OpenAI provider",
+    "Public checks ran from the development machine; an independent human/network review is separate",
+    "No change to simulator random draws, dataset, prompts, verifier or historical evaluation",
+    "Azure cache remains ephemeral; one maximum replica does not cap inference spending",
+    "No repository visibility change, final video publication or hackathon submission in this feature release"
+  ]
+}
