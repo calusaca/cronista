@@ -118,8 +118,9 @@ Docker pasaron en CI y la imagen también se construyó en ACR. El `what-if` no 
 ejecutó; el despliegue real terminó en `Succeeded` y la aplicación en `Running`.
 El primer preflight detectó el valor inválido de logs; corregido sin reconstruir
 la imagen. El entorno original tardó en aprovisionarse, sin error de cuota
-reportado. Se canceló un intento alternativo en East US y se inició su retirada
-al comprobar la salud del original. Los resultados de las suites y el
+reportado. Se canceló un intento alternativo en East US al comprobar la salud
+del original. Su entorno temporal quedó eliminado: operación de borrado terminada,
+consulta del recurso HTTP 404 y listado con solo `cronista-env`. Los resultados de las suites y el
 smoke local se registran en `BITACORA.md` y `docs/evidencia/validacion-entrega.json`.
 
 El código puede subirse al repositorio privado con la sesión de GitHub actual.

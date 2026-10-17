@@ -1,5 +1,5 @@
 {
-  "checkedUtc": "2026-10-17T21:24:39.936017+00:00",
+  "checkedUtc": "2026-10-17T21:41:14.991206+00:00",
   "baseCommit": "c27518de36f0b90a291d2a506908b36118029845",
   "local": {
     "typecheck": {
@@ -193,7 +193,8 @@
         "omitted": 0
       },
       "mobileWidth": 360,
-      "pageErrors": 0
+      "pageErrors": 0,
+      "alternateEnvironmentDeleted": true
     }
   },
   "sourceSha256": {

@@ -1,5 +1,5 @@
 {
-  "checkedUtc": "2026-10-17T21:24:39.936017+00:00",
+  "checkedUtc": "2026-10-17T21:41:14.990953+00:00",
   "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
   "group": "rg-cronista-demo",
   "appName": "cronista",
@@ -47,7 +47,20 @@
     "imageRebuiltForTemplateFix": false,
     "firstEnvironmentCreation": "East US 2 succeeded after waiting; no capacity error was reported",
     "alternateEastUsDeployment": "Canceled after primary became healthy",
-    "alternateEnvironmentCleanup": "deleting"
+    "alternateEnvironmentCleanup": "deleted; resource GET returned 404",
+    "cleanupConfirmation": {
+      "checkedUtc": "2026-10-17T21:41:04.342519+00:00",
+      "operationHttpStatus": 204,
+      "resource": "cronista-eastus-env",
+      "resourceHttpStatus": 404,
+      "deleted": true
+    },
+    "remainingEnvironments": [
+      {
+        "name": "cronista-env",
+        "state": "Succeeded"
+      }
+    ]
   },
   "limits": [
     "Cache is ephemeral and can be lost on scale-to-zero or revision changes",
