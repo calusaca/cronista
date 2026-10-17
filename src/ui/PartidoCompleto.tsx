@@ -7,12 +7,19 @@ import { ACCIONES_POR_PAGINA, accionesCompletas, explicarAccion, exportarPartido
 import { fmtMinuto } from "../vista/evidencia";
 import { IconoCerrar } from "./Iconos";
 import type { LenguaXg, ModoXg } from "./textos";
+import { construirRelato, exportarRelato } from "../vista/relato";
+import { cuadroInicial } from "../vista/tactica";
+import { RelatoPartido } from "./RelatoPartido";
+import { Formaciones } from "./Formaciones";
+
+export type VistaCompleta = "relato" | "acciones" | "formaciones";
 
 const SIN_FILTROS: FiltroAcciones = { periodo: "todos", equipo: "todos", tipo: "todos", buscar: "" };
 
-export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }: {
+export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar, vistaInicial = "relato", accionInicial }: {
   partido: Partido; m: MicroPartido; lengua: LenguaXg; modo: ModoXg;
   onLengua: (l: LenguaXg) => void; onCerrar: () => void;
+  vistaInicial?: VistaCompleta; accionInicial?: string;
 }) {
   const es = lengua === "es";
   const dialogo = useRef<HTMLDialogElement>(null);
@@ -22,6 +29,10 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
   const [minuto, setMinuto] = useState("0");
   const [destino, setDestino] = useState<string | null>(null);
   const filas = useMemo(() => accionesCompletas(partido, m), [partido, m]);
+  const [vista, setVista] = useState<VistaCompleta>(vistaInicial);
+  const [seleccion, setSeleccion] = useState(accionInicial ?? filas[0]?.id ?? "");
+  const relato = useMemo(() => construirRelato(partido, filas), [partido, filas]);
+  const inicial = useMemo(() => cuadroInicial(partido), [partido]);
   const filtradas = useMemo(() => filtrarAcciones(filas, filtro, partido), [filas, filtro, partido]);
   const tipos = useMemo(() => [...new Map(filas.map((a) => [a.registro.evento.tipo, a])).values()], [filas]);
   const paginas = Math.max(1, Math.ceil(filtradas.length / ACCIONES_POR_PAGINA));
@@ -40,6 +51,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
       el?.close();
       document.body.style.overflow = overflow;
       if (antes instanceof HTMLElement && antes.isConnected) antes.focus({ preventScroll: true });
+      else document.querySelector<HTMLElement>('[data-testid="open-full-match"]')?.focus({ preventScroll: true });
     };
   }, []);
 
@@ -48,7 +60,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
     if (!cont) return;
     const fila = destino ? cont.querySelector<HTMLElement>(`[data-action-id="${destino}"]`) : null;
     cont.scrollTop = fila ? fila.offsetTop - 10 : 0;
-  }, [actual, filtro, destino]);
+  }, [actual, filtro, destino, vista]);
 
   function filtrar(cambio: Partial<FiltroAcciones>) {
     setFiltro((f) => ({ ...f, ...cambio }));
@@ -63,11 +75,14 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
     setDestino((filas.find((a) => a.minuto >= n) ?? filas.at(-1))?.id ?? null);
   }
   function descargar() {
-    const blob = new Blob([exportarPartido(partido, filas, lengua, modo)], { type: "text/plain;charset=utf-8" });
+    guardar(exportarPartido(partido, filas, lengua, modo), `cronista-partido-${partido.config.seed}-${lengua}.txt`);
+  }
+  function guardar(texto: string, archivo: string) {
+    const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const enlace = document.createElement("a");
     enlace.href = url;
-    enlace.download = `cronista-partido-${partido.config.seed}-${lengua}.txt`;
+    enlace.download = archivo;
     document.body.append(enlace);
     enlace.click();
     enlace.remove();
@@ -75,7 +90,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
   }
 
   return (
-    <dialog ref={dialogo} className="full-match" aria-labelledby="full-match-title" data-testid="full-match" lang={lengua}
+    <dialog ref={dialogo} className={`full-match full-match-${vista}`} aria-labelledby="full-match-title" data-testid="full-match" lang={lengua}
       onCancel={(e) => { e.preventDefault(); onCerrar(); }}
       onKeyDown={(e) => {
         if (e.key !== "Tab") return;
@@ -94,6 +109,12 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
         <button type="button" className="btn btn-quiet" onClick={onCerrar} aria-label={es ? "Cerrar" : "Close"} data-testid="full-match-close"><IconoCerrar /></button>
       </header>
 
+      <nav className="full-match-views" aria-label={es ? "Vista del partido" : "Match view"}>
+        {(["relato", "acciones", "formaciones"] as const).map(v => <button key={v} type="button" aria-pressed={vista === v} onClick={() => setVista(v)} data-testid={`full-view-${v}`}>
+          {(es ? { relato: "Relato por jugadas", acciones: "Cada acción", formaciones: "Formaciones" } : { relato: "Commentary", acciones: "Every action", formaciones: "Formations" })[v]}
+        </button>)}
+      </nav>
+
       <div className="full-match-tools">
         <div className="full-match-summary">
           <p className="caption">{es ? `${filas.length.toLocaleString("es")} acciones registradas, del saque inicial al final.` : `${filas.length.toLocaleString("en")} recorded actions, from kick-off to full time.`}</p>
@@ -102,8 +123,9 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
           </div>
           <button type="button" className="btn" onClick={descargar} data-testid="full-match-download">{es ? "Descargar partido completo" : "Download full match"}</button>
         </div>
-        <p className="full-match-note" data-testid="full-match-limit">{es ? "Todas las acciones registradas con balón, con minutos y zonas. El simulador no registra segundos exactos ni desplazamientos sin balón." : "Every recorded on-ball action, with minutes and zones. The simulator does not record exact seconds or off-ball movement."}</p>
+        <p className="full-match-note" data-testid="full-match-limit">{es ? "Minutos, zonas y acciones con balón del registro. Cancha, direcciones y apoyos: reconstrucción esquemática, sin tracking ni segundos exactos." : "Recorded minutes, zones and on-ball actions. Pitch, directions and support runs: schematic reconstruction, without tracking or exact seconds."}</p>
 
+        {vista === "acciones" && <>
         <div className="full-match-filters">
           <label className="full-match-search">{es ? "Buscar jugador o equipo" : "Find a player or team"}
             <input type="search" value={filtro.buscar} placeholder={es ? "Nombre, receptor o rival…" : "Name, receiver or opponent…"} onChange={(e) => filtrar({ buscar: e.target.value })} data-testid="full-match-search" />
@@ -129,8 +151,12 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
             {filtradas.length ? desde + 1 : 0}–{Math.min(desde + ACCIONES_POR_PAGINA, filtradas.length)} {es ? "de" : "of"} {filtradas.length} {es ? "acciones" : "actions"}
           </output>
         </div>
+        </>}
       </div>
 
+      {vista === "relato" && <RelatoPartido partido={partido} filas={filas} jugadas={relato.jugadas} cuadros={relato.cuadros} lengua={lengua} modo={modo} seleccion={seleccion} onSeleccion={setSeleccion} onDescargar={() => guardar(exportarRelato(partido, relato.jugadas, relato.cuadros, lengua, modo), `cronista-relato-${partido.config.seed}-${lengua}.txt`)} />}
+      {vista === "formaciones" && <Formaciones partido={partido} inicial={inicial} actual={relato.cuadros.get(seleccion) ?? inicial} lengua={lengua} />}
+      {vista === "acciones" && <>
       <ol className="full-match-list" ref={lista} start={desde + 1} data-testid="full-match-list" aria-label={es ? "Relato completo de las acciones" : "Complete play-by-play commentary"}>
         {visibles.map((a) => {
           const e = a.registro.evento;
@@ -143,6 +169,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
               </div>
               <p>{explicarAccion(a, partido, lengua, modo)}</p>
               <div className="full-match-location">{ubicacion}{a.registro.capa === "micro" ? ` · ${es ? "Posesión" : "Possession"} ${a.registro.evento.posesion}` : ""}</div>
+              <button type="button" className="btn btn-quiet full-match-see-pitch" onClick={() => { setSeleccion(a.id); setVista("relato"); }} data-testid="show-action-pitch">{es ? "Seguir en cancha →" : "Follow on pitch →"}</button>
             </div>
           </li>;
         })}
@@ -155,6 +182,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar }
         <button type="button" className="btn" disabled={actual === paginas - 1} onClick={() => { setPagina(actual + 1); setDestino(null); }} data-testid="full-match-next">{es ? "Siguiente" : "Next"}</button>
         <button type="button" className="btn" disabled={actual === paginas - 1} onClick={() => { setPagina(paginas - 1); setDestino(null); }} data-testid="full-match-last">{es ? "Final" : "Last"}</button>
       </footer>
+      </>}
     </dialog>
   );
 }

@@ -29,7 +29,7 @@ import { formatoXg } from "./textos";
 
 const PartidoCompleto = dynamic(() => import("./PartidoCompleto").then((m) => m.PartidoCompleto));
 
-type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | { tipo: "completo" } | null;
+type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | { tipo: "completo"; vista?: "relato" | "formaciones"; accion?: string } | null;
 
 const ESTILO: Record<string, string> = { posesion: "possession", contragolpe: "counter-attack", presion: "pressing" };
 
@@ -353,6 +353,11 @@ export function VistaPartido({
             </button>
           )}
           {!vivo && (
+            <button type="button" className="btn" data-testid="open-formations" onClick={() => setCapa({ tipo: "completo", vista: "formaciones" })}>
+              {lengua === "es" ? "Formaciones" : "Formations"}
+            </button>
+          )}
+          {!vivo && (
             <button type="button" className="btn btn-primary watch-live" data-testid="watch-live" onClick={verEnVivo} title="Replay the match minute by minute, with verified updates at each key moment">
               Watch live
             </button>
@@ -459,9 +464,9 @@ export function VistaPartido({
       )}
       {capa?.tipo === "historia" && <HistoriaFrase cronica={cronica} i={capa.i} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "proceso" && <Proceso cronica={cronica} lengua={lengua} onCerrar={() => setCapa(null)} />}
-      {capa?.tipo === "completo" && <PartidoCompleto partido={partidoVisto} m={microVisto} lengua={lengua} modo={modo} onLengua={setLengua} onCerrar={() => setCapa(null)} />}
+      {capa?.tipo === "completo" && <PartidoCompleto partido={partidoVisto} m={microVisto} lengua={lengua} modo={modo} onLengua={setLengua} onCerrar={() => setCapa(null)} vistaInicial={capa.vista} accionInicial={capa.accion} />}
       {capa?.tipo === "gol" && (
-        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id, anclaDe).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} />
+        <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id, anclaDe).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} onVerJugada={vivo ? undefined : () => setCapa({ tipo: "completo", accion: capa.id })} />
       )}
     </div>
   );

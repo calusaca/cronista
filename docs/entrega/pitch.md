@@ -28,9 +28,12 @@ coherence constraints, auditable player ratings, verified live replays, and a
 3D goal diorama where only the ball moves — because only the ball's trajectory
 is recorded data. Readers click any sentence to see its evidence and switch
 language, fan/analyst view, or team perspective — personalizing the story,
-never the truth. We red-teamed our own verifier across five adversarial
-rounds; the crafted lies it rejects ship as a permanent battery within 1,400
-unit tests. Another 55 statistical checks and 51 browser journeys passed locally. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
+never the truth. A separate full-match commentary connects every recorded action
+to a schematic pitch, with shirt numbers, team formations and labelled modelled
+support runs. We red-teamed our own verifier across five adversarial
+rounds; the crafted lies it rejects ship as a permanent battery within 1,416
+unit tests. The automated suites also contain 55 statistical checks and 56 browser
+journeys. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
 and published pipeline output had zero sentence-level Verifier findings
 (0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
 findings with the pipeline. Independent semantic evaluation is still needed

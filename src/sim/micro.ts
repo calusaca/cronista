@@ -157,7 +157,7 @@ function inicioTras(p: Partido, k: number): { equipo: Lado; zona: Zona; actor?: 
 }
 
 /** Un segmento vacío: el ancla es consecuencia directa del ancla anterior (gol tras tiro, tiro tras pase clave…). */
-function segmentoVacio(ancla: Evento, prev: Evento | undefined): boolean {
+export function segmentoVacio(ancla: Evento, prev: Evento | undefined): boolean {
   if (ancla.tipo === "inicio_periodo") return true;
   if (!prev) return false;
   // Brief 019: la lesión es consecuencia directa de su falta (o un instante del juego): tramo vacío.

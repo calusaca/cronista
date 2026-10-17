@@ -1,0 +1,135 @@
+import { expect, test } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { enCancha, micro } from "../src/sim/micro";
+import { simular } from "../src/sim/motor";
+import { configDeSemilla } from "../src/sim/plantillas";
+import { accionesCompletas } from "../src/vista/partido-completo";
+import { mundo } from "../src/mundo/mundo";
+import { configDePartidoLiga } from "../src/mundo/temporada";
+import { LIGA_DESTACADA, TEMPORADA_ACTUAL } from "../src/analista/umbrales";
+
+const p = simular(configDeSemilla(246));
+const m = micro(p);
+const filas = accionesCompletas(p, m);
+
+test("relato conectado: frase→cancha, balón antes/después, cada acción y TXT completo con búsqueda activa", async ({ page }) => {
+  await page.goto("/");
+  const api: string[] = [];
+  page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url()); });
+  await page.getByTestId("open-full-match").click();
+  await expect(page.getByTestId("commentary-view")).toBeVisible();
+  await expect(page.getByTestId("commentary-story")).toContainText("Kick-off!");
+  const carry = m.eventos.find(e => e.tipo === "conduccion")!;
+  const frase = page.locator(`[data-relato-id="${carry.id}"]`);
+  await frase.click();
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-action-id", carry.id);
+  await expect(page.getByTestId("tactical-player")).toHaveCount(22);
+  const jugador = p.config[carry.equipo].jugadores.find(j => j.nombre === carry.jugador)!;
+  await expect(page.locator(`.tactical-active[data-name="${jugador.nombre}"]`)).toHaveAttribute("data-shirt", String(jugador.dorsal));
+  await page.getByRole("button", { name: "Before", exact: true }).click();
+  const antes = await page.getByTestId("tactical-ball").getAttribute("cx");
+  await page.getByRole("button", { name: "After", exact: true }).click();
+  expect(await page.getByTestId("tactical-ball").getAttribute("cx")).not.toBe(antes);
+  await page.getByTestId("commentary-action-next").click();
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-action-id", filas[filas.findIndex(a => a.id === carry.id) + 1]!.id);
+
+  await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();
+  await expect(page.getByTestId("tactical-provenance")).toContainText("reconstrucción esquemática");
+  await page.getByTestId("commentary-search").fill(jugador.nombre);
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("download-commentary").click();
+  const txt = await readFile((await (await downloadPromise).path())!, "utf8");
+  expect([...txt.matchAll(/^\[([^\]]+)\]/gm)].map(x => x[1])).toEqual(filas.map(a => a.id));
+  expect(txt).toContain(`(#${jugador.dorsal})`);
+  expect(txt).toContain("4–1");
+  await page.getByTestId("full-view-acciones").click();
+  await expect(page.getByTestId("full-match-action")).toHaveCount(80);
+  await page.getByTestId("show-action-pitch").first().click();
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-action-id", p.eventos[0]!.id);
+  expect(api).toEqual([]);
+});
+
+test("formaciones: 22 dorsales iniciales y distribución tras cambios/rojas, con cambio de arcos", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("open-formations").click();
+  await expect(page.getByTestId("formations-view")).toBeVisible();
+  await expect(page.getByTestId("formation-shape")).toHaveText(["4-3-3", "4-3-3"]);
+  const titulares = [...p.config.local.jugadores.slice(0, 11), ...p.config.visita.jugadores.slice(0, 11)];
+  expect((await page.getByTestId("formation-person").evaluateAll(es => es.map(e => e.getAttribute("data-name")))).sort()).toEqual(titulares.map(j => j.nombre).sort());
+  await page.getByTestId("formation-person").first().click();
+  const nombre = await page.getByTestId("formation-person").first().getAttribute("data-name");
+  await expect(page.locator(".tactical-active")).toHaveAttribute("data-name", nombre!);
+  await page.getByTestId("full-view-relato").click();
+  await page.getByTestId("commentary-minute").fill(String(p.eventos.at(-1)!.minuto));
+  await page.getByTestId("commentary-go").click();
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-period", "2");
+  await expect(page.getByTestId("commentary-sentence").last()).toContainText("Full time");
+  await page.getByTestId("full-view-formaciones").click();
+  await page.getByTestId("formation-current").click();
+  const activos = enCancha(p, p.eventos.length);
+  expect((await page.getByTestId("formation-person").evaluateAll(es => es.map(e => e.getAttribute("data-name")))).sort()).toEqual([...activos.local, ...activos.visita].map(j => j.nombre).sort());
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-period", "2");
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("open-formations")).toBeFocused();
+});
+
+test("un gol abre su elaboración completa y el relato conserva remate, gol y evidencia previa", async ({ page }) => {
+  await page.goto("/");
+  const gol = p.eventos.find(e => e.tipo === "gol")!;
+  await page.locator(`[data-testid="timeline-event"][data-event-id="${gol.id}"]`).click();
+  await page.getByTestId("goal-open-commentary").click();
+  await expect(page.getByTestId("commentary-view")).toBeVisible();
+  await expect(page.getByTestId("tactical-board")).toHaveAttribute("data-action-id", gol.id);
+  const jugada = page.getByTestId("commentary-sequence").filter({ has: page.locator(`[data-relato-id="${gol.id}"]`) });
+  await expect(jugada.locator(`[data-relato-id="${gol.relacionadoCon}"]`)).toBeVisible();
+  expect(await jugada.locator('[data-relato-id^="m"]').count()).toBeGreaterThan(0);
+  await expect(jugada.locator('[data-relato-id^="m"]').first()).toBeInViewport();
+  await expect(page.locator(`[data-relato-id="${gol.id}"]`)).toHaveAttribute("aria-pressed", "true");
+});
+
+test("relato y formaciones ES en móvil: lectura, cancha desplegable, foco y sin desborde", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/");
+  await page.getByTestId("open-full-match").click();
+  await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();
+  await expect(page.getByTestId("commentary-story")).toContainText("¡Comienza el encuentro!");
+  await expect(page.getByTestId("tactical-pitch")).toBeHidden();
+  await page.getByTestId("commentary-pitch-toggle").click();
+  await expect(page.getByTestId("tactical-pitch")).toBeVisible();
+  await expect(page.getByTestId("tactical-pitch")).toBeInViewport({ ratio: .95 });
+  await expect(page.getByTestId("commentary-story")).toBeHidden();
+  expect(await page.getByTestId("full-match").evaluate(e => e.scrollWidth <= e.clientWidth)).toBe(true);
+  await page.getByTestId("commentary-pitch-toggle").click();
+  await expect(page.getByTestId("commentary-story")).toBeVisible();
+  await page.getByTestId("commentary-search").fill("No existe este nombre");
+  await expect(page.getByTestId("commentary-count")).toHaveAttribute("data-total", "0");
+  await page.getByTestId("full-view-formaciones").click();
+  await expect(page.getByTestId("formation-person")).toHaveCount(22);
+  expect(await page.getByTestId("formations-view").evaluate(e => e.scrollWidth <= e.clientWidth)).toBe(true);
+  await page.getByTestId("full-match-close").focus();
+  await page.keyboard.press("Shift+Tab");
+  expect(await page.getByTestId("full-match").evaluate(e => e.contains(document.activeElement))).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("open-full-match")).toBeFocused();
+});
+
+test("el relato de liga usa sus alineaciones reales; no hay entradas al detalle completo durante replay", async ({ page }) => {
+  const liga = mundo().ligas.find(l => l.id === LIGA_DESTACADA)!;
+  const partido = simular(configDePartidoLiga(liga, TEMPORADA_ACTUAL, 7, 3));
+  await page.goto("/liga/7/3");
+  await page.getByTestId("open-formations").click();
+  const titulares = [...partido.config.local.jugadores.slice(0, 11), ...partido.config.visita.jugadores.slice(0, 11)];
+  expect((await page.getByTestId("formation-person").evaluateAll(es => es.map(e => e.getAttribute("data-name")))).sort()).toEqual(titulares.map(j => j.nombre).sort());
+  await page.getByTestId("full-view-relato").click();
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByTestId("download-commentary").click();
+  const txt = await readFile((await (await downloadPromise).path())!, "utf8");
+  const expected = accionesCompletas(partido);
+  expect([...txt.matchAll(/^\[([^\]]+)\]/gm)].map(x => x[1])).toEqual(expected.map(a => a.id));
+  const pase = micro(partido).eventos.find(e => e.tipo === "pase")!;
+  expect(txt).toContain(pase.jugador); expect(txt).toContain(pase.receptor!);
+  await page.getByTestId("full-match-close").click();
+  await page.getByTestId("watch-live").click();
+  await expect(page.getByTestId("open-formations")).toHaveCount(0);
+  await expect(page.getByTestId("open-full-match")).toHaveCount(0);
+});

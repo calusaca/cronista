@@ -1161,6 +1161,88 @@ main {
   .full-match-pages { padding: 9px 6px; gap: 5px; font-size: 12px; }
 }
 
+/* ---------- relato espacial y formaciones (030) ---------- */
+.full-match-relato, .full-match-formaciones { width: min(1280px, calc(100vw - 32px)); }
+.full-match-views { display: flex; gap: 4px; padding: 0 20px; border-bottom: 1px solid var(--line); flex: none; }
+.full-match-views button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.full-match-views button[aria-pressed="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.full-match-see-pitch { padding: 3px 0; margin-top: 3px; font-size: 12px; }
+.commentary-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.commentary-toolbar { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; padding: 10px 20px; border-bottom: 1px solid var(--line); font-size: 13px; flex: none; }
+.commentary-search { display: grid; gap: 3px; flex: 1; min-width: 180px; max-width: 350px; color: var(--muted); font-size: 12px; }
+.commentary-toolbar output { margin-left: auto; align-self: center; }
+.commentary-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); min-height: 0; flex: 1; }
+.commentary-story { position: relative; overflow-y: auto; padding: 14px 24px; overscroll-behavior: contain; min-height: 0; }
+.commentary-hint { margin: 0 0 18px; }
+.commentary-sequence { padding-bottom: 20px; margin-bottom: 22px; border-bottom: 1px solid var(--line); }
+.commentary-sequence header { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; font-size: 12px; }
+.commentary-sequence p { font-size: 16px; line-height: 1.8; margin: 12px 0; }
+.commentary-sentence { display: inline; background: transparent; border: 0; padding: 2px 0; text-align: left; font: inherit; line-height: inherit; cursor: pointer; border-radius: 3px; box-decoration-break: clone; }
+.commentary-sentence:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+.commentary-sentence[aria-pressed="true"] { background: var(--hl); outline: 1px solid var(--hl-line); }
+.commentary-sequence p.commentary-support { padding: 8px 10px; background: var(--bg); border-radius: var(--radius); font-size: 13px; color: var(--muted); line-height: 1.5; }
+.commentary-pitch { min-width: 0; padding: 14px 16px; border-left: 1px solid var(--line); background: var(--bg); overflow-y: auto; }
+.commentary-pitch-toggle { display: none; }
+.commentary-selected { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; font-size: 15px; }
+.commentary-step { display: flex; gap: 8px; flex-wrap: wrap; }
+.commentary-record-detail { margin: 10px 0; font-size: 13px; line-height: 1.5; }
+.commentary-step .btn { flex: 1; font-size: 12px; padding: 8px; }
+.tactical-provenance { margin-top: 12px; line-height: 1.5; }
+.tactical-board { margin: 10px 0; min-width: 0; }
+.tactical-board svg { display: block; width: 100%; height: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-board); }
+.tactical-lines { stroke: var(--pitch-line); }
+.tactical-player circle { fill: var(--accent); stroke: var(--accent); stroke-width: .4; }
+.tactical-player.tactical-local text { fill: var(--accent-ink); }
+.tactical-player rect { fill: var(--surface); stroke: var(--ink); stroke-width: .45; }
+.tactical-player.tactical-visita text { fill: var(--ink); }
+.tactical-active circle, .tactical-active rect { stroke: var(--ink); stroke-width: 1.1; }
+.tactical-ball { fill: var(--surface); stroke: var(--ink); stroke-width: .55; }
+.tactical-ball-path { stroke: var(--accent); }
+.tactical-support { stroke: var(--muted); stroke-dasharray: 1.3 1; }
+.tactical-directions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+.tactical-team { min-width: 0; }
+.tactical-team strong { display: block; font-size: 12px; }
+.tactical-team.tactical-local { color: var(--accent); }
+.tactical-team.tactical-visita { text-align: right; }
+.tactical-board figcaption .caption { margin: 8px 0; line-height: 1.4; }
+.tactical-phase { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 7px; }
+.tactical-phase .btn { padding: 3px 8px; font-size: 12px; }
+.tactical-phase button[aria-pressed="true"] { background: var(--hl); }
+.formations-view { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 24px; }
+.formations-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.formations-view > .tactical-board { max-width: 760px; margin: 16px auto 24px; }
+.formation-rosters { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.formation-roster h3 { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 0; font-size: 17px; }
+.formation-roster h3 .tnum { padding: 3px 8px; border: 1px solid var(--line); border-radius: var(--radius); font-size: 15px; }
+.formation-roster.tactical-local h3 { color: var(--accent); }
+.formation-line h4 { margin: 14px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); }
+.formation-person { display: grid; grid-template-columns: 30px minmax(0, 1fr) 30px; align-items: center; text-align: left; gap: 10px; background: none; border: 0; border-bottom: 1px solid var(--line); width: 100%; padding: 8px 3px; font-size: 14px; cursor: pointer; }
+.formation-person[aria-pressed="true"] { background: var(--hl); }
+.formation-number { text-align: center; font-weight: 700; }
+@media (max-width: 760px) {
+  .full-match-relato, .full-match-formaciones { width: 100vw; height: 100dvh; border-radius: 0; border: 0; }
+  .full-match-views { padding: 0 8px; gap: 2px; }
+  .full-match-views button { padding: 9px 7px; font-size: 12px; flex: 1; }
+  .commentary-toolbar { padding: 8px 12px; gap: 7px; font-size: 12px; }
+  .commentary-search { max-width: none; flex-basis: 100%; }
+  .commentary-toolbar output { flex-basis: 100%; margin-left: 0; }
+  .commentary-layout { display: flex; flex-direction: column; }
+  .commentary-layout.pitch-expanded .commentary-story { display: none; }
+  .commentary-story { padding: 12px 14px; flex: 1; min-height: 90px; }
+  .commentary-sequence p { font-size: 15px; line-height: 1.75; }
+  .commentary-pitch { order: -1; border-left: 0; border-bottom: 1px solid var(--line); padding: 7px 12px; flex: none; max-height: 55%; }
+  .commentary-pitch:not(.pitch-open) .tactical-board, .commentary-pitch:not(.pitch-open) .commentary-step, .commentary-pitch:not(.pitch-open) .tactical-provenance, .commentary-pitch:not(.pitch-open) .commentary-record-detail { display: none; }
+  .commentary-pitch.pitch-open { flex: 1; min-height: 0; max-height: none; }
+  .commentary-pitch-toggle { display: inline-flex; font-size: 12px; padding: 4px 7px; margin-bottom: 5px; position: sticky; top: 0; z-index: 1; background: var(--surface); }
+  .commentary-selected { font-size: 12px; }
+  .commentary-pitch .tactical-board svg { max-height: none; }
+  .tactical-directions, .tactical-team strong { font-size: 11px; }
+  .tactical-board figcaption .caption { font-size: 11px; }
+  .formations-view { padding: 12px; }
+  .formations-toolbar { gap: 7px; }
+  .formation-rosters { grid-template-columns: 1fr; gap: 24px; }
+}
+
 /* ---------- capas (Caja de cristal, proceso, gol) ---------- */
 
 .scrim {

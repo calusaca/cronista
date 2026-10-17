@@ -15,7 +15,7 @@ English captions, no audio. Final video publication is pending.
 An AI recap can sound convincing even when a detail lacks supporting evidence.
 Readers need a way to inspect its claims.
 CRONISTA generates bilingual (EN/ES) football match chronicles from synthetic
-match events. **Every published sentence passes the defined V1–V8 checks**:
+match events. **Every sentence in the AI recap passes the defined V1–V8 checks**:
 a deterministic Verifier checks structure, citations, numbers, names and
 maintained claim patterns before publication. The Glass Box lets you inspect
 the evidence and the drafts it rejected. These checks do not prove every
@@ -103,13 +103,18 @@ permanent tests; all are rejected.
 Everything runs on a fully synthetic world — 8 fictional countries with
 climates, one league each (10 teams, double round-robin), all navigable:
 
-- **Full match, pass by pass**: open every recorded pass, carry, dribble, duel,
-  recovery and match event in chronological order, in English or Spanish.
-  Search players and receivers, filter by half/team/action, jump to a minute,
-  and download the entire commentary as text. This view uses the match's recorded
-  events and makes no additional model calls. Times are minute-level and locations
-  are zones; off-ball movement and exact-second tracking are not recorded.
-  [Public desktop and mobile checks](docs/evidencia/partido-completo.json).
+- **Connected commentary and the complete log**: follow each possession in
+  English or Spanish, with shirt numbers, passes, distances and outcomes.
+  Select a sentence to see the action on the pitch, or open a goal's full build-up.
+  **Every action** keeps every recorded pass, carry, duel and match event in order.
+  Search players and receivers, jump to a minute and download the entire text.
+  The commentary uses deterministic templates with event IDs and makes no extra
+  model calls. The pitch, directions and off-ball support runs are labelled
+  schematic reconstructions; recorded locations have zone precision, with no
+  observed tracking or exact seconds.
+  **Formations** shows both starting line-ups and the active players after
+  substitutions and sendings-off, with their actual names, roles and shirt numbers.
+  [Previous public log release checks](docs/evidencia/partido-completo.json).
 - **League mode**: standings, matchdays, top scorers; every result opens the
   full report.
 - **Conditions that really bite**: heat slows the second half, rain degrades
@@ -159,9 +164,9 @@ The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker ima
 Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
-npm test           # 1,400 unit/invariant/oracle/lie-battery tests
+npm test           # 1,416 unit/invariant/oracle/lie-battery tests
 npm run test:stats # 55 checks: N=1000 matches + A/B condition proofs
-npm run e2e        # 51 browser journeys against the production standalone build
+npm run e2e        # 56 browser journeys against the production standalone build
 npm run test:deploy # deployment context and artifact credential checks
 ```
 
@@ -179,7 +184,7 @@ All countries, leagues, teams and players are fictional.
 ## Responsible AI & known limitations
 
 - **100% synthetic data; no real people, clubs, or trademarks.**
-- **Every published sentence passes V1–V8.** When a sentence fails those checks
+- **Every sentence in the AI recap passes V1–V8.** When a sentence fails those checks
   after retries, it is omitted or the chronicle falls back to a template-based
   report — visibly labeled. Assertions outside the maintained rules can pass;
   [a reproduced example](docs/evidencia/verificador-2026-10-10.md) demonstrates
@@ -189,16 +194,16 @@ All countries, leagues, teams and players are fictional.
   explain the drop. The same losses are never narrated twice under two names.
 - **Honest limits:** verification of numbers, names, structure and listed strong
   claims is deterministic and tested; a novel rhetorical figure outside the
-  maintained lexicon could pass. The Glass Box makes every published sentence
+  maintained lexicon could pass. The Glass Box makes every AI recap sentence
   inspectable, and the lie battery grows with every red-team round.
 - Player ratings are computed from events with a clickable breakdown — auditable
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated locally on 17 October 2026: typecheck, 1,400 unit tests,
-51 browser journeys, and two deployment packaging checks. The standalone
+Validated locally on 17 October 2026: typecheck, 1,416 unit tests,
+56 browser journeys, and two deployment packaging checks. The standalone
 server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
-[Remote CI passed](https://github.com/calusaca/cronista/actions/runs/39076053895),
+[Previous release CI passed](https://github.com/calusaca/cronista/actions/runs/39076053895),
 including all 55 statistical checks, Bicep compilation, the Docker image, an HTTP
 smoke, non-root execution and writable cache. The [full-match Azure release](docs/evidencia/partido-completo.json)
 passed separate [HTTP checks with the real model](docs/evidencia/smoke-web-partido-completo.json)

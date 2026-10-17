@@ -17,6 +17,7 @@ test("partido completo: cada acción, páginas hasta el final, minuto, filtros y
   const peticiones: string[] = [];
   page.on("request", (r) => { if (new URL(r.url()).pathname.startsWith("/api/")) peticiones.push(r.url()); });
   await page.getByTestId("open-full-match").click();
+  await page.getByTestId("full-view-acciones").click();
   const detalle = page.getByTestId("full-match");
   await expect(detalle).toBeVisible();
   await expect(page.getByTestId("full-match-count")).toHaveAttribute("data-total", String(total));
@@ -60,6 +61,7 @@ test("partido completo ES/EN, sin resultados de búsqueda, teclado y móvil de 3
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto("/");
   await page.getByTestId("open-full-match").click();
+  await page.getByTestId("full-view-acciones").click();
   await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Partido completo", exact: true })).toBeVisible();
   await page.getByTestId("full-match-type").selectOption("pase");
@@ -89,6 +91,7 @@ test("la liga usa los equipos y eventos de su partido; el detalle no revela el f
   const nombre = (await page.locator(".scoreline .team.home").innerText()).split("\n")[0]!;
   const ultimo = await page.getByTestId("timeline-event").last().getAttribute("data-event-id");
   await page.getByTestId("open-full-match").click();
+  await page.getByTestId("full-view-acciones").click();
   await expect(page.getByTestId("full-match").locator(".full-match-teams")).toContainText(nombre);
   await page.getByTestId("full-match-last").click();
   await expect(page.getByTestId("full-match-action").last()).toContainText("Full time");

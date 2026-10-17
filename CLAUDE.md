@@ -35,12 +35,18 @@ Las reglas V1–V8 no prueban toda afirmación de prosa libre: [reproducción](d
 
 ## Alcance
 
-Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–029. Tres pilares:
+Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–030. Tres pilares:
 simulador determinista, cadena Analista→Cronista→Verificador y UI de explicabilidad.
 Ya existen personalización, replay incremental, overlay JSON, ligas, condiciones,
-consecuencias, pizarra 3D, relato completo pase por pase y exportación de dataset. El replay es simulado, sin un feed
+consecuencias, pizarra 3D, relato por posesiones con dorsales, formaciones y cancha
+esquemática, registro completo pase por pase y exportación de dataset. El replay es simulado, sin un feed
 externo en vivo. No hay Fabric ni AKS y los idiomas son ES/EN. No se agrega alcance
 sin actualizar el diseño correspondiente.
+
+Las direcciones y apoyos del relato espacial son una reconstrucción modelada y
+rotulada; dorsales, zonas, distancias y resultados proceden de los registros.
+Las reglas V1–V8 verifican la crónica del Writer; el relato completo usa plantillas
+deterministas, con sus propias pruebas, y no debe presentarse como prosa LLM validada.
 
 ## Forma de trabajo
 

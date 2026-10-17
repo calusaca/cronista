@@ -270,6 +270,7 @@ export function TarjetaGol({
   onCerrar,
   modo,
   lengua,
+  onVerJugada,
 }: {
   eventos: Evento[];
   golId: string;
@@ -278,6 +279,7 @@ export function TarjetaGol({
   /** Brief 017: cómo se muestra el xG (Aficionado «35% chance» / Analista «xG 0.35»). */
   modo: ModoXg;
   lengua: LenguaXg;
+  onVerJugada?: () => void;
 }) {
   const fx = (xg: number) => formatoXg(xg, modo, lengua);
   const pasos = jugadaDelGol(eventos, golId);
@@ -328,6 +330,7 @@ export function TarjetaGol({
           </button>
         </div>
         <div className="layer-body">
+          {onVerJugada && <button type="button" className="btn" onClick={onVerJugada} data-testid="goal-open-commentary">{lengua === "es" ? "Ver cómo se construyó esta jugada →" : "Follow the full build-up →"}</button>}
           <ol className="steps">
             {pasos.map((p) => (
               <li key={p.evento.id} data-testid="goal-step">
