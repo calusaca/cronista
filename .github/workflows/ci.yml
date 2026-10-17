@@ -60,7 +60,7 @@ jobs:
       - name: Start the production image offline
         run: |
           docker run --detach --name cronista-ci --publish 127.0.0.1:3419:3000 --env CRONISTA_LLM=stub cronista-ci
-          curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 --max-time 5 http://127.0.0.1:3419/api/health
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 2 --max-time 5 http://127.0.0.1:3419/api/health
       - name: Verify HTTP, dataset, assets, non-root user and writable cache
         run: |
           node scripts/smoke-public.mjs http://127.0.0.1:3419 --stub > /tmp/container-smoke.json
