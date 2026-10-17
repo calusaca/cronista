@@ -1,0 +1,50 @@
+{
+  "checkedUtc": "2026-10-17T23:47:23.672Z",
+  "url": "http://127.0.0.1:3419",
+  "modelCheck": "offline-stub",
+  "results": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "bytes": 36,
+      "elapsedMs": 67
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 180679,
+      "elapsedMs": 864
+    },
+    {
+      "path": "/_next/static/chunks/1u5zan5bs9a7v.js",
+      "status": 200,
+      "bytes": 23558,
+      "elapsedMs": 11
+    },
+    {
+      "path": "/datos",
+      "status": 200,
+      "bytes": 22314,
+      "elapsedMs": 35
+    },
+    {
+      "path": "/datos/datasheet",
+      "status": 200,
+      "bytes": 24525,
+      "elapsedMs": 11
+    },
+    {
+      "path": "/muestra-10.jsonl",
+      "status": 200,
+      "bytes": 241833,
+      "elapsedMs": 7
+    },
+    {
+      "path": "/match/not-a-number",
+      "status": 404,
+      "bytes": 6817,
+      "elapsedMs": 25
+    }
+  ],
+  "note": "HTTP smoke; no sustituye la inspección visual ni una prueba desde otra red."
+}

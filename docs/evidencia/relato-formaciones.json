@@ -1,0 +1,365 @@
+{
+  "checkedUtc": "2026-10-17T23:58:46.346Z",
+  "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07",
+  "design": "../disenos/030-relato-y-formaciones.md",
+  "feature": {
+    "entries": [
+      "Full match → Commentary / Relato por jugadas",
+      "Every action / Cada acción",
+      "Formations / Formaciones",
+      "Goal card → Follow the full build-up"
+    ],
+    "languages": [
+      "es",
+      "en"
+    ],
+    "featuredSeed": 246,
+    "totalActions": 2215,
+    "sequences": 324,
+    "sequencesPerPage": 8,
+    "startingFormations": [
+      "4-3-3",
+      "4-3-3"
+    ],
+    "scope": "All recorded macro and micro events from the actual displayed configuration, grouped without losing or duplicating IDs; fictional simulated football"
+  },
+  "provenance": {
+    "recorded": [
+      "Player names, shirt numbers and roles",
+      "Minutes and zones/channels",
+      "Pass receiver, metres and outcome",
+      "Carry distance, dribble/duel opponent and outcome",
+      "Goals, shots, cards, substitutions and other macro events"
+    ],
+    "modelled": [
+      "Coordinates generated from zones and current role distribution",
+      "Pass/carry direction and halfway-line crossing in the schematic view",
+      "Two supporting teammates when their projected positions advance"
+    ],
+    "method": "Deterministic zone reconstruction, before/after frames and attacking perspective; ends switch in half two. Modelled pass/carry paths preserve the recorded metre length. Frames may re-anchor when the next recorded zone differs; this is not continuous tracking or a full physics engine.",
+    "unchanged": "Macro/micro event generation, results, dataset, prompts, verifier and evaluation; segmentoVacio was only exported to reuse its existing causal grouping rule"
+  },
+  "local": {
+    "typecheck": "passed",
+    "unit": {
+      "passed": 1416,
+      "files": 54,
+      "seconds": 51.3,
+      "newTests": 16,
+      "backend": "offline stub"
+    },
+    "browser": {
+      "passed": 56,
+      "secondsApprox": 72,
+      "newJourneys": 5,
+      "backend": "labeled ensayo fixture",
+      "server": "Next production standalone",
+      "coverage": [
+        "Exact ordered coverage and whole commentary download even while filtered",
+        "Shirt numbers from actual match and league line-ups",
+        "Sentence-to-pitch, previous/next action, before/after ball",
+        "Starting/selected-action formations including substitutions and red cards",
+        "Second-half orientation and stable prefixes",
+        "Goal opens the start of its full possession",
+        "Mobile 360px pitch at least 95% in viewport, keyboard, no overflow",
+        "No extra API requests; no full-match entries during replay"
+      ]
+    },
+    "packaging": {
+      "passed": 2,
+      "sourceFiles": 199,
+      "knownCredentialsExcluded": true
+    },
+    "statistics": "Not rerun locally; 55 statistical checks ran in remote CI",
+    "visualReview": {
+      "screenshots": 7,
+      "viewports": [
+        1440,
+        360
+      ],
+      "languages": [
+        "es",
+        "en"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "fixture": true
+    },
+    "recovery": [
+      "Initial browser invocation omitted the existing Chromium installation path; corrected PLAYWRIGHT_BROWSERS_PATH",
+      "Visual review found a clipped mobile pitch and strengthened viewport checks exposed initial scrolling before showModal; mobile view switching and deferred measurements fixed both, then all 56 journeys passed"
+    ]
+  },
+  "ci": {
+    "run": "https://github.com/calusaca/cronista/actions/runs/39080290883",
+    "commit": "c82d816443fd7b4d2b43db752b682c6674b26c07",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Production container & Azure templates",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T23:46:23Z",
+        "completedUtc": "2026-10-17T23:47:26Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39080290883/job/117535672775"
+      },
+      {
+        "name": "Unit, invariants & statistics",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T23:46:23Z",
+        "completedUtc": "2026-10-17T23:55:31Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39080290883/job/117535672969"
+      },
+      {
+        "name": "Judge's path (Playwright)",
+        "conclusion": "success",
+        "startedUtc": "2026-10-17T23:46:23Z",
+        "completedUtc": "2026-10-17T23:50:05Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39080290883/job/117535672991"
+      }
+    ],
+    "unitTests": 1416,
+    "statisticalTests": 55,
+    "playwrightTests": 56,
+    "packagingTests": 2,
+    "container": "Docker build, offline-stub HTTP smoke, non-root runtime, writable cache and compiled Azure Bicep templates",
+    "containerHttpEvidence": "container-relato.json"
+  },
+  "deployment": {
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "group": "rg-cronista-demo",
+    "appName": "cronista",
+    "registryName": "crcronistae1734ecca5ff",
+    "imageTag": "demo-20261017234642",
+    "deployedUtc": "2026-10-17T23:49:14.236Z",
+    "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07",
+    "sourceFiles": 199,
+    "sourceManifestSha256": "9fb88ea4cb62b644cd4238a6878f3d9c667b44cbc552bc9a23739dfc43136e53",
+    "currentApplicationSourceMatchesManifest": true,
+    "provider": "azure-openai",
+    "image": {
+      "createdUtc": "2026-10-17T23:48:37.0597496Z",
+      "digest": "sha256:22bcc331e889d4bdf0541eee7e0d8bed703a8e7766f4564aabd5ae249d3c8100",
+      "updatedUtc": "2026-10-17T23:48:37.0597496Z"
+    },
+    "runtime": {
+      "fqdn": "cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261017234642",
+      "latestReadyRevision": "cronista--0000002",
+      "location": "East US 2",
+      "name": "cronista",
+      "resources": {
+        "cpu": 0.5,
+        "ephemeralStorage": "2Gi",
+        "memory": "1Gi"
+      },
+      "runningStatus": "Running",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 1,
+        "minReplicas": 0,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "state": "Succeeded"
+    }
+  },
+  "publicChecks": {
+    "httpEvidence": "smoke-web-relato.json",
+    "browser": {
+      "checkedUtc": "2026-10-17T23:50:53.621Z",
+      "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "writer": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+      "fixture": false,
+      "actions": 2215,
+      "sequences": 324,
+      "selectedAction": {
+        "id": "m0004",
+        "text": "Desde el tercio de ataque, por la derecha, Leo Fenaido (#5) conduce el balón 11 metros hacia adelante.",
+        "modelledSupportArrows": 2
+      },
+      "search": {
+        "player": "Leo Fenaido",
+        "matchedSequences": 48
+      },
+      "download": {
+        "actions": 2215,
+        "uniqueActions": 2215,
+        "exactSameOrderedIdsAsOriginalLog": true,
+        "whileFiltered": true
+      },
+      "goalBuildUp": {
+        "goalId": "e005",
+        "actionsInSequence": 5,
+        "startInViewport": true
+      },
+      "minuteJump": {
+        "minute": 48,
+        "selectedAction": "e047",
+        "half": 2
+      },
+      "formations": [
+        "4-3-3",
+        "4-3-3"
+      ],
+      "startingPlayers": [
+        {
+          "name": "Aarón Celoón",
+          "shirt": 1
+        },
+        {
+          "name": "Aarón Palooya",
+          "shirt": 2
+        },
+        {
+          "name": "Joel Mendiuz",
+          "shirt": 3
+        },
+        {
+          "name": "Bruno Quinoich",
+          "shirt": 4
+        },
+        {
+          "name": "Tomás Oreardi",
+          "shirt": 5
+        },
+        {
+          "name": "Benja Celiánez",
+          "shirt": 6
+        },
+        {
+          "name": "Dante Doraena",
+          "shirt": 8
+        },
+        {
+          "name": "Darío Mariosa",
+          "shirt": 10
+        },
+        {
+          "name": "Darío Celeloya",
+          "shirt": 7
+        },
+        {
+          "name": "Owen Brelelardi",
+          "shirt": 9
+        },
+        {
+          "name": "Rafael Ulveich",
+          "shirt": 11
+        },
+        {
+          "name": "Emilio Torelueta",
+          "shirt": 1
+        },
+        {
+          "name": "Ciro Breleosa",
+          "shirt": 2
+        },
+        {
+          "name": "Elías Lorardi",
+          "shirt": 3
+        },
+        {
+          "name": "Thiago Valoena",
+          "shirt": 4
+        },
+        {
+          "name": "Leo Fenaido",
+          "shirt": 5
+        },
+        {
+          "name": "Fabio Valinera",
+          "shirt": 6
+        },
+        {
+          "name": "Mateo Dorinosa",
+          "shirt": 8
+        },
+        {
+          "name": "Lucio Castinido",
+          "shirt": 10
+        },
+        {
+          "name": "Bruno Toroino",
+          "shirt": 7
+        },
+        {
+          "name": "Emilio Quinelón",
+          "shirt": 9
+        },
+        {
+          "name": "Tomás Valelino",
+          "shirt": 11
+        }
+      ],
+      "viewports": [
+        1440,
+        360
+      ],
+      "mobilePitchViewportRatioAtLeast": 0.95,
+      "pageErrors": [],
+      "apiCallsAfterOpening": [],
+      "screenshots": [
+        "es-relato-inicio.png",
+        "es-relato-cancha.png",
+        "es-formaciones.png",
+        "es-gol-elaboracion.png",
+        "es-relato-movil.png",
+        "es-cancha-movil.png",
+        "es-formaciones-movil.png",
+        "en-relato-oscuro.png"
+      ]
+    },
+    "screenshots": [
+      {
+        "path": "docs/entrega/capturas/relato-cancha.png",
+        "sha256": "d737e3f8d1792c30e732c2eab401c1eb58d39b6b937bb0cefa4813eaf5d2e754",
+        "origin": "Public Azure demo; real Azure OpenAI recap loaded before opening commentary"
+      },
+      {
+        "path": "docs/entrega/capturas/relato-movil.png",
+        "sha256": "e1c2938fd1a489010e63c899d1682614f4428ca7625b3822f12fc207ca4992ac",
+        "origin": "Public Azure demo; real Azure OpenAI recap loaded before opening commentary"
+      },
+      {
+        "path": "docs/entrega/capturas/cancha-movil.png",
+        "sha256": "a9e42830cf79265b84beec8ef6c75e721dd30b4aed411cb9229073b496793f5c",
+        "origin": "Public Azure demo; real Azure OpenAI recap loaded before opening commentary"
+      },
+      {
+        "path": "docs/entrega/capturas/formaciones.png",
+        "sha256": "413f5230527c7eb5b1914443168614fa2e1b99e3fe061baab6b21756eaa61926",
+        "origin": "Public Azure demo; real Azure OpenAI recap loaded before opening commentary"
+      },
+      {
+        "path": "docs/entrega/capturas/relato-dark.png",
+        "sha256": "b6005fc09a13c00fca62010a53a5e7ac6ab3c9b459df86f3ea785195e29f995a",
+        "origin": "Public Azure demo; real Azure OpenAI recap loaded before opening commentary"
+      }
+    ]
+  },
+  "sourceSha256": {
+    "src/vista/relato.ts": "afa2e2228ec036a2a9adb3dcbdb95bbceb4da3b155e2b75cb0b33ed0fc8be9d3",
+    "src/vista/tactica.ts": "b4bd6be895c46e396bd55d08f2e8a73b4e4ad7ef67029770a042ffbb24cc1c93",
+    "src/sim/micro.ts": "15c5b9c227512dbb6fb0bb2850069ba61d2cbd4819f3a4203b101530dc9edd4c",
+    "src/ui/PartidoCompleto.tsx": "c503bc7f6bbba3936a91bc742ed4992beabed9589352dc8ab494c3144712a2e9",
+    "src/ui/RelatoPartido.tsx": "a46807ca9bd5464e28c1dc78d162a7ce0a2cdb0f956650e8cbd2df702106d4e0",
+    "src/ui/CanchaTactica.tsx": "48fbcd23b4b7043020cc5f3d814f7beee7af166000277ac472ed56ee80e1d8b6",
+    "src/ui/Formaciones.tsx": "6a25eef972f2669608c71e5ac2ced783f63f8cce6b7ec82a8fc43b6de45fc58a",
+    "src/ui/VistaPartido.tsx": "ce7466bb872a75477473890c8529791af7abd6c1775d9b6b5bb221b2508bb41c",
+    "src/ui/Gol.tsx": "2e472a6d48310a5387f0f8320201448d70cbe571d14394997f0e6ce619350be3",
+    "src/app/globals.css": "530f384057b1e8923f36f5b9a17ab405bdb676c40ee3af3461f1b1b4a2ee340f",
+    "src/vista/__tests__/relato-tactica.test.ts": "6d32bc6f322064dd6857df5cd2f686e25b7f05bc46830925eb5079b14758175b",
+    "e2e/relato-formaciones.spec.ts": "17c47ae776113feb8551502bdf48e7fcb99400f186167a7c3e1bf47d31835639"
+  },
+  "limits": [
+    "The diagram, directions and off-ball supports are labelled modelled reconstructions, not observed positions or tracking",
+    "No invented taker for a kick-off whose player is not recorded, no exact seconds or inferred tactical intention",
+    "The full commentary uses deterministic templates; V1–V8 applies to the separate AI recap",
+    "Three unique user-provided YouTube references could not be played or transcribed; the written example guided style, with no copied footage/audio",
+    "Public checks ran from the development machine; independent human/network review is separate",
+    "Real evaluation remains 0/163 vs 0/167, without a demonstrated reduction",
+    "Cache remains ephemeral; no change to inference billing limits or repository visibility; final submission/video remain separate"
+  ]
+}

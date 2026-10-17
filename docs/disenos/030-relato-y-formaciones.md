@@ -50,3 +50,14 @@ Coordenadas acotadas y trayectos/apoyos consistentes con su propio modelo;
 procedencia visible. Navegador: las tres vistas, frase→cancha, navegación,
 búsqueda/minuto, descargas completas y accesibilidad/móvil. Suites existentes,
 build/CI y prueba del despliegue real antes de darlo por publicado.
+
+## Resultado observado
+
+Implementado y publicado: revisión `c82d816`, imagen Azure
+`demo-20261017234642`, revisión `cronista--0000002`. [CI verde](https://github.com/calusaca/cronista/actions/runs/39080290883):
+1416 unitarias, 55 estadísticas, 56 recorridos de navegador y 2 pruebas de
+empaquetado, además de typecheck, Docker y Bicep. El recorrido público verificó
+2215 acciones en 324 jugadas, 22 titulares con dorsales, selección frase→cancha,
+elaboración del gol, salto al segundo tiempo y TXT íntegro aun con búsqueda;
+sin errores JS ni llamadas API adicionales. Cancha móvil revisada a 360 px,
+ambos idiomas y modo oscuro. [Evidencias y capturas públicas](../evidencia/relato-formaciones.json).

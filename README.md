@@ -114,7 +114,7 @@ climates, one league each (10 teams, double round-robin), all navigable:
   observed tracking or exact seconds.
   **Formations** shows both starting line-ups and the active players after
   substitutions and sendings-off, with their actual names, roles and shirt numbers.
-  [Previous public log release checks](docs/evidencia/partido-completo.json).
+  [Published commentary and formations checks](docs/evidencia/relato-formaciones.json).
 - **League mode**: standings, matchdays, top scorers; every result opens the
   full report.
 - **Conditions that really bite**: heat slows the second half, rain degrades
@@ -133,6 +133,8 @@ climates, one league each (10 teams, double round-robin), all navigable:
   3D scene — procedural, lazy-loaded (133 KB), where **only the ball moves**,
   because only the ball's trajectory is recorded data. Player pieces stay
   still in their recorded zones. The label says so, always.
+
+![Connected Spanish commentary: select a sentence to follow its action on the schematic pitch](docs/entrega/capturas/relato-cancha.png)
 
 ## Microsoft technologies
 
@@ -200,15 +202,18 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated locally on 17 October 2026: typecheck, 1,416 unit tests,
-56 browser journeys, and two deployment packaging checks. The standalone
-server also passed an [HTTP smoke with the real model](docs/evidencia/smoke-web-local.json).
-[Previous release CI passed](https://github.com/calusaca/cronista/actions/runs/39076053895),
-including all 55 statistical checks, Bicep compilation, the Docker image, an HTTP
-smoke, non-root execution and writable cache. The [full-match Azure release](docs/evidencia/partido-completo.json)
-passed separate [HTTP checks with the real model](docs/evidencia/smoke-web-partido-completo.json)
-and a public browser walkthrough: both languages, search, minute jump, full TXT
-download, dark mode and a 360px mobile viewport.
-The CI browser suite uses a labeled rehearsal fixture; the public demo and
-screenshot above use GPT-6.1 Sol. A fresh report took about 31 seconds;
-the replica's cache is ephemeral, so scale-to-zero can require a new generation.
+Validated on 17 October 2026: typecheck, 1,416 unit tests, 55 statistical checks,
+56 browser journeys and two deployment packaging checks.
+[CI passed for the published application](https://github.com/calusaca/cronista/actions/runs/39080290883),
+including Bicep compilation, the Docker image, an HTTP smoke, non-root execution
+and writable cache. The [commentary and formations Azure release](docs/evidencia/relato-formaciones.json)
+passed separate [HTTP checks with the real provider](docs/evidencia/smoke-web-relato.json)
+and a public browser walkthrough: 2,215 actions in 324 sequences, sentence-to-pitch,
+shirt numbers, starting line-ups, goal build-up, search, minute jump and a full
+TXT download containing the same ordered IDs as the original log, even while
+filtered. Both languages, dark mode and a 360px mobile viewport were checked,
+with no JavaScript errors or extra API calls after opening the detail.
+The CI browser suite uses a labeled rehearsal fixture. The public demo loads a
+GPT-6.1 Sol recap; the full commentary and pitch are deterministic client-side
+views. A fresh report in this release took about 21 seconds; the replica's cache
+is ephemeral, so scale-to-zero can require a new generation.
