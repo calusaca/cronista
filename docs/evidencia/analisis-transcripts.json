@@ -1,0 +1,514 @@
+{
+  "checkedUtc": "2026-10-18T00:24:15.963991+00:00",
+  "scope": "Análisis lingüístico de seis transcripts locales (dos incorporados por Carlos como estilo radio), con comparación histórica contra el generador del brief 030. No verifica externamente la autenticidad o los datos de los encuentros rotulados.",
+  "method": {
+    "wholeCorpus": "Lectura programática de los seis archivos para normalizar metadatos, volumen y tiempos; revisión cualitativa de pasajes de alineaciones, posesión, transiciones, goles, cambios y cierre. No se realizó anotación manual exhaustiva de cada línea ni se escuchó audio.",
+    "words": "Conteo aproximado de secuencias alfanuméricas tras retirar el timestamp y su duración duplicada en inglés. No equivale a palabras de audio verificadas.",
+    "segmentation": "Los cortes son de subtítulos: un segmento no equivale a una acción ni a una oración. Las medianas por archivo se indican en corpus. Los tiempos son del video, no del reloj del encuentro.",
+    "sources": "Archivos originales conservados sin modificaciones. Sin audio o video reproducido, sin corrección automática de nombres y sin uso del corpus como dataset factual del simulador.",
+    "scores": "No se asignan notas de calidad ni puntuaciones de jurado: no hay evaluación humana ciega ni medición de comprensión de lectores."
+  },
+  "corpus": [
+    {
+      "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+      "sha256": "4ad93681932716d57185f12e52c8c16f525ba3d1821957bdc839256dc7afec95",
+      "language": "es",
+      "userProvidedRadioStyle": true,
+      "originalLines": 1543,
+      "timestampedSegments": 1542,
+      "approxWordsAfterRemovingTimestampMetadata": 32151,
+      "videoFirstSeconds": 6,
+      "videoLastSeconds": 11562,
+      "medianGapBetweenSubtitleStartsSeconds": 8
+    },
+    {
+      "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+      "sha256": "76c254740e5b1dbf975b38f35df3c2283bbccc1f2674b8c3e3df7e92eed99bfb",
+      "language": "es",
+      "userProvidedRadioStyle": false,
+      "originalLines": 850,
+      "timestampedSegments": 850,
+      "approxWordsAfterRemovingTimestampMetadata": 15354,
+      "videoFirstSeconds": 0,
+      "videoLastSeconds": 6752,
+      "medianGapBetweenSubtitleStartsSeconds": 8
+    },
+    {
+      "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+      "sha256": "2bbf791e628e0ed39cc20e401c3f57b74018aa99f3f884c7c4ad30fb2b1258e3",
+      "language": "es",
+      "userProvidedRadioStyle": true,
+      "originalLines": 1337,
+      "timestampedSegments": 1337,
+      "approxWordsAfterRemovingTimestampMetadata": 23340,
+      "videoFirstSeconds": 56,
+      "videoLastSeconds": 10141,
+      "medianGapBetweenSubtitleStartsSeconds": 8.0
+    },
+    {
+      "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+      "sha256": "d63b2e101a976bcc88f4047f000c9ed71e1da9db7387665a7c7678d5c9329570",
+      "language": "es",
+      "userProvidedRadioStyle": false,
+      "originalLines": 1914,
+      "timestampedSegments": 1914,
+      "approxWordsAfterRemovingTimestampMetadata": 39237,
+      "videoFirstSeconds": 263,
+      "videoLastSeconds": 14985,
+      "medianGapBetweenSubtitleStartsSeconds": 8
+    },
+    {
+      "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+      "sha256": "b12cd8225c08b3d6a1cfff0a97884bce487bea6a1b2e7fd7b6f25b7b3337009c",
+      "language": "en",
+      "userProvidedRadioStyle": false,
+      "originalLines": 834,
+      "timestampedSegments": 825,
+      "approxWordsAfterRemovingTimestampMetadata": 9818,
+      "videoFirstSeconds": 0,
+      "videoLastSeconds": 6133,
+      "medianGapBetweenSubtitleStartsSeconds": 8.0
+    },
+    {
+      "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+      "sha256": "d90da5b34a8d7758d1e6bedbdbc0c211ac08beeaeb9df87eb692f9168873428f",
+      "language": "es",
+      "userProvidedRadioStyle": false,
+      "originalLines": 803,
+      "timestampedSegments": 801,
+      "approxWordsAfterRemovingTimestampMetadata": 15982,
+      "videoFirstSeconds": 6,
+      "videoLastSeconds": 5924,
+      "medianGapBetweenSubtitleStartsSeconds": 8.0
+    }
+  ],
+  "totalTimestampedSegments": 7269,
+  "approxTotalWords": 135882,
+  "findings": [
+    {
+      "title": "El hilo es actor → destino → receptor → siguiente acción",
+      "observation": "Los pasajes de España y Madrid enlazan quién recibe con la acción posterior, sin volver a explicar de forma aislada cada pase. Nuestro generador aún usa una plantilla completa por acción, con confirmación adicional del pase.",
+      "recommendation": "Mantener memoria del poseedor y receptor dentro de la posesión; enlazar cláusulas sin perder el orden ni las citas de eventos.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 330,
+          "toLine": 340
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 414,
+          "toLine": 420
+        },
+        {
+          "path": "src/vista/relato.ts",
+          "fromLine": 63,
+          "toLine": 79,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        }
+      ]
+    },
+    {
+      "title": "La posición se expresa por relaciones útiles",
+      "observation": "Las bandas, la divisoria, el área y el movimiento hacia atrás permiten reconstruir la acción. La orientación de pantalla se anuncia al inicio y cambia en el segundo tiempo.",
+      "recommendation": "Situar al lector al inicio de la posesión, cuando cambia la zona y tras una pérdida; conservar siempre una perspectiva declarada.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 19,
+          "toLine": 21
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 393,
+          "toLine": 393
+        },
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 330,
+          "toLine": 338
+        },
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 695,
+          "toLine": 701
+        }
+      ]
+    },
+    {
+      "title": "Identidad primero, identificación abreviada después",
+      "observation": "Alajuelense presenta alineaciones con números; en el juego continuo predominan los nombres. Los dorsales reaparecen en sustituciones y para identificar jugadores.",
+      "recommendation": "Conservar nombres completos y dorsales en la introducción y el detalle; abreviar de forma inequívoca en el relato conectado. El dorsal debe seguir visible en la cancha y accesible en cada acción.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 19,
+          "toLine": 28
+        },
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 689,
+          "toLine": 700
+        },
+        {
+          "path": "src/vista/relato.ts",
+          "fromLine": 51,
+          "toLine": 57,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        },
+        {
+          "path": "src/vista/relato.ts",
+          "fromLine": 74,
+          "toLine": 76,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        }
+      ]
+    },
+    {
+      "title": "El ritmo cambia con el peligro y con las pausas",
+      "observation": "Se observa relato ágil durante la acción y una reconstrucción más explicativa después del gol. El transcript inglés distingue la definición de su análisis posterior.",
+      "recommendation": "Acortar cláusulas en la secuencia de remate y gol; reservar la explicación de cómo se construyó para después, sin inventar velocidad ni anticipar el resultado.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 447,
+          "toLine": 460
+        },
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 578,
+          "toLine": 590
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 519,
+          "toLine": 531
+        }
+      ]
+    },
+    {
+      "title": "Importa la función durante la jugada, además del dibujo inicial",
+      "observation": "El transcript inglés describe a Rico Lewis pasando del lateral al mediocampo y una posterior forma 4-2-4. Madrid introduce líneas y puestos, luego relata incorporaciones.",
+      "recommendation": "Distinguir formación inicial, jugadores activos y distribución modelada con balón. El actual conteo DEF/MED/DEL no demuestra por sí solo un cambio táctico ordenado por el entrenador.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 45,
+          "toLine": 47
+        },
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 552,
+          "toLine": 554
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 13,
+          "toLine": 18
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 417,
+          "toLine": 418
+        },
+        {
+          "path": "src/vista/tactica.ts",
+          "fromLine": 34,
+          "toLine": 50,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        }
+      ]
+    },
+    {
+      "title": "Los movimientos sin balón explican opciones",
+      "observation": "España menciona compañeros que se muestran y Madrid apoyos e incorporaciones; aportan más que decir que el equipo avanza en general.",
+      "recommendation": "Nombrar apoyos concretos únicamente cuando existan registros que los sustenten o, como ahora, identificarlos explícitamente como modelados. No convertir flechas del esquema en hechos observados.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 334,
+          "toLine": 336
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 543,
+          "toLine": 548
+        },
+        {
+          "path": "src/vista/relato.ts",
+          "fromLine": 89,
+          "toLine": 93,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        }
+      ]
+    },
+    {
+      "title": "Narrador y comentarista cumplen funciones distintas",
+      "observation": "La acción se alterna con interpretación, dudas y predicciones: por ejemplo, hay especulación sobre quién saldrá antes de confirmarse un cambio.",
+      "recommendation": "Separar acciones registradas de interpretación y contexto. No incorporar conjeturas del comentarista como eventos ni opiniones tácticas como hechos.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 905,
+          "toLine": 910
+        },
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 621,
+          "toLine": 624
+        },
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 530,
+          "toLine": 530
+        }
+      ]
+    },
+    {
+      "title": "El estilo inglés requiere redacción propia",
+      "observation": "El inglés alterna identificación breve, acción directa y explicación posterior, con silencios representados por aplausos. Traducir las plantillas ES literalmente no reproduce ese ritmo.",
+      "recommendation": "Crear repertorios ES y EN independientes que conserven los mismos actores, resultados e IDs.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 578,
+          "toLine": 590
+        },
+        {
+          "path": "src/vista/relato.ts",
+          "fromLine": 74,
+          "toLine": 79,
+          "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07"
+        }
+      ]
+    },
+    {
+      "title": "La retransmisión completa contiene material ajeno al juego",
+      "observation": "El archivo España–Argentina incluye saludos, suscripciones y charla histórica entre pasajes de acción; los demás también mezclan ambiente y comentarios.",
+      "recommendation": "Etiquetar previa, alineaciones, acción, análisis, pausa, audiencia y cierre antes de seleccionar ejemplos de estilo.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 341,
+          "toLine": 347
+        },
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 748,
+          "toLine": 764
+        },
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 903,
+          "toLine": 910
+        }
+      ]
+    },
+    {
+      "title": "Hay ruido ASR y relojes distintos",
+      "observation": "Los archivos duplican el tiempo con unidades inglesas, fragmentan nombres y contienen etiquetas de sonido. En España, el tiempo de video 47:45 acompaña una mención de 1:40 de partido.",
+      "recommendation": "Conservar original y versión normalizada por separado; no inferir automáticamente el minuto de partido, la identidad de un jugador o una jugada faltante a partir del subtítulo.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+          "fromLine": 328,
+          "toLine": 329
+        },
+        {
+          "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+          "fromLine": 20,
+          "toLine": 21
+        },
+        {
+          "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+          "fromLine": 578,
+          "toLine": 580
+        },
+        {
+          "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+          "fromLine": 14,
+          "toLine": 15
+        }
+      ]
+    },
+    {
+      "title": "Radio: reorientar al oyente con equipo, sector, periodo y marcador",
+      "observation": "Maipú vuelve a informar marcador, tiempo y dueño del balón al retomar la acción. Argentina–Cabo Verde repone el sector y quién sale del fondo.",
+      "recommendation": "Mantener minuto, periodo, equipos y marcador junto a la acción activa; situar la posesión y sus cambios de zona en el texto. Probar la lectura sin mirar el SVG.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+          "fromLine": 303,
+          "toLine": 305
+        },
+        {
+          "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+          "fromLine": 343,
+          "toLine": 351
+        },
+        {
+          "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+          "fromLine": 776,
+          "toLine": 785
+        }
+      ]
+    },
+    {
+      "title": "Radio: nombres breves y continuidad espacial sobre la misma pelota",
+      "observation": "Los pasajes enlazan el poseedor con quien recibe y describen desplazamientos hacia banda o centro; la identidad se recupera al cambiar de protagonista.",
+      "recommendation": "Usar la recepción completada y la memoria local de la posesión para enlazar las frases. Describir solo direcciones que provengan del mismo cuadro esquemático.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+          "fromLine": 359,
+          "toLine": 363
+        },
+        {
+          "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+          "fromLine": 275,
+          "toLine": 281
+        },
+        {
+          "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+          "fromLine": 375,
+          "toLine": 375
+        }
+      ]
+    },
+    {
+      "title": "Radio: separar partido principal, información de otros encuentros y publicidad",
+      "observation": "Maipú incluye alineaciones de Rosario Central e Independiente Rivadavia y actualizaciones de ese partido dentro de la misma transmisión, además de tandas comerciales. El otro archivo mezcla conversación del chat con acciones.",
+      "recommendation": "No tratar todo el transcript como un único registro de partido. Tomar patrones de expresión seleccionados, sin incorporar jugadores, marcadores, anuncios o teléfonos al mundo sintético ni al producto.",
+      "evidence": [
+        {
+          "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+          "fromLine": 176,
+          "toLine": 184
+        },
+        {
+          "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+          "fromLine": 294,
+          "toLine": 302
+        },
+        {
+          "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+          "fromLine": 772,
+          "toLine": 785
+        }
+      ]
+    }
+  ],
+  "perFileUse": [
+    {
+      "path": "docs/DatosPrueba/Real_Madrid_3-1_FC_Barcelona_2014-15_FULL_MATCH.txt",
+      "use": "Base de continuidad verbal ES y orientación espacial; la narración televisiva depende a veces de la imagen.",
+      "avoid": "Errores en nombres y supuestos visuales no verbalizados."
+    },
+    {
+      "path": "docs/DatosPrueba/Alajuelense-Saprissa_Partido_del_22_de_Abril_de_2018.txt",
+      "use": "Presentación con dorsales, narración centroamericana y explicación de la construcción de los goles.",
+      "avoid": "Muletillas, patrocinios y atribuciones poco claras por ASR."
+    },
+    {
+      "path": "docs/DatosPrueba/ESPAÑA_VS_ARGENTINA_EN_VIVO_NARRACIÓN_GRAN_FINAL_2026_JC_SPORTS.txt",
+      "use": "Cadenas de pases con orientación explícita y compañeros que se ofrecen.",
+      "avoid": "Charla del chat, previa extensa, opiniones y confundir el título o contenido con verificación histórica."
+    },
+    {
+      "path": "docs/DatosPrueba/FULL_MATCH_Manchester_City_v_Arsenal_Fourth_Round_Emirates_FA_Cup_2022-23.txt",
+      "use": "Redacción inglesa, roles con balón y explicación táctica después de la acción.",
+      "avoid": "Trasladar sin datos observaciones visuales o cambios tácticos al simulador."
+    },
+    {
+      "path": "docs/DatosPrueba/DEPORTIVO MAIPu VS SAN MARTIN DE SAN JUAN EN VIVO  RELATO RADIAL .txt",
+      "use": "Reorientación de radio: equipo, marcador, periodo, banda y destinatario; separar eventos y pausa.",
+      "avoid": "Publicidad, otros partidos, partes de cambios aún no confirmadas y nombres ASR corruptos."
+    },
+    {
+      "path": "docs/DatosPrueba/ARGENTINA vs CABO VERDE.txt",
+      "use": "Flujo verbal por sectores, salida desde el fondo y devolución del pase; contraste entre relato y comentario.",
+      "avoid": "Saludos, expresiones ofensivas, bromas, opiniones y referencias históricas no verificadas."
+    }
+  ],
+  "priorities": [
+    {
+      "order": 1,
+      "change": "Memoria de posesión y receptor; conectores y elipsis no ambiguas.",
+      "requiresNewSimulationData": false
+    },
+    {
+      "order": 2,
+      "change": "Variar vocabulario por resultado y situación, y reducir confirmaciones redundantes.",
+      "requiresNewSimulationData": false
+    },
+    {
+      "order": 3,
+      "change": "Dorsales en primera identificación y en contexto; conservar todos los metros en el registro técnico y su descarga.",
+      "requiresNewSimulationData": false
+    },
+    {
+      "order": 4,
+      "change": "Introducción narrada de alineaciones con los roles realmente disponibles, y recapitulación de la elaboración después del gol.",
+      "requiresNewSimulationData": false
+    },
+    {
+      "order": 5,
+      "change": "Roles específicos, cambios de estructura y movimientos sin balón registrados por el simulador si se desea narrarlos como hechos.",
+      "requiresNewSimulationData": true
+    }
+  ],
+  "evidenceGates": [
+    {
+      "term": "recibe",
+      "minimum": "Pase completado al mismo receptor; no dar por recibido un envío fallido."
+    },
+    {
+      "term": "devuelve",
+      "minimum": "A→B y B→A consecutivos y completados dentro de la misma posesión; no implica un toque."
+    },
+    {
+      "term": "a un toque / de primera intención",
+      "minimum": "Dato explícito sobre toques o ejecución; los pases consecutivos no lo prueban."
+    },
+    {
+      "term": "pared",
+      "minimum": "Combinación y movimiento de devolución registrados; no basta observar A→B→A."
+    },
+    {
+      "term": "cambio de orientación / dirección / cruce de medio campo",
+      "minimum": "Zonas de origen y destino o geometría que lo demuestren; si procede de la pizarra, conservar su carácter modelado."
+    },
+    {
+      "term": "desmarque / doblaje / presión / arrastrar marcas",
+      "minimum": "Movimiento o estado registrado por el simulador; en el modelo actual solo se pueden presentar como reconstrucción rotulada."
+    },
+    {
+      "term": "formación táctica nueva",
+      "minimum": "Asignación táctica explícita; los números de jugadores por categoría DEF/MED/DEL no bastan."
+    }
+  ],
+  "recommendedExperience": "Conservar resumen + relato de todas las acciones conectado por posesiones + registro técnico íntegro. La narración puede ser más natural manteniendo el detalle consultable, los IDs de cada cláusula y las mismas posiciones en la pizarra; no hace falta suprimir acciones ni generar prosa libre para variar la redacción.",
+  "example": {
+    "status": "Ejemplo ficticio propuesto, no extraído ni atribuido a ninguno de los partidos del corpus.",
+    "assumedRecordedEvents": [
+      "Juan #23 completa un pase a Esteban #6 en zona defensiva",
+      "Esteban conduce 8 metros",
+      "Esteban completa un pase a Camilo #11"
+    ],
+    "proposedNarration": "Juan, el 23, tiene el balón en campo propio y juega con Esteban, el 6. Esteban conduce ocho metros y entrega a Camilo, el 11.",
+    "note": "No se afirma que el pase vaya hacia atrás, que cruce el mediocampo ni que sea de primera intención: esos datos no están en los eventos hipotéticos. Añadir apoyos solo en un bloque identificado como reconstrucción cuando procedan del modelo."
+  },
+  "followUpValidation": [
+    "Todos los IDs, actores y resultados conservados en orden, aunque cambie la agrupación verbal.",
+    "La elipsis nunca oculta un cambio de poseedor; el receptor fallido no recibe.",
+    "Términos tácticos y direcciones exigen los datos de su regla.",
+    "Revisión ES/EN de secuencias rutinarias, pérdida y recuperación, gol, cambios y expulsión.",
+    "Comparación ciega de comprensión espacial, continuidad, repetición y legibilidad; no asignar puntuaciones de mejora antes de medirlas."
+  ],
+  "implementationBaseline": {
+    "sourceCommit": "c82d816443fd7b4d2b43db752b682c6674b26c07",
+    "design": "../disenos/030-relato-y-formaciones.md",
+    "followUp": "../disenos/031-relato-fluido-y-reproduccion.md",
+    "note": "Las limitaciones de redacción observadas se refieren a este código previo a la mejora 031."
+  }
+}

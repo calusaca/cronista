@@ -3,16 +3,20 @@
 import { useId, useState } from "react";
 import type { Partido } from "../sim/tipos";
 import { sentidoAtaque, type CuadroTactico } from "../vista/tactica";
+import { interpolarCuadro } from "../vista/reproduccion";
 import type { LenguaXg } from "./textos";
 
-export function CanchaTactica({ cuadro, partido, lengua, formacion = false, resaltado }: {
+export function CanchaTactica({ cuadro, partido, lengua, formacion = false, resaltado, progreso, onMomento }: {
   cuadro: CuadroTactico; partido: Partido; lengua: LenguaXg; formacion?: boolean; resaltado?: string;
+  progreso?: number; onMomento?: (progreso: number) => void;
 }) {
   const es = lengua === "es";
   const marker = `tactica-${useId().replace(/:/g, "")}`;
   const [antes, setAntes] = useState(false);
-  const jugadores = antes ? cuadro.antes : cuadro.jugadores;
-  const balon = antes ? cuadro.balon.desde : cuadro.balon.hasta;
+  const animacion = progreso === undefined ? undefined : interpolarCuadro(cuadro, progreso);
+  const jugadores = animacion?.jugadores ?? (antes ? cuadro.antes : cuadro.jugadores);
+  const balon = animacion?.balon ?? (antes ? cuadro.balon.desde : cuadro.balon.hasta);
+  const alInicio = progreso === undefined ? antes : progreso === 0;
   const actor = jugadores.find(j => j.nombre === cuadro.actor);
   return <figure className="tactical-board" data-testid="tactical-board" data-action-id={cuadro.id} data-period={cuadro.periodo}>
     <div className="tactical-directions">
@@ -37,12 +41,12 @@ export function CanchaTactica({ cuadro, partido, lengua, formacion = false, resa
         {j.lado === "local" ? <circle r="2.65" /> : <rect x="-2.65" y="-2.65" width="5.3" height="5.3" rx=".7" />}
         <text textAnchor="middle" dominantBaseline="central" fontSize="3.1" fontWeight="700">{j.dorsal}</text>
       </g>)}
-      {!formacion && (cuadro.paseCompletado !== false || antes) && <circle cx={balon.x + (balon.x > 101 ? -3 : 3)} cy={balon.y + (balon.y > 64 ? -2 : 2)} r="1.2" className="tactical-ball" data-testid="tactical-ball"><title>{es ? "Balón (esquema)" : "Ball (schematic)"}</title></circle>}
+      {!formacion && (animacion?.mostrarBalon ?? (cuadro.paseCompletado !== false || antes)) && <circle cx={balon.x + (balon.x > 101 ? -3 : 3)} cy={balon.y + (balon.y > 64 ? -2 : 2)} r="1.2" className="tactical-ball" data-testid="tactical-ball"><title>{es ? "Balón (esquema)" : "Ball (schematic)"}</title></circle>}
     </svg>
     <figcaption>
       {!formacion && <div className="tactical-phase" role="group" aria-label={es ? "Momento del esquema" : "Moment in schematic view"}>
-        <button type="button" className="btn btn-quiet" aria-pressed={antes} onClick={() => setAntes(true)}>{es ? "Antes" : "Before"}</button>
-        <button type="button" className="btn btn-quiet" aria-pressed={!antes} onClick={() => setAntes(false)}>{es ? "Después" : "After"}</button>
+        <button type="button" className="btn btn-quiet" aria-pressed={alInicio} onClick={() => { setAntes(true); onMomento?.(0); }}>{es ? "Antes" : "Before"}</button>
+        <button type="button" className="btn btn-quiet" aria-pressed={progreso === undefined ? !antes : progreso === 1} onClick={() => { setAntes(false); onMomento?.(1); }}>{es ? "Después" : "After"}</button>
         <span className="caption">{actor ? `#${actor.dorsal} ${actor.nombre}` : es ? "Balón y distribución" : "Ball and team shape"}</span>
       </div>}
       <p className="caption">{es ? "Círculos: local · cuadrados: visitante. Izquierda/derecha desde el equipo que ataca; los arcos cambian en el 2T." : "Circles: home · squares: away. Left/right from the attacking team; ends switch in the second half."}</p>

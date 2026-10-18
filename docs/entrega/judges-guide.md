@@ -12,12 +12,18 @@ deterministic Writer.
    the timeline. Click an event to inspect the sentences that cite it.
 2. Choose **Full match** for connected commentary by possession. Select a sentence
    to follow its action on the pitch, with shirt numbers and before/after views.
+   **Play sequence** animates the same action's players and ball while the active
+   sentence follows along. Pause, restart, change speed or select **Whole match**.
+   Choose **Flowing / Detailed** to compare the two narrative styles.
    **Every action** keeps the original complete log; **Formations** shows both
    starting line-ups and the players on the pitch at the selected action.
    Search, jump to a minute or download the entire commentary in EN/ES. On mobile,
    open **Show this action on pitch** and return to the commentary when ready.
    The diagram, directions and support runs are explicitly modelled reconstructions;
    numbers, zones, distances and outcomes come from the events. No extra model calls.
+   Playback uses an illustrative reading pace, with possible cuts between zones;
+   reduced motion shows discrete steps. On mobile, playback hides the search tools
+   temporarily to keep the pitch and controls together; return to commentary to search.
 3. Choose **View process** to inspect the actual drafts and verdicts. The recorded
    public report passed on its first attempt: 11 sentence pairs, zero omissions.
    The earlier local video shows a separate generation with 12 pairs. New

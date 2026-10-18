@@ -31,8 +31,8 @@ language, fan/analyst view, or team perspective — personalizing the story,
 never the truth. A separate full-match commentary connects every recorded action
 to a schematic pitch, with shirt numbers, team formations and labelled modelled
 support runs. We red-teamed our own verifier across five adversarial
-rounds; the crafted lies it rejects ship as a permanent battery within 1,416
-unit tests. The automated suites also contain 55 statistical checks and 56 browser
+rounds; the crafted lies it rejects ship as a permanent battery within 1,429
+unit tests. The automated suites also contain 55 statistical checks and 62 browser
 journeys. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
 and published pipeline output had zero sentence-level Verifier findings
 (0/163 and 0/167 bilingual units). This sample did not demonstrate fewer

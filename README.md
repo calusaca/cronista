@@ -106,6 +106,12 @@ climates, one league each (10 teams, double round-robin), all navigable:
 - **Connected commentary and the complete log**: follow each possession in
   English or Spanish, with shirt numbers, passes, distances and outcomes.
   Select a sentence to see the action on the pitch, or open a goal's full build-up.
+  Choose **Flowing / Detailed** commentary. Flowing text connects a completed pass
+  to its receiver's next action and introduces shirt numbers before using short,
+  unambiguous names. **Play sequence** moves the player markers and ball through
+  the same schematic action; pause, restart, change speed or follow the whole
+  match. Playback starts paused, respects reduced motion and stops when hidden.
+  Its reading pace is illustrative, and cuts can occur between recorded zones.
   **Every action** keeps every recorded pass, carry, duel and match event in order.
   Search players and receivers, jump to a minute and download the entire text.
   The commentary uses deterministic templates with event IDs and makes no extra
@@ -166,9 +172,9 @@ The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker ima
 Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
-npm test           # 1,416 unit/invariant/oracle/lie-battery tests
+npm test           # 1,429 unit/invariant/oracle/lie-battery tests
 npm run test:stats # 55 checks: N=1000 matches + A/B condition proofs
-npm run e2e        # 56 browser journeys against the production standalone build
+npm run e2e        # 62 browser journeys against the production standalone build
 npm run test:deploy # deployment context and artifact credential checks
 ```
 

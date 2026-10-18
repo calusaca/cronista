@@ -142,7 +142,7 @@ describe("030 · narración completa, con dorsales y fuentes", () => {
 
   it("cada acción tiene frase ES/EN, y los pases conservan autor, receptor, metros y resultado", () => {
     for (const lengua of ["es", "en"] as const) {
-      const frases = jugadas.flatMap(j => frasesDeJugada(p, j, cuadros, lengua, "aficionado"));
+      const frases = jugadas.flatMap(j => frasesDeJugada(p, j, cuadros, lengua, "aficionado", "detallado"));
       expect(frases.map(f => f.accion.id)).toEqual(filas.map(a => a.id));
       for (const f of frases) {
         expect(f.texto).not.toMatch(/undefined|NaN/);

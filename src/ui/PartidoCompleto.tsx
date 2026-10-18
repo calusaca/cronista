@@ -154,7 +154,7 @@ export function PartidoCompleto({ partido, m, lengua, modo, onLengua, onCerrar, 
         </>}
       </div>
 
-      {vista === "relato" && <RelatoPartido partido={partido} filas={filas} jugadas={relato.jugadas} cuadros={relato.cuadros} lengua={lengua} modo={modo} seleccion={seleccion} onSeleccion={setSeleccion} onDescargar={() => guardar(exportarRelato(partido, relato.jugadas, relato.cuadros, lengua, modo), `cronista-relato-${partido.config.seed}-${lengua}.txt`)} />}
+      {vista === "relato" && <RelatoPartido partido={partido} filas={filas} jugadas={relato.jugadas} cuadros={relato.cuadros} lengua={lengua} modo={modo} seleccion={seleccion} onSeleccion={setSeleccion} onDescargar={estilo => guardar(exportarRelato(partido, relato.jugadas, relato.cuadros, lengua, modo, estilo), `cronista-relato-${partido.config.seed}-${lengua}.txt`)} />}
       {vista === "formaciones" && <Formaciones partido={partido} inicial={inicial} actual={relato.cuadros.get(seleccion) ?? inicial} lengua={lengua} />}
       {vista === "acciones" && <>
       <ol className="full-match-list" ref={lista} start={desde + 1} data-testid="full-match-list" aria-label={es ? "Relato completo de las acciones" : "Complete play-by-play commentary"}>
