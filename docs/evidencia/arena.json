@@ -1,5 +1,5 @@
 {
-  "phase": "local_validation",
+  "phase": "public_deployed_and_ci_verified",
   "recording": {
     "path": "public/experimentos/arena-llm-v1.json",
     "seconds": 10,
@@ -67,6 +67,30 @@
         "Browser checks do not assess professional football realism.",
         "Loading the recorded AI example makes no new inference calls."
       ]
+    },
+    "remoteCI": {
+      "id": 39096736758,
+      "url": "https://github.com/calusaca/cronista/actions/runs/39096736758",
+      "headSha": "31cd96610123c3b4b5673b799a69dfbe90193f0a",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "name": "Unit, invariants & statistics",
+          "conclusion": "success"
+        },
+        {
+          "name": "Production container & Azure templates",
+          "conclusion": "success"
+        },
+        {
+          "name": "Judge's path (Playwright)",
+          "conclusion": "success"
+        }
+      ],
+      "unitTests": 1453,
+      "statisticsTests": 55,
+      "browserTests": 89,
+      "packagingTests": 2
     }
   },
   "files": [
@@ -127,7 +151,50 @@
     "Two independent controllers used the same deployment; this is not a comparison of different models.",
     "Short 2D open-play prototype with uncalibrated parameters and simplified restarts, not a full regulation match.",
     "No human football-realism evaluation or hackathon score improvement was measured.",
-    "No token/cost measurement was added to the transport.",
-    "Final full-suite remote CI and public deployment will be recorded separately."
-  ]
+    "No token/cost measurement was added to the transport."
+  ],
+  "checkedUtc": "2026-10-18T04:31:26.162461+00:00",
+  "publication": {
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "group": "rg-cronista-demo",
+    "appName": "cronista",
+    "registryName": "crcronistae1734ecca5ff",
+    "imageTag": "demo-20261018042118",
+    "deployedUtc": "2026-10-18T04:24:00.127Z",
+    "sourceCommit": "31cd96610123c3b4b5673b799a69dfbe90193f0a",
+    "app": {
+      "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261018042118",
+      "latestRevision": "cronista--0000005",
+      "provisioning": "Succeeded",
+      "revision": "cronista--0000005"
+    },
+    "revision": {
+      "active": true,
+      "running": "RunningAtMaxScale",
+      "state": "Provisioned"
+    },
+    "imageDigest": "sha256:f3e00c72639fde2b030003755c9dda38cf0db16eb9ba676263c02b1b8abeb8ae",
+    "sourceCheck": {
+      "sourceCommit": "31cd96610123c3b4b5673b799a69dfbe90193f0a",
+      "files": 220,
+      "allMatch": true,
+      "mismatches": []
+    },
+    "httpEvidence": "smoke-web-arena.json",
+    "browserEvidence": "smoke-browser-arena.json",
+    "downloadEvidence": "arena-descarga-publica.json",
+    "captures": [
+      "arena-capturas-publicas/ia-escritorio.png",
+      "arena-capturas-publicas/programado-escritorio.png",
+      "arena-capturas-publicas/movil-es-oscuro.png"
+    ]
+  },
+  "availableModelDeployments": [
+    {
+      "name": "gpt-6.1-sol",
+      "model": "gpt-6.1-sol",
+      "state": "Succeeded"
+    }
+  ],
+  "comparisonEvidence": "arena-comparacion-programada.json"
 }

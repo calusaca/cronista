@@ -103,4 +103,20 @@ móvil que desbordaba, el alcance del selector de alertas de la prueba y la
 conservación del fuera de juego en pases detenidos. Tres capturas revisadas.
 
 La web ejecuta políticas programadas o reproduce archivos; no dispara inferencia.
-La evaluación remota y publicación se registrarán por separado.
+## Publicación comprobada
+
+Fuente `31cd966`, imagen `demo-20261018042118`, revisión `cronista--0000005`
+activa en Azure existente. Los 220 archivos del contexto coinciden con el código;
+sin entornos ni credenciales conocidas. [CI 39096736758](https://github.com/calusaca/cronista/actions/runs/39096736758)
+verde: 1453 unitarias, 55 estadísticas, 89 e2e, 2 empaquetado, typecheck,
+contenedor y Bicep. Siete comprobaciones HTTP públicas con proveedor real;
+portada fresca en 23,3 s. Siete comprobaciones de navegador público sin errores
+JS: ejemplo LLM archivado, movimiento/pausa, otra formación, móvil oscuro y
+movimiento reducido; tres capturas revisadas. Descarga idéntica al ejemplo,
+reimportación HTTP 200 y marcador alterado HTTP 400 conservando los 22 jugadores.
+[Evidencia de la versión](../evidencia/arena.json).
+
+La consulta del recurso confirmó un único deployment operativo, GPT-6.1 Sol.
+No se creó ningún deployment nuevo de modelo. La comparación descriptiva con
+políticas programadas produce secuencias distintas con la misma configuración;
+no constituye una evaluación de superioridad o plausibilidad profesional.

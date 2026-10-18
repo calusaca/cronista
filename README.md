@@ -60,7 +60,7 @@ The experimental lab below adapts its first three formation profiles.
 
 ## Experimental team agents lab
 
-Open **Team agents lab** in the app to inspect 22 players, team plans, individual
+Open [Team agents lab](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) to inspect 22 players, team plans, individual
 orders and engine events on one shared pitch. Programmed scenarios and playback
 make no model calls. A recorded real Azure OpenAI example is included: two
 independent controllers using the same GPT-6.1 Sol deployment, four valid
@@ -206,15 +206,15 @@ The [Azure deployment runbook](docs/entrega/despliegue.md) includes a Docker ima
 Bicep templates, and a command that builds remotely in ACR without local Docker.
 
 ```bash
-npm test           # 1,429 unit/invariant/oracle/lie-battery tests
+npm test           # 1,453 unit/invariant/oracle/lie-battery/arena tests
 npm run test:stats # 55 checks: N=1000 matches + A/B condition proofs
-npm run e2e        # 62 browser journeys against the production standalone build
+npm run e2e        # 89 browser journeys against the production standalone build
 npm run test:deploy # deployment context and artifact credential checks
 ```
 
 ## Synthetic data
 
-No real match footage or data is used anywhere. The simulator generates
+No real match footage or data is used anywhere. The standard report simulator generates
 football-realistic matches (seeded, byte-for-byte reproducible): ~2.9 goals
 per match, the stronger team wins 63%, red cards in 12.5%, ~25% draws (Premier
 League: ~24%), three distinguishable play styles, and **~2,100 micro-events
@@ -222,6 +222,8 @@ per match** (passes with 79.6% completion, dribbles, duels) with causal
 continuity — the receiver of a pass is the next actor. Realism is enforced by
 a statistical test suite over 1,000 matches plus per-condition A/B proofs.
 All countries, leagues, teams and players are fictional.
+These distributions do not describe the separate experimental 2D arena, whose
+movement parameters and outcomes still require calibration and human evaluation.
 
 ## Responsible AI & known limitations
 
@@ -242,11 +244,12 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated on 17 October 2026 (America/Guatemala): typecheck, 1,429 unit tests,
-55 statistical checks, 62 browser journeys and two deployment packaging checks.
-[CI passed for the published application](https://github.com/calusaca/cronista/actions/runs/39082924408),
+Validated on 17 October 2026 (America/Guatemala): typecheck, 1,453 unit tests,
+55 statistical checks, 89 browser journeys and two deployment packaging checks.
+[CI passed for the published application](https://github.com/calusaca/cronista/actions/runs/39096736758),
 including Bicep compilation, the Docker image, an HTTP smoke, non-root execution
-and writable cache. The [flowing commentary and playback Azure release](docs/evidencia/relato-reproduccion.json)
+and writable cache. The experimental arena has separate [public release evidence](docs/evidencia/arena.json).
+The earlier [flowing commentary and playback Azure release](docs/evidencia/relato-reproduccion.json)
 passed separate [HTTP checks with the real provider](docs/evidencia/smoke-web-reproduccion.json)
 and a public browser walkthrough: player and ball movement, stable pause, linked
 sentence, style selection, complete TXT download with the same 2,215 ordered IDs

@@ -1,0 +1,50 @@
+{
+  "checkedUtc": "2026-10-18T04:24:52.946Z",
+  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "modelCheck": "real-provider",
+  "results": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "bytes": 36,
+      "elapsedMs": 672
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 174882,
+      "elapsedMs": 23321
+    },
+    {
+      "path": "/_next/static/chunks/310vm2bl3xxpt.js",
+      "status": 200,
+      "bytes": 5364,
+      "elapsedMs": 430
+    },
+    {
+      "path": "/datos",
+      "status": 200,
+      "bytes": 23130,
+      "elapsedMs": 110
+    },
+    {
+      "path": "/datos/datasheet",
+      "status": 200,
+      "bytes": 24525,
+      "elapsedMs": 97
+    },
+    {
+      "path": "/muestra-10.jsonl",
+      "status": 200,
+      "bytes": 241833,
+      "elapsedMs": 444
+    },
+    {
+      "path": "/match/not-a-number",
+      "status": 404,
+      "bytes": 7326,
+      "elapsedMs": 112
+    }
+  ],
+  "note": "HTTP smoke; no sustituye la inspecci\u00f3n visual ni una prueba desde otra red."
+}

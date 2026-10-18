@@ -1,0 +1,45 @@
+{
+  "checkedUtc": "2026-10-18T04:26:30.294Z",
+  "seed": 42,
+  "seconds": 10,
+  "sameConfig": true,
+  "sameInitialState": true,
+  "sameFinalState": false,
+  "sameEventLog": false,
+  "llm": {
+    "eventos": 7,
+    "tipos": {
+      "pase": 2,
+      "recepcion": 2,
+      "tiro": 1,
+      "atajada": 1,
+      "recuperacion": 1
+    },
+    "marcador": {
+      "local": 0,
+      "visita": 0
+    },
+    "respaldos": 0
+  },
+  "programmed": {
+    "eventos": 8,
+    "tipos": {
+      "pase": 3,
+      "recepcion": 2,
+      "tiro": 1,
+      "gol": 1,
+      "reinicio": 1
+    },
+    "marcador": {
+      "local": 1,
+      "visita": 0
+    },
+    "respaldos": 0
+  },
+  "reproduceProgrammed": "npm run arena -- --seed 42 --segundos 10 --intervalo 5 --local 4-3-3 --visita 4-2-3-1",
+  "limits": [
+    "One short scenario, one model deployment, two independent controllers.",
+    "Different output is not evidence of better football realism, tactical quality or hackathon score.",
+    "There is no multi-seed, side-swapped or human evaluation in this comparison."
+  ]
+}

@@ -5,6 +5,8 @@ independientes sobre un motor espacial compartido. El simulador de las crónicas
 su dataset histórico conservan su comportamiento. La página `/arena` permite
 inspeccionar el experimento en inglés o español.
 
+[Abrir el laboratorio publicado](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena).
+
 ## Qué se puede probar
 
 - 22 jugadores con identidad y puesto estable; tres formaciones y cambios de
@@ -114,3 +116,16 @@ La narración usa plantillas desde eventos y distingue pase intentado y recepci�
 Es independiente de V1–V8. La siguiente evaluación debe medir plausibilidad con
 revisión humana, comparar con políticas programadas y alternar lados antes de
 atribuir una ventaja a un modelo.
+
+## Primera comparación descriptiva
+
+La [comparación registrada](evidencia/arena-comparacion-programada.json) usa la
+misma configuración y el mismo estado inicial durante 10 segundos. El ejemplo LLM
+produjo 7 eventos, un tiro y una atajada; las políticas programadas produjeron 8
+eventos, un tiro, un gol y un reinicio. Ambos tuvieron cero respaldos. Los estados
+finales y las secuencias difieren: las órdenes influyen en la jugada. Esta muestra
+no mide superioridad táctica, realismo profesional ni mejora de puntuación.
+
+[Evidencia de la entrega](evidencia/arena.json),
+[comprobaciones del navegador público](evidencia/smoke-browser-arena.json) y
+[comprobaciones HTTP](evidencia/smoke-web-arena.json).
