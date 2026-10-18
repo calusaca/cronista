@@ -1,0 +1,287 @@
+{
+  "checkedUtc": "2026-10-18T01:32:06.348Z",
+  "source": {
+    "commit": "89c0bbc56902efd74b332cfefd13da44ebef60cc",
+    "files": 206,
+    "exactHashesVerified": true,
+    "knownCredentialsExcludedByStageSource": true
+  },
+  "local": {
+    "typecheck": "passed",
+    "unitTests": 1429,
+    "browserTests": 84,
+    "newBrowserTests": 22,
+    "packagingTests": 2,
+    "writer": "Explicit rehearsal fixture; no local real-model calls",
+    "checks": [
+      "Held navigation responses: seed, random, empty seed with Enter, stories",
+      "Held links: home, Data, league, perspective, tabs, matchday, fixture, next and back",
+      "Native modified click, Enter, history; invalid seed and same route",
+      "Download: pending, one request, original bytes, failure and retry",
+      "Replay: pending, clock held, failure/retry, leave/re-enter without duplicate request",
+      "Full match and 3D modules held, failures clear loading; page retry recovers module failure",
+      "360px, dark theme, reduced motion; existing no-prefetch and HTTP 404 checks preserved"
+    ],
+    "candidateSecretScan": {
+      "files": 21,
+      "findings": 0
+    }
+  },
+  "ci": {
+    "url": "https://github.com/calusaca/cronista/actions/runs/39086205637",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Judge's path (Playwright)",
+        "conclusion": "success",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39086205637/job/117553207415"
+      },
+      {
+        "name": "Unit, invariants & statistics",
+        "conclusion": "success",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39086205637/job/117553207467"
+      },
+      {
+        "name": "Production container & Azure templates",
+        "conclusion": "success",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39086205637/job/117553207551"
+      }
+    ]
+  },
+  "deployment": {
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "group": "rg-cronista-demo",
+    "appName": "cronista",
+    "registryName": "crcronistae1734ecca5ff",
+    "imageTag": "demo-20261018012201",
+    "deployedUtc": "2026-10-18T01:24:44.249Z",
+    "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261018012201",
+    "provisioningState": "Succeeded",
+    "revision": "cronista--0000004",
+    "runningStatus": "Running",
+    "digest": "sha256:240d3a525b397b9cf93bb26b56aba018d5dc846c0a6b287cc89f9ce51e7d96fc",
+    "sourceFilesMatchManifest": 206
+  },
+  "publicHttp": {
+    "checkedUtc": "2026-10-18T01:25:36.266Z",
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "modelCheck": "real-provider",
+    "results": [
+      {
+        "path": "/api/health",
+        "status": 200,
+        "bytes": 36,
+        "elapsedMs": 473
+      },
+      {
+        "path": "/",
+        "status": 200,
+        "bytes": 174143,
+        "elapsedMs": 21531
+      },
+      {
+        "path": "/_next/static/chunks/310vm2bl3xxpt.js",
+        "status": 200,
+        "bytes": 5364,
+        "elapsedMs": 388
+      },
+      {
+        "path": "/datos",
+        "status": 200,
+        "bytes": 23049,
+        "elapsedMs": 115
+      },
+      {
+        "path": "/datos/datasheet",
+        "status": 200,
+        "bytes": 24525,
+        "elapsedMs": 97
+      },
+      {
+        "path": "/muestra-10.jsonl",
+        "status": 200,
+        "bytes": 241833,
+        "elapsedMs": 446
+      },
+      {
+        "path": "/match/not-a-number",
+        "status": 404,
+        "bytes": 7202,
+        "elapsedMs": 113
+      }
+    ],
+    "note": "HTTP smoke; no sustituye la inspección visual ni una prueba desde otra red."
+  },
+  "publicBrowser": {
+    "base": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "checkedUtc": "2026-10-18T01:26:33.757Z",
+    "provider": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+    "generatedProvider": "Writer: Microsoft Foundry · gpt-6.1-sol",
+    "note": "Responses held until the visible status was observed, then released to the real server. Durations include this brief browser hold; not pure model latency. Random UI selection controlled to reuse seed 246.",
+    "results": [
+      {
+        "name": "simulate",
+        "title": "Preparing your match…",
+        "feedbackMs": 62,
+        "durationIncludingBrowserHoldMs": 8178,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "random-match-controlled-246",
+        "title": "Preparing your match…",
+        "feedbackMs": 99,
+        "durationIncludingBrowserHoldMs": 331,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "data-navigation",
+        "title": "Loading page…",
+        "feedbackMs": 65,
+        "durationIncludingBrowserHoldMs": 313,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "league-navigation",
+        "title": "Loading page…",
+        "feedbackMs": 84,
+        "durationIncludingBrowserHoldMs": 884,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "matchday-query-navigation",
+        "title": "Loading page…",
+        "feedbackMs": 64,
+        "durationIncludingBrowserHoldMs": 350,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "home-navigation",
+        "title": "Preparing your match…",
+        "feedbackMs": 78,
+        "durationIncludingBrowserHoldMs": 385,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "full-match-lazy-module",
+        "title": "Opening the full match…",
+        "feedbackMs": 60,
+        "durationIncludingBrowserHoldMs": 439,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "3d-lazy-module",
+        "title": "Loading the 3D view…",
+        "feedbackMs": 72,
+        "durationIncludingBrowserHoldMs": 1095,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      },
+      {
+        "name": "dataset-download",
+        "title": "Preparing download…",
+        "feedbackMs": 82,
+        "durationIncludingBrowserHoldMs": 391,
+        "requests": 1,
+        "statusVisibleBeforeRelease": true,
+        "statusRemovedAfterCompletion": true
+      }
+    ],
+    "javascriptErrors": [],
+    "download": {
+      "bytes": 241833,
+      "sha256": "258f9310b56b523f6f101849e16ab3ef695e56fa1c843e7d6a988ca75f2de9d0",
+      "matchesOriginal": true
+    }
+  },
+  "publicCaptures": {
+    "base": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "checkedUtc": "2026-10-18T01:26:20.924Z",
+    "note": "Navigation responses intentionally held in browser for reproducible screenshots; no extra match generation requested.",
+    "results": [
+      {
+        "name": "carga-escritorio",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "colorScheme": "light",
+        "reducedMotion": "no-preference",
+        "provider": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+        "status": "Preparing your match…\nGenerating the match and its report. This may take a little while.",
+        "visible": true,
+        "disabledControls": true,
+        "horizontalOverflow": false,
+        "animation": "match-loading-spin",
+        "screenshot": "docs/entrega/capturas/carga-escritorio.png",
+        "javascriptErrors": [],
+        "responseHeldInBrowser": true,
+        "sha256": "d9cea85b23817fb426e3a1d6fc29e8c3c9fa8ed89ce77acdf212b5911fb9442d",
+        "visuallyReviewed": true
+      },
+      {
+        "name": "carga-movil",
+        "viewport": {
+          "width": 360,
+          "height": 780
+        },
+        "colorScheme": "light",
+        "reducedMotion": "no-preference",
+        "provider": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+        "status": "Preparing your match…\nGenerating the match and its report. This may take a little while.",
+        "visible": true,
+        "disabledControls": true,
+        "horizontalOverflow": false,
+        "animation": "match-loading-spin",
+        "screenshot": "docs/entrega/capturas/carga-movil.png",
+        "javascriptErrors": [],
+        "responseHeldInBrowser": true,
+        "sha256": "f1a2b4a5c4579bb132721de29210a4078171177d6a52bd5d6ce274e76bccbf66",
+        "visuallyReviewed": true
+      },
+      {
+        "name": "carga-oscuro",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "colorScheme": "dark",
+        "reducedMotion": "reduce",
+        "provider": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+        "status": "Preparing your match…\nGenerating the match and its report. This may take a little while.",
+        "visible": true,
+        "disabledControls": true,
+        "horizontalOverflow": false,
+        "animation": "none",
+        "screenshot": "docs/entrega/capturas/carga-oscuro.png",
+        "javascriptErrors": [],
+        "responseHeldInBrowser": true,
+        "sha256": "06274e68878560adf52da8ba3ce66458ba9026b5560bade9265c9c43430f7d4e",
+        "visuallyReviewed": true
+      }
+    ]
+  },
+  "limits": [
+    "Loading feedback does not make model generation faster or expose server progress stages.",
+    "No fabricated percentage or remaining time. Loading UI adds no model calls or speculative prefetch; requested uncached reports still call the model.",
+    "Browser tests briefly hold requests for reproducible visibility checks, then use the real server; timings include this hold.",
+    "Radio commentary TXT exports and local filters remain immediate; the Markdown datasheet keeps native browser document handling.",
+    "Initial full-document navigation uses the browser loading state; there is no global streaming loading.tsx, preserving invalid-route HTTP status.",
+    "DOM accessibility checks and reduced-motion behavior are verified; no human screen-reader study claimed.",
+    "Model report content varies by generation; historical evaluation results are unchanged."
+  ]
+}

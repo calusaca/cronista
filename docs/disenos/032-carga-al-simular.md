@@ -65,4 +65,17 @@ de espera/recuperación y los 62 existentes. Las pruebas retienen peticiones rea
 del navegador, sin añadir demoras al producto. Tres capturas revisadas:
 escritorio, móvil de 360 px y oscuro con movimiento reducido, sin desborde ni
 errores JS. Gitleaks del candidato sin hallazgos y contexto de ACR validado:
-206 archivos, sin entorno ni claves conocidas. Publicación y CI pendientes.
+206 archivos, sin entorno ni claves conocidas.
+
+## Publicación verificada
+
+Versión `89c0bbc` publicada en la demo existente: imagen
+`demo-20261018012201`, revisión `cronista--0000004`, Succeeded/Running.
+[CI verde](https://github.com/calusaca/cronista/actions/runs/39086205637), incluidos 55 tests estadísticos, 84 de navegador, Docker y Bicep.
+HTTP con proveedor real aprobado; primera portada en 21,5 s. Nueve recorridos
+públicos verifican aviso antes de liberar la petición y retirada al terminar,
+una petición por operación, descarga byte a byte y cero errores JS. Capturas
+públicas de escritorio, móvil y oscuro revisadas. Las respuestas se retienen
+brevemente en el navegador para observar la espera de forma reproducible;
+la generación y las descargas posteriores son del servidor real.
+[Evidencia](../evidencia/estados-carga.json).
