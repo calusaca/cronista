@@ -23,7 +23,7 @@ export interface Llm {
    * deployment invalida la caché sola.
    */
   readonly id: string;
-  completar(system: string, mensajes: Mensaje[]): Promise<string>;
+  completar(system: string, mensajes: Mensaje[], opciones?: { signal?: AbortSignal }): Promise<string>;
 }
 
 export type TipoLlm = "stub" | "foundry" | "azure-openai" | "ensayo";
@@ -44,7 +44,7 @@ function requerida(env: Env, nombre: string, tipo: TipoLlm = "foundry"): string 
 const opcional = (env: Env, nombre: string): string | undefined => (env[nombre]?.trim() ? (env[nombre] as string).trim() : undefined);
 
 /** Construye el LLM que pide el entorno. Lanza con un mensaje claro si falta config. */
-export function crearLlmDesdeEnv(env: Env = process.env): Llm {
+export function crearLlmDesdeEnv(env: Env = process.env, opciones: { maxRetries?: number } = {}): Llm {
   const tipo = (env.CRONISTA_LLM ?? "stub").trim() || "stub";
   switch (tipo) {
     case "stub":
@@ -56,6 +56,7 @@ export function crearLlmDesdeEnv(env: Env = process.env): Llm {
         apiKey: requerida(env, "FOUNDRY_API_KEY"),
         baseURL: requerida(env, "FOUNDRY_BASE_URL"),
         deployment: requerida(env, "FOUNDRY_DEPLOYMENT"),
+        ...(opciones.maxRetries !== undefined ? { maxRetries: opciones.maxRetries } : {}),
       });
     case "azure-openai": {
       const apiVersion = opcional(env, "AZURE_OPENAI_API_VERSION");
@@ -74,6 +75,22 @@ export function crearLlmDesdeEnv(env: Env = process.env): Llm {
     default:
       throw new Error(`CRONISTA_LLM="${tipo}" no existe; valores válidos: ${TIPOS_LLM.join(", ")}`);
   }
+}
+
+/** Brief 034: instancias separadas, mismas credenciales por defecto. Sobreescribir
+ * ARENA_LOCAL_LLM / ARENA_VISITA_LLM y ARENA_<LADO>_<VARIABLE_ORIGINAL> para otro
+ * proveedor/deployment. No modifica process.env ni el Writer. */
+export function crearLlmEquipoDesdeEnv(lado: "local" | "visita", env: Env = process.env): Llm {
+  const prefijo = `ARENA_${lado.toUpperCase()}_`;
+  const configuracion = { ...env };
+  for (const key of ["FOUNDRY_API_KEY", "FOUNDRY_BASE_URL", "FOUNDRY_DEPLOYMENT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION", "AZURE_OPENAI_REASONING_EFFORT"]) {
+    if (env[prefijo + key] !== undefined) configuracion[key] = env[prefijo + key];
+  }
+  configuracion.CRONISTA_LLM = (env[prefijo + "LLM"] ?? env.CRONISTA_LLM ?? "stub").trim();
+  if (configuracion.CRONISTA_LLM !== "foundry" && configuracion.CRONISTA_LLM !== "azure-openai") {
+    throw new Error("Arena LLM necesita azure-openai o foundry; el modo programado se elige por separado");
+  }
+  return crearLlmDesdeEnv(configuracion, { maxRetries: 0 });
 }
 
 let porDefecto: Llm | undefined;

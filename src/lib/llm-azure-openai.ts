@@ -60,10 +60,11 @@ export function crearLlmAzureOpenAI(cfg: ConfigAzureOpenAI): Llm {
   const transporte = cfg.fetch ?? fetch;
   return {
     id: `azure-openai:${cfg.deployment}${cfg.reasoningEffort ? `:reasoning-${cfg.reasoningEffort}` : ""}`,
-    async completar(system: string, mensajes: Mensaje[]): Promise<string> {
+    async completar(system: string, mensajes: Mensaje[], opciones?: { signal?: AbortSignal }): Promise<string> {
       const r = await transporte(urlAzureOpenAI(cfg), {
         method: "POST",
         headers: { "content-type": "application/json", "api-key": cfg.apiKey },
+        ...(opciones?.signal ? { signal: opciones.signal } : {}),
         body: JSON.stringify({
           messages: [{ role: "system", content: system }, ...mensajes.map((m) => ({ role: m.rol, content: m.contenido }))],
           ...(cfg.reasoningEffort

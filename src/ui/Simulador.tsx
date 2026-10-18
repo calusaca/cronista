@@ -62,6 +62,9 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
         <Link href="/datos" className="league-link" prefetch={false} data-testid="data-link">
           Data
         </Link>
+        <Link href="/arena" className="league-link" prefetch={false} data-testid="arena-link">
+          Team agents lab
+        </Link>
       </nav>
       <form className="sim-form" onSubmit={simular} aria-label="Simulate a match" aria-busy={pendiente}>
         <select

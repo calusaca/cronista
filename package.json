@@ -8,6 +8,7 @@
     "test:stats": "vitest run --config vitest.stats.config.ts --reporter=verbose --silent=false",
     "typecheck": "tsc --noEmit",
     "sim": "tsx src/sim/cli.ts",
+    "arena": "node --import tsx src/arena/cli.ts",
     "analizar": "tsx src/analista/cli.ts",
     "cronica": "tsx src/cadena/cli.ts",
     "presets": "tsx src/vista/cli-presets.ts",

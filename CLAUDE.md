@@ -57,9 +57,13 @@ Las reglas V1–V8 verifican la crónica del Writer; el relato completo usa plan
 deterministas, con sus propias pruebas, y no debe presentarse como prosa LLM validada.
 
 El [brief 033](docs/disenos/033-tactica-y-movimiento.md) reúne investigación y una
-propuesta de formaciones, funciones y movimiento continuo. Su catálogo y parámetros
-son un diseño pendiente de integración y calibración; no amplían las capacidades
-actuales del simulador.
+propuesta de formaciones, funciones y movimiento continuo. El [brief 034](docs/disenos/034-arena-dos-controladores.md)
+inicia un laboratorio independiente (`/arena`, `npm run arena`) con tres perfiles,
+dos controladores y motor espacial central. La CLI admite dos instancias LLM; la
+web ejecuta políticas programadas o reproduce registros. Ejemplo real archivado
+de dos agentes del mismo deployment; comparación entre modelos distintos pendiente.
+Parámetros sintéticos por calibrar y reglas/reinicios simplificados: no presentar
+como partido reglamentario completo ni como reemplazo de los eventos históricos.
 
 ## Forma de trabajo
 

@@ -55,7 +55,28 @@ flowchart LR
 (Spanish): 25 primary sources, seven formations, seven tactical profiles and
 14 coordinated movement patterns, with a [proposed JSON catalog](docs/tactica/catalogo-propuesto.v1.json)
 and phased integration plan. This is research and design; the application does
-not consume this catalog yet, and movement parameters require calibration.
+not consume this catalog directly, and movement parameters require calibration.
+The experimental lab below adapts its first three formation profiles.
+
+## Experimental team agents lab
+
+Open **Team agents lab** in the app to inspect 22 players, team plans, individual
+orders and engine events on one shared pitch. Programmed scenarios and playback
+make no model calls. A recorded real Azure OpenAI example is included: two
+independent controllers using the same GPT-6.1 Sol deployment, four valid
+decisions, no fallbacks. Different-model comparisons remain pending.
+
+The CLI runs two LLM controllers with simultaneous observations, bounded
+requests, cancellation and programmed fallback:
+
+```bash
+npm run arena -- --modo llm --segundos 10 --intervalo 5 --salida .cache/arena-modelos.json
+npm run arena -- --reproducir .cache/arena-modelos.json
+```
+
+[Setup, configuration and limitations](docs/arena.md). This is a short 2D open-play
+prototype with simplified restarts and uncalibrated movement. Existing reports
+and their historical evaluations retain their original simulator.
 
 ## The multi-agent system (Best Multi-Agent System category)
 

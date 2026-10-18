@@ -453,3 +453,31 @@ export const BANCO_LIMITADO = 3;
 export const RAREZA_SANCIONES_CLUB = { media: { min: 0.6, max: 1.0 }, max: 2 } as const;
 /** A/B de la puerta cerrada (N_AB): pérdidas tempranas del visitante con presión alta vs puerta cerrada, cociente sobre la base. */
 export const AB_PUERTA_CERRADA = { cocienteBase: { min: 0.9, max: 1.1 } } as const;
+/** Brief 034: prototipo espacial independiente; cifras sintéticas por calibrar.
+ * No intervienen en el motor histórico. Unidades: metros y segundos. */
+export const ARENA = {
+  version: "arena-v1",
+  largoM: 105, anchoM: 68, arcoM: 7.32,
+  pasoS: 0.1, fotogramaS: 0.5,
+  duracionS: 180, duracionMaxS: 180,
+  intervaloS: 15, intervaloMinS: 2, intervaloMaxS: 30,
+  maxRondas: 90, esperaMs: 45_000, esperaMaxMs: 60_000,
+  aceleracionMps2: 3, velocidadMps: 6.5,
+  velocidadBalonMps: 17, velocidadTiroMps: 24,
+  controlM: 1.1, controlPorteroM: 1.7,
+  separacionM: 1.6, toleranciaM: 0.2,
+  accionCadaS: 2, radioTiroM: 25, paseMaxM: 32,
+  recuperacionCadaS: 0.8, archivoMaxBytes: 8_000_000,
+  paseMinM: 4, avanceMinPaseM: -8, margenPase: 1.5,
+  pesoAvanceDirecto: 1.5, pesoDistanciaPase: 0.15, margenUtilM: 8,
+  ajusteLongitud: 0.25, ajusteAncho: 0.2, ajusteMaxM: 10,
+  avanceConduccionM: 15, velocidadMinFactor: 0.9, velocidadNivelFactor: 0.2,
+  energiaMin: 0.4, energiaPorMetro: 0.00015, recuperacionEnergiaS: 0.0002,
+  factorCalor: 1.5, factorEnergiaMin: 0.8,
+  errorPaseM: 2, errorLluviaM: 0.5, errorTiroM: 9,
+  dueloBase: 0.35, dueloNivel: 0.004, dueloFuerza: 0.002,
+  dueloMin: 0.1, dueloMax: 0.75, ignorarAutorS: 0.4,
+  areaLargoM: 16.5, areaAnchoM: 40.32,
+  amplitud: { estrecha: 0.8, media: 1, amplia: 1.1 },
+  alturaBloqueM: { bajo: -6, medio: 0, alto: 6 },
+} as const;

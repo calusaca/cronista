@@ -1,0 +1,133 @@
+{
+  "phase": "local_validation",
+  "recording": {
+    "path": "public/experimentos/arena-llm-v1.json",
+    "seconds": 10,
+    "rounds": 2,
+    "decisions": 4,
+    "events": 7,
+    "fallbacks": 0,
+    "controllerIds": [
+      "azure-openai:gpt-6.1-sol:reasoning-low"
+    ],
+    "distinctDeployments": 1,
+    "offlineReplay": "passed"
+  },
+  "validation": {
+    "fullUnitTests": 1453,
+    "finalArenaUnitTests": 24,
+    "fullBrowserTests": 89,
+    "finalArenaBrowserTests": 5,
+    "packagingTests": 2,
+    "typecheck": "passed",
+    "browser": {
+      "checkedUtc": "2026-10-18T04:19:08.034Z",
+      "baseUrl": "http://127.0.0.1:3420",
+      "verificaciones": [
+        {
+          "check": "22 jugadores iniciales",
+          "passed": true
+        },
+        {
+          "check": "movimiento real de la reproducción",
+          "passed": true
+        },
+        {
+          "check": "pausa estable",
+          "passed": true
+        },
+        {
+          "check": "otra configuración resuelta",
+          "passed": true
+        },
+        {
+          "check": "móvil sin desborde",
+          "passed": true
+        },
+        {
+          "check": "movimiento reducido declarado",
+          "passed": true
+        },
+        {
+          "check": "sin errores JS",
+          "passed": true
+        }
+      ],
+      "errores": [],
+      "peticiones": [
+        "reproducir",
+        "simular"
+      ],
+      "capturas": [
+        "ia-escritorio.png",
+        "programado-escritorio.png",
+        "movil-es-oscuro.png"
+      ],
+      "limits": [
+        "Browser checks do not assess professional football realism.",
+        "Loading the recorded AI example makes no new inference calls."
+      ]
+    }
+  },
+  "files": [
+    {
+      "file": "src/arena/tipos.ts",
+      "sha256": "a860b18efb368b70542d882e2a489bc12e6063954b11a4da005d5cddccafc4c9"
+    },
+    {
+      "file": "src/arena/catalogo.ts",
+      "sha256": "b316e9d130ee76fc45c91c472e2d8e23fb329290d2d5552b0c8243e6c0f5c2c4"
+    },
+    {
+      "file": "src/arena/geometria.ts",
+      "sha256": "f364330d86edb65af9f7167363f7440d2c5f9ebecb2aa53d2097d0414588881f"
+    },
+    {
+      "file": "src/arena/controladores.ts",
+      "sha256": "5f247ced325e68b59bbed90a73431e87a8db7e035faa30fa4d13370afe691fea"
+    },
+    {
+      "file": "src/arena/motor.ts",
+      "sha256": "43f5addbda110da55f4beee2084eb15ead4ee0bd14dde319a97ab127fe5ae952"
+    },
+    {
+      "file": "src/arena/coordinador.ts",
+      "sha256": "4d0494f99f26dc4e283a504b79e9e5f3b8a5821845efdd1212f20f06419694ac"
+    },
+    {
+      "file": "src/arena/vista.ts",
+      "sha256": "4ac48a3350c3e581fae3187f3635cfb53c9d5f271930f3954e2d3915a644eaf0"
+    },
+    {
+      "file": "src/arena/cli.ts",
+      "sha256": "044bb4d9ae13fbdefcb4a10f408dc5001188c3fc3af3e05fb32ef57d6ce0f580"
+    },
+    {
+      "file": "src/ui/Arena.tsx",
+      "sha256": "e6d1ebbc48a60292921b2f7d8afd9ca28e47cae7acc6709661b90c392a965966"
+    },
+    {
+      "file": "src/lib/llm.ts",
+      "sha256": "231a03dfac08cbc2ab782a6924cea18c2a21bc16fb0f206461fcfd03e3f16a00"
+    },
+    {
+      "file": "src/lib/llm-azure-openai.ts",
+      "sha256": "215b2818a10dbac6a901ac7f386b10b34ee21e1f40292e1010575d471134ac0c"
+    },
+    {
+      "file": "src/lib/llm-foundry.ts",
+      "sha256": "b5702227d22f820a2f6fe0d80da9512482e8d2efae359a83b699571a31ba7ec0"
+    },
+    {
+      "file": "public/experimentos/arena-llm-v1.json",
+      "sha256": "b3d04925c16b60a7317b79b0dd0e3bf6567b4f1e08fb984cf9625a87b82a83b5"
+    }
+  ],
+  "limits": [
+    "Two independent controllers used the same deployment; this is not a comparison of different models.",
+    "Short 2D open-play prototype with uncalibrated parameters and simplified restarts, not a full regulation match.",
+    "No human football-realism evaluation or hackathon score improvement was measured.",
+    "No token/cost measurement was added to the transport.",
+    "Final full-suite remote CI and public deployment will be recorded separately."
+  ]
+}

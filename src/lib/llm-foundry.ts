@@ -38,7 +38,7 @@ export function crearLlmFoundry(cfg: ConfigFoundry): Llm {
   });
   return {
     id: `foundry:${cfg.deployment}`,
-    async completar(system: string, mensajes: Mensaje[]): Promise<string> {
+    async completar(system: string, mensajes: Mensaje[], opciones?: { signal?: AbortSignal }): Promise<string> {
       const respuesta = await cliente.messages.create({
         model: cfg.deployment,
         max_tokens: MAX_TOKENS_FOUNDRY,
@@ -46,7 +46,7 @@ export function crearLlmFoundry(cfg: ConfigFoundry): Llm {
         thinking: { type: "adaptive" },
         messages: mensajes.map((m) => ({ role: m.rol, content: m.contenido })),
         // Sin temperature ni top_k: Foundry los rechaza (brief 003).
-      });
+      }, opciones?.signal ? { signal: opciones.signal } : undefined);
       return respuesta.content
         .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
         .map((b) => b.text)
