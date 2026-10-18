@@ -1,0 +1,334 @@
+{
+  "checkedUtc": "2026-10-18T00:39:56.432Z",
+  "sourceCommit": "73999a2d8b4f36243e211e5bf815799d167147c6",
+  "design": "../disenos/031-relato-fluido-y-reproduccion.md",
+  "feature": {
+    "languages": [
+      "es",
+      "en"
+    ],
+    "styles": [
+      "fluido",
+      "detallado"
+    ],
+    "actions": 2215,
+    "sequences": 324,
+    "recordedIdsAndOrderPreserved": true,
+    "playback": [
+      "Player markers and ball from the same selected action",
+      "Initially paused; play, pause and restart",
+      "Scope: sequence or whole match; speed 0.5/1/2",
+      "Active text and pitch share event IDs and geometry",
+      "Manual selection, hidden pitch/page and unmount stop playback",
+      "Reduced motion uses discrete steps",
+      "Starting shape/goalkeeper introduction and current score"
+    ]
+  },
+  "referenceAnalysis": {
+    "file": "analisis-transcripts.json",
+    "transcripts": 6,
+    "radioExamplesAdded": 2,
+    "approxWords": 135882,
+    "timestampedSegments": 7269,
+    "findings": 13,
+    "rawFilesKeptLocal": true,
+    "noAudioListened": true
+  },
+  "lengthComparison": {
+    "seed": 246,
+    "scope": "All action clauses, same recorded IDs, excluding headings, line-up introduction and support blocks; whitespace word count",
+    "results": [
+      {
+        "language": "es",
+        "detailedWords": 34194,
+        "flowingWords": 27342,
+        "reductionPercent": 20.04
+      },
+      {
+        "language": "en",
+        "detailedWords": 31565,
+        "flowingWords": 27041,
+        "reductionPercent": 14.33
+      }
+    ],
+    "interpretation": "Descriptive length reduction only; no blind comprehension or quality study, no judge score prediction"
+  },
+  "evidenceRules": [
+    "Receive follows only a completed pass to the actor in the same possession and side",
+    "Return pass requires completed A→B→A; no claim of one-touch or wall pass",
+    "Repeated surnames keep full names; first mention resets by possession",
+    "All metre distances and outcomes remain available in both narrative styles and the technical log"
+  ],
+  "local": {
+    "typecheck": "passed",
+    "unit": {
+      "passed": 1429,
+      "files": 55,
+      "seconds": 34.36,
+      "newTests": 13
+    },
+    "browser": {
+      "fullSuitePassed": 62,
+      "fullRuns": 2,
+      "focusedAfterFinalViewportAdjustmentPassed": 11,
+      "newJourneys": 6,
+      "backend": "labeled ensayo fixture",
+      "server": "Next production standalone"
+    },
+    "packaging": {
+      "passed": 2,
+      "sourceFiles": 202,
+      "knownCredentialsExcluded": true
+    },
+    "visual": {
+      "checkedUtc": "2026-10-18T00:28:35.856Z",
+      "url": "http://127.0.0.1:3416",
+      "writer": "Writer: Rehearsal fixture — a scripted writer with one deliberate error (test only)",
+      "fixture": true,
+      "actions": 2215,
+      "uniqueOrderedIds": true,
+      "downloadWhileFiltered": true,
+      "before": {
+        "id": "m0004",
+        "progress": 0,
+        "actor": "translate(19 12)",
+        "ball": "22"
+      },
+      "middle": {
+        "id": "m0004",
+        "progress": 0.3154,
+        "actor": "translate(15.530152142857144 12)",
+        "ball": "18.530152142857144"
+      },
+      "after": {
+        "id": "m0004",
+        "progress": 1,
+        "actor": "translate(8 12.000000000000002)",
+        "ball": "11"
+      },
+      "motion": {
+        "actorAndBallMoved": true,
+        "pauseStable": true,
+        "initiallyPaused": true
+      },
+      "styles": {
+        "flowing": "En el tercio de ataque, por la derecha, Leo Fenaido (#5) se mueve con la pelota 11 metros hacia adelante.",
+        "detailed": "Desde el tercio de ataque, por la derecha, Leo Fenaido (#5) conduce el balón 11 metros hacia adelante."
+      },
+      "goalBuildUp": "e005",
+      "mobile": {
+        "width": 360,
+        "height": 800,
+        "pitchRatioAtLeast": 0.95,
+        "noHorizontalOverflow": true,
+        "hiddenPitchStopsPlayback": true
+      },
+      "reducedMotion": true,
+      "pageErrors": [],
+      "extraApiCalls": [],
+      "screenshots": [
+        "es-relato-fluido.png",
+        "es-cancha-antes.png",
+        "es-cancha-movimiento.png",
+        "es-cancha-despues.png",
+        "es-gol-con-relato.png",
+        "es-relato-radio-movil.png",
+        "es-reproduccion-movil.png",
+        "en-reproduccion-oscuro.png"
+      ],
+      "screenshotsReviewed": 8,
+      "recovery": "Manual screenshot review led to visible starting line-ups on language change, keeping the active clause in view and prioritizing pitch/controls over filters on mobile"
+    }
+  },
+  "ci": {
+    "run": "https://github.com/calusaca/cronista/actions/runs/39082924408",
+    "commit": "73999a2d8b4f36243e211e5bf815799d167147c6",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Production container & Azure templates",
+        "conclusion": "success",
+        "startedUtc": "2026-10-18T00:29:15Z",
+        "completedUtc": "2026-10-18T00:30:13Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39082924408/job/117543454302"
+      },
+      {
+        "name": "Unit, invariants & statistics",
+        "conclusion": "success",
+        "startedUtc": "2026-10-18T00:29:15Z",
+        "completedUtc": "2026-10-18T00:38:39Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39082924408/job/117543454395"
+      },
+      {
+        "name": "Judge's path (Playwright)",
+        "conclusion": "success",
+        "startedUtc": "2026-10-18T00:29:15Z",
+        "completedUtc": "2026-10-18T00:33:46Z",
+        "url": "https://github.com/calusaca/cronista/actions/runs/39082924408/job/117543454404"
+      }
+    ],
+    "unitTests": 1429,
+    "statisticalTests": 55,
+    "browserTests": 62,
+    "packagingTests": 2,
+    "container": "Docker build, offline-stub HTTP smoke, non-root runtime, writable cache and Bicep compilation",
+    "containerHttpEvidence": "container-reproduccion.json"
+  },
+  "deployment": {
+    "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "group": "rg-cronista-demo",
+    "appName": "cronista",
+    "registryName": "crcronistae1734ecca5ff",
+    "imageTag": "demo-20261018002936",
+    "deployedUtc": "2026-10-18T00:32:13.298Z",
+    "sourceCommit": "73999a2d8b4f36243e211e5bf815799d167147c6",
+    "sourceFiles": 202,
+    "sourceManifestSha256": "854fa21f736d705ee93a07b713c82ec6a803557666aecfc4d0b482ecb08306f4",
+    "currentApplicationSourceMatchesManifest": true,
+    "provider": "azure-openai",
+    "image": {
+      "createdUtc": "2026-10-18T00:31:35.3314418Z",
+      "digest": "sha256:e8bc25ea17041624ba660335a34e8bfb52371664ec0b589934f7fd15f2d370b8",
+      "updatedUtc": "2026-10-18T00:31:35.3314418Z"
+    },
+    "runtime": {
+      "fqdn": "cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261018002936",
+      "latestReadyRevision": "cronista--0000003",
+      "location": "East US 2",
+      "name": "cronista",
+      "resources": {
+        "cpu": 0.5,
+        "ephemeralStorage": "2Gi",
+        "memory": "1Gi"
+      },
+      "runningStatus": "Running",
+      "scale": {
+        "cooldownPeriod": 300,
+        "maxReplicas": 1,
+        "minReplicas": 0,
+        "pollingInterval": 30,
+        "rules": null
+      },
+      "state": "Succeeded"
+    }
+  },
+  "supplementaryVideo": {
+    "path": "docs/entrega/reproduccion-en-borrador.webm",
+    "evidence": "reproduccion-video.json",
+    "durationSeconds": 25.04,
+    "language": "en",
+    "audio": false,
+    "draft": true
+  },
+  "publicChecks": {
+    "httpEvidence": "smoke-web-reproduccion.json",
+    "browser": {
+      "checkedUtc": "2026-10-18T00:33:41.669Z",
+      "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+      "writer": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+      "fixture": false,
+      "actions": 2215,
+      "uniqueOrderedIds": true,
+      "downloadWhileFiltered": true,
+      "before": {
+        "id": "m0004",
+        "progress": 0,
+        "actor": "translate(19 12)",
+        "ball": "22"
+      },
+      "middle": {
+        "id": "m0004",
+        "progress": 0.3154,
+        "actor": "translate(15.530285714285714 12)",
+        "ball": "18.530285714285714"
+      },
+      "after": {
+        "id": "m0004",
+        "progress": 1,
+        "actor": "translate(8 12.000000000000002)",
+        "ball": "11"
+      },
+      "motion": {
+        "actorAndBallMoved": true,
+        "pauseStable": true,
+        "initiallyPaused": true
+      },
+      "styles": {
+        "flowing": "En el tercio de ataque, por la derecha, Leo Fenaido (#5) se mueve con la pelota 11 metros hacia adelante.",
+        "detailed": "Desde el tercio de ataque, por la derecha, Leo Fenaido (#5) conduce el balón 11 metros hacia adelante."
+      },
+      "goalBuildUp": "e005",
+      "mobile": {
+        "width": 360,
+        "height": 800,
+        "pitchRatioAtLeast": 0.95,
+        "noHorizontalOverflow": true,
+        "hiddenPitchStopsPlayback": true
+      },
+      "reducedMotion": true,
+      "pageErrors": [],
+      "extraApiCalls": [],
+      "screenshots": [
+        "es-relato-fluido.png",
+        "es-cancha-antes.png",
+        "es-cancha-movimiento.png",
+        "es-cancha-despues.png",
+        "es-gol-con-relato.png",
+        "es-relato-radio-movil.png",
+        "es-reproduccion-movil.png",
+        "en-reproduccion-oscuro.png"
+      ]
+    },
+    "screenshots": [
+      {
+        "path": "docs/entrega/capturas/relato-fluido.png",
+        "sha256": "928dd941f6973c743eba45c533c2177c9b20d625681855bb3fce7ffa432ca5f3",
+        "origin": "Public Azure demo; real-provider recap, deterministic commentary and schematic playback"
+      },
+      {
+        "path": "docs/entrega/capturas/reproduccion-cancha.png",
+        "sha256": "f0841be1ee17f2d104b320f84c81d466ea6c1d390ead979c72f1cb15a70bcb12",
+        "origin": "Public Azure demo; real-provider recap, deterministic commentary and schematic playback"
+      },
+      {
+        "path": "docs/entrega/capturas/reproduccion-movil.png",
+        "sha256": "f7f70d4a2176d4f014601cf6acecde8385822b9d28ceff5e73a24db2b3355ed0",
+        "origin": "Public Azure demo; real-provider recap, deterministic commentary and schematic playback"
+      },
+      {
+        "path": "docs/entrega/capturas/reproduccion-dark.png",
+        "sha256": "4afd814eb1e06b36d13e87385c78d056131994d9781a80c4fff0f062ed6e8adb",
+        "origin": "Public Azure demo; real-provider recap, deterministic commentary and schematic playback"
+      }
+    ]
+  },
+  "security": {
+    "tool": "Gitleaks",
+    "scannedFeatureFiles": 17,
+    "findings": 0,
+    "rawTranscriptsExcluded": true,
+    "scope": "Feature code, tests and docs; package independently checks known credentials"
+  },
+  "sourceSha256": {
+    "src/vista/relato.ts": "0f3281bda009e1d086cdad3ca3a21d79695dc94f71b32e8fb8a24397542bb80c",
+    "src/vista/reproduccion.ts": "fae20cb0db08ff12a53265722e97fee39fcd0eb5abc8bcc9e6afb571ad4582a6",
+    "src/ui/ReproductorCancha.tsx": "51bad52c455a7be735a06875140f6bfd4d0e476efdc64b7216ec18f97a026c84",
+    "src/ui/CanchaTactica.tsx": "a0a78d0d015c8d07db98ad70948f944073f0c7f647a298cc9d9eda0c0dced242",
+    "src/ui/RelatoPartido.tsx": "ae8d3c20ba9eca8378c0479886088e3535ecc1b3057c1fa1fcbd57b77c93edb5",
+    "src/ui/PartidoCompleto.tsx": "68c65f03b4f6dc2412a6f1f63c4022fece70ee7d4222ba5b46608ca965f66188",
+    "src/app/globals.css": "1a9462b4e8c8e7e3510ad08ef71a790bf28f926b0a0dcfbbd02e08aa1c4b82f0",
+    "src/vista/__tests__/relato-reproduccion.test.ts": "d2f9477aff7341b3eec9427e93767c0bccfb78cfbf93e4bb19388159b7d54e05",
+    "e2e/reproduccion.spec.ts": "671bf8ffc97a5c4c161944d3597eb48f210980abdda8454ef9b880f256fdda2e"
+  },
+  "limits": [
+    "Coordinates, directions, supports and interpolated movement are labelled modelled reconstructions, not observed tracking",
+    "Playback interpolates within each action; zone re-anchoring may cause cuts between actions and is not disguised as continuous physics",
+    "Timing follows an illustrative reading pace, not exact match seconds; no audio or recorded broadcaster voice added",
+    "Full commentary remains deterministic templates; V1–V8 applies to the separate AI recap",
+    "Only the presentation changed; simulator, dataset, prompts, Verifier and historical model evaluation remain unchanged",
+    "Expected UX/demo benefit is a design inference; no score gain, comprehension improvement or new agent collaboration was measured",
+    "Real model evaluation stays 0/163 vs 0/167 without a demonstrated reduction",
+    "Public checks ran from the development machine; separate human/network review, billing verification, final video/repository publication and submission remain pending"
+  ]
+}

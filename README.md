@@ -10,7 +10,9 @@ Hosted on Azure Container Apps with real Azure OpenAI output: the first public
 report passed with 11 sentence pairs on its first attempt, with zero omissions.
 [Public browser checks](docs/evidencia/smoke-browser-public.json).
 [Video preview](docs/entrega/demo-en-borrador.mp4): a local recording, 1:50,
-English captions, no audio. Final video publication is pending.
+English captions, no audio. A separate [25-second playback clip](docs/entrega/reproduccion-en-borrador.webm)
+shows the current public app in English, without audio. Both are review drafts;
+final video publication is pending.
 
 An AI recap can sound convincing even when a detail lacks supporting evidence.
 Readers need a way to inspect its claims.
@@ -120,7 +122,7 @@ climates, one league each (10 teams, double round-robin), all navigable:
   observed tracking or exact seconds.
   **Formations** shows both starting line-ups and the active players after
   substitutions and sendings-off, with their actual names, roles and shirt numbers.
-  [Published commentary and formations checks](docs/evidencia/relato-formaciones.json).
+  [Published flowing commentary and playback checks](docs/evidencia/relato-reproduccion.json).
 - **League mode**: standings, matchdays, top scorers; every result opens the
   full report.
 - **Conditions that really bite**: heat slows the second half, rain degrades
@@ -140,7 +142,7 @@ climates, one league each (10 teams, double round-robin), all navigable:
   because only the ball's trajectory is recorded data. Player pieces stay
   still in their recorded zones. The label says so, always.
 
-![Connected Spanish commentary: select a sentence to follow its action on the schematic pitch](docs/entrega/capturas/relato-cancha.png)
+![Flowing Spanish commentary and schematic playback of the same selected action](docs/entrega/capturas/reproduccion-cancha.png)
 
 ## Microsoft technologies
 
@@ -208,18 +210,25 @@ All countries, leagues, teams and players are fictional.
   arithmetic, not AI opinion. Season ratings are the audited per-match ratings,
   averaged, with the full list one click away.
 
-Validated on 17 October 2026: typecheck, 1,416 unit tests, 55 statistical checks,
-56 browser journeys and two deployment packaging checks.
-[CI passed for the published application](https://github.com/calusaca/cronista/actions/runs/39080290883),
+Validated on 17 October 2026 (America/Guatemala): typecheck, 1,429 unit tests,
+55 statistical checks, 62 browser journeys and two deployment packaging checks.
+[CI passed for the published application](https://github.com/calusaca/cronista/actions/runs/39082924408),
 including Bicep compilation, the Docker image, an HTTP smoke, non-root execution
-and writable cache. The [commentary and formations Azure release](docs/evidencia/relato-formaciones.json)
-passed separate [HTTP checks with the real provider](docs/evidencia/smoke-web-relato.json)
-and a public browser walkthrough: 2,215 actions in 324 sequences, sentence-to-pitch,
-shirt numbers, starting line-ups, goal build-up, search, minute jump and a full
-TXT download containing the same ordered IDs as the original log, even while
-filtered. Both languages, dark mode and a 360px mobile viewport were checked,
-with no JavaScript errors or extra API calls after opening the detail.
+and writable cache. The [flowing commentary and playback Azure release](docs/evidencia/relato-reproduccion.json)
+passed separate [HTTP checks with the real provider](docs/evidencia/smoke-web-reproduccion.json)
+and a public browser walkthrough: player and ball movement, stable pause, linked
+sentence, style selection, complete TXT download with the same 2,215 ordered IDs
+even while filtered, goal build-up, both languages, dark mode and a 360px viewport.
+No JavaScript errors or extra API requests occurred after opening the detail.
+
+The [six-transcript analysis](docs/evidencia/analisis-transcripts.json), including
+two radio-style examples, informed the narrative design without importing real
+match data into the simulator. In seed 246, the flowing variant uses 27,342 words
+in ES versus 34,194 in the detailed variant, and 27,041 versus 31,565 in EN. These
+are descriptive word counts over the same action clauses, not measured gains in
+reader comprehension or predicted hackathon scores.
+
 The CI browser suite uses a labeled rehearsal fixture. The public demo loads a
-GPT-6.1 Sol recap; the full commentary and pitch are deterministic client-side
-views. A fresh report in this release took about 21 seconds; the replica's cache
-is ephemeral, so scale-to-zero can require a new generation.
+GPT-6.1 Sol recap; full commentary and schematic playback run deterministically
+on the client. A fresh report in this release took about 19 seconds; the replica's
+cache is ephemeral, so scale-to-zero can require a new generation.

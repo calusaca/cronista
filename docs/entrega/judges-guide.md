@@ -3,6 +3,8 @@
 Open the [public demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io).
 It runs on Azure Container Apps with real GPT-6.1 Sol output through Azure OpenAI.
 A new report can take tens of seconds; the first public generation took about 31.
+A [25-second English clip](reproduccion-en-borrador.webm) previews the current public
+commentary and pitch playback, without audio; it is supplementary draft material.
 To try the interface locally without an API key, run `npm ci` and `npm run dev`,
 then open `http://localhost:3000`. The local default uses a visibly labeled
 deterministic Writer.

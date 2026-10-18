@@ -61,3 +61,16 @@ reinicio, velocidad, salto manual, pestaña oculta, movimiento reducido y móvil
 Typecheck, suites completas y recorrido visual antes de publicar en la demo.
 Medir la reducción de repetición/longitud como descripción, no como puntuación
 de calidad ni comprensión humana demostrada. Corpus original conservado local.
+
+## Resultado observado
+
+Publicado en la demo existente: revisión `73999a2`, imagen
+`demo-20261018002936`, revisión `cronista--0000003`.
+[CI verde](https://github.com/calusaca/cronista/actions/runs/39082924408): 1429 unitarias, 55 estadísticas, 62 de navegador,
+2 de empaquetado, typecheck, Docker y Bicep. Recorrido público con proveedor real:
+fichas y balón cambian de posición, pausa estable y selección sincronizada;
+TXT con los 2215 IDs en orden incluso con filtro, ambos estilos/idiomas, móvil
+y oscuro, sin errores JS ni nuevas API. Ocho capturas locales y cuatro capturas
+públicas revisadas. [Clip EN de 25 s](../entrega/reproduccion-en-borrador.webm),
+sin audio, reproducido hasta el final y con tres fotogramas revisados; borrador
+complementario para el montaje. [Evidencia de la publicación](../evidencia/relato-reproduccion.json).

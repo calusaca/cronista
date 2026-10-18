@@ -1,0 +1,82 @@
+{
+  "recordedUtc": "2026-10-18T00:33:59.736Z",
+  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "sourceCommit": "73999a2d8b4f36243e211e5bf815799d167147c6",
+  "writer": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+  "fixture": false,
+  "language": "en",
+  "audio": false,
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "elapsedMs": 23747,
+  "scenes": [
+    {
+      "name": "Real-provider match recap",
+      "elapsedMs": 2754
+    },
+    {
+      "name": "Full match: flowing commentary and starting formations",
+      "elapsedMs": 4868
+    },
+    {
+      "name": "Select an action: shirt numbers, score and schematic pitch",
+      "elapsedMs": 6696
+    },
+    {
+      "name": "Moving players and ball follow the same action",
+      "elapsedMs": 7924
+    },
+    {
+      "name": "Pause",
+      "elapsedMs": 9964
+    },
+    {
+      "name": "Detailed commentary remains available",
+      "elapsedMs": 10973
+    },
+    {
+      "name": "Goal: follow its complete build-up",
+      "elapsedMs": 12845
+    },
+    {
+      "name": "Replay the goal sequence at 2×",
+      "elapsedMs": 14114
+    },
+    {
+      "name": "Starting line-ups and shirts",
+      "elapsedMs": 21593
+    }
+  ],
+  "pageErrors": [],
+  "path": "docs/entrega/reproduccion-en-borrador.webm",
+  "note": "Supplementary screen recording of the actual public app, without DOM or response edits. Draft review material; not the final submitted demo video. Motion and reading pace are schematic.",
+  "validation": {
+    "checkedUtc": "2026-10-18T00:34:57.661Z",
+    "path": "docs/entrega/reproduccion-en-borrador.webm",
+    "sha256": "5db217655f81d6ee0e97b0307a2599862886ca370ee07d846f0d599b7119bf52",
+    "metadata": {
+      "duration": 25.04,
+      "width": 1440,
+      "height": 1000
+    },
+    "playback": {
+      "ended": true,
+      "error": null,
+      "totalVideoFrames": 905,
+      "droppedVideoFrames": 438
+    },
+    "reviewFramesSeconds": [
+      4,
+      9,
+      18
+    ],
+    "note": "Browser metadata, seeking and playback to the end at 8×; dropped frames at accelerated review are not evidence of corrupted frames. Silent supplementary draft, not the final submission video."
+  },
+  "framesReviewedSeconds": [
+    4,
+    9,
+    18
+  ]
+}
