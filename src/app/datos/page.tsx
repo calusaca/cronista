@@ -1,11 +1,12 @@
 // Brief 028 §3 — /datos: la historia del dataset en una pantalla. Cifras de cabecera de la corrida
 // de referencia (ficha.json, escrita por el CLI), el esquema en una tabla corta (el diccionario del
 // código), la descarga de la muestra REAL de public/ y el DATASHEET. Nada a mano.
-import Link from "next/link";
+import Link from "../../ui/Enlace";
 import { CAMPOS_LINEA } from "../../dataset/esquema";
 import { dec, miles } from "../../dataset/texto";
 import { ESQUEMA, MUESTRA_ARCHIVO } from "../../dataset/umbrales-dataset";
 import { Simulador } from "../../ui/Simulador";
+import { DescargaMuestra } from "../../ui/DescargaMuestra";
 import { kbMuestra, leerFicha, RUTA_DATASHEET } from "../../vista/datos";
 import { presets } from "../../vista/servidor";
 
@@ -70,9 +71,9 @@ export default function PaginaDatos() {
               A real {miles(semillas.length)}-match sample — seeds {miles(primera)}–{miles(ultima)}, exactly what <code className="datos-code">npm run dataset -- --muestra</code> writes
               (one JSON object per line, schema <code className="datos-code">{ESQUEMA}</code>).
             </p>
-            <a className="btn btn-primary datos-descarga" href={`/${MUESTRA_ARCHIVO}`} download data-testid="sample-download">
+            <DescargaMuestra href={`/${MUESTRA_ARCHIVO}`}>
               Download the sample · JSONL · {miles(kb)} KB
-            </a>
+            </DescargaMuestra>
             <p className="ratings-note">
               Seed matches carry every engine variant (player levels, rare events, injuries, own goals), so seed {miles(primera)} here is a different match from{" "}
               <Link href={`/match/${primera}`} prefetch={false}>

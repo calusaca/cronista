@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Escena3D } from "../vista/escena3d";
 import { IconoHistoria } from "./Iconos";
+import { useAvisoCarga } from "./Actividad";
 
 type Estado = "cargando" | "corriendo" | "terminada" | "sin-webgl" | "error";
 
@@ -26,6 +27,7 @@ export function Pizarra3D({ escena, onSinWebGL }: { escena: Escena3D; onSinWebGL
   const caja = useRef<HTMLDivElement | null>(null);
   const [estado, setEstado] = useState<Estado>("cargando");
   const repetir = useRef<(() => void) | null>(null);
+  useAvisoCarga(estado === "cargando", "Loading the 3D view…", "Preparing the pitch and players.");
 
   useEffect(() => {
     if (!hayWebGL()) {

@@ -35,7 +35,7 @@ Las reglas V1–V8 no prueban toda afirmación de prosa libre: [reproducción](d
 
 ## Alcance
 
-Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–031. Tres pilares:
+Base en `docs/disenos/000-alcance.md`, ampliada por los briefs 006–032. Tres pilares:
 simulador determinista, cadena Analista→Cronista→Verificador y UI de explicabilidad.
 Ya existen personalización, replay incremental, overlay JSON, ligas, condiciones,
 consecuencias, pizarra 3D, relato por posesiones con dorsales, formaciones y cancha
@@ -44,6 +44,10 @@ exportación de dataset. Relato fluido/detallado ES/EN inspirado en patrones de 
 transcripts locales, sin incorporar sus datos al simulador. El replay es simulado, sin un feed
 externo en vivo. No hay Fabric ni AKS y los idiomas son ES/EN. No se agrega alcance
 sin actualizar el diseño correspondiente.
+
+Las navegaciones y operaciones diferidas muestran espera accesible, sin prefetch
+de crónicas ni porcentajes ficticios (brief 032). Descarga del dataset y replay
+permiten recuperarse de fallos y evitan solicitudes duplicadas durante su carga.
 
 Las direcciones y apoyos del relato espacial son una reconstrucción modelada y
 rotulada; dorsales, zonas, distancias y resultados proceden de los registros.

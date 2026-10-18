@@ -4,9 +4,8 @@
 // persistente al clic, transitorio al pasar el mouse, scroll al primero) y evento →
 // oraciones que lo citan. Las capas: Caja de cristal (006), proceso, y el gol.
 
-import Link from "next/link";
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "./Enlace";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Evento } from "../sim/tipos";
 import { eventosDeOracion, marcadorProgresivo, oracionesDeEvento } from "../vista/evidencia";
 import type { DatosPartido } from "../vista/servidor";
@@ -26,8 +25,14 @@ import { micro } from "../sim/micro";
 import { reacciones } from "../vista/grada";
 import { EvidenciaGrada } from "./Grada";
 import { formatoXg } from "./textos";
+import { useAvisoCarga } from "./Actividad";
 
-const PartidoCompleto = dynamic(() => import("./PartidoCompleto").then((m) => m.PartidoCompleto));
+const PartidoCompleto = lazy(() => import("./PartidoCompleto").then((m) => ({ default: m.PartidoCompleto })));
+
+function CargandoPartidoCompleto({ es }: { es: boolean }) {
+  useAvisoCarga(true, es ? "Abriendo el partido completo…" : "Opening the full match…", es ? "Preparando el relato, las jugadas y las formaciones." : "Preparing commentary, actions and formations.");
+  return null;
+}
 
 type Capa = { tipo: "historia"; i: number } | { tipo: "proceso" } | { tipo: "gol"; id: string } | { tipo: "completo"; vista?: "relato" | "formaciones"; accion?: string } | null;
 
@@ -76,6 +81,10 @@ export function VistaPartido({
   const [vivo, setVivo] = useState(false);
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [errorOverlay, setErrorOverlay] = useState<string | null>(null);
+  const [cargandoOverlay, setCargandoOverlay] = useState(false);
+  const peticionOverlay = useRef<AbortController | null>(null);
+  useEffect(() => () => { peticionOverlay.current?.abort(); }, []);
+  useAvisoCarga(vivo && cargandoOverlay, "Preparing the replay…", "Generating and checking match updates. This may take a little while.");
   const [reloj, setReloj] = useState(0);
   const [velocidad, setVelocidad] = useState<Velocidad>("x1");
   const [updateSel, setUpdateSel] = useState<number | null>(null);
@@ -95,18 +104,25 @@ export function VistaPartido({
     setOracionSel(null);
     setEventoSel(null);
     setCapa(null);
-    if (overlay) return;
+    if (overlay || peticionOverlay.current) return;
     setErrorOverlay(null);
+    setCargandoOverlay(true);
+    const controller = new AbortController();
+    peticionOverlay.current = controller;
     const q = datos.perspectiva === "neutral" ? "" : `?perspectiva=${datos.perspectiva}`;
-    fetch(`${overlayUrl ?? `/api/overlay/${datos.seed}`}${q}`)
+    fetch(`${overlayUrl ?? `/api/overlay/${datos.seed}`}${q}`, { signal: controller.signal })
       .then(async (r) => {
         const json: unknown = await r.json();
         if (!r.ok) throw new Error((json as { error?: string }).error ?? `HTTP ${r.status}`);
         const v = esquemaOverlay.safeParse(json);
         if (!v.success) throw new Error("the overlay did not match its schema");
-        setOverlay(v.data);
+        if (!controller.signal.aborted) setOverlay(v.data);
       })
-      .catch((e: unknown) => setErrorOverlay((e as Error).message));
+      .catch(() => { if (!controller.signal.aborted) setErrorOverlay("Please try again."); })
+      .finally(() => {
+        peticionOverlay.current = null;
+        if (!controller.signal.aborted) setCargandoOverlay(false);
+      });
   }, [overlay, datos.perspectiva, datos.seed, overlayUrl]);
 
   const salirAlFinal = useCallback(() => {
@@ -407,8 +423,9 @@ export function VistaPartido({
               seleccionada={updateSel}
               resaltadas={updatesResaltadas}
               onActualizacion={alUpdate}
-              cargando={overlay === null && errorOverlay === null}
+              cargando={cargandoOverlay}
               error={errorOverlay}
+              onReintentar={verEnVivo}
               reacciones={gradaVista}
               reaccionSel={reaccionSel}
               onReaccion={alReaccion}
@@ -464,7 +481,7 @@ export function VistaPartido({
       )}
       {capa?.tipo === "historia" && <HistoriaFrase cronica={cronica} i={capa.i} lengua={lengua} onCerrar={() => setCapa(null)} />}
       {capa?.tipo === "proceso" && <Proceso cronica={cronica} lengua={lengua} onCerrar={() => setCapa(null)} />}
-      {capa?.tipo === "completo" && <PartidoCompleto partido={partidoVisto} m={microVisto} lengua={lengua} modo={modo} onLengua={setLengua} onCerrar={() => setCapa(null)} vistaInicial={capa.vista} accionInicial={capa.accion} />}
+      {capa?.tipo === "completo" && <Suspense fallback={<CargandoPartidoCompleto es={lengua === "es"} />}><PartidoCompleto partido={partidoVisto} m={microVisto} lengua={lengua} modo={modo} onLengua={setLengua} onCerrar={() => setCapa(null)} vistaInicial={capa.vista} accionInicial={capa.accion} /></Suspense>}
       {capa?.tipo === "gol" && (
         <TarjetaGol eventos={eventosVisibles} golId={capa.id} citas={oracionesDeEvento(cronica, hechos, capa.id, anclaDe).length} onCerrar={() => setCapa(null)} modo={modo} lengua={lengua} onVerJugada={vivo ? undefined : () => setCapa({ tipo: "completo", accion: capa.id })} />
       )}

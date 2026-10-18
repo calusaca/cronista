@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Archivo, Source_Sans_3 } from "next/font/google";
+import { ProveedorActividad } from "../ui/Actividad";
 import "./globals.css";
 
 // Brief 010: dos familias, las de la maqueta aprobada. Archivo para titulares, marcador y
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
-      <body>{children}</body>
+      <body><ProveedorActividad>{children}</ProveedorActividad></body>
     </html>
   );
 }

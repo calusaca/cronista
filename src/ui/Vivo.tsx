@@ -65,6 +65,7 @@ export function Ticker({
   onActualizacion,
   cargando,
   error,
+  onReintentar,
   reacciones = [],
   reaccionSel = null,
   onReaccion,
@@ -81,6 +82,7 @@ export function Ticker({
   onActualizacion: (i: number) => void;
   cargando: boolean;
   error: string | null;
+  onReintentar: () => void;
 }) {
   const teclado = (i: number, f: (i: number) => void = onActualizacion) => (ev: KeyboardEvent) => {
     if (ev.key === "Enter" || ev.key === " ") {
@@ -108,11 +110,12 @@ export function Ticker({
         <p className="ticker-note">
           Each update knows only the minutes already played and passed the same verifier (V1–V8) as the full report. Click one to see the events behind it.
         </p>
-        {cargando && <p className="ticker-empty" data-testid="ticker-loading">Preparing verified updates…</p>}
+        {cargando && <p className="ticker-empty" role="status" data-testid="ticker-loading">Preparing verified updates…</p>}
         {error && (
-          <p className="ticker-empty" data-testid="ticker-error">
-            Could not load the updates: {error}
-          </p>
+          <div className="ticker-empty" data-testid="ticker-error">
+            <p role="alert">Could not load the updates. {error}</p>
+            <button type="button" className="btn" onClick={onReintentar} data-testid="ticker-retry">Try again</button>
+          </div>
         )}
         {!cargando && !error && actualizaciones.length === 0 && reacciones.length === 0 && <p className="ticker-empty">Nothing yet — the first update arrives with the first goal, red card or half-time.</p>}
         <ol className="ticker-list">

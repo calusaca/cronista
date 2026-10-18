@@ -118,6 +118,7 @@ test("el relato de liga usa sus alineaciones reales; no hay entradas al detalle 
   const partido = simular(configDePartidoLiga(liga, TEMPORADA_ACTUAL, 7, 3));
   await page.goto("/liga/7/3");
   await page.getByTestId("open-formations").click();
+  await expect(page.getByTestId("formation-person")).toHaveCount(22);
   const titulares = [...partido.config.local.jugadores.slice(0, 11), ...partido.config.visita.jugadores.slice(0, 11)];
   expect((await page.getByTestId("formation-person").evaluateAll(es => es.map(e => e.getAttribute("data-name")))).sort()).toEqual(titulares.map(j => j.nombre).sort());
   await page.getByTestId("full-view-relato").click();

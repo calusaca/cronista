@@ -1,7 +1,7 @@
 // Brief 016 §4 — /liga: la liga ficticia completa. Tabla de posiciones, selector de jornada con
 // sus 5 partidos (marcador + link a la vista de partido de siempre) y goleadores. Todo sale de
 // la temporada simulada en el server; los números son funciones puras de los resultados.
-import Link from "next/link";
+import Link from "../../ui/Enlace";
 import { CLIMA_EN } from "../../ui/textos";
 import { Simulador } from "../../ui/Simulador";
 import { mundo } from "../../mundo/mundo";

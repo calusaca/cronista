@@ -1,7 +1,7 @@
 // Brief 016 §4 — un partido de liga: la vista de partido de SIEMPRE (crónica, stats, pizarra,
 // ratings, replay), con su config fabricada por la temporada, más un breadcrumb y la
 // navegación anterior/siguiente por el calendario.
-import Link from "next/link";
+import Link from "../../../../ui/Enlace";
 import { notFound } from "next/navigation";
 import { Pie } from "../../../../ui/Pie";
 import { Simulador } from "../../../../ui/Simulador";

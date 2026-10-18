@@ -105,6 +105,10 @@ permanent tests; all are rejected.
 Everything runs on a fully synthetic world — 8 fictional countries with
 climates, one league each (10 teams, double round-robin), all navigable:
 
+- **Visible loading feedback**: preparing a match, changing perspective, opening
+  league pages, loading commentary or 3D, starting a replay and downloading the
+  sample all show a pending state. Simulation controls prevent duplicate requests;
+  replay and sample downloads offer retries. Indicators respect reduced motion.
 - **Connected commentary and the complete log**: follow each possession in
   English or Spanish, with shirt numbers, passes, distances and outcomes.
   Select a sentence to see the action on the pitch, or open a goal's full build-up.

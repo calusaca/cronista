@@ -24,9 +24,9 @@ export default async function Partido({
   const historia = presets().find((p) => p.seed === v.seed)?.historia;
   return (
     <>
-      <Simulador presets={presets()} semillaActual={v.seed} />
+      <Simulador key={v.seed} presets={presets()} semillaActual={v.seed} />
       <main>
-        <VistaPartido key={perspectiva} datos={datos} etiqueta={historia ?? "Match"} ruta={`/match/${v.seed}`} />
+        <VistaPartido key={`${v.seed}:${perspectiva}`} datos={datos} etiqueta={historia ?? "Match"} ruta={`/match/${v.seed}`} />
       </main>
       <Pie datos={datos} />
     </>
