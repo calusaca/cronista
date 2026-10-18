@@ -51,6 +51,12 @@ flowchart LR
     C --> U[Match view<br/>click a sentence → see its evidence]
 ```
 
+[Football tactics and movement proposal](docs/disenos/033-tactica-y-movimiento.md)
+(Spanish): 25 primary sources, seven formations, seven tactical profiles and
+14 coordinated movement patterns, with a [proposed JSON catalog](docs/tactica/catalogo-propuesto.v1.json)
+and phased integration plan. This is research and design; the application does
+not consume this catalog yet, and movement parameters require calibration.
+
 ## The multi-agent system (Best Multi-Agent System category)
 
 | Category requirement | How CRONISTA meets it |

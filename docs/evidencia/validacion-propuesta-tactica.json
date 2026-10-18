@@ -1,0 +1,85 @@
+{
+  "checkedUtc": "2026-10-18T01:49:07.578Z",
+  "type": "documentation_and_proposed_catalog_validation",
+  "formaciones": 7,
+  "perfiles": 7,
+  "fuentesPrimarias": 25,
+  "files": [
+    {
+      "file": "docs/disenos/033-tactica-y-movimiento.md",
+      "sha256": "eb433c0d5963e7f080a6ac68a38490a399329f8b315435e758b8abbc7118892f"
+    },
+    {
+      "file": "docs/tactica/catalogo-propuesto.v1.json",
+      "sha256": "854c391c44e7f4ef5c81f192903da7df7173ea0b738789d700d66119c2df62bf"
+    },
+    {
+      "file": "docs/tactica/estructuras-433.svg",
+      "sha256": "ca1caaef15369a274307fcd096ad7ee6502f1cd96f263c20b8765dc96a74bb99"
+    },
+    {
+      "file": "docs/tactica/validar-propuesta.mjs",
+      "sha256": "e88e63eeb38ea10ac67d2ba91e78019419581b2f26caf69b70c6ea4c79a4b60f"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Catálogo explícitamente propuesto, sin activar funciones de la app",
+      "passed": true
+    },
+    {
+      "name": "Siete formaciones y siete perfiles con IDs únicos",
+      "passed": true
+    },
+    {
+      "name": "Cada formación contiene exactamente diez slots de campo, con rol conocido",
+      "passed": true
+    },
+    {
+      "name": "Cada fase conserva los mismos diez slots y su rótulo coincide con las líneas",
+      "passed": true
+    },
+    {
+      "name": "Funciones y resguardo se asignan a slots existentes de cada perfil",
+      "passed": true
+    },
+    {
+      "name": "Todos los patrones del catálogo se describen en el documento",
+      "passed": true
+    },
+    {
+      "name": "Tres juegos de anclas con los mismos once jugadores y coordenadas finitas normalizadas",
+      "passed": true
+    },
+    {
+      "name": "Coordenadas de las tres estructuras concuerdan con el orden de sus líneas",
+      "passed": true
+    },
+    {
+      "name": "Parámetros sintéticos positivos y bandas ordenadas; no es calibración física",
+      "passed": true
+    },
+    {
+      "name": "El ejemplo narrativo conserva las cinco distancias de su geometría",
+      "passed": true
+    },
+    {
+      "name": "Veinticinco referencias primarias y ninguna referencia F sin definir",
+      "passed": true
+    },
+    {
+      "name": "Los enlaces locales del documento apuntan a archivos existentes",
+      "passed": true
+    },
+    {
+      "name": "La figura está enlazada y corresponde a las tres estructuras del catálogo",
+      "passed": true
+    }
+  ],
+  "limits": [
+    "No runtime code was changed or integrated.",
+    "Structural checks do not validate real-match tactical quality, physical realism or empirical probabilities.",
+    "Movement parameters are synthetic initial proposals, not calibrated values.",
+    "Source links were browsed during research; this checker only validates their definitions and local paths."
+  ]
+}

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="490" viewBox="0 0 1420 490" role="img" aria-labelledby="title desc">
+<title id="title">Un mismo once en tres estructuras tácticas propuestas</title>
+<desc id="desc">Tres canchas muestran los mismos once puestos: formación base 4-3-3, ocupación con balón 3-2-5 y defensa 4-1-4-1. Se destaca el lateral izquierdo con un anillo. Son objetivos nominales de juego abierto, no posiciones de saque inicial ni trayectorias observadas.</desc>
+<style>text{font-family:Arial, sans-serif;fill:#20281f}.heading{font-size:24px;font-weight:700}.sub{font-size:15px;fill:#526450}.phase{font-size:19px;font-weight:700}.small{font-size:13px;fill:#526450}.label{font-size:12px;font-weight:700}.line{fill:none;stroke:#83a38a;stroke-width:1.2}</style>
+<rect width="1420" height="490" rx="12" fill="#f6f5f1"/>
+<text x="26" y="37" class="heading">Una alineación, distintas funciones según la fase</text>
+<text x="26" y="63" class="sub">Propuesta CRONISTA · el jugador conserva su identidad y se desplaza hacia su nueva responsabilidad</text>
+<text x="26" y="100" class="phase">Base: 4-3-3</text>
+<text x="26" y="121" class="small">Referencia de puestos</text>
+<rect x="26" y="141" width="420" height="272" fill="#e2eee4" stroke="#83a38a" stroke-width="1.2"/>
+<path class="line" d="M 236 141 v 272"/>
+<circle class="line" cx="236" cy="277" r="36.6"/>
+<rect class="line" x="26" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="380" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="20" y="262.4" width="6" height="29.2"/>
+<rect class="line" x="446" y="262.4" width="6" height="29.2"/>
+<text x="32" y="434" class="small">Arco propio</text>
+<text x="344" y="434" class="small">Ataque →</text>
+<circle cx="51.2" cy="277" r="7.5" fill="#647062" stroke="#fff" stroke-width="1.5"/>
+<text x="51.2" y="262" text-anchor="middle" class="label">POR</text>
+<circle cx="131" cy="168.2" r="12" fill="none" stroke="#1c7a48" stroke-width="2"/>
+<circle cx="131" cy="168.2" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="131" y="153.2" text-anchor="middle" class="label">LI</text>
+<circle cx="122.60000000000001" cy="236.2" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="122.60000000000001" y="221.2" text-anchor="middle" class="label">DFC_I</text>
+<circle cx="122.60000000000001" cy="317.8" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="122.60000000000001" y="302.8" text-anchor="middle" class="label">DFC_D</text>
+<circle cx="131" cy="385.8" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="131" y="370.8" text-anchor="middle" class="label">LD</text>
+<circle cx="206.6" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="206.6" y="262" text-anchor="middle" class="label">PIV</text>
+<circle cx="269.6" cy="222.6" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="269.6" y="207.6" text-anchor="middle" class="label">INT_I</text>
+<circle cx="269.6" cy="331.4" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="269.6" y="316.4" text-anchor="middle" class="label">INT_D</text>
+<circle cx="341" cy="162.76" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="341" y="147.76" text-anchor="middle" class="label">EI</text>
+<circle cx="362" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="362" y="262" text-anchor="middle" class="label">DC</text>
+<circle cx="341" cy="391.24" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="341" y="376.24" text-anchor="middle" class="label">ED</text>
+<text x="492" y="100" class="phase">Con balón: 3-2-5</text>
+<text x="492" y="121" class="small">LI entra al centro; LD conserva resguardo</text>
+<rect x="492" y="141" width="420" height="272" fill="#e2eee4" stroke="#83a38a" stroke-width="1.2"/>
+<path class="line" d="M 702 141 v 272"/>
+<circle class="line" cx="702" cy="277" r="36.6"/>
+<rect class="line" x="492" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="846" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="486" y="262.4" width="6" height="29.2"/>
+<rect class="line" x="912" y="262.4" width="6" height="29.2"/>
+<text x="498" y="434" class="small">Arco propio</text>
+<text x="810" y="434" class="small">Ataque →</text>
+<circle cx="525.6" cy="277" r="7.5" fill="#647062" stroke="#fff" stroke-width="1.5"/>
+<text x="525.6" y="262" text-anchor="middle" class="label">POR</text>
+<circle cx="626.4" cy="203.56" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="626.4" y="188.56" text-anchor="middle" class="label">DFC_I</text>
+<circle cx="626.4" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="626.4" y="262" text-anchor="middle" class="label">DFC_D</text>
+<circle cx="626.4" cy="350.44" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="626.4" y="335.44" text-anchor="middle" class="label">LD</text>
+<circle cx="697.8" cy="236.2" r="12" fill="none" stroke="#1c7a48" stroke-width="2"/>
+<circle cx="697.8" cy="236.2" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="697.8" y="221.2" text-anchor="middle" class="label">LI</text>
+<circle cx="697.8" cy="317.8" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="697.8" y="302.8" text-anchor="middle" class="label">PIV</text>
+<circle cx="819.6" cy="162.76" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="819.6" y="147.76" text-anchor="middle" class="label">EI</text>
+<circle cx="794.4" cy="219.88" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="794.4" y="204.88" text-anchor="middle" class="label">INT_I</text>
+<circle cx="836.4" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="836.4" y="262" text-anchor="middle" class="label">DC</text>
+<circle cx="794.4" cy="334.12" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="794.4" y="319.12" text-anchor="middle" class="label">INT_D</text>
+<circle cx="819.6" cy="391.24" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="819.6" y="376.24" text-anchor="middle" class="label">ED</text>
+<text x="958" y="100" class="phase">Sin balón: 4-1-4-1</text>
+<text x="958" y="121" class="small">Laterales atrás; extremos con los medios</text>
+<rect x="958" y="141" width="420" height="272" fill="#e2eee4" stroke="#83a38a" stroke-width="1.2"/>
+<path class="line" d="M 1168 141 v 272"/>
+<circle class="line" cx="1168" cy="277" r="36.6"/>
+<rect class="line" x="958" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="1312" y="196.4" width="66" height="161.2"/>
+<rect class="line" x="952" y="262.4" width="6" height="29.2"/>
+<rect class="line" x="1378" y="262.4" width="6" height="29.2"/>
+<text x="964" y="434" class="small">Arco propio</text>
+<text x="1276" y="434" class="small">Ataque →</text>
+<circle cx="987.4" cy="277" r="7.5" fill="#647062" stroke="#fff" stroke-width="1.5"/>
+<text x="987.4" y="262" text-anchor="middle" class="label">POR</text>
+<circle cx="1067.2" cy="173.64" r="12" fill="none" stroke="#1c7a48" stroke-width="2"/>
+<circle cx="1067.2" cy="173.64" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1067.2" y="158.64" text-anchor="middle" class="label">LI</text>
+<circle cx="1058.8" cy="244.36" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1058.8" y="229.36" text-anchor="middle" class="label">DFC_I</text>
+<circle cx="1058.8" cy="309.64" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1058.8" y="294.64" text-anchor="middle" class="label">DFC_D</text>
+<circle cx="1067.2" cy="380.36" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1067.2" y="365.36" text-anchor="middle" class="label">LD</text>
+<circle cx="1121.8" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1121.8" y="262" text-anchor="middle" class="label">PIV</text>
+<circle cx="1176.4" cy="176.36" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1176.4" y="161.36" text-anchor="middle" class="label">EI</text>
+<circle cx="1168" cy="244.36" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1168" y="229.36" text-anchor="middle" class="label">INT_I</text>
+<circle cx="1168" cy="309.64" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1168" y="294.64" text-anchor="middle" class="label">INT_D</text>
+<circle cx="1176.4" cy="377.64" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1176.4" y="362.64" text-anchor="middle" class="label">ED</text>
+<circle cx="1231" cy="277" r="7.5" fill="#1c7a48" stroke="#fff" stroke-width="1.5"/>
+<text x="1231" y="262" text-anchor="middle" class="label">DC</text>
+<text x="26" y="464" class="small">LI: lateral izquierdo (anillo) · LD: lateral derecho · DFC: central · PIV: pivote · INT: interior · EI/ED: extremos · DC: punta · POR: portero</text>
+</svg>

@@ -56,6 +56,11 @@ ilustrativo de lectura; no implica trayectorias continuas observadas ni audio.
 Las reglas V1–V8 verifican la crónica del Writer; el relato completo usa plantillas
 deterministas, con sus propias pruebas, y no debe presentarse como prosa LLM validada.
 
+El [brief 033](docs/disenos/033-tactica-y-movimiento.md) reúne investigación y una
+propuesta de formaciones, funciones y movimiento continuo. Su catálogo y parámetros
+son un diseño pendiente de integración y calibración; no amplían las capacidades
+actuales del simulador.
+
 ## Forma de trabajo
 
 - Fable diseña y verifica; Opus implementa por brief cerrado en `docs/disenos/`

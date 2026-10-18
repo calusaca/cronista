@@ -1,0 +1,468 @@
+{
+  "version": "tactica-propuesta-v1",
+  "estado": "propuesta_no_integrada",
+  "consultado": "2026-10-18",
+  "documento": "../disenos/033-tactica-y-movimiento.md",
+  "advertencias": ["No es configuración consumida por la aplicación.","Perfiles, asignaciones y coordenadas son propuestas de CRONISTA, no mediciones de FIFA o UEFA.","Las líneas excluyen al portero; cada fase conserva los mismos diez slots de campo.","Las anclas son objetivos nominales en juego abierto; no describen una colocación reglamentaria de saque inicial.","Una función de resguardo es una responsabilidad contextual, no inmovilizar al jugador."],
+  "convenciones": {
+    "portero": "POR",
+    "lineas": "desde portería propia hacia la rival",
+    "slotsEnLinea": "de izquierda a derecha desde el equipo que ataca",
+    "coordenadas": "[u,v] normalizadas; u=0 portería propia, u=1 rival; v=0 izquierda propia",
+    "orientacionPantalla": "Usar orientar() de src/vista/tactica.ts y cambiar ambos ejes según lado/periodo."
+  },
+  "rolesPorSlot": {
+    "POR": "portero",
+    "LI": "lateral",
+    "LD": "lateral",
+    "DFC_I": "central",
+    "DFC": "central",
+    "DFC_D": "central",
+    "PIV": "pivote",
+    "PIV_I": "pivote",
+    "PIV_D": "pivote",
+    "INT_I": "interior",
+    "INT_D": "interior",
+    "MC_I": "mediocentro",
+    "MC_D": "mediocentro",
+    "MP": "mediapunta",
+    "EI": "extremo",
+    "ED": "extremo",
+    "VOL_I": "volante_exterior",
+    "VOL_D": "volante_exterior",
+    "DC": "delantero_centro",
+    "DC_I": "delantero_centro",
+    "DC_D": "delantero_centro",
+    "CAI": "carrilero",
+    "CAD": "carrilero"
+  },
+  "formaciones": [
+    {
+      "id": "4-3-3",
+      "lineas": [
+        ["LI","DFC_I","DFC_D","LD"],
+        ["INT_I","PIV","INT_D"],
+        ["EI","DC","ED"]
+      ]
+    },
+    {
+      "id": "4-2-3-1",
+      "lineas": [
+        ["LI","DFC_I","DFC_D","LD"],
+        ["PIV_I","PIV_D"],
+        ["EI","MP","ED"],
+        ["DC"]
+      ]
+    },
+    {
+      "id": "4-4-2",
+      "lineas": [
+        ["LI","DFC_I","DFC_D","LD"],
+        ["VOL_I","MC_I","MC_D","VOL_D"],
+        ["DC_I","DC_D"]
+      ]
+    },
+    {
+      "id": "4-1-4-1",
+      "lineas": [
+        ["LI","DFC_I","DFC_D","LD"],
+        ["PIV"],
+        ["VOL_I","INT_I","INT_D","VOL_D"],
+        ["DC"]
+      ]
+    },
+    {
+      "id": "4-1-2-1-2",
+      "lineas": [
+        ["LI","DFC_I","DFC_D","LD"],
+        ["PIV"],
+        ["INT_I","INT_D"],
+        ["MP"],
+        ["DC_I","DC_D"]
+      ]
+    },
+    {
+      "id": "3-5-2",
+      "lineas": [
+        ["DFC_I","DFC","DFC_D"],
+        ["CAI","INT_I","PIV","INT_D","CAD"],
+        ["DC_I","DC_D"]
+      ]
+    },
+    {
+      "id": "3-4-3",
+      "lineas": [
+        ["DFC_I","DFC","DFC_D"],
+        ["CAI","MC_I","MC_D","CAD"],
+        ["EI","DC","ED"]
+      ]
+    }
+  ],
+  "perfiles": [
+    {
+      "id": "posesion-433-asimetrica",
+      "formacionBase": "4-3-3",
+      "estiloLegadoSugerido": "posesion",
+      "descripcion": "Salida apoyada, amplitud de extremos, lateral izquierdo interior y derecho conservador.",
+      "conBalon": {
+        "nombre": "3-2-5",
+        "lineas": [
+          ["DFC_I","DFC_D","LD"],
+          ["LI","PIV"],
+          ["EI","INT_I","DC","INT_D","ED"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "4-1-4-1",
+        "lineas": [
+          ["LI","DFC_I","DFC_D","LD"],
+          ["PIV"],
+          ["EI","INT_I","INT_D","ED"],
+          ["DC"]
+        ]
+      },
+      "parametros": {
+        "salida": "corta",
+        "progresion": "paciente",
+        "foco": "equilibrado",
+        "amplitud": "alta",
+        "alturaBloque": "media",
+        "intensidadPresion": "media",
+        "trasPerdida": "situacional",
+        "trasRecuperacion": "asegurar",
+        "riesgo": "medio"
+      },
+      "resguardo": ["DFC_I","DFC_D","LD","LI","PIV"],
+      "funcionesConBalon": {
+        "LI": "lateral_interior",
+        "LD": "tercer_defensor",
+        "PIV": "apoyo_y_equilibrio",
+        "EI": "amplitud",
+        "ED": "amplitud"
+      },
+      "patrones": ["M01","M02","M03","M06","M13"],
+      "riesgoPrincipal": "Espacio a la espalda del lateral que abandona la banda; requiere cobertura del central cercano."
+    },
+    {
+      "id": "equilibrado-4231",
+      "formacionBase": "4-2-3-1",
+      "estiloLegadoSugerido": "posesion",
+      "descripcion": "Doble pivote, mediapunta de enlace y una subida lateral coordinada.",
+      "conBalon": {
+        "nombre": "3-2-4-1",
+        "lineas": [
+          ["DFC_I","DFC_D","LD"],
+          ["PIV_I","PIV_D"],
+          ["LI","EI","MP","ED"],
+          ["DC"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "4-4-2",
+        "lineas": [
+          ["LI","DFC_I","DFC_D","LD"],
+          ["EI","PIV_I","PIV_D","ED"],
+          ["MP","DC"]
+        ]
+      },
+      "parametros": {
+        "salida": "mixta",
+        "progresion": "equilibrada",
+        "foco": "equilibrado",
+        "amplitud": "media",
+        "alturaBloque": "media",
+        "intensidadPresion": "media",
+        "trasPerdida": "replegar",
+        "trasRecuperacion": "evaluar_salida",
+        "riesgo": "medio"
+      },
+      "resguardo": ["DFC_I","DFC_D","LD","PIV_I","PIV_D"],
+      "funcionesConBalon": {
+        "LI": "amplitud",
+        "EI": "apoyo_interior",
+        "LD": "tercer_defensor",
+        "MP": "enlace",
+        "DC": "fijar_y_romper"
+      },
+      "patrones": ["M01","M03","M04","M07","M13"],
+      "riesgoPrincipal": "El doble pivote puede quedar demasiado plano; escalonar alturas y evitar duplicar apoyos."
+    },
+    {
+      "id": "compacto-442",
+      "formacionBase": "4-4-2",
+      "estiloLegadoSugerido": "contragolpe",
+      "descripcion": "Dos líneas compactas, delanteros complementarios y salida por bandas o apoyo directo.",
+      "conBalon": {
+        "nombre": "2-4-4",
+        "lineas": [
+          ["DFC_I","DFC_D"],
+          ["LI","MC_I","MC_D","LD"],
+          ["VOL_I","DC_I","DC_D","VOL_D"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "4-4-2",
+        "lineas": [
+          ["LI","DFC_I","DFC_D","LD"],
+          ["VOL_I","MC_I","MC_D","VOL_D"],
+          ["DC_I","DC_D"]
+        ]
+      },
+      "parametros": {
+        "salida": "mixta",
+        "progresion": "vertical",
+        "foco": "bandas",
+        "amplitud": "media",
+        "alturaBloque": "media",
+        "intensidadPresion": "media",
+        "trasPerdida": "replegar",
+        "trasRecuperacion": "evaluar_salida",
+        "riesgo": "medio"
+      },
+      "resguardo": ["DFC_I","DFC_D","MC_I","MC_D"],
+      "funcionesConBalon": {
+        "DC_I": "apoyo",
+        "DC_D": "ruptura",
+        "MC_I": "equilibrio",
+        "MC_D": "apoyo_escalonado"
+      },
+      "patrones": ["M02","M04","M06","M09","M12"],
+      "riesgoPrincipal": "Posible inferioridad central frente a tres medios; un delantero puede cerrar la línea al pivote rival."
+    },
+    {
+      "id": "presion-4141",
+      "formacionBase": "4-1-4-1",
+      "estiloLegadoSugerido": "presion",
+      "descripcion": "Presión por señales observables, interiores que saltan y pivote que protege el centro.",
+      "conBalon": {
+        "nombre": "2-3-5",
+        "lineas": [
+          ["DFC_I","DFC_D"],
+          ["LI","PIV","LD"],
+          ["VOL_I","INT_I","DC","INT_D","VOL_D"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "4-1-4-1",
+        "lineas": [
+          ["LI","DFC_I","DFC_D","LD"],
+          ["PIV"],
+          ["VOL_I","INT_I","INT_D","VOL_D"],
+          ["DC"]
+        ]
+      },
+      "parametros": {
+        "salida": "corta",
+        "progresion": "equilibrada",
+        "foco": "equilibrado",
+        "amplitud": "alta",
+        "alturaBloque": "alta",
+        "intensidadPresion": "alta",
+        "trasPerdida": "contrapresionar_si_hay_cobertura",
+        "trasRecuperacion": "evaluar_salida",
+        "riesgo": "alto"
+      },
+      "resguardo": ["DFC_I","DFC_D","LI","PIV","LD"],
+      "funcionesConBalon": {
+        "LI": "lateral_interior",
+        "LD": "lateral_interior",
+        "PIV": "equilibrio",
+        "VOL_I": "amplitud",
+        "VOL_D": "amplitud"
+      },
+      "patrones": ["M01","M07","M10","M11","M14"],
+      "riesgoPrincipal": "Balón a la espalda si falla la presión; exige recuperación de líneas y portero preparado."
+    },
+    {
+      "id": "rombo-central",
+      "formacionBase": "4-1-2-1-2",
+      "estiloLegadoSugerido": "posesion",
+      "descripcion": "Superioridad interior, mediapunta y dos puntas; la amplitud depende de los laterales.",
+      "conBalon": {
+        "nombre": "2-3-5",
+        "lineas": [
+          ["DFC_I","DFC_D"],
+          ["INT_I","PIV","INT_D"],
+          ["LI","DC_I","MP","DC_D","LD"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "4-3-1-2",
+        "lineas": [
+          ["LI","DFC_I","DFC_D","LD"],
+          ["INT_I","PIV","INT_D"],
+          ["MP"],
+          ["DC_I","DC_D"]
+        ]
+      },
+      "parametros": {
+        "salida": "corta",
+        "progresion": "equilibrada",
+        "foco": "centro",
+        "amplitud": "media",
+        "alturaBloque": "media",
+        "intensidadPresion": "media",
+        "trasPerdida": "situacional",
+        "trasRecuperacion": "asegurar",
+        "riesgo": "alto"
+      },
+      "resguardo": ["DFC_I","DFC_D","PIV"],
+      "funcionesConBalon": {
+        "LI": "amplitud",
+        "LD": "amplitud",
+        "INT_I": "cubrir_lateral",
+        "INT_D": "cubrir_lateral",
+        "MP": "enlace",
+        "DC_I": "apoyo",
+        "DC_D": "ruptura"
+      },
+      "patrones": ["M01","M02","M03","M04","M08"],
+      "riesgoPrincipal": "Bandas expuestas tras pérdida; limitar subidas simultáneas cuando no haya coberturas."
+    },
+    {
+      "id": "transicion-352",
+      "formacionBase": "3-5-2",
+      "estiloLegadoSugerido": "contragolpe",
+      "descripcion": "Tres centrales, carrileros y dos salidas ofensivas; bloque bajo o medio según contexto.",
+      "conBalon": {
+        "nombre": "3-2-3-2",
+        "lineas": [
+          ["DFC_I","DFC","DFC_D"],
+          ["INT_I","PIV"],
+          ["CAI","INT_D","CAD"],
+          ["DC_I","DC_D"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "5-3-2",
+        "lineas": [
+          ["CAI","DFC_I","DFC","DFC_D","CAD"],
+          ["INT_I","PIV","INT_D"],
+          ["DC_I","DC_D"]
+        ]
+      },
+      "parametros": {
+        "salida": "directa",
+        "progresion": "vertical",
+        "foco": "equilibrado",
+        "amplitud": "alta",
+        "alturaBloque": "baja",
+        "intensidadPresion": "baja",
+        "trasPerdida": "replegar",
+        "trasRecuperacion": "atacar_si_hay_ventaja",
+        "riesgo": "bajo"
+      },
+      "resguardo": ["DFC_I","DFC","DFC_D","INT_I","PIV"],
+      "funcionesConBalon": {
+        "CAI": "amplitud",
+        "CAD": "amplitud",
+        "DC_I": "apoyo",
+        "DC_D": "ruptura",
+        "INT_D": "llegada"
+      },
+      "patrones": ["M06","M07","M09","M12","M14"],
+      "riesgoPrincipal": "Carrileros fijados atrás pueden aislar a los puntas; ofrecer un enlace antes de lanzar."
+    },
+    {
+      "id": "amplitud-343",
+      "formacionBase": "3-4-3",
+      "estiloLegadoSugerido": "posesion",
+      "descripcion": "Carrileros abiertos y extremos interiores; dos medios protegen la circulación.",
+      "conBalon": {
+        "nombre": "3-2-5",
+        "lineas": [
+          ["DFC_I","DFC","DFC_D"],
+          ["MC_I","MC_D"],
+          ["CAI","EI","DC","ED","CAD"]
+        ]
+      },
+      "sinBalon": {
+        "nombre": "5-4-1",
+        "lineas": [
+          ["CAI","DFC_I","DFC","DFC_D","CAD"],
+          ["EI","MC_I","MC_D","ED"],
+          ["DC"]
+        ]
+      },
+      "parametros": {
+        "salida": "mixta",
+        "progresion": "equilibrada",
+        "foco": "bandas",
+        "amplitud": "alta",
+        "alturaBloque": "media",
+        "intensidadPresion": "media",
+        "trasPerdida": "situacional",
+        "trasRecuperacion": "evaluar_salida",
+        "riesgo": "medio"
+      },
+      "resguardo": ["DFC_I","DFC","DFC_D","MC_I","MC_D"],
+      "funcionesConBalon": {
+        "CAI": "amplitud",
+        "CAD": "amplitud",
+        "EI": "apoyo_interior",
+        "ED": "apoyo_interior",
+        "DC": "fijar_y_romper"
+      },
+      "patrones": ["M03","M04","M05","M06","M08"],
+      "riesgoPrincipal": "Dos medios pueden quedar superados; impedir que ambos abandonen el centro a la vez."
+    }
+  ],
+  "ejemploAnclas": {
+    "perfil": "posesion-433-asimetrica",
+    "estado": "propuesta_para_calibrar",
+    "base": {
+      "POR": [0.06,0.5],
+      "LI": [0.25,0.1],
+      "DFC_I": [0.23,0.35],
+      "DFC_D": [0.23,0.65],
+      "LD": [0.25,0.9],
+      "PIV": [0.43,0.5],
+      "INT_I": [0.58,0.3],
+      "INT_D": [0.58,0.7],
+      "EI": [0.75,0.08],
+      "DC": [0.8,0.5],
+      "ED": [0.75,0.92]
+    },
+    "conBalon": {
+      "POR": [0.08,0.5],
+      "DFC_I": [0.32,0.23],
+      "DFC_D": [0.32,0.5],
+      "LD": [0.32,0.77],
+      "LI": [0.49,0.35],
+      "PIV": [0.49,0.65],
+      "EI": [0.78,0.08],
+      "INT_I": [0.72,0.29],
+      "DC": [0.82,0.5],
+      "INT_D": [0.72,0.71],
+      "ED": [0.78,0.92]
+    },
+    "sinBalon": {
+      "POR": [0.07,0.5],
+      "LI": [0.26,0.12],
+      "DFC_I": [0.24,0.38],
+      "DFC_D": [0.24,0.62],
+      "LD": [0.26,0.88],
+      "PIV": [0.39,0.5],
+      "EI": [0.52,0.13],
+      "INT_I": [0.5,0.38],
+      "INT_D": [0.5,0.62],
+      "ED": [0.52,0.87],
+      "DC": [0.65,0.5]
+    }
+  },
+  "parametrosMovimientoPropuestos": {
+    "unidades": "metros_y_segundos_del_modelo",
+    "pasoFijoS": 0.1,
+    "velocidadMarchaMps": [1,2],
+    "velocidadApoyoMps": [2,4],
+    "velocidadCarreraMps": [4,6],
+    "velocidadSprintMps": [6,8.5],
+    "aceleracionMaxMps2": 3,
+    "toleranciaLlegadaM": 0.25,
+    "ventanaContrapresionS": [3,5],
+    "minEstadoEstableS": 2,
+    "minEntreCambiosPlanMin": 10,
+    "nota": "Valores sintéticos iniciales; no calibrados con tracking, ni normativos ni invariantes universales. Las pérdidas reales y las reanudaciones pueden interrumpir una fase."
+  },
+  "mutacionesPermitidas": ["reflejar_asimetria_con_mapeo_de_slots","subida_de_un_lateral_con_cobertura","intercambio_temporal_de_roles_compatibles","ajuste_de_altura_y_anchura_acotado","cambio_a_formacion_validada_con_asignacion_explicita"]
+}
