@@ -1,0 +1,78 @@
+{
+  "checkedUtc": "2026-10-19T18:36:20.762Z",
+  "phase": "implemented_and_validated_locally_not_deployed",
+  "design": "../../disenos/038-emision-con-buffer.md",
+  "checks": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "standalonePackaging": "passed",
+    "packagingTests": 2,
+    "unit": {
+      "passed": 1544,
+      "files": 66,
+      "log": ".cache/arena-buffer-unitarias-final.log"
+    },
+    "browser": {
+      "passed": 25,
+      "newBufferedCases": 5,
+      "log": ".cache/arena-buffer-e2e-final.log",
+      "coverage": [
+        "starts before generation finishes",
+        "independent interpolated clock",
+        "pause and shared broadcast without new creation",
+        "audio prepared ahead while the real AudioContext runs",
+        "recovery after exhausting twenty seconds of reserve",
+        "stale audio discarded on language change",
+        "speech failure continues visual playback",
+        "late viewer joins near frontier",
+        "future goal hidden until its cursor",
+        "all twenty previous arena and prepared playback cases preserved"
+      ]
+    },
+    "localMobileScreenshot": ".cache/arena-buffer-movil.png"
+  },
+  "parameters": {
+    "initialContentSeconds": 20,
+    "refillContentSeconds": 10,
+    "narrationWindowSeconds": 5,
+    "maximumDecodedPassageSeconds": 6,
+    "maximumSpeechRate": 1.2,
+    "maximumOrdinarySpeechDelaySeconds": 2,
+    "producerLeadSeconds": 20
+  },
+  "limits": {
+    "modelMatchesPerDay": 10,
+    "analystQuestionsPerDay": 20,
+    "speechCharactersIncludingMarkupPerDay": 120000,
+    "speechCharactersIncludingMarkupPerSession": 24000,
+    "retentionHours": 24
+  },
+  "limitations": [
+    "Buffer size is usable content, not a guaranteed startup time or maximum delay.",
+    "Decision deadline remains sixty seconds; a slow model or Speech service can exhaust the reserve.",
+    "Narration is selective, with silence and omitted routine interventions; full narration is preserved in prepared replay.",
+    "A paused viewer falls behind; manual reconnection obtains a new snapshot near the available frontier.",
+    "Encounters shorter than twenty seconds can finish before buffered playback starts.",
+    "Speech/pitch alignment is per intervention, not per word.",
+    "Browser audio regression uses short fixture audio; public real-Speech verification is pending."
+  ],
+  "verificationIssues": [
+    "The first isolated Next build stalled; that process tree was stopped and the browser suite passed outside the local-binding restriction.",
+    "A second invocation encountered the first build lock; after stopping the isolated process, the final build and all twenty-five cases passed."
+  ],
+  "sourceHashes": {
+    "src/arena/buffer.ts": "96fe1bd9f35bce7416b962365e028ba696a047d850c176dc932bc72243943923",
+    "src/arena/protocolo.ts": "1a9c05b841df1ccbaa8edfbc0e3aa79934fc2278e73a172e7569520017717f0e",
+    "src/arena/peticiones.ts": "f9788e0c7de4187a2b085d94ff0fe752f96eff4c79c2cf681c792b5b312a51d1",
+    "src/arena/sesiones.ts": "74752949b33526821c0667c281d96a92b96923da145b7ade8fa39bcd8728acba",
+    "src/arena/relato.ts": "7c942cb1c05451b80ea910e6621d3ada6d6670b9f79efd180bf4a75c20354e2b",
+    "src/ui/Arena.tsx": "16e681bdd73bad9e108f8814567bfa23f57169a31af1756ea89b6c54dac402dc",
+    "src/ui/ArenaEnDirecto.tsx": "72a211b6859526c6adcb570e8bbff8dce8e4e5f63becde1c8ccbd9241dec02a2",
+    "src/ui/ArenaEmisionBuffer.tsx": "427bd5687af4cb3dd7431a08ea8ec38cd64cc27e1cf0d3879ac498e5a1bd0934",
+    "src/app/api/arena/sesiones/[id]/emision/route.ts": "94d079631774a99b31b1ec386c7c2aa5eea1d6f67fe3daa28870e38e406f4acc",
+    "src/app/api/arena/sesiones/[id]/relato/route.ts": "92b881122243454b0bb680a7a8366ca391b1ca7a76d3096f9f97ee277ff6ef80",
+    "src/arena/__tests__/buffer.test.ts": "b491ea8d07f22959b2ffea85266f3b2f0085b69a4e75bb63a9c686e06bd13b97",
+    "e2e/arena.spec.ts": "f7f209b8038bbbe8ee6ea0ab125c607b2842c590049c3a8ecf3ee70d46c83443",
+    "e2e/arena-buffer.spec.ts": "e0572c18503cf6dff60b15425932142ae48bf70ca6814081fa8698f17edf1815"
+  }
+}

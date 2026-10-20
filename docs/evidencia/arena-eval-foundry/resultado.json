@@ -1,0 +1,178 @@
+{
+  "checkedUtc": "2026-10-19T03:31:45.039Z",
+  "phase": "local_verified_pending_publication",
+  "metodo": "ablacion_verificacion_mismo_primer_borrador",
+  "modeloNarrador": "azure-openai:cronista-rapido:reasoning-low",
+  "modeloJuez": "gpt-5.4-mini-2026-03-17",
+  "evaluacion": {
+    "evalId": "eval_9aaa789c081b410c91c812846fb9263f",
+    "runId": "evalrun_f559e6ed9ec5463fbb8bb86e0fb0a5b3",
+    "status": "queued",
+    "reportUrl": null
+  },
+  "estado": "completed",
+  "totales": {
+    "total": 4,
+    "passed": 3,
+    "failed": 1,
+    "errored": 0,
+    "skipped": 0
+  },
+  "resultados": [
+    {
+      "id": "1",
+      "brazo": "primer_borrador",
+      "tick": 150,
+      "status": "completed",
+      "resultados": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 4,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The first two lines accurately narrate fact arena:a10 in Spanish and English using only the confirmed context: Ramiro Galiueta (15) attempts a 20 m pass towards Tomás Oreich for Sporting Montefrío Bajo. However, the response then adds extra preceding information about Ramiro previously receiving the ball after a 36 m pass from Ismael Rosarell. Although that detail exists in the broader context (arena:a9 and a8), the query asks to narrate fact arena:a10 and explicitly says not to anticipate results, so including prior-event narration goes beyond the requested fact. Therefore the answer is mostly correct but not fully grounded to the specific target fact.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 2192,
+            "completion_tokens": 161,
+            "total_tokens": 2353
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "The response is directly on task, narrating the specified football action in both Spanish and English while staying within confirmed context and avoiding result prediction. It is relevant and sufficiently detailed, though not especially elaborate.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 1872,
+            "completion_tokens": 57,
+            "total_tokens": 1929
+          }
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "brazo": "pipeline",
+      "tick": 150,
+      "status": "completed",
+      "resultados": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 2,
+          "umbral": 3,
+          "aprobada": false,
+          "motivo": "Let's think step by step: The response is mostly grounded in the confirmed context for arena:a10 because it correctly states that Ramiro Galiueta (15) attempts a 20 m pass towards Tomás Oreich for Sporting Montefrío Bajo in both Spanish and English. However, it also adds an extra sentence saying Ramiro Galiueta receives the ball, which is not part of the confirmed fact for a10 and is unsupported by the context. Since the answer includes correct information but also anticipates an unconfirmed result, it is partially correct rather than fully grounded.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 2159,
+            "completion_tokens": 134,
+            "total_tokens": 2293
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 3,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "The response follows the bilingual narration request and uses cautious, on-topic football language. However, it provides only a couple of action lines and may not fully narrate the arena fact context, so it feels somewhat incomplete.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 1839,
+            "completion_tokens": 60,
+            "total_tokens": 1899
+          }
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "brazo": "primer_borrador",
+      "tick": 300,
+      "status": "completed",
+      "resultados": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 5,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response is fully anchored in the provided context. For arena:a21, the confirmed fact is that Lucio Fenoido (5) receives the ball, and the prior context also confirms Ismael Rosarell (1) attempts a 21 m pass toward Lucio Fenoido. The response accurately narrates this in both Spanish and English, without anticipating any unconfirmed result such as whether the pass succeeded beyond the receiver action. It is complete and does not introduce unsupported information.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 2064,
+            "completion_tokens": 121,
+            "total_tokens": 2185
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "The response follows the requested bilingual English/Spanish narration style and stays within confirmed context by describing an in-arena event without predicting results. It is relevant, but the available content is very limited and may not fully reflect the specific fact arena context.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 1821,
+            "completion_tokens": 66,
+            "total_tokens": 1887
+          }
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "brazo": "pipeline",
+      "tick": 300,
+      "status": "completed",
+      "resultados": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 4,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response is grounded in the provided context because it accurately states the confirmed fact for arena:a21: Lucio Fenoido (5) receives the ball. It also correctly mentions the team, Sporting Montefrío Bajo, which is supported by the context. The response is bilingual as requested and does not anticipate any future outcome. However, it is slightly less complete than the source fact because it omits the player’s jersey number and does not explicitly preserve the exact match of the context phrasing beyond the core event, so it is correct but not fully exhaustive.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 2025,
+            "completion_tokens": 136,
+            "total_tokens": 2161
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 3,
+          "umbral": 3,
+          "aprobada": true,
+          "motivo": "The response follows the language requirement and narrates a live-style fact about the arena, but it adds an unconfirmed player action rather than using only confirmed context. It is relevant yet may violate the no-anticipation constraint.",
+          "modelo": "gpt-5.4-mini-2026-03-17",
+          "uso": {
+            "prompt_tokens": 1782,
+            "completion_tokens": 62,
+            "total_tokens": 1844
+          }
+        }
+      ]
+    }
+  ],
+  "usoNarrador": {
+    "llamadas": 4,
+    "respuestasConUso": 4,
+    "entrada": 3675,
+    "salida": 800,
+    "cache": 0
+  },
+  "hashes": {
+    "dataset.jsonl": "e286eb5fe7201196b6e441436a54f34261370920935cde773271932eb5586890",
+    "informe.json": "d578747c5db97554f6f33eef08641c5a804d7c6c525d5593fc6450638524c57b"
+  },
+  "conclusion": "Esta muestra no demuestra mejora: el primer borrador obtuvo mayor puntuación que el resultado final en las dos ventanas.",
+  "limites": [
+    "Dos ventanas de un encuentro sintético; no permite inferencias de calidad general.",
+    "Juez y narrador usan la misma familia y versión de modelo.",
+    "V3 rechaza el dorsal del pasador por alcance de citas aunque existe en otro hecho del contexto: no es una alucinación demostrada.",
+    "La relevancia solo recibe query y respuesta; no es una validación de fidelidad al contexto.",
+    "Revisión humana ciega y evaluación con juez distinto pendientes."
+  ]
+}

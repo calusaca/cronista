@@ -1,0 +1,379 @@
+{
+  "checkedUtc": "2026-10-19T22:56:28.544Z",
+  "phase": "passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "sesion": "38017b3f-12ff-4859-b86a-13f3d0178a2a",
+  "seed": 6,
+  "intervaloDecisionesS": 30,
+  "balonInicial": {
+    "x": 52.5,
+    "y": 34
+  },
+  "reactivacionTickMinimo": 160,
+  "contextoReutilizado": true,
+  "voz": {
+    "fuentes": [
+      {
+        "inicio": 11825.39999999851,
+        "fin": 16985.39999999851,
+        "duracion": 5.16,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            12005.39999999851,
+            13405.39999999851
+          ],
+          [
+            13505.39999999851,
+            15405.39999999851
+          ],
+          [
+            15425.39999999851,
+            16005.39999999851
+          ]
+        ]
+      },
+      {
+        "inicio": 19007.599999997765,
+        "fin": 21494.29999999702,
+        "duracion": 5.952,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            19187.599999997765,
+            21487.599999997765
+          ],
+          [
+            21707.599999997765,
+            23987.599999997765
+          ]
+        ]
+      },
+      {
+        "inicio": 26004,
+        "fin": 30178.29999999702,
+        "duracion": 4.176,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            26184,
+            28984
+          ],
+          [
+            29004,
+            29184
+          ]
+        ]
+      },
+      {
+        "inicio": 31637.199999999255,
+        "fin": 36007.599999997765,
+        "duracion": 6.192,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            31837.199999999255,
+            32897.199999999255
+          ],
+          [
+            32957.199999999255,
+            33777.199999999255
+          ],
+          [
+            33877.199999999255,
+            35517.199999999255
+          ],
+          [
+            35677.199999999255,
+            36877.199999999255
+          ]
+        ]
+      },
+      {
+        "inicio": 36037.79999999702,
+        "fin": 40261.79999999702,
+        "duracion": 4.224,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            36177.79999999702,
+            36757.79999999702
+          ],
+          [
+            37517.79999999702,
+            39117.79999999702
+          ]
+        ]
+      }
+    ],
+    "reinicios": [
+      {
+        "texto": "Kick-off · Sporting Montefrío Bajo",
+        "reloj": "0:00 / 1:00"
+      },
+      {
+        "texto": "Kick-off · Club Nebrisa",
+        "reloj": "0:00 / 1:00"
+      },
+      {
+        "texto": "Kick-off · Deportivo Brezal",
+        "reloj": "0:27 / 1:00"
+      }
+    ],
+    "transcripciones": [
+      {
+        "tick": 33,
+        "instante": 11828.099999997765,
+        "tipo": "comentario",
+        "texto": "Narration transcript and evidenceWe continue our coverage, following the ball and the movements of both teams.",
+        "reloj": "0:03 / 1:00"
+      },
+      {
+        "tick": 105,
+        "instante": 19009.5,
+        "tipo": "comentario",
+        "texto": "Narration transcript and evidenceStay with us for the action as it unfolds, with match commentary throughout our coverage.",
+        "reloj": "0:10 / 1:00"
+      },
+      {
+        "tick": 170,
+        "instante": 25975.699999999255,
+        "tipo": "entrada",
+        "texto": "Narration transcript and evidenceTomás Orioya has the ball in the central area of the pitch.",
+        "reloj": "0:17 / 1:00"
+      },
+      {
+        "tick": 231,
+        "instante": 31609.89999999851,
+        "tipo": "jugada",
+        "texto": "Narration transcript and evidenceVicente Quinooya (17) receives in an offside position (point approximation).a13",
+        "reloj": "0:23 / 1:00"
+      },
+      {
+        "tick": 275,
+        "instante": 36013,
+        "tipo": "jugada",
+        "texto": "Narration transcript and evidenceGoal! Vicente Quinooya scores!a18",
+        "reloj": "0:27 / 1:00"
+      }
+    ],
+    "contextos": 1,
+    "ventanasAudibles": [
+      [
+        9741.099999997765,
+        21459.599999997765
+      ],
+      [
+        25498.79999999702,
+        36403.5
+      ]
+    ],
+    "maxSilencioMs": 3182.199999999255,
+    "duracionObservadaMs": 26662.400000002235,
+    "medicion": "PCM absoluto > 0.001 en bloques de 20 ms; incluye pausas internas y truncamientos"
+  },
+  "solicitudes": [
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false,
+      "entradaTick": 12,
+      "estado": 200,
+      "tipoRelato": "entrada",
+      "tick": 12,
+      "texto": "Club Nebrisa prepares to restart play.",
+      "caracteres": 38
+    },
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 0,
+      "texto": "Kick-off for Club Nebrisa; Thiago Fenelera (6) takes it.",
+      "caracteres": 56
+    },
+    {
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "estado",
+      "tick": 100,
+      "texto": "Vicente Quinooya has the ball in the right sector of the pitch.",
+      "caracteres": 63
+    },
+    {
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "cierre": false,
+      "estado": 429,
+      "caracteres": 0
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false,
+      "estado": 429,
+      "caracteres": 0
+    },
+    {
+      "desdeTick": 200,
+      "hastaTick": 250,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 231,
+      "texto": "Vicente Quinooya (17) receives in an offside position (point approximation).",
+      "caracteres": 76
+    },
+    {
+      "desdeTick": 250,
+      "hastaTick": 300,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 275,
+      "texto": "Goal! Vicente Quinooya scores!",
+      "caracteres": 30
+    },
+    {
+      "desdeTick": 300,
+      "hastaTick": 350,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "estado",
+      "tick": 350,
+      "texto": "Nico Zareón has the ball in the central area of the pitch.",
+      "caracteres": 58
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false,
+      "entradaTick": 170,
+      "estado": 200,
+      "tipoRelato": "entrada",
+      "tick": 170,
+      "texto": "Tomás Orioya has the ball in the central area of the pitch.",
+      "caracteres": 59
+    },
+    {
+      "desdeTick": 350,
+      "hastaTick": 400,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 394,
+      "texto": "Nico Zareón shoots!",
+      "caracteres": 19
+    },
+    {
+      "desdeTick": 400,
+      "hastaTick": 450,
+      "cierre": false,
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 403,
+      "texto": "It's a goal by Nico Zareón!",
+      "caracteres": 27
+    }
+  ],
+  "reiniciosServidor": [
+    {
+      "seed": 3,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 3,
+      "tick": 261,
+      "tipo": "centro",
+      "lado": "visita"
+    },
+    {
+      "seed": 3,
+      "tick": 400,
+      "tipo": "centro",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 4,
+      "tick": 114,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 408,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 472,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 5,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 5,
+      "tick": 147,
+      "tipo": "meta",
+      "lado": "visita"
+    },
+    {
+      "seed": 5,
+      "tick": 276,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 5,
+      "tick": 442,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 326,
+      "tipo": "banda",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 411,
+      "tipo": "centro",
+      "lado": "visita"
+    }
+  ],
+  "modelosLlm": 0,
+  "speechReal": true,
+  "javascriptErrors": [],
+  "mobileWidth": 360,
+  "horizontalOverflow": false
+}

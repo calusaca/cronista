@@ -1,0 +1,32 @@
+{
+  "checkedUtc": "2026-10-19T13:46:57.783Z",
+  "audioListenedOrAcousticallyMeasured": false,
+  "references": [
+    {
+      "title": "Así cantó RNE los partidos de España en el Mundial de Sudáfrica",
+      "url": "https://www.rtve.es/deportes/20110711/asi-canto-rne-partidos-espana-mundial-sudafrica/445909.shtml",
+      "publisher": "RTVE / RNE",
+      "kind": "Recopilación de relatos con audio",
+      "pageVerified": true
+    },
+    {
+      "title": "España en los Mundiales: El gol de Iniesta (2010)",
+      "url": "https://www.rtve.es/play/audios/deportes-en-el-archivo-de-rtve/espana-mundiales-gol-iniesta-2010/2456807/",
+      "publisher": "RTVE / RNE",
+      "kind": "Gol narrado por Antonio Muelas",
+      "pageVerified": "Localizado en buscador; lectura directa con bucle de redirección"
+    },
+    {
+      "title": "FIFA World Cup Qatar 2022 Highlights",
+      "url": "https://www.fifa.com/en/tournaments/mens/worldcup/qatar2022/qatar-highlights",
+      "publisher": "FIFA",
+      "kind": "Resúmenes de partidos",
+      "pageVerified": true
+    }
+  ],
+  "technicalSources": [
+    "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-voice",
+    "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts"
+  ],
+  "note": "Referencias para comparación humana. La selección de estilos implementada se apoya en el catálogo real, no en un supuesto análisis auditivo de los relatos."
+}

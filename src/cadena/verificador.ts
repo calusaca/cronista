@@ -20,9 +20,13 @@
 // jugadores que nombra. Sus motivos llevan oracion −1 y el detalle empieza con «título».
 
 import { z } from "zod";
-import type { Hecho } from "../analista/tipos";
+import type { Hecho as HechoAnalista } from "../analista/tipos";
 import { FUERA_DEL_AREA_M, MISIL_KMH } from "../sim/limites";
-import type { Partido } from "../sim/tipos";
+import type { Partido as PartidoSimulado } from "../sim/tipos";
+/** El verificador consume hechos y planteles; no necesita fabricar un Partido histórico. */
+export type HechoVerificable = HechoAnalista | (Omit<HechoAnalista, "tipo"> & { tipo: "accion_arena" });
+type Hecho = HechoVerificable;
+type Partido = Pick<PartidoSimulado, "config">;
 import {
   BALANCE_POSTERIOR,
   CIERRE_EN_VIVO,
@@ -498,7 +502,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   // V7: «nunca se acomodó / never settled» describe la medición, no niega un suceso).
   for (const e of [...INSOLITOS_JUICIO, ...GRADA_JUICIO, ...SANCION_CLUB_JUICIO, ...EFECTOS_CONDICION, ...CONSECUENCIAS]) {
     s = quitar(s, e[lengua], (m) => {
-      if (!ctx.hechos.some((x) => e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
+      if (!ctx.hechos.some((x) => x.tipo !== "accion_arena" && e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
     });
   }
   for (const f of FRANJAS) {
@@ -574,7 +578,7 @@ function analizarTexto(texto: string, lengua: Lengua, ctx: Contexto, esTitulo: b
   // V8 — tabla de juicio y muletillas
   for (const e of JUICIO) {
     w = quitar(w, e[lengua], (m) => {
-      if (!ctx.hechos.some((x) => e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
+      if (!ctx.hechos.some((x) => x.tipo !== "accion_arena" && e.habilita(x, marcadoresDe(x, ctx.partido)))) h.push({ regla: "V8", detalle: `«${m[0]}»: ${e.requisito}` });
     });
   }
 

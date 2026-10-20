@@ -1,0 +1,483 @@
+{
+  "checkedUtc": "2026-10-19T03:16:34.281Z",
+  "phase": "resilience_run_with_fallbacks",
+  "id": "3e438a56-4056-4107-8f1d-a507e59c64be",
+  "asignacion": {
+    "modo": "manual",
+    "local": {
+      "id": "principal",
+      "nombre": "GPT-6.1 Sol",
+      "controlador": "azure-openai:gpt-6.1-sol:reasoning-low"
+    },
+    "visita": {
+      "id": "rapido",
+      "nombre": "GPT-5.4 mini",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low"
+    }
+  },
+  "distinctModels": true,
+  "models": {
+    "principal": "gpt-6.1-sol:2026-09-29",
+    "rapido": "gpt-5.4-mini:2026-03-17"
+  },
+  "firstAdvanceMs": 31600,
+  "elapsedMs": 123546,
+  "seconds": 60,
+  "score": {
+    "local": 1,
+    "visita": 0
+  },
+  "events": 42,
+  "decisions": [
+    {
+      "controller": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "source": "respaldo",
+      "reason": "error_controlador",
+      "timeMs": 31070.266386
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "respaldo",
+      "reason": "orden_invalida",
+      "timeMs": 3747.716293
+    },
+    {
+      "controller": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 31908.675050000005
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "respaldo",
+      "reason": "orden_invalida",
+      "timeMs": 3320.7396999999983
+    }
+  ],
+  "comments": [
+    {
+      "tick": 5,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a1",
+      "hechos": [
+        {
+          "id": "arena:a1",
+          "tipo": "accion_arena",
+          "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+          "texto_en": "Benja Bareardi (16) attempts a 18 m pass towards Dante Doraena.",
+          "eventos": [
+            "a1"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Benja Bareardi",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 16,
+            "distancia": 18,
+            "receptor": "Dante Doraena"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+          "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+          "hecho": "arena:a1",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+              "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+              "hecho": "arena:a1",
+              "apoyo": [
+                "a1"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V2",
+              "detalle": "cita de apoyo a1, que no existe"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+              "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+              "hecho": "arena:a1",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a12",
+      "hechos": [
+        {
+          "id": "arena:a7",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) recibe el balón.",
+          "texto_en": "Rafael Ulveich (11) receives the ball.",
+          "eventos": [
+            "a7"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 21,
+            "receptor": "Dante Doraena"
+          }
+        },
+        {
+          "id": "arena:a8",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) intenta un pase de 21 m hacia Darío Celeloya.",
+          "texto_en": "Rafael Ulveich (11) attempts a 21 m pass towards Darío Celeloya.",
+          "eventos": [
+            "a8"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 21,
+            "receptor": "Darío Celeloya"
+          }
+        },
+        {
+          "id": "arena:a9",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) recibe el balón.",
+          "texto_en": "Darío Celeloya (7) receives the ball.",
+          "eventos": [
+            "a9"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 21,
+            "receptor": "Rafael Ulveich"
+          }
+        },
+        {
+          "id": "arena:a10",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) intenta un pase de 21 m hacia Fabio Celiido.",
+          "texto_en": "Darío Celeloya (7) attempts a 21 m pass towards Fabio Celiido.",
+          "eventos": [
+            "a10"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 21,
+            "receptor": "Fabio Celiido"
+          }
+        },
+        {
+          "id": "arena:a11",
+          "tipo": "accion_arena",
+          "texto_es": "Fabio Celiido (15) recibe el balón.",
+          "texto_en": "Fabio Celiido (15) receives the ball.",
+          "eventos": [
+            "a11"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Fabio Celiido",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 15,
+            "distancia": 21,
+            "receptor": "Darío Celeloya"
+          }
+        },
+        {
+          "id": "arena:a12",
+          "tipo": "accion_arena",
+          "texto_es": "Fabio Celiido (15) intenta un pase de 25 m hacia Darío Celeloya.",
+          "texto_en": "Fabio Celiido (15) attempts a 25 m pass towards Darío Celeloya.",
+          "eventos": [
+            "a12"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Fabio Celiido",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 15,
+            "distancia": 25,
+            "receptor": "Darío Celeloya"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Fabio Celiido (15) intenta un pase de 25 m hacia Darío Celeloya.",
+          "texto_en": "Fabio Celiido (15) attempts a 25 m pass towards Darío Celeloya.",
+          "hecho": "arena:a12",
+          "apoyo": [
+            "arena:a11",
+            "arena:a10"
+          ]
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "En el tick 155, Fabio Celiido (15) intenta un pase de 25 m hacia Darío Celeloya.",
+              "texto_en": "At tick 155, Fabio Celiido (15) attempts a 25 m pass towards Darío Celeloya.",
+              "hecho": "arena:a12",
+              "apoyo": [
+                "arena:a11",
+                "arena:a10"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 155 no está en el hecho (ES)"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Fabio Celiido (15) intenta un pase de 25 m hacia Darío Celeloya.",
+              "texto_en": "Fabio Celiido (15) attempts a 25 m pass towards Darío Celeloya.",
+              "hecho": "arena:a12",
+              "apoyo": [
+                "arena:a11",
+                "arena:a10"
+              ]
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 305,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a21",
+      "hechos": [
+        {
+          "id": "arena:a16",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) intenta un pase de 22 m hacia Darío Celeloya.",
+          "texto_en": "Rafael Ulveich (11) attempts a 22 m pass towards Darío Celeloya.",
+          "eventos": [
+            "a16"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 22,
+            "receptor": "Darío Celeloya"
+          }
+        },
+        {
+          "id": "arena:a17",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) recibe el balón.",
+          "texto_en": "Darío Celeloya (7) receives the ball.",
+          "eventos": [
+            "a17"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 22,
+            "receptor": "Rafael Ulveich"
+          }
+        },
+        {
+          "id": "arena:a18",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) intenta un pase de 20 m hacia Rafael Ulveich.",
+          "texto_en": "Darío Celeloya (7) attempts a 20 m pass towards Rafael Ulveich.",
+          "eventos": [
+            "a18"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 20,
+            "receptor": "Rafael Ulveich"
+          }
+        },
+        {
+          "id": "arena:a19",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) recibe el balón.",
+          "texto_en": "Rafael Ulveich (11) receives the ball.",
+          "eventos": [
+            "a19"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 20,
+            "receptor": "Darío Celeloya"
+          }
+        },
+        {
+          "id": "arena:a20",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) intenta un pase de 20 m hacia Darío Celeloya.",
+          "texto_en": "Rafael Ulveich (11) attempts a 20 m pass towards Darío Celeloya.",
+          "eventos": [
+            "a20"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 20,
+            "receptor": "Darío Celeloya"
+          }
+        },
+        {
+          "id": "arena:a21",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) recibe el balón.",
+          "texto_en": "Darío Celeloya (7) receives the ball.",
+          "eventos": [
+            "a21"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 20,
+            "receptor": "Rafael Ulveich"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Darío Celeloya (7) recibe el balón.",
+          "texto_en": "Darío Celeloya (7) receives the ball.",
+          "hecho": "arena:a21",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Darío Celeloya (7) recibe el balón tras un pase de 20 m de Rafael Ulveich (11).",
+              "texto_en": "Darío Celeloya (7) receives the ball after a 20 m pass from Rafael Ulveich (11).",
+              "hecho": "arena:a21",
+              "apoyo": [
+                "arena:a20"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 11 no está en el hecho (ES)"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Darío Celeloya (7) recibe el balón.",
+              "texto_en": "Darío Celeloya (7) receives the ball.",
+              "hecho": "arena:a21",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  ],
+  "usage": [
+    {
+      "model": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 1,
+        "entrada": 7978,
+        "salida": 516,
+        "cache": 0
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 2,
+        "entrada": 14989,
+        "salida": 1091,
+        "cache": 0
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 6,
+        "respuestasConUso": 6,
+        "entrada": 4426,
+        "salida": 705,
+        "cache": 0
+      }
+    }
+  ],
+  "replay": true,
+  "recording": {
+    "path": ".cache/arena-respaldo-v3.json",
+    "bytes": 1908667,
+    "sha256": "e07cc50da8b930e38c49bdfc981c47363af865d3462ff00587fce97d4d8a8b21"
+  },
+  "limits": [
+    "Three of four team decisions used programmed fallback; this run demonstrates recovery, not a pure model duel.",
+    "Single synthetic match; no superiority or professional realism claim.",
+    "Coaches wait at common decision boundaries; generation is incremental, not uninterrupted 1x play.",
+    "Narration checks maintained V1–V8 rules, not independent semantic certification."
+  ],
+  "pureModelControl": false,
+  "fallbackCount": 3
+}

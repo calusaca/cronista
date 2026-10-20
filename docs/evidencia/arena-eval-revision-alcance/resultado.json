@@ -1,0 +1,149 @@
+{
+  "checkedUtc": "2026-10-19T05:14:25.813Z",
+  "estado": "completed",
+  "totales": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0
+  },
+  "narrador": "gpt-5.4-mini",
+  "juez": "gpt-5.6-luna",
+  "resultados": [
+    {
+      "id": "1",
+      "brazo": "primer_borrador",
+      "tick": 150,
+      "criterios": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 5,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response accurately narrates arena:a10 in both English and Spanish. It identifies Ramiro Galiueta (15), the attempted 20 m pass, and Tomás Oreich as the intended recipient, exactly as confirmed by the context. It does not anticipate the outcome or add unsupported information, so it fully satisfies the query.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 2163,
+            "completion_tokens": 136,
+            "total_tokens": 2299
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "aprobada": true,
+          "motivo": "The response directly narrates a single football action in both Spanish and English, using clear language suitable for a casual fan. It stays factual and does not predict the outcome, fully satisfying the stated constraints.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 1795,
+            "completion_tokens": 242,
+            "total_tokens": 2037
+          }
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "brazo": "pipeline",
+      "tick": 150,
+      "criterios": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 5,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response accurately narrates the confirmed arena:a10 event in both requested languages. It identifies Ramiro Galiueta (15), the 20 m pass, and Tomás Oreich as the intended recipient. It does not add any unconfirmed outcome or unrelated information, so it fully satisfies the query.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 2163,
+            "completion_tokens": 127,
+            "total_tokens": 2290
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "aprobada": true,
+          "motivo": "The response accurately narrates the confirmed pass attempt in both Spanish and English, remains suitable for a casual football fan, and does not anticipate any result. It is concise and fully aligned with the requested format.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 1795,
+            "completion_tokens": 197,
+            "total_tokens": 1992
+          }
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "brazo": "primer_borrador",
+      "tick": 300,
+      "criterios": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 5,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response accurately narrates arena:a21 in both Spanish and English. It correctly identifies Lucio Fenoido (5) receiving the ball and attributes the 21 m pass to Ismael Rosarell (1), all of which is supported by the confirmed context. It does not anticipate later results or add unrelated information.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 2072,
+            "completion_tokens": 174,
+            "total_tokens": 2246
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "aprobada": true,
+          "motivo": "The response directly narrates the confirmed football action in both Spanish and English, including the players, shirt numbers, and 21-meter pass. It remains concise and avoids predicting any result, fully matching the requested format and constraints.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 1805,
+            "completion_tokens": 228,
+            "total_tokens": 2033
+          }
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "brazo": "pipeline",
+      "tick": 300,
+      "criterios": [
+        {
+          "nombre": "groundedness",
+          "puntuacion": 5,
+          "aprobada": true,
+          "motivo": "Let's think step by step: The response directly narrates arena:a21 in both requested languages. It accurately identifies Lucio Fenoido (5) receiving the ball and correctly connects this to Ismael Rosarell (1)'s 21 m pass, which is supported by the confirmed arena:a20 and arena:a21 context. It does not anticipate any later result or add unsupported information.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 2072,
+            "completion_tokens": 193,
+            "total_tokens": 2265
+          }
+        },
+        {
+          "nombre": "relevance",
+          "puntuacion": 4,
+          "aprobada": true,
+          "motivo": "The response directly narrates the confirmed football event in both English and Spanish, clearly identifying the players, shirt numbers, and pass distance. It stays suitable for a casual fan and does not anticipate any result, fully satisfying the request without unnecessary additions.",
+          "modelo": "gpt-5.6-luna-2026-07-09",
+          "uso": {
+            "prompt_tokens": 1805,
+            "completion_tokens": 197,
+            "total_tokens": 2002
+          }
+        }
+      ]
+    }
+  ],
+  "hashes": {
+    "informe.json": "aceaba9ada804e0b7445525c6755aa5d8dcaf43e1d5a0eac68ece6a22b946781",
+    "dataset.jsonl": "cf97e9fb4315b059ef9ac137dad6365bcfa36140712d12aac2ce3d28621aa486"
+  },
+  "limites": [
+    "Dos ventanas, cuatro filas pareadas; muestra insuficiente para generalizar.",
+    "Primer borrador y pipeline obtuvieron las mismas puntuaciones: no se demuestra ventaja.",
+    "El juez y las generaciones difieren de la primera corrida: no es una comparación causal antes/después.",
+    "Los resultados originales se conservan sin modificaciones."
+  ]
+}

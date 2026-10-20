@@ -1,0 +1,12 @@
+{
+  "checkedUtc": "2026-10-19T04:52:42.375Z",
+  "name": "cronista-analista",
+  "version": "1",
+  "id": "cronista-analista:1",
+  "model": "cronista-rapido",
+  "tools": [
+    "consultar_eventos",
+    "consultar_jugador"
+  ],
+  "inferenceCalls": 0
+}

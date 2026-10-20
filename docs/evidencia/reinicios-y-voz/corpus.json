@@ -1,0 +1,112 @@
+{
+  "checkedUtc": "2026-10-19T22:18:33.247Z",
+  "partidos": 30,
+  "duracionS": 60,
+  "totales": {
+    "falta": 17,
+    "reinicio": 68,
+    "amarilla": 7,
+    "banda": 7,
+    "pase": 408,
+    "recepcion": 322,
+    "plan_equipo": 65,
+    "fuera_juego": 51,
+    "cambio": 36,
+    "intercepcion": 34,
+    "tiro": 59,
+    "atajada": 19,
+    "tiro_fuera": 10,
+    "esquina": 10,
+    "gol": 36,
+    "centro": 36,
+    "recuperacion": 33,
+    "meta": 14,
+    "roja": 1
+  },
+  "ejemplos": {
+    "falta": {
+      "seed": 1,
+      "tick": 13
+    },
+    "reinicio": {
+      "seed": 1,
+      "tick": 13
+    },
+    "amarilla": {
+      "seed": 1,
+      "tick": 181
+    },
+    "banda": {
+      "seed": 1,
+      "tick": 230
+    },
+    "pase": {
+      "seed": 1,
+      "tick": 246
+    },
+    "recepcion": {
+      "seed": 1,
+      "tick": 247
+    },
+    "plan_equipo": {
+      "seed": 1,
+      "tick": 301
+    },
+    "fuera_juego": {
+      "seed": 1,
+      "tick": 321
+    },
+    "cambio": {
+      "seed": 1,
+      "tick": 321
+    },
+    "intercepcion": {
+      "seed": 1,
+      "tick": 383
+    },
+    "tiro": {
+      "seed": 2,
+      "tick": 63
+    },
+    "atajada": {
+      "seed": 2,
+      "tick": 69
+    },
+    "tiro_fuera": {
+      "seed": 2,
+      "tick": 73
+    },
+    "esquina": {
+      "seed": 2,
+      "tick": 73
+    },
+    "gol": {
+      "seed": 2,
+      "tick": 256
+    },
+    "centro": {
+      "seed": 2,
+      "tick": 256
+    },
+    "recuperacion": {
+      "seed": 2,
+      "tick": 291
+    },
+    "meta": {
+      "seed": 6,
+      "tick": 494
+    },
+    "roja": {
+      "seed": 30,
+      "tick": 496
+    }
+  },
+  "reproduccionExacta": 30,
+  "archivosHistoricosExactos": [
+    "arena-duelo-v3.json",
+    "arena-llm-v1.json",
+    "arena-llm-v3.json",
+    "src/arena/__fixtures__/arena-v2.json"
+  ],
+  "llamadasModelos": 0
+}

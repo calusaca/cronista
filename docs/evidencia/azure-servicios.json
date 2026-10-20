@@ -1,0 +1,19 @@
+{
+  "checkedUtc": "2026-10-19T04:52:19.126Z",
+  "phase": "auxiliary_services_provisioned_application_unchanged",
+  "resourceGroup": "rg-cronista-demo",
+  "resources": {
+    "blobEndpoint": "https://stcronistaecgb5kb3ti.blob.core.windows.net/",
+    "insightsId": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-cronista-demo/providers/Microsoft.Insights/components/cronista-trazas",
+    "insightsName": "cronista-trazas",
+    "storageName": "stcronistaecgb5kb3ti",
+    "vaultName": "kvcronistaecgb5kb3ti",
+    "vaultUri": "https://kvcronistaecgb5kb3ti.vault.azure.net/",
+    "workspaceId": "a6b7a762-325e-4032-b51a-6001fe786481"
+  },
+  "identityClientId": "133c8bce-eed8-4e7e-8f1b-7f08544f6bd7",
+  "identityPrincipalId": "fbed1915-373e-4941-801b-1921157d246c",
+  "foundryConnection": "cronista-appinsights",
+  "secret": "cronista-inferencia",
+  "modelCalls": 0
+}

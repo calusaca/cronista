@@ -1,0 +1,12 @@
+{
+  "checkedUtc": "2026-10-19T05:00:03.429Z",
+  "phase": "completed",
+  "jobName": "cronista-evaluaciones",
+  "execution": "cronista-evaluaciones-6fa9ivt",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista-lotes:lote-20261019045648",
+  "modelCalls": 0,
+  "retryLimit": 0,
+  "sourceIsolation": "explicit_allowlist_without_env_or_cache",
+  "resultPrefix": "lotes/validacion-cloud-v1/",
+  "status": "Succeeded"
+}

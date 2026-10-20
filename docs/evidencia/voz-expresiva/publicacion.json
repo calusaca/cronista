@@ -1,0 +1,85 @@
+{
+  "checkedUtc": "2026-10-19T13:48:43.883Z",
+  "phase": "published_and_public_voice_smoke_passed",
+  "app": "cronista-arena",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "newAzureMutationExecuted": true,
+  "prepared": {
+    "unitTests": 1532,
+    "browserTests": 15,
+    "speechSamples": 5,
+    "usageLimitsUnchanged": true
+  },
+  "pending": [
+    "Escucha humana y preferencia de estilo"
+  ],
+  "previousApprovalReview": {
+    "status": "rejected_before_execution",
+    "reason": "El dale fue considerado autorización para implementar voz expresiva, no para actualizar la aplicación pública."
+  },
+  "authorization": {
+    "instruction": "continua ultima tarea",
+    "context": "Continuación de la publicación de voz expresiva solicitada en el último intercambio",
+    "automaticReview": "approved_execution_started"
+  },
+  "updatedUtc": "2026-10-19T14:03:21.853338+00:00",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019135737",
+  "azure": {
+    "fqdn": "cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019135737",
+    "name": "cronista-arena",
+    "provisioningState": "Succeeded",
+    "resources": {
+      "cpu": 0.5,
+      "ephemeralStorage": "2Gi",
+      "memory": "1Gi"
+    },
+    "revision": "cronista-arena--0000001",
+    "runningStatus": "Running",
+    "scale": {
+      "cooldownPeriod": 300,
+      "maxReplicas": 1,
+      "minReplicas": 0,
+      "pollingInterval": 30,
+      "rules": null
+    },
+    "voices": [
+      {
+        "name": "ARENA_VOZ_ES",
+        "value": "es-MX-JorgeNeural"
+      },
+      {
+        "name": "ARENA_VOZ_EN",
+        "value": "en-US-JennyNeural"
+      }
+    ]
+  },
+  "acr": {
+    "run": "ch9",
+    "status": "Succeeded",
+    "digest": "sha256:43f7f75792eb1ad40e8f1ad6d570096febecb104f82e8949d70a2aa946a19846"
+  },
+  "sourceManifest": {
+    "files": 281,
+    "mismatches": [],
+    "evidence": "../azure-arena-publicacion.json"
+  },
+  "publicSmoke": {
+    "status": "passed",
+    "evidence": "navegador-publico.json",
+    "audioSegments": 6,
+    "recordedEvents": 33,
+    "allRecordedEventsCovered": true,
+    "downloadedFiles": 6,
+    "javascriptErrors": 0,
+    "mobileOverflow": false,
+    "newTeamModelCalls": 0,
+    "newAnalystCalls": 0,
+    "playbackAcceleratedBySeeking": true
+  },
+  "limits": {
+    "modelMatchesPerDay": 10,
+    "analystQuestionsPerDay": 20,
+    "speechCharactersPerDay": 120000
+  }
+}

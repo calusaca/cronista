@@ -1,0 +1,16 @@
+{
+  "checkedUtc": "2026-10-19T13:37:13.868Z",
+  "readOnly": true,
+  "synthesisCalls": 0,
+  "voices": [
+    {
+      "name": "es-MX-JorgeNeural",
+      "locale": "es-MX",
+      "styles": [
+        "cheerful",
+        "chat"
+      ],
+      "status": "GA"
+    }
+  ]
+}

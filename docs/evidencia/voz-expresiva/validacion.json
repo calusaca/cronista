@@ -1,0 +1,103 @@
+{
+  "checkedUtc": "2026-10-19T13:48:43.882Z",
+  "phase": "published_and_public_voice_smoke_passed",
+  "checks": {
+    "typecheck": "passed_again_before_publication",
+    "unit": {
+      "passed": true,
+      "tests": 1532,
+      "files": 64
+    },
+    "browser": {
+      "status": "passed",
+      "tests": 15
+    },
+    "productionBuild": "passed",
+    "standalone": "passed",
+    "deploymentPackaging": {
+      "status": "passed",
+      "tests": 2
+    },
+    "realSpeech": {
+      "status": "generated",
+      "samples": 5,
+      "decoder": "decodificacion.json",
+      "humanListening": "pending"
+    },
+    "realBrowser": {
+      "status": "passed",
+      "scope": "localhost production build with real Azure Speech and cached Foundry reply",
+      "audioSegments": 6,
+      "mobileWidth": 360,
+      "overflow": false,
+      "javascriptErrors": 0,
+      "playbackAcceleratedBySeeking": true
+    },
+    "completeNarration": {
+      "status": "passed",
+      "recordedEvents": 33,
+      "fullEventCoverage": true,
+      "observedCarries": 3,
+      "durationSeconds": 204.52798185941043,
+      "artifact": "duelo-es-completo.mp3"
+    },
+    "publicBrowser": {
+      "status": "passed",
+      "evidence": "navegador-publico.json",
+      "audioSegments": 6,
+      "recordedEvents": 33,
+      "allRecordedEventsCovered": true,
+      "downloadedFiles": 6,
+      "javascriptErrors": 0,
+      "mobileOverflow": false,
+      "newTeamModelCalls": 0,
+      "newAnalystCalls": 0,
+      "playbackAcceleratedBySeeking": true
+    }
+  },
+  "testEnvironment": {
+    "initialSandboxRun": "Ocho pruebas CLI no capturaron stdout/stderr por EPERM de spawnSync. La suite completa se repitió fuera del sandbox, sin cambios de pruebas, y pasó."
+  },
+  "sourceHashes": {
+    "src/arena/expresion.ts": "6374f2e3d6bea1f2e2786157a7ef479e7031beee8832ca7297a9f9fb1414481f",
+    "src/arena/relato.ts": "6f88b85c3af86f262bf92ba64dd2e1b9749a635a46a531f285d484443d150e8b",
+    "src/arena/voz.ts": "8bca5a7f4bbb57cf267cdb30bd9b73fce81345c4fa4d8a4acfea264f6350c6b7",
+    "src/arena/protocolo.ts": "5a93ff7841a5ad38243785071f1f167c0e5d4e8b5d0cbdf14d2957b0dbd6c45b",
+    "src/arena/sesiones.ts": "897d01a9746ef98b7bc15ba6b87d80e8dca670f54242cbe56a99e43cca4d70e8",
+    "src/arena/voz-muestras-cli.ts": "5dd42843d55d5ef6abb4a153cf31693b1758ded24489afd3964a601f71de8a9f",
+    "src/app/api/arena/sesiones/[id]/relato/route.ts": "dc025b4032ba9c70895a9ee9bc1d57206f3031e1ece2cd07a809e7a4a38bee3a",
+    "src/app/api/arena/sesiones/[id]/voz/route.ts": "3023990118967dd3249d4e0a6e346c46eac2fa529153f5518f598a133488f98f",
+    "src/ui/ArenaNarracion.tsx": "725ebf7bd091804597f6b7ce78989b05ca5db7e0536be2ea9c34db38308823fb",
+    "src/arena/__tests__/voz-expresiva.test.ts": "57beda2d157676bc6365f5ada6cce273ea176e5ef3acd24941d9d3b7c24afd3a",
+    "e2e/arena.spec.ts": "2fa194f1103d58f0d32ce511067c70dde0659109d115a66b1c2248b4070287bd",
+    "infra/arena-preview.bicep": "2248b73bff28887a778a168dd6f13e28eea4f32c8e5d76fb20c4f444a6c42480",
+    "package.json": "bd4c17117231f6ef55004036c72b2ac32398d4d67c416d41ecd2667a04a9926a"
+  },
+  "limitations": [
+    "Revisión humana de emoción, pronunciación y preferencia pendiente.",
+    "Las etiquetas editoriales se traducen a los estilos que anuncia el recurso y a prosodia; no todas son estilos nativos.",
+    "Tres segundos es el tamaño de ventana viva, no una garantía de latencia.",
+    "El texto completo puede durar más que el encuentro.",
+    "Las referencias de internet se localizaron; no se analizaron acústicamente sus audios."
+  ],
+  "updatedUtc": "2026-10-19T14:03:21.853338+00:00",
+  "evidence": {
+    "samples": "muestras.json",
+    "decoder": "decodificacion.json",
+    "completeNarration": "relato-completo.json",
+    "realBrowser": "navegador-local.json",
+    "catalog": "catalogo.json",
+    "references": "referencias.json",
+    "sampleCorrection": "ajuste-muestras.json",
+    "publication": "publicacion.json",
+    "publicBrowser": "navegador-publico.json"
+  },
+  "screenshots": {
+    "desktop": "narracion-escritorio.png",
+    "mobile": "narracion-movil.png",
+    "analyst": "analista-escritorio.png",
+    "historicalImageNote": "Dos capturas nuevas se escribieron inicialmente en azure-voz; se movieron a esta entrega. Esos dos nombres anteriores se restauraron con las capturas públicas de la misma versión previa, conservadas en azure-publica.",
+    "publicDesktop": "narracion-publica-escritorio.png",
+    "publicMobile": "narracion-publica-movil.png"
+  }
+}

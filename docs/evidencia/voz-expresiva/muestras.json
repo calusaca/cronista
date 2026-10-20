@@ -1,0 +1,187 @@
+{
+  "checkedUtc": "2026-10-19T13:44:07.351Z",
+  "phase": "real_speech_generated_human_listening_pending",
+  "recording": "public/experimentos/arena-duelo-v3.json",
+  "recordingSha256": "c21c41476de1df6667894ded3311a49c8305432e3e4a135e52ea3e43292d0b15",
+  "teamModelCalls": 0,
+  "maximumSpeechCalls": 5,
+  "reservedCharactersIncludingMarkup": 2436,
+  "session": "96966545-033c-4280-bcf7-dcb2b12f25bb",
+  "samples": [
+    {
+      "nombre": "calma-es",
+      "idioma": "es",
+      "tick": 50,
+      "texto": "Benja Bareardi (16) intenta un pase de 23 m hacia Emilio Zaroánez. Emilio Zaroánez (14) intenta un pase de 19 m hacia Dante Doraena.",
+      "voz": "es-MX-JorgeNeural",
+      "version": "voz-expresiva-v1",
+      "fragmentos": [
+        {
+          "tick": 1,
+          "texto": "Benja Bareardi (16) intenta un pase de 23 m hacia Emilio Zaroánez.",
+          "emocion": "serena",
+          "intensidad": 0.18,
+          "variante": 2,
+          "fuentes": [
+            "a1"
+          ],
+          "fotogramas": []
+        },
+        {
+          "tick": 50,
+          "texto": "Emilio Zaroánez (14) intenta un pase de 19 m hacia Dante Doraena.",
+          "emocion": "serena",
+          "intensidad": 0.18,
+          "variante": 2,
+          "fuentes": [
+            "a4"
+          ],
+          "fotogramas": []
+        }
+      ],
+      "caracteresPresupuestados": 483,
+      "ssmlFile": "docs/evidencia/voz-expresiva/calma-es.ssml",
+      "archivoAudio": "docs/evidencia/voz-expresiva/calma-es.mp3",
+      "bytes": 78912,
+      "sha256": "ebc92d93bc820ed7951b2c2e29626fc5fb991c3d969f20ba085b3e6cd062d886"
+    },
+    {
+      "nombre": "ataque-es",
+      "idioma": "es",
+      "tick": 215,
+      "texto": "Joel Mendiuz avanza hacia el área.",
+      "voz": "es-MX-JorgeNeural",
+      "version": "voz-expresiva-v1",
+      "fragmentos": [
+        {
+          "tick": 215,
+          "texto": "Joel Mendiuz avanza hacia el área.",
+          "emocion": "tension",
+          "intensidad": 0.5742003750327678,
+          "variante": 0,
+          "fuentes": [],
+          "fotogramas": [
+            205,
+            215
+          ]
+        }
+      ],
+      "caracteresPresupuestados": 369,
+      "ssmlFile": "docs/evidencia/voz-expresiva/ataque-es.ssml",
+      "archivoAudio": "docs/evidencia/voz-expresiva/ataque-es.mp3",
+      "bytes": 15408,
+      "sha256": "64db3271eb61b8e24ea3f50d02b455302369299174b179574537e48de334c29f"
+    },
+    {
+      "nombre": "gol-es",
+      "idioma": "es",
+      "tick": 231,
+      "texto": "Joel Mendiuz (3) remata hacia la portería rival. ¡Gol! ¡Lo anota Joel Mendiuz!",
+      "voz": "es-MX-JorgeNeural",
+      "version": "voz-expresiva-v1",
+      "fragmentos": [
+        {
+          "tick": 222,
+          "texto": "Joel Mendiuz (3) remata hacia la portería rival.",
+          "emocion": "emocion",
+          "intensidad": 0.85,
+          "variante": 2,
+          "fuentes": [
+            "a13"
+          ],
+          "fotogramas": []
+        },
+        {
+          "tick": 231,
+          "texto": "¡Gol! ¡Lo anota Joel Mendiuz!",
+          "emocion": "jubilo",
+          "intensidad": 0.92,
+          "variante": 1,
+          "fuentes": [
+            "a14"
+          ],
+          "fotogramas": []
+        }
+      ],
+      "caracteresPresupuestados": 579,
+      "ssmlFile": "docs/evidencia/voz-expresiva/gol-es.ssml",
+      "archivoAudio": "docs/evidencia/voz-expresiva/gol-es.mp3",
+      "bytes": 42336,
+      "sha256": "6167a79a1c8086200433aeb39e89f896ae66b759d677fa44d850f53045a5ce12"
+    },
+    {
+      "nombre": "gol-en",
+      "idioma": "en",
+      "tick": 231,
+      "texto": "Joel Mendiuz (3) shoots towards the opposing goal. Goal! Joel Mendiuz scores!",
+      "voz": "en-US-JennyNeural",
+      "version": "voz-expresiva-v1",
+      "fragmentos": [
+        {
+          "tick": 222,
+          "texto": "Joel Mendiuz (3) shoots towards the opposing goal.",
+          "emocion": "emocion",
+          "intensidad": 0.85,
+          "variante": 2,
+          "fuentes": [
+            "a13"
+          ],
+          "fotogramas": []
+        },
+        {
+          "tick": 231,
+          "texto": "Goal! Joel Mendiuz scores!",
+          "emocion": "jubilo",
+          "intensidad": 0.92,
+          "variante": 1,
+          "fuentes": [
+            "a14"
+          ],
+          "fotogramas": []
+        }
+      ],
+      "caracteresPresupuestados": 576,
+      "ssmlFile": "docs/evidencia/voz-expresiva/gol-en.ssml",
+      "archivoAudio": "docs/evidencia/voz-expresiva/gol-en.mp3",
+      "bytes": 47664,
+      "sha256": "c8d24d7dc633753b09b744dfad41182160f2d5d98041f28805ff446f5b06bdbf"
+    },
+    {
+      "nombre": "gol-es-sereno",
+      "idioma": "es",
+      "tick": 231,
+      "texto": "Joel Mendiuz (3) remata hacia la portería rival. ¡Gol! ¡Lo anota Joel Mendiuz!",
+      "voz": "es-MX-JorgeNeural",
+      "version": "voz-expresiva-v1",
+      "fragmentos": [
+        {
+          "tick": 222,
+          "texto": "Joel Mendiuz (3) remata hacia la portería rival.",
+          "emocion": "serena",
+          "intensidad": 0.18,
+          "variante": 2,
+          "fuentes": [
+            "a13"
+          ],
+          "fotogramas": []
+        },
+        {
+          "tick": 231,
+          "texto": "¡Gol! ¡Lo anota Joel Mendiuz!",
+          "emocion": "serena",
+          "intensidad": 0.18,
+          "variante": 1,
+          "fuentes": [
+            "a14"
+          ],
+          "fotogramas": []
+        }
+      ],
+      "caracteresPresupuestados": 429,
+      "ssmlFile": "docs/evidencia/voz-expresiva/gol-es-sereno.ssml",
+      "archivoAudio": "docs/evidencia/voz-expresiva/gol-es-sereno.mp3",
+      "bytes": 50832,
+      "sha256": "60e03b1afe763477462ddfc0bf7cb53639fe305147160f8ed145b74fab447e06"
+    }
+  ]
+}

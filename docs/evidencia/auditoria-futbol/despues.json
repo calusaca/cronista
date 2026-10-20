@@ -1,0 +1,5732 @@
+{
+  "checkedUtc": "2026-10-19T19:53:55.882Z",
+  "scope": "offline audit: archived real-LLM recordings plus controlled programmed matches; no new inference",
+  "catalogo": [
+    "4-3-3",
+    "4-2-3-1",
+    "4-4-2",
+    "4-1-4-1",
+    "4-1-2-1-2",
+    "3-5-2",
+    "3-4-3",
+    "4-3-1-2",
+    "4-2-2-2",
+    "3-4-2-1",
+    "5-3-2",
+    "5-4-1"
+  ],
+  "configuraciones": {
+    "cantidad": 1000,
+    "elecciones": 2000,
+    "elegidas": {
+      "4-4-2": 140,
+      "4-3-3": 240,
+      "4-1-4-1": 143,
+      "3-4-3": 215,
+      "4-3-1-2": 246,
+      "4-2-3-1": 218,
+      "5-3-2": 147,
+      "5-4-1": 107,
+      "4-2-2-2": 244,
+      "3-4-2-1": 54,
+      "3-5-2": 125,
+      "4-1-2-1-2": 121
+    },
+    "perfiles": {
+      "vertical": 433,
+      "presion": 214,
+      "posicional": 306,
+      "adaptable": 844,
+      "reactivo": 203
+    },
+    "mismaFormacion": 94,
+    "mismoPerfil": 281
+  },
+  "corpus": {
+    "cantidad": 50,
+    "semillas": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      42
+    ],
+    "duracionesS": [
+      60,
+      180
+    ],
+    "intervaloS": 30,
+    "tiros": 179,
+    "partidosSinTiros": 5,
+    "goles": 118,
+    "desenlaces": {
+      "atajada": 55,
+      "gol": 118,
+      "intercepcion": 4,
+      "tiro_fuera": 1,
+      "fuera_juego": 1
+    },
+    "tirosCentralesUnMetro": 63,
+    "desviacionCentroMediaM": 1.4010563414753796
+  },
+  "pruebaDireccionIgnorada": [
+    {
+      "orden": {
+        "x": 105,
+        "y": 31
+      },
+      "objetivoEjecutado": {
+        "x": 105,
+        "y": 31.315440580295398
+      }
+    },
+    {
+      "orden": {
+        "x": 105,
+        "y": 37
+      },
+      "objetivoEjecutado": {
+        "x": 105,
+        "y": 31.315440580295398
+      }
+    }
+  ],
+  "ejemplo": {
+    "seed": 42,
+    "equipos": [
+      "Sporting Montefrío Bajo",
+      "Olímpico Brezal"
+    ],
+    "condiciones": {
+      "clima": "calor",
+      "temperaturaC": 39,
+      "superficie": "natural",
+      "cesped": "corto",
+      "presion": {
+        "local": "media",
+        "visita": "alta"
+      }
+    },
+    "atributos": {
+      "local": {
+        "nombre": "Elio Ulvino",
+        "perfil": "adaptable",
+        "preferidas": [
+          "4-3-3",
+          "3-4-2-1",
+          "3-5-2",
+          "4-4-2",
+          "5-3-2",
+          "4-2-2-2",
+          "4-1-4-1",
+          "5-4-1",
+          "4-1-2-1-2",
+          "4-2-3-1",
+          "4-3-1-2",
+          "3-4-3"
+        ],
+        "ofensiva": 66,
+        "defensiva": 75,
+        "presion": 54,
+        "verticalidad": 59,
+        "amplitud": 51,
+        "riesgo": 47,
+        "adaptabilidad": 81,
+        "paciencia": 56,
+        "rotacion": 65,
+        "serenidad": 92
+      },
+      "visita": {
+        "nombre": "Leo Quinera",
+        "perfil": "adaptable",
+        "preferidas": [
+          "3-4-3",
+          "5-4-1",
+          "3-4-2-1",
+          "4-1-4-1",
+          "4-4-2",
+          "4-3-3",
+          "4-2-3-1",
+          "4-2-2-2",
+          "5-3-2",
+          "3-5-2",
+          "4-3-1-2",
+          "4-1-2-1-2"
+        ],
+        "ofensiva": 73,
+        "defensiva": 74,
+        "presion": 67,
+        "verticalidad": 55,
+        "amplitud": 66,
+        "riesgo": 63,
+        "adaptabilidad": 99,
+        "paciencia": 68,
+        "rotacion": 74,
+        "serenidad": 79
+      }
+    },
+    "inicial": {
+      "local": {
+        "formacion": "4-3-3",
+        "plan": {
+          "mentalidad": "equilibrar",
+          "amplitud": "media",
+          "bloque": "bajo",
+          "ritmo": "pausado"
+        },
+        "confianza": 60,
+        "frustracion": 0,
+        "urgencia": 0,
+        "proximaRevisionTick": 166,
+        "ultimaRevisionTick": 0,
+        "ultimoPlanTick": 0,
+        "cambios": 0,
+        "ventanas": 0,
+        "ultimoCambioTick": -150,
+        "pendiente": null,
+        "ultimaDecision": null
+      },
+      "visita": {
+        "formacion": "3-4-3",
+        "plan": {
+          "mentalidad": "equilibrar",
+          "amplitud": "amplia",
+          "bloque": "medio",
+          "ritmo": "pausado"
+        },
+        "confianza": 60,
+        "frustracion": 0,
+        "urgencia": 0,
+        "proximaRevisionTick": 208,
+        "ultimaRevisionTick": 0,
+        "ultimoPlanTick": 0,
+        "cambios": 0,
+        "ventanas": 0,
+        "ultimoCambioTick": -150,
+        "pendiente": null,
+        "ultimaDecision": null
+      }
+    },
+    "segundo30_5": {
+      "local": {
+        "formacion": "4-3-3",
+        "plan": {
+          "mentalidad": "conservar",
+          "amplitud": "media",
+          "bloque": "bajo",
+          "ritmo": "pausado"
+        },
+        "confianza": 75,
+        "frustracion": 5,
+        "urgencia": 0,
+        "proximaRevisionTick": 496,
+        "ultimaRevisionTick": 300,
+        "ultimoPlanTick": 300,
+        "cambios": 0,
+        "ventanas": 0,
+        "ultimoCambioTick": -150,
+        "pendiente": {
+          "sale": "local-6",
+          "entra": "local-5"
+        },
+        "ultimaDecision": {
+          "tick": 301,
+          "motivo": "calor, ventaja",
+          "fuentes": [
+            "a7",
+            "a9",
+            "a10",
+            "a11",
+            "a12",
+            "a13",
+            "a14",
+            "a15"
+          ]
+        }
+      },
+      "visita": {
+        "formacion": "3-4-3",
+        "plan": {
+          "mentalidad": "buscar",
+          "amplitud": "amplia",
+          "bloque": "medio",
+          "ritmo": "pausado"
+        },
+        "confianza": 45,
+        "frustracion": 12,
+        "urgencia": 50,
+        "proximaRevisionTick": 548,
+        "ultimaRevisionTick": 300,
+        "ultimoPlanTick": 300,
+        "cambios": 0,
+        "ventanas": 0,
+        "ultimoCambioTick": -150,
+        "pendiente": {
+          "sale": "visita-6",
+          "entra": "visita-5"
+        },
+        "ultimaDecision": {
+          "tick": 301,
+          "motivo": "calor, desventaja",
+          "fuentes": [
+            "a7",
+            "a9",
+            "a10",
+            "a11",
+            "a12",
+            "a13",
+            "a14",
+            "a15"
+          ]
+        }
+      }
+    },
+    "resumen30_5": {
+      "local": {
+        "pases": 0,
+        "recepciones": 0,
+        "perdidas": 0,
+        "tiros": 2,
+        "goles": 1,
+        "energiaMedia": 0.9544276177272312,
+        "fuentes": [
+          "a7",
+          "a9",
+          "a10",
+          "a11",
+          "a12",
+          "a13",
+          "a14",
+          "a15"
+        ]
+      },
+      "visita": {
+        "pases": 3,
+        "recepciones": 3,
+        "perdidas": 0,
+        "tiros": 1,
+        "goles": 0,
+        "energiaMedia": 0.9462517559039231,
+        "fuentes": [
+          "a7",
+          "a9",
+          "a10",
+          "a11",
+          "a12",
+          "a13",
+          "a14",
+          "a15"
+        ]
+      }
+    }
+  },
+  "archivados": [
+    {
+      "archivo": "public/experimentos/arena-llm-v1.json",
+      "reproduccionExacta": true,
+      "seed": 42,
+      "segundos": 10,
+      "equipos": [
+        "Sporting Montefrío Bajo",
+        "Olímpico Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "4-2-3-1"
+      },
+      "perfiles": {},
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 2,
+        "recepcion": 2,
+        "tiro": 1,
+        "atajada": 1,
+        "recuperacion": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 69,
+          "lado": "local",
+          "desde": {
+            "x": 83.13568671937067,
+            "y": 32.7516893983842
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.27142395028379
+          },
+          "distanciaM": 21.870489689029423,
+          "desviacionCentroM": 0.7285760497162102,
+          "desviacionPorteroM": 0.12766400411857148,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": []
+    },
+    {
+      "archivo": "src/arena/__fixtures__/arena-v2.json",
+      "reproduccionExacta": true,
+      "seed": 42,
+      "segundos": 5,
+      "equipos": [
+        "Sporting Montefrío Bajo",
+        "Olímpico Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "4-2-3-1"
+      },
+      "perfiles": {},
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 1,
+        "recepcion": 1
+      },
+      "tiros": [],
+      "cambiosFormacion": []
+    },
+    {
+      "archivo": "public/experimentos/arena-llm-v3.json",
+      "reproduccionExacta": true,
+      "seed": 42,
+      "segundos": 60,
+      "equipos": [
+        "Sporting Montefrío Bajo",
+        "Olímpico Brezal"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-2-3-1"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 12,
+        "intercepcion": 2,
+        "recepcion": 9,
+        "fuera_juego": 1,
+        "reinicio": 3,
+        "tiro": 5,
+        "atajada": 3,
+        "recuperacion": 3,
+        "gol": 2,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a14",
+          "tick": 226,
+          "lado": "visita",
+          "desde": {
+            "x": 12.254545333915196,
+            "y": 35.131339775211295
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.809607795323245
+          },
+          "distanciaM": 12.325617906119007,
+          "desviacionCentroM": 0.19039220467675477,
+          "desviacionPorteroM": 0.19039220467675477,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a17",
+          "tick": 260,
+          "lado": "visita",
+          "desde": {
+            "x": 0,
+            "y": 34.1691958973107
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.86857487891863
+          },
+          "distanciaM": 1.3006210183920714,
+          "desviacionCentroM": 1.1314251210813708,
+          "desviacionPorteroM": 1.8332505741170948,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a27",
+          "tick": 373,
+          "lado": "visita",
+          "desde": {
+            "x": 14.143402612799443,
+            "y": 33.15372599888154
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.2431355365552
+          },
+          "distanciaM": 14.296904199296566,
+          "desviacionCentroM": 1.2431355365552008,
+          "desviacionPorteroM": 1.2463853381702208,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a35",
+          "tick": 502,
+          "lado": "local",
+          "desde": {
+            "x": 87.82351843922042,
+            "y": 36.080634684387945
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.97857424282655
+          },
+          "distanciaM": 17.659513545792358,
+          "desviacionCentroM": 2.02142575717345,
+          "desviacionPorteroM": 2.0199688844584465,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a38",
+          "tick": 544,
+          "lado": "local",
+          "desde": {
+            "x": 105,
+            "y": 34.24621536473992
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.54283380894922
+          },
+          "distanciaM": 2.703381555790699,
+          "desviacionCentroM": 2.4571661910507814,
+          "desviacionPorteroM": 2.2763397673768537,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-2-3-1"
+      ]
+    },
+    {
+      "archivo": "public/experimentos/arena-duelo-v3.json",
+      "reproduccionExacta": true,
+      "seed": 246,
+      "segundos": 60,
+      "equipos": [
+        "Juventud Islaverde Sur",
+        "Atlético Montefrío Bajo"
+      ],
+      "formaciones": {
+        "local": "4-4-2",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "reactivo"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 11,
+        "intercepcion": 3,
+        "recuperacion": 4,
+        "recepcion": 6,
+        "fuera_juego": 2,
+        "reinicio": 3,
+        "tiro": 1,
+        "gol": 1,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a13",
+          "tick": 222,
+          "lado": "local",
+          "desde": {
+            "x": 86.73322367570022,
+            "y": 42.30006336675678
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.53844999486804
+          },
+          "distanciaM": 20.25934318186201,
+          "desviacionCentroM": 0.4615500051319614,
+          "desviacionPorteroM": 0.4615500051319614,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-4-2",
+        "3-4-3"
+      ]
+    }
+  ],
+  "partidos": [
+    {
+      "seed": 1,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Valdecristal",
+        "Sporting Ventolera"
+      ],
+      "formaciones": {
+        "local": "4-4-2",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "falta": 1,
+        "reinicio": 1,
+        "plan_equipo": 2
+      },
+      "tiros": [],
+      "cambiosFormacion": [
+        "4-4-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 2,
+      "segundos": 60,
+      "equipos": [
+        "Racing Arenablanca",
+        "Deportivo Pradoalto"
+      ],
+      "formaciones": {
+        "local": "4-1-4-1",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 16,
+        "recepcion": 9,
+        "tiro": 2,
+        "atajada": 1,
+        "fuera_juego": 4,
+        "reinicio": 5,
+        "intercepcion": 3,
+        "plan_equipo": 2,
+        "cambio": 2,
+        "gol": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 63,
+          "lado": "local",
+          "desde": {
+            "x": 82.90997428962561,
+            "y": 34.15827423284979
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.55427563863974
+          },
+          "distanciaM": 22.09357492571968,
+          "desviacionCentroM": 0.5542756386397372,
+          "desviacionPorteroM": 0.5542756386397372,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a31",
+          "tick": 405,
+          "lado": "visita",
+          "desde": {
+            "x": 18.41149512696468,
+            "y": 47.122663632576455
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.804276046194136
+          },
+          "distanciaM": 23.950702516980083,
+          "desviacionCentroM": 2.1957239538058637,
+          "desviacionPorteroM": 2.1957239538058637,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 3,
+      "segundos": 60,
+      "equipos": [
+        "Juventud Torreluna",
+        "Unión Brezal"
+      ],
+      "formaciones": {
+        "local": "3-4-3",
+        "visita": "4-3-1-2"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "posicional"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 14,
+        "recepcion": 10,
+        "fuera_juego": 3,
+        "reinicio": 5,
+        "tiro": 2,
+        "gol": 2,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a17",
+          "tick": 262,
+          "lado": "local",
+          "desde": {
+            "x": 87.91547259028192,
+            "y": 15.766274121250625
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.04218968880363
+          },
+          "distanciaM": 23.596323958945863,
+          "desviacionCentroM": 1.9578103111963685,
+          "desviacionPorteroM": 1.9578103111963685,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a24",
+          "tick": 404,
+          "lado": "visita",
+          "desde": {
+            "x": 13.492574178808866,
+            "y": 20.193541661571963
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 37.24526207510382
+          },
+          "distanciaM": 21.744211345365432,
+          "desviacionCentroM": 3.245262075103817,
+          "desviacionPorteroM": 3.245262075103817,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3",
+        "4-3-1-2"
+      ]
+    },
+    {
+      "seed": 4,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Marisal",
+        "Unión Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 17,
+        "recepcion": 13,
+        "fuera_juego": 4,
+        "reinicio": 5,
+        "tiro": 1,
+        "gol": 1,
+        "plan_equipo": 2,
+        "cambio": 1
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 174,
+          "lado": "visita",
+          "desde": {
+            "x": 22.042016200168042,
+            "y": 34.01306685740392
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.58743862607765
+          },
+          "distanciaM": 22.191842378942194,
+          "desviacionCentroM": 2.587438626077649,
+          "desviacionPorteroM": 2.587438626077649,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 5,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Montefrío Bajo",
+        "Atlético Arenablanca"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 10,
+        "recepcion": 8,
+        "falta": 2,
+        "amarilla": 2,
+        "reinicio": 3,
+        "fuera_juego": 1,
+        "intercepcion": 1,
+        "recuperacion": 2,
+        "plan_equipo": 2,
+        "cambio": 1
+      },
+      "tiros": [],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 6,
+      "segundos": 60,
+      "equipos": [
+        "Club Nebrisa",
+        "Deportivo Brezal"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "recuperacion": 2,
+        "pase": 16,
+        "intercepcion": 3,
+        "recepcion": 8,
+        "fuera_juego": 5,
+        "reinicio": 7,
+        "plan_equipo": 2,
+        "tiro": 2,
+        "gol": 2,
+        "cambio": 2
+      },
+      "tiros": [
+        {
+          "id": "a28",
+          "tick": 358,
+          "lado": "visita",
+          "desde": {
+            "x": 5.026290397520563,
+            "y": 34.346128564573355
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.47132170492783
+          },
+          "distanciaM": 5.150694590374019,
+          "desviacionCentroM": 1.4713217049278313,
+          "desviacionPorteroM": 1.5453683447025668,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a40",
+          "tick": 489,
+          "lado": "local",
+          "desde": {
+            "x": 100.00620396572302,
+            "y": 34.03426367471194
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.532914488876237
+          },
+          "distanciaM": 5.58522574131444,
+          "desviacionCentroM": 2.467085511123763,
+          "desviacionPorteroM": 2.4613587443575398,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 7,
+      "segundos": 60,
+      "equipos": [
+        "Juventud Valdecristal",
+        "Racing Pradoalto"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "reactivo"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 15,
+        "recepcion": 13,
+        "tiro": 3,
+        "atajada": 1,
+        "gol": 2,
+        "reinicio": 3,
+        "plan_equipo": 2,
+        "intercepcion": 1,
+        "recuperacion": 1,
+        "fuera_juego": 1,
+        "cambio": 2
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 73,
+          "lado": "local",
+          "desde": {
+            "x": 87.86721715785704,
+            "y": 28.518240505136813
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.64422023903802
+          },
+          "distanciaM": 18.195050855004403,
+          "desviacionCentroM": 0.6442202390380203,
+          "desviacionPorteroM": 0.6442202390380203,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a11",
+          "tick": 164,
+          "lado": "visita",
+          "desde": {
+            "x": 18.275296386543864,
+            "y": 26.875091057039622
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.641527641518664
+          },
+          "distanciaM": 19.487717210278877,
+          "desviacionCentroM": 0.3584723584813361,
+          "desviacionPorteroM": 0.3584723584813361,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a20",
+          "tick": 288,
+          "lado": "local",
+          "desde": {
+            "x": 93.91532209038226,
+            "y": 55.64419717546313
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.581175959273054
+          },
+          "distanciaM": 26.493377935076172,
+          "desviacionCentroM": 2.418824040726946,
+          "desviacionPorteroM": 2.418824040726946,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "5-3-2"
+      ]
+    },
+    {
+      "seed": 8,
+      "segundos": 60,
+      "equipos": [
+        "Racing Brezal",
+        "Juventud Puertoscuro"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 17,
+        "recepcion": 12,
+        "recuperacion": 1,
+        "tiro": 1,
+        "atajada": 1,
+        "fuera_juego": 4,
+        "reinicio": 4,
+        "plan_equipo": 2,
+        "cambio": 1
+      },
+      "tiros": [
+        {
+          "id": "a4",
+          "tick": 86,
+          "lado": "visita",
+          "desde": {
+            "x": 20.26655363466874,
+            "y": 32.70766816623003
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.108920913139976
+          },
+          "distanciaM": 20.408312301154332,
+          "desviacionCentroM": 1.1089209131399755,
+          "desviacionPorteroM": 1.1089209131399755,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 9,
+      "segundos": 60,
+      "equipos": [
+        "Racing Ventolera",
+        "Olímpico Arenablanca"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "4-2-3-1"
+      },
+      "perfiles": {
+        "local": "reactivo",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 14,
+        "recepcion": 12,
+        "tiro": 3,
+        "gol": 2,
+        "reinicio": 4,
+        "intercepcion": 2,
+        "falta": 1,
+        "amarilla": 1,
+        "recuperacion": 2,
+        "plan_equipo": 2,
+        "fuera_juego": 1,
+        "cambio": 2
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 76,
+          "lado": "local",
+          "desde": {
+            "x": 102.1007493231026,
+            "y": 27.874193058938904
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.63757073751185
+          },
+          "distanciaM": 5.576326873150194,
+          "desviacionCentroM": 1.362429262488149,
+          "desviacionPorteroM": 1.362429262488149,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a12",
+          "tick": 180,
+          "lado": "visita",
+          "desde": {
+            "x": 21.408791706964653,
+            "y": 21.894997484821907
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.84144426276038
+          },
+          "distanciaM": 24.04497992127334,
+          "desviacionCentroM": 1.1585557372396167,
+          "desviacionPorteroM": 1.1585557372396167,
+          "desenlace": "intercepcion"
+        },
+        {
+          "id": "a40",
+          "tick": 517,
+          "lado": "local",
+          "desde": {
+            "x": 97.96649622931601,
+            "y": 40.276269413216404
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.074963547852825
+          },
+          "distanciaM": 8.192749615761754,
+          "desviacionCentroM": 2.0749635478528248,
+          "desviacionPorteroM": 2.074894593342215,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "4-2-3-1"
+      ]
+    },
+    {
+      "seed": 10,
+      "segundos": 60,
+      "equipos": [
+        "Olímpico Torreluna",
+        "Club Ormidia"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "4-1-4-1"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 8,
+        "recepcion": 5,
+        "tiro": 1,
+        "atajada": 1,
+        "intercepcion": 3,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 83,
+          "lado": "local",
+          "desde": {
+            "x": 87.22378894284469,
+            "y": 33.850593290431334
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.05847070320168
+          },
+          "distanciaM": 17.777426488872642,
+          "desviacionCentroM": 0.05847070320167802,
+          "desviacionPorteroM": 0.05847070320167802,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "4-1-4-1"
+      ]
+    },
+    {
+      "seed": 11,
+      "segundos": 60,
+      "equipos": [
+        "Unión Caleteo",
+        "Sporting Puertoscuro"
+      ],
+      "formaciones": {
+        "local": "4-2-2-2",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 17,
+        "recepcion": 14,
+        "fuera_juego": 3,
+        "reinicio": 5,
+        "tiro": 1,
+        "gol": 1,
+        "plan_equipo": 2,
+        "cambio": 2,
+        "falta": 1,
+        "recuperacion": 1
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 188,
+          "lado": "visita",
+          "desde": {
+            "x": 19.324941894215534,
+            "y": 43.72506710113191
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.38913707418988
+          },
+          "distanciaM": 21.46189573832574,
+          "desviacionCentroM": 0.3891370741898825,
+          "desviacionPorteroM": 0.3891370741898825,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-2-2",
+        "5-3-2"
+      ]
+    },
+    {
+      "seed": 12,
+      "segundos": 60,
+      "equipos": [
+        "Olímpico Ormidia",
+        "Deportivo Valdecristal"
+      ],
+      "formaciones": {
+        "local": "3-4-2-1",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 5,
+        "recepcion": 4,
+        "falta": 5,
+        "reinicio": 6,
+        "fuera_juego": 1,
+        "plan_equipo": 2,
+        "recuperacion": 3,
+        "cambio": 1,
+        "amarilla": 1
+      },
+      "tiros": [],
+      "cambiosFormacion": [
+        "3-4-2-1",
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 13,
+      "segundos": 60,
+      "equipos": [
+        "Sporting Ventolera",
+        "Atlético Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "5-4-1"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 15,
+        "recepcion": 10,
+        "tiro": 2,
+        "atajada": 1,
+        "intercepcion": 3,
+        "recuperacion": 1,
+        "plan_equipo": 2,
+        "fuera_juego": 1,
+        "cambio": 1,
+        "reinicio": 2,
+        "gol": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 64,
+          "lado": "local",
+          "desde": {
+            "x": 81.11918868073,
+            "y": 27.747536530404425
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.872369537141736
+          },
+          "distanciaM": 24.65373660577627,
+          "desviacionCentroM": 0.12763046285826363,
+          "desviacionPorteroM": 0.12763046285826363,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a34",
+          "tick": 534,
+          "lado": "local",
+          "desde": {
+            "x": 81.6553900145117,
+            "y": 34.43192374405813
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 30.899115754850207
+          },
+          "distanciaM": 23.61041184865634,
+          "desviacionCentroM": 3.1008842451497927,
+          "desviacionPorteroM": 3.1008842451497927,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-3",
+        "5-4-1"
+      ]
+    },
+    {
+      "seed": 14,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Puertoscuro",
+        "Atlético Brezal"
+      ],
+      "formaciones": {
+        "local": "4-2-2-2",
+        "visita": "5-4-1"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 18,
+        "recepcion": 13,
+        "fuera_juego": 5,
+        "reinicio": 5,
+        "recuperacion": 1,
+        "plan_equipo": 2,
+        "cambio": 2
+      },
+      "tiros": [],
+      "cambiosFormacion": [
+        "4-2-2-2",
+        "5-4-1"
+      ]
+    },
+    {
+      "seed": 15,
+      "segundos": 60,
+      "equipos": [
+        "Club Pradoalto",
+        "Olímpico Lumbrera"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "reactivo",
+        "visita": "reactivo"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "recuperacion": 3,
+        "pase": 12,
+        "recepcion": 11,
+        "plan_equipo": 2,
+        "tiro": 2,
+        "atajada": 1,
+        "gol": 1,
+        "cambio": 2,
+        "reinicio": 1
+      },
+      "tiros": [
+        {
+          "id": "a22",
+          "tick": 453,
+          "lado": "visita",
+          "desde": {
+            "x": 21.167698981567927,
+            "y": 21.84854638062616
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.07844031003304
+          },
+          "distanciaM": 25.506104395152985,
+          "desviacionCentroM": 2.078440310033038,
+          "desviacionPorteroM": 2.078440310033038,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a30",
+          "tick": 574,
+          "lado": "local",
+          "desde": {
+            "x": 96.56239535055828,
+            "y": 28.594850616683953
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.275855047474614
+          },
+          "distanciaM": 11.410127137157867,
+          "desviacionCentroM": 2.2758550474746144,
+          "desviacionPorteroM": 2.2758550474746144,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 16,
+      "segundos": 60,
+      "equipos": [
+        "Club Torreluna",
+        "Racing Ormidia"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-2-2-2"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 16,
+        "intercepcion": 4,
+        "recepcion": 8,
+        "recuperacion": 1,
+        "fuera_juego": 3,
+        "reinicio": 3,
+        "plan_equipo": 2,
+        "cambio": 1,
+        "tiro": 1,
+        "atajada": 1
+      },
+      "tiros": [
+        {
+          "id": "a36",
+          "tick": 538,
+          "lado": "local",
+          "desde": {
+            "x": 90.05054481132542,
+            "y": 38.62842533312224
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.21970396859944
+          },
+          "distanciaM": 16.684584582641723,
+          "desviacionCentroM": 2.7802960314005603,
+          "desviacionPorteroM": 2.7802960314005603,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-2-2-2"
+      ]
+    },
+    {
+      "seed": 17,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Ormidia",
+        "Club Quebralta"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-1-4-1"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 10,
+        "recepcion": 10,
+        "recuperacion": 2,
+        "tiro": 3,
+        "gol": 2,
+        "reinicio": 2,
+        "plan_equipo": 1,
+        "atajada": 1
+      },
+      "tiros": [
+        {
+          "id": "a8",
+          "tick": 114,
+          "lado": "visita",
+          "desde": {
+            "x": 16.308418350190934,
+            "y": 20.19313189420848
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.83731466684739
+          },
+          "distanciaM": 22.598782350130648,
+          "desviacionCentroM": 1.8373146668473908,
+          "desviacionPorteroM": 1.8373146668473908,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a21",
+          "tick": 435,
+          "lado": "visita",
+          "desde": {
+            "x": 12.275647714494353,
+            "y": 33.35349550881091
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.628433180078865
+          },
+          "distanciaM": 12.297042009805317,
+          "desviacionCentroM": 1.371566819921135,
+          "desviacionPorteroM": 1.371566819921135,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a27",
+          "tick": 540,
+          "lado": "local",
+          "desde": {
+            "x": 95.78078961058357,
+            "y": 46.968796981603035
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 37.30229313699529
+          },
+          "distanciaM": 13.357961550406568,
+          "desviacionCentroM": 3.3022931369952886,
+          "desviacionPorteroM": 3.3022931369952886,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1"
+      ]
+    },
+    {
+      "seed": 18,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Pradoalto",
+        "Racing Solcanto"
+      ],
+      "formaciones": {
+        "local": "3-4-3",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 13,
+        "recepcion": 7,
+        "fuera_juego": 3,
+        "reinicio": 4,
+        "intercepcion": 3,
+        "tiro": 2,
+        "atajada": 1,
+        "recuperacion": 1,
+        "gol": 1,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 204,
+          "lado": "local",
+          "desde": {
+            "x": 86.88868240611785,
+            "y": 34.00593872223504
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.15558235100098
+          },
+          "distanciaM": 18.14776860827874,
+          "desviacionCentroM": 1.1555823510009802,
+          "desviacionPorteroM": 1.1555823510009802,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a15",
+          "tick": 238,
+          "lado": "local",
+          "desde": {
+            "x": 104.23770541912158,
+            "y": 33.98052149351515
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.729992799767295
+          },
+          "distanciaM": 1.4645528470913278,
+          "desviacionCentroM": 1.2700072002327047,
+          "desviacionPorteroM": 1.3113389827878805,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 19,
+      "segundos": 60,
+      "equipos": [
+        "Unión Pradoalto",
+        "Juventud Torreluna"
+      ],
+      "formaciones": {
+        "local": "3-5-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 11,
+        "recepcion": 10,
+        "intercepcion": 1,
+        "recuperacion": 1,
+        "falta": 1,
+        "reinicio": 5,
+        "tiro": 4,
+        "gol": 4,
+        "plan_equipo": 1,
+        "cambio": 1
+      },
+      "tiros": [
+        {
+          "id": "a14",
+          "tick": 205,
+          "lado": "local",
+          "desde": {
+            "x": 88.04774829448463,
+            "y": 43.48176262745018
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.286394203941896
+          },
+          "distanciaM": 20.315391013348354,
+          "desviacionCentroM": 1.7136057960581041,
+          "desviacionPorteroM": 1.7136057960581041,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a24",
+          "tick": 353,
+          "lado": "visita",
+          "desde": {
+            "x": 7.884074178120774,
+            "y": 19.208389568538355
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.378014337457714
+          },
+          "distanciaM": 17.989313239080616,
+          "desviacionCentroM": 1.3780143374577136,
+          "desviacionPorteroM": 1.3780143374577136,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a30",
+          "tick": 476,
+          "lado": "local",
+          "desde": {
+            "x": 84.810360628479,
+            "y": 24.243157545626584
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.711632578447464
+          },
+          "distanciaM": 22.742262584555323,
+          "desviacionCentroM": 0.711632578447464,
+          "desviacionPorteroM": 0.711632578447464,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a37",
+          "tick": 593,
+          "lado": "visita",
+          "desde": {
+            "x": 6.985445633774311,
+            "y": 48.419860146568084
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.38802382861823
+          },
+          "distanciaM": 15.674465896997994,
+          "desviacionCentroM": 0.3880238286182305,
+          "desviacionPorteroM": 0.3880238286182305,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 20,
+      "segundos": 60,
+      "equipos": [
+        "Sporting Ormidia",
+        "Unión Lumbrera"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 16,
+        "recepcion": 13,
+        "tiro": 1,
+        "gol": 1,
+        "reinicio": 3,
+        "recuperacion": 1,
+        "plan_equipo": 2,
+        "intercepcion": 1,
+        "fuera_juego": 2,
+        "cambio": 1
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 76,
+          "lado": "local",
+          "desde": {
+            "x": 85.28630297430412,
+            "y": 25.141664736915235
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.425836626002564
+          },
+          "distanciaM": 21.016398609911754,
+          "desviacionCentroM": 1.574163373997436,
+          "desviacionPorteroM": 1.574163373997436,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 21,
+      "segundos": 60,
+      "equipos": [
+        "Deportivo Arenablanca",
+        "Unión Islaverde Sur"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 11,
+        "recepcion": 11,
+        "tiro": 3,
+        "gol": 3,
+        "reinicio": 3,
+        "plan_equipo": 1,
+        "recuperacion": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 81,
+          "lado": "local",
+          "desde": {
+            "x": 85.74541406873067,
+            "y": 46.42874571977948
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.26084201582707
+          },
+          "distanciaM": 22.258956680972013,
+          "desviacionCentroM": 1.2608420158270732,
+          "desviacionPorteroM": 1.2608420158270732,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a12",
+          "tick": 204,
+          "lado": "visita",
+          "desde": {
+            "x": 15.87007189383094,
+            "y": 41.63861732996757
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.6553519305177
+          },
+          "distanciaM": 17.76490102289951,
+          "desviacionCentroM": 0.34464806948229665,
+          "desviacionPorteroM": 0.34464806948229665,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a20",
+          "tick": 341,
+          "lado": "local",
+          "desde": {
+            "x": 94.1792473117961,
+            "y": 41.636948046804
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.87065659807995
+          },
+          "distanciaM": 12.261272601606246,
+          "desviacionCentroM": 1.8706565980799468,
+          "desviacionPorteroM": 1.8706565980799468,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 22,
+      "segundos": 60,
+      "equipos": [
+        "Olímpico Lumbrera",
+        "Sporting Valdecristal"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "posicional"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "falta": 1,
+        "reinicio": 4,
+        "pase": 14,
+        "recepcion": 10,
+        "fuera_juego": 2,
+        "tiro": 2,
+        "atajada": 1,
+        "plan_equipo": 2,
+        "intercepcion": 1,
+        "gol": 1,
+        "recuperacion": 1
+      },
+      "tiros": [
+        {
+          "id": "a14",
+          "tick": 198,
+          "lado": "visita",
+          "desde": {
+            "x": 20.081474395191215,
+            "y": 33.331168068497824
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.473590529138846
+          },
+          "distanciaM": 20.195434827816396,
+          "desviacionCentroM": 1.4735905291388463,
+          "desviacionPorteroM": 1.4735905291388463,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a29",
+          "tick": 362,
+          "lado": "local",
+          "desde": {
+            "x": 96.11909994835196,
+            "y": 37.94555318040499
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.76347280451097
+          },
+          "distanciaM": 9.816322223613081,
+          "desviacionCentroM": 0.23652719548903178,
+          "desviacionPorteroM": 0.23652719548903178,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 23,
+      "segundos": 60,
+      "equipos": [
+        "Club Torreluna",
+        "Atlético Arenablanca"
+      ],
+      "formaciones": {
+        "local": "4-1-4-1",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 4,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 12,
+        "recepcion": 10,
+        "tiro": 7,
+        "gol": 5,
+        "reinicio": 5,
+        "intercepcion": 2,
+        "atajada": 2,
+        "recuperacion": 3,
+        "plan_equipo": 2,
+        "cambio": 2
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 44,
+          "lado": "local",
+          "desde": {
+            "x": 86.05387125120048,
+            "y": 24.933333333333337
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.82691032482404
+          },
+          "distanciaM": 21.373784415789405,
+          "desviacionCentroM": 0.8269103248240413,
+          "desviacionPorteroM": 0.8269103248240413,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a10",
+          "tick": 117,
+          "lado": "local",
+          "desde": {
+            "x": 85.53411782121287,
+            "y": 32.57691106667952
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.9880099264795
+          },
+          "distanciaM": 19.51696105930816,
+          "desviacionCentroM": 0.011990073520500744,
+          "desviacionPorteroM": 0.011990073520500744,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a13",
+          "tick": 152,
+          "lado": "local",
+          "desde": {
+            "x": 104.11741089298312,
+            "y": 33.86908398165871
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.13714885533899
+          },
+          "distanciaM": 1.5449763932457503,
+          "desviacionCentroM": 1.1371488553389923,
+          "desviacionPorteroM": 0.9756568759317119,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a27",
+          "tick": 334,
+          "lado": "local",
+          "desde": {
+            "x": 88.90463202868885,
+            "y": 19.865097120062725
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.71155439731665
+          },
+          "distanciaM": 20.59350224483973,
+          "desviacionCentroM": 1.2884456026833533,
+          "desviacionPorteroM": 1.2910937267129796,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a34",
+          "tick": 388,
+          "lado": "local",
+          "desde": {
+            "x": 86.19024484439073,
+            "y": 32.08297886168107
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.74365304846782
+          },
+          "distanciaM": 18.82135434539863,
+          "desviacionCentroM": 1.25634695153218,
+          "desviacionPorteroM": 1.2589950755618062,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a37",
+          "tick": 424,
+          "lado": "local",
+          "desde": {
+            "x": 103.88392552518968,
+            "y": 33.89496575210467
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.473362887408584
+          },
+          "distanciaM": 1.9331217628640824,
+          "desviacionCentroM": 1.4733628874085838,
+          "desviacionPorteroM": 1.314094852130843,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a44",
+          "tick": 512,
+          "lado": "visita",
+          "desde": {
+            "x": 18.73728033585159,
+            "y": 50.5105094526278
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.69221306911204
+          },
+          "distanciaM": 25.17818038755124,
+          "desviacionCentroM": 0.30778693088795706,
+          "desviacionPorteroM": 0.30778693088795706,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 24,
+      "segundos": 60,
+      "equipos": [
+        "Olímpico Marisal",
+        "Atlético Lumbrera"
+      ],
+      "formaciones": {
+        "local": "4-1-2-1-2",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "plan_equipo": 2,
+        "recuperacion": 1,
+        "tiro": 2,
+        "atajada": 1,
+        "pase": 1,
+        "recepcion": 1,
+        "gol": 1,
+        "cambio": 2,
+        "reinicio": 1
+      },
+      "tiros": [
+        {
+          "id": "a4",
+          "tick": 439,
+          "lado": "visita",
+          "desde": {
+            "x": 19.67138545405538,
+            "y": 32.36700346470126
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.327129354346546
+          },
+          "distanciaM": 19.768801157006948,
+          "desviacionCentroM": 0.3271293543465461,
+          "desviacionPorteroM": 0.3271293543465461,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a8",
+          "tick": 575,
+          "lado": "local",
+          "desde": {
+            "x": 94.21495754761989,
+            "y": 56.366404778859575
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.62293348507956
+          },
+          "distanciaM": 25.17106726363896,
+          "desviacionCentroM": 0.3770665149204433,
+          "desviacionPorteroM": 0.3770665149204433,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-2-1-2",
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 42,
+      "segundos": 60,
+      "equipos": [
+        "Sporting Montefrío Bajo",
+        "Olímpico Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 9,
+        "recepcion": 8,
+        "tiro": 3,
+        "atajada": 2,
+        "recuperacion": 2,
+        "gol": 1,
+        "reinicio": 1,
+        "plan_equipo": 2
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 91,
+          "lado": "local",
+          "desde": {
+            "x": 87.39469961913991,
+            "y": 34.23617106834883
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.72997829800472
+          },
+          "distanciaM": 17.612575979142317,
+          "desviacionCentroM": 0.2700217019952831,
+          "desviacionPorteroM": 0.2700217019952831,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a6",
+          "tick": 132,
+          "lado": "local",
+          "desde": {
+            "x": 105,
+            "y": 34.10934563677996
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.45687500252947
+          },
+          "distanciaM": 1.6524706342504913,
+          "desviacionCentroM": 1.5431249974705281,
+          "desviacionPorteroM": 1.6494837236819464,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a15",
+          "tick": 279,
+          "lado": "visita",
+          "desde": {
+            "x": 19.699565941755512,
+            "y": 34.404551520900256
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.17305218687716
+          },
+          "distanciaM": 19.738021402949006,
+          "desviacionCentroM": 0.8269478131228425,
+          "desviacionPorteroM": 0.8269478131228425,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-3",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 1,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Valdecristal",
+        "Sporting Ventolera"
+      ],
+      "formaciones": {
+        "local": "4-4-2",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 0
+      },
+      "eventos": {
+        "falta": 1,
+        "reinicio": 11,
+        "plan_equipo": 10,
+        "recuperacion": 1,
+        "pase": 31,
+        "recepcion": 20,
+        "fuera_juego": 8,
+        "cambio": 5,
+        "intercepcion": 3,
+        "tiro": 2,
+        "gol": 2
+      },
+      "tiros": [
+        {
+          "id": "a30",
+          "tick": 929,
+          "lado": "local",
+          "desde": {
+            "x": 100.91696029327109,
+            "y": 35.448963186932666
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.49794475187547
+          },
+          "distanciaM": 4.215634658069266,
+          "desviacionCentroM": 2.4979447518754725,
+          "desviacionPorteroM": 2.6587386768726162,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a69",
+          "tick": 1452,
+          "lado": "local",
+          "desde": {
+            "x": 91.71882114802531,
+            "y": 41.468672554955525
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.77529213962145
+          },
+          "distanciaM": 14.086075799213248,
+          "desviacionCentroM": 2.775292139621449,
+          "desviacionPorteroM": 2.772016210512703,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-4-2",
+        "4-3-3",
+        "4-4-2",
+        "4-3-3",
+        "4-4-2",
+        "4-3-3",
+        "4-4-2",
+        "4-3-3",
+        "4-3-1-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 2,
+      "segundos": 180,
+      "equipos": [
+        "Racing Arenablanca",
+        "Deportivo Pradoalto"
+      ],
+      "formaciones": {
+        "local": "4-1-4-1",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 22,
+        "recepcion": 15,
+        "tiro": 4,
+        "atajada": 2,
+        "fuera_juego": 4,
+        "reinicio": 8,
+        "intercepcion": 3,
+        "plan_equipo": 10,
+        "cambio": 6,
+        "gol": 2,
+        "recuperacion": 4,
+        "falta": 2
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 63,
+          "lado": "local",
+          "desde": {
+            "x": 82.90997428962561,
+            "y": 34.15827423284979
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.55427563863974
+          },
+          "distanciaM": 22.09357492571968,
+          "desviacionCentroM": 0.5542756386397372,
+          "desviacionPorteroM": 0.5542756386397372,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a30",
+          "tick": 405,
+          "lado": "visita",
+          "desde": {
+            "x": 18.41149512696468,
+            "y": 47.122663632576455
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.804276046194136
+          },
+          "distanciaM": 23.950702516980083,
+          "desviacionCentroM": 2.1957239538058637,
+          "desviacionPorteroM": 2.1957239538058637,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a51",
+          "tick": 686,
+          "lado": "visita",
+          "desde": {
+            "x": 20.847739658192964,
+            "y": 20.47777421077521
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.197594424523416
+          },
+          "distanciaM": 25.52060649712036,
+          "desviacionCentroM": 1.197594424523416,
+          "desviacionPorteroM": 1.197594424523416,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a60",
+          "tick": 809,
+          "lado": "local",
+          "desde": {
+            "x": 80.95323197977298,
+            "y": 31.122457198400333
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.178336820024995
+          },
+          "distanciaM": 24.386414490935792,
+          "desviacionCentroM": 1.1783368200249953,
+          "desviacionPorteroM": 1.0911628332479992,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3",
+        "4-3-3",
+        "3-4-3",
+        "4-3-3",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 3,
+      "segundos": 180,
+      "equipos": [
+        "Juventud Torreluna",
+        "Unión Brezal"
+      ],
+      "formaciones": {
+        "local": "3-4-3",
+        "visita": "4-3-1-2"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "posicional"
+      },
+      "marcador": {
+        "local": 3,
+        "visita": 3
+      },
+      "eventos": {
+        "pase": 37,
+        "recepcion": 27,
+        "fuera_juego": 7,
+        "reinicio": 14,
+        "tiro": 6,
+        "gol": 6,
+        "plan_equipo": 8,
+        "cambio": 6,
+        "intercepcion": 3,
+        "recuperacion": 4,
+        "falta": 1
+      },
+      "tiros": [
+        {
+          "id": "a17",
+          "tick": 262,
+          "lado": "local",
+          "desde": {
+            "x": 87.91547259028192,
+            "y": 15.766274121250625
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.04218968880363
+          },
+          "distanciaM": 23.596323958945863,
+          "desviacionCentroM": 1.9578103111963685,
+          "desviacionPorteroM": 1.9578103111963685,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a24",
+          "tick": 406,
+          "lado": "visita",
+          "desde": {
+            "x": 17.69763745609253,
+            "y": 20.22349765983223
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.86355505220592
+          },
+          "distanciaM": 22.34407163420618,
+          "desviacionCentroM": 0.13644494779408234,
+          "desviacionPorteroM": 0.13644494779408234,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a73",
+          "tick": 1154,
+          "lado": "visita",
+          "desde": {
+            "x": 1.9328270421807259,
+            "y": 33.87111438886458
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.61252880729735
+          },
+          "distanciaM": 2.0701487180502527,
+          "desviacionCentroM": 0.6125288072973518,
+          "desviacionPorteroM": 0.5576276055836544,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a83",
+          "tick": 1294,
+          "lado": "local",
+          "desde": {
+            "x": 97.00229493941916,
+            "y": 53.0339806030772
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.706866822302345
+          },
+          "distanciaM": 19.996159275458574,
+          "desviacionCentroM": 0.7068668223023451,
+          "desviacionPorteroM": 0.7068668223023451,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a89",
+          "tick": 1429,
+          "lado": "visita",
+          "desde": {
+            "x": 19.739827411640274,
+            "y": 27.71717170691278
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.114685714971273
+          },
+          "distanciaM": 20.03007457989856,
+          "desviacionCentroM": 2.885314285028727,
+          "desviacionPorteroM": 2.8876811441443166,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a112",
+          "tick": 1707,
+          "lado": "local",
+          "desde": {
+            "x": 81.75899909461245,
+            "y": 34.13143298567391
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 37.37137317150552
+          },
+          "distanciaM": 23.465748134078133,
+          "desviacionCentroM": 3.3713731715055175,
+          "desviacionPorteroM": 3.3713731715055175,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "3-4-3",
+        "4-3-1-2",
+        "4-4-2",
+        "3-4-3",
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 4,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Marisal",
+        "Unión Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 3
+      },
+      "eventos": {
+        "pase": 49,
+        "recepcion": 32,
+        "fuera_juego": 14,
+        "reinicio": 17,
+        "tiro": 4,
+        "gol": 3,
+        "plan_equipo": 9,
+        "cambio": 5,
+        "recuperacion": 3,
+        "intercepcion": 3,
+        "atajada": 1
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 174,
+          "lado": "visita",
+          "desde": {
+            "x": 22.042016200168042,
+            "y": 34.01306685740392
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.58743862607765
+          },
+          "distanciaM": 22.191842378942194,
+          "desviacionCentroM": 2.587438626077649,
+          "desviacionPorteroM": 2.587438626077649,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a67",
+          "tick": 817,
+          "lado": "visita",
+          "desde": {
+            "x": 16.813847756556292,
+            "y": 36.590854683533074
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 37.39433479831554
+          },
+          "distanciaM": 16.83303468408189,
+          "desviacionCentroM": 3.3943347983155405,
+          "desviacionPorteroM": 10.817827643778969,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a124",
+          "tick": 1578,
+          "lado": "visita",
+          "desde": {
+            "x": 22.653657985705347,
+            "y": 35.89020002310836
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.297684986889365
+          },
+          "distanciaM": 22.80152087792245,
+          "desviacionCentroM": 0.7023150131106348,
+          "desviacionPorteroM": 0.7155358317554459,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a127",
+          "tick": 1621,
+          "lado": "visita",
+          "desde": {
+            "x": 0.9726593573753988,
+            "y": 34.234730912004544
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.95866680085659
+          },
+          "distanciaM": 2.4751836423881044,
+          "desviacionCentroM": 2.041333199143409,
+          "desviacionPorteroM": 1.8453956778406564,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "4-3-3",
+        "4-3-1-2",
+        "4-3-3",
+        "4-3-1-2",
+        "4-3-3",
+        "4-3-1-2",
+        "4-3-1-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 5,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Montefrío Bajo",
+        "Atlético Arenablanca"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 34,
+        "recepcion": 29,
+        "falta": 2,
+        "amarilla": 2,
+        "reinicio": 9,
+        "fuera_juego": 3,
+        "intercepcion": 2,
+        "recuperacion": 5,
+        "plan_equipo": 10,
+        "cambio": 5,
+        "tiro": 5,
+        "atajada": 1,
+        "gol": 4
+      },
+      "tiros": [
+        {
+          "id": "a42",
+          "tick": 715,
+          "lado": "local",
+          "desde": {
+            "x": 84.5871291799886,
+            "y": 28.63606104192298
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.787826428189874
+          },
+          "distanciaM": 21.31969775775784,
+          "desviacionCentroM": 0.7878264281898737,
+          "desviacionPorteroM": 0.7878264281898737,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a65",
+          "tick": 1097,
+          "lado": "local",
+          "desde": {
+            "x": 102.13484817842492,
+            "y": 58.81122849039034
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.86041055786889
+          },
+          "distanciaM": 26.108505248817902,
+          "desviacionCentroM": 1.1395894421311112,
+          "desviacionPorteroM": 1.139492065811929,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a78",
+          "tick": 1341,
+          "lado": "local",
+          "desde": {
+            "x": 89.41431345018471,
+            "y": 53.08224496855714
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.50696706629358
+          },
+          "distanciaM": 25.022092841725716,
+          "desviacionCentroM": 0.49303293370641654,
+          "desviacionPorteroM": 0.4930322862561809,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a88",
+          "tick": 1491,
+          "lado": "visita",
+          "desde": {
+            "x": 7.29828249315588,
+            "y": 41.63915722513786
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.956154525227845
+          },
+          "distanciaM": 10.5968607538615,
+          "desviacionCentroM": 0.04384547477215506,
+          "desviacionPorteroM": 0.04384547477215506,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a97",
+          "tick": 1617,
+          "lado": "visita",
+          "desde": {
+            "x": 20.114051370546136,
+            "y": 24.30614410373841
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.60742360396497
+          },
+          "distanciaM": 22.598482733996914,
+          "desviacionCentroM": 0.6074236039649676,
+          "desviacionPorteroM": 0.599724385174099,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 6,
+      "segundos": 180,
+      "equipos": [
+        "Club Nebrisa",
+        "Deportivo Brezal"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": {
+        "recuperacion": 3,
+        "pase": 37,
+        "intercepcion": 6,
+        "recepcion": 21,
+        "fuera_juego": 10,
+        "reinicio": 12,
+        "plan_equipo": 10,
+        "tiro": 2,
+        "gol": 2,
+        "cambio": 4
+      },
+      "tiros": [
+        {
+          "id": "a28",
+          "tick": 358,
+          "lado": "visita",
+          "desde": {
+            "x": 5.026290397520563,
+            "y": 34.346128564573355
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.47132170492783
+          },
+          "distanciaM": 5.150694590374019,
+          "desviacionCentroM": 1.4713217049278313,
+          "desviacionPorteroM": 1.5453683447025668,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a39",
+          "tick": 486,
+          "lado": "local",
+          "desde": {
+            "x": 100.00602929135115,
+            "y": 34.01976312180712
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 30.809457098403946
+          },
+          "distanciaM": 5.936818020012178,
+          "desviacionCentroM": 3.1905429015960536,
+          "desviacionPorteroM": 3.1867752218591363,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 7,
+      "segundos": 180,
+      "equipos": [
+        "Juventud Valdecristal",
+        "Racing Pradoalto"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "reactivo"
+      },
+      "marcador": {
+        "local": 4,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 40,
+        "recepcion": 34,
+        "tiro": 10,
+        "atajada": 3,
+        "gol": 5,
+        "reinicio": 9,
+        "plan_equipo": 9,
+        "intercepcion": 6,
+        "recuperacion": 3,
+        "fuera_juego": 2,
+        "cambio": 2,
+        "falta": 2,
+        "amarilla": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 73,
+          "lado": "local",
+          "desde": {
+            "x": 87.86721715785704,
+            "y": 28.518240505136813
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.64422023903802
+          },
+          "distanciaM": 18.195050855004403,
+          "desviacionCentroM": 0.6442202390380203,
+          "desviacionPorteroM": 0.6442202390380203,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a11",
+          "tick": 164,
+          "lado": "visita",
+          "desde": {
+            "x": 18.275296386543864,
+            "y": 26.875091057039622
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.641527641518664
+          },
+          "distanciaM": 19.487717210278877,
+          "desviacionCentroM": 0.3584723584813361,
+          "desviacionPorteroM": 0.3584723584813361,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a20",
+          "tick": 288,
+          "lado": "local",
+          "desde": {
+            "x": 93.91532209038226,
+            "y": 55.64419717546313
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.581175959273054
+          },
+          "distanciaM": 26.493377935076172,
+          "desviacionCentroM": 2.418824040726946,
+          "desviacionPorteroM": 2.418824040726946,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a47",
+          "tick": 651,
+          "lado": "local",
+          "desde": {
+            "x": 88.49353623780075,
+            "y": 52.32346685024783
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.27795533900615
+          },
+          "distanciaM": 23.020030095336242,
+          "desviacionCentroM": 2.277955339006148,
+          "desviacionPorteroM": 2.237974323054395,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a61",
+          "tick": 851,
+          "lado": "local",
+          "desde": {
+            "x": 88.87929876492285,
+            "y": 34.54102929631479
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.53817738427315
+          },
+          "distanciaM": 16.151511155923988,
+          "desviacionCentroM": 1.5381773842731477,
+          "desviacionPorteroM": 1.4981963683213948,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a76",
+          "tick": 1045,
+          "lado": "local",
+          "desde": {
+            "x": 83.77686645548987,
+            "y": 40.0928830228788
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.26558537527453
+          },
+          "distanciaM": 22.00860730082405,
+          "desviacionCentroM": 0.26558537527453296,
+          "desviacionPorteroM": 0.2616499862496653,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a99",
+          "tick": 1388,
+          "lado": "local",
+          "desde": {
+            "x": 105,
+            "y": 58.99498228491167
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.67501771425828
+          },
+          "distanciaM": 27.31996457065339,
+          "desviacionCentroM": 2.3249822857417186,
+          "desviacionPorteroM": 2.3262771222576433,
+          "desenlace": "intercepcion"
+        },
+        {
+          "id": "a109",
+          "tick": 1521,
+          "lado": "local",
+          "desde": {
+            "x": 90.4582776936889,
+            "y": 34.25884797758245
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.87809059189167
+          },
+          "distanciaM": 14.607127663986699,
+          "desviacionCentroM": 1.1219094081083298,
+          "desviacionPorteroM": 1.1232042446242545,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a112",
+          "tick": 1554,
+          "lado": "local",
+          "desde": {
+            "x": 97.61448535940748,
+            "y": 34.14837626742481
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.75604950005654
+          },
+          "distanciaM": 7.8323550860893985,
+          "desviacionCentroM": 2.756049500056541,
+          "desviacionPorteroM": 2.8810782652990667,
+          "desenlace": "intercepcion"
+        },
+        {
+          "id": "a120",
+          "tick": 1728,
+          "lado": "local",
+          "desde": {
+            "x": 103.74258509490217,
+            "y": 58.961207985085665
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.479900570171885
+          },
+          "distanciaM": 22.516444553424048,
+          "desviacionCentroM": 2.4799005701718855,
+          "desviacionPorteroM": 2.6487558982359403,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "5-3-2",
+        "4-3-1-2",
+        "4-3-1-2",
+        "4-3-3",
+        "4-3-1-2",
+        "4-3-3",
+        "3-5-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 8,
+      "segundos": 180,
+      "equipos": [
+        "Racing Brezal",
+        "Juventud Puertoscuro"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 24,
+        "recepcion": 19,
+        "recuperacion": 5,
+        "tiro": 1,
+        "atajada": 1,
+        "fuera_juego": 5,
+        "reinicio": 7,
+        "plan_equipo": 10,
+        "cambio": 4,
+        "falta": 2,
+        "amarilla": 1
+      },
+      "tiros": [
+        {
+          "id": "a4",
+          "tick": 86,
+          "lado": "visita",
+          "desde": {
+            "x": 20.26655363466874,
+            "y": 32.70766816623003
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.108920913139976
+          },
+          "distanciaM": 20.408312301154332,
+          "desviacionCentroM": 1.1089209131399755,
+          "desviacionPorteroM": 1.1089209131399755,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3",
+        "4-3-1-2",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 9,
+      "segundos": 180,
+      "equipos": [
+        "Racing Ventolera",
+        "Olímpico Arenablanca"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "4-2-3-1"
+      },
+      "perfiles": {
+        "local": "reactivo",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 38,
+        "recepcion": 32,
+        "tiro": 7,
+        "gol": 3,
+        "reinicio": 10,
+        "intercepcion": 3,
+        "falta": 2,
+        "amarilla": 1,
+        "recuperacion": 4,
+        "plan_equipo": 9,
+        "atajada": 2,
+        "fuera_juego": 4,
+        "cambio": 5,
+        "tiro_fuera": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 76,
+          "lado": "local",
+          "desde": {
+            "x": 102.1007493231026,
+            "y": 27.874193058938904
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.63757073751185
+          },
+          "distanciaM": 5.576326873150194,
+          "desviacionCentroM": 1.362429262488149,
+          "desviacionPorteroM": 1.362429262488149,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a12",
+          "tick": 180,
+          "lado": "visita",
+          "desde": {
+            "x": 21.408791706964653,
+            "y": 21.894997484821907
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.84144426276038
+          },
+          "distanciaM": 24.04497992127334,
+          "desviacionCentroM": 1.1585557372396167,
+          "desviacionPorteroM": 1.1585557372396167,
+          "desenlace": "intercepcion"
+        },
+        {
+          "id": "a28",
+          "tick": 373,
+          "lado": "visita",
+          "desde": {
+            "x": 18.263811274061524,
+            "y": 27.213960032129624
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.687285799101
+          },
+          "distanciaM": 20.133654705685153,
+          "desviacionCentroM": 1.687285799100998,
+          "desviacionPorteroM": 1.687285799100998,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a43",
+          "tick": 589,
+          "lado": "visita",
+          "desde": {
+            "x": 10.027773295598104,
+            "y": 50.66881663372023
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.67356264833547
+          },
+          "distanciaM": 20.600616574909033,
+          "desviacionCentroM": 1.3264373516645307,
+          "desviacionPorteroM": 1.3264373516645307,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a50",
+          "tick": 646,
+          "lado": "visita",
+          "desde": {
+            "x": 0.1195387275829273,
+            "y": 34.28335848749936
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 37.858089022981005
+          },
+          "distanciaM": 3.5767286602001294,
+          "desviacionCentroM": 3.858089022981005,
+          "desviacionPorteroM": 3.942324549482926,
+          "desenlace": "tiro_fuera"
+        },
+        {
+          "id": "a86",
+          "tick": 1208,
+          "lado": "visita",
+          "desde": {
+            "x": 0.026660229636389234,
+            "y": 54.86364500354644
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.70347263232805
+          },
+          "distanciaM": 22.160188408268443,
+          "desviacionCentroM": 1.296527367671949,
+          "desviacionPorteroM": 1.3433055650921375,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a96",
+          "tick": 1353,
+          "lado": "local",
+          "desde": {
+            "x": 87.87861409282317,
+            "y": 35.543408262172086
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.51035687867179
+          },
+          "distanciaM": 17.152523153851895,
+          "desviacionCentroM": 0.5103568786717929,
+          "desviacionPorteroM": 0.5103568742389584,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "3-4-3",
+        "5-4-1",
+        "3-4-3",
+        "3-4-3",
+        "5-4-1",
+        "3-4-3",
+        "5-4-1",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 10,
+      "segundos": 180,
+      "equipos": [
+        "Olímpico Torreluna",
+        "Club Ormidia"
+      ],
+      "formaciones": {
+        "local": "4-3-1-2",
+        "visita": "4-1-4-1"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 40,
+        "recepcion": 28,
+        "tiro": 5,
+        "atajada": 3,
+        "intercepcion": 7,
+        "plan_equipo": 10,
+        "recuperacion": 2,
+        "gol": 2,
+        "cambio": 6,
+        "reinicio": 6,
+        "fuera_juego": 4
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 83,
+          "lado": "local",
+          "desde": {
+            "x": 87.22378894284469,
+            "y": 33.850593290431334
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.05847070320168
+          },
+          "distanciaM": 17.777426488872642,
+          "desviacionCentroM": 0.05847070320167802,
+          "desviacionPorteroM": 0.05847070320167802,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a26",
+          "tick": 691,
+          "lado": "visita",
+          "desde": {
+            "x": 19.727735280896148,
+            "y": 45.10128604719033
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.973254392385485
+          },
+          "distanciaM": 22.64987037100772,
+          "desviacionCentroM": 0.026745607614515166,
+          "desviacionPorteroM": 0.026745607614515166,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a39",
+          "tick": 858,
+          "lado": "visita",
+          "desde": {
+            "x": 23.132806418510963,
+            "y": 33.56659261686906
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.2401278791111
+          },
+          "distanciaM": 23.19326309664661,
+          "desviacionCentroM": 1.2401278791110997,
+          "desviacionPorteroM": 1.2401278791110997,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a51",
+          "tick": 1034,
+          "lado": "visita",
+          "desde": {
+            "x": 21.9800759530646,
+            "y": 33.85144742737939
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.72156213932671
+          },
+          "distanciaM": 21.98045971062801,
+          "desviacionCentroM": 0.2784378606732929,
+          "desviacionPorteroM": 0.27769033665915543,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a94",
+          "tick": 1568,
+          "lado": "visita",
+          "desde": {
+            "x": 19.397022850054,
+            "y": 48.69651322939945
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.2174320121482
+          },
+          "distanciaM": 24.20512938080015,
+          "desviacionCentroM": 0.21743201214820118,
+          "desviacionPorteroM": 0.21737656328385668,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1"
+      ]
+    },
+    {
+      "seed": 11,
+      "segundos": 180,
+      "equipos": [
+        "Unión Caleteo",
+        "Sporting Puertoscuro"
+      ],
+      "formaciones": {
+        "local": "4-2-2-2",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 3
+      },
+      "eventos": {
+        "pase": 52,
+        "recepcion": 38,
+        "fuera_juego": 11,
+        "reinicio": 14,
+        "tiro": 4,
+        "gol": 3,
+        "plan_equipo": 10,
+        "cambio": 4,
+        "intercepcion": 3,
+        "atajada": 1
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 188,
+          "lado": "visita",
+          "desde": {
+            "x": 19.324941894215534,
+            "y": 43.72506710113191
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.38913707418988
+          },
+          "distanciaM": 21.46189573832574,
+          "desviacionCentroM": 0.3891370741898825,
+          "desviacionPorteroM": 0.3891370741898825,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a37",
+          "tick": 498,
+          "lado": "visita",
+          "desde": {
+            "x": 17.059283454387227,
+            "y": 26.37025965216248
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.24772443135269
+          },
+          "distanciaM": 17.742852494719408,
+          "desviacionCentroM": 2.7522755686473097,
+          "desviacionPorteroM": 2.7522755686473097,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a63",
+          "tick": 800,
+          "lado": "visita",
+          "desde": {
+            "x": 12.882787593216587,
+            "y": 27.457483115880645
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.271532167624684
+          },
+          "distanciaM": 15.609409881814406,
+          "desviacionCentroM": 2.2715321676246845,
+          "desviacionPorteroM": 2.2748212082515877,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a101",
+          "tick": 1265,
+          "lado": "visita",
+          "desde": {
+            "x": 20.020550356029435,
+            "y": 41.70902120384539
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.89221535192802
+          },
+          "distanciaM": 20.84844519088199,
+          "desviacionCentroM": 1.892215351928023,
+          "desviacionPorteroM": 1.8920163741382794,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-2-2",
+        "5-3-2",
+        "4-2-2-2",
+        "5-3-2",
+        "4-2-2-2",
+        "5-3-2",
+        "4-2-2-2",
+        "5-3-2",
+        "4-2-2-2",
+        "5-3-2"
+      ]
+    },
+    {
+      "seed": 12,
+      "segundos": 180,
+      "equipos": [
+        "Olímpico Ormidia",
+        "Deportivo Valdecristal"
+      ],
+      "formaciones": {
+        "local": "3-4-2-1",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 5,
+        "recepcion": 4,
+        "falta": 6,
+        "reinicio": 7,
+        "fuera_juego": 1,
+        "plan_equipo": 9,
+        "recuperacion": 3,
+        "cambio": 2
+      },
+      "tiros": [],
+      "cambiosFormacion": [
+        "3-4-2-1",
+        "4-3-1-2",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2",
+        "4-1-4-1",
+        "4-3-1-2"
+      ]
+    },
+    {
+      "seed": 13,
+      "segundos": 180,
+      "equipos": [
+        "Sporting Ventolera",
+        "Atlético Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "5-4-1"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 31,
+        "recepcion": 24,
+        "tiro": 3,
+        "atajada": 2,
+        "intercepcion": 3,
+        "recuperacion": 4,
+        "plan_equipo": 9,
+        "fuera_juego": 4,
+        "cambio": 4,
+        "reinicio": 6,
+        "gol": 1,
+        "falta": 1
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 64,
+          "lado": "local",
+          "desde": {
+            "x": 81.11918868073,
+            "y": 27.747536530404425
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.872369537141736
+          },
+          "distanciaM": 24.65373660577627,
+          "desviacionCentroM": 0.12763046285826363,
+          "desviacionPorteroM": 0.12763046285826363,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a40",
+          "tick": 621,
+          "lado": "visita",
+          "desde": {
+            "x": 11.610388334916617,
+            "y": 23.297255688135476
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.3171389179593
+          },
+          "distanciaM": 16.007465248643214,
+          "desviacionCentroM": 0.31713891795929783,
+          "desviacionPorteroM": 0.31713891795929783,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a51",
+          "tick": 765,
+          "lado": "visita",
+          "desde": {
+            "x": 22.862481290275582,
+            "y": 33.54917213542617
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.46188826575875
+          },
+          "distanciaM": 22.86264790487106,
+          "desviacionCentroM": 0.538111734241248,
+          "desviacionPorteroM": 0.6623563305719173,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-3-3",
+        "5-4-1",
+        "4-3-3",
+        "4-3-3",
+        "5-4-1",
+        "4-3-3",
+        "5-4-1",
+        "4-3-3",
+        "5-4-1"
+      ]
+    },
+    {
+      "seed": 14,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Puertoscuro",
+        "Atlético Brezal"
+      ],
+      "formaciones": {
+        "local": "4-2-2-2",
+        "visita": "5-4-1"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 49,
+        "recepcion": 38,
+        "fuera_juego": 10,
+        "reinicio": 13,
+        "recuperacion": 5,
+        "plan_equipo": 9,
+        "cambio": 5,
+        "intercepcion": 1,
+        "tiro": 3,
+        "gol": 3
+      },
+      "tiros": [
+        {
+          "id": "a74",
+          "tick": 988,
+          "lado": "visita",
+          "desde": {
+            "x": 18.377349030745844,
+            "y": 39.524315918762404
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.46594866625965
+          },
+          "distanciaM": 18.630098433691554,
+          "desviacionCentroM": 2.4659486662596493,
+          "desviacionPorteroM": 2.5728380725704554,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a86",
+          "tick": 1158,
+          "lado": "visita",
+          "desde": {
+            "x": 11.811489101144135,
+            "y": 31.652529826645782
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.74367111593485
+          },
+          "distanciaM": 11.811840733817062,
+          "desviacionCentroM": 2.2563288840651516,
+          "desviacionPorteroM": 2.248467525197537,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a101",
+          "tick": 1338,
+          "lado": "local",
+          "desde": {
+            "x": 86.916679418539,
+            "y": 16.998283303886797
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.85029679590836
+          },
+          "distanciaM": 26.12288069787201,
+          "desviacionCentroM": 1.8502967959083634,
+          "desviacionPorteroM": 1.8502967959083634,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2"
+      ]
+    },
+    {
+      "seed": 15,
+      "segundos": 180,
+      "equipos": [
+        "Club Pradoalto",
+        "Olímpico Lumbrera"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "reactivo",
+        "visita": "reactivo"
+      },
+      "marcador": {
+        "local": 5,
+        "visita": 2
+      },
+      "eventos": {
+        "recuperacion": 6,
+        "pase": 28,
+        "recepcion": 26,
+        "plan_equipo": 10,
+        "tiro": 11,
+        "atajada": 4,
+        "gol": 7,
+        "cambio": 4,
+        "reinicio": 7,
+        "intercepcion": 2
+      },
+      "tiros": [
+        {
+          "id": "a22",
+          "tick": 453,
+          "lado": "visita",
+          "desde": {
+            "x": 21.167698981567927,
+            "y": 21.84854638062616
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.07844031003304
+          },
+          "distanciaM": 25.506104395152985,
+          "desviacionCentroM": 2.078440310033038,
+          "desviacionPorteroM": 2.078440310033038,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a30",
+          "tick": 574,
+          "lado": "local",
+          "desde": {
+            "x": 96.56239535055828,
+            "y": 28.594850616683953
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.275855047474614
+          },
+          "distanciaM": 11.410127137157867,
+          "desviacionCentroM": 2.2758550474746144,
+          "desviacionPorteroM": 2.2758550474746144,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a39",
+          "tick": 694,
+          "lado": "visita",
+          "desde": {
+            "x": 20.775739945835113,
+            "y": 20.510958926343097
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.622840708000584
+          },
+          "distanciaM": 23.560672465498527,
+          "desviacionCentroM": 2.3771592919994156,
+          "desviacionPorteroM": 2.3771592919994156,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a48",
+          "tick": 818,
+          "lado": "local",
+          "desde": {
+            "x": 87.2494992634415,
+            "y": 27.699429144519613
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.63627452206798
+          },
+          "distanciaM": 18.717008560009823,
+          "desviacionCentroM": 0.3637254779320216,
+          "desviacionPorteroM": 0.3637254779320216,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a58",
+          "tick": 1041,
+          "lado": "local",
+          "desde": {
+            "x": 80.52014570741717,
+            "y": 33.030222972191794
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.13575122243725
+          },
+          "distanciaM": 24.676052599618895,
+          "desviacionCentroM": 2.13575122243725,
+          "desviacionPorteroM": 2.13575122243725,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a61",
+          "tick": 1081,
+          "lado": "local",
+          "desde": {
+            "x": 103.71933819484092,
+            "y": 33.93020324909167
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.714765600436365
+          },
+          "distanciaM": 1.7656113210336124,
+          "desviacionCentroM": 1.2852343995636346,
+          "desviacionPorteroM": 1.3412511803107279,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a70",
+          "tick": 1195,
+          "lado": "visita",
+          "desde": {
+            "x": 10.267252004519069,
+            "y": 14.540915950548746
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 37.139894004940054
+          },
+          "distanciaM": 24.8219715741349,
+          "desviacionCentroM": 3.1398940049400537,
+          "desviacionPorteroM": 3.1398940049400537,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a77",
+          "tick": 1316,
+          "lado": "local",
+          "desde": {
+            "x": 85.34595062778801,
+            "y": 32.53624033016175
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.885557940695435
+          },
+          "distanciaM": 19.700312554359197,
+          "desviacionCentroM": 0.11444205930456519,
+          "desviacionPorteroM": 0.11436118076665025,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a81",
+          "tick": 1415,
+          "lado": "local",
+          "desde": {
+            "x": 91.77864732773818,
+            "y": 47.570745143836554
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.717313682679084
+          },
+          "distanciaM": 18.439492043193525,
+          "desviacionCentroM": 0.7173136826790838,
+          "desviacionPorteroM": 0.7170166820609225,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a95",
+          "tick": 1628,
+          "lado": "local",
+          "desde": {
+            "x": 80.73393510745754,
+            "y": 32.72074298603749
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.66097451292444
+          },
+          "distanciaM": 24.443544481125926,
+          "desviacionCentroM": 1.6609745129244402,
+          "desviacionPorteroM": 1.6607368671628606,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a99",
+          "tick": 1689,
+          "lado": "local",
+          "desde": {
+            "x": 88.2810939291233,
+            "y": 42.3666672819788
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.9397115945816
+          },
+          "distanciaM": 17.577646834538758,
+          "desviacionCentroM": 2.9397115945816026,
+          "desviacionPorteroM": 2.868112062541627,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "4-4-2",
+        "5-4-1",
+        "4-4-2",
+        "5-4-1",
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2",
+        "5-4-1",
+        "4-2-2-2"
+      ]
+    },
+    {
+      "seed": 16,
+      "segundos": 180,
+      "equipos": [
+        "Club Torreluna",
+        "Racing Ormidia"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-2-2-2"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 42,
+        "intercepcion": 8,
+        "recepcion": 23,
+        "recuperacion": 1,
+        "fuera_juego": 11,
+        "reinicio": 13,
+        "plan_equipo": 10,
+        "cambio": 6,
+        "tiro": 2,
+        "atajada": 1,
+        "gol": 1,
+        "falta": 1
+      },
+      "tiros": [
+        {
+          "id": "a37",
+          "tick": 538,
+          "lado": "local",
+          "desde": {
+            "x": 90.05054481132542,
+            "y": 38.62842533312224
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.21970396859944
+          },
+          "distanciaM": 16.684584582641723,
+          "desviacionCentroM": 2.7802960314005603,
+          "desviacionPorteroM": 2.7802960314005603,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a77",
+          "tick": 1044,
+          "lado": "visita",
+          "desde": {
+            "x": 11.558130620375158,
+            "y": 45.558956627352764
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.63515609480813
+          },
+          "distanciaM": 17.338252612147937,
+          "desviacionCentroM": 1.3648439051918686,
+          "desviacionPorteroM": 1.3648439051918686,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-2-2-2",
+        "4-2-3-1",
+        "4-2-2-2",
+        "4-2-3-1",
+        "4-2-2-2",
+        "4-3-3",
+        "4-2-2-2",
+        "4-3-3",
+        "4-2-2-2"
+      ]
+    },
+    {
+      "seed": 17,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Ormidia",
+        "Club Quebralta"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-1-4-1"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 6,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 32,
+        "recepcion": 24,
+        "recuperacion": 3,
+        "tiro": 11,
+        "gol": 8,
+        "reinicio": 10,
+        "plan_equipo": 9,
+        "atajada": 2,
+        "cambio": 4,
+        "intercepcion": 6,
+        "fuera_juego": 2
+      },
+      "tiros": [
+        {
+          "id": "a8",
+          "tick": 114,
+          "lado": "visita",
+          "desde": {
+            "x": 16.308418350190934,
+            "y": 20.19313189420848
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.83731466684739
+          },
+          "distanciaM": 22.598782350130648,
+          "desviacionCentroM": 1.8373146668473908,
+          "desviacionPorteroM": 1.8373146668473908,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a21",
+          "tick": 435,
+          "lado": "visita",
+          "desde": {
+            "x": 12.275647714494353,
+            "y": 33.35349550881091
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.628433180078865
+          },
+          "distanciaM": 12.297042009805317,
+          "desviacionCentroM": 1.371566819921135,
+          "desviacionPorteroM": 1.371566819921135,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a27",
+          "tick": 540,
+          "lado": "local",
+          "desde": {
+            "x": 95.78078961058357,
+            "y": 46.968796981603035
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 37.30229313699529
+          },
+          "distanciaM": 13.357961550406568,
+          "desviacionCentroM": 3.3022931369952886,
+          "desviacionPorteroM": 3.3022931369952886,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a36",
+          "tick": 651,
+          "lado": "visita",
+          "desde": {
+            "x": 15.748920904317822,
+            "y": 36.40549994283893
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.16998972866684
+          },
+          "distanciaM": 16.077843014424257,
+          "desviacionCentroM": 0.8300102713331583,
+          "desviacionPorteroM": 0.8305031159567022,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a40",
+          "tick": 784,
+          "lado": "local",
+          "desde": {
+            "x": 89.36303151863011,
+            "y": 40.39307986081685
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.15779083932284
+          },
+          "distanciaM": 16.200384451701847,
+          "desviacionCentroM": 2.1577908393228427,
+          "desviacionPorteroM": 2.1577908393228427,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a59",
+          "tick": 1055,
+          "lado": "visita",
+          "desde": {
+            "x": 4.788870858211283,
+            "y": 37.253842652613855
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.84111744564772
+          },
+          "distanciaM": 5.362324777645891,
+          "desviacionCentroM": 0.8411174456477184,
+          "desviacionPorteroM": 0.8417821955860347,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a67",
+          "tick": 1225,
+          "lado": "local",
+          "desde": {
+            "x": 95.34494004713868,
+            "y": 26.229142640454764
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.194474639715626
+          },
+          "distanciaM": 10.857011769185403,
+          "desviacionCentroM": 2.805525360284374,
+          "desviacionPorteroM": 2.805525360284374,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a73",
+          "tick": 1283,
+          "lado": "local",
+          "desde": {
+            "x": 96.52547653495726,
+            "y": 37.273675224724634
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.242698887269945
+          },
+          "distanciaM": 9.00024252549731,
+          "desviacionCentroM": 0.24269888726994537,
+          "desviacionPorteroM": 0.24269888726994537,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a82",
+          "tick": 1436,
+          "lado": "local",
+          "desde": {
+            "x": 87.46222744977248,
+            "y": 29.571487914624274
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 31.17377506329678
+          },
+          "distanciaM": 17.610814578840888,
+          "desviacionCentroM": 2.8262249367032197,
+          "desviacionPorteroM": 2.808862393114552,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a89",
+          "tick": 1501,
+          "lado": "local",
+          "desde": {
+            "x": 87.87954262137289,
+            "y": 35.03933072010032
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 30.37844161361456
+          },
+          "distanciaM": 17.743560750772236,
+          "desviacionCentroM": 3.6215583863854413,
+          "desviacionPorteroM": 3.279865285585881,
+          "desenlace": "fuera_juego"
+        },
+        {
+          "id": "a102",
+          "tick": 1659,
+          "lado": "local",
+          "desde": {
+            "x": 98.05325416808893,
+            "y": 38.68274067539474
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.744523856360466
+          },
+          "distanciaM": 7.5425722223144644,
+          "desviacionCentroM": 1.7445238563604661,
+          "desviacionPorteroM": 1.745723396907735,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1",
+        "4-2-3-1",
+        "4-1-4-1",
+        "4-4-2",
+        "4-3-1-2",
+        "4-2-3-1",
+        "4-1-4-1",
+        "4-4-2",
+        "4-3-1-2"
+      ]
+    },
+    {
+      "seed": 18,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Pradoalto",
+        "Racing Solcanto"
+      ],
+      "formaciones": {
+        "local": "3-4-3",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "vertical",
+        "visita": "presion"
+      },
+      "marcador": {
+        "local": 3,
+        "visita": 1
+      },
+      "eventos": {
+        "pase": 41,
+        "recepcion": 22,
+        "fuera_juego": 7,
+        "reinicio": 12,
+        "intercepcion": 12,
+        "tiro": 7,
+        "atajada": 3,
+        "recuperacion": 4,
+        "gol": 4,
+        "plan_equipo": 10,
+        "cambio": 6,
+        "falta": 1
+      },
+      "tiros": [
+        {
+          "id": "a12",
+          "tick": 204,
+          "lado": "local",
+          "desde": {
+            "x": 86.88868240611785,
+            "y": 34.00593872223504
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.15558235100098
+          },
+          "distanciaM": 18.14776860827874,
+          "desviacionCentroM": 1.1555823510009802,
+          "desviacionPorteroM": 1.1555823510009802,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a15",
+          "tick": 238,
+          "lado": "local",
+          "desde": {
+            "x": 104.23770541912158,
+            "y": 33.98052149351515
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.729992799767295
+          },
+          "distanciaM": 1.4645528470913278,
+          "desviacionCentroM": 1.2700072002327047,
+          "desviacionPorteroM": 1.3113389827878805,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a57",
+          "tick": 898,
+          "lado": "local",
+          "desde": {
+            "x": 88.77368885448918,
+            "y": 34.06361672314482
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.66226218948141
+          },
+          "distanciaM": 16.231274098253063,
+          "desviacionCentroM": 0.33773781051858975,
+          "desviacionPorteroM": 0.35077717308736567,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a62",
+          "tick": 930,
+          "lado": "local",
+          "desde": {
+            "x": 104.33137144181931,
+            "y": 34.02044010403405
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.17887025999371
+          },
+          "distanciaM": 1.9591946404820415,
+          "desviacionCentroM": 1.8211297400062918,
+          "desviacionPorteroM": 1.6853601176267006,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a94",
+          "tick": 1337,
+          "lado": "local",
+          "desde": {
+            "x": 85.75379397981125,
+            "y": 21.12054750703084
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.86435691535007
+          },
+          "distanciaM": 24.24451199839651,
+          "desviacionCentroM": 1.864356915350072,
+          "desviacionPorteroM": 1.8906642207383868,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a101",
+          "tick": 1437,
+          "lado": "local",
+          "desde": {
+            "x": 85.20611205298741,
+            "y": 33.39684197070349
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.60931207130197
+          },
+          "distanciaM": 19.809548288674875,
+          "desviacionCentroM": 1.3906879286980285,
+          "desviacionPorteroM": 1.3849974241452827,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a115",
+          "tick": 1628,
+          "lado": "visita",
+          "desde": {
+            "x": 18.881225485452546,
+            "y": 46.264839372463626
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 36.27911228834186
+          },
+          "distanciaM": 21.35919992019986,
+          "desviacionCentroM": 2.2791122883418566,
+          "desviacionPorteroM": 2.274216209305301,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 19,
+      "segundos": 180,
+      "equipos": [
+        "Unión Pradoalto",
+        "Juventud Torreluna"
+      ],
+      "formaciones": {
+        "local": "3-5-2",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 4,
+        "visita": 3
+      },
+      "eventos": {
+        "pase": 33,
+        "recepcion": 28,
+        "intercepcion": 2,
+        "recuperacion": 3,
+        "falta": 2,
+        "reinicio": 11,
+        "tiro": 8,
+        "gol": 7,
+        "plan_equipo": 9,
+        "cambio": 5,
+        "atajada": 1,
+        "fuera_juego": 2
+      },
+      "tiros": [
+        {
+          "id": "a14",
+          "tick": 205,
+          "lado": "local",
+          "desde": {
+            "x": 88.04774829448463,
+            "y": 43.48176262745018
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.286394203941896
+          },
+          "distanciaM": 20.315391013348354,
+          "desviacionCentroM": 1.7136057960581041,
+          "desviacionPorteroM": 1.7136057960581041,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a24",
+          "tick": 353,
+          "lado": "visita",
+          "desde": {
+            "x": 7.884074178120774,
+            "y": 19.208389568538355
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.378014337457714
+          },
+          "distanciaM": 17.989313239080616,
+          "desviacionCentroM": 1.3780143374577136,
+          "desviacionPorteroM": 1.3780143374577136,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a30",
+          "tick": 476,
+          "lado": "local",
+          "desde": {
+            "x": 84.810360628479,
+            "y": 24.243157545626584
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.711632578447464
+          },
+          "distanciaM": 22.742262584555323,
+          "desviacionCentroM": 0.711632578447464,
+          "desviacionPorteroM": 0.711632578447464,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a37",
+          "tick": 593,
+          "lado": "visita",
+          "desde": {
+            "x": 6.985445633774311,
+            "y": 48.419860146568084
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.38802382861823
+          },
+          "distanciaM": 15.674465896997994,
+          "desviacionCentroM": 0.3880238286182305,
+          "desviacionPorteroM": 0.3880238286182305,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a46",
+          "tick": 712,
+          "lado": "local",
+          "desde": {
+            "x": 86.25157472717363,
+            "y": 37.95514227373309
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.840630547231996
+          },
+          "distanciaM": 19.005358020970487,
+          "desviacionCentroM": 0.8406305472319957,
+          "desviacionPorteroM": 0.8406305472319957,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a54",
+          "tick": 848,
+          "lado": "visita",
+          "desde": {
+            "x": 19.80703179637125,
+            "y": 38.97723924798288
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.27420788942464
+          },
+          "distanciaM": 20.910503054117967,
+          "desviacionCentroM": 1.7257921105753624,
+          "desviacionPorteroM": 1.5920075649430885,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a97",
+          "tick": 1569,
+          "lado": "visita",
+          "desde": {
+            "x": 11.339039749841174,
+            "y": 50.60843618183518
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.24842212656513
+          },
+          "distanciaM": 21.57924786822265,
+          "desviacionCentroM": 1.7515778734348686,
+          "desviacionPorteroM": 1.7426650533237833,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a106",
+          "tick": 1733,
+          "lado": "local",
+          "desde": {
+            "x": 88.28786801256962,
+            "y": 42.01034358581298
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.86286540143192
+          },
+          "distanciaM": 19.05181651966608,
+          "desviacionCentroM": 1.1371345985680819,
+          "desviacionPorteroM": 1.1374294948929062,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-4-3",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 20,
+      "segundos": 180,
+      "equipos": [
+        "Sporting Ormidia",
+        "Unión Lumbrera"
+      ],
+      "formaciones": {
+        "local": "5-4-1",
+        "visita": "5-3-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 3
+      },
+      "eventos": {
+        "pase": 41,
+        "recepcion": 35,
+        "tiro": 5,
+        "gol": 4,
+        "reinicio": 8,
+        "recuperacion": 6,
+        "plan_equipo": 9,
+        "intercepcion": 3,
+        "cambio": 6,
+        "atajada": 1,
+        "fuera_juego": 3,
+        "falta": 1
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 76,
+          "lado": "local",
+          "desde": {
+            "x": 85.28630297430412,
+            "y": 25.141664736915235
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.425836626002564
+          },
+          "distanciaM": 21.016398609911754,
+          "desviacionCentroM": 1.574163373997436,
+          "desviacionPorteroM": 1.574163373997436,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a27",
+          "tick": 508,
+          "lado": "visita",
+          "desde": {
+            "x": 0,
+            "y": 58.9809265230738
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.71067893984728
+          },
+          "distanciaM": 25.27024758322652,
+          "desviacionCentroM": 0.28932106015272296,
+          "desviacionPorteroM": 0.28932106015272296,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a40",
+          "tick": 646,
+          "lado": "local",
+          "desde": {
+            "x": 90.6660316716679,
+            "y": 38.75575671678151
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.817828050665554
+          },
+          "distanciaM": 15.515206891353706,
+          "desviacionCentroM": 1.182171949334446,
+          "desviacionPorteroM": 1.182171949334446,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a59",
+          "tick": 938,
+          "lado": "visita",
+          "desde": {
+            "x": 20.724674014276445,
+            "y": 39.318302390128196
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.53781364493072
+          },
+          "distanciaM": 21.268878335280988,
+          "desviacionCentroM": 0.537813644930722,
+          "desviacionPorteroM": 0.537813644930722,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a81",
+          "tick": 1229,
+          "lado": "visita",
+          "desde": {
+            "x": 15.359201113415184,
+            "y": 26.478752575215278
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.96812699297909
+          },
+          "distanciaM": 17.08788424620758,
+          "desviacionCentroM": 0.03187300702091278,
+          "desviacionPorteroM": 0.03187300702091278,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "5-4-1",
+        "5-3-2",
+        "5-4-1",
+        "5-3-2",
+        "5-3-2",
+        "4-3-1-2",
+        "5-3-2",
+        "4-3-1-2",
+        "5-3-2"
+      ]
+    },
+    {
+      "seed": 21,
+      "segundos": 180,
+      "equipos": [
+        "Deportivo Arenablanca",
+        "Unión Islaverde Sur"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 3,
+        "visita": 2
+      },
+      "eventos": {
+        "pase": 23,
+        "recepcion": 19,
+        "tiro": 6,
+        "gol": 5,
+        "reinicio": 8,
+        "plan_equipo": 8,
+        "cambio": 2,
+        "intercepcion": 3,
+        "atajada": 1,
+        "fuera_juego": 1,
+        "recuperacion": 2,
+        "falta": 2
+      },
+      "tiros": [
+        {
+          "id": "a5",
+          "tick": 81,
+          "lado": "local",
+          "desde": {
+            "x": 85.74541406873067,
+            "y": 46.42874571977948
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.26084201582707
+          },
+          "distanciaM": 22.258956680972013,
+          "desviacionCentroM": 1.2608420158270732,
+          "desviacionPorteroM": 1.2608420158270732,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a12",
+          "tick": 204,
+          "lado": "visita",
+          "desde": {
+            "x": 15.87007189383094,
+            "y": 41.63861732996757
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.6553519305177
+          },
+          "distanciaM": 17.76490102289951,
+          "desviacionCentroM": 0.34464806948229665,
+          "desviacionPorteroM": 0.34464806948229665,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a20",
+          "tick": 341,
+          "lado": "local",
+          "desde": {
+            "x": 94.1792473117961,
+            "y": 41.636948046804
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.87065659807995
+          },
+          "distanciaM": 12.261272601606246,
+          "desviacionCentroM": 1.8706565980799468,
+          "desviacionPorteroM": 1.8706565980799468,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a32",
+          "tick": 557,
+          "lado": "local",
+          "desde": {
+            "x": 89.53234762277343,
+            "y": 41.76587509476879
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 36.595474776113406
+          },
+          "distanciaM": 16.308933426741138,
+          "desviacionCentroM": 2.595474776113406,
+          "desviacionPorteroM": 2.595474776113406,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a41",
+          "tick": 673,
+          "lado": "visita",
+          "desde": {
+            "x": 22.861460621208288,
+            "y": 40.34002114714618
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.36827099102549
+          },
+          "distanciaM": 24.21146799115385,
+          "desviacionCentroM": 1.63172900897451,
+          "desviacionPorteroM": 1.63172900897451,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a64",
+          "tick": 969,
+          "lado": "visita",
+          "desde": {
+            "x": 7.246062854533374,
+            "y": 37.70656304238163
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.962207748180255
+          },
+          "distanciaM": 8.66108157503813,
+          "desviacionCentroM": 1.037792251819745,
+          "desviacionPorteroM": 1.0380216659346857,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-4-2",
+        "3-5-2",
+        "4-3-3",
+        "3-5-2",
+        "4-3-3",
+        "4-3-3",
+        "3-5-2",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 22,
+      "segundos": 180,
+      "equipos": [
+        "Olímpico Lumbrera",
+        "Sporting Valdecristal"
+      ],
+      "formaciones": {
+        "local": "4-2-3-1",
+        "visita": "4-3-3"
+      },
+      "perfiles": {
+        "local": "posicional",
+        "visita": "posicional"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "falta": 1,
+        "reinicio": 4,
+        "pase": 25,
+        "recepcion": 22,
+        "fuera_juego": 2,
+        "tiro": 5,
+        "atajada": 4,
+        "plan_equipo": 8,
+        "intercepcion": 1,
+        "gol": 1,
+        "recuperacion": 2
+      },
+      "tiros": [
+        {
+          "id": "a14",
+          "tick": 198,
+          "lado": "visita",
+          "desde": {
+            "x": 20.081474395191215,
+            "y": 33.331168068497824
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.473590529138846
+          },
+          "distanciaM": 20.195434827816396,
+          "desviacionCentroM": 1.4735905291388463,
+          "desviacionPorteroM": 1.4735905291388463,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a29",
+          "tick": 362,
+          "lado": "local",
+          "desde": {
+            "x": 96.11909994835196,
+            "y": 37.94555318040499
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.76347280451097
+          },
+          "distanciaM": 9.816322223613081,
+          "desviacionCentroM": 0.23652719548903178,
+          "desviacionPorteroM": 0.23652719548903178,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a46",
+          "tick": 684,
+          "lado": "local",
+          "desde": {
+            "x": 83.89956659893352,
+            "y": 28.072501191548778
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.656213126978834
+          },
+          "distanciaM": 22.42188610336843,
+          "desviacionCentroM": 1.6562131269788338,
+          "desviacionPorteroM": 1.7429497330051973,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a56",
+          "tick": 843,
+          "lado": "visita",
+          "desde": {
+            "x": 19.479064713343575,
+            "y": 34.72323675898514
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 32.22497034970671
+          },
+          "distanciaM": 19.638617496105876,
+          "desviacionCentroM": 1.7750296502932912,
+          "desviacionPorteroM": 1.7738873720561728,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a66",
+          "tick": 963,
+          "lado": "local",
+          "desde": {
+            "x": 84.7316630678701,
+            "y": 32.27410402524702
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.75081594238989
+          },
+          "distanciaM": 20.273942296610368,
+          "desviacionCentroM": 1.2491840576101083,
+          "desviacionPorteroM": 1.2493898088598527,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-2-3-1",
+        "4-3-3",
+        "4-2-3-1",
+        "4-3-3",
+        "4-3-3"
+      ]
+    },
+    {
+      "seed": 23,
+      "segundos": 180,
+      "equipos": [
+        "Club Torreluna",
+        "Atlético Arenablanca"
+      ],
+      "formaciones": {
+        "local": "4-1-4-1",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "presion",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 7,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 35,
+        "recepcion": 25,
+        "tiro": 10,
+        "gol": 7,
+        "reinicio": 12,
+        "intercepcion": 6,
+        "atajada": 3,
+        "recuperacion": 7,
+        "plan_equipo": 10,
+        "cambio": 6,
+        "fuera_juego": 4,
+        "falta": 1,
+        "amarilla": 1
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 44,
+          "lado": "local",
+          "desde": {
+            "x": 86.05387125120048,
+            "y": 24.933333333333337
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.82691032482404
+          },
+          "distanciaM": 21.373784415789405,
+          "desviacionCentroM": 0.8269103248240413,
+          "desviacionPorteroM": 0.8269103248240413,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a10",
+          "tick": 117,
+          "lado": "local",
+          "desde": {
+            "x": 85.53411782121287,
+            "y": 32.57691106667952
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.9880099264795
+          },
+          "distanciaM": 19.51696105930816,
+          "desviacionCentroM": 0.011990073520500744,
+          "desviacionPorteroM": 0.011990073520500744,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a13",
+          "tick": 152,
+          "lado": "local",
+          "desde": {
+            "x": 104.11741089298312,
+            "y": 33.86908398165871
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.13714885533899
+          },
+          "distanciaM": 1.5449763932457503,
+          "desviacionCentroM": 1.1371488553389923,
+          "desviacionPorteroM": 0.9756568759317119,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a27",
+          "tick": 334,
+          "lado": "local",
+          "desde": {
+            "x": 88.90463202868885,
+            "y": 19.865097120062725
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.71155439731665
+          },
+          "distanciaM": 20.59350224483973,
+          "desviacionCentroM": 1.2884456026833533,
+          "desviacionPorteroM": 1.2910937267129796,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a33",
+          "tick": 388,
+          "lado": "local",
+          "desde": {
+            "x": 86.19024484439073,
+            "y": 32.08297886168107
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.74365304846782
+          },
+          "distanciaM": 18.82135434539863,
+          "desviacionCentroM": 1.25634695153218,
+          "desviacionPorteroM": 1.2589950755618062,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a36",
+          "tick": 424,
+          "lado": "local",
+          "desde": {
+            "x": 103.88392552518968,
+            "y": 33.89496575210467
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 35.473362887408584
+          },
+          "distanciaM": 1.9331217628640824,
+          "desviacionCentroM": 1.4733628874085838,
+          "desviacionPorteroM": 1.314094852130843,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a45",
+          "tick": 529,
+          "lado": "local",
+          "desde": {
+            "x": 92.28186859887093,
+            "y": 12.659830570938741
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.39705305602401
+          },
+          "distanciaM": 23.479966306665368,
+          "desviacionCentroM": 1.6029469439759865,
+          "desviacionPorteroM": 1.6182861426220398,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a107",
+          "tick": 1535,
+          "lado": "local",
+          "desde": {
+            "x": 88.61510229251078,
+            "y": 33.823567659481405
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.46256399326026
+          },
+          "distanciaM": 16.388874169140188,
+          "desviacionCentroM": 0.537436006739739,
+          "desviacionPorteroM": 0.5375968999352096,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a118",
+          "tick": 1680,
+          "lado": "local",
+          "desde": {
+            "x": 92.04557583681233,
+            "y": 45.891261879108946
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.370447161793706
+          },
+          "distanciaM": 18.725104432812888,
+          "desviacionCentroM": 1.629552838206294,
+          "desviacionPorteroM": 1.6221023948517868,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a123",
+          "tick": 1750,
+          "lado": "local",
+          "desde": {
+            "x": 89.50416375278432,
+            "y": 22.42072442347743
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34.27036216733977
+          },
+          "distanciaM": 19.50730262392241,
+          "desviacionCentroM": 0.27036216733976914,
+          "desviacionPorteroM": 0.27186417711073574,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3",
+        "4-1-4-1",
+        "3-4-3"
+      ]
+    },
+    {
+      "seed": 24,
+      "segundos": 180,
+      "equipos": [
+        "Olímpico Marisal",
+        "Atlético Lumbrera"
+      ],
+      "formaciones": {
+        "local": "4-1-2-1-2",
+        "visita": "4-4-2"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "vertical"
+      },
+      "marcador": {
+        "local": 2,
+        "visita": 3
+      },
+      "eventos": {
+        "plan_equipo": 9,
+        "recuperacion": 5,
+        "tiro": 7,
+        "atajada": 2,
+        "pase": 15,
+        "recepcion": 15,
+        "gol": 5,
+        "cambio": 4,
+        "reinicio": 5
+      },
+      "tiros": [
+        {
+          "id": "a4",
+          "tick": 439,
+          "lado": "visita",
+          "desde": {
+            "x": 19.67138545405538,
+            "y": 32.36700346470126
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 34.327129354346546
+          },
+          "distanciaM": 19.768801157006948,
+          "desviacionCentroM": 0.3271293543465461,
+          "desviacionPorteroM": 0.3271293543465461,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a8",
+          "tick": 575,
+          "lado": "local",
+          "desde": {
+            "x": 94.21495754761989,
+            "y": 56.366404778859575
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.62293348507956
+          },
+          "distanciaM": 25.17106726363896,
+          "desviacionCentroM": 0.3770665149204433,
+          "desviacionPorteroM": 0.3770665149204433,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a23",
+          "tick": 991,
+          "lado": "visita",
+          "desde": {
+            "x": 2.4775253413242586,
+            "y": 49.453123726396335
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 31.218502114264293
+          },
+          "distanciaM": 18.402161752210983,
+          "desviacionCentroM": 2.781497885735707,
+          "desviacionPorteroM": 2.7806837988899495,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a28",
+          "tick": 1143,
+          "lado": "local",
+          "desde": {
+            "x": 91.77696086673947,
+            "y": 12.892797954768374
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 34
+          },
+          "distanciaM": 24.90708216748741,
+          "desviacionCentroM": 0,
+          "desviacionPorteroM": 0.07155491360315125,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a39",
+          "tick": 1262,
+          "lado": "visita",
+          "desde": {
+            "x": 18.2944376637181,
+            "y": 36.716595227788176
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 35.37307035573293
+          },
+          "distanciaM": 18.34370487424769,
+          "desviacionCentroM": 1.3730703557329278,
+          "desviacionPorteroM": 1.3731291927359308,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a46",
+          "tick": 1401,
+          "lado": "visita",
+          "desde": {
+            "x": 18.953570570081407,
+            "y": 43.256405611929836
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 30.462260112240912
+          },
+          "distanciaM": 22.867618949559798,
+          "desviacionCentroM": 3.5377398877590878,
+          "desviacionPorteroM": 3.537736399675346,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a61",
+          "tick": 1673,
+          "lado": "visita",
+          "desde": {
+            "x": 19.2434470371041,
+            "y": 23.613917788330813
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.26412542548962
+          },
+          "distanciaM": 21.527581408744197,
+          "desviacionCentroM": 0.7358745745103832,
+          "desviacionPorteroM": 0.7358745818085097,
+          "desenlace": "gol"
+        }
+      ],
+      "cambiosFormacion": [
+        "4-1-2-1-2",
+        "4-4-2",
+        "4-4-2",
+        "4-4-2",
+        "4-4-2",
+        "4-4-2",
+        "4-4-2",
+        "4-1-2-1-2",
+        "4-4-2"
+      ]
+    },
+    {
+      "seed": 42,
+      "segundos": 180,
+      "equipos": [
+        "Sporting Montefrío Bajo",
+        "Olímpico Brezal"
+      ],
+      "formaciones": {
+        "local": "4-3-3",
+        "visita": "3-4-3"
+      },
+      "perfiles": {
+        "local": "adaptable",
+        "visita": "adaptable"
+      },
+      "marcador": {
+        "local": 1,
+        "visita": 0
+      },
+      "eventos": {
+        "pase": 6,
+        "recepcion": 6,
+        "tiro": 3,
+        "atajada": 2,
+        "recuperacion": 3,
+        "gol": 1,
+        "reinicio": 2,
+        "plan_equipo": 9,
+        "falta": 1,
+        "cambio": 2
+      },
+      "tiros": [
+        {
+          "id": "a3",
+          "tick": 91,
+          "lado": "local",
+          "desde": {
+            "x": 87.39469961913991,
+            "y": 34.23617106834883
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 33.72997829800472
+          },
+          "distanciaM": 17.612575979142317,
+          "desviacionCentroM": 0.2700217019952831,
+          "desviacionPorteroM": 0.2700217019952831,
+          "desenlace": "atajada"
+        },
+        {
+          "id": "a6",
+          "tick": 132,
+          "lado": "local",
+          "desde": {
+            "x": 105,
+            "y": 34.10934563677996
+          },
+          "objetivo": {
+            "x": 105,
+            "y": 32.45687500252947
+          },
+          "distanciaM": 1.6524706342504913,
+          "desviacionCentroM": 1.5431249974705281,
+          "desviacionPorteroM": 1.6494837236819464,
+          "desenlace": "gol"
+        },
+        {
+          "id": "a15",
+          "tick": 279,
+          "lado": "visita",
+          "desde": {
+            "x": 19.699565941755512,
+            "y": 34.404551520900256
+          },
+          "objetivo": {
+            "x": 0,
+            "y": 33.17305218687716
+          },
+          "distanciaM": 19.738021402949006,
+          "desviacionCentroM": 0.8269478131228425,
+          "desviacionPorteroM": 0.8269478131228425,
+          "desenlace": "atajada"
+        }
+      ],
+      "cambiosFormacion": [
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-5-2",
+        "3-4-3",
+        "3-5-2",
+        "3-4-3"
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "src/arena/tipos.ts": "824db2e4e0f3408c6a1ed2648198a6f6186a01759afbd6dd99a7a5012ba74f25",
+    "src/arena/catalogo.ts": "173992fe3b234dc5c5cde1d3cfb78c2c5708c523b394ddf6f045ab3403174ec8",
+    "src/arena/alineacion.ts": "465b014bca2a506438a8b6be8a5d10e50adaff2d6a1931b20e973e0da5f6656b",
+    "src/arena/entrenadores.ts": "d147f70ad44610f2d3ed42e97ba8595dc2ff0aa6be1fdb4c4ef36618bed9c7d1",
+    "src/arena/controladores.ts": "8f6fb330eaa2a695ceb647c86d692463dac6ff9574d89a6dc121c87604aea225",
+    "src/arena/motor.ts": "557c77be9992873e4cb94ffeec1041ffdf9ef3363dbed60c2b35946e7b5d08f9",
+    "src/arena/personalidades.ts": "2b426be11f4d606165ff45cae3ff0bd638cf9b89cad5a74c1a2ea0c7450b4a69"
+  }
+}

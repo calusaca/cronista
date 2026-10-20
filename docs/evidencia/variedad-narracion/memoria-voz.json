@@ -1,0 +1,125 @@
+{
+  "escuchado": [
+    {
+      "tick": 400,
+      "texto": "Current match entry."
+    },
+    {
+      "tick": 424,
+      "texto": "There is more to follow than the ball carrier: the movement around them matters too."
+    },
+    {
+      "tick": 450,
+      "texto": "One confirmed passing sequence."
+    },
+    {
+      "tick": 473,
+      "texto": "Going backwards can sometimes offer a different route forwards."
+    },
+    {
+      "tick": 524,
+      "texto": "Current match entry."
+    },
+    {
+      "tick": 548,
+      "texto": "A good first touch can make the next part of a move much easier."
+    }
+  ],
+  "peticiones": [
+    {
+      "desdeTick": 400,
+      "hastaTick": 450,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": [],
+      "entradaTick": 400
+    },
+    {
+      "desdeTick": 400,
+      "hastaTick": 450,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": []
+    },
+    {
+      "desdeTick": 450,
+      "hastaTick": 500,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": []
+    },
+    {
+      "desdeTick": 500,
+      "hastaTick": 550,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": []
+    },
+    {
+      "desdeTick": 550,
+      "hastaTick": 600,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": [
+        {
+          "tick": 401,
+          "texto": "Current match entry.",
+          "clave": "entrada",
+          "tema": "entrada",
+          "estado": "iniciada"
+        }
+      ]
+    },
+    {
+      "desdeTick": 550,
+      "hastaTick": 600,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": [
+        {
+          "tick": 401,
+          "texto": "Current match entry.",
+          "clave": "entrada",
+          "tema": "entrada",
+          "estado": "iniciada"
+        }
+      ],
+      "cierre": true
+    },
+    {
+      "desdeTick": 500,
+      "hastaTick": 550,
+      "modo": "buffer",
+      "idioma": "en",
+      "memoria": [
+        {
+          "tick": 401,
+          "texto": "Current match entry.",
+          "clave": "entrada",
+          "tema": "entrada",
+          "estado": "completa"
+        },
+        {
+          "tick": 424,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "interrumpida"
+        },
+        {
+          "tick": 450,
+          "texto": "One confirmed passing sequence.",
+          "clave": "secuencia:compartida",
+          "tema": "secuencia",
+          "estado": "completa"
+        },
+        {
+          "tick": 473,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "completa"
+        }
+      ],
+      "entradaTick": 524
+    }
+  ]
+}

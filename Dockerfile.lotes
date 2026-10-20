@@ -1,0 +1,16 @@
+FROM node:24-bookworm-slim AS build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --include=dev --ignore-scripts
+COPY src ./src
+RUN ./node_modules/.bin/esbuild src/arena/lote-cli.ts --bundle --platform=node --format=esm --packages=external --outfile=dist/lote.mjs
+
+FROM node:24-bookworm-slim AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+COPY --from=build /app/dist/lote.mjs ./lote.mjs
+RUN mkdir -p .cache && chown node:node .cache
+USER node
+CMD ["node", "lote.mjs"]

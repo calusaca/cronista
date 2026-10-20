@@ -1,0 +1,458 @@
+{
+  "checkedUtc": "2026-10-19T03:20:42.385Z",
+  "phase": "resilience_run_with_fallbacks",
+  "id": "3368b47b-549c-46a8-bf93-110d1856c623",
+  "asignacion": {
+    "modo": "manual",
+    "local": {
+      "id": "principal",
+      "nombre": "GPT-6.1 Sol",
+      "controlador": "azure-openai:gpt-6.1-sol:reasoning-low"
+    },
+    "visita": {
+      "id": "rapido",
+      "nombre": "GPT-5.4 mini",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low"
+    }
+  },
+  "distinctModels": true,
+  "pureModelControl": false,
+  "models": {
+    "principal": "gpt-6.1-sol:2026-09-29",
+    "rapido": "gpt-5.4-mini:2026-03-17"
+  },
+  "firstAdvanceMs": 32507,
+  "elapsedMs": 125046,
+  "seconds": 60,
+  "score": {
+    "local": 1,
+    "visita": 0
+  },
+  "events": 23,
+  "decisions": [
+    {
+      "controller": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "source": "respaldo",
+      "reason": "error_controlador",
+      "timeMs": 31981.126149
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 3834.225273
+    },
+    {
+      "controller": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "source": "respaldo",
+      "reason": "error_controlador",
+      "timeMs": 32563.689528999996
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "respaldo",
+      "reason": "orden_invalida",
+      "timeMs": 4504.506930999996
+    }
+  ],
+  "comments": [
+    {
+      "tick": 5,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a1",
+      "hechos": [
+        {
+          "id": "arena:a1",
+          "tipo": "accion_arena",
+          "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+          "texto_en": "Benja Bareardi (16) attempts a 18 m pass towards Dante Doraena.",
+          "eventos": [
+            "a1"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Benja Bareardi",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 16,
+            "distancia": 18,
+            "receptor": "Dante Doraena"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+          "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+          "hecho": "arena:a1",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+              "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+              "hecho": "arena:a1",
+              "apoyo": [
+                "a1"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V2",
+              "detalle": "cita de apoyo a1, que no existe"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16) intenta un pase de 18 m hacia Dante Doraena.",
+              "texto_en": "Benja Bareardi (16) attempts an 18 m pass towards Dante Doraena.",
+              "hecho": "arena:a1",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a10",
+      "hechos": [
+        {
+          "id": "arena:a4",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) recibe el balón.",
+          "texto_en": "Rafael Ulveich (11) receives the ball.",
+          "eventos": [
+            "a4"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 25,
+            "receptor": "Dante Doraena"
+          }
+        },
+        {
+          "id": "arena:a5",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Ulveich (11) remata hacia la portería rival.",
+          "texto_en": "Rafael Ulveich (11) shoots towards the opposing goal.",
+          "eventos": [
+            "a5"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 24
+          }
+        },
+        {
+          "id": "arena:a6",
+          "tipo": "gol_anotado",
+          "texto_es": "Gol de Rafael Ulveich (11).",
+          "texto_en": "Goal by Rafael Ulveich (11).",
+          "eventos": [
+            "a6"
+          ],
+          "relevancia": 100,
+          "datos": {
+            "jugador": "Rafael Ulveich",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 11,
+            "distancia": 24
+          }
+        },
+        {
+          "id": "arena:a8",
+          "tipo": "accion_arena",
+          "texto_es": "Emilio Torelueta (1) intenta un pase de 33 m hacia Fabio Valinera.",
+          "texto_en": "Emilio Torelueta (1) attempts a 33 m pass towards Fabio Valinera.",
+          "eventos": [
+            "a8"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Emilio Torelueta",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 1,
+            "distancia": 33,
+            "receptor": "Fabio Valinera"
+          }
+        },
+        {
+          "id": "arena:a9",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) intercepta la trayectoria del balón.",
+          "texto_en": "Darío Celeloya (7) intercepts the ball's path.",
+          "eventos": [
+            "a9"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 21,
+            "receptor": "Emilio Torelueta"
+          }
+        },
+        {
+          "id": "arena:a10",
+          "tipo": "accion_arena",
+          "texto_es": "Darío Celeloya (7) intenta un pase de 24 m hacia Rafael Ulveich.",
+          "texto_en": "Darío Celeloya (7) attempts a 24 m pass towards Rafael Ulveich.",
+          "eventos": [
+            "a10"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Darío Celeloya",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 7,
+            "distancia": 24,
+            "receptor": "Rafael Ulveich"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Darío Celeloya (7) intenta un pase de 24 m hacia Rafael Ulveich.",
+          "texto_en": "Darío Celeloya (7) attempts a 24 m pass towards Rafael Ulveich.",
+          "hecho": "arena:a10",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Rafael Ulveich (11) marca un gol para Juventud Islaverde Sur.",
+          "texto_en": "Rafael Ulveich (11) scores a goal for Juventud Islaverde Sur.",
+          "hecho": "arena:a6",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Darío Celeloya (7) intenta un pase de 24 m hacia Rafael Ulveich.",
+              "texto_en": "Darío Celeloya (7) attempts a 24 m pass towards Rafael Ulveich.",
+              "hecho": "arena:a10",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Rafael Ulveich (11) marca un gol para Juventud Islaverde Sur.",
+              "texto_en": "Rafael Ulveich (11) scores a goal for Juventud Islaverde Sur.",
+              "hecho": "arena:a6",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 305,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a21",
+      "hechos": [
+        {
+          "id": "arena:a14",
+          "tipo": "accion_arena",
+          "texto_es": "Fabio Valinera (6) recibe el balón.",
+          "texto_en": "Fabio Valinera (6) receives the ball.",
+          "eventos": [
+            "a14"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Fabio Valinera",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 6,
+            "distancia": 33,
+            "receptor": "Emilio Torelueta"
+          }
+        },
+        {
+          "id": "arena:a15",
+          "tipo": "accion_arena",
+          "texto_es": "Fabio Valinera (6) intenta un pase de 9 m hacia Lucio Castinido.",
+          "texto_en": "Fabio Valinera (6) attempts a 9 m pass towards Lucio Castinido.",
+          "eventos": [
+            "a15"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Fabio Valinera",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 6,
+            "distancia": 9,
+            "receptor": "Lucio Castinido"
+          }
+        },
+        {
+          "id": "arena:a16",
+          "tipo": "accion_arena",
+          "texto_es": "Lucio Castinido (10) recibe el balón.",
+          "texto_en": "Lucio Castinido (10) receives the ball.",
+          "eventos": [
+            "a16"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Lucio Castinido",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 10,
+            "distancia": 10,
+            "receptor": "Fabio Valinera"
+          }
+        },
+        {
+          "id": "arena:a17",
+          "tipo": "accion_arena",
+          "texto_es": "Lucio Castinido (10) intenta un pase de 30 m hacia Emilio Quinelón.",
+          "texto_en": "Lucio Castinido (10) attempts a 30 m pass towards Emilio Quinelón.",
+          "eventos": [
+            "a17"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Lucio Castinido",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 10,
+            "distancia": 30,
+            "receptor": "Emilio Quinelón"
+          }
+        },
+        {
+          "id": "arena:a20",
+          "tipo": "accion_arena",
+          "texto_es": "Aarón Celoón (1) intenta un pase de 31 m hacia Joel Mendiuz.",
+          "texto_en": "Aarón Celoón (1) attempts a 31 m pass towards Joel Mendiuz.",
+          "eventos": [
+            "a20"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Aarón Celoón",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 1,
+            "distancia": 31,
+            "receptor": "Joel Mendiuz"
+          }
+        },
+        {
+          "id": "arena:a21",
+          "tipo": "accion_arena",
+          "texto_es": "Joel Mendiuz (3) recibe el balón.",
+          "texto_en": "Joel Mendiuz (3) receives the ball.",
+          "eventos": [
+            "a21"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 31,
+            "receptor": "Aarón Celoón"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Joel Mendiuz (3) recibe el balón para Juventud Islaverde Sur.",
+          "texto_en": "Joel Mendiuz (3) receives the ball for Juventud Islaverde Sur.",
+          "hecho": "arena:a21",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Antes, Aarón Celoón (1) había intentado un pase de 31 m hacia Joel Mendiuz.",
+          "texto_en": "Before that, Aarón Celoón (1) had attempted a 31 m pass towards Joel Mendiuz.",
+          "hecho": "arena:a20",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Joel Mendiuz (3) recibe el balón para Juventud Islaverde Sur.",
+              "texto_en": "Joel Mendiuz (3) receives the ball for Juventud Islaverde Sur.",
+              "hecho": "arena:a21",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Antes, Aarón Celoón (1) había intentado un pase de 31 m hacia Joel Mendiuz.",
+              "texto_en": "Before that, Aarón Celoón (1) had attempted a 31 m pass towards Joel Mendiuz.",
+              "hecho": "arena:a20",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  ],
+  "usage": [
+    {
+      "model": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 0,
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 2,
+        "entrada": 16258,
+        "salida": 1307,
+        "cache": 6912
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 4,
+        "respuestasConUso": 4,
+        "entrada": 2387,
+        "salida": 775,
+        "cache": 0
+      }
+    }
+  ],
+  "replay": true,
+  "recording": {
+    "path": ".cache/arena-duelo-estricto-v3.json",
+    "bytes": 1881362,
+    "sha256": "6281cd20356fccb6c58204707267f390400b8ee2d4e1f40bf92696a23a4911ab"
+  },
+  "limits": [
+    "Provider quota errors and invalid orders caused programmed intervention. This is not a pure model duel.",
+    "Single synthetic match; no superiority or professional realism claim.",
+    "Coaches wait at common decision boundaries; generation is incremental, not uninterrupted 1x play.",
+    "Narration checks maintained V1–V8 rules, not independent semantic certification."
+  ],
+  "fallbackCount": 3
+}

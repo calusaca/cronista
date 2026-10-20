@@ -1,0 +1,495 @@
+{
+  "checkedUtc": "2026-10-19T23:56:37.489Z",
+  "phase": "passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "sesion": "fc6438f3-2b26-417c-a228-010c920c71af",
+  "seed": 6,
+  "intervaloDecisionesS": 30,
+  "balonInicial": {
+    "x": 52.5,
+    "y": 34
+  },
+  "reactivacionTickMinimo": 170,
+  "contextoReutilizado": true,
+  "voz": {
+    "fuentes": [
+      {
+        "inicio": 11853.599999997765,
+        "fin": 16965.599999997765,
+        "duracion": 5.112,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            12053.599999997765,
+            14093.599999997765
+          ],
+          [
+            14273.599999997765,
+            16013.599999997765
+          ]
+        ]
+      },
+      {
+        "inicio": 18969.599999997765,
+        "fin": 21538.39999999851,
+        "duracion": 4.44,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            19169.599999997765,
+            22449.599999997765
+          ]
+        ]
+      },
+      {
+        "inicio": 26132,
+        "fin": 30812,
+        "duracion": 4.68,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            26312,
+            27992
+          ],
+          [
+            28052,
+            28772
+          ],
+          [
+            28872,
+            29812
+          ]
+        ]
+      },
+      {
+        "inicio": 31431.800000000745,
+        "fin": 34503.800000000745,
+        "duracion": 3.072,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            31611.800000000745,
+            33531.800000000745
+          ]
+        ]
+      }
+    ],
+    "reinicios": [
+      {
+        "texto": "Kick-off · Sporting Montefrío Bajo",
+        "reloj": "0:00 / 1:00"
+      },
+      {
+        "texto": "Kick-off · Club Nebrisa",
+        "reloj": "0:00 / 1:00"
+      },
+      {
+        "texto": "Kick-off · Deportivo Brezal",
+        "reloj": "0:27 / 1:00"
+      }
+    ],
+    "transcripciones": [
+      {
+        "tick": 35,
+        "instante": 11855.800000000745,
+        "tipo": "comentario",
+        "texto": "Narration transcript and evidenceThere is more to follow than the ball carrier: the movement around them matters too.",
+        "reloj": "0:03 / 1:00"
+      },
+      {
+        "tick": 106,
+        "instante": 18972.300000000745,
+        "tipo": "comentario",
+        "texto": "Narration transcript and evidenceGoing backwards can sometimes offer a different route forwards.",
+        "reloj": "0:10 / 1:00"
+      },
+      {
+        "tick": 172,
+        "instante": 26104.5,
+        "tipo": "entrada",
+        "texto": "Narration transcript and evidenceWith Tomás Orioya on the ball, in midfield, near the touchline.",
+        "reloj": "0:17 / 1:00"
+      },
+      {
+        "tick": 231,
+        "instante": 31403.39999999851,
+        "tipo": "jugada",
+        "texto": "Narration transcript and evidenceVicente Quinooya was caught offside.a13",
+        "reloj": "0:23 / 1:00"
+      }
+    ],
+    "contextos": 1,
+    "ventanasAudibles": [
+      [
+        9778.5,
+        21504.89999999851
+      ],
+      [
+        25543.199999999255,
+        36449
+      ]
+    ],
+    "maxSilencioMs": 3156,
+    "duracionObservadaMs": 26670.5,
+    "medicion": "PCM absoluto > 0.001 en bloques de 20 ms; incluye pausas internas y truncamientos"
+  },
+  "solicitudes": [
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false,
+      "entradaTick": 15,
+      "memoria": [],
+      "estado": 200,
+      "tipoRelato": "entrada",
+      "tick": 15,
+      "texto": "Thiago Fenelera controls it in midfield.",
+      "temaVoz": "posesion",
+      "claveVoz": "estado:local-5:centro:interior",
+      "caracteres": 40
+    },
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false,
+      "memoria": [],
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 0,
+      "texto": "Kick-off for Club Nebrisa; Thiago Fenelera (6) takes it.",
+      "temaVoz": "reinicio",
+      "claveVoz": "evento:a1",
+      "caracteres": 56
+    },
+    {
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "comentario",
+      "tick": 100,
+      "texto": "Thiago Fenelera found Vicente Quinooya with that pass.",
+      "temaVoz": "secuencia",
+      "claveVoz": "secuencia:a3",
+      "caracteres": 54
+    },
+    {
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 429,
+      "caracteres": 0
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 429,
+      "caracteres": 0
+    },
+    {
+      "desdeTick": 200,
+      "hastaTick": 250,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 231,
+      "texto": "Vicente Quinooya was caught offside.",
+      "temaVoz": "fuera_juego",
+      "claveVoz": "evento:a13",
+      "caracteres": 36
+    },
+    {
+      "desdeTick": 250,
+      "hastaTick": 300,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 429,
+      "caracteres": 0
+    },
+    {
+      "desdeTick": 300,
+      "hastaTick": 350,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "interrumpida"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "comentario",
+      "tick": 350,
+      "texto": "Joel Dorarera received the delivery from Nico Zareón.",
+      "temaVoz": "secuencia",
+      "claveVoz": "secuencia:a21",
+      "caracteres": 53
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false,
+      "entradaTick": 172,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "interrumpida"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "entrada",
+      "tick": 172,
+      "texto": "With Tomás Orioya on the ball, in midfield, near the touchline.",
+      "temaVoz": "posesion",
+      "claveVoz": "estado:local-1:centro:banda",
+      "caracteres": 63
+    },
+    {
+      "desdeTick": 350,
+      "hastaTick": 400,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "interrumpida"
+        },
+        {
+          "tick": 178,
+          "texto": "With Tomás Orioya on the ball, in midfield, near the touchline.",
+          "clave": "estado:local-1:centro:banda",
+          "tema": "posesion",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 394,
+      "texto": "Nico Zareón shoots!",
+      "temaVoz": "tiro",
+      "claveVoz": "evento:a26",
+      "caracteres": 19
+    },
+    {
+      "desdeTick": 400,
+      "hastaTick": 450,
+      "cierre": false,
+      "memoria": [
+        {
+          "tick": 35,
+          "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+          "tema": "reserva",
+          "estado": "completa"
+        },
+        {
+          "tick": 106,
+          "texto": "Going backwards can sometimes offer a different route forwards.",
+          "tema": "reserva",
+          "estado": "interrumpida"
+        },
+        {
+          "tick": 178,
+          "texto": "With Tomás Orioya on the ball, in midfield, near the touchline.",
+          "clave": "estado:local-1:centro:banda",
+          "tema": "posesion",
+          "estado": "completa"
+        },
+        {
+          "tick": 231,
+          "texto": "Vicente Quinooya was caught offside.",
+          "clave": "evento:a13",
+          "tema": "fuera_juego",
+          "estado": "iniciada"
+        }
+      ],
+      "estado": 200,
+      "tipoRelato": "jugada",
+      "tick": 403,
+      "texto": "It's a goal by Nico Zareón!",
+      "temaVoz": "gol",
+      "claveVoz": "evento:a27",
+      "caracteres": 27
+    }
+  ],
+  "reiniciosServidor": [
+    {
+      "seed": 3,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 3,
+      "tick": 261,
+      "tipo": "centro",
+      "lado": "visita"
+    },
+    {
+      "seed": 3,
+      "tick": 400,
+      "tipo": "centro",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 4,
+      "tick": 114,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 408,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 4,
+      "tick": 472,
+      "tipo": "esquina",
+      "lado": "visita"
+    },
+    {
+      "seed": 5,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 5,
+      "tick": 147,
+      "tipo": "meta",
+      "lado": "visita"
+    },
+    {
+      "seed": 5,
+      "tick": 276,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 5,
+      "tick": 442,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 0,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 326,
+      "tipo": "banda",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 411,
+      "tipo": "centro",
+      "lado": "visita"
+    }
+  ],
+  "modelosLlm": 0,
+  "speechReal": true,
+  "javascriptErrors": [],
+  "mobileWidth": 360,
+  "horizontalOverflow": false
+}

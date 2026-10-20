@@ -1,15 +1,17 @@
-// El laboratorio HTTP usa únicamente políticas programadas o reproduce un archivo.
-// Las llamadas de inferencia se habilitan explícitamente en la CLI, nunca aquí.
+// Esta ruta conserva políticas programadas y reproducción. La ejecución incremental
+// con inferencia explícita y acotada vive en /api/arena/sesiones.
 import { z } from "zod";
 import { crearControladorProgramado } from "../../../arena/controladores";
 import { ejecutarArena, reproducirArena } from "../../../arena/coordinador";
 import { crearConfigArena } from "../../../arena/motor";
 import { formaciones } from "../../../arena/tipos";
-import { ARENA } from "../../../sim/limites";
+import { ARENA, CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES } from "../../../sim/limites";
 
 export const dynamic = "force-dynamic";
 const peticion = z.discriminatedUnion("accion", [
-  z.strictObject({ accion: z.literal("simular"), seed: z.number().int().min(0).max(4294967295), segundos: z.number().int().min(1).max(ARENA.duracionMaxS), local: z.enum(formaciones), visita: z.enum(formaciones) }),
+  z.strictObject({ accion: z.literal("simular"), seed: z.number().int().min(0).max(4294967295), segundos: z.number().int().min(1).max(ARENA.duracionMaxS), local: z.enum([...formaciones, "auto"]), visita: z.enum([...formaciones, "auto"]),
+    entorno: z.strictObject({ clima: z.enum(CLIMAS_PARTIDO).optional(), temperaturaC: z.number().int().min(-8).max(41).optional(), superficie: z.enum(SUPERFICIES).optional(), cesped: z.enum(CESPEDES).optional(), presion: z.strictObject({ local: z.enum(NIVELES_PRESION), visita: z.enum(NIVELES_PRESION) }).optional() }).optional(),
+  }),
   z.strictObject({ accion: z.literal("reproducir"), registro: z.unknown() }),
 ]);
 async function leerAcotado(req: Request): Promise<unknown> {
@@ -31,11 +33,11 @@ export async function POST(req: Request): Promise<Response> {
   try {
     const p = peticion.parse(await leerAcotado(req));
     const registro = p.accion === "reproducir" ? reproducirArena(p.registro) : await ejecutarArena(
-      crearConfigArena({ seed: p.seed, duracionS: p.segundos, local: p.local, visita: p.visita }),
+      crearConfigArena({ seed: p.seed, duracionS: p.segundos, ...(p.local !== "auto" ? { local: p.local } : {}), ...(p.visita !== "auto" ? { visita: p.visita } : {}), entorno: p.entorno }),
       { local: crearControladorProgramado(), visita: crearControladorProgramado() }, { signal: req.signal },
     );
     return Response.json(registro, { headers: { "cache-control": "no-store" } });
   } catch {
-    return Response.json({ error: "Invalid experiment or recording. Check the settings or use an unmodified arena-v1 file." }, { status: 400 });
+    return Response.json({ error: "Invalid experiment or recording. Check the settings or use an unmodified arena-v1, arena-v2 or arena-v3 file." }, { status: 400 });
   }
 }

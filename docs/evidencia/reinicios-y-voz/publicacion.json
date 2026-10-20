@@ -1,0 +1,1486 @@
+{
+  "checkedUtc": "2026-10-19T22:27:28.658Z",
+  "phase": "deployed_and_smoke_passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019222039",
+  "sourceFiles": [
+    {
+      "path": "Dockerfile",
+      "bytes": 959,
+      "sha256": "54960a6a2447996ebf15dd492cab0e5755013e2d8525e614932d46e0739bd904"
+    },
+    {
+      "path": ".dockerignore",
+      "bytes": 288,
+      "sha256": "c52bdbb64051fe7f721927fc2065a830bff6da345430ac58827d8dd018afcae8"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2066,
+      "sha256": "bd4c17117231f6ef55004036c72b2ac32398d4d67c416d41ecd2667a04a9926a"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 213145,
+      "sha256": "d99e58da411f336fa20dbb15e836bf813b94697496a5e1b69d27421805677218"
+    },
+    {
+      "path": "tsconfig.json",
+      "bytes": 915,
+      "sha256": "fb4317dd300ce278b3415f701e7d3d191e82b1d1663e0fff5c3b0812d81537c7"
+    },
+    {
+      "path": "next.config.ts",
+      "bytes": 991,
+      "sha256": "5fa8e837c4092ccbc8010cde3ff8f4b0a3428f38f483e2dea0edc9f577b02ef3"
+    },
+    {
+      "path": "src/analista/__fixtures__/constructor.ts",
+      "bytes": 4329,
+      "sha256": "abd0202ea35a689600913c8b9248a7a73b13d1dbb22c8440e03ed35d8ebd2846"
+    },
+    {
+      "path": "src/analista/__fixtures__/partidos.ts",
+      "bytes": 15213,
+      "sha256": "0e1882f4a96fed29302715c01aa1ccff417f0d606ed5c3059a7c00cc585710de"
+    },
+    {
+      "path": "src/analista/__tests__/analista.test.ts",
+      "bytes": 25140,
+      "sha256": "ed12d8b3709f3e969ac64921375135f137ff34b90ffe894db722ac59d4c5fe8f"
+    },
+    {
+      "path": "src/analista/__tests__/condiciones.stats.test.ts",
+      "bytes": 5674,
+      "sha256": "a143b206e6feac8e4c36f2cf5ce66ead43c1a8622ab77e7757da27a98802b66e"
+    },
+    {
+      "path": "src/analista/__tests__/condiciones.test.ts",
+      "bytes": 13023,
+      "sha256": "8164a2173ac2203670a4c52f49cadab16258a1e671b4d3fe4ceb8e186676c68e"
+    },
+    {
+      "path": "src/analista/__tests__/oraculo.test.ts",
+      "bytes": 38970,
+      "sha256": "88feb2a27b356efb75e1fe2eaefd33655ebd30b9a2e7b49461bb3dc6aeabb319"
+    },
+    {
+      "path": "src/analista/__tests__/valoracion.test.ts",
+      "bytes": 11011,
+      "sha256": "ec7e17ee69fb9ea9345b76be40a1506853abfbd3155a42246b0bddf760df0683"
+    },
+    {
+      "path": "src/analista/analista.ts",
+      "bytes": 36624,
+      "sha256": "142861aa0eac48e6f8d2bfc5177a082f940a3911474463e9568f2a99e973ab54"
+    },
+    {
+      "path": "src/analista/cli.ts",
+      "bytes": 3585,
+      "sha256": "6c1d5287a5fdfea3fe15a2d40b1d6f6171861ba21e3207a376e749f25740acd4"
+    },
+    {
+      "path": "src/analista/condiciones.ts",
+      "bytes": 5850,
+      "sha256": "fb8938df56cf8e262bc7f81982284e5e240881721e60d0b39f94d42c539ea13d"
+    },
+    {
+      "path": "src/analista/grada.ts",
+      "bytes": 2367,
+      "sha256": "9356957670aa87d512392ead30f4946af1f67f7d52d56680a327d2fe52658859"
+    },
+    {
+      "path": "src/analista/index.ts",
+      "bytes": 327,
+      "sha256": "f50c099c7208092ff1db7e524a3c68316b5fcb54093d3343049793a093dc409d"
+    },
+    {
+      "path": "src/analista/textos.ts",
+      "bytes": 16685,
+      "sha256": "921a37be76e4277e2906cff8720f4e6f147ef25e5beadf32021baaf64219be7c"
+    },
+    {
+      "path": "src/analista/tipos.ts",
+      "bytes": 3573,
+      "sha256": "db98653278222811ce8edcc4f8313dad365ef9fd90454de4797a0341afaf8fff"
+    },
+    {
+      "path": "src/analista/umbrales.ts",
+      "bytes": 23125,
+      "sha256": "361c17a8f0869875ef19cef6bf1621c40990bec3a16799301b77d64173679b1c"
+    },
+    {
+      "path": "src/analista/valoracion.ts",
+      "bytes": 9960,
+      "sha256": "15379a63049513039b3518239807b5c56e95e749ab812f62fc3add830f4b6b6e"
+    },
+    {
+      "path": "src/app/api/arena/grabaciones/route.ts",
+      "bytes": 1751,
+      "sha256": "fcd41397be095d1593e102acb02e7e9f2ea3cfbf5462ffe5357fb90e635950c1"
+    },
+    {
+      "path": "src/app/api/arena/herramientas/route.ts",
+      "bytes": 350,
+      "sha256": "041779bd12b27f074b54672206e37fe70e501c12df169b33f2435efbbce008ce"
+    },
+    {
+      "path": "src/app/api/arena/modelos/route.ts",
+      "bytes": 430,
+      "sha256": "dccc22c428534299fa07bcea2b1165d17deb7797c0882aaac8ab58e0acb50a60"
+    },
+    {
+      "path": "src/app/api/arena/route.ts",
+      "bytes": 2686,
+      "sha256": "f6f6f1027e7120fb6292059639522f002f8e1873963220503b09c6f54aac948d"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/analisis/route.ts",
+      "bytes": 1434,
+      "sha256": "edb2372c34c40214cb2a2e44e57a63fa38bab3ab8d6d2e70afb570838aac878e"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/emision/route.ts",
+      "bytes": 439,
+      "sha256": "94d079631774a99b31b1ec386c7c2aa5eea1d6f67fe3daa28870e38e406f4acc"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/eventos/route.ts",
+      "bytes": 867,
+      "sha256": "9bbf49dc684af09b852c1f0b61144b61308daf7bf9b77c0e02f466757c70183d"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/registro/route.ts",
+      "bytes": 426,
+      "sha256": "b8bf1784d12c3674075c70c9f05ac71889409765afb92ebd3a4c09a8184cc2a7"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/relato/route.ts",
+      "bytes": 1791,
+      "sha256": "1f98e51f7885366677e297654b0b07c57cc4fb977acdf245f1e3cf5f4861bf9f"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/reproduccion/route.ts",
+      "bytes": 477,
+      "sha256": "5727fe4b9bc497f13425dafb88b884c54ea35f2dac017a3e47d4f02e68501440"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/route.ts",
+      "bytes": 405,
+      "sha256": "4897105ea88a68ad4e25e47f3c84d5577b9f5acdd26732f36848a1af35d3f161"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/voz/route.ts",
+      "bytes": 1811,
+      "sha256": "8c1066efe8be1b32258406a67a39cbe29add81cd55c82eaf76b84207dcf03477"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/route.ts",
+      "bytes": 521,
+      "sha256": "08e184fffdf188890634503b0b1cb99cfe2a5b517f717d91b5d7d7390224b0a6"
+    },
+    {
+      "path": "src/app/api/health/route.ts",
+      "bytes": 273,
+      "sha256": "26096423be79f86464f8d265c165ca51ee11391f15ce15cdd84200d366fb50e9"
+    },
+    {
+      "path": "src/app/api/liga/[jornada]/[partido]/overlay/route.ts",
+      "bytes": 971,
+      "sha256": "b8be4e53ec0c93eb6cecefbc61676af55b292b935c62d2f158c40c539e7aed45"
+    },
+    {
+      "path": "src/app/api/overlay/[seed]/route.ts",
+      "bytes": 968,
+      "sha256": "11430d0845d584f43097c1dca112c51b7293aca1579396d66ba759a90cfff0a3"
+    },
+    {
+      "path": "src/app/arena/page.tsx",
+      "bytes": 620,
+      "sha256": "e21e74f74f65ec629a37ff3c7aba5837c2611271dc9678fd1ad1da2eaaeecfac"
+    },
+    {
+      "path": "src/app/datos/datasheet/route.ts",
+      "bytes": 288,
+      "sha256": "e10c3d63ec20c58e49929b4c48633bc4ae45978433301d68536b8c90681ede99"
+    },
+    {
+      "path": "src/app/datos/page.tsx",
+      "bytes": 6261,
+      "sha256": "fc9f4eca7e5c8ef13427ab2f3ee3d752e5960fd15f751ca4a380d7cd1deceac7"
+    },
+    {
+      "path": "src/app/error.tsx",
+      "bytes": 838,
+      "sha256": "f2cdf82c953f618164056f1d451a7e687a888badb74f838b7e73c7cfae84518f"
+    },
+    {
+      "path": "src/app/globals.css",
+      "bytes": 71674,
+      "sha256": "265c446a4f31ff25a90c7577b69931f22e4fc125f7c1c2fb8338b93284dc308e"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "bytes": 1051,
+      "sha256": "00cee6134be6d10d47ec265c12262e66a7fe3871aaca0faebb8a9289726e8e14"
+    },
+    {
+      "path": "src/app/liga/[jornada]/[partido]/page.tsx",
+      "bytes": 2542,
+      "sha256": "b12b267ae2ca79a316f5bd50af60ff56baefd0ea284e1447fd821f1e1f510c5f"
+    },
+    {
+      "path": "src/app/liga/page.tsx",
+      "bytes": 12774,
+      "sha256": "95984a62e5ae5de331ee9b9dbda2321b26e2decd269dccfb48b9d109990d7a73"
+    },
+    {
+      "path": "src/app/match/[seed]/page.tsx",
+      "bytes": 1290,
+      "sha256": "3f44e2cd227a6c777788a2deae0438091ce457c4c102edbb0d863cec8bf11cfc"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "bytes": 1134,
+      "sha256": "d05b9bbda0489ec5a15ae9e83f552d245e4792438e0a97883fa7dd08ea0caecb"
+    },
+    {
+      "path": "src/arena/__fixtures__/arena-v2.json",
+      "bytes": 125760,
+      "sha256": "f61f8056d9543b4a13a2772eb0aa99e931d3a12e7a10e1c16f78a85aac5a61d1"
+    },
+    {
+      "path": "src/arena/__tests__/arena.test.ts",
+      "bytes": 16266,
+      "sha256": "17231a04a3156dec4d12d23f3d5c90deab693a7a044a7919168bad8498b4a987"
+    },
+    {
+      "path": "src/arena/__tests__/buffer.test.ts",
+      "bytes": 9536,
+      "sha256": "5435d4f191883a48bc694d4439f681949774d2ddeda84ca343d801440092e4fa"
+    },
+    {
+      "path": "src/arena/__tests__/competencia.test.ts",
+      "bytes": 3736,
+      "sha256": "6449aaffd64821257de42ed87db7e2906e093c65aab25651521f2d08b642aee0"
+    },
+    {
+      "path": "src/arena/__tests__/directo.test.ts",
+      "bytes": 9664,
+      "sha256": "bc1ef66809dc0030211b106b5caf243b951f910d4ed8495e34d9c98942e87c0a"
+    },
+    {
+      "path": "src/arena/__tests__/formaciones-diversidad.test.ts",
+      "bytes": 3182,
+      "sha256": "d0420d4ba33f47df3740ea396ff67a7fa9f363d4bb3bcd09bb0e5e21014e8d78"
+    },
+    {
+      "path": "src/arena/__tests__/gestion-entorno.test.ts",
+      "bytes": 17636,
+      "sha256": "c77aafc7f84c0f12f839a1cd8fbfe146c1cdd17f79d24a46ecefc8678ecf9da5"
+    },
+    {
+      "path": "src/arena/__tests__/http-vista.test.ts",
+      "bytes": 2143,
+      "sha256": "1b148b661012dfe3b9e9380e95a494eff4b953514389869070ff9720dd7d1f87"
+    },
+    {
+      "path": "src/arena/__tests__/narrador.test.ts",
+      "bytes": 3280,
+      "sha256": "18ff6e86d73c590349f9ead082f8e03f59cc29f2a1e154b43fefdf51c7a72d15"
+    },
+    {
+      "path": "src/arena/__tests__/personalidades-arbitro.test.ts",
+      "bytes": 9841,
+      "sha256": "ecf09aecb39cf05265bc59c2dfa320bac067f3dc5a6c27efcc433f8f06e9b153"
+    },
+    {
+      "path": "src/arena/__tests__/reinicios.test.ts",
+      "bytes": 6713,
+      "sha256": "cf8799ce0f88c67847badb4bb2a6320b3fdaf0b46dd17f7a936171f4737902d1"
+    },
+    {
+      "path": "src/arena/__tests__/reproduccion-preparada.test.ts",
+      "bytes": 4904,
+      "sha256": "12122012093fecfaebf7cb3aba0b4b7704342443b749a3a0faeb593eab470904"
+    },
+    {
+      "path": "src/arena/__tests__/servicios-azure.test.ts",
+      "bytes": 11676,
+      "sha256": "61edf1be0e543c5510a62724a01eb6ab9f00fba42ca00810dad143eef9a227b7"
+    },
+    {
+      "path": "src/arena/__tests__/voz-expresiva.test.ts",
+      "bytes": 10098,
+      "sha256": "57beda2d157676bc6365f5ada6cce273ea176e5ef3acd24941d9d3b7c24afd3a"
+    },
+    {
+      "path": "src/arena/agente-cli.ts",
+      "bytes": 1485,
+      "sha256": "435eb0f875c4ea95f9abab10efb5dedefbdf753129e71bac1323dc58af815234"
+    },
+    {
+      "path": "src/arena/agente.ts",
+      "bytes": 11031,
+      "sha256": "7c7cc01cf90e9cab65dc9b03a7aabe8ba6c24cab16ee497d41281d484a0ed177"
+    },
+    {
+      "path": "src/arena/alineacion.ts",
+      "bytes": 2004,
+      "sha256": "465b014bca2a506438a8b6be8a5d10e50adaff2d6a1931b20e973e0da5f6656b"
+    },
+    {
+      "path": "src/arena/almacen.ts",
+      "bytes": 4436,
+      "sha256": "9989e6fa0c12363b0105d06ee495001f88be5740e594e243674caab0a79fd6a3"
+    },
+    {
+      "path": "src/arena/arbitro.ts",
+      "bytes": 2164,
+      "sha256": "1b372d876f0677b0542ee977e994a185a8a5d744350a230d4e30848de2998c84"
+    },
+    {
+      "path": "src/arena/buffer.ts",
+      "bytes": 3526,
+      "sha256": "472a8b58e00fb8ca5ba7b03df2d30061d86f3b446ec972c751797779353721f2"
+    },
+    {
+      "path": "src/arena/catalogo.ts",
+      "bytes": 5713,
+      "sha256": "173992fe3b234dc5c5cde1d3cfb78c2c5708c523b394ddf6f045ab3403174ec8"
+    },
+    {
+      "path": "src/arena/cli.ts",
+      "bytes": 4970,
+      "sha256": "a1ce3ae7af98b6c5538baeb24839468112c1870678f4cfdb8a226b31b62fbeb5"
+    },
+    {
+      "path": "src/arena/competencia.ts",
+      "bytes": 2294,
+      "sha256": "73424c2d08c55ef24f2df8c5324b29d07005cfac89aae2d4887f4850c0a62013"
+    },
+    {
+      "path": "src/arena/controladores.ts",
+      "bytes": 16482,
+      "sha256": "8f6fb330eaa2a695ceb647c86d692463dac6ff9574d89a6dc121c87604aea225"
+    },
+    {
+      "path": "src/arena/coordinador.ts",
+      "bytes": 9744,
+      "sha256": "6c8b1e1b7139cf6e01e7075c45e0799d8bde4abeda2c5f0789a0c3d692d96602"
+    },
+    {
+      "path": "src/arena/entorno.ts",
+      "bytes": 6067,
+      "sha256": "7beef3eb2fbf1360199bdddcb2af0400149ba26a11f7e2af374f0abdf2deead1"
+    },
+    {
+      "path": "src/arena/entrenadores.ts",
+      "bytes": 8882,
+      "sha256": "d147f70ad44610f2d3ed42e97ba8595dc2ff0aa6be1fdb4c4ef36618bed9c7d1"
+    },
+    {
+      "path": "src/arena/eval-cli.ts",
+      "bytes": 4278,
+      "sha256": "d9d7fad1f1b7b9579a36c1dab61f3589ff880d8e3c4df76b9248eb352262d017"
+    },
+    {
+      "path": "src/arena/evaluacion.ts",
+      "bytes": 2562,
+      "sha256": "30e109d21032ee5909183767f980e3c1423afffc8666ed7b4e899f76a7037ee7"
+    },
+    {
+      "path": "src/arena/expresion.ts",
+      "bytes": 3352,
+      "sha256": "6374f2e3d6bea1f2e2786157a7ef479e7031beee8832ca7297a9f9fb1414481f"
+    },
+    {
+      "path": "src/arena/foundry-eval.ts",
+      "bytes": 2607,
+      "sha256": "5d57e918579def55dfc28d53768bd7ef8db7bba0ca695e675ae623d8a4ca2b6f"
+    },
+    {
+      "path": "src/arena/geometria.ts",
+      "bytes": 692,
+      "sha256": "f364330d86edb65af9f7167363f7440d2c5f9ebecb2aa53d2097d0414588881f"
+    },
+    {
+      "path": "src/arena/inteligencia.ts",
+      "bytes": 3215,
+      "sha256": "1f8ca062575674707f51ef94fc5111b8592b2d26e96ad56728d776553d578369"
+    },
+    {
+      "path": "src/arena/lote-cli.ts",
+      "bytes": 1335,
+      "sha256": "1aab07742a2f5bbae54d8356cd0e70fa4f2b43014550cfdc88630419d1178380"
+    },
+    {
+      "path": "src/arena/lote.ts",
+      "bytes": 4188,
+      "sha256": "ebbebfebe3b3cf9f70411f76b74b68cbb45be500db1f170b282b2f8ad32fd362"
+    },
+    {
+      "path": "src/arena/modelos.ts",
+      "bytes": 4092,
+      "sha256": "27e98eed6e9c327ad57881fe0e61754b5d2e5843d055f6a5675df5cf8cb00c78"
+    },
+    {
+      "path": "src/arena/motor.ts",
+      "bytes": 41620,
+      "sha256": "62155f6067e35a22027769c2498c528214df810694af312cc5301847d8091f2f"
+    },
+    {
+      "path": "src/arena/narrador.ts",
+      "bytes": 5730,
+      "sha256": "79fc25686e8ce1c181336fdde830868f65b3c1b9b4b68f0ba494a46b939ae770"
+    },
+    {
+      "path": "src/arena/personalidades.ts",
+      "bytes": 4282,
+      "sha256": "2b426be11f4d606165ff45cae3ff0bd638cf9b89cad5a74c1a2ea0c7450b4a69"
+    },
+    {
+      "path": "src/arena/peticiones.ts",
+      "bytes": 1727,
+      "sha256": "f9788e0c7de4187a2b085d94ff0fe752f96eff4c79c2cf681c792b5b312a51d1"
+    },
+    {
+      "path": "src/arena/pista-audio.ts",
+      "bytes": 2137,
+      "sha256": "64e0a5c4efe7ba18aa65a5da7aed6f3b4dfd7e503b97b5a05416069b58c80e6a"
+    },
+    {
+      "path": "src/arena/protocolo.ts",
+      "bytes": 2541,
+      "sha256": "1a9c05b841df1ccbaa8edfbc0e3aa79934fc2278e73a172e7569520017717f0e"
+    },
+    {
+      "path": "src/arena/reinicios.ts",
+      "bytes": 1091,
+      "sha256": "5f1699c8fbecec8dafba58cbdf35a88a10ee1a1471e216b795aab659e2b1388f"
+    },
+    {
+      "path": "src/arena/relato.ts",
+      "bytes": 14219,
+      "sha256": "f9f06a360d23b9ddd35cf29c4e8ad41f55d37b26ce78ce16c7684aeff4e95991"
+    },
+    {
+      "path": "src/arena/sesiones.ts",
+      "bytes": 28259,
+      "sha256": "74752949b33526821c0667c281d96a92b96923da145b7ade8fa39bcd8728acba"
+    },
+    {
+      "path": "src/arena/tipos.ts",
+      "bytes": 8390,
+      "sha256": "b8de25444efe5e9288e3a199593a8c84f521cfa5621a6c6a600d7ae3cbb6c8d5"
+    },
+    {
+      "path": "src/arena/vista.ts",
+      "bytes": 6966,
+      "sha256": "294b2b089222af84f039006aa2ad4f8c5656c9e6f617fbaa914eeb5a7a6bdf16"
+    },
+    {
+      "path": "src/arena/voz-muestras-cli.ts",
+      "bytes": 5168,
+      "sha256": "5dd42843d55d5ef6abb4a153cf31693b1758ded24489afd3964a601f71de8a9f"
+    },
+    {
+      "path": "src/arena/voz-reserva.json",
+      "bytes": 288984,
+      "sha256": "fefe4c3158cff8a9e05ebc1090cde2e3ec77d3be3489f1eadc4f141e3ca97732"
+    },
+    {
+      "path": "src/arena/voz.ts",
+      "bytes": 7620,
+      "sha256": "8bca5a7f4bbb57cf267cdb30bd9b73fce81345c4fa4d8a4acfea264f6350c6b7"
+    },
+    {
+      "path": "src/cadena/__fixtures__/llms-falsos.ts",
+      "bytes": 3972,
+      "sha256": "1bf6b84e42bc09691bd1e979368861bd3bc8dbf7f0512c9319dfd1d70fa56012"
+    },
+    {
+      "path": "src/cadena/__fixtures__/mentiras-r2.ts",
+      "bytes": 11246,
+      "sha256": "17dd5ba209f2dfd7289b9f94e1092e598e09736f148e1705185ed53fa2bfcda5"
+    },
+    {
+      "path": "src/cadena/__fixtures__/mentiras.ts",
+      "bytes": 11125,
+      "sha256": "356983a028678ca66342661863d36afa353b0c2b3495a46af46c04aa1883f765"
+    },
+    {
+      "path": "src/cadena/__fixtures__/sujeto-implicito-real.json",
+      "bytes": 2772,
+      "sha256": "2d0ccb4c044806175481b848c97d6e7258fc1ad492524ce03db9042c8174f811"
+    },
+    {
+      "path": "src/cadena/__tests__/cadena.test.ts",
+      "bytes": 16248,
+      "sha256": "33498f5660df305a94ab60a54b777dbb7f138099663f79b97809968fab9a3c18"
+    },
+    {
+      "path": "src/cadena/__tests__/condiciones018.test.ts",
+      "bytes": 7826,
+      "sha256": "e41f643724cadc8bc6c4dd5f5e766f079653bbd011caf8348177d09a0b808b5b"
+    },
+    {
+      "path": "src/cadena/__tests__/consecuencias019.test.ts",
+      "bytes": 8818,
+      "sha256": "d2c2a3e5fd596b96dde262abf413161df5c7c1fe99b041b2f8a16a8532da211c"
+    },
+    {
+      "path": "src/cadena/__tests__/definiciones020.test.ts",
+      "bytes": 7302,
+      "sha256": "0ea02c04b38fa32d2d9f5bbe86708e656da32bdc13c6882b6ccf4e5f5b043919"
+    },
+    {
+      "path": "src/cadena/__tests__/figura.test.ts",
+      "bytes": 3385,
+      "sha256": "916765715d927a44d99cb9aa2cabca48e5edf5dd540c74c80cd3d352f2559280"
+    },
+    {
+      "path": "src/cadena/__tests__/grada026.test.ts",
+      "bytes": 4103,
+      "sha256": "b98dc7342074087c308a2b3fdbf02a0e577431c8936d2d0bd3cc81ea55843821"
+    },
+    {
+      "path": "src/cadena/__tests__/insolitos025.test.ts",
+      "bytes": 11487,
+      "sha256": "e4b9591c6a357087cbbfd8193ee8213529a7c23417f0275d418da365c423bd60"
+    },
+    {
+      "path": "src/cadena/__tests__/magnitudes015.test.ts",
+      "bytes": 5158,
+      "sha256": "66a93cf78e3844a6bdcaf854d572cb6454ff088d6876358140fe7c7b468653d1"
+    },
+    {
+      "path": "src/cadena/__tests__/mentiras.test.ts",
+      "bytes": 7358,
+      "sha256": "5e61cc7d5eeb4afd2e0d49b335ee8859db8e473d11be50a027361192f2cd52f1"
+    },
+    {
+      "path": "src/cadena/__tests__/micro013.test.ts",
+      "bytes": 9675,
+      "sha256": "92fe1265cf15eeef247e98f140e3e10d19b9aee83509588e89a0ad1cb0ddadf0"
+    },
+    {
+      "path": "src/cadena/__tests__/niveles024.test.ts",
+      "bytes": 1848,
+      "sha256": "0c9cb00bc2d852e0d01c8375c4745c4d67510eadf06005bce903263fcaf4240f"
+    },
+    {
+      "path": "src/cadena/__tests__/personalizacion.test.ts",
+      "bytes": 8661,
+      "sha256": "3920a78dee6b8862d9f446306fc6e2ee973e7b298a7f57d5d6310f02cc014df2"
+    },
+    {
+      "path": "src/cadena/__tests__/revision31.test.ts",
+      "bytes": 10610,
+      "sha256": "669f25338df938d06f30db8ad3d355ed5852c711f2bac6745db097b3f765819e"
+    },
+    {
+      "path": "src/cadena/__tests__/revision32.test.ts",
+      "bytes": 17130,
+      "sha256": "4de8ce8ad40b6793db8ea7fe58acee859e09435b2d29ba54c9be60184e58de84"
+    },
+    {
+      "path": "src/cadena/__tests__/sancion027.test.ts",
+      "bytes": 5181,
+      "sha256": "8ed1d6f5c2655a59cfdb664cf035c718a56743a784c24c200cd32cd8666d1bef"
+    },
+    {
+      "path": "src/cadena/__tests__/sujeto-implicito.test.ts",
+      "bytes": 5933,
+      "sha256": "81d35fb3bc83f3cceac73a44e4647e2a7bca9f79cc10ade72bc4b072303258dc"
+    },
+    {
+      "path": "src/cadena/__tests__/verificador.test.ts",
+      "bytes": 20087,
+      "sha256": "98830e965f2d65d0434ec35045e1beb491d02c34214b266e531970e30c9fa961"
+    },
+    {
+      "path": "src/cadena/acta.ts",
+      "bytes": 965,
+      "sha256": "502e14b7bea2b6c50b55ef1f7737bfb77735581839d0e29f4cf1af68ccadc062"
+    },
+    {
+      "path": "src/cadena/cache.ts",
+      "bytes": 8294,
+      "sha256": "e21f63f6ccfcb94bb25c059b681574776861129692fe0c49b992ea0fabc905f7"
+    },
+    {
+      "path": "src/cadena/cadena.ts",
+      "bytes": 9513,
+      "sha256": "e5541b489f59fd9f6f16ccdce4dd58bd8a6765ac07d75a1f430edd553592313e"
+    },
+    {
+      "path": "src/cadena/cli-args.ts",
+      "bytes": 3029,
+      "sha256": "09ee74b2d473675b89445cc59e3fbf47a75113437a50588e9ec37058553ec27d"
+    },
+    {
+      "path": "src/cadena/cli.ts",
+      "bytes": 3387,
+      "sha256": "6273c2df4ffd778a4c21fa7bee25636e3089118e4ed0737f475f2eae42205614"
+    },
+    {
+      "path": "src/cadena/lexico.ts",
+      "bytes": 52529,
+      "sha256": "df5ac92a7ff453e5f3a8d642b92bd1c5011df5b32ab5e86e9d2c5c09808d5b51"
+    },
+    {
+      "path": "src/cadena/personalizacion.ts",
+      "bytes": 2870,
+      "sha256": "430b35165bcde259829c82b3aef8bdba4ecab0533f9be40542b4e3dea764297f"
+    },
+    {
+      "path": "src/cadena/prompt.ts",
+      "bytes": 5523,
+      "sha256": "7f328b99d0a607636be3f634db80ce8b096521d9d55a2e5720ab9f4025dd58be"
+    },
+    {
+      "path": "src/cadena/tipos.ts",
+      "bytes": 2313,
+      "sha256": "5e7dbddb9d2b7a2b6ab72a7b75bec0942ff9aa1a95438a553cceed4318ee08ae"
+    },
+    {
+      "path": "src/cadena/umbrales.ts",
+      "bytes": 2734,
+      "sha256": "5c042955ad68a2440ae7dd348ea04015608e6a333f579915ebbbcabc06ca4b05"
+    },
+    {
+      "path": "src/cadena/verificador.ts",
+      "bytes": 41919,
+      "sha256": "c92e1243f5b38739ddcc2dbe573ff9bf602e296cc097b7373f78bc1e1d3e32af"
+    },
+    {
+      "path": "src/dataset/__tests__/dataset.stats.test.ts",
+      "bytes": 4827,
+      "sha256": "6b4dd8efa47808953856786a0fb5ecdb909e7ea0b0f3f7988f4a05c80547b19f"
+    },
+    {
+      "path": "src/dataset/__tests__/dataset.test.ts",
+      "bytes": 14530,
+      "sha256": "3e3354b30c74393d2b6af6a74953e497e2557327f35f0d96a4955c864c1f6649"
+    },
+    {
+      "path": "src/dataset/cli-args.ts",
+      "bytes": 3044,
+      "sha256": "69a657a7a218f8f2d01808dde6cedd91c11a36dfea9c4e88645719203506d11a"
+    },
+    {
+      "path": "src/dataset/cli.ts",
+      "bytes": 1697,
+      "sha256": "99c78d5d46d6782a149fee2e87bfac5042c3eda1273f56fcb251c2bc8d4b0b6e"
+    },
+    {
+      "path": "src/dataset/datasheet.ts",
+      "bytes": 20912,
+      "sha256": "1109c5070fcb7761d9b126de6202b8358e2fb562f85f50da5f49ca556ea0eecc"
+    },
+    {
+      "path": "src/dataset/esquema.ts",
+      "bytes": 13372,
+      "sha256": "57a01016dd6af6c4a4d9bcc055e43fb9f0cea75e7d2ae17477205015339d8bee"
+    },
+    {
+      "path": "src/dataset/experimentos.ts",
+      "bytes": 12503,
+      "sha256": "2ea794ac8e527369b6181ab49095e189b4c511f7f049a04137fc212f02eab5a5"
+    },
+    {
+      "path": "src/dataset/exportar.ts",
+      "bytes": 6254,
+      "sha256": "7f3278964a9041e09aa142e8cfed4d9a0f739ab6f7d88b578654504aec231d77"
+    },
+    {
+      "path": "src/dataset/fuente.ts",
+      "bytes": 2534,
+      "sha256": "c33a40101910f8d2148323599e8bdfcfcc47dad1eae02c3c47a68ef7f51168d5"
+    },
+    {
+      "path": "src/dataset/generar.ts",
+      "bytes": 5591,
+      "sha256": "726ee5a55f07ff2d5991026b436b5ac92fb5fef15c1601f9cbc4e370fce27169"
+    },
+    {
+      "path": "src/dataset/gzip.ts",
+      "bytes": 1866,
+      "sha256": "26ca79b0b9ca8d0641023d01557f7d94c8d87a4747e9310532a4964117d6d3d9"
+    },
+    {
+      "path": "src/dataset/medir.ts",
+      "bytes": 16638,
+      "sha256": "0291c43838e766a48496a9355c98c3159f0a4688f2fffa8be04622b5a27e8418"
+    },
+    {
+      "path": "src/dataset/texto.ts",
+      "bytes": 2448,
+      "sha256": "c155847da12a38521b264aac0c4fe3f27786813814c10d7146250aa7e4217092"
+    },
+    {
+      "path": "src/dataset/umbrales-dataset.ts",
+      "bytes": 2388,
+      "sha256": "2d177261c0e7c260dc69d24ed6e2b7275a297c73f107d80cd7c2e74a7f1e9c8e"
+    },
+    {
+      "path": "src/eval/__tests__/eval.test.ts",
+      "bytes": 5260,
+      "sha256": "b263ddb57374fa1242afb0a1e48b6cad99358a1b847f08dca92f492bbb8d4897"
+    },
+    {
+      "path": "src/eval/cli.ts",
+      "bytes": 1351,
+      "sha256": "3d627e3d997122ac218facd8413ac87ac731deb386c80327d898357f2ed28bec"
+    },
+    {
+      "path": "src/eval/eval.ts",
+      "bytes": 7337,
+      "sha256": "e27abece00fa7a16e0b49b86e07b9d60be00e133023c5d411804cb32fb27226d"
+    },
+    {
+      "path": "src/eval/umbrales-eval.ts",
+      "bytes": 1188,
+      "sha256": "22d47fd7c62a50072bd4ed5495ba404b3a524371cb40a9219b268e4e7b3837d1"
+    },
+    {
+      "path": "src/instrumentation.ts",
+      "bytes": 187,
+      "sha256": "f8fe3c7659d59cdf076b158a3cea67756d8d90b7af4a8a1af398ed0df0272728"
+    },
+    {
+      "path": "src/lib/__tests__/llm-azure-openai.test.ts",
+      "bytes": 10865,
+      "sha256": "1bbabee14c579d0a9b80c8cf69fcd6cdc7e35614b5dcb7fe535f95eb62413ce4"
+    },
+    {
+      "path": "src/lib/__tests__/llm.test.ts",
+      "bytes": 5976,
+      "sha256": "6e5fb2e48a15eaf8716edd252ac282c38686573679ac3c5b72481fb8640d7a78"
+    },
+    {
+      "path": "src/lib/azure.ts",
+      "bytes": 768,
+      "sha256": "af5f9921e23533ad28dc154df312cf5bbd42cb6fa32d5722ecc392227ceeb5ba"
+    },
+    {
+      "path": "src/lib/cancelacion.ts",
+      "bytes": 553,
+      "sha256": "4326d5808316b1ac83da7d46f1a18591c25af08e962b6f8f75c275fbf8878931"
+    },
+    {
+      "path": "src/lib/llm-azure-openai.ts",
+      "bytes": 6281,
+      "sha256": "59705cabcc2705b794e486a87af57a5fcce010445b7a58fafc87118516fc9336"
+    },
+    {
+      "path": "src/lib/llm-ensayo.ts",
+      "bytes": 2018,
+      "sha256": "229c3d03d5085bd3bfd15c30b1e421d7476c28da51c1319a790e09fda8b28a7a"
+    },
+    {
+      "path": "src/lib/llm-foundry.ts",
+      "bytes": 2463,
+      "sha256": "b5702227d22f820a2f6fe0d80da9512482e8d2efae359a83b699571a31ba7ec0"
+    },
+    {
+      "path": "src/lib/llm-stub.ts",
+      "bytes": 1948,
+      "sha256": "be27b7800b9bf5a465f0d59bf16420f7e6bfd314bc42920fa01cdefab34e7c76"
+    },
+    {
+      "path": "src/lib/llm.ts",
+      "bytes": 5309,
+      "sha256": "522b60cd5e6d3b91b9e2e11829502a3e0e681d27d3f183d7fc70451dd2ff4e8d"
+    },
+    {
+      "path": "src/lib/telemetria.ts",
+      "bytes": 2349,
+      "sha256": "7fe2090584f5fcff4bac1031e1351d387f746945896ec3790698bc9359fcac69"
+    },
+    {
+      "path": "src/mundo/__fixtures__/temporada-026.json",
+      "bytes": 1108,
+      "sha256": "31491ea5b3de2b109aed5ff16ec63065ec7870287eb090a413daabcffc62ef2a"
+    },
+    {
+      "path": "src/mundo/__tests__/consecuencias.stats.test.ts",
+      "bytes": 3480,
+      "sha256": "27f7df213e5aa86974376f9692e165c11c50b9f5df5f639c9b4fefbd56c7d876"
+    },
+    {
+      "path": "src/mundo/__tests__/consecuencias.test.ts",
+      "bytes": 9810,
+      "sha256": "623c648f3fd534f25f0cf45da4f4c50185c09a73e13762b160c15555ef527f7b"
+    },
+    {
+      "path": "src/mundo/__tests__/mundo.test.ts",
+      "bytes": 12531,
+      "sha256": "a72604dce951a392ea79985d9899bcccc7359372399c957478dca04fb888bca7"
+    },
+    {
+      "path": "src/mundo/__tests__/sanciones027.stats.test.ts",
+      "bytes": 4903,
+      "sha256": "f9d2c5fb16e4684279cbf6f2835197fd8254508bdc9a7339603fb5bba4409f96"
+    },
+    {
+      "path": "src/mundo/__tests__/sanciones027.test.ts",
+      "bytes": 11612,
+      "sha256": "ba0eef85d2389644fea03528cb35d6df1dcc4aaed7d9338dd8454cfebfad56d4"
+    },
+    {
+      "path": "src/mundo/calendario.ts",
+      "bytes": 1264,
+      "sha256": "752970d36494d21400a2d968f2cf58c555fa09fbc4de504acd9ac9b5314fa996"
+    },
+    {
+      "path": "src/mundo/mundo.ts",
+      "bytes": 5696,
+      "sha256": "07876ae15a51e0211cf5b6f8904c8ba2dae67ce58ff529464813c1969604dc1c"
+    },
+    {
+      "path": "src/mundo/rating.ts",
+      "bytes": 3290,
+      "sha256": "4c526b51a3ae8da2bcc95b97607d5917925c7949cddcbb358309968b519af2c2"
+    },
+    {
+      "path": "src/mundo/tabla.ts",
+      "bytes": 2734,
+      "sha256": "32541ec2d970e4e6295cee0f46962df4ef8bf58fd2c92deeddae2a6125c3fa31"
+    },
+    {
+      "path": "src/mundo/temporada.ts",
+      "bytes": 15224,
+      "sha256": "b25325945ea928e2415f88fd62609749b85bb88f73c724c30a4edaf7cd3432de"
+    },
+    {
+      "path": "src/mundo/tipos.ts",
+      "bytes": 4313,
+      "sha256": "a2e7d6f96c481f5d64efef2634df3ac1dc69300bdd6659d4cab8c12d37919e54"
+    },
+    {
+      "path": "src/sim/__fixtures__/hashes-011.json",
+      "bytes": 22499,
+      "sha256": "7575f01e108cfcaea8ccc3f36b4967896cc98345d27b5beab050b781b251285d"
+    },
+    {
+      "path": "src/sim/__fixtures__/hashes-015.json",
+      "bytes": 123694,
+      "sha256": "5fe65ea03da9ef47c2353e048f288f9859f356b4a48d1865345c69ef130e1b88"
+    },
+    {
+      "path": "src/sim/__fixtures__/hashes-legado.json",
+      "bytes": 72389,
+      "sha256": "af2b308f21c53ec39f36f80085d61d4afb8ba2138fb53b38a2baece6a73a4338"
+    },
+    {
+      "path": "src/sim/__tests__/condiciones.stats.test.ts",
+      "bytes": 7658,
+      "sha256": "a4901fee140fecaf0306c294b86e23d8fc8d3ba079fc4b08aded44746370ebc8"
+    },
+    {
+      "path": "src/sim/__tests__/condiciones.test.ts",
+      "bytes": 11168,
+      "sha256": "e7f10f74dfa6318b315559ff7336f162d951c4c6e098882d94ff078a37cc0c10"
+    },
+    {
+      "path": "src/sim/__tests__/definiciones.stats.test.ts",
+      "bytes": 2209,
+      "sha256": "b7475b3579ae76ba384149feeb2f2657810c1f0232f942a32fefc5808e19e687"
+    },
+    {
+      "path": "src/sim/__tests__/definiciones.test.ts",
+      "bytes": 10058,
+      "sha256": "a1a3d2e5c293225edfeb127e7d43489d8807e0772cd9fd8e11937d31be9ab4b0"
+    },
+    {
+      "path": "src/sim/__tests__/espacial.test.ts",
+      "bytes": 18161,
+      "sha256": "ec6d7749b03a86e10c4a9012e17f6af83eba8c5d898849864c42dc707119b1cb"
+    },
+    {
+      "path": "src/sim/__tests__/estadisticas.stats.test.ts",
+      "bytes": 6696,
+      "sha256": "0e55372c677ba355115cf81b9cc806746c28607434dbeec918b46df911ddb5cd"
+    },
+    {
+      "path": "src/sim/__tests__/insolitos.stats.test.ts",
+      "bytes": 6707,
+      "sha256": "6e2a31151778c789e06da958a4a7f39a2aae78a70a40fbd222ec57e65a051191"
+    },
+    {
+      "path": "src/sim/__tests__/insolitos.test.ts",
+      "bytes": 12562,
+      "sha256": "23dfc1e3f9678bbd583d6606ac2247162c4353f3847df0865e97b810efeceb9e"
+    },
+    {
+      "path": "src/sim/__tests__/invariantes.test.ts",
+      "bytes": 17115,
+      "sha256": "55bd31a8e64da0ad6c5e484df3041c6a8f9679e1a93ca67c473128632abaf909"
+    },
+    {
+      "path": "src/sim/__tests__/lesiones.test.ts",
+      "bytes": 5317,
+      "sha256": "6bd533bd0d6f09e0e29875dff0f2ab404649f155542afbd8ecdcd3c896e6444a"
+    },
+    {
+      "path": "src/sim/__tests__/micro.stats.test.ts",
+      "bytes": 6418,
+      "sha256": "3abca95c8c3886e1c8c2e4f33d8295fcb1727984998b7ca785bdff12939c99a9"
+    },
+    {
+      "path": "src/sim/__tests__/micro.test.ts",
+      "bytes": 8627,
+      "sha256": "6dd86ad8f8e67178daf309919c01772a57ceba91c39b0ea3861e1a61c442d30a"
+    },
+    {
+      "path": "src/sim/__tests__/niveles.stats.test.ts",
+      "bytes": 6831,
+      "sha256": "ed7cf232b28ed0cbfc8bc633f3f0f5e9f7333bbf411d3b29af5f978a13d452e0"
+    },
+    {
+      "path": "src/sim/__tests__/niveles.test.ts",
+      "bytes": 5978,
+      "sha256": "f473bde69b1b2f77242b0cc51ec7823e2e3e333da5903d40a8c0b6df28cf427d"
+    },
+    {
+      "path": "src/sim/__tests__/unidades.test.ts",
+      "bytes": 8121,
+      "sha256": "ddf61166041bd7ea832aeef9426002a5f1f874bad9874454b7a3f5ced40719ea"
+    },
+    {
+      "path": "src/sim/cli-args.ts",
+      "bytes": 2201,
+      "sha256": "216f964df65946750ca8d3644e56c352b12c70edd0a95d27773c08f3815254ec"
+    },
+    {
+      "path": "src/sim/cli.ts",
+      "bytes": 4847,
+      "sha256": "8a365b657f692a7af8a661ad23a1e88af615c038bbb66abf9e9a10de44a74f63"
+    },
+    {
+      "path": "src/sim/condiciones.ts",
+      "bytes": 5977,
+      "sha256": "182d421e321150b37baa8eca15e21a3ffb4e0a76339686fb111b9514d39978ca"
+    },
+    {
+      "path": "src/sim/espacial.ts",
+      "bytes": 15080,
+      "sha256": "b0dad0106150467918e5dd8adbdd8ebc08b7f0c6ececbe245394ac1512cee29c"
+    },
+    {
+      "path": "src/sim/index.ts",
+      "bytes": 643,
+      "sha256": "f0c4b04ff7bd0efbe26791efb1c1eca149e44caa2540ea5324026be253649ec6"
+    },
+    {
+      "path": "src/sim/invariantes.ts",
+      "bytes": 38113,
+      "sha256": "6cb6aa0033ab5b08111f291d93e44f1c2afc29fef785fed83a73f902d5352816"
+    },
+    {
+      "path": "src/sim/limites.ts",
+      "bytes": 29202,
+      "sha256": "80ce9d598ea4fc42febb83794a2868caafd17c60dddd94737d58802bcbe71991"
+    },
+    {
+      "path": "src/sim/micro.ts",
+      "bytes": 18301,
+      "sha256": "15c5b9c227512dbb6fb0bb2850069ba61d2cbd4819f3a4203b101530dc9edd4c"
+    },
+    {
+      "path": "src/sim/motor.ts",
+      "bytes": 28587,
+      "sha256": "eb432699b1452e5a2944d4ec61f31d2925ae8a3b62f65535b32ffcbb544088ba"
+    },
+    {
+      "path": "src/sim/niveles.ts",
+      "bytes": 3034,
+      "sha256": "22294011809684392e946d411a8d297b91fecf09f4a03574b293ce4719a98c26"
+    },
+    {
+      "path": "src/sim/parametros.ts",
+      "bytes": 13520,
+      "sha256": "f351f0d09b9fc05bdcaed182ff0f065c367c8a90e721765e9b2e2414c845fba4"
+    },
+    {
+      "path": "src/sim/plantillas.ts",
+      "bytes": 4203,
+      "sha256": "0a4166f6ece927c1b7aebb54d424bb284b7c44168612b34039f5ea944f20a4fe"
+    },
+    {
+      "path": "src/sim/prng.ts",
+      "bytes": 2772,
+      "sha256": "c8850e9237f1d2d39e5bf3793589b287045dbfd96d940d639932a73551d01987"
+    },
+    {
+      "path": "src/sim/resumen.ts",
+      "bytes": 2064,
+      "sha256": "9267352f029276d3eae0885ab372327ede47465fe9861365c1089d933b712e69"
+    },
+    {
+      "path": "src/sim/tipos.ts",
+      "bytes": 7989,
+      "sha256": "6a74e558e61c88f21799fb6fdf724316ed1ed12b6daf7f4e65789ab85d3715dc"
+    },
+    {
+      "path": "src/ui/Actividad.tsx",
+      "bytes": 1666,
+      "sha256": "84131591e682d3f688235621695bffba4fb1bb66e4f9fceb17f17c461bbda5f9"
+    },
+    {
+      "path": "src/ui/Arena.tsx",
+      "bytes": 37207,
+      "sha256": "5a8c81fbbd8af3476c3e1f17e03663df17e10ea5b1a2df9517368e9c41c87136"
+    },
+    {
+      "path": "src/ui/ArenaAsistente.tsx",
+      "bytes": 6719,
+      "sha256": "ae28c9b9e606335e58284e7f8e6549956d39879af47402e4137107ee0789b4c8"
+    },
+    {
+      "path": "src/ui/ArenaComentarios.tsx",
+      "bytes": 2121,
+      "sha256": "8d889fac700eb5e94f46da5a1890efb1325a537a56aa453a27698302cbaa12c1"
+    },
+    {
+      "path": "src/ui/ArenaContexto.tsx",
+      "bytes": 9638,
+      "sha256": "c4156adf43192576cb9d57053b696621bbc5b93a3dec89de93c17cac8984e96d"
+    },
+    {
+      "path": "src/ui/ArenaDescripcion.tsx",
+      "bytes": 3138,
+      "sha256": "0c814f04a28015702fa55b4467e03f74452ecd426919e7ce2533e6755974dc52"
+    },
+    {
+      "path": "src/ui/ArenaEmisionBuffer.tsx",
+      "bytes": 15517,
+      "sha256": "8a71f1215ae948014b7c0164c566b68b55868112eb478d392c01078abdbdc833"
+    },
+    {
+      "path": "src/ui/ArenaEnDirecto.tsx",
+      "bytes": 14949,
+      "sha256": "637fac4ef042e773f5bf83aab6a89887656f9ae064fb3f4e7d431b1eb82e3e34"
+    },
+    {
+      "path": "src/ui/ArenaInteligencia.tsx",
+      "bytes": 4267,
+      "sha256": "b5b43e73bef5e1a1a914846f6a4d145e54228c6f9cb2583ae99bb03bb8b1bfea"
+    },
+    {
+      "path": "src/ui/ArenaNarracion.tsx",
+      "bytes": 11949,
+      "sha256": "d7f1d073ac1ad3fa4599b02639d652120aab28878ca80f4b81c6f2857f275b6a"
+    },
+    {
+      "path": "src/ui/ArenaPlantilla.tsx",
+      "bytes": 8463,
+      "sha256": "5d733f8dc77bede041f56de115975d04281ef13e553a7745a3e8e89029ce54bb"
+    },
+    {
+      "path": "src/ui/CajaDeCristal.tsx",
+      "bytes": 7159,
+      "sha256": "2a0d0e4ab3b2c8a110632a83d03e6a730570aaefeb64650f1644fe513d756c9b"
+    },
+    {
+      "path": "src/ui/CanchaTactica.tsx",
+      "bytes": 5607,
+      "sha256": "a0a78d0d015c8d07db98ad70948f944073f0c7f647a298cc9d9eda0c0dced242"
+    },
+    {
+      "path": "src/ui/Cronica.tsx",
+      "bytes": 11679,
+      "sha256": "7e66a0445a7a2f592a33e1dce1b10eb5adb447c13981057e8b8d364c2588959f"
+    },
+    {
+      "path": "src/ui/DescargaMuestra.tsx",
+      "bytes": 2338,
+      "sha256": "954b8192c049920e9a7c09a2b7731612c6ea6175d8abe4815f7792ccd2869259"
+    },
+    {
+      "path": "src/ui/Enlace.tsx",
+      "bytes": 1032,
+      "sha256": "497f994d4270b88ae000109a1cd1eefdd68dd9b8343634560cb4566a3332baa4"
+    },
+    {
+      "path": "src/ui/Formaciones.tsx",
+      "bytes": 3459,
+      "sha256": "6a25eef972f2669608c71e5ac2ced783f63f8cce6b7ec82a8fc43b6de45fc58a"
+    },
+    {
+      "path": "src/ui/Gol.tsx",
+      "bytes": 19336,
+      "sha256": "2e472a6d48310a5387f0f8320201448d70cbe571d14394997f0e6ce619350be3"
+    },
+    {
+      "path": "src/ui/Grada.tsx",
+      "bytes": 5126,
+      "sha256": "46cefbddc0fae574b988848b41ccfc8fde81e00b2abaa1e9dbff5386ccee9520"
+    },
+    {
+      "path": "src/ui/Iconos.tsx",
+      "bytes": 5146,
+      "sha256": "c25711f8bb8169d9cbc25ced15c4a5b8b7d3bba57621a3f987326207070e5103"
+    },
+    {
+      "path": "src/ui/Linea.tsx",
+      "bytes": 3756,
+      "sha256": "ac7830d31831275e9c53c87aed47a75536baea1ddb9f811c44cf012f27170a0a"
+    },
+    {
+      "path": "src/ui/PartidoCompleto.tsx",
+      "bytes": 13682,
+      "sha256": "68c65f03b4f6dc2412a6f1f63c4022fece70ee7d4222ba5b46608ca965f66188"
+    },
+    {
+      "path": "src/ui/Pie.tsx",
+      "bytes": 642,
+      "sha256": "af45f122508c83e85d4cf77cd8162a69f67cf65efaf02df3d7c0535e0a3afe46"
+    },
+    {
+      "path": "src/ui/Pizarra3D.tsx",
+      "bytes": 3132,
+      "sha256": "3b7b8d9b139915e27e0ef189925617ccfb94ff5c98bb8697b9ac8074eb3ad65f"
+    },
+    {
+      "path": "src/ui/Ratings.tsx",
+      "bytes": 6407,
+      "sha256": "954ce26afe8366310b16f322f78de613c15bbf0a8a8dc3b6b2c27cadf189a8ae"
+    },
+    {
+      "path": "src/ui/RelatoPartido.tsx",
+      "bytes": 12316,
+      "sha256": "ae8d3c20ba9eca8378c0479886088e3535ecc1b3057c1fa1fcbd57b77c93edb5"
+    },
+    {
+      "path": "src/ui/ReproductorCancha.tsx",
+      "bytes": 6084,
+      "sha256": "51bad52c455a7be735a06875140f6bfd4d0e476efdc64b7216ec18f97a026c84"
+    },
+    {
+      "path": "src/ui/Simulador.tsx",
+      "bytes": 4443,
+      "sha256": "5926ed3521cde115756b83de5e10c027440129431662a17cb5202638d12b2e25"
+    },
+    {
+      "path": "src/ui/Stats.tsx",
+      "bytes": 12512,
+      "sha256": "6824bc1355e862ec5a229b417436baf013efce1822bbcb4570198b7cd78d40b6"
+    },
+    {
+      "path": "src/ui/VistaPartido.tsx",
+      "bytes": 23788,
+      "sha256": "e55ebe36a0e7a1efdf58c645d034f1af871e4c0b84e6d4ec78a2d36c58c9d743"
+    },
+    {
+      "path": "src/ui/Vivo.tsx",
+      "bytes": 8256,
+      "sha256": "8cccd36c58f009356540ca163b402c51a5b6ae0cfc47e20f3e4d826d1608d444"
+    },
+    {
+      "path": "src/ui/__tests__/xg.test.ts",
+      "bytes": 4305,
+      "sha256": "369062b27cd517592d98b2e8d4347bb85d6458a944dff68878fa0338774d08f8"
+    },
+    {
+      "path": "src/ui/render3d.ts",
+      "bytes": 9786,
+      "sha256": "77ee929c03bf36488f863415905c5ca1fd5f10d803e8d35e582a890d34ca2600"
+    },
+    {
+      "path": "src/ui/textos.ts",
+      "bytes": 7508,
+      "sha256": "7e7b69124686f79d02ba14d2a7108fb77ce2ff3594eb8a66f23aeed60ce61578"
+    },
+    {
+      "path": "src/vista/__tests__/condiciones.test.ts",
+      "bytes": 3247,
+      "sha256": "42ea9dfa4f7c318cd26dc844c788c586ad9494dd61e462dcd00df697d114c0f3"
+    },
+    {
+      "path": "src/vista/__tests__/consecuencias.test.ts",
+      "bytes": 2265,
+      "sha256": "b2dcffd2805f85129f7fcefa45dda6a864c7be6a1fe1a3d5937ef7188000c9cd"
+    },
+    {
+      "path": "src/vista/__tests__/definiciones.test.ts",
+      "bytes": 2138,
+      "sha256": "c4362441674499c2c7fc199f1328a7672dab39c0f17a681ab179aa14e3502041"
+    },
+    {
+      "path": "src/vista/__tests__/escena3d.test.ts",
+      "bytes": 6194,
+      "sha256": "c3ff8ffac6e786b3e1da3654c04c069eb1dd218b0a20f4513c1688630417c6f2"
+    },
+    {
+      "path": "src/vista/__tests__/evidencia.test.ts",
+      "bytes": 7616,
+      "sha256": "f85554d8a4ad5af9e51fdd8deb3a7c0b6a0c9007ab47f4c651b7128769867e1b"
+    },
+    {
+      "path": "src/vista/__tests__/grada.stats.test.ts",
+      "bytes": 2925,
+      "sha256": "3823bc78735858a8934fb5214d1b382df1377b581ebb6ec768f1a27eed388167"
+    },
+    {
+      "path": "src/vista/__tests__/grada.test.ts",
+      "bytes": 14252,
+      "sha256": "e76bff8d0e09ec91ab49f9082dc7220f8d215b512ea8ae6bb1fadbc074ce07e9"
+    },
+    {
+      "path": "src/vista/__tests__/insolitos.test.ts",
+      "bytes": 6851,
+      "sha256": "44eba6721024bb9e9905ec77ad0710b076f2bbf79b6fae707514d4330bd69d43"
+    },
+    {
+      "path": "src/vista/__tests__/liga.test.ts",
+      "bytes": 2716,
+      "sha256": "de423f1ea7998d4ec6a99862ac05080ba239a995d9e1b84026383b2d66bf01d8"
+    },
+    {
+      "path": "src/vista/__tests__/modoAnalista.test.ts",
+      "bytes": 3479,
+      "sha256": "261275a2b6a19bbb796d8c8cbaf1273343164e8edc21e73ebca6b89401b57792"
+    },
+    {
+      "path": "src/vista/__tests__/partido-completo.test.ts",
+      "bytes": 11236,
+      "sha256": "2d8f47c2367abc9022c478bd0affc1245c4cf5d504139dfb3b71e1a618655e4f"
+    },
+    {
+      "path": "src/vista/__tests__/pizarra.test.ts",
+      "bytes": 8656,
+      "sha256": "afe81d06267d4d1122b77554b1d2d6e88b41269add1e4cee77ffbc50f0ef0f20"
+    },
+    {
+      "path": "src/vista/__tests__/relato-reproduccion.test.ts",
+      "bytes": 9854,
+      "sha256": "d2f9477aff7341b3eec9427e93767c0bccfb78cfbf93e4bb19388159b7d54e05"
+    },
+    {
+      "path": "src/vista/__tests__/relato-tactica.test.ts",
+      "bytes": 11892,
+      "sha256": "7676c9e40f69a6513f044f42f86ea93f230beef893755d0149d32a0fadf60acf"
+    },
+    {
+      "path": "src/vista/__tests__/sanciones.test.ts",
+      "bytes": 2701,
+      "sha256": "b965d78b01ee4cf6c7be5d96deced34344a06404da728f13c14dbe5bcd2924a6"
+    },
+    {
+      "path": "src/vista/__tests__/stats.test.ts",
+      "bytes": 6648,
+      "sha256": "a5eb1dc11e03e3ee89c53ef5f63c3faf9928a8e654b96b9076d11d4b72160165"
+    },
+    {
+      "path": "src/vista/cli-presets.ts",
+      "bytes": 1056,
+      "sha256": "75394e6a2701ef1c64ff6dc11fa9f1bfab9ef1c392d3a52b7f6233e16c65acb6"
+    },
+    {
+      "path": "src/vista/condiciones.ts",
+      "bytes": 4325,
+      "sha256": "41b3b7a043795fbf41491be71642dc558a4440369a6fcb704f835bf4f36d2cf0"
+    },
+    {
+      "path": "src/vista/datos.ts",
+      "bytes": 1099,
+      "sha256": "86511a685dc3174efbf46cec2faa7ec0086217f5cac38116e1c19e41cfda66e0"
+    },
+    {
+      "path": "src/vista/escena3d.ts",
+      "bytes": 6648,
+      "sha256": "39603eb1d6bf02077c5ffc815fded68c8c7d8e633cb8dab49413aea3c436164c"
+    },
+    {
+      "path": "src/vista/evidencia.ts",
+      "bytes": 10851,
+      "sha256": "bb1f1b9d23984d74aaecf443f5e20db684c7240a630072b7a70de6e40cc65571"
+    },
+    {
+      "path": "src/vista/grada.ts",
+      "bytes": 8853,
+      "sha256": "f608d2132a059bbbbceb087598a2168bfb100000ba4bf5374cd98d76d387e098"
+    },
+    {
+      "path": "src/vista/liga.ts",
+      "bytes": 4578,
+      "sha256": "114622a9923ffbf85053a2c0a1248be7aa80f0a3f67bf51cec4e4f35901f5205"
+    },
+    {
+      "path": "src/vista/modoAnalista.ts",
+      "bytes": 3388,
+      "sha256": "0c0d648d19bbc326197d65551ce1d16167ba97c47956b0bc6ebef4686e401c4f"
+    },
+    {
+      "path": "src/vista/partido-completo.ts",
+      "bytes": 13845,
+      "sha256": "c6d87bfeac5f7122a69289562fca21df97ac6596b2e9c0e89810b6ab63073aea"
+    },
+    {
+      "path": "src/vista/pizarra.ts",
+      "bytes": 7955,
+      "sha256": "499c7ce5c135e236a0f3df721576a3e9b2b869fe92f74bb13fad98ddc7a68baa"
+    },
+    {
+      "path": "src/vista/presets.ts",
+      "bytes": 5608,
+      "sha256": "745495158eef06d78242530ec73528dd7fd293bc086326574afd972b2f2bb020"
+    },
+    {
+      "path": "src/vista/relato.ts",
+      "bytes": 14872,
+      "sha256": "0f3281bda009e1d086cdad3ca3a21d79695dc94f71b32e8fb8a24397542bb80c"
+    },
+    {
+      "path": "src/vista/reproduccion.ts",
+      "bytes": 967,
+      "sha256": "fae20cb0db08ff12a53265722e97fee39fcd0eb5abc8bcc9e6afb571ad4582a6"
+    },
+    {
+      "path": "src/vista/sanciones.ts",
+      "bytes": 1760,
+      "sha256": "7dfc7e68b6c1c281a73bf8b9c23ad0c85b56a87a75b4258330c167eb8dc87b41"
+    },
+    {
+      "path": "src/vista/servidor.ts",
+      "bytes": 6108,
+      "sha256": "6b04a72258c2922b81db90c9692591f4fe61ca03c92c0e59ad24a66a90f18a23"
+    },
+    {
+      "path": "src/vista/stats.ts",
+      "bytes": 9404,
+      "sha256": "c3495a1c2a0a7bc023209e66609a3e2a3cbfc9f5095cd50a7c3f962c016a1d22"
+    },
+    {
+      "path": "src/vista/tactica.ts",
+      "bytes": 10392,
+      "sha256": "b4bd6be895c46e396bd55d08f2e8a73b4e4ad7ef67029770a042ffbb24cc1c93"
+    },
+    {
+      "path": "src/vivo/__fixtures__/cronistas-vivo.ts",
+      "bytes": 4833,
+      "sha256": "12cc8c3cf74e5839069a657d345e506c051929e73ad08a6d028e6988be93620e"
+    },
+    {
+      "path": "src/vivo/__tests__/auditoria012.test.ts",
+      "bytes": 24934,
+      "sha256": "bc03bb63decaec11c3ae425256994c97c6b8e2cd083aa7cb68b333c82884868f"
+    },
+    {
+      "path": "src/vivo/__tests__/vivo.test.ts",
+      "bytes": 25053,
+      "sha256": "cb0ec34537e179dc544f315887f6173e355dc52574f53258076f0c885529b36c"
+    },
+    {
+      "path": "src/vivo/cache.ts",
+      "bytes": 5420,
+      "sha256": "670c31d729cd1c6ec0840172b35160c76a03927582ec627ad9b568da875ecb8b"
+    },
+    {
+      "path": "src/vivo/enVivo.ts",
+      "bytes": 2956,
+      "sha256": "b136459e93d9164102cc493b47ef7fd30eafb14578f909f4071aa315a3555ba5"
+    },
+    {
+      "path": "src/vivo/momentos.ts",
+      "bytes": 3119,
+      "sha256": "e4b86db365d90ab7a82147205abf0068468d79c0805736e7c39b2fde9b674e70"
+    },
+    {
+      "path": "src/vivo/overlay.ts",
+      "bytes": 3488,
+      "sha256": "1b13a9b3b09ee64f81301bbb5f2731a1082420248170f82111b827cb2c350ba6"
+    },
+    {
+      "path": "src/vivo/prompt.ts",
+      "bytes": 2699,
+      "sha256": "46a02aef39d1e281d9ebf01133d1e41c24a724e6916f238990d5a21f3867ce86"
+    },
+    {
+      "path": "src/vivo/umbrales.ts",
+      "bytes": 2664,
+      "sha256": "b53de3a6df39a7604d0c21032af4c5600cdd6d59b4cdeafe1589a727e172fde8"
+    },
+    {
+      "path": "src/vivo/updates.ts",
+      "bytes": 7764,
+      "sha256": "37983ae53d2716c232879a527e3b9ba698a220777a0119f09e4ea0615a320bf4"
+    },
+    {
+      "path": "public/experimentos/arena-duelo-v3.json",
+      "bytes": 1909155,
+      "sha256": "c21c41476de1df6667894ded3311a49c8305432e3e4a135e52ea3e43292d0b15"
+    },
+    {
+      "path": "public/experimentos/arena-llm-v1.json",
+      "bytes": 128460,
+      "sha256": "b3d04925c16b60a7317b79b0dd0e3bf6567b4f1e08fb984cf9625a87b82a83b5"
+    },
+    {
+      "path": "public/experimentos/arena-llm-v3.json",
+      "bytes": 1911791,
+      "sha256": "a9ce11dbc8e89242c8fa86a9db6be8cf231ae671d4aff20fe69268fb011a0d47"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/ataque-es.mp3",
+      "bytes": 15408,
+      "sha256": "64db3271eb61b8e24ea3f50d02b455302369299174b179574537e48de334c29f"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/calma-es.mp3",
+      "bytes": 78912,
+      "sha256": "ebc92d93bc820ed7951b2c2e29626fc5fb991c3d969f20ba085b3e6cd062d886"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/duelo-es-completo.mp3",
+      "bytes": 1227168,
+      "sha256": "437fa220f447216d5ae81813cf92394d859610f70f2cc4e85a1e8a6f2326d326"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/gol-en.mp3",
+      "bytes": 47664,
+      "sha256": "c8d24d7dc633753b09b744dfad41182160f2d5d98041f28805ff446f5b06bdbf"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/gol-es-sereno.mp3",
+      "bytes": 50832,
+      "sha256": "60e03b1afe763477462ddfc0bf7cb53639fe305147160f8ed145b74fab447e06"
+    },
+    {
+      "path": "public/experimentos/voz-expresiva/gol-es.mp3",
+      "bytes": 42336,
+      "sha256": "6167a79a1c8086200433aeb39e89f896ae66b759d677fa44d850f53045a5ce12"
+    },
+    {
+      "path": "public/muestra-10.jsonl",
+      "bytes": 241833,
+      "sha256": "258f9310b56b523f6f101849e16ab3ef695e56fa1c843e7d6a988ca75f2de9d0"
+    },
+    {
+      "path": "docs/dataset/ficha.json",
+      "bytes": 640,
+      "sha256": "70c3d1e4bef43a0fb945a727312f4b3503f19ae7a40ef2db771445997602467b"
+    },
+    {
+      "path": "docs/dataset/DATASHEET.md",
+      "bytes": 24525,
+      "sha256": "0c287866c23e993318f295e80a483e01a1e854563c07e19ac99fb48f90a317a5"
+    }
+  ],
+  "limits": {
+    "modelMatchesPerDay": 10,
+    "analystQuestionsPerDay": 20,
+    "speechCharactersPerDay": 120000
+  },
+  "originalDemoUnchanged": true,
+  "revision": "cronista-arena--0000006",
+  "acrRun": "chf",
+  "originalDemo": {
+    "revision": "cronista--0000005",
+    "status": "Succeeded"
+  },
+  "smokeEvidence": "docs/evidencia/reinicios-y-voz/navegador-publico.json"
+}

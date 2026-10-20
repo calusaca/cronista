@@ -1,0 +1,353 @@
+{
+  "checkedUtc": "2026-10-19T05:27:06.132Z",
+  "phase": "local_verified_pending_publication",
+  "version": "arena-v3",
+  "corpus": {
+    "seeds": 24,
+    "seconds": 90,
+    "replayMatches": 24,
+    "fallback": 0,
+    "maxBytes": 3024625,
+    "events": {
+      "falta": 13,
+      "reinicio": 128,
+      "recuperacion": 46,
+      "plan_equipo": 124,
+      "pase": 432,
+      "recepcion": 339,
+      "tiro": 66,
+      "gol": 53,
+      "cambio": 64,
+      "fuera_juego": 62,
+      "atajada": 10,
+      "intercepcion": 31,
+      "amarilla": 8,
+      "roja": 1
+    },
+    "cases": [
+      {
+        "seed": 1,
+        "score": {
+          "local": 2,
+          "visita": 0
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2890616
+      },
+      {
+        "seed": 2,
+        "score": {
+          "local": 0,
+          "visita": 0
+        },
+        "changes": 6,
+        "replay": true,
+        "bytes": 3024625
+      },
+      {
+        "seed": 3,
+        "score": {
+          "local": 0,
+          "visita": 1
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2953524
+      },
+      {
+        "seed": 4,
+        "score": {
+          "local": 0,
+          "visita": 0
+        },
+        "changes": 4,
+        "replay": true,
+        "bytes": 2946133
+      },
+      {
+        "seed": 5,
+        "score": {
+          "local": 3,
+          "visita": 1
+        },
+        "changes": 4,
+        "replay": true,
+        "bytes": 2970513
+      },
+      {
+        "seed": 6,
+        "score": {
+          "local": 2,
+          "visita": 3
+        },
+        "changes": 4,
+        "replay": true,
+        "bytes": 2958305
+      },
+      {
+        "seed": 7,
+        "score": {
+          "local": 4,
+          "visita": 1
+        },
+        "changes": 3,
+        "replay": true,
+        "bytes": 2974394
+      },
+      {
+        "seed": 8,
+        "score": {
+          "local": 0,
+          "visita": 0
+        },
+        "changes": 0,
+        "replay": true,
+        "bytes": 2834080
+      },
+      {
+        "seed": 9,
+        "score": {
+          "local": 2,
+          "visita": 2
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2937994
+      },
+      {
+        "seed": 10,
+        "score": {
+          "local": 0,
+          "visita": 2
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2888488
+      },
+      {
+        "seed": 11,
+        "score": {
+          "local": 2,
+          "visita": 0
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2960080
+      },
+      {
+        "seed": 12,
+        "score": {
+          "local": 1,
+          "visita": 0
+        },
+        "changes": 0,
+        "replay": true,
+        "bytes": 2790160
+      },
+      {
+        "seed": 13,
+        "score": {
+          "local": 0,
+          "visita": 1
+        },
+        "changes": 5,
+        "replay": true,
+        "bytes": 2980794
+      },
+      {
+        "seed": 14,
+        "score": {
+          "local": 1,
+          "visita": 1
+        },
+        "changes": 3,
+        "replay": true,
+        "bytes": 2965171
+      },
+      {
+        "seed": 15,
+        "score": {
+          "local": 2,
+          "visita": 1
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2926968
+      },
+      {
+        "seed": 16,
+        "score": {
+          "local": 1,
+          "visita": 0
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2896525
+      },
+      {
+        "seed": 17,
+        "score": {
+          "local": 1,
+          "visita": 1
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2980164
+      },
+      {
+        "seed": 18,
+        "score": {
+          "local": 0,
+          "visita": 0
+        },
+        "changes": 4,
+        "replay": true,
+        "bytes": 2908149
+      },
+      {
+        "seed": 19,
+        "score": {
+          "local": 2,
+          "visita": 2
+        },
+        "changes": 2,
+        "replay": true,
+        "bytes": 2946823
+      },
+      {
+        "seed": 20,
+        "score": {
+          "local": 4,
+          "visita": 1
+        },
+        "changes": 3,
+        "replay": true,
+        "bytes": 2950686
+      },
+      {
+        "seed": 21,
+        "score": {
+          "local": 1,
+          "visita": 1
+        },
+        "changes": 3,
+        "replay": true,
+        "bytes": 2904810
+      },
+      {
+        "seed": 22,
+        "score": {
+          "local": 0,
+          "visita": 0
+        },
+        "changes": 0,
+        "replay": true,
+        "bytes": 2872094
+      },
+      {
+        "seed": 23,
+        "score": {
+          "local": 2,
+          "visita": 1
+        },
+        "changes": 4,
+        "replay": true,
+        "bytes": 2996840
+      },
+      {
+        "seed": 24,
+        "score": {
+          "local": 1,
+          "visita": 3
+        },
+        "changes": 3,
+        "replay": true,
+        "bytes": 2969086
+      }
+    ]
+  },
+  "real": {
+    "path": "public/experimentos/arena-llm-v3.json",
+    "sha256": "a9ce11dbc8e89242c8fa86a9db6be8cf231ae671d4aff20fe69268fb011a0d47",
+    "seconds": 60,
+    "calls": 4,
+    "valid": 4,
+    "fallback": 0,
+    "controllers": [
+      "azure-openai:gpt-6.1-sol:reasoning-low"
+    ],
+    "distinctModels": false,
+    "replay": true,
+    "technicalEvents": 2
+  },
+  "comparison": {
+    "sameConfig": true,
+    "sameInitialState": true,
+    "sameFinalState": false,
+    "llm": {
+      "score": {
+        "local": 1,
+        "visita": 1
+      },
+      "events": 42,
+      "tacticalReviews": 2,
+      "substitutions": 0
+    },
+    "programmed": {
+      "score": {
+        "local": 2,
+        "visita": 0
+      },
+      "events": 40,
+      "tacticalReviews": 2,
+      "substitutions": 1
+    }
+  },
+  "sourceHashes": {
+    "src/arena/agente-cli.ts": "435eb0f875c4ea95f9abab10efb5dedefbdf753129e71bac1323dc58af815234",
+    "src/arena/agente.ts": "7c7cc01cf90e9cab65dc9b03a7aabe8ba6c24cab16ee497d41281d484a0ed177",
+    "src/arena/alineacion.ts": "465b014bca2a506438a8b6be8a5d10e50adaff2d6a1931b20e973e0da5f6656b",
+    "src/arena/almacen.ts": "9989e6fa0c12363b0105d06ee495001f88be5740e594e243674caab0a79fd6a3",
+    "src/arena/arbitro.ts": "1b372d876f0677b0542ee977e994a185a8a5d744350a230d4e30848de2998c84",
+    "src/arena/catalogo.ts": "669ae5a5ff2f736804fb4ed2d20436eead141a83b08bf744f54cbb78e0985b3e",
+    "src/arena/cli.ts": "a1ce3ae7af98b6c5538baeb24839468112c1870678f4cfdb8a226b31b62fbeb5",
+    "src/arena/competencia.ts": "73424c2d08c55ef24f2df8c5324b29d07005cfac89aae2d4887f4850c0a62013",
+    "src/arena/controladores.ts": "af21f37d6a73c25ba4a19e95ceea431ad7be9855af32e02337135ecd6ccd98b2",
+    "src/arena/coordinador.ts": "6c8b1e1b7139cf6e01e7075c45e0799d8bde4abeda2c5f0789a0c3d692d96602",
+    "src/arena/entorno.ts": "7beef3eb2fbf1360199bdddcb2af0400149ba26a11f7e2af374f0abdf2deead1",
+    "src/arena/entrenadores.ts": "61ea4cd98b37300fdbeebf018f8b9f19ed25875aa632be078ec5127fb0ffb4ca",
+    "src/arena/eval-cli.ts": "d9d7fad1f1b7b9579a36c1dab61f3589ff880d8e3c4df76b9248eb352262d017",
+    "src/arena/evaluacion.ts": "30e109d21032ee5909183767f980e3c1423afffc8666ed7b4e899f76a7037ee7",
+    "src/arena/foundry-eval.ts": "5d57e918579def55dfc28d53768bd7ef8db7bba0ca695e675ae623d8a4ca2b6f",
+    "src/arena/geometria.ts": "f364330d86edb65af9f7167363f7440d2c5f9ebecb2aa53d2097d0414588881f",
+    "src/arena/inteligencia.ts": "1f8ca062575674707f51ef94fc5111b8592b2d26e96ad56728d776553d578369",
+    "src/arena/lote-cli.ts": "1aab07742a2f5bbae54d8356cd0e70fa4f2b43014550cfdc88630419d1178380",
+    "src/arena/lote.ts": "ebbebfebe3b3cf9f70411f76b74b68cbb45be500db1f170b282b2f8ad32fd362",
+    "src/arena/modelos.ts": "27e98eed6e9c327ad57881fe0e61754b5d2e5843d055f6a5675df5cf8cb00c78",
+    "src/arena/motor.ts": "e374b341764043910e5669b35cd7eda489ee035eb1a7fda9b8632ecec8780bbb",
+    "src/arena/narrador.ts": "8cdc46e4862b0446c64c90695c7c4722bf86a7331e2b0cf0462f3afce78de486",
+    "src/arena/personalidades.ts": "2b426be11f4d606165ff45cae3ff0bd638cf9b89cad5a74c1a2ea0c7450b4a69",
+    "src/arena/peticiones.ts": "1294a8be4f70a4f23b5667fe5f5187bb684e7bfed370f7ffbdd52ffbc1544e11",
+    "src/arena/protocolo.ts": "6f43ec63e51c34af7bf96f844d49c4d7ae329f0c2bda23a9f348adbb2177aee7",
+    "src/arena/relato.ts": "eb57ecc1ee26ef9470422c7d72018b9bf653ca0bd8e0d33a4f5961fe5a612660",
+    "src/arena/sesiones.ts": "33a6070ac5dbd6dc9ac24938ef13b37a35ecf0442fce7351a730aa4e469e9a04",
+    "src/arena/tipos.ts": "0c1245bac565fec381a189b4eb6c1a8d2accf27ba46f5ee153eb2140ebd357fb",
+    "src/arena/vista.ts": "e90f0b83e0078b2ae06eb80d6cbf78619e8a95ef6f1d157a77f1915a6878e223",
+    "src/arena/voz.ts": "70e6c490ddf299ed3945b7c97774f158ed6087c522a7308930816a4c944fd6c4",
+    "src/sim/limites.ts": "80ce9d598ea4fc42febb83794a2868caafd17c60dddd94737d58802bcbe71991",
+    "src/ui/Arena.tsx": "1bc2491033534fa4b59a8c38e61debfae0f992bef67af8bfdb6a6ac679d6bb9c",
+    "src/ui/ArenaPlantilla.tsx": "5d733f8dc77bede041f56de115975d04281ef13e553a7745a3e8e89029ce54bb",
+    "src/ui/ArenaContexto.tsx": "e2bf452fbe63bd1738c9328c60378c60748956d1396bb6d6abf0d7cd919ef854",
+    "src/app/api/arena/route.ts": "f6f6f1027e7120fb6292059639522f002f8e1873963220503b09c6f54aac948d",
+    "src/app/globals.css": "4814eda7b3b1f4552d5db7fd60e9cdd7058edeee049c7c6837f410cf7f84e8f2",
+    "docs/evidencia/validar-arena-v3.mjs": "76bae7e9a1270e5bcd4b1a010c69346b26c5643a4d412cc6dbc154b7054cd571"
+  },
+  "limits": [
+    "One model deployment, two independent controllers.",
+    "Descriptive comparison, not an evaluation of tactical superiority.",
+    "Synthetic uncalibrated movement, personalities and environmental effects.",
+    "Simplified restarts and contact fouls; no human realism assessment.",
+    "No public deployment or new model deployment was performed."
+  ]
+}

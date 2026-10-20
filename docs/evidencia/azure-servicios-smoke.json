@@ -1,0 +1,230 @@
+{
+  "checkedUtc": "2026-10-19T04:53:46.282Z",
+  "scope": "servicios_reales_sobre_partido_programado_sin_inferencia_de_equipos",
+  "exclusion": "passed",
+  "sesion": "940ce5ba-741d-4833-ba0a-95662f1a8a33",
+  "persistencia": {
+    "reproducidoTrasNuevoGestor": true,
+    "tick": 120,
+    "eventos": 7
+  },
+  "analista": {
+    "tick": 120,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 2,
+    "herramientas": [
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 120,
+          "tipo": "todos"
+        },
+        "hechos": [
+          "arena:a1",
+          "arena:a2",
+          "arena:a3",
+          "arena:a4",
+          "arena:a6",
+          "arena:a7"
+        ]
+      }
+    ],
+    "uso": {
+      "entrada": 1620,
+      "salida": 203
+    },
+    "comentario": {
+      "tick": 120,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "llm",
+      "principal": "arena:a3",
+      "hechos": [
+        {
+          "id": "arena:a1",
+          "tipo": "accion_arena",
+          "texto_es": "Ramiro Galiueta (15) intenta un pase de 26 m hacia Tomás Oreich.",
+          "texto_en": "Ramiro Galiueta (15) attempts a 26 m pass towards Tomás Oreich.",
+          "eventos": [
+            "a1"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Ramiro Galiueta",
+            "equipo": "Sporting Montefrío Bajo",
+            "dorsal": 15,
+            "distancia": 26,
+            "receptor": "Tomás Oreich",
+            "dorsal_receptor": 11
+          }
+        },
+        {
+          "id": "arena:a2",
+          "tipo": "accion_arena",
+          "texto_es": "Tomás Oreich (11) recibe el balón.",
+          "texto_en": "Tomás Oreich (11) receives the ball.",
+          "eventos": [
+            "a2"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Tomás Oreich",
+            "equipo": "Sporting Montefrío Bajo",
+            "dorsal": 11,
+            "distancia": 26,
+            "receptor": "Ramiro Galiueta",
+            "dorsal_receptor": 15
+          }
+        },
+        {
+          "id": "arena:a3",
+          "tipo": "accion_arena",
+          "texto_es": "Tomás Oreich (11) remata hacia la portería rival.",
+          "texto_en": "Tomás Oreich (11) shoots towards the opposing goal.",
+          "eventos": [
+            "a3"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Tomás Oreich",
+            "equipo": "Sporting Montefrío Bajo",
+            "dorsal": 11,
+            "distancia": 18
+          }
+        },
+        {
+          "id": "arena:a4",
+          "tipo": "gol_anotado",
+          "texto_es": "Gol de Tomás Oreich (11).",
+          "texto_en": "Goal by Tomás Oreich (11).",
+          "eventos": [
+            "a4"
+          ],
+          "relevancia": 100,
+          "datos": {
+            "jugador": "Tomás Oreich",
+            "equipo": "Sporting Montefrío Bajo",
+            "dorsal": 11,
+            "distancia": 18
+          }
+        },
+        {
+          "id": "arena:a6",
+          "tipo": "accion_arena",
+          "texto_es": "Simón Fenuz (13) intenta un pase de 18 m hacia Vicente Oreales.",
+          "texto_en": "Simón Fenuz (13) attempts a 18 m pass towards Vicente Oreales.",
+          "eventos": [
+            "a6"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Simón Fenuz",
+            "equipo": "Olímpico Brezal",
+            "dorsal": 13,
+            "distancia": 18,
+            "receptor": "Vicente Oreales",
+            "dorsal_receptor": 4
+          }
+        },
+        {
+          "id": "arena:a7",
+          "tipo": "accion_arena",
+          "texto_es": "Vicente Oreales (4) recibe el balón.",
+          "texto_en": "Vicente Oreales (4) receives the ball.",
+          "eventos": [
+            "a7"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Vicente Oreales",
+            "equipo": "Olímpico Brezal",
+            "dorsal": 4,
+            "distancia": 18,
+            "receptor": "Simón Fenuz",
+            "dorsal_receptor": 13
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Tomás Oreich (11) recibe el balón y remata hacia la portería rival.",
+          "texto_en": "Tomás Oreich (11) receives the ball and shoots towards the opposing goal.",
+          "hecho": "arena:a3",
+          "apoyo": [
+            "arena:a2"
+          ]
+        },
+        {
+          "texto_es": "Tomás Oreich (11) marca gol.",
+          "texto_en": "Tomás Oreich (11) scores a goal.",
+          "hecho": "arena:a4",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Tomás Oreich (11) recibe el balón y remata hacia la portería rival.",
+              "texto_en": "Tomás Oreich (11) receives the ball and shoots towards the opposing goal.",
+              "hecho": "arena:a3",
+              "apoyo": [
+                "arena:a2"
+              ]
+            },
+            {
+              "texto_es": "Tomás Oreich (11) marca gol.",
+              "texto_en": "Tomás Oreich (11) scores a goal.",
+              "hecho": "arena:a4",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  },
+  "cacheSinInferencia": true,
+  "narracion": {
+    "segmentos": [
+      {
+        "desdeTick": 0,
+        "hastaTick": 100,
+        "modo": "completo",
+        "idioma": "es",
+        "texto": "Comienza el partido entre Sporting Montefrío Bajo y Olímpico Brezal. Ramiro Galiueta (15) intenta un pase de 26 m hacia Tomás Oreich. Tomás Oreich (11) recibe el balón. Tomás Oreich (11) remata hacia la portería rival. Gol de Tomás Oreich (11). Reinicio experimental desde Simón Fenuz (13); se recoloca el balón. Simón Fenuz (13) intenta un pase de 18 m hacia Vicente Oreales.",
+        "fuentes": [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6"
+        ],
+        "eventosDisponibles": 6,
+        "eventosNarrados": 6,
+        "archivo": "docs/evidencia/azure-voz/relato-0-100.mp3",
+        "bytes": 193824,
+        "sha256": "210b0c4c0f53da165fa5ec1ceb1210bba482525bfb2682e1a7de5f43a561454d"
+      },
+      {
+        "desdeTick": 100,
+        "hastaTick": 120,
+        "modo": "completo",
+        "idioma": "es",
+        "texto": "Vicente Oreales (4) recibe el balón. Final del partido. Sporting Montefrío Bajo, 1; Olímpico Brezal, 0.",
+        "fuentes": [
+          "a7"
+        ],
+        "eventosDisponibles": 1,
+        "eventosNarrados": 1,
+        "archivo": "docs/evidencia/azure-voz/relato-100-120.mp3",
+        "bytes": 65376,
+        "sha256": "e916a9b243c1c591e711e6c93525fbb91e816f283e54c730cfedd452edf22024"
+      }
+    ],
+    "todosLosEventosCubiertos": true
+  },
+  "status": "passed"
+}

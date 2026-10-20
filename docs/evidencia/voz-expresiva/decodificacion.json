@@ -1,0 +1,57 @@
+{
+  "checkedUtc": "2026-10-19T13:45:53.896Z",
+  "status": "passed",
+  "decoder": "Chromium Web Audio",
+  "samples": [
+    {
+      "name": "calma-es",
+      "file": "docs/evidencia/voz-expresiva/calma-es.mp3",
+      "durationSeconds": 13.151995464852607,
+      "sampleRate": 44100,
+      "channels": 1,
+      "rms": 0.10227491996685537,
+      "peak": 0.7278788089752197
+    },
+    {
+      "name": "ataque-es",
+      "file": "docs/evidencia/voz-expresiva/ataque-es.mp3",
+      "durationSeconds": 2.567981859410431,
+      "sampleRate": 44100,
+      "channels": 1,
+      "rms": 0.08241089385442887,
+      "peak": 0.5365241765975952
+    },
+    {
+      "name": "gol-es",
+      "file": "docs/evidencia/voz-expresiva/gol-es.mp3",
+      "durationSeconds": 7.055986394557823,
+      "sampleRate": 44100,
+      "channels": 1,
+      "rms": 0.07987856313977429,
+      "peak": 0.6195996403694153
+    },
+    {
+      "name": "gol-en",
+      "file": "docs/evidencia/voz-expresiva/gol-en.mp3",
+      "durationSeconds": 7.943990929705215,
+      "sampleRate": 44100,
+      "channels": 1,
+      "rms": 0.09301182071060538,
+      "peak": 0.5939058065414429
+    },
+    {
+      "name": "gol-es-sereno",
+      "file": "docs/evidencia/voz-expresiva/gol-es-sereno.mp3",
+      "durationSeconds": 8.471995464852608,
+      "sampleRate": 44100,
+      "channels": 1,
+      "rms": 0.09421727585742336,
+      "peak": 0.7953442931175232
+    }
+  ],
+  "sameTextGoalComparison": true,
+  "goalAndNeutralAudioDiffer": true,
+  "limitations": [
+    "Las diferencias acústicas y la decodificación no prueban preferencia ni naturalidad. Revisión humana de emoción y pronunciación pendiente."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "checkedUtc": "2026-10-19T21:59:24.219019+00:00",
+  "phase": "deployed_and_smoke_passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "revision": "cronista-arena--0000005",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019215514",
+  "sourceFiles": 290,
+  "acrRun": "che",
+  "browserEvidence": "navegador-publico.json"
+}

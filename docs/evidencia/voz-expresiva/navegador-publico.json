@@ -1,0 +1,232 @@
+{
+  "checkedUtc": "2026-10-19T14:02:30.827Z",
+  "scope": "public_azure_container_app_real_speech",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "playbackAcceleratedBySeeking": true,
+  "newTeamModelCalls": 0,
+  "newAnalystCalls": 0,
+  "samples": [
+    {
+      "name": "calma-es",
+      "http": 200,
+      "bytes": 78912,
+      "sha256": "ebc92d93bc820ed7951b2c2e29626fc5fb991c3d969f20ba085b3e6cd062d886"
+    },
+    {
+      "name": "ataque-es",
+      "http": 200,
+      "bytes": 15408,
+      "sha256": "64db3271eb61b8e24ea3f50d02b455302369299174b179574537e48de334c29f"
+    },
+    {
+      "name": "gol-es",
+      "http": 200,
+      "bytes": 42336,
+      "sha256": "6167a79a1c8086200433aeb39e89f896ae66b759d677fa44d850f53045a5ce12"
+    },
+    {
+      "name": "gol-es-sereno",
+      "http": 200,
+      "bytes": 50832,
+      "sha256": "60e03b1afe763477462ddfc0bf7cb53639fe305147160f8ed145b74fab447e06"
+    },
+    {
+      "name": "gol-en",
+      "http": 200,
+      "bytes": 47664,
+      "sha256": "c8d24d7dc633753b09b744dfad41182160f2d5d98041f28805ff446f5b06bdbf"
+    },
+    {
+      "name": "duelo-es-completo",
+      "http": 200,
+      "bytes": 1227168,
+      "sha256": "437fa220f447216d5ae81813cf92394d859610f70f2cc4e85a1e8a6f2326d326"
+    }
+  ],
+  "segments": [
+    {
+      "http": 200,
+      "desdeTick": 0,
+      "hastaTick": 100,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8"
+      ],
+      "narratedEvents": 8,
+      "carryFrames": [
+        0
+      ],
+      "emotions": [
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena"
+      ],
+      "bytes": 292320,
+      "decodedDurationSeconds": 48.72
+    },
+    {
+      "http": 200,
+      "desdeTick": 100,
+      "hastaTick": 200,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a9",
+        "a10",
+        "a11",
+        "a12"
+      ],
+      "narratedEvents": 4,
+      "carryFrames": [],
+      "emotions": [
+        "seria",
+        "serena",
+        "serena",
+        "serena"
+      ],
+      "bytes": 129168,
+      "decodedDurationSeconds": 21.528
+    },
+    {
+      "http": 200,
+      "desdeTick": 200,
+      "hastaTick": 300,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a13",
+        "a14",
+        "a15",
+        "a16",
+        "a17",
+        "a18"
+      ],
+      "narratedEvents": 6,
+      "carryFrames": [
+        205,
+        215
+      ],
+      "emotions": [
+        "tension",
+        "emocion",
+        "jubilo",
+        "serena",
+        "serena",
+        "serena",
+        "serena"
+      ],
+      "bytes": 189360,
+      "decodedDurationSeconds": 31.56
+    },
+    {
+      "http": 200,
+      "desdeTick": 300,
+      "hastaTick": 400,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a19",
+        "a14",
+        "a16",
+        "a18",
+        "a20",
+        "a14",
+        "a18",
+        "a21"
+      ],
+      "narratedEvents": 3,
+      "carryFrames": [
+        315,
+        325,
+        355,
+        365
+      ],
+      "emotions": [
+        "serena",
+        "serena",
+        "serena",
+        "tension",
+        "tension"
+      ],
+      "bytes": 202752,
+      "decodedDurationSeconds": 33.792
+    },
+    {
+      "http": 200,
+      "desdeTick": 400,
+      "hastaTick": 500,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a22",
+        "a23",
+        "a24",
+        "a25"
+      ],
+      "narratedEvents": 4,
+      "carryFrames": [],
+      "emotions": [
+        "serena",
+        "serena",
+        "serena",
+        "serena"
+      ],
+      "bytes": 117648,
+      "decodedDurationSeconds": 19.608
+    },
+    {
+      "http": 200,
+      "desdeTick": 500,
+      "hastaTick": 600,
+      "voiceVersion": "voz-expresiva-v1",
+      "voice": "es-MX-JorgeNeural",
+      "events": [
+        "a26",
+        "a27",
+        "a28",
+        "a29",
+        "a30",
+        "a31",
+        "a32",
+        "a33"
+      ],
+      "narratedEvents": 8,
+      "carryFrames": [
+        600
+      ],
+      "emotions": [
+        "serena",
+        "serena",
+        "seria",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena",
+        "serena"
+      ],
+      "bytes": 295920,
+      "decodedDurationSeconds": 49.32
+    }
+  ],
+  "errors": [],
+  "mobileOverflow": false,
+  "recordedEvents": 33,
+  "allRecordedEventsCovered": true,
+  "status": "passed",
+  "finishedUtc": "2026-10-19T14:02:44.014Z"
+}

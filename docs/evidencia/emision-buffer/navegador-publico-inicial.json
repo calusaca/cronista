@@ -1,0 +1,162 @@
+{
+  "checkedUtc": "2026-10-19T18:39:29.284Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "scope": "real_deployed_application_no_mock_responses",
+  "newTeamModelCalls": 0,
+  "newAnalystCalls": 0,
+  "speechProviderCalls": "not instrumented; real Speech responses or durable cache used",
+  "checks": {
+    "startsBeforeFinished": {
+      "session": "86b832e7-c222-4d28-b61b-f695de08a36a",
+      "replayHttp": 409,
+      "snapshotTick": 205,
+      "fullDurationTick": 600,
+      "interpolatedMovement": true
+    },
+    "sharing": {
+      "secondViewerRestoredSameMatch": true,
+      "sessionCreations": 1
+    },
+    "audio": {
+      "preparedWindows": 5,
+      "realAudioContextRuns": true,
+      "pauseSuspendsAudioAndPitch": true,
+      "resumeWorks": true,
+      "scheduledSources": [
+        {
+          "cuando": 2.6668000000000003,
+          "reloj": 0,
+          "duracionS": 2.472,
+          "velocidad": 1
+        },
+        {
+          "cuando": 5.8668000000000005,
+          "reloj": 0,
+          "duracionS": 2.592,
+          "velocidad": 1
+        },
+        {
+          "cuando": 9.3668,
+          "reloj": 0,
+          "duracionS": 2.64,
+          "velocidad": 1
+        },
+        {
+          "cuando": 17.1668,
+          "reloj": 0,
+          "duracionS": 2.976,
+          "velocidad": 1
+        },
+        {
+          "cuando": 21.6668,
+          "reloj": 0,
+          "duracionS": 2.568,
+          "velocidad": 1
+        }
+      ],
+      "speechQualityListening": "not measured"
+    },
+    "mobile": {
+      "width": 360,
+      "dark": true,
+      "reducedMotion": true,
+      "spanish": true,
+      "horizontalOverflow": false
+    }
+  },
+  "audioSegments": [
+    {
+      "http": 200,
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a2"
+      ],
+      "fragments": [
+        {
+          "tick": 39,
+          "emotion": "serena",
+          "text": "Recibe Tomás Oreich."
+        }
+      ],
+      "bytes": 14832
+    },
+    {
+      "http": 200,
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a4"
+      ],
+      "fragments": [
+        {
+          "tick": 71,
+          "emotion": "jubilo",
+          "text": "¡Tomás Oreich marca el gol!"
+        }
+      ],
+      "bytes": 15552
+    },
+    {
+      "http": 200,
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a7"
+      ],
+      "fragments": [
+        {
+          "tick": 106,
+          "emotion": "serena",
+          "text": "Recibe Vicente Oreales."
+        }
+      ],
+      "bytes": 15840
+    },
+    {
+      "http": 200,
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a11"
+      ],
+      "fragments": [
+        {
+          "tick": 184,
+          "emotion": "seria",
+          "text": "Owen Barinera, fuera de juego."
+        }
+      ],
+      "bytes": 17856
+    },
+    {
+      "http": 200,
+      "desdeTick": 200,
+      "hastaTick": 250,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a14"
+      ],
+      "fragments": [
+        {
+          "tick": 229,
+          "emotion": "serena",
+          "text": "Recibe Ramiro Galiueta."
+        }
+      ],
+      "bytes": 15408
+    }
+  ],
+  "errors": [],
+  "status": "passed",
+  "finishedUtc": "2026-10-19T18:39:46.344Z"
+}

@@ -456,12 +456,12 @@ export const AB_PUERTA_CERRADA = { cocienteBase: { min: 0.9, max: 1.1 } } as con
 /** Brief 034: prototipo espacial independiente; cifras sintéticas por calibrar.
  * No intervienen en el motor histórico. Unidades: metros y segundos. */
 export const ARENA = {
-  version: "arena-v1",
+  version: "arena-v3", versionPersonalidades: "arena-v2", versionLegado: "arena-v1",
   largoM: 105, anchoM: 68, arcoM: 7.32,
   pasoS: 0.1, fotogramaS: 0.5,
   duracionS: 180, duracionMaxS: 180,
   intervaloS: 15, intervaloMinS: 2, intervaloMaxS: 30,
-  maxRondas: 90, esperaMs: 45_000, esperaMaxMs: 60_000,
+  maxRondas: 90, esperaMs: 60_000, esperaMaxMs: 60_000, tokensOrdenes: 2048, intentosOrdenes: 2,
   aceleracionMps2: 3, velocidadMps: 6.5,
   velocidadBalonMps: 17, velocidadTiroMps: 24,
   controlM: 1.1, controlPorteroM: 1.7,
@@ -480,4 +480,46 @@ export const ARENA = {
   areaLargoM: 16.5, areaAnchoM: 40.32,
   amplitud: { estrecha: 0.8, media: 1, amplia: 1.1 },
   alturaBloqueM: { bajo: -6, medio: 0, alto: 6 },
+} as const;
+
+/** Mini-encuentro v3: parámetros sintéticos, en segundos reales de simulación. */
+export const TECNICA_ARENA = {
+  semilla: 0x7465636e, revisionMinS: 10, revisionMaxS: 25,
+  cambioPlanMinS: 20, ventanaMemoriaS: 30, maxCambios: 5, maxVentanas: 3,
+  pausaS: 1.5, cambioMinS: 20, cambiosSeparacionS: 15,
+  energiaCambio: 0.87, confianzaInicial: 60, emocionMin: 0, emocionMax: 100,
+  presionCalor: 0.25, desgasteRitmo: 0.5, energiaPorMetro: 0.0005,
+  ritmo: { pausado: 0.85, normal: 1, alto: 1.12 },
+  compatibilidadMinFactor: 0.85, resguardoM: 6,
+} as const;
+
+export const ENTORNO_ARENA = {
+  calorFactor: 0.65, frioVelocidad: 0.06, frioHastaS: 25,
+  sinteticaBalon: 1.12, cespedAltoBalon: 0.9, cespedAltoErrorM: 0.6,
+  paseCortoM: 18, nieblaDesdeM: 20, nieblaErrorM: 1,
+  presionErrorM: 0.8, presionInicialS: 30,
+  presion: { baja: 0.15, media: 0.5, alta: 1 },
+  animoInicial: 50, animoGol: 15, animoTiro: 2, animoPerdida: 1,
+} as const;
+
+export const ARBITRAJE_ARENA = {
+  faltaBase: 0.015, faltaAgresividad: 0.07, faltaIndisciplina: 0.04,
+  temerariaDesde: 0.6, excesivaDesde: 0.985,
+  criterioMin: 40, criterioMax: 85, minJugadores: 7,
+} as const;
+
+/** Preferencias sintéticas de arena-v2; no son capacidades ni cifras calibradas. */
+export const PERSONALIDAD_ARENA = {
+  semilla: 0x70657273, min: 0, max: 100, variacion: 12,
+  distanciaPresionM: 8, ajusteApoyoM: 10,
+  avanceMinFactor: 0.6, avanceRangoFactor: 0.8,
+  margenMinFactor: 0.5, distanciaMinFactor: 0.7, distanciaRangoFactor: 0.6,
+  tiroMinFactor: 0.4, tiroRangoFactor: 0.6, ventajaConduccion: 15,
+  temperamentoAlto: 70, temperamentoBajo: 35,
+} as const;
+
+/** Árbitro visual de arena-v2: movimiento propio, sin contacto ni decisiones arbitrales. */
+export const ARBITRO_ARENA = {
+  velocidadMps: 5.5, aceleracionMps2: 3,
+  distanciaLongitudM: 10, distanciaLateralM: 12, margenM: 3,
 } as const;

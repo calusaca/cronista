@@ -1,0 +1,74 @@
+{
+  "checkedUtc": "2026-10-19T23:53:03.049691+00:00",
+  "typecheck": "passed",
+  "build": "Next production + standalone passed",
+  "unitarias": {
+    "pasaron": 1594,
+    "archivos": 69
+  },
+  "empaquetado": 2,
+  "navegador": {
+    "corridaInicial": {
+      "startTime": "2026-10-19T23:47:54.523Z",
+      "duration": 96610.927,
+      "expected": 34,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "focoFinal": {
+      "startTime": "2026-10-19T23:51:35.911Z",
+      "duration": 62221.149,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "escenariosUnicosComprobados": 37,
+    "notas": "La corrida general pasó 34 escenarios y falló tres fixtures: dos nuevos asumían inicio en cero para una incorporación al frente del partido; uno antiguo dependía del balance periódico que ahora cede ante noticias. Corregidos los fixtures, pasaron los tres contra el build final. La prueba de memoria incluye silenciar/reactivar."
+  },
+  "respaldo40s": {
+    "fuentes": 6,
+    "frasesDistintas": 6,
+    "maxSilencioPcmMs": 3126.7000000029802,
+    "speech": "503 simulado; respaldo con MP3 reales"
+  },
+  "catalogo": {
+    "idiomas": 2,
+    "comentariosPorIdioma": 12,
+    "cierresPorIdioma": 1,
+    "clips": 26,
+    "caracteresSintetizados": 2039
+  },
+  "fuentes": [
+    {
+      "path": "src/arena/editorial.ts",
+      "sha256": "93c5947781ae432f2d3f6f1997d4f953cdc5ede53527798efe69b50d701c1b0b"
+    },
+    {
+      "path": "src/arena/relato.ts",
+      "sha256": "6cd2c2cce5d40bac7f7064533d914e31f9b94113cfe12e6ca4bd36b7a8513695"
+    },
+    {
+      "path": "src/arena/buffer.ts",
+      "sha256": "ff0eb2fc419750a186fa5727d96eec36bf12383f467c4c58b86f9f17b966710c"
+    },
+    {
+      "path": "src/ui/ArenaEmisionBuffer.tsx",
+      "sha256": "caf8d5d223249ea5dcd2edeecd04077d1577e95a093c5a99b48668311189d130"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/relato/route.ts",
+      "sha256": "0fdd8963eb64389f9b4c414f539108586c467d2ce5668d760f22f69b5d461902"
+    },
+    {
+      "path": "src/arena/voz-reserva.json",
+      "sha256": "d9505c58d0a1c4bbf04c4bad6eb6c15bf00f8a9aa0e6a8a0327946b1e0163503"
+    },
+    {
+      "path": "scripts/generar-voz-reserva.mts",
+      "sha256": "b45f58ae0b2ac0fcc7e8c2528553fe34fd80c2a28a1261aab2a9f744434fc3f1"
+    }
+  ],
+  "sourceFiles": 296
+}

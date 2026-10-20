@@ -1,0 +1,523 @@
+{
+  "checkedUtc": "2026-10-19T03:25:57.251Z",
+  "phase": "local_verified_pending_publication",
+  "id": "6b485b5f-c2e7-4c9c-a319-00fbee03f954",
+  "asignacion": {
+    "modo": "manual",
+    "local": {
+      "id": "principal",
+      "nombre": "GPT-5.6 Luna",
+      "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+    },
+    "visita": {
+      "id": "rapido",
+      "nombre": "GPT-5.4 mini",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low"
+    }
+  },
+  "distinctModels": true,
+  "models": {
+    "principal": "gpt-5.6-luna:2026-07-09",
+    "rapido": "gpt-5.4-mini:2026-03-17"
+  },
+  "firstAdvanceMs": 4821,
+  "elapsedMs": 68816,
+  "seconds": 60,
+  "score": {
+    "local": 1,
+    "visita": 0
+  },
+  "events": 33,
+  "decisions": [
+    {
+      "controller": "azure-openai:cronista-equilibrado:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 3860.4006950000003
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 4286.834554
+    },
+    {
+      "controller": "azure-openai:cronista-equilibrado:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 4104.026812999997
+    },
+    {
+      "controller": "azure-openai:cronista-rapido:reasoning-low",
+      "source": "controlador",
+      "reason": "valida",
+      "timeMs": 3544.120109000003
+    }
+  ],
+  "comments": [
+    {
+      "tick": 5,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a1",
+      "hechos": [
+        {
+          "id": "arena:a1",
+          "tipo": "accion_arena",
+          "texto_es": "Benja Bareardi (16) intenta un pase de 23 m hacia Emilio Zaroánez.",
+          "texto_en": "Benja Bareardi (16) attempts a 23 m pass towards Emilio Zaroánez.",
+          "eventos": [
+            "a1"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Benja Bareardi",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 16,
+            "distancia": 23,
+            "receptor": "Emilio Zaroánez"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Benja Bareardi (16), de Juventud Islaverde Sur, intenta un pase de 23 m hacia Emilio Zaroánez.",
+          "texto_en": "Benja Bareardi (16) of Juventud Islaverde Sur attempts a 23 m pass toward Emilio Zaroánez.",
+          "hecho": "arena:a1",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16), de Juventud Islaverde Sur, intenta un pase de 23 m hacia Emilio Zaroánez.",
+              "texto_en": "Benja Bareardi (16) of Juventud Islaverde Sur attempts a 23 m pass toward Emilio Zaroánez.",
+              "hecho": "arena:a1",
+              "apoyo": [
+                "a1"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V2",
+              "detalle": "cita de apoyo a1, que no existe"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Benja Bareardi (16), de Juventud Islaverde Sur, intenta un pase de 23 m hacia Emilio Zaroánez.",
+              "texto_en": "Benja Bareardi (16) of Juventud Islaverde Sur attempts a 23 m pass toward Emilio Zaroánez.",
+              "hecho": "arena:a1",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 155,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a12",
+      "hechos": [
+        {
+          "id": "arena:a5",
+          "tipo": "accion_arena",
+          "texto_es": "Mateo Dorinosa (8) intercepta la trayectoria del balón.",
+          "texto_en": "Mateo Dorinosa (8) intercepts the ball's path.",
+          "eventos": [
+            "a5"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Mateo Dorinosa",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 8,
+            "distancia": 12,
+            "receptor": "Emilio Zaroánez"
+          }
+        },
+        {
+          "id": "arena:a6",
+          "tipo": "accion_arena",
+          "texto_es": "Mateo Dorinosa (8) intenta un pase de 12 m hacia Teo Lorelino.",
+          "texto_en": "Mateo Dorinosa (8) attempts a 12 m pass towards Teo Lorelino.",
+          "eventos": [
+            "a6"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Mateo Dorinosa",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 8,
+            "distancia": 12,
+            "receptor": "Teo Lorelino"
+          }
+        },
+        {
+          "id": "arena:a7",
+          "tipo": "accion_arena",
+          "texto_es": "Emilio Quinelón (9) recibe el balón.",
+          "texto_en": "Emilio Quinelón (9) receives the ball.",
+          "eventos": [
+            "a7"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Emilio Quinelón",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 9,
+            "distancia": 3,
+            "receptor": "Mateo Dorinosa"
+          }
+        },
+        {
+          "id": "arena:a8",
+          "tipo": "accion_arena",
+          "texto_es": "Emilio Quinelón (9) intenta un pase de 11 m hacia Teo Lorelino.",
+          "texto_en": "Emilio Quinelón (9) attempts a 11 m pass towards Teo Lorelino.",
+          "eventos": [
+            "a8"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Emilio Quinelón",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 9,
+            "distancia": 11,
+            "receptor": "Teo Lorelino"
+          }
+        },
+        {
+          "id": "arena:a11",
+          "tipo": "accion_arena",
+          "texto_es": "Aarón Celoón (1) intenta un pase de 29 m hacia Joel Mendiuz.",
+          "texto_en": "Aarón Celoón (1) attempts a 29 m pass towards Joel Mendiuz.",
+          "eventos": [
+            "a11"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Aarón Celoón",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 1,
+            "distancia": 29,
+            "receptor": "Joel Mendiuz"
+          }
+        },
+        {
+          "id": "arena:a12",
+          "tipo": "accion_arena",
+          "texto_es": "Joel Mendiuz (3) recibe el balón.",
+          "texto_en": "Joel Mendiuz (3) receives the ball.",
+          "eventos": [
+            "a12"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 28,
+            "receptor": "Aarón Celoón"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Joel Mendiuz (3) recibe el balón.",
+          "texto_en": "Joel Mendiuz (3) receives the ball.",
+          "hecho": "arena:a12",
+          "apoyo": [
+            "arena:a12"
+          ]
+        },
+        {
+          "texto_es": "Aarón Celoón (1) intenta un pase de 29 m hacia Joel Mendiuz.",
+          "texto_en": "Aarón Celoón (1) attempts a 29 m pass towards Joel Mendiuz.",
+          "hecho": "arena:a11",
+          "apoyo": [
+            "arena:a11"
+          ]
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Joel Mendiuz (3) recibe el balón tras el pase de Aarón Celoón (1).",
+              "texto_en": "Joel Mendiuz (3) receives the ball after Aarón Celoón (1)'s pass.",
+              "hecho": "arena:a12",
+              "apoyo": [
+                "arena:a11",
+                "arena:a12"
+              ]
+            },
+            {
+              "texto_es": "Antes, Aarón Celoón (1) había intentado un pase de 29 m hacia Joel Mendiuz.",
+              "texto_en": "Earlier, Aarón Celoón (1) had attempted a 29 m pass towards Joel Mendiuz.",
+              "hecho": "arena:a11",
+              "apoyo": [
+                "arena:a11"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 1 no está en el hecho (ES)"
+            },
+            {
+              "oracion": 1,
+              "regla": "V4",
+              "detalle": "«Earlier» no es un nombre del hecho ni una palabra permitida (EN)"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Joel Mendiuz (3) recibe el balón.",
+              "texto_en": "Joel Mendiuz (3) receives the ball.",
+              "hecho": "arena:a12",
+              "apoyo": [
+                "arena:a12"
+              ]
+            },
+            {
+              "texto_es": "Aarón Celoón (1) intenta un pase de 29 m hacia Joel Mendiuz.",
+              "texto_en": "Aarón Celoón (1) attempts a 29 m pass towards Joel Mendiuz.",
+              "hecho": "arena:a11",
+              "apoyo": [
+                "arena:a11"
+              ]
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 305,
+      "modelo": "azure-openai:cronista-rapido:reasoning-low",
+      "modo": "llm",
+      "principal": "arena:a18",
+      "hechos": [
+        {
+          "id": "arena:a12",
+          "tipo": "accion_arena",
+          "texto_es": "Joel Mendiuz (3) recibe el balón.",
+          "texto_en": "Joel Mendiuz (3) receives the ball.",
+          "eventos": [
+            "a12"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 28,
+            "receptor": "Aarón Celoón"
+          }
+        },
+        {
+          "id": "arena:a13",
+          "tipo": "accion_arena",
+          "texto_es": "Joel Mendiuz (3) remata hacia la portería rival.",
+          "texto_en": "Joel Mendiuz (3) shoots towards the opposing goal.",
+          "eventos": [
+            "a13"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 20
+          }
+        },
+        {
+          "id": "arena:a14",
+          "tipo": "gol_anotado",
+          "texto_es": "Gol de Joel Mendiuz (3).",
+          "texto_en": "Goal by Joel Mendiuz (3).",
+          "eventos": [
+            "a14"
+          ],
+          "relevancia": 100,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 20
+          }
+        },
+        {
+          "id": "arena:a16",
+          "tipo": "accion_arena",
+          "texto_es": "Emilio Torelueta (1) intenta un pase de 32 m hacia Thiago Valoena.",
+          "texto_en": "Emilio Torelueta (1) attempts a 32 m pass towards Thiago Valoena.",
+          "eventos": [
+            "a16"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Emilio Torelueta",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 1,
+            "distancia": 32,
+            "receptor": "Thiago Valoena"
+          }
+        },
+        {
+          "id": "arena:a17",
+          "tipo": "accion_arena",
+          "texto_es": "Thiago Valoena (4) recibe el balón.",
+          "texto_en": "Thiago Valoena (4) receives the ball.",
+          "eventos": [
+            "a17"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Thiago Valoena",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 4,
+            "distancia": 32,
+            "receptor": "Emilio Torelueta"
+          }
+        },
+        {
+          "id": "arena:a18",
+          "tipo": "accion_arena",
+          "texto_es": "Thiago Valoena (4) intenta un pase de 38 m hacia Teo Lorelino.",
+          "texto_en": "Thiago Valoena (4) attempts a 38 m pass towards Teo Lorelino.",
+          "eventos": [
+            "a18"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Thiago Valoena",
+            "equipo": "Atlético Montefrío Bajo",
+            "dorsal": 4,
+            "distancia": 38,
+            "receptor": "Teo Lorelino"
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Thiago Valoena (4) intenta un pase de 38 m hacia Teo Lorelino para Atlético Montefrío Bajo.",
+          "texto_en": "Thiago Valoena (4) attempts a 38 m pass towards Teo Lorelino for Atlético Montefrío Bajo.",
+          "hecho": "arena:a18",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Antes, Joel Mendiuz (3) marcó un gol para Juventud Islaverde Sur.",
+          "texto_en": "Before that, Joel Mendiuz (3) scored a goal for Juventud Islaverde Sur.",
+          "hecho": "arena:a14",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "Thiago Valoena (4) intenta un pase de 38 m hacia Teo Lorelino para Atlético Montefrío Bajo.",
+              "texto_en": "Thiago Valoena (4) attempts a 38 m pass towards Teo Lorelino for Atlético Montefrío Bajo.",
+              "hecho": "arena:a18",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Antes, Joel Mendiuz (3) marcó un gol para Juventud Islaverde Sur.",
+              "texto_en": "Earlier, Joel Mendiuz (3) scored a goal for Juventud Islaverde Sur.",
+              "hecho": "arena:a14",
+              "apoyo": []
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 1,
+              "regla": "V4",
+              "detalle": "«Earlier» no es un nombre del hecho ni una palabra permitida (EN)"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Thiago Valoena (4) intenta un pase de 38 m hacia Teo Lorelino para Atlético Montefrío Bajo.",
+              "texto_en": "Thiago Valoena (4) attempts a 38 m pass towards Teo Lorelino for Atlético Montefrío Bajo.",
+              "hecho": "arena:a18",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Antes, Joel Mendiuz (3) marcó un gol para Juventud Islaverde Sur.",
+              "texto_en": "Before that, Joel Mendiuz (3) scored a goal for Juventud Islaverde Sur.",
+              "hecho": "arena:a14",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  ],
+  "usage": [
+    {
+      "model": "azure-openai:cronista-equilibrado:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 2,
+        "entrada": 16497,
+        "salida": 1027,
+        "cache": 0
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 2,
+        "respuestasConUso": 2,
+        "entrada": 16519,
+        "salida": 1201,
+        "cache": 0
+      }
+    },
+    {
+      "model": "azure-openai:cronista-rapido:reasoning-low",
+      "usage": {
+        "llamadas": 6,
+        "respuestasConUso": 6,
+        "entrada": 4561,
+        "salida": 1019,
+        "cache": 0
+      }
+    }
+  ],
+  "replay": true,
+  "recording": {
+    "path": "public/experimentos/arena-duelo-v3.json",
+    "bytes": 1909155,
+    "sha256": "c21c41476de1df6667894ded3311a49c8305432e3e4a135e52ea3e43292d0b15"
+  },
+  "limits": [
+    "Un encuentro de 60 segundos no mide superioridad entre modelos ni realismo reglamentario.",
+    "Cada modelo dirige al equipo por intervalos; no elige mediante inferencia cada contacto con el balón."
+  ],
+  "allTeamDecisionsFromModels": true,
+  "programmedFallbacks": 0,
+  "execution": "Motor compartido con física y control local autónomo entre decisiones LLM; cero respaldos en las cuatro decisiones de equipo."
+}

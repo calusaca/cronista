@@ -1,0 +1,17 @@
+{
+  "checkedUtc": "2026-10-19T20:14:31.884846+00:00",
+  "phase": "deployed_and_smoke_passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019201001",
+  "revision": "cronista-arena--0000004",
+  "sourceFiles": 289,
+  "acrRun": "chd",
+  "originalDemoRevision": "cronista--0000005",
+  "originalDemoUnchanged": true,
+  "browserEvidence": "navegador-publico.json",
+  "previousBuild": {
+    "acrRun": "chc",
+    "status": "Canceled before deployment",
+    "reason": "Include the final header/panel alignment fix"
+  }
+}

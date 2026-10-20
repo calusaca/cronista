@@ -1,0 +1,31 @@
+{
+  "checkedUtc": "2026-10-19T05:06:30.429Z",
+  "mode": "offline_no_new_model_calls",
+  "originalSha256": "d578747c5db97554f6f33eef08641c5a804d7c6c525d5593fc6450638524c57b",
+  "change": "El hecho incorpora el dorsal comprobado de su receptor/pasador, sin habilitar números de hechos ajenos.",
+  "casos": [
+    {
+      "tick": 150,
+      "original": [
+        {
+          "oracion": 1,
+          "regla": "V3",
+          "detalle": "el número 1 no está en el hecho (ES)"
+        }
+      ],
+      "revalidacion": []
+    },
+    {
+      "tick": 300,
+      "original": [
+        {
+          "oracion": 0,
+          "regla": "V3",
+          "detalle": "el número 1 no está en el hecho (ES)"
+        }
+      ],
+      "revalidacion": []
+    }
+  ],
+  "limits": "No sustituye resultados originales de Foundry ni es una nueva generación."
+}

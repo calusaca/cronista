@@ -1,0 +1,80 @@
+{
+  "checkedUtc": "2026-10-19T05:19:22.744Z",
+  "status": "passed",
+  "decoder": "Chromium HTMLMediaElement",
+  "files": [
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-0-100.mp3",
+      "idioma": "es",
+      "duracionS": 46.632,
+      "bytes": 279792
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-100-200.mp3",
+      "idioma": "es",
+      "duracionS": 20.448,
+      "bytes": 122688
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-200-300.mp3",
+      "idioma": "es",
+      "duracionS": 28.224,
+      "bytes": 169344
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-300-400.mp3",
+      "idioma": "es",
+      "duracionS": 27.936,
+      "bytes": 167616
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-400-500.mp3",
+      "idioma": "es",
+      "duracionS": 18.84,
+      "bytes": 113040
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/es-500-600.mp3",
+      "idioma": "es",
+      "duracionS": 47.952,
+      "bytes": 287712
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-0-100.mp3",
+      "idioma": "en",
+      "duracionS": 44.4,
+      "bytes": 266400
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-100-200.mp3",
+      "idioma": "en",
+      "duracionS": 19.776,
+      "bytes": 118656
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-200-300.mp3",
+      "idioma": "en",
+      "duracionS": 27.408,
+      "bytes": 164448
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-300-400.mp3",
+      "idioma": "en",
+      "duracionS": 28.704,
+      "bytes": 172224
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-400-500.mp3",
+      "idioma": "en",
+      "duracionS": 17.544,
+      "bytes": 105264
+    },
+    {
+      "archivo": "docs/evidencia/azure-voz/duelo/en-500-600.mp3",
+      "idioma": "en",
+      "duracionS": 44.928,
+      "bytes": 269568
+    }
+  ],
+  "limits": "Verifica formato y duración; no reemplaza revisión humana de pronunciación ni transcripción del audio."
+}

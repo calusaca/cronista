@@ -1,0 +1,24 @@
+{
+  "fuentes": [
+    {
+      "inicio": 2710.10000000149,
+      "fin": 7870.10000000149,
+      "audible": true,
+      "velocidad": 1
+    },
+    {
+      "inicio": 9876.10000000149,
+      "fin": 15823.10000000149,
+      "audible": true,
+      "velocidad": 1
+    },
+    {
+      "inicio": 17826,
+      "fin": 22986,
+      "audible": true,
+      "velocidad": 1
+    }
+  ],
+  "maxSilencioMs": 2118,
+  "duracionMs": 22333.800000000745
+}

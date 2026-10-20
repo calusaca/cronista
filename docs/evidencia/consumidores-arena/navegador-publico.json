@@ -1,0 +1,46 @@
+{
+  "checkedUtc": "2026-10-19T21:58:41.097Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "phase": "passed",
+  "match": "d552b0ec-25e1-4b48-a6a1-a84ef68715b1",
+  "seed": 2,
+  "programmed": true,
+  "realSpeech": true,
+  "voiceRequests": [
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false
+    },
+    {
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "cierre": false
+    },
+    {
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "cierre": false
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false
+    }
+  ],
+  "decodedSeconds": [
+    3.096,
+    5.232,
+    11.856
+  ],
+  "playbackRates": [
+    1
+  ],
+  "visualProgressWhileSpeechBlocked": true,
+  "turningVoiceOffDoesNotPauseMatch": true,
+  "visibleSecond": 5,
+  "descriptionActions": 4,
+  "mobileWidth": 360,
+  "horizontalOverflow": false,
+  "javascriptErrors": []
+}

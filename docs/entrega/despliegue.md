@@ -1,11 +1,33 @@
 # Publicación de la demo en Azure
 
-Actualizado el 17 de octubre de 2026. La inferencia con GPT-6.1 Sol está
+Actualizado el 19 de octubre de 2026. La inferencia con GPT-6.1 Sol está
 probada. **[La demo pública está desplegada](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io)**
 en Azure Container Apps, East US 2. Inicio de sesión, preflight, construcción en
 ACR, despliegue y pruebas HTTP/navegador del servicio público aprobados.
 Azure CLI 2.91 y Bicep 0.48.1 están instalados localmente en `.cache/`, sin cambios
 del sistema. GitHub está conectado y el repositorio existente sigue privado.
+
+El 19 de octubre se publicó, con autorización específica, una aplicación
+adicional para la [arena en vivo](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena).
+La aplicación `cronista` conserva su revisión `cronista--0000005` y su imagen
+`cronista:demo-20261018042118`. La nueva `cronista-arena` incorpora Blob, Key Vault,
+analista Foundry, Speech y trazas con límites de consumo. Su plantilla es
+`infra/arena-preview.bicep`; el script es `scripts/deploy-azure-arena.mjs`.
+Ver [operación](../azure-integraciones.md) y
+[evidencia del despliegue](../evidencia/azure-arena-publicacion.json).
+
+La revisión `cronista-arena--0000002`, publicada el 19 de octubre, incorpora
+«Generar primero», enlace al partido guardado y narración completa preparada
+como una pista continua. Compilación ACR `cha` correcta y HTTP/navegador público
+aprobados, incluidos seis audios reales y los 33 eventos del duelo archivado.
+[Evidencia y límites](../evidencia/partido-preparado/publicacion.json).
+
+La revisión actual `cronista-arena--0000003` añade la emisión casi en vivo con
+20 segundos de reserva, voz breve preparada por delante y enlace al mismo
+encuentro para otros espectadores. Imagen `arena-20261019183630`, compilación ACR
+`chb` correcta; publicación y navegador público verificados el 19 de octubre,
+incluidos seis tramos reales de voz y su reloj de reproducción. La demo original
+conserva `cronista--0000005`. [Evidencia](../evidencia/emision-buffer/publicacion.json).
 
 ## Continuar en esta máquina
 

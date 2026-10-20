@@ -1,0 +1,204 @@
+{
+  "checkedUtc": "2026-10-19T13:04:00.851Z",
+  "scope": "public_recorded_complete_narration",
+  "session": "7631ee92-07b1-4612-9902-da3e3189896b",
+  "segments": [
+    {
+      "language": "es",
+      "fromTick": 0,
+      "toTick": 100,
+      "bytes": 279792,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "39e1782adb525b3b0a59b593ed44d0d517c68b524aa443c7046c5429c7b6a14b",
+      "sources": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8"
+      ]
+    },
+    {
+      "language": "es",
+      "fromTick": 100,
+      "toTick": 200,
+      "bytes": 122688,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "9e487cd13d9f6019bad5cc713481939e3e54798550522a75a9b326f11be4f581",
+      "sources": [
+        "a9",
+        "a10",
+        "a11",
+        "a12"
+      ]
+    },
+    {
+      "language": "es",
+      "fromTick": 200,
+      "toTick": 300,
+      "bytes": 169344,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "a5a0e9af77efd324903d8b4396c52b6ee5df1f9948b925884fce023e4af55335",
+      "sources": [
+        "a13",
+        "a14",
+        "a15",
+        "a16",
+        "a17",
+        "a18"
+      ]
+    },
+    {
+      "language": "es",
+      "fromTick": 300,
+      "toTick": 400,
+      "bytes": 167616,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "5d3fc65e60417b8af58475af9b1308d73552b53a62839f148baa54d73099bb6d",
+      "sources": [
+        "a19",
+        "a14",
+        "a16",
+        "a18",
+        "a20",
+        "a14",
+        "a18",
+        "a21"
+      ]
+    },
+    {
+      "language": "es",
+      "fromTick": 400,
+      "toTick": 500,
+      "bytes": 113040,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "76df36d4fb25bdf5cb48aedbc85eb19b9bbf017e94ae847ca2d0a083466148d8",
+      "sources": [
+        "a22",
+        "a23",
+        "a24",
+        "a25"
+      ]
+    },
+    {
+      "language": "es",
+      "fromTick": 500,
+      "toTick": 600,
+      "bytes": 287712,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "e8f13c1326ed0ad2e65e8dd677c797529368fc912eb26eeeb924fb2b39e4abbb",
+      "sources": [
+        "a26",
+        "a27",
+        "a28",
+        "a29",
+        "a30",
+        "a31",
+        "a32",
+        "a33"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 0,
+      "toTick": 100,
+      "bytes": 266400,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "0607caf9e7d807148d60943359ce8b30622658d10a6bc05265bb0087e66f84e7",
+      "sources": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 100,
+      "toTick": 200,
+      "bytes": 118656,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "aec7e8a2fd3fd0b9b558a92d6ed4ac2ed00be1e65d2a83081ef6c80a09f14090",
+      "sources": [
+        "a9",
+        "a10",
+        "a11",
+        "a12"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 200,
+      "toTick": 300,
+      "bytes": 164448,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "381dbcf3a13ab33180c6c082514287a7469498112dc91d06fb405b89c369aef9",
+      "sources": [
+        "a13",
+        "a14",
+        "a15",
+        "a16",
+        "a17",
+        "a18"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 300,
+      "toTick": 400,
+      "bytes": 172224,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "a0c05137e422c6b4420a25d39059c5804c3e7307f70c7ad7bc1004ae272f72c5",
+      "sources": [
+        "a19",
+        "a14",
+        "a16",
+        "a18",
+        "a20",
+        "a14",
+        "a18",
+        "a21"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 400,
+      "toTick": 500,
+      "bytes": 105264,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "e7c9281bb1414ac46979f6e03ab0eab28b556a5f02c031c7863ca945153099bc",
+      "sources": [
+        "a22",
+        "a23",
+        "a24",
+        "a25"
+      ]
+    },
+    {
+      "language": "en",
+      "fromTick": 500,
+      "toTick": 600,
+      "bytes": 269568,
+      "identicalToPreviouslyGeneratedAudio": true,
+      "sha256": "4e59ec4047a881d8284ff945f074d92f4ae95de22ad5aa47df3ebc193e038b87",
+      "sources": [
+        "a26",
+        "a27",
+        "a28",
+        "a29",
+        "a30",
+        "a31",
+        "a32",
+        "a33"
+      ]
+    }
+  ],
+  "status": "passed"
+}

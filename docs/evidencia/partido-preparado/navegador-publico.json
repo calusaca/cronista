@@ -1,0 +1,143 @@
+{
+  "checkedUtc": "2026-10-19T17:25:18.116Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "scope": "deployed_application_real_http_and_browser_without_mock_responses",
+  "newTeamModelCalls": 0,
+  "newAnalystCalls": 0,
+  "speechProviderCalls": "not instrumented; requests use the existing durable recording/audio cache",
+  "playbackAcceleratedBySeeking": true,
+  "checks": {
+    "health": {
+      "http": 200
+    },
+    "generateFirst": {
+      "http": 201,
+      "session": "5a6b6c36-532a-4dbf-a12a-e264cf98d504",
+      "finalTick": 600,
+      "startsPausedAtZero": true,
+      "shareRestoresSameMatch": true,
+      "sessionCreations": 1,
+      "visualPlaybackWithArenaNetworkBlocked": true
+    },
+    "mobile": {
+      "width": 360,
+      "dark": true,
+      "reducedMotion": true,
+      "spanish": true,
+      "horizontalOverflow": false
+    },
+    "recording": {
+      "http": 200,
+      "session": "7631ee92-07b1-4612-9902-da3e3189896b"
+    },
+    "audio": {
+      "type": "audio/wav",
+      "durationSeconds": 204.528,
+      "sources": 0,
+      "passagesPreparedBeforePlayback": 6,
+      "requestsAfterPlaybackStarted": 0,
+      "allEventsCovered": true,
+      "recordedEvents": 33,
+      "seekUpdatesPitch": true,
+      "playbackWithArenaNetworkBlocked": true,
+      "realEndedEvent": true
+    }
+  },
+  "segments": [
+    {
+      "http": 200,
+      "desdeTick": 0,
+      "hastaTick": 100,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8"
+      ],
+      "bytes": 292320
+    },
+    {
+      "http": 200,
+      "desdeTick": 100,
+      "hastaTick": 200,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a9",
+        "a10",
+        "a11",
+        "a12"
+      ],
+      "bytes": 129168
+    },
+    {
+      "http": 200,
+      "desdeTick": 200,
+      "hastaTick": 300,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a13",
+        "a14",
+        "a15",
+        "a16",
+        "a17",
+        "a18"
+      ],
+      "bytes": 189360
+    },
+    {
+      "http": 200,
+      "desdeTick": 300,
+      "hastaTick": 400,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a19",
+        "a14",
+        "a16",
+        "a18",
+        "a20",
+        "a14",
+        "a18",
+        "a21"
+      ],
+      "bytes": 202752
+    },
+    {
+      "http": 200,
+      "desdeTick": 400,
+      "hastaTick": 500,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a22",
+        "a23",
+        "a24",
+        "a25"
+      ],
+      "bytes": 117648
+    },
+    {
+      "http": 200,
+      "desdeTick": 500,
+      "hastaTick": 600,
+      "version": "voz-expresiva-v1",
+      "events": [
+        "a26",
+        "a27",
+        "a28",
+        "a29",
+        "a30",
+        "a31",
+        "a32",
+        "a33"
+      ],
+      "bytes": 295920
+    }
+  ],
+  "errors": [],
+  "status": "passed",
+  "finishedUtc": "2026-10-19T17:26:16.483Z"
+}

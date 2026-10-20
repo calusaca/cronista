@@ -1,0 +1,42 @@
+{
+  "checkedUtc": "2026-10-19T20:11:34.687737+00:00",
+  "phase": "local_checks_passed",
+  "unit": {
+    "files": 67,
+    "passed": 1559
+  },
+  "typescript": "passed",
+  "packagingTests": 2,
+  "browser": {
+    "uniqueScenariosPassed": 28,
+    "initialRun": {
+      "passed": 25,
+      "failed": 3
+    },
+    "correctedTests": "Exact label selectors for a wrapping select; Saved matches access for the Spanish archived-audio flow. All three rerun against the same production build: 2 + 1 passed.",
+    "productionCodeAfterInitialBuild": "unchanged",
+    "paidInference": false,
+    "realSpeechFiles": "Six archived MP3 passages decoded without calling Azure"
+  },
+  "sourceSha256": {
+    "src/ui/Arena.tsx": "46b4fbc64a2b6c0ca5e6a913ad6f623f2154957f43795586f0a7a57986b05cc5",
+    "src/ui/ArenaEnDirecto.tsx": "3bec285f2731054f5dd16ac660178d116031aa7d9950dea8bed41fb909f89b7b",
+    "src/ui/ArenaEmisionBuffer.tsx": "6c12ffdd7ade78ec30f7258ed1c7bcb6fd151b6be9f70ab200bad6f080ceb69f",
+    "src/ui/ArenaComentarios.tsx": "8d889fac700eb5e94f46da5a1890efb1325a537a56aa453a27698302cbaa12c1",
+    "src/ui/ArenaNarracion.tsx": "d7f1d073ac1ad3fa4599b02639d652120aab28878ca80f4b81c6f2857f275b6a",
+    "src/ui/ArenaContexto.tsx": "c4156adf43192576cb9d57053b696621bbc5b93a3dec89de93c17cac8984e96d",
+    "src/arena/catalogo.ts": "173992fe3b234dc5c5cde1d3cfb78c2c5708c523b394ddf6f045ab3403174ec8",
+    "src/arena/entrenadores.ts": "d147f70ad44610f2d3ed42e97ba8595dc2ff0aa6be1fdb4c4ef36618bed9c7d1",
+    "src/arena/tipos.ts": "824db2e4e0f3408c6a1ed2648198a6f6186a01759afbd6dd99a7a5012ba74f25",
+    "src/arena/motor.ts": "557c77be9992873e4cb94ffeec1041ffdf9ef3363dbed60c2b35946e7b5d08f9",
+    "src/arena/controladores.ts": "8f6fb330eaa2a695ceb647c86d692463dac6ff9574d89a6dc121c87604aea225",
+    "src/app/globals.css": "d8a7b64705924adb61e141df209d86123341fabd4ac4c8d5386b450623046742"
+  },
+  "finalCssVerification": {
+    "change": "Sticky narration stays below the fixed header",
+    "productionBuild": "passed",
+    "formationAndUiScenarios": 3,
+    "headerAndNarrationAssertion": 1,
+    "note": "Final visual case also waits for the selected recording before seeking; passed after correcting the test synchronization."
+  }
+}

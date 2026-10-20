@@ -1,0 +1,87 @@
+{
+  "checkedUtc": "2026-10-19T14:16:30.976877+00:00",
+  "phase": "implemented_and_validated_locally_not_deployed",
+  "design": "../../disenos/037-partido-preparado.md",
+  "checks": {
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "standalonePackaging": "passed",
+    "deploymentPackagingTests": {
+      "status": "passed",
+      "tests": 2
+    },
+    "unit": {
+      "status": "passed",
+      "tests": 1537,
+      "files": 65,
+      "log": ".cache/partido-preparado-unitarias-final.log"
+    },
+    "browser": {
+      "status": "passed",
+      "fullArenaSuite": 19,
+      "finalPreparedModeCases": 5,
+      "uniqueCases": 20,
+      "finalCases": [
+        "generate-first paused result, sharing and offline visual replay",
+        "all audio prepared before playback, one continuous clock",
+        "six authentic archived MP3 files decoded into one WAV",
+        "cancellation and language changes discard stale responses",
+        "download failure reconnects to the same match without another creation"
+      ]
+    },
+    "audio": {
+      "source": "../voz-expresiva/duelo-es-completo.mp3",
+      "mp3Passages": 6,
+      "newAzureSpeechCalls": 0,
+      "singleContinuousTrack": "audio/wav; mono PCM 16-bit at 24 kHz",
+      "durationComparedAgainstOriginalSeconds": 204.52798185941043,
+      "pitchFollowsAudio": true
+    },
+    "cache": {
+      "matchRestoredAfterRestartWithoutNewTeamCalls": true,
+      "sameAudioConcurrentConsumersShareOneSynthesis": true,
+      "audioRestoredAfterRestartWithoutNewSynthesis": true,
+      "partialOrCancelledMatchRejectedAsFinished": true
+    },
+    "mobile": {
+      "width": 360,
+      "horizontalOverflow": false,
+      "screenshot": "movil.png"
+    }
+  },
+  "initialVerificationIssues": [
+    "The sandbox prevented the local Playwright server from starting; browser checks passed after running outside that restriction.",
+    "Eight CLI assertions could not capture subprocess output in the sandbox. The unchanged full unit suite passed outside the restriction.",
+    "One new browser test initially fetched the recording before asynchronous generation completed. The test now waits for the ready response; all cases passed."
+  ],
+  "limits": {
+    "dailyModelMatches": 10,
+    "dailyAnalystQuestions": 20,
+    "dailySpeechBudgetIncludingMarkup": 120000,
+    "perSessionSpeechBudgetIncludingMarkup": 24000,
+    "maximumLocalPcmBytes": 60000000,
+    "maximumRetentionHours": 24
+  },
+  "limitations": [
+    "Initial match generation and audio preparation still take time; no latency benchmark or guaranteed completion time.",
+    "Audio and pitch synchronization is approximate within each passage, not word-aligned.",
+    "New match creation produces a new match; existing sessions are reused by ID, not by seed alone.",
+    "Speech budgets may prevent preparing very dense or long recordings in full.",
+    "A reserved synthesis finishes under the provider timeout after a viewer disconnects and remains cached.",
+    "Subjective voice quality and professional football realism are not measured by these checks."
+  ],
+  "sourceHashes": {
+    "src/arena/peticiones.ts": "61058d0f680b81db6b5f7d62a9b0139c344d2d6e38fd0ad0eb3e7d02450ed6f1",
+    "src/arena/protocolo.ts": "bc7ce293c9d085a77155cbbc3d79cc9699610176caac81ab058f516ad89d7b8b",
+    "src/arena/sesiones.ts": "9582735eb4d0f88cb03bb2c214f512ff21cb8158d86883feba02dc54679ba494",
+    "src/arena/pista-audio.ts": "64e0a5c4efe7ba18aa65a5da7aed6f3b4dfd7e503b97b5a05416069b58c80e6a",
+    "src/ui/Arena.tsx": "9e97870507cdfd27add2af865d4ac345b4777070a98cc51a97ae1a6ec5bd1168",
+    "src/ui/ArenaEnDirecto.tsx": "7905ddcf4643807617fe134756d84c938ff2c2bf1911c2f0c5d8eecceab59d27",
+    "src/ui/ArenaNarracion.tsx": "0df75e5e8fb1ac4dc7c8648afc45b4b8fc61c887482dd243171910d80bec6ef8",
+    "src/app/api/arena/sesiones/[id]/reproduccion/route.ts": "5727fe4b9bc497f13425dafb88b884c54ea35f2dac017a3e47d4f02e68501440",
+    "src/app/api/arena/sesiones/[id]/relato/route.ts": "6fd476c26e7fb87d4eb8c3d25c5b3d448b4d63422b59b97a162ca96c74427f6c",
+    "src/app/api/arena/sesiones/[id]/voz/route.ts": "8c1066efe8be1b32258406a67a39cbe29add81cd55c82eaf76b84207dcf03477",
+    "src/arena/__tests__/reproduccion-preparada.test.ts": "12122012093fecfaebf7cb3aba0b4b7704342443b749a3a0faeb593eab470904",
+    "e2e/arena.spec.ts": "6a656bafcd27b128ed054d7eb2314d5fc71c22a50879ee946632cbc903a3a870"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "checkedUtc": "2026-10-19T22:53:39.791Z",
+  "typecheck": "passed",
+  "build": "Next production + standalone passed",
+  "unitarias": {
+    "pasaron": 1586,
+    "archivos": 68
+  },
+  "navegador": {
+    "corridaInicial": {
+      "pasaron": 33,
+      "fallaron": 2
+    },
+    "correccionFixturesAudio": {
+      "pasaron": 2,
+      "fallaron": 0
+    },
+    "escenariosUnicosComprobados": 35,
+    "notas": "La entrada recibió por error el WAV largo de contexto en un fixture. Se separaron ambos audios. El cierre admitió correctamente el saque inicial de prioridad mayor antes que la entrada: se comprueba narración actual y cierre posterior al final.",
+    "reactivacionAntesDeCaducar": {
+      "pasaron": 1,
+      "fallaron": 0
+    },
+    "golDuranteSilencioTick": 231,
+    "entradaAlReactivar": 240
+  },
+  "empaquetado": 2,
+  "sourceFiles": 294,
+  "fuentes": [
+    {
+      "path": "src/arena/motor.ts",
+      "sha256": "e834b86799f516c4f5db4730ce12cdeb69f767206a1357be048ee543099495cc"
+    },
+    {
+      "path": "src/arena/coordinador.ts",
+      "sha256": "38ba0506dab8d99b6acd8d88060125b86ee4a78a0d2443e50d7f38a67f8071f1"
+    },
+    {
+      "path": "src/arena/reinicios.ts",
+      "sha256": "2176e5ed2932253a6d816ccba539566c755dcccf149dd01f2063e98b6a8960ba"
+    },
+    {
+      "path": "src/arena/tipos.ts",
+      "sha256": "4b8121cb99fa98103ed747b88a72f0bbdf07f753b19de54704104f0f090e48e3"
+    },
+    {
+      "path": "src/arena/buffer.ts",
+      "sha256": "12b09927554954eb8c8083a33d9bb9e91cf0e1279f68264a7e5c4f317f4ed36c"
+    },
+    {
+      "path": "src/arena/relato.ts",
+      "sha256": "e870fba75e21a34760c032347658c412b129215846fc6fc5d42de275409c9d7f"
+    },
+    {
+      "path": "src/ui/ArenaEmisionBuffer.tsx",
+      "sha256": "6d770f87e043de93a7c430739a6a314b238a7b5a1d9f7ba8f6aa850e346eecf3"
+    },
+    {
+      "path": "src/ui/Arena.tsx",
+      "sha256": "a4252f54d13946d49725a6e31fa5e40bde3cc840304a38053bee7b96cda21f05"
+    },
+    {
+      "path": "src/app/api/arena/sesiones/[id]/relato/route.ts",
+      "sha256": "20892ca1f9a63a59083d23885734375689446ed833952d47940bd3af3b9cb425"
+    },
+    {
+      "path": "src/arena/__fixtures__/arena-reinicios-v1.json",
+      "sha256": "8fbcc25e38d5d80b76989f0e1d261b15629c7e2654a63fa38c96c97e2f3f6953"
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+{
+  "checkedUtc": "2026-10-19T13:51:35.835Z",
+  "status": "passed",
+  "session": "7631ee92-07b1-4612-9902-da3e3189896b",
+  "voice": "es-MX-JorgeNeural",
+  "version": "voz-expresiva-v1",
+  "scope": "local_production_app_real_azure_speech_cached_after_browser_test",
+  "file": "docs/evidencia/voz-expresiva/duelo-es-completo.mp3",
+  "sha256": "437fa220f447216d5ae81813cf92394d859610f70f2cc4e85a1e8a6f2326d326",
+  "bytes": 1227168,
+  "recordedEvents": 33,
+  "fullEventCoverage": true,
+  "segments": [
+    {
+      "desdeTick": 0,
+      "hastaTick": 100,
+      "text": "Comienza el partido entre Juventud Islaverde Sur y Atlético Montefrío Bajo. Benja Bareardi (16) intenta un pase de 23 m hacia Emilio Zaroánez. Emilio Quinelón (9) intercepta la trayectoria del balón. Emilio Zaroánez (14) toma el control del balón. Emilio Zaroánez (14) intenta un pase de 19 m hacia Dante Doraena. Mateo Dorinosa (8) intercepta la trayectoria del balón. Mateo Dorinosa (8) intenta un pase de 12 m hacia Teo Lorelino. Emilio Quinelón (9) recibe el balón. Emilio Quinelón (9) intenta un pase de 11 m hacia Teo Lorelino.",
+      "events": [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8"
+      ],
+      "positions": [
+        0
+      ],
+      "emotions": [
+        {
+          "tick": 0,
+          "emotion": "serena",
+          "intensity": 0.25
+        },
+        {
+          "tick": 1,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 10,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 31,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 50,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 57,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 76,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 77,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 96,
+          "emotion": "serena",
+          "intensity": 0.18
+        }
+      ],
+      "bytes": 292320,
+      "sha256": "97301eaa3f0ef281657c0d7e5b28f40cc0f7b3b0252f95d26a113b98bc95603b"
+    },
+    {
+      "desdeTick": 100,
+      "hastaTick": 200,
+      "text": "Teo Lorelino (16) interviene en posición adelantada (aproximación puntual). Reinicio experimental desde Aarón Celoón (1); se recoloca el balón. Aarón Celoón (1) intenta un pase de 29 m hacia Joel Mendiuz. Joel Mendiuz (3) recibe el balón.",
+      "events": [
+        "a9",
+        "a10",
+        "a11",
+        "a12"
+      ],
+      "positions": [],
+      "emotions": [
+        {
+          "tick": 102,
+          "emotion": "seria",
+          "intensity": 0.35
+        },
+        {
+          "tick": 102,
+          "emotion": "serena",
+          "intensity": 0.2
+        },
+        {
+          "tick": 122,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 139,
+          "emotion": "serena",
+          "intensity": 0.18
+        }
+      ],
+      "bytes": 129168,
+      "sha256": "dfedd3057a15c27f657759e3ffb4d695319d2fffa1e772d23a9db589a8dee83a"
+    },
+    {
+      "desdeTick": 200,
+      "hastaTick": 300,
+      "text": "Joel Mendiuz avanza hacia el área. Joel Mendiuz (3) remata hacia la portería rival. ¡Gol! ¡Lo anota Joel Mendiuz! Reinicio experimental desde Emilio Torelueta (1); se recoloca el balón. Emilio Torelueta (1) intenta un pase de 32 m hacia Thiago Valoena. Thiago Valoena (4) recibe el balón. Thiago Valoena (4) intenta un pase de 38 m hacia Teo Lorelino.",
+      "events": [
+        "a13",
+        "a14",
+        "a15",
+        "a16",
+        "a17",
+        "a18"
+      ],
+      "positions": [
+        205,
+        215
+      ],
+      "emotions": [
+        {
+          "tick": 215,
+          "emotion": "tension",
+          "intensity": 0.5742003750327678
+        },
+        {
+          "tick": 222,
+          "emotion": "emocion",
+          "intensity": 0.85
+        },
+        {
+          "tick": 231,
+          "emotion": "jubilo",
+          "intensity": 0.92
+        },
+        {
+          "tick": 231,
+          "emotion": "serena",
+          "intensity": 0.2
+        },
+        {
+          "tick": 250,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 270,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 289,
+          "emotion": "serena",
+          "intensity": 0.18
+        }
+      ],
+      "bytes": 189360,
+      "sha256": "061a3d5789440e03c86bacabf5145dccfc44a65527ac7626c377291efbcac65f"
+    },
+    {
+      "desdeTick": 300,
+      "hastaTick": 400,
+      "text": "Mara Dorino revisa la formación a 4-4-2. Motivo declarado: «Ventaja de un gol y 30 segundos restantes; mantener estructura y reducir espacios sin renunciar al contraataque.». Elio Zarueta revisa la formación a 3-4-3. Motivo declarado: «Queda poco tiempo y vamos abajo: más presencia arriba y presión tras pérdida.». Teo Lorelino (16) recibe el balón. Teo Lorelino avanza hacia el área. Teo Lorelino lleva el balón hacia el área.",
+      "events": [
+        "a19",
+        "a14",
+        "a16",
+        "a18",
+        "a20",
+        "a14",
+        "a18",
+        "a21"
+      ],
+      "positions": [
+        315,
+        325,
+        355,
+        365
+      ],
+      "emotions": [
+        {
+          "tick": 301,
+          "emotion": "serena",
+          "intensity": 0.2
+        },
+        {
+          "tick": 301,
+          "emotion": "serena",
+          "intensity": 0.2
+        },
+        {
+          "tick": 313,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 325,
+          "emotion": "tension",
+          "intensity": 0.5
+        },
+        {
+          "tick": 365,
+          "emotion": "tension",
+          "intensity": 0.6336813105070255
+        }
+      ],
+      "bytes": 202752,
+      "sha256": "f364af6cbca845f81f409e5fd8ed9b8dda1ae49b44ffe665143f8fd5b9f55b57"
+    },
+    {
+      "desdeTick": 400,
+      "hastaTick": 500,
+      "text": "Bruno Quinoich (4) toma el control del balón. Fabio Valinera (6) toma el control del balón. Bruno Quinoich (4) toma el control del balón. Bruno Quinoich (4) intenta un pase de 35 m hacia Emilio Zaroánez.",
+      "events": [
+        "a22",
+        "a23",
+        "a24",
+        "a25"
+      ],
+      "positions": [],
+      "emotions": [
+        {
+          "tick": 428,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 436,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 467,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 486,
+          "emotion": "serena",
+          "intensity": 0.18
+        }
+      ],
+      "bytes": 117648,
+      "sha256": "6e867e94d5f1b5e6d5249051978bfbf5231d0fed1cb7bf65152c15711a98c13d"
+    },
+    {
+      "desdeTick": 500,
+      "hastaTick": 600,
+      "text": "Thiago Valoena (4) intercepta la trayectoria del balón. Thiago Valoena (4) intenta un pase de 6 m hacia Fabio Valinera. Fabio Valinera (6) interviene en posición adelantada (aproximación puntual). Reinicio experimental desde Aarón Celoón (1); se recoloca el balón. Aarón Celoón (1) intenta un pase de 30 m hacia Bruno Quinoich. Bruno Quinoich (4) recibe el balón. Bruno Quinoich (4) intenta un pase de 17 m hacia Dante Doraena. Dante Doraena (8) recibe el balón. Final del partido. Juventud Islaverde Sur, 1; Atlético Montefrío Bajo, 0.",
+      "events": [
+        "a26",
+        "a27",
+        "a28",
+        "a29",
+        "a30",
+        "a31",
+        "a32",
+        "a33"
+      ],
+      "positions": [
+        600
+      ],
+      "emotions": [
+        {
+          "tick": 508,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 527,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 530,
+          "emotion": "seria",
+          "intensity": 0.35
+        },
+        {
+          "tick": 530,
+          "emotion": "serena",
+          "intensity": 0.2
+        },
+        {
+          "tick": 549,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 567,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 586,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 596,
+          "emotion": "serena",
+          "intensity": 0.18
+        },
+        {
+          "tick": 600,
+          "emotion": "serena",
+          "intensity": 0.25
+        }
+      ],
+      "bytes": 295920,
+      "sha256": "35ba8923b916aa81a44024958193e5884d7f4ad816f5eefd46261d4bc4263425"
+    }
+  ],
+  "limitations": [
+    "MP3 concatenado a partir de seis tramos del mismo formato.",
+    "La reproducción de navegador se aceleró con saltos; escucha humana íntegra pendiente."
+  ],
+  "decoded": {
+    "durationSeconds": 204.52798185941043,
+    "sampleRate": 44100,
+    "channels": 1
+  }
+}

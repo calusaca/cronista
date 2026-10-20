@@ -1,0 +1,262 @@
+{
+  "checkedUtc": "2026-10-19T22:26:11.500Z",
+  "phase": "passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "sesion": "bacd3835-dcc2-409d-a728-a2ea07a646ba",
+  "seed": 7,
+  "intervaloDecisionesS": 30,
+  "voz": {
+    "fuentes": [
+      {
+        "inicio": 5992.10000000149,
+        "fin": 11146.10000000149,
+        "duracion": 5.16,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            6172.10000000149,
+            7572.10000000149
+          ],
+          [
+            7672.10000000149,
+            9572.10000000149
+          ],
+          [
+            9592.10000000149,
+            10172.10000000149
+          ]
+        ]
+      },
+      {
+        "inicio": 13158.20000000298,
+        "fin": 15891.20000000298,
+        "duracion": 5.952,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            13338.20000000298,
+            15638.20000000298
+          ],
+          [
+            15858.20000000298,
+            18138.20000000298
+          ]
+        ]
+      },
+      {
+        "inicio": 15921.300000000745,
+        "fin": 20961.300000000745,
+        "duracion": 5.04,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            16061.300000000745,
+            17021.300000000745
+          ],
+          [
+            17041.300000000745,
+            17801.300000000745
+          ],
+          [
+            17881.300000000745,
+            18821.300000000745
+          ],
+          [
+            18901.300000000745,
+            20081.300000000745
+          ]
+        ]
+      },
+      {
+        "inicio": 21004.5,
+        "fin": 25640.800000000745,
+        "duracion": 11.976,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            21204.5,
+            22884.5
+          ],
+          [
+            23064.5,
+            27364.5
+          ],
+          [
+            28264.5,
+            30524.5
+          ],
+          [
+            30564.5,
+            32024.5
+          ]
+        ]
+      },
+      {
+        "inicio": 25670.900000002235,
+        "fin": 28718.900000002235,
+        "duracion": 3.048,
+        "audible": true,
+        "velocidad": 1,
+        "voz": [
+          [
+            25810.900000002235,
+            27590.900000002235
+          ]
+        ]
+      }
+    ],
+    "reinicios": [
+      {
+        "texto": "Corner kick · Juventud Valdecristal",
+        "reloj": "0:08 / 1:00"
+      },
+      {
+        "texto": "Kick-off · Juventud Valdecristal",
+        "reloj": "0:21 / 1:00"
+      }
+    ],
+    "transcripciones": [
+      {
+        "tick": 20,
+        "texto": "Narration transcript and evidenceWe continue our coverage, following the ball and the movements of both teams.",
+        "reloj": "0:02 / 1:00"
+      },
+      {
+        "tick": 92,
+        "texto": "Narration transcript and evidenceStay with us for the action as it unfolds, with match commentary throughout our coverage.",
+        "reloj": "0:09 / 1:00"
+      },
+      {
+        "tick": 77,
+        "texto": "Narration transcript and evidenceDarío Maraera (13) deflects the shot; the ball stays in play.a6",
+        "reloj": "0:11 / 1:00"
+      },
+      {
+        "tick": 150,
+        "texto": "Narration transcript and evidenceOver the last 15 seconds, Juventud Valdecristal recorded 4 attempted passes and 3 receptions. That spell also included 1 shots and 0 ball recoveries.a1 · a2 · a3 · a4 · a5 · a9 · a10 · a11",
+        "reloj": "0:17 / 1:00"
+      },
+      {
+        "tick": 217,
+        "texto": "Narration transcript and evidenceBenja Maraena scores the goal!a18",
+        "reloj": "0:21 / 1:00"
+      }
+    ],
+    "maxSilencioMs": 3166.10000000149,
+    "duracionObservadaMs": 22585.39999999851,
+    "medicion": "PCM absoluto > 0.001 en bloques de 20 ms; incluye pausas internas y truncamientos"
+  },
+  "solicitudes": [
+    {
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "cierre": false,
+      "estado": 200,
+      "texto": "The match between Juventud Valdecristal and Racing Pradoalto begins.",
+      "caracteres": 68
+    },
+    {
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Darío Maraera (13) deflects the shot; the ball stays in play.",
+      "caracteres": 61
+    },
+    {
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Over the last 15 seconds, Juventud Valdecristal recorded 4 attempted passes and 3 receptions. That spell also included 1 shots and 0 ball recoveries.",
+      "caracteres": 149
+    },
+    {
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Benja Maraena, playing for Racing Pradoalto, has the ball in the left sector of the pitch. We follow the options in this possession.",
+      "caracteres": 132
+    },
+    {
+      "desdeTick": 200,
+      "hastaTick": 250,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Benja Maraena scores the goal!",
+      "caracteres": 30
+    },
+    {
+      "desdeTick": 250,
+      "hastaTick": 300,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Joel Mariell (15) shoots towards the opposing goal.",
+      "caracteres": 51
+    },
+    {
+      "desdeTick": 300,
+      "hastaTick": 350,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Darío Maraera makes the save!",
+      "caracteres": 29
+    },
+    {
+      "desdeTick": 350,
+      "hastaTick": 400,
+      "cierre": false,
+      "estado": 200,
+      "texto": "Goal by Hugo Nevera!",
+      "caracteres": 20
+    }
+  ],
+  "reiniciosServidor": [
+    {
+      "seed": 1,
+      "tick": 230,
+      "tipo": "banda",
+      "lado": "visita"
+    },
+    {
+      "seed": 2,
+      "tick": 73,
+      "tipo": "esquina",
+      "lado": "local"
+    },
+    {
+      "seed": 2,
+      "tick": 256,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 206,
+      "tipo": "centro",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 330,
+      "tipo": "banda",
+      "lado": "local"
+    },
+    {
+      "seed": 6,
+      "tick": 494,
+      "tipo": "meta",
+      "lado": "local"
+    }
+  ],
+  "modelosLlm": 0,
+  "speechReal": true,
+  "javascriptErrors": [],
+  "mobileWidth": 360,
+  "horizontalOverflow": false
+}

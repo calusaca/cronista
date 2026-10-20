@@ -1,0 +1,38 @@
+{
+  "checkedUtc": "2026-10-19T05:20:26.853Z",
+  "method": "Concatenación de tramas MP3 del mismo formato; duración total comprobada en Chromium",
+  "files": [
+    {
+      "idioma": "es",
+      "archivo": "docs/evidencia/azure-voz/duelo-completo-es.mp3",
+      "duracionS": 190.032,
+      "bytes": 1140192,
+      "sha256": "43d6d2993c51002358b362e31119f817c01bb9b78e1d15adb171bd96572a5434",
+      "partes": [
+        "docs/evidencia/azure-voz/duelo/es-0-100.mp3",
+        "docs/evidencia/azure-voz/duelo/es-100-200.mp3",
+        "docs/evidencia/azure-voz/duelo/es-200-300.mp3",
+        "docs/evidencia/azure-voz/duelo/es-300-400.mp3",
+        "docs/evidencia/azure-voz/duelo/es-400-500.mp3",
+        "docs/evidencia/azure-voz/duelo/es-500-600.mp3"
+      ]
+    },
+    {
+      "idioma": "en",
+      "archivo": "docs/evidencia/azure-voz/duelo-completo-en.mp3",
+      "duracionS": 182.76,
+      "bytes": 1096560,
+      "sha256": "b9babc553778493ef82451f0043d49f7e5546c56168ea473cda4828af5265993",
+      "partes": [
+        "docs/evidencia/azure-voz/duelo/en-0-100.mp3",
+        "docs/evidencia/azure-voz/duelo/en-100-200.mp3",
+        "docs/evidencia/azure-voz/duelo/en-200-300.mp3",
+        "docs/evidencia/azure-voz/duelo/en-300-400.mp3",
+        "docs/evidencia/azure-voz/duelo/en-400-500.mp3",
+        "docs/evidencia/azure-voz/duelo/en-500-600.mp3"
+      ]
+    }
+  ],
+  "additionalModelOrSpeechCalls": 0,
+  "limits": "Pendiente revisión humana de pronunciación y escucha completa."
+}

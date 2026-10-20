@@ -11,7 +11,7 @@
 // docs/evidencia/primera-corrida-azure-openai.json. La clave llega por env y queda en el servidor.
 
 import { z } from "zod";
-import type { Llm, Mensaje } from "./llm";
+import type { Llm, Mensaje, OpcionesLlm, UsoLlm } from "./llm";
 
 // ---- umbrales del backend (config del cliente, no del simulador) ----
 /** api-version por defecto (la GA de chat completions; se sobreescribe con AZURE_OPENAI_API_VERSION). */
@@ -58,9 +58,13 @@ export function urlAzureOpenAI(cfg: Pick<ConfigAzureOpenAI, "endpoint" | "deploy
 
 export function crearLlmAzureOpenAI(cfg: ConfigAzureOpenAI): Llm {
   const transporte = cfg.fetch ?? fetch;
+  const uso: UsoLlm = { llamadas: 0, respuestasConUso: 0, entrada: 0, salida: 0, cache: 0 };
   return {
     id: `azure-openai:${cfg.deployment}${cfg.reasoningEffort ? `:reasoning-${cfg.reasoningEffort}` : ""}`,
-    async completar(system: string, mensajes: Mensaje[], opciones?: { signal?: AbortSignal }): Promise<string> {
+    uso: () => ({ ...uso }),
+    async completar(system: string, mensajes: Mensaje[], opciones?: OpcionesLlm): Promise<string> {
+      uso.llamadas++;
+      if (opciones?.maxTokens !== undefined && (!Number.isInteger(opciones.maxTokens) || opciones.maxTokens < 1 || opciones.maxTokens > MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI)) throw new Error("Presupuesto de salida inválido");
       const r = await transporte(urlAzureOpenAI(cfg), {
         method: "POST",
         headers: { "content-type": "application/json", "api-key": cfg.apiKey },
@@ -68,10 +72,10 @@ export function crearLlmAzureOpenAI(cfg: ConfigAzureOpenAI): Llm {
         body: JSON.stringify({
           messages: [{ role: "system", content: system }, ...mensajes.map((m) => ({ role: m.rol, content: m.contenido }))],
           ...(cfg.reasoningEffort
-            ? { reasoning_effort: cfg.reasoningEffort, max_completion_tokens: MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI }
-            : { temperature: TEMPERATURA_AZURE_OPENAI, max_completion_tokens: MAX_TOKENS_AZURE_OPENAI }),
+            ? { reasoning_effort: cfg.reasoningEffort, max_completion_tokens: opciones?.maxTokens ?? MAX_TOKENS_RAZONAMIENTO_AZURE_OPENAI }
+            : { temperature: TEMPERATURA_AZURE_OPENAI, max_completion_tokens: opciones?.maxTokens ?? MAX_TOKENS_AZURE_OPENAI }),
           // El prompt del 003 exige «únicamente un objeto JSON válido»: se le pide al servicio.
-          response_format: { type: "json_object" },
+          response_format: opciones?.esquema ? { type: "json_schema", json_schema: { name: opciones.esquema.nombre, strict: true, schema: opciones.esquema.json } } : { type: "json_object" },
         }),
       });
       if (!r.ok) {
@@ -86,6 +90,8 @@ export function crearLlmAzureOpenAI(cfg: ConfigAzureOpenAI): Llm {
         throw new Error("Azure OpenAI: la respuesta no es JSON");
       }
       const v = esquemaRespuesta.safeParse(json);
+      const consumo = z.object({ usage: z.object({ prompt_tokens: z.number().nonnegative(), completion_tokens: z.number().nonnegative(), prompt_tokens_details: z.object({ cached_tokens: z.number().nonnegative().optional() }).optional() }) }).safeParse(json);
+      if (consumo.success) { uso.respuestasConUso++; uso.entrada += consumo.data.usage.prompt_tokens; uso.salida += consumo.data.usage.completion_tokens; uso.cache += consumo.data.usage.prompt_tokens_details?.cached_tokens ?? 0; }
       if (!v.success) throw new Error(`Azure OpenAI: respuesta malformada (${v.error.issues.map((i) => i.path.join(".") || "(raíz)").join(", ")})`);
       const eleccion = v.data.choices[0] as z.infer<typeof esquemaRespuesta>["choices"][number];
       if (eleccion.finish_reason === "length") throw new Error("Azure OpenAI: respuesta truncada (finish_reason = length)");

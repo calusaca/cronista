@@ -1,0 +1,150 @@
+{
+  "checkedUtc": "2026-10-19T12:56:21.008Z",
+  "scope": "public_container_app_with_real_azure_services",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "playbackAcceleratedBySeeking": true,
+  "audio": [
+    {
+      "desdeS": 0,
+      "hastaS": 10,
+      "duracionAudioS": 46.632
+    },
+    {
+      "desdeS": 10,
+      "hastaS": 20,
+      "duracionAudioS": 20.448
+    },
+    {
+      "desdeS": 20,
+      "hastaS": 30,
+      "duracionAudioS": 28.224
+    },
+    {
+      "desdeS": 30,
+      "hastaS": 40,
+      "duracionAudioS": 27.936
+    },
+    {
+      "desdeS": 40,
+      "hastaS": 50,
+      "duracionAudioS": 18.84
+    },
+    {
+      "desdeS": 50,
+      "hastaS": 60,
+      "duracionAudioS": 47.952
+    }
+  ],
+  "newTeamModelCalls": 0,
+  "analisisHttp": 200,
+  "analisis": {
+    "tick": 600,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 3,
+    "herramientas": [
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 600,
+          "tipo": "tiro"
+        },
+        "hechos": [
+          "arena:a13"
+        ]
+      },
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 600,
+          "tipo": "gol"
+        },
+        "hechos": [
+          "arena:a14"
+        ]
+      }
+    ],
+    "uso": {
+      "entrada": 1798,
+      "salida": 236
+    },
+    "comentario": {
+      "tick": 600,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "llm",
+      "principal": "arena:a13",
+      "hechos": [
+        {
+          "id": "arena:a13",
+          "tipo": "accion_arena",
+          "texto_es": "Joel Mendiuz (3) remata hacia la portería rival.",
+          "texto_en": "Joel Mendiuz (3) shoots towards the opposing goal.",
+          "eventos": [
+            "a13"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 20
+          }
+        },
+        {
+          "id": "arena:a14",
+          "tipo": "gol_anotado",
+          "texto_es": "Gol de Joel Mendiuz (3).",
+          "texto_en": "Goal by Joel Mendiuz (3).",
+          "eventos": [
+            "a14"
+          ],
+          "relevancia": 100,
+          "datos": {
+            "jugador": "Joel Mendiuz",
+            "equipo": "Juventud Islaverde Sur",
+            "dorsal": 3,
+            "distancia": 20
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Joel Mendiuz (3) ha rematado hacia la portería rival.",
+          "texto_en": "Joel Mendiuz (3) has shot towards the opposing goal.",
+          "hecho": "arena:a13",
+          "apoyo": []
+        },
+        {
+          "texto_es": "También se ha confirmado un gol de Joel Mendiuz (3).",
+          "texto_en": "A goal by Joel Mendiuz (3) has also been confirmed.",
+          "hecho": "arena:a14",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 3,
+          "oraciones": [
+            {
+              "texto_es": "Joel Mendiuz (3) ha rematado hacia la portería rival.",
+              "texto_en": "Joel Mendiuz (3) has shot towards the opposing goal.",
+              "hecho": "arena:a13",
+              "apoyo": []
+            },
+            {
+              "texto_es": "También se ha confirmado un gol de Joel Mendiuz (3).",
+              "texto_en": "A goal by Joel Mendiuz (3) has also been confirmed.",
+              "hecho": "arena:a14",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  },
+  "mobileOverflow": false,
+  "errors": [],
+  "status": "passed"
+}

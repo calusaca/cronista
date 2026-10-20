@@ -1,0 +1,207 @@
+{
+  "checkedUtc": "2026-10-19T05:19:29.322Z",
+  "provider": "Azure Monitor / Log Analytics",
+  "foundryConnection": "cronista-appinsights",
+  "workspaceId": "a6b7a762-325e-4032-b51a-6001fe786481",
+  "count": 19,
+  "operations": [
+    "arena.agente",
+    "arena.herramienta",
+    "arena.voz",
+    "arena.lote.semilla",
+    "arena.sesion",
+    "arena.analisis"
+  ],
+  "rows": [
+    {
+      "TimeGenerated": "2026-10-19T04:53:59.598Z",
+      "Name": "arena.agente",
+      "OperationId": "b7afe08b8328f539ab5ef73f7348eeb6",
+      "ParentId": "b7afe08b8328f539ab5ef73f7348eeb6",
+      "Id": "5a4511e7a872c138",
+      "Success": true,
+      "DurationMs": 3397.0486,
+      "Properties": "{\"_MS.ResourceAttributeId\":\"7244f72b-430d-4822-b28f-c2800add5008\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"arena.tick\":\"120\",\"arena.intento\":\"1\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T04:54:02.995Z",
+      "Name": "arena.herramienta",
+      "OperationId": "4f0dfa71d600d1edb3a89c5521760289",
+      "ParentId": "4f0dfa71d600d1edb3a89c5521760289",
+      "Id": "183d50e86fd5fed1",
+      "Success": true,
+      "DurationMs": 0.7485,
+      "Properties": "{\"_MS.ResourceAttributeId\":\"7244f72b-430d-4822-b28f-c2800add5008\",\"arena.tick\":\"120\",\"gen_ai.tool.name\":\"consultar_eventos\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T04:54:02.996Z",
+      "Name": "arena.agente",
+      "OperationId": "89a007a04bf805bb5f20373aab3d5b7f",
+      "ParentId": "89a007a04bf805bb5f20373aab3d5b7f",
+      "Id": "4647bfa91fec86f1",
+      "Success": true,
+      "DurationMs": 3073.6113,
+      "Properties": "{\"_MS.ResourceAttributeId\":\"7244f72b-430d-4822-b28f-c2800add5008\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"arena.tick\":\"120\",\"arena.intento\":\"2\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T04:54:08.337Z",
+      "Name": "arena.voz",
+      "OperationId": "6828e52567bcc02e3a4ec46b9174b799",
+      "ParentId": "6828e52567bcc02e3a4ec46b9174b799",
+      "Id": "e2380db118f952d6",
+      "Success": true,
+      "DurationMs": 1746.665,
+      "Properties": "{\"_MS.ResourceAttributeId\":\"54d6b49f-4f3c-40d8-b5ae-e423558a5599\",\"arena.tick\":\"100\",\"arena.idioma\":\"es\",\"speech.caracteres\":\"376\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T04:54:11.953Z",
+      "Name": "arena.voz",
+      "OperationId": "5e2cda44f92f9f3d73e39fa94235ff91",
+      "ParentId": "5e2cda44f92f9f3d73e39fa94235ff91",
+      "Id": "45dd59dd39f20dda",
+      "Success": true,
+      "DurationMs": 419.7454,
+      "Properties": "{\"_MS.ResourceAttributeId\":\"54d6b49f-4f3c-40d8-b5ae-e423558a5599\",\"arena.tick\":\"120\",\"arena.idioma\":\"es\",\"speech.caracteres\":\"103\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:06:18.391Z",
+      "Name": "arena.voz",
+      "OperationId": "319318a4c2b5c86f3e91ef9b84dfc4f1",
+      "ParentId": "319318a4c2b5c86f3e91ef9b84dfc4f1",
+      "Id": "a763a6c1c4a7363c",
+      "Success": true,
+      "DurationMs": 477.8405,
+      "Properties": "{\"arena.tick\":\"500\",\"arena.idioma\":\"en\",\"speech.caracteres\":\"202\",\"_MS.ResourceAttributeId\":\"2256af2b-05b0-441b-92bc-af9a8ce8c0c9\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:06:20.638Z",
+      "Name": "arena.voz",
+      "OperationId": "a99be29d37ae5dbaeca322e5f1ea6e55",
+      "ParentId": "a99be29d37ae5dbaeca322e5f1ea6e55",
+      "Id": "a4210e3c432138c7",
+      "Success": true,
+      "DurationMs": 514.3809,
+      "Properties": "{\"arena.tick\":\"600\",\"arena.idioma\":\"en\",\"speech.caracteres\":\"519\",\"_MS.ResourceAttributeId\":\"2256af2b-05b0-441b-92bc-af9a8ce8c0c9\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:00:35.927Z",
+      "Name": "arena.lote.semilla",
+      "OperationId": "cc8880e6c5f56654885f7102bd27dfe1",
+      "ParentId": "cc8880e6c5f56654885f7102bd27dfe1",
+      "Id": "9c897ec7237daa76",
+      "Success": true,
+      "DurationMs": 294.7014,
+      "Properties": "{\"arena.lote.id\":\"validacion-cloud-v1\",\"arena.seed\":\"42\",\"_MS.ResourceAttributeId\":\"f2f9e306-1847-483f-b315-3e182e625e2b\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:00:36.257Z",
+      "Name": "arena.lote.semilla",
+      "OperationId": "ba1799f7c7dae4f25cb25e42942b981e",
+      "ParentId": "ba1799f7c7dae4f25cb25e42942b981e",
+      "Id": "45596ee004f59ff9",
+      "Success": true,
+      "DurationMs": 191.3919,
+      "Properties": "{\"arena.lote.id\":\"validacion-cloud-v1\",\"arena.seed\":\"43\",\"_MS.ResourceAttributeId\":\"f2f9e306-1847-483f-b315-3e182e625e2b\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:06:10.297Z",
+      "Name": "arena.voz",
+      "OperationId": "8998b50b254889b7ed3e32830ff9098f",
+      "ParentId": "8998b50b254889b7ed3e32830ff9098f",
+      "Id": "7b610ed1777bc670",
+      "Success": true,
+      "DurationMs": 1266.4529,
+      "Properties": "{\"arena.tick\":\"200\",\"arena.idioma\":\"en\",\"speech.caracteres\":\"238\",\"_MS.ResourceAttributeId\":\"cf0f21fb-bf73-46fd-a45f-1931144f30ee\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:06:13.342Z",
+      "Name": "arena.voz",
+      "OperationId": "8c98d43fbea42619394aa21611c8352c",
+      "ParentId": "8c98d43fbea42619394aa21611c8352c",
+      "Id": "add9be9e3ebfb939",
+      "Success": true,
+      "DurationMs": 705.8547,
+      "Properties": "{\"arena.tick\":\"300\",\"arena.idioma\":\"en\",\"speech.caracteres\":\"316\",\"_MS.ResourceAttributeId\":\"cf0f21fb-bf73-46fd-a45f-1931144f30ee\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:06:15.9Z",
+      "Name": "arena.voz",
+      "OperationId": "20356edfa796ea24ba152c7b7db0b8c0",
+      "ParentId": "20356edfa796ea24ba152c7b7db0b8c0",
+      "Id": "da7921e595d68cbc",
+      "Success": true,
+      "DurationMs": 634.2942,
+      "Properties": "{\"arena.tick\":\"400\",\"arena.idioma\":\"en\",\"speech.caracteres\":\"348\",\"_MS.ResourceAttributeId\":\"cf0f21fb-bf73-46fd-a45f-1931144f30ee\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T04:53:50.262Z",
+      "Name": "arena.sesion",
+      "OperationId": "8e2aa20ec68e1b04c7d7e51e6e6f38de",
+      "ParentId": "8e2aa20ec68e1b04c7d7e51e6e6f38de",
+      "Id": "438f9cabcad73818",
+      "Success": true,
+      "DurationMs": 6207.9101,
+      "Properties": "{\"arena.sesion.id\":\"940ce5ba-741d-4833-ba0a-95662f1a8a33\",\"arena.seed\":\"42\",\"arena.modo\":\"programado\",\"arena.version\":\"arena-v3\",\"arena.estado\":\"completa\",\"arena.decisiones\":\"2\",\"arena.respaldos\":\"0\",\"arena.duracion_ms\":\"6203\",\"_MS.ResourceAttributeId\":\"dbb0ae07-26a8-442a-bcaf-8609ffa2fa55\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:27.081Z",
+      "Name": "arena.agente",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "88ab651ade99d0a9",
+      "Id": "57e1660304694d1a",
+      "Success": true,
+      "DurationMs": 2703.9609,
+      "Properties": "{\"gen_ai.operation.name\":\"chat\",\"gen_ai.request.model\":\"cronista-rapido\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"arena.tick\":\"600\",\"arena.intento\":\"1\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:29.785Z",
+      "Name": "arena.herramienta",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "88ab651ade99d0a9",
+      "Id": "c2f5e0519481f36e",
+      "Success": true,
+      "DurationMs": 0.6157,
+      "Properties": "{\"gen_ai.operation.name\":\"execute_tool\",\"gen_ai.tool.name\":\"consultar_eventos\",\"arena.tick\":\"600\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:29.787Z",
+      "Name": "arena.agente",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "88ab651ade99d0a9",
+      "Id": "0a1038b8b7304653",
+      "Success": true,
+      "DurationMs": 2367.6865,
+      "Properties": "{\"gen_ai.operation.name\":\"chat\",\"gen_ai.request.model\":\"cronista-rapido\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"arena.tick\":\"600\",\"arena.intento\":\"2\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:32.153Z",
+      "Name": "arena.herramienta",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "88ab651ade99d0a9",
+      "Id": "0bd9aa45374fb276",
+      "Success": true,
+      "DurationMs": 0.4584,
+      "Properties": "{\"gen_ai.operation.name\":\"execute_tool\",\"gen_ai.tool.name\":\"consultar_eventos\",\"arena.tick\":\"600\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:32.155Z",
+      "Name": "arena.agente",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "88ab651ade99d0a9",
+      "Id": "a7d7ff97c4c2e0a8",
+      "Success": true,
+      "DurationMs": 2395.6453,
+      "Properties": "{\"gen_ai.operation.name\":\"chat\",\"gen_ai.request.model\":\"cronista-rapido\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"arena.tick\":\"600\",\"arena.intento\":\"3\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    },
+    {
+      "TimeGenerated": "2026-10-19T05:13:27.069Z",
+      "Name": "arena.analisis",
+      "OperationId": "d2f2a8f0b582c8f4e4f53707392600d0",
+      "ParentId": "0776b2a302a05b13",
+      "Id": "88ab651ade99d0a9",
+      "Success": true,
+      "DurationMs": 7580.2788,
+      "Properties": "{\"gen_ai.operation.name\":\"invoke_agent\",\"gen_ai.provider.name\":\"microsoft.foundry\",\"gen_ai.agent.id\":\"foundry-agent:cronista-analista:1\",\"gen_ai.agent.name\":\"cronista-analista\",\"gen_ai.agent.version\":\"1\",\"arena.sesion.id\":\"7631ee92-07b1-4612-9902-da3e3189896b\",\"arena.tick\":\"600\",\"microsoft.gen_ai.main_agent.name\":\"cronista-analista\",\"microsoft.gen_ai.main_agent.id\":\"foundry-agent:cronista-analista:1\",\"microsoft.gen_ai.main_agent.version\":\"1\",\"_MS.ResourceAttributeId\":\"9751bf40-c594-4a30-a4d4-741183df40d3\"}"
+    }
+  ]
+}

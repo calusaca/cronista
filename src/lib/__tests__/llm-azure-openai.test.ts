@@ -59,6 +59,14 @@ describe("023 · fábrica por CRONISTA_LLM=azure-openai", () => {
 });
 
 describe("023 · la petición y la respuesta (fetch inyectado)", () => {
+  it("la arena solicita JSON Schema estricto y conserva el consumo informado", async () => {
+    const { f, llamadas } = fetchFalso(okCon("{}"));
+    const llm = crearLlmAzureOpenAI(cfg(f));
+    const schema = { type: "object", properties: {}, required: [], additionalProperties: false };
+    await llm.completar("s", [{ rol: "user", contenido: "JSON" }], { esquema: { nombre: "arena", json: schema } });
+    expect(JSON.parse(String(llamadas[0]?.init.body)).response_format).toEqual({ type: "json_schema", json_schema: { name: "arena", strict: true, schema } });
+    expect(llm.uso?.()).toEqual({ llamadas: 1, respuestasConUso: 1, entrada: 10, salida: 20, cache: 0 });
+  });
   it("POST a /openai/deployments/{deployment}/chat/completions?api-version=…, cabecera api-key, system primero, temperatura explícita y json_object", async () => {
     const { f, llamadas } = fetchFalso(okCon('{"ok":true}'));
     const salida = await crearLlmAzureOpenAI(cfg(f)).completar("sistema", [

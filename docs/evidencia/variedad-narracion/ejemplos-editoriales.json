@@ -1,0 +1,229 @@
+{
+  "metodo": "Muestra offline de selección por ventanas; supone reproducción de cada intervención para ejercitar la memoria. No representa audio efectivamente reproducido por el navegador.",
+  "ejemplos": {
+    "es": [
+      {
+        "tick": 0,
+        "texto": "Comienza el partido entre Juventud Islaverde Sur y Atlético Montefrío Bajo.",
+        "fuentes": [],
+        "fotogramas": [
+          0
+        ]
+      },
+      {
+        "tick": 100,
+        "tema": "secuencia",
+        "texto": "Mateo Dorinosa conectó con Emilio Quinelón en esa combinación.",
+        "fuentes": [
+          "a7"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 102,
+        "tema": "fuera_juego",
+        "texto": "Teo Lorelino estaba en fuera de juego.",
+        "fuentes": [
+          "a9"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 200,
+        "tema": "conduccion",
+        "texto": "Joel Mendiuz progresó con el balón, en campo rival.",
+        "fuentes": [],
+        "fotogramas": [
+          150,
+          200
+        ]
+      },
+      {
+        "tick": 231,
+        "tema": "gol",
+        "texto": "¡Gol! ¡Lo anota Joel Mendiuz!",
+        "fuentes": [
+          "a14"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 300,
+        "tema": "secuencia",
+        "texto": "Emilio Torelueta conectó con Thiago Valoena en esa combinación.",
+        "fuentes": [
+          "a17"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 350,
+        "tema": "posesion",
+        "texto": "Con el balón Teo Lorelino, en campo rival, junto a la banda.",
+        "fuentes": [],
+        "fotogramas": [
+          350
+        ]
+      },
+      {
+        "tick": 400,
+        "tema": "conduccion",
+        "texto": "Teo Lorelino progresó con el balón, en campo rival, junto a la banda.",
+        "fuentes": [],
+        "fotogramas": [
+          350,
+          400
+        ]
+      },
+      {
+        "tick": 450,
+        "tema": "recuperacion",
+        "texto": "En la última recuperación apareció Fabio Valinera, de Atlético Montefrío Bajo.",
+        "fuentes": [
+          "a23"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 500,
+        "tema": "vuelo",
+        "texto": "La pelota está en recorrido en campo propio, junto a la banda.",
+        "fuentes": [],
+        "fotogramas": [
+          500
+        ]
+      },
+      {
+        "tick": 530,
+        "tema": "fuera_juego",
+        "texto": "Señalan posición adelantada de Fabio Valinera.",
+        "fuentes": [
+          "a28"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 600,
+        "tema": "secuencia",
+        "texto": "Aarón Celoón conectó con Bruno Quinoich, que después encontró a Dante Doraena.",
+        "fuentes": [
+          "a31",
+          "a33"
+        ],
+        "fotogramas": []
+      }
+    ],
+    "en": [
+      {
+        "tick": 0,
+        "texto": "The match between Juventud Islaverde Sur and Atlético Montefrío Bajo begins.",
+        "fuentes": [],
+        "fotogramas": [
+          0
+        ]
+      },
+      {
+        "tick": 100,
+        "tema": "secuencia",
+        "texto": "Mateo Dorinosa found Emilio Quinelón with that pass.",
+        "fuentes": [
+          "a7"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 102,
+        "tema": "fuera_juego",
+        "texto": "Teo Lorelino was caught offside.",
+        "fuentes": [
+          "a9"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 200,
+        "tema": "conduccion",
+        "texto": "Joel Mendiuz made progress on the ball, in the opposition half.",
+        "fuentes": [],
+        "fotogramas": [
+          150,
+          200
+        ]
+      },
+      {
+        "tick": 231,
+        "tema": "gol",
+        "texto": "Goal! Joel Mendiuz scores!",
+        "fuentes": [
+          "a14"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 300,
+        "tema": "secuencia",
+        "texto": "Emilio Torelueta found Thiago Valoena with that pass.",
+        "fuentes": [
+          "a17"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 350,
+        "tema": "posesion",
+        "texto": "With Teo Lorelino on the ball, in the opposition half, near the touchline.",
+        "fuentes": [],
+        "fotogramas": [
+          350
+        ]
+      },
+      {
+        "tick": 400,
+        "tema": "conduccion",
+        "texto": "Teo Lorelino made progress on the ball, in the opposition half, near the touchline.",
+        "fuentes": [],
+        "fotogramas": [
+          350,
+          400
+        ]
+      },
+      {
+        "tick": 450,
+        "tema": "recuperacion",
+        "texto": "Fabio Valinera, of Atlético Montefrío Bajo, made that recent recovery.",
+        "fuentes": [
+          "a23"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 500,
+        "tema": "vuelo",
+        "texto": "The ball is in flight in their own half, near the touchline.",
+        "fuentes": [],
+        "fotogramas": [
+          500
+        ]
+      },
+      {
+        "tick": 530,
+        "tema": "fuera_juego",
+        "texto": "Offside against Fabio Valinera.",
+        "fuentes": [
+          "a28"
+        ],
+        "fotogramas": []
+      },
+      {
+        "tick": 600,
+        "tema": "secuencia",
+        "texto": "Aarón Celoón found Bruno Quinoich, who then picked out Dante Doraena.",
+        "fuentes": [
+          "a31",
+          "a33"
+        ],
+        "fotogramas": []
+      }
+    ]
+  }
+}

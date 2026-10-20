@@ -23,8 +23,12 @@ export interface Llm {
    * deployment invalida la caché sola.
    */
   readonly id: string;
-  completar(system: string, mensajes: Mensaje[], opciones?: { signal?: AbortSignal }): Promise<string>;
+  /** Consumo comunicado por el proveedor, sin estimar costos. */
+  uso?: () => UsoLlm;
+  completar(system: string, mensajes: Mensaje[], opciones?: OpcionesLlm): Promise<string>;
 }
+export interface OpcionesLlm { signal?: AbortSignal; esquema?: { nombre: string; json: Record<string, unknown> }; maxTokens?: number }
+export interface UsoLlm { llamadas: number; respuestasConUso: number; entrada: number; salida: number; cache: number }
 
 export type TipoLlm = "stub" | "foundry" | "azure-openai" | "ensayo";
 /** "ensayo" es un fixture de pruebas (e2e de la UI): jamás alimenta la demo. */

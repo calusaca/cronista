@@ -1,0 +1,107 @@
+{
+  "checkedUtc": "2026-10-19T22:22:28.172Z",
+  "typecheck": "passed",
+  "unitarias": {
+    "suiteCompleta": 1571,
+    "archivos": 68,
+    "afectadasTrasAjusteEsquina": 73,
+    "archivosAfectados": 4
+  },
+  "navegador": {
+    "primeraSuiteCompleta": {
+      "pasaron": 114,
+      "fallaron": 2
+    },
+    "revisionFinalArena": {
+      "pasaron": 33,
+      "fallaron": 1
+    },
+    "correccionImportacion": {
+      "pasaron": 1
+    },
+    "escenariosUnicosComprobados": 118,
+    "escenariosArena": 34,
+    "notas": "La corrida final de arena verifica la corrección de cancelación y el gol de prueba; el foco posterior verifica los cuatro saques tras corregir una aserción de visibilidad."
+  },
+  "empaquetado": 2,
+  "sourceFiles": 293,
+  "fuentes": [
+    {
+      "path": "src/arena/motor.ts",
+      "sha256": "62155f6067e35a22027769c2498c528214df810694af312cc5301847d8091f2f"
+    },
+    {
+      "path": "src/arena/reinicios.ts",
+      "sha256": "5f1699c8fbecec8dafba58cbdf35a88a10ee1a1471e216b795aab659e2b1388f"
+    },
+    {
+      "path": "src/arena/tipos.ts",
+      "sha256": "b8de25444efe5e9288e3a199593a8c84f521cfa5621a6c6a600d7ae3cbb6c8d5"
+    },
+    {
+      "path": "src/arena/relato.ts",
+      "sha256": "f9f06a360d23b9ddd35cf29c4e8ad41f55d37b26ce78ce16c7684aeff4e95991"
+    },
+    {
+      "path": "src/arena/buffer.ts",
+      "sha256": "472a8b58e00fb8ca5ba7b03df2d30061d86f3b446ec972c751797779353721f2"
+    },
+    {
+      "path": "src/arena/vista.ts",
+      "sha256": "294b2b089222af84f039006aa2ad4f8c5656c9e6f617fbaa914eeb5a7a6bdf16"
+    },
+    {
+      "path": "src/arena/narrador.ts",
+      "sha256": "79fc25686e8ce1c181336fdde830868f65b3c1b9b4b68f0ba494a46b939ae770"
+    },
+    {
+      "path": "src/arena/voz-reserva.json",
+      "sha256": "fefe4c3158cff8a9e05ebc1090cde2e3ec77d3be3489f1eadc4f141e3ca97732"
+    },
+    {
+      "path": "src/ui/Arena.tsx",
+      "sha256": "5a8c81fbbd8af3476c3e1f17e03663df17e10ea5b1a2df9517368e9c41c87136"
+    },
+    {
+      "path": "src/ui/ArenaEmisionBuffer.tsx",
+      "sha256": "8a71f1215ae948014b7c0164c566b68b55868112eb478d392c01078abdbdc833"
+    },
+    {
+      "path": "src/ui/ArenaEnDirecto.tsx",
+      "sha256": "637fac4ef042e773f5bf83aab6a89887656f9ae064fb3f4e7d431b1eb82e3e34"
+    }
+  ],
+  "vozReserva": {
+    "idiomas": [
+      "es",
+      "en"
+    ],
+    "clips": 6,
+    "caracteresTexto": 503,
+    "llamadasSpeechGeneracion": 6
+  },
+  "continuidadLocal": {
+    "fuentes": [
+      {
+        "inicio": 2710.10000000149,
+        "fin": 7870.10000000149,
+        "audible": true,
+        "velocidad": 1
+      },
+      {
+        "inicio": 9876.10000000149,
+        "fin": 15823.10000000149,
+        "audible": true,
+        "velocidad": 1
+      },
+      {
+        "inicio": 17826,
+        "fin": 22986,
+        "audible": true,
+        "velocidad": 1
+      }
+    ],
+    "maxSilencioMs": 2118,
+    "duracionMs": 22333.800000000745
+  }
+}

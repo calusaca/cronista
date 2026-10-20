@@ -1,0 +1,37 @@
+{
+  "checkedUtc": "2026-10-19T05:25:52.667Z",
+  "phase": "deployed_verified",
+  "appName": "cronista-arena",
+  "resourceGroup": "rg-cronista-demo",
+  "template": "infra/arena-preview.bicep",
+  "templateSha256": "8c92f18308a0f673fb7fb33d9d0ea8616f85afe2d28a4a161137ee20e13cb531",
+  "script": "scripts/deploy-azure-arena.mjs",
+  "sourceManifest": ".cache/arena-publicacion/source-manifest.json",
+  "originalDemoUnchanged": true,
+  "uses": [
+    "Existing Container Apps environment and ACR",
+    "Existing application identity",
+    "Key Vault secret references",
+    "Durable Blob sessions and budget",
+    "Foundry analyst and model pool",
+    "Azure Speech",
+    "Application Insights"
+  ],
+  "limitsPerUtcDay": {
+    "modelMatches": 10,
+    "analystQuestions": 20,
+    "speechCharacters": 120000
+  },
+  "approvalReview": {
+    "status": "rejected_before_execution",
+    "reason": "La autorización para incorporar herramientas no fue considerada autorización concreta para publicar una nueva aplicación pública con configuración de recursos y secretos."
+  },
+  "subsequentUserApproval": {
+    "dateUtc": "2026-10-19",
+    "message": "si dale",
+    "scope": "Publicar cronista-arena con los límites propuestos y comprobar su URL pública, conservando la demo anterior."
+  },
+  "pending": [],
+  "verifiedUtc": "2026-10-19T13:06:53.515Z",
+  "result": "azure-arena-publicacion.json"
+}

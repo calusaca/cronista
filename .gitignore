@@ -16,3 +16,6 @@ next-env.d.ts
 # directorio accidental de cache de compilacion de node (redireccion perdida)
 /1/
 /2/
+
+# artefacto vacío de herramienta externa
+.primos/

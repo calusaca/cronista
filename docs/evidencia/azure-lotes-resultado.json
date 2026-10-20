@@ -1,0 +1,44 @@
+{
+  "id": "validacion-cloud-v1",
+  "config": {
+    "id": "validacion-cloud-v1",
+    "semillas": [
+      42,
+      43
+    ],
+    "segundos": 30,
+    "ventanas": 2,
+    "narrar": false,
+    "maxSolicitudes": 0
+  },
+  "informes": [
+    {
+      "seed": 42,
+      "reproducido": true,
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "eventos": 18,
+      "filas": 2,
+      "modo": "sin_inferencia",
+      "uso": null
+    },
+    {
+      "seed": 43,
+      "reproducido": true,
+      "marcador": {
+        "local": 0,
+        "visita": 1
+      },
+      "eventos": 20,
+      "filas": 2,
+      "modo": "sin_inferencia",
+      "uso": null
+    }
+  ],
+  "completadoUtc": "2026-10-19T05:00:36.467Z",
+  "checkedUtc": "2026-10-19T05:06:30.317Z",
+  "retrievedFrom": "Azure Blob Storage",
+  "managedIdentityRuntimeVerifiedByJob": true
+}

@@ -19,9 +19,9 @@ it("HTTP permite ejecutar políticas y verificar archivos, sin habilitar inferen
 it("la vista interpola jugadores sin modificar el registro y ofrece estados discretos", async () => {
   const registro = await ejecutarArena(crearConfigArena({ duracionS: 5 }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
   const antes = JSON.stringify(registro);
-  const f = estadoVisual(registro, 0.25), discreto = estadoVisual(registro, 0.25, true);
-  expect(f.jugadores[1]!.posicion).not.toEqual(registro.inicial.jugadores[1]!.posicion);
-  expect(discreto).toEqual(registro.inicial);
+  const f = estadoVisual(registro, 2.25), discreto = estadoVisual(registro, 2.25, true);
+  expect(f.jugadores[1]!.posicion).not.toEqual(discreto.jugadores[1]!.posicion);
+  expect(discreto).toEqual(registro.fotogramas.find(f => f.tick === 20));
   expect(JSON.stringify(registro)).toBe(antes);
   const pase = registro.eventos.find(e => e.tipo === "pase")!;
   expect(narrarEventoArena(pase, registro, "es")).toContain("intenta");

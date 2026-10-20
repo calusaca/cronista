@@ -1,0 +1,57 @@
+{
+  "checkedUtc": "2026-10-19T13:05:17.454Z",
+  "principal": "fbed1915-373e-4941-801b-1921157d246c",
+  "scope": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-carlos.sandi-6716/providers/Microsoft.CognitiveServices/accounts/carlossandi-9096-resource/projects/carlossandi-9096",
+  "diagnostic": {
+    "identityToken": true,
+    "status": 403,
+    "missingAction": "Microsoft.CognitiveServices/accounts/AIServices/agents/read",
+    "incorrectRole": "Azure AI Developer",
+    "insufficientRole": "Foundry Project Runtime User"
+  },
+  "correction": {
+    "role": "Foundry User",
+    "roleDefinitionId": "53ca6127-db72-4b80-b1b0-d745d6d5456d",
+    "scope": "Foundry project only",
+    "source": "https://learn.microsoft.com/en-us/azure/foundry/concepts/rbac-foundry",
+    "propagation": "La consulta pública respondió con IA después de propagarse la asignación."
+  },
+  "removedAssignments": [
+    {
+      "role": "Azure AI Developer",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-carlos.sandi-6716/providers/Microsoft.CognitiveServices/accounts/carlossandi-9096-resource/projects/carlossandi-9096/providers/Microsoft.Authorization/roleAssignments/cd81ba40-4738-4dd1-90eb-97bc4f07075d"
+    },
+    {
+      "role": "Foundry Project Runtime User",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-carlos.sandi-6716/providers/Microsoft.CognitiveServices/accounts/carlossandi-9096-resource/projects/carlossandi-9096/providers/Microsoft.Authorization/roleAssignments/bb566348-8e64-4016-8c06-799c3c2023e1"
+    }
+  ],
+  "effectiveAssignments": [
+    {
+      "role": "AcrPull",
+      "scope": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.ContainerRegistry/registries/crcronistae1734ecca5ff",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.ContainerRegistry/registries/crcronistae1734ecca5ff/providers/Microsoft.Authorization/roleAssignments/5c5a30fa-27a6-5d72-bdca-7a36c067478f"
+    },
+    {
+      "role": "Key Vault Secrets User",
+      "scope": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.KeyVault/vaults/kvcronistaecgb5kb3ti",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.KeyVault/vaults/kvcronistaecgb5kb3ti/providers/Microsoft.Authorization/roleAssignments/e0dd3b7a-3390-5db2-81f7-dfb66f6fb612"
+    },
+    {
+      "role": "Storage Blob Data Contributor",
+      "scope": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.Storage/storageAccounts/stcronistaecgb5kb3ti/blobServices/default/containers/arena",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourcegroups/rg-cronista-demo/providers/Microsoft.Storage/storageAccounts/stcronistaecgb5kb3ti/blobServices/default/containers/arena/providers/Microsoft.Authorization/roleAssignments/d899cd65-a263-562c-a84a-6d6f84f688d9"
+    },
+    {
+      "role": "Foundry User",
+      "scope": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-carlos.sandi-6716/providers/Microsoft.CognitiveServices/accounts/carlossandi-9096-resource/projects/carlossandi-9096",
+      "id": "/subscriptions/a21e292b-4e33-4ffa-ba34-928dee3ab4ec/resourceGroups/rg-carlos.sandi-6716/providers/Microsoft.CognitiveServices/accounts/carlossandi-9096-resource/projects/carlossandi-9096/providers/Microsoft.Authorization/roleAssignments/85634a62-45f0-48c1-8745-589ed4e78873"
+    }
+  ],
+  "publicAnalyst": {
+    "session": "89231a4c-81f0-4bf9-b0b1-e7c0becda8ea",
+    "requests": 2,
+    "tools": 1,
+    "mode": "llm"
+  }
+}

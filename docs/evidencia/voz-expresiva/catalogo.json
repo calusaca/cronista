@@ -1,0 +1,61 @@
+{
+  "checkedUtc": "2026-10-19T13:36:11.038Z",
+  "readOnly": true,
+  "synthesisCalls": 0,
+  "voices": [
+    {
+      "name": "en-US-JennyNeural",
+      "locale": "en-US",
+      "styles": [
+        "assistant",
+        "chat",
+        "customerservice",
+        "newscast",
+        "angry",
+        "cheerful",
+        "sad",
+        "excited",
+        "friendly",
+        "terrified",
+        "shouting",
+        "unfriendly",
+        "whispering",
+        "hopeful"
+      ],
+      "status": "GA"
+    },
+    {
+      "name": "en-US-GuyNeural",
+      "locale": "en-US",
+      "styles": [
+        "newscast",
+        "angry",
+        "cheerful",
+        "sad",
+        "excited",
+        "friendly",
+        "terrified",
+        "shouting",
+        "unfriendly",
+        "whispering",
+        "hopeful"
+      ],
+      "status": "GA"
+    },
+    {
+      "name": "es-MX-DaliaNeural",
+      "locale": "es-MX",
+      "styles": [],
+      "status": "GA"
+    },
+    {
+      "name": "es-MX-JorgeNeural",
+      "locale": "es-MX",
+      "styles": [
+        "cheerful",
+        "chat"
+      ],
+      "status": "GA"
+    }
+  ]
+}

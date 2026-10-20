@@ -1,0 +1,44 @@
+{
+  "checkedUtc": "2026-10-19T13:44:04.794Z",
+  "phase": "sample_selection_corrected_before_delivery",
+  "reason": "Las fuentes de una revisión del entrenador incluían el ID del gol. Las muestras deben seleccionar la acción primaria y no una cita secundaria.",
+  "firstRun": {
+    "checkedUtc": "2026-10-19T13:42:26.605Z",
+    "session": "96966545-033c-4280-bcf7-dcb2b12f25bb",
+    "maximumSpeechCalls": 5,
+    "reservedCharactersIncludingMarkup": 2846,
+    "samples": [
+      {
+        "nombre": "calma-es",
+        "texto": "Benja Bareardi (16) intenta un pase de 23 m hacia Emilio Zaroánez. Emilio Zaroánez (14) intenta un pase de 19 m hacia Dante Doraena.",
+        "bytes": 78912,
+        "sha256": "ebc92d93bc820ed7951b2c2e29626fc5fb991c3d969f20ba085b3e6cd062d886"
+      },
+      {
+        "nombre": "ataque-es",
+        "texto": "Joel Mendiuz avanza hacia el área.",
+        "bytes": 15408,
+        "sha256": "64db3271eb61b8e24ea3f50d02b455302369299174b179574537e48de334c29f"
+      },
+      {
+        "nombre": "gol-es",
+        "texto": "Mara Dorino revisa la formación a 4-4-2. Motivo declarado: «Ventaja de un gol y 30 segundos restantes; mantener estructura y reducir espacios sin renunciar al contraataque.». Elio Zarueta revisa la formación a 3-4-3. Motivo declarado: «Queda poco tiempo y vamos abajo: más presencia arriba y presión tras pérdida.».",
+        "bytes": 147600,
+        "sha256": "ceb7cb60e08b2387a8a5a177840f342c8f2a3fadba0aec97e5505e0aec54893f"
+      },
+      {
+        "nombre": "gol-en",
+        "texto": "Mara Dorino reviews the formation: 4-4-2. Stated reason: “Ventaja de un gol y 30 segundos restantes; mantener estructura y reducir espacios sin renunciar al contraataque.”. Elio Zarueta reviews the formation: 3-4-3. Stated reason: “Queda poco tiempo y vamos abajo: más presencia arriba y presión tras pérdida.”.",
+        "bytes": 150336,
+        "sha256": "d51790115555d41b42d04ebd61d58413eaae10a757e82e8eb9f22a688acec6a9"
+      },
+      {
+        "nombre": "gol-es-sereno",
+        "texto": "Mara Dorino revisa la formación a 4-4-2. Motivo declarado: «Ventaja de un gol y 30 segundos restantes; mantener estructura y reducir espacios sin renunciar al contraataque.». Elio Zarueta revisa la formación a 3-4-3. Motivo declarado: «Queda poco tiempo y vamos abajo: más presencia arriba y presión tras pérdida.».",
+        "bytes": 147600,
+        "sha256": "ceb7cb60e08b2387a8a5a177840f342c8f2a3fadba0aec97e5505e0aec54893f"
+      }
+    ]
+  },
+  "correction": "Seleccionar el fragmento con emoción jubilo, tick del gol e ID primario exactos. Reutilizar las muestras correctas de calma y ataque."
+}

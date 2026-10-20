@@ -1,0 +1,21 @@
+{
+  "checkedUtc": "2026-10-19T20:13:42.111Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "phase": "passed",
+  "match": "fefc28bb-7bd1-4857-a410-1f24a9383607",
+  "initial": "live",
+  "presentation": "buffer",
+  "formationOptions": 12,
+  "home": "5-3-2",
+  "away": "4-2-2-2",
+  "randomSeed": 3679207180,
+  "textNarrationWithAudioOff": true,
+  "audioControlsBesidePitch": true,
+  "pause": true,
+  "savedRecording": true,
+  "mobileWidth": 360,
+  "horizontalOverflow": false,
+  "javascriptErrors": [],
+  "inference": false,
+  "speechSynthesis": false
+}

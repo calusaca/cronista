@@ -1,0 +1,34 @@
+{
+  "checkedUtc": "2026-10-19T21:56:45.966516+00:00",
+  "phase": "local_checks_passed",
+  "unit": {
+    "files": 67,
+    "passed": 1561,
+    "finalNarrationFocusedChecks": 20
+  },
+  "typescript": "passed",
+  "packagingTestsPassed": 2,
+  "browser": {
+    "uniqueScenariosPassed": 31,
+    "finalFullRunPassed": 30,
+    "finalFullRunFailed": 1,
+    "correctedCase": "The archived goal belongs to the home team; corrected the expected score from 0–1 to 1–0. The corrected interruption test passed against the same production build in 14.1 s.",
+    "realSpeechGenerated": false,
+    "coverage": [
+      "visual clock continues while two speech requests are blocked",
+      "language cancellation and per-passage failure",
+      "15-second natural-speed voice interrupted by a visible goal",
+      "closing commentary after the visual end while session commentary is still pending",
+      "all 94 recorded actions remain accessible, with no future events"
+    ]
+  },
+  "sourceSha256": {
+    "src/arena/buffer.ts": "8e202b6dc3403521206d0edd223d1815a2de95c9181fa36930b1d6e69618def0",
+    "src/arena/relato.ts": "9551427de10adc49bba25547b9c507c8a331e326e06ecc8ad892bcccf4581b06",
+    "src/app/api/arena/sesiones/[id]/relato/route.ts": "1f98e51f7885366677e297654b0b07c57cc4fb977acdf245f1e3cf5f4861bf9f",
+    "src/ui/ArenaEmisionBuffer.tsx": "cc0cc0d37528472540d767def9437f54568cdf056ca934854d5c8ba9377a49df",
+    "src/ui/ArenaDescripcion.tsx": "0c814f04a28015702fa55b4467e03f74452ecd426919e7ce2533e6755974dc52",
+    "src/ui/Arena.tsx": "32f3fbd3badfb3129564507ea6c15dcc8a7053186853f8ba9cb7867a32e02ec9",
+    "src/app/globals.css": "265c446a4f31ff25a90c7577b69931f22e4fc125f7c1c2fb8338b93284dc308e"
+  }
+}

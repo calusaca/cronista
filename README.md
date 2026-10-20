@@ -60,11 +60,12 @@ The experimental lab below adapts its first three formation profiles.
 
 ## Experimental team agents lab
 
-Open [Team agents lab](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) to inspect 22 players, team plans, individual
+Open [Team agents lab](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) to inspect 22 players, team plans, individual
 orders and engine events on one shared pitch. Programmed scenarios and playback
 make no model calls. A recorded real Azure OpenAI example is included: two
 independent controllers using the same GPT-6.1 Sol deployment, four valid
-decisions, no fallbacks. Different-model comparisons remain pending.
+decisions, no fallbacks. The new arena has its own public application; the
+original report demo remains available at its existing address.
 
 The CLI runs two LLM controllers with simultaneous observations, bounded
 requests, cancellation and programmed fallback:
@@ -77,6 +78,96 @@ npm run arena -- --reproducir .cache/arena-modelos.json
 [Setup, configuration and limitations](docs/arena.md). This is a short 2D open-play
 prototype with simplified restarts and uncalibrated movement. Existing reports
 and their historical evaluations retain their original simulator.
+
+The published `arena-v3` version adds fictional coaches, twelve formations,
+individual player traits and ability, captains, a substitute bench, tactical reviews,
+substitutions at stoppages, active weather/pitch/crowd effects and a visible referee
+with simplified contact fouls and cards. Team and player inspectors explain the
+recorded state. Earlier v1/v2 recordings retain their original behaviour. These
+features are described in the [arena guide](docs/arena.md).
+
+The live version adds random or manual model selection, incremental SSE
+updates, cancellation and reconnection without repeated inference, personalized
+match intelligence and optional verified LLM commentary. Each team controller
+tries to win, using the score, remaining time, public opponent actions and its
+own previous valid plan. Players execute through the shared engine and local
+autonomous control between model decisions; the simulation clock pauses while
+both coaches decide.
+
+A [recorded 60-second duel](public/experimentos/arena-duelo-v3.json) uses distinct
+GPT-5.6 Luna and GPT-5.4 mini deployments: four accepted decisions, zero programmed
+fallbacks and three verified LLM comments. This demonstrates execution, not model
+superiority. The [evidence](docs/evidencia/arena-duelo-competitivo.json) includes
+latency and actual token usage. The first paired Foundry narration evaluation
+**did not demonstrate an improvement**; its [results and limitations](docs/evidencia/arena-eval-foundry/README.md)
+are retained. A [follow-up with a different judge](docs/evidencia/arena-eval-revision-alcance/README.md)
+accepted all four paired rows, with equal scores for draft and pipeline; it also
+does not demonstrate an advantage.
+
+The [Azure integration delivery](docs/azure-integraciones.md) adds durable Blob
+journals and request reservations, a versioned Foundry analyst with read-only
+match tools, Application Insights traces, Key Vault configuration, and a manual
+Container Apps Job that completed without model calls. Azure Speech provides
+short live narration and complete EN/ES playback. Twelve real audio passages
+cover all 33 events of the recorded duel. Complete narration can take longer
+than the simulated match. The new application was deployed with specific user
+consent on 19 October. Human quality review remains pending; see the
+[public deployment evidence](docs/evidencia/azure-arena-publica-smoke.json).
+
+The published expressive revision adds rising tension for observed carries into the attacking
+quarter, per-sentence rhythm and intonation, and celebration for confirmed goals.
+Live windows cover three seconds. [Speech samples](docs/evidencia/voz-expresiva/muestras.json)
+include an expressive/serene goal comparison using the same text. Voice styles
+were checked against the actual resource catalog; subjective quality review is
+pending. The [public voice check](docs/evidencia/voz-expresiva/navegador-publico.json)
+played all six passages, covered all 33 recorded events and verified the six
+downloadable audio files. Desktop and mobile checks found no JavaScript errors
+or horizontal overflow; playback was accelerated by seeking.
+
+The arena opens in **Live** mode; **Saved matches** contains the archived examples,
+recording import and recording creation. Starting formations and match conditions
+are selected before creation. An optional seed is explained under advanced setup;
+leaving it blank draws new teams and conditions. Text narration, audio, commentary
+and personalized evidence sit beside the pitch, or directly below it on mobile.
+The [football and interface audit](docs/disenos/039-auditoria-futbol-e-interfaz.md)
+documents formation diversity, incomplete refereeing and the outstanding shot-target bug.
+
+The default Live mode uses [buffered playback](docs/disenos/038-emision-con-buffer.md).
+It starts with 20 seconds of usable content while the match keeps generating.
+Pitch playback has its own continuous clock; optional narration independently prepares
+upcoming passages. [Selective live commentary](docs/disenos/040-consumidores-y-narracion.md)
+can span several actions at natural speed, while the complete description retains
+every visible event. [Continuous voice coverage](docs/disenos/041-reinicios-y-continuidad-de-voz.md)
+combines selected action, recent context and the observed ball state. Bundled EN/ES
+voice passages cover Speech delays after two seconds of silence, targeting gaps
+under five seconds while narration is enabled and playback is permitted. New
+matches start from the exact centre spot and also include kick-offs for the
+conceding team, throw-ins, corner kicks and goal kicks based on the last touch.
+[Voice synchronisation](docs/disenos/042-sincronia-y-saque-inicial.md) starts each
+activation at the visible cursor, retains preparation while muted and drops
+passages more than three seconds late. Shots and restarts can interrupt analysis. Slow or failed speech never holds back the live pitch. A depleted buffer pauses explicitly and rebuilds before
+continuing. Sharing a broadcast reuses the match and cached speech. The buffer
+size is not a guaranteed startup time or maximum delay. The
+[public verification](docs/evidencia/emision-buffer/publicacion.json) started
+playback with 20 seconds generated before the 60-second match finished,
+restored the same match for a second viewer and prepared six real speech
+passages ahead of playback. A speech source reached its natural end; audio and
+pitch paused and resumed together. Subjective voice quality remains unmeasured.
+
+[Narration variety](docs/disenos/043-variedad-de-la-narracion.md) adds a recent
+spoken history, confirmed passing sequences and changes of commentary topic.
+Prepared passages are checked again for repetition before playback. Twelve bundled
+backup comments per language rotate by recent use, with a separate closing clip.
+The supplied transcripts guide these patterns; this does not train a new model.
+
+The published [generate-first playback](docs/disenos/037-partido-preparado.md)
+generates and stores the match before showing it, and prepares the complete
+narration as one continuous audio track before playback. Viewers can share the
+same saved match without rerunning the teams. The audio drives the pitch clock
+approximately within each passage. Initial preparation takes time. The
+[public check on 19 October](docs/evidencia/partido-preparado/publicacion.json)
+verified sharing, offline visual playback and a continuous 204.5-second audio
+track covering all 33 events in the recorded duel.
 
 ## The multi-agent system (Best Multi-Agent System category)
 

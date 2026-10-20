@@ -1,0 +1,89 @@
+{
+  "checkedUtc": "2026-10-19T03:38:40.086Z",
+  "phase": "local_verified_pending_publication",
+  "checks": {
+    "typecheck": "passed",
+    "productionBuildAndStandalonePackaging": "passed",
+    "unit": {
+      "files": 62,
+      "tests": 1508,
+      "status": "passed"
+    },
+    "browser": {
+      "file": "e2e/arena.spec.ts",
+      "tests": 13,
+      "status": "passed",
+      "desktopAndMobileScreenshotsReviewed": true
+    },
+    "deploymentChecks": {
+      "tests": 2,
+      "status": "passed"
+    },
+    "offlineCorpus": {
+      "seeds": 24,
+      "replayed": 24,
+      "programmedFallbacks": 0
+    }
+  },
+  "realDuel": "arena-duelo-competitivo.json",
+  "foundryEvaluation": "arena-eval-foundry/resultado.json",
+  "limits": [
+    "Los jugadores ejecutan control local autónomo entre decisiones de equipo.",
+    "El reloj simulado se pausa mientras ambos modelos deciden.",
+    "Un encuentro no demuestra superioridad táctica ni realismo reglamentario.",
+    "La muestra Foundry de dos ventanas no demostró mejora.",
+    "Persistencia compartida, trazas cloud, audio y publicación pendientes."
+  ],
+  "sourceHashes": {
+    "e2e/arena.spec.ts": "76a8874edcbd1a578fea69a3e2dba2da64ff4007b5fce263ac5c91db6d6a36fb",
+    "infra/modelos-arena.bicep": "6f72506117395efc73f10d3a159a5eee6c60fa810fbfb9e44141aa91ff54082d",
+    "src/app/api/arena/modelos/route.ts": "dccc22c428534299fa07bcea2b1165d17deb7797c0882aaac8ab58e0acb50a60",
+    "src/app/api/arena/route.ts": "f6f6f1027e7120fb6292059639522f002f8e1873963220503b09c6f54aac948d",
+    "src/app/api/arena/sesiones/[id]/eventos/route.ts": "c1c8d3c19e3c42b9de8ecf20a61ad7a168cef2066246f2967669a205b27874b9",
+    "src/app/api/arena/sesiones/[id]/registro/route.ts": "b8bf1784d12c3674075c70c9f05ac71889409765afb92ebd3a4c09a8184cc2a7",
+    "src/app/api/arena/sesiones/[id]/route.ts": "4897105ea88a68ad4e25e47f3c84d5577b9f5acdd26732f36848a1af35d3f161",
+    "src/app/api/arena/sesiones/route.ts": "08e184fffdf188890634503b0b1cb99cfe2a5b517f717d91b5d7d7390224b0a6",
+    "src/app/globals.css": "248919cb8cce4da0e30b0fca552cbe1fad6d228cb56b070359d683011c5d0d57",
+    "src/arena/__fixtures__/arena-v2.json": "f61f8056d9543b4a13a2772eb0aa99e931d3a12e7a10e1c16f78a85aac5a61d1",
+    "src/arena/__tests__/arena.test.ts": "2850bc737a027f34a0016b66663d92498926867f455fd52ef7b65bd9b365d15b",
+    "src/arena/__tests__/competencia.test.ts": "6449aaffd64821257de42ed87db7e2906e093c65aab25651521f2d08b642aee0",
+    "src/arena/__tests__/directo.test.ts": "bc1ef66809dc0030211b106b5caf243b951f910d4ed8495e34d9c98942e87c0a",
+    "src/arena/__tests__/gestion-entorno.test.ts": "500cbfa9074e8cd5f3789c25d9ee257cc6f44f12de7261634a26d819de498180",
+    "src/arena/__tests__/http-vista.test.ts": "1b148b661012dfe3b9e9380e95a494eff4b953514389869070ff9720dd7d1f87",
+    "src/arena/__tests__/narrador.test.ts": "18ff6e86d73c590349f9ead082f8e03f59cc29f2a1e154b43fefdf51c7a72d15",
+    "src/arena/__tests__/personalidades-arbitro.test.ts": "ecf09aecb39cf05265bc59c2dfa320bac067f3dc5a6c27efcc433f8f06e9b153",
+    "src/arena/alineacion.ts": "465b014bca2a506438a8b6be8a5d10e50adaff2d6a1931b20e973e0da5f6656b",
+    "src/arena/arbitro.ts": "1b372d876f0677b0542ee977e994a185a8a5d744350a230d4e30848de2998c84",
+    "src/arena/catalogo.ts": "669ae5a5ff2f736804fb4ed2d20436eead141a83b08bf744f54cbb78e0985b3e",
+    "src/arena/cli.ts": "a1ce3ae7af98b6c5538baeb24839468112c1870678f4cfdb8a226b31b62fbeb5",
+    "src/arena/competencia.ts": "73424c2d08c55ef24f2df8c5324b29d07005cfac89aae2d4887f4850c0a62013",
+    "src/arena/controladores.ts": "0ee16144d523d22b0351c507b0d4914468620723cf111ddea799ef280b045ebf",
+    "src/arena/coordinador.ts": "6c8b1e1b7139cf6e01e7075c45e0799d8bde4abeda2c5f0789a0c3d692d96602",
+    "src/arena/entorno.ts": "7beef3eb2fbf1360199bdddcb2af0400149ba26a11f7e2af374f0abdf2deead1",
+    "src/arena/entrenadores.ts": "61ea4cd98b37300fdbeebf018f8b9f19ed25875aa632be078ec5127fb0ffb4ca",
+    "src/arena/eval-cli.ts": "d9d7fad1f1b7b9579a36c1dab61f3589ff880d8e3c4df76b9248eb352262d017",
+    "src/arena/evaluacion.ts": "30e109d21032ee5909183767f980e3c1423afffc8666ed7b4e899f76a7037ee7",
+    "src/arena/foundry-eval.ts": "5d57e918579def55dfc28d53768bd7ef8db7bba0ca695e675ae623d8a4ca2b6f",
+    "src/arena/geometria.ts": "f364330d86edb65af9f7167363f7440d2c5f9ebecb2aa53d2097d0414588881f",
+    "src/arena/inteligencia.ts": "1f8ca062575674707f51ef94fc5111b8592b2d26e96ad56728d776553d578369",
+    "src/arena/modelos.ts": "27e98eed6e9c327ad57881fe0e61754b5d2e5843d055f6a5675df5cf8cb00c78",
+    "src/arena/motor.ts": "e374b341764043910e5669b35cd7eda489ee035eb1a7fda9b8632ecec8780bbb",
+    "src/arena/narrador.ts": "703e360cb3265203d384da76e0abc87deca92df56776004a190721eacc639b3e",
+    "src/arena/personalidades.ts": "2b426be11f4d606165ff45cae3ff0bd638cf9b89cad5a74c1a2ea0c7450b4a69",
+    "src/arena/peticiones.ts": "1294a8be4f70a4f23b5667fe5f5187bb684e7bfed370f7ffbdd52ffbc1544e11",
+    "src/arena/protocolo.ts": "a029b59ddea3948b4d4d664883da352e56d2496b37a09625b5fbb73d36809e99",
+    "src/arena/sesiones.ts": "b7924995da2d6d5ff237d82c1744f634142673ce3182e02aa859d6055bc22fad",
+    "src/arena/tipos.ts": "0c1245bac565fec381a189b4eb6c1a8d2accf27ba46f5ee153eb2140ebd357fb",
+    "src/arena/vista.ts": "e90f0b83e0078b2ae06eb80d6cbf78619e8a95ef6f1d157a77f1915a6878e223",
+    "src/cadena/verificador.ts": "c92e1243f5b38739ddcc2dbe573ff9bf602e296cc097b7373f78bc1e1d3e32af",
+    "src/lib/llm-azure-openai.ts": "59705cabcc2705b794e486a87af57a5fcce010445b7a58fafc87118516fc9336",
+    "src/lib/llm.ts": "522b60cd5e6d3b91b9e2e11829502a3e0e681d27d3f183d7fc70451dd2ff4e8d",
+    "src/sim/limites.ts": "80ce9d598ea4fc42febb83794a2868caafd17c60dddd94737d58802bcbe71991",
+    "src/ui/Arena.tsx": "40e8730995a2006137406fb891365b915a6f7dd7af8047dc27f3a22097565ee3",
+    "src/ui/ArenaComentarios.tsx": "ee0dca97dde166fb81633ade7863ca6611e9e4aee012da8ea9c07fd775d77042",
+    "src/ui/ArenaContexto.tsx": "e2bf452fbe63bd1738c9328c60378c60748956d1396bb6d6abf0d7cd919ef854",
+    "src/ui/ArenaEnDirecto.tsx": "b75003c193c37b62ff06266b991ad21ed2fd34835c218e3fe1a5b86a9af8c02d",
+    "src/ui/ArenaInteligencia.tsx": "b5b43e73bef5e1a1a914846f6a4d145e54228c6f9cb2583ae99bb03bb8b1bfea",
+    "src/ui/ArenaPlantilla.tsx": "5d733f8dc77bede041f56de115975d04281ef13e553a7745a3e8e89029ce54bb"
+  }
+}

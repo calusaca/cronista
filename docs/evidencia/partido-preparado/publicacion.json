@@ -1,0 +1,116 @@
+{
+  "checkedUtc": "2026-10-19T17:27:30.100Z",
+  "phase": "published_and_public_prepared_playback_smoke_passed",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019172140",
+  "authorization": {
+    "instruction": "continua ultima tarea",
+    "scope": "Continue the pending publication of brief 037 in the existing arena app",
+    "automaticReview": "approved_execution_started"
+  },
+  "acr": {
+    "run": "cha",
+    "status": "Succeeded",
+    "buildIncludes": [
+      "typecheck",
+      "production build"
+    ]
+  },
+  "azure": {
+    "fqdn": "cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+    "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261019172140",
+    "name": "cronista-arena",
+    "provisioningState": "Succeeded",
+    "resources": {
+      "cpu": 0.5,
+      "ephemeralStorage": "2Gi",
+      "memory": "1Gi"
+    },
+    "revision": "cronista-arena--0000002",
+    "runningStatus": "Running",
+    "scale": {
+      "cooldownPeriod": 300,
+      "maxReplicas": 1,
+      "minReplicas": 0,
+      "pollingInterval": 30,
+      "rules": null
+    }
+  },
+  "sourceManifest": {
+    "files": 284,
+    "mismatches": [],
+    "evidence": "../azure-arena-publicacion.json"
+  },
+  "validation": {
+    "priorLocalEvidence": "validacion.json",
+    "priorLocalUnitTests": 1537,
+    "priorLocalBrowserCases": 20,
+    "unchangedRecordedSourceHashes": 12,
+    "typecheckRepeated": "passed",
+    "packagingTestsRepeated": 2,
+    "publicSmoke": "navegador-publico.json",
+    "checks": {
+      "health": {
+        "http": 200
+      },
+      "generateFirst": {
+        "http": 201,
+        "session": "5a6b6c36-532a-4dbf-a12a-e264cf98d504",
+        "finalTick": 600,
+        "startsPausedAtZero": true,
+        "shareRestoresSameMatch": true,
+        "sessionCreations": 1,
+        "visualPlaybackWithArenaNetworkBlocked": true
+      },
+      "mobile": {
+        "width": 360,
+        "dark": true,
+        "reducedMotion": true,
+        "spanish": true,
+        "horizontalOverflow": false
+      },
+      "recording": {
+        "http": 200,
+        "session": "7631ee92-07b1-4612-9902-da3e3189896b"
+      },
+      "audio": {
+        "type": "audio/wav",
+        "durationSeconds": 204.528,
+        "sources": 0,
+        "passagesPreparedBeforePlayback": 6,
+        "requestsAfterPlaybackStarted": 0,
+        "allEventsCovered": true,
+        "recordedEvents": 33,
+        "seekUpdatesPitch": true,
+        "playbackWithArenaNetworkBlocked": true,
+        "realEndedEvent": true
+      }
+    },
+    "javascriptErrors": []
+  },
+  "originalDemo": {
+    "name": "cronista",
+    "revision": "cronista--0000005",
+    "image": "crcronistae1734ecca5ff.azurecr.io/cronista:demo-20261018042118",
+    "unchanged": true
+  },
+  "limits": {
+    "dailyModelMatches": 10,
+    "dailyAnalystQuestions": 20,
+    "dailySpeechBudgetIncludingMarkup": 120000,
+    "perSessionSpeechBudgetIncludingMarkup": 24000,
+    "maximumLocalPcmBytes": 60000000,
+    "maximumRetentionHours": 24
+  },
+  "verificationIssue": "Initial public-browser invocation omitted PLAYWRIGHT_BROWSERS_PATH; rerun passed with Chromium already installed in .cache/playwright.",
+  "limitations": [
+    "Initial match generation and audio preparation still take time; no latency benchmark or guaranteed completion time.",
+    "Audio and pitch synchronization is approximate within each passage, not word-aligned.",
+    "New match creation produces a new match; existing sessions are reused by ID, not by seed alone.",
+    "Speech budgets may prevent preparing very dense or long recordings in full.",
+    "A reserved synthesis finishes under the provider timeout after a viewer disconnects and remains cached.",
+    "Subjective voice quality and professional football realism are not measured by these checks.",
+    "Public audio playback was accelerated by seeking; full human listening was not performed.",
+    "Speech provider calls were not instrumented; the archived session and durable audio cache were reused."
+  ]
+}

@@ -1,0 +1,682 @@
+{
+  "checkedUtc": "2026-10-19T12:54:13.977Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "scope": "public_container_app_real_azure_services",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "models": {
+    "modelos": [
+      {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    ],
+    "estado": "ok"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true
+  },
+  "originalHealthHttp": 200,
+  "match": {
+    "id": "89231a4c-81f0-4bf9-b0b1-e7c0becda8ea",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      "visita": {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-19T12:54:58.948Z"
+  },
+  "stream": {
+    "contentType": "text/event-stream; charset=utf-8",
+    "firstAdvanceMs": 5712,
+    "messages": 136,
+    "advances": 123,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 5,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 155,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 305,
+        "accepted": true
+      }
+    ],
+    "lastId": 136,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 72112,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          4465.724350999997,
+          4937.839785000004,
+          4010.2224050000077,
+          4141.253185000009
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 16585,
+            "salida": 1038,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 16501,
+            "salida": 1368,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 3,
+            "respuestasConUso": 3,
+            "entrada": 2541,
+            "salida": 501,
+            "cache": 0
+          }
+        }
+      }
+    },
+    "elapsedMs": 71925
+  },
+  "matchResult": {
+    "version": "arena-v3",
+    "finalTick": 600,
+    "score": {
+      "local": 0,
+      "visita": 0
+    },
+    "events": 43,
+    "referee": true,
+    "coaches": [
+      "local",
+      "visita"
+    ],
+    "players": 22,
+    "traits": true,
+    "decisions": [
+      {
+        "side": "local",
+        "tick": 0,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "side": "visita",
+        "tick": 0,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-rapido:reasoning-low"
+      },
+      {
+        "side": "local",
+        "tick": 300,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "side": "visita",
+        "tick": 300,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    ],
+    "sha256": "7ebdfe571bdd424583bcabb891393116173cc63363c4a2573cde69dbb50b4a05",
+    "recording": "azure-publica/partido.json",
+    "canonicalJsonSha256": "29d0bf69d10fb2a249dcf0f521065b8cf8d1d189792bbe917a513ac4394f4d2a"
+  },
+  "replay": {
+    "consistent": true,
+    "events": 43
+  },
+  "voice": {
+    "http": 200,
+    "bytes": 327456,
+    "type": "audio/mpeg",
+    "characters": 646,
+    "text": "Comienza el partido entre Sporting Brezal y Deportivo Ormidia. Marco Zariido (10) intenta un pase de 23 m hacia Elías Brelinera. Benja Quininena (8) intercepta la trayectoria del balón. Marco Zariido (10) toma el control del balón. Marco Zariido (10) intenta un pase de 7 m hacia Elías Brelinera. Elías Brelinera (9) recibe el balón. Elías Brelinera (9) intenta un pase de 7 m hacia Marco Zariido. Marco Zariido (10) recibe el balón. Marco Zariido (10) intenta un pase de 10 m hacia Elías Brelinera. Elías Brelinera (9) interviene en posición adelantada (aproximación puntual). Reinicio experimental desde Iker Valiena (13); se recoloca el balón.",
+    "audioSha256": "d5049649effaf393bc2692bf659908eff3229d3583bf68b8fae510330333f508"
+  },
+  "analyst": {
+    "tick": 600,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 2,
+    "herramientas": [
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 600,
+          "tipo": "todos"
+        },
+        "hechos": [
+          "arena:a30",
+          "arena:a31",
+          "arena:a32",
+          "arena:a33",
+          "arena:a34",
+          "arena:a35",
+          "arena:a40",
+          "arena:a43"
+        ]
+      }
+    ],
+    "uso": {
+      "entrada": 1885,
+      "salida": 355
+    },
+    "comentario": {
+      "tick": 600,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "llm",
+      "principal": "arena:a43",
+      "hechos": [
+        {
+          "id": "arena:a30",
+          "tipo": "accion_arena",
+          "texto_es": "Mateo Lorión (4) intenta un pase de 18 m hacia Marco Zariido.",
+          "texto_en": "Mateo Lorión (4) attempts a 18 m pass towards Marco Zariido.",
+          "eventos": [
+            "a30"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Mateo Lorión",
+            "equipo": "Sporting Brezal",
+            "dorsal": 4,
+            "distancia": 18,
+            "receptor": "Marco Zariido",
+            "dorsal_receptor": 10
+          }
+        },
+        {
+          "id": "arena:a31",
+          "tipo": "accion_arena",
+          "texto_es": "Marco Zariido (10) recibe el balón.",
+          "texto_en": "Marco Zariido (10) receives the ball.",
+          "eventos": [
+            "a31"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Marco Zariido",
+            "equipo": "Sporting Brezal",
+            "dorsal": 10,
+            "distancia": 18,
+            "receptor": "Mateo Lorión",
+            "dorsal_receptor": 4
+          }
+        },
+        {
+          "id": "arena:a32",
+          "tipo": "accion_arena",
+          "texto_es": "Marco Zariido (10) intenta un pase de 20 m hacia Elías Brelinera.",
+          "texto_en": "Marco Zariido (10) attempts a 20 m pass towards Elías Brelinera.",
+          "eventos": [
+            "a32"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Marco Zariido",
+            "equipo": "Sporting Brezal",
+            "dorsal": 10,
+            "distancia": 20,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a33",
+          "tipo": "accion_arena",
+          "texto_es": "Elías Brelinera (9) recibe el balón.",
+          "texto_en": "Elías Brelinera (9) receives the ball.",
+          "eventos": [
+            "a33"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Elías Brelinera",
+            "equipo": "Sporting Brezal",
+            "dorsal": 9,
+            "distancia": 20,
+            "receptor": "Marco Zariido",
+            "dorsal_receptor": 10
+          }
+        },
+        {
+          "id": "arena:a34",
+          "tipo": "accion_arena",
+          "texto_es": "Elías Brelinera (9) intenta un pase de 19 m hacia Rafael Bareena.",
+          "texto_en": "Elías Brelinera (9) attempts a 19 m pass towards Rafael Bareena.",
+          "eventos": [
+            "a34"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Elías Brelinera",
+            "equipo": "Sporting Brezal",
+            "dorsal": 9,
+            "distancia": 19,
+            "receptor": "Rafael Bareena",
+            "dorsal_receptor": 17
+          }
+        },
+        {
+          "id": "arena:a35",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Bareena (17) recibe el balón.",
+          "texto_en": "Rafael Bareena (17) receives the ball.",
+          "eventos": [
+            "a35"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Bareena",
+            "equipo": "Sporting Brezal",
+            "dorsal": 17,
+            "distancia": 19,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a40",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Bareena (17) intenta un pase de 19 m hacia Elías Brelinera.",
+          "texto_en": "Rafael Bareena (17) attempts a 19 m pass towards Elías Brelinera.",
+          "eventos": [
+            "a40"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Bareena",
+            "equipo": "Sporting Brezal",
+            "dorsal": 17,
+            "distancia": 19,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a43",
+          "tipo": "accion_arena",
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "eventos": [
+            "a43"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Iker Valiena",
+            "equipo": "Deportivo Ormidia",
+            "dorsal": 13,
+            "distancia": 19,
+            "receptor": "Iker Zareales",
+            "dorsal_receptor": 4
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "hecho": "arena:a43",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Rafael Bareena (17) recibe el balón.",
+          "texto_en": "Rafael Bareena (17) receives the ball.",
+          "hecho": "arena:a35",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+              "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+              "hecho": "arena:a43",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Rafael Bareena (17) recibe el balón.",
+              "texto_en": "Rafael Bareena (17) receives the ball.",
+              "hecho": "arena:a35",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  },
+  "status": "passed",
+  "initialAnalystAttempt": {
+    "tick": 600,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 1,
+    "herramientas": [],
+    "uso": {
+      "entrada": 0,
+      "salida": 0
+    },
+    "comentario": {
+      "tick": 600,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "plantilla",
+      "principal": "arena:a43",
+      "hechos": [
+        {
+          "id": "arena:a43",
+          "tipo": "accion_arena",
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "eventos": [
+            "a43"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Iker Valiena",
+            "equipo": "Deportivo Ormidia",
+            "dorsal": 13,
+            "distancia": 19,
+            "receptor": "Iker Zareales",
+            "dorsal_receptor": 4
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "hecho": "arena:a43",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [],
+          "motivos": [
+            {
+              "oracion": -1,
+              "regla": "V1",
+              "detalle": "Agente no disponible, cancelado o plazo agotado"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "analystRecoveryAttempted": {
+    "checkedUtc": "2026-10-19T13:04:25.794Z",
+    "role": "Foundry User",
+    "roleScope": "Foundry project only",
+    "question": "momento",
+    "audience": "fan"
+  },
+  "analystRecovered": {
+    "http": 200,
+    "tick": 600,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 2,
+    "herramientas": [
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 600,
+          "tipo": "todos"
+        },
+        "hechos": [
+          "arena:a30",
+          "arena:a31",
+          "arena:a32",
+          "arena:a33",
+          "arena:a34",
+          "arena:a35",
+          "arena:a40",
+          "arena:a43"
+        ]
+      }
+    ],
+    "uso": {
+      "entrada": 1885,
+      "salida": 355
+    },
+    "comentario": {
+      "tick": 600,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "llm",
+      "principal": "arena:a43",
+      "hechos": [
+        {
+          "id": "arena:a30",
+          "tipo": "accion_arena",
+          "texto_es": "Mateo Lorión (4) intenta un pase de 18 m hacia Marco Zariido.",
+          "texto_en": "Mateo Lorión (4) attempts a 18 m pass towards Marco Zariido.",
+          "eventos": [
+            "a30"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Mateo Lorión",
+            "equipo": "Sporting Brezal",
+            "dorsal": 4,
+            "distancia": 18,
+            "receptor": "Marco Zariido",
+            "dorsal_receptor": 10
+          }
+        },
+        {
+          "id": "arena:a31",
+          "tipo": "accion_arena",
+          "texto_es": "Marco Zariido (10) recibe el balón.",
+          "texto_en": "Marco Zariido (10) receives the ball.",
+          "eventos": [
+            "a31"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Marco Zariido",
+            "equipo": "Sporting Brezal",
+            "dorsal": 10,
+            "distancia": 18,
+            "receptor": "Mateo Lorión",
+            "dorsal_receptor": 4
+          }
+        },
+        {
+          "id": "arena:a32",
+          "tipo": "accion_arena",
+          "texto_es": "Marco Zariido (10) intenta un pase de 20 m hacia Elías Brelinera.",
+          "texto_en": "Marco Zariido (10) attempts a 20 m pass towards Elías Brelinera.",
+          "eventos": [
+            "a32"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Marco Zariido",
+            "equipo": "Sporting Brezal",
+            "dorsal": 10,
+            "distancia": 20,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a33",
+          "tipo": "accion_arena",
+          "texto_es": "Elías Brelinera (9) recibe el balón.",
+          "texto_en": "Elías Brelinera (9) receives the ball.",
+          "eventos": [
+            "a33"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Elías Brelinera",
+            "equipo": "Sporting Brezal",
+            "dorsal": 9,
+            "distancia": 20,
+            "receptor": "Marco Zariido",
+            "dorsal_receptor": 10
+          }
+        },
+        {
+          "id": "arena:a34",
+          "tipo": "accion_arena",
+          "texto_es": "Elías Brelinera (9) intenta un pase de 19 m hacia Rafael Bareena.",
+          "texto_en": "Elías Brelinera (9) attempts a 19 m pass towards Rafael Bareena.",
+          "eventos": [
+            "a34"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Elías Brelinera",
+            "equipo": "Sporting Brezal",
+            "dorsal": 9,
+            "distancia": 19,
+            "receptor": "Rafael Bareena",
+            "dorsal_receptor": 17
+          }
+        },
+        {
+          "id": "arena:a35",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Bareena (17) recibe el balón.",
+          "texto_en": "Rafael Bareena (17) receives the ball.",
+          "eventos": [
+            "a35"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Bareena",
+            "equipo": "Sporting Brezal",
+            "dorsal": 17,
+            "distancia": 19,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a40",
+          "tipo": "accion_arena",
+          "texto_es": "Rafael Bareena (17) intenta un pase de 19 m hacia Elías Brelinera.",
+          "texto_en": "Rafael Bareena (17) attempts a 19 m pass towards Elías Brelinera.",
+          "eventos": [
+            "a40"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Rafael Bareena",
+            "equipo": "Sporting Brezal",
+            "dorsal": 17,
+            "distancia": 19,
+            "receptor": "Elías Brelinera",
+            "dorsal_receptor": 9
+          }
+        },
+        {
+          "id": "arena:a43",
+          "tipo": "accion_arena",
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "eventos": [
+            "a43"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Iker Valiena",
+            "equipo": "Deportivo Ormidia",
+            "dorsal": 13,
+            "distancia": 19,
+            "receptor": "Iker Zareales",
+            "dorsal_receptor": 4
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+          "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+          "hecho": "arena:a43",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Rafael Bareena (17) recibe el balón.",
+          "texto_en": "Rafael Bareena (17) receives the ball.",
+          "hecho": "arena:a35",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Iker Valiena (13) intenta un pase de 19 m hacia Iker Zareales.",
+              "texto_en": "Iker Valiena (13) attempts a 19 m pass towards Iker Zareales.",
+              "hecho": "arena:a43",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Rafael Bareena (17) recibe el balón.",
+              "texto_en": "Rafael Bareena (17) receives the ball.",
+              "hecho": "arena:a35",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  },
+  "finishedUtc": "2026-10-19T13:04:33.492Z",
+  "recoveryEvidence": "azure-foundry-identidad-publica.json",
+  "limitations": [
+    "El reloj simulado se detiene durante las decisiones.",
+    "Las decisiones válidas y la reproducción consistente no establecen superioridad ni realismo futbolístico.",
+    "La primera consulta del analista usó respaldo por un permiso ausente; se conservan ese resultado y la consulta correcta posterior."
+  ]
+}

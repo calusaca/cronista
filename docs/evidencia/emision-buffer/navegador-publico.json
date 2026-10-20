@@ -1,0 +1,193 @@
+{
+  "checkedUtc": "2026-10-19T18:41:13.354Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "scope": "real_deployed_application_no_mock_responses",
+  "newTeamModelCalls": 0,
+  "newAnalystCalls": 0,
+  "speechProviderCalls": "not instrumented; real Speech responses or durable cache used",
+  "checks": {
+    "startsBeforeFinished": {
+      "session": "401e18d5-d9f4-4b3d-9e5d-02ae28e1ee96",
+      "replayHttp": 409,
+      "snapshotTick": 200,
+      "fullDurationTick": 600,
+      "interpolatedMovement": true
+    },
+    "sharing": {
+      "secondViewerRestoredSameMatch": true,
+      "sessionCreations": 1
+    },
+    "audio": {
+      "preparedWindows": 6,
+      "realAudioContextRuns": true,
+      "realSpeechSourceReachedEnded": true,
+      "endedSources": [
+        {
+          "reloj": 5.413333333333333,
+          "duracionS": 2.472
+        }
+      ],
+      "pauseSuspendsAudioAndPitch": true,
+      "resumeWorks": true,
+      "scheduledSources": [
+        {
+          "cuando": 2.9335,
+          "reloj": 0,
+          "duracionS": 2.472,
+          "velocidad": 1
+        },
+        {
+          "cuando": 6.1335,
+          "reloj": 0,
+          "duracionS": 2.592,
+          "velocidad": 1
+        },
+        {
+          "cuando": 9.6335,
+          "reloj": 0,
+          "duracionS": 2.64,
+          "velocidad": 1
+        },
+        {
+          "cuando": 17.4335,
+          "reloj": 0,
+          "duracionS": 2.976,
+          "velocidad": 1
+        },
+        {
+          "cuando": 21.9335,
+          "reloj": 0,
+          "duracionS": 2.568,
+          "velocidad": 1
+        },
+        {
+          "cuando": 28.8335,
+          "reloj": 5.413333333333333,
+          "duracionS": 3.168,
+          "velocidad": 1
+        }
+      ],
+      "speechQualityListening": "not measured"
+    },
+    "mobile": {
+      "width": 360,
+      "dark": true,
+      "reducedMotion": true,
+      "spanish": true,
+      "horizontalOverflow": false
+    }
+  },
+  "audioSegments": [
+    {
+      "http": 200,
+      "desdeTick": 0,
+      "hastaTick": 50,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a2"
+      ],
+      "fragments": [
+        {
+          "tick": 39,
+          "emotion": "serena",
+          "text": "Recibe Tomás Oreich."
+        }
+      ],
+      "bytes": 14832
+    },
+    {
+      "http": 200,
+      "desdeTick": 50,
+      "hastaTick": 100,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a4"
+      ],
+      "fragments": [
+        {
+          "tick": 71,
+          "emotion": "jubilo",
+          "text": "¡Tomás Oreich marca el gol!"
+        }
+      ],
+      "bytes": 15552
+    },
+    {
+      "http": 200,
+      "desdeTick": 100,
+      "hastaTick": 150,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a7"
+      ],
+      "fragments": [
+        {
+          "tick": 106,
+          "emotion": "serena",
+          "text": "Recibe Vicente Oreales."
+        }
+      ],
+      "bytes": 15840
+    },
+    {
+      "http": 200,
+      "desdeTick": 150,
+      "hastaTick": 200,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a11"
+      ],
+      "fragments": [
+        {
+          "tick": 184,
+          "emotion": "seria",
+          "text": "Owen Barinera, fuera de juego."
+        }
+      ],
+      "bytes": 17856
+    },
+    {
+      "http": 200,
+      "desdeTick": 200,
+      "hastaTick": 250,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a14"
+      ],
+      "fragments": [
+        {
+          "tick": 229,
+          "emotion": "serena",
+          "text": "Recibe Ramiro Galiueta."
+        }
+      ],
+      "bytes": 15408
+    },
+    {
+      "http": 200,
+      "desdeTick": 250,
+      "hastaTick": 300,
+      "modo": "buffer",
+      "idioma": "es",
+      "events": [
+        "a18"
+      ],
+      "fragments": [
+        {
+          "tick": 298,
+          "emotion": "seria",
+          "text": "Ismael Galiera, fuera de juego."
+        }
+      ],
+      "bytes": 19008
+    }
+  ],
+  "errors": [],
+  "status": "passed",
+  "finishedUtc": "2026-10-19T18:41:30.429Z"
+}

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { crearLlmEquipoDesdeEnv, type Llm } from "../../lib/llm";
 import { crearLlmAzureOpenAI } from "../../lib/llm-azure-openai";
-import { ARENA } from "../../sim/limites";
+import { ARENA, TECNICA_ARENA } from "../../sim/limites";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
 import { anclas, puestos } from "../catalogo";
@@ -109,17 +109,21 @@ describe("Arena: mundo espacial y reproducción", () => {
   });
   it("mantiene jugadores acotados y desplazamientos compatibles con el tiempo", async () => {
     const r = await ejecutarArena(crearConfigArena({ duracionS: 180 }), programados());
-    const max = ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor);
+    const max = ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor) * Math.max(...Object.values(TECNICA_ARENA.ritmo));
     for (let i = 0; i < r.fotogramas.length; i++) {
       const f = r.fotogramas[i]!;
-      expect(new Set(f.jugadores.map(j => j.id)).size).toBe(22);
+      expect(new Set(f.jugadores.map(j => j.id)).size).toBe(f.jugadores.length);
       for (const [n, j] of f.jugadores.entries()) {
         expect(j.posicion.x).toBeGreaterThanOrEqual(0); expect(j.posicion.x).toBeLessThanOrEqual(ARENA.largoM);
         expect(j.posicion.y).toBeGreaterThanOrEqual(0); expect(j.posicion.y).toBeLessThanOrEqual(ARENA.anchoM);
         expect(Math.hypot(j.velocidad.x, j.velocidad.y)).toBeLessThanOrEqual(max + 1e-9);
         if (i) {
           const anterior = r.fotogramas[i - 1]!, dt = (f.tick - anterior.tick) * ARENA.pasoS;
-          expect(distancia(j.posicion, anterior.jugadores[n]!.posicion)).toBeLessThanOrEqual(max * dt + 1e-9);
+          const previo = anterior.jugadores.find(p => p.id === j.id);
+          const recolocacion = r.eventos.some(e => e.tipo === "reinicio" && e.reinicio && e.tick > anterior.tick && e.tick <= f.tick);
+          if (previo && !recolocacion) expect(distancia(j.posicion, previo.posicion)).toBeLessThanOrEqual(max * dt + 1e-9);
+          else if (previo) { expect(f.saque).toBeDefined(); expect(j.velocidad).toEqual({ x: 0, y: 0 }); }
+          else expect(r.eventos.some(e => e.tipo === "cambio" && e.jugador === j.id && e.tick > anterior.tick && e.tick <= f.tick)).toBe(true);
         }
       }
     }
@@ -150,7 +154,7 @@ describe("Arena: mundo espacial y reproducción", () => {
 });
 
 function escenarioPase(bloqueado: boolean, adelantado = false) {
-  const config = crearConfigArena({ duracionS: 5, intervaloS: 5 });
+  const config = crearConfigArena({ duracionS: 5, intervaloS: 5, version: ARENA.versionPersonalidades });
   const inicial = crearEstadoArena(config);
   for (const j of inicial.jugadores) { j.posicion = { x: j.lado === "local" ? 8 : adelantado ? 48 : 95, y: 5 }; j.nivel = 100; }
   const autor = inicial.jugadores.find(j => j.id === "local-5")!, receptor = inicial.jugadores.find(j => j.id === "local-6")!;
