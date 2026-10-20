@@ -1,11 +1,14 @@
 import { z } from "zod";
-import { ARENA } from "../sim/limites";
+import { ARENA, TECNICA_ARENA } from "../sim/limites";
 import type { Lado, Posicion, SimConfig } from "../sim/tipos";
 
 export const lados: readonly Lado[] = ["local", "visita"];
 export const formaciones = ["4-3-3", "4-2-3-1", "4-4-2", "4-1-4-1", "4-1-2-1-2", "3-5-2", "3-4-3", "4-3-1-2", "4-2-2-2", "3-4-2-1", "5-3-2", "5-4-1"] as const;
 export type FormacionArena = (typeof formaciones)[number];
 export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalidades | typeof ARENA.versionLegado;
+/** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", ARENA.reglas] as const;
+export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
 export interface EntrenadorArena {
@@ -21,9 +24,11 @@ export interface PlanTecnico {
   ritmo: "pausado" | "normal" | "alto";
   mentalidad: Mentalidad;
 }
+export interface ParSustitucion { sale: string; entra: string }
 export interface GestionEquipo {
   formacion: FormacionArena | null; mentalidad: Mentalidad;
-  sustitucion: { sale: string; entra: string } | null;
+  /** Brief 044: un par (forma original) o hasta TECNICA_ARENA.cambiosPorVentana pares en la misma ventana. */
+  sustitucion: ParSustitucion | ParSustitucion[] | null;
   motivo: string; fuentes: string[];
 }
 export interface EstadoEntrenador {
@@ -63,7 +68,10 @@ export interface ArbitroArena {
 export type TipoReinicioArena = "centro" | "banda" | "esquina" | "meta";
 export interface SaqueArena { tipo: TipoReinicioArena; lado: Lado; ejecutor: string; punto: Punto; hastaTick: number }
 export interface Vuelo {
-  tipo: "pase" | "tiro"; autor: string; lado: Lado; receptor: string | null;
+  /** "rechace" (reinicios-v3): balón suelto tras el desvío del portero. Su autor es el portero
+   * (último toque, autogol si entra en su arco) pero conserva el `lado` del remate original;
+   * quien lo recoja genera una `recuperacion` sin relación. */
+  tipo: "pase" | "tiro" | "rechace"; autor: string; lado: Lado; receptor: string | null;
   origen: Punto; destino: Punto; inicioTick: number; adelantados: string[];
   reinicio?: TipoReinicioArena;
 }
@@ -83,7 +91,7 @@ export interface EstadoArena {
 export interface ConfigArena {
   /** Ausente en archivos arena-v1; nunca se actualizan al reproducirlos. */
   version?: VersionArena;
-  reglas?: "reinicios-v1" | "reinicios-v2";
+  reglas?: ReglasArena;
   partido: SimConfig;
   formaciones: Record<Lado, FormacionArena>;
   entrenadores?: Record<Lado, EntrenadorArena>;
@@ -99,6 +107,9 @@ export interface EventoArena {
   gravedad?: "imprudente" | "temeraria" | "fuerza_excesiva";
   dobleAmarilla?: boolean; reinicio?: TipoReinicioArena; ultimoToque?: string; autogol?: boolean;
 }
+const parSustitucion = z.strictObject({ sale: z.string().max(40), entra: z.string().max(40) });
+/** Ambas formas de `gestion.sustitucion` como lista; null o ausente es una lista vacía. */
+export const paresSustitucion = (s: GestionEquipo["sustitucion"] | undefined): ParSustitucion[] => !s ? [] : Array.isArray(s) ? s : [s];
 const punto = z.strictObject({ x: z.number().min(0).max(ARENA.largoM), y: z.number().min(0).max(ARENA.anchoM) });
 export const esquemaOrdenes = z.strictObject({
   observacion: z.string().min(1).max(80),
@@ -114,7 +125,7 @@ export const esquemaOrdenes = z.strictObject({
   })).min(1).max(11),
   gestion: z.strictObject({
     formacion: z.enum(formaciones).nullable(), mentalidad: z.enum(["conservar", "equilibrar", "buscar"]),
-    sustitucion: z.strictObject({ sale: z.string().max(40), entra: z.string().max(40) }).nullable(),
+    sustitucion: z.union([parSustitucion, z.array(parSustitucion).min(1).max(TECNICA_ARENA.cambiosPorVentana)]).nullable(),
     motivo: z.string().min(1).max(200), fuentes: z.array(z.string().max(40)).max(8),
   }).nullable().optional(),
 });

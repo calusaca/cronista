@@ -8,7 +8,7 @@ import { ajusteApoyo, prefiereConducir, prefiereTirar } from "./personalidades";
 import { contextoCompetitivo } from "./competencia";
 import { trazar } from "../lib/telemetria";
 import { z } from "zod";
-import { esquemaOrdenes, formaciones, rival, type ControladorEquipo, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto } from "./tipos";
+import { esquemaOrdenes, formaciones, paresSustitucion, rival, type ControladorEquipo, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto } from "./tipos";
 
 /** También se usa al reproducir: un archivo JSON no se considera una orden válida
  * por cumplir solo su forma. IDs, lado y observación deben coincidir. */
@@ -29,12 +29,17 @@ export function validarOrdenes(raw: unknown, obs: ObservacionArena): OrdenesEqui
       const fuentes = new Set([...obs.recientes.map(e => e.id), ...Object.values(obs.resumen ?? {}).flatMap(r => r.fuentes)]);
       if (new Set(gestion.fuentes).size !== gestion.fuentes.length) throw new Error("Citas repetidas en la gestión");
       if (gestion.fuentes.some(id => !fuentes.has(id))) throw new Error("La gestión cita un evento no observado");
-      if (gestion.sustitucion) {
-        const { sale, entra } = gestion.sustitucion;
-        const titular = obs.estado.jugadores.find(j => j.id === sale && j.lado === obs.lado);
-        const suplente = obs.estado.banco?.find(j => j.id === entra && j.lado === obs.lado);
-        if (!titular || !suplente || (titular.puesto === "POR") !== (suplente.posicionNatural === "POR")) throw new Error("Sustitución inválida");
-        if (tecnico.pendiente || tecnico.cambios >= T.maxCambios || tecnico.ventanas >= T.maxVentanas || obs.tiempoS < T.cambioMinS || obs.tiempoS - tecnico.ultimoCambioTick * ARENA.pasoS < T.cambiosSeparacionS) throw new Error("Sustitución fuera de su ventana o presupuesto");
+      const pares = paresSustitucion(gestion.sustitucion);
+      if (pares.length) {
+        // Se rechaza la propuesta entera: jugadores repetidos, reingresos o un par inválido.
+        const ids = pares.flatMap(p => [p.sale, p.entra]);
+        if (new Set(ids).size !== ids.length) throw new Error("Sustitución con jugadores repetidos");
+        for (const { sale, entra } of pares) {
+          const titular = obs.estado.jugadores.find(j => j.id === sale && j.lado === obs.lado);
+          const suplente = obs.estado.banco?.find(j => j.id === entra && j.lado === obs.lado);
+          if (!titular || !suplente || (titular.puesto === "POR") !== (suplente.posicionNatural === "POR")) throw new Error("Sustitución inválida");
+        }
+        if (tecnico.pendiente || tecnico.cambios + pares.length > T.maxCambios || tecnico.ventanas >= T.maxVentanas || obs.tiempoS < T.cambioMinS || obs.tiempoS - tecnico.ultimoCambioTick * ARENA.pasoS < T.cambiosSeparacionS) throw new Error("Sustitución fuera de su ventana o presupuesto");
       }
     }
   }
@@ -63,7 +68,7 @@ export function opcionPase(j: JugadorArena, obs: ObservacionArena): JugadorArena
     const seguridad = personalidad ? P.margenMinFactor + personalidad.pase / P.max : 1;
     const cautela = personalidad ? P.distanciaMinFactor + P.distanciaRangoFactor * personalidad.compostura / P.max : 1;
     const entrenador = obs.equipos[j.lado].entrenador;
-    const direccion = entrenador ? 0.6 + entrenador.verticalidad / 100 : 1;
+    const direccion = entrenador ? T.direccionPaseBase + entrenador.verticalidad / 100 : 1;
     const puntuacion = avance * (estilo === "contragolpe" ? ARENA.pesoAvanceDirecto : 1) * verticalidad * direccion + Math.min(margen, ARENA.margenUtilM) * seguridad - d * ARENA.pesoDistanciaPase * cautela;
     return { p, d, avance, margen, puntuacion };
   }).filter(c => c.d >= ARENA.paseMinM && c.d <= ARENA.paseMaxM && c.avance >= ARENA.avanceMinPaseM && c.margen > ARENA.controlM * ARENA.margenPase * (obs.equipos[j.lado].entrenador ? 1 - obs.equipos[j.lado].entrenador!.riesgo / 200 : 1))
@@ -129,7 +134,7 @@ Revisa tu última propuesta válida y los resultados posteriores antes de repeti
 Tu estilo y el temperamento de jugadores y entrenador son preferencias que debes gestionar, no un resultado obligatorio. Combínalos con nivel, posición natural, energía, clima, cancha, afición y criterio del árbitro.
 No hay premio por redactar una buena intención: importa lo que tus órdenes produzcan dentro del motor compartido.
 Propón intenciones, nunca resultados. El motor mueve jugadores y resuelve balón, intercepciones y goles.
-Coordenadas en metros: x=0..105, y=0..68. Local ataca hacia x=105; visita hacia x=0.
+Coordenadas en metros: x=0..${ARENA.largoM}, y=0..${ARENA.anchoM}. Local ataca hacia x=${ARENA.largoM}; visita hacia x=0.
 No conoces órdenes nuevas del rival ni eventos futuros. Conserva amplitud, profundidad, apoyos y resguardo.
 Al defender coordina presión, cobertura y bloque. El portero debe proteger su arco.
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
@@ -152,10 +157,10 @@ usa SOLO los IDs activos (pueden ser menos de once). Incluye también "gestion":
 tiempo/tick aún no alcanza proximaRevisionTick. Cuando ya corresponda puedes mantener null o
 proponer {"formacion":null,"mentalidad":"conservar|equilibrar|buscar","sustitucion":null,
 "motivo":"razón pública breve, máximo 200 caracteres","fuentes":[]}.
-formacion puede ser una de las ${formaciones.length} del catálogo: ${formaciones.join(", ")}; conserva el plan al menos 20 s.
-sustitucion puede ser {"sale":"ID activo propio","entra":"ID de tu banco"}; sin reingresos,
-máximo cinco cambios y tres ventanas, desde 20 s y separados 15 s. El motor espera una
-interrupción para ejecutarla. No pidas otro cambio si pendiente no es null. Cita únicamente
+formacion puede ser una de las ${formaciones.length} del catálogo: ${formaciones.join(", ")}; conserva el plan al menos ${T.cambioPlanMinS} s.
+sustitucion puede ser {"sale":"ID activo propio","entra":"ID de tu banco"} o un arreglo de 1 a ${T.cambiosPorVentana} de esos pares
+sin repetir jugadores (todos usan la misma ventana); sin reingresos, máximo ${T.maxCambios} cambios y ${T.maxVentanas} ventanas,
+desde ${T.cambioMinS} s y separadas ${T.cambiosSeparacionS} s. El motor espera una interrupción para ejecutarlos. No pidas otro cambio si pendiente no es null. Cita únicamente
 IDs de eventos que recibes en recientes/resumen; no inventes causas, lesiones ni acciones futuras.
 GESTION es una propiedad de la RAÍZ del objeto, al mismo nivel que ordenes. Nunca es un elemento del arreglo ordenes. Si no hay entrenadores, omite gestion.
 Lee resumen, energía, marcador, condiciones y afición antes de decidir. El calor aconseja

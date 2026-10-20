@@ -54,6 +54,13 @@ describe("Reanudaciones por salida real del balón", () => {
     expect(registro.config.reglas).toBe("reinicios-v1");
     expect(reproducirArena(registro)).toEqual(registro);
   });
+  it("reproduce exactamente los registros v2 (desvío del portero y sustitución con forma objeto)", async () => {
+    const registro = JSON.parse(await readFile("src/arena/__fixtures__/arena-reinicios-v2.json", "utf8"));
+    expect(registro.config.reglas).toBe("reinicios-v2");
+    expect(registro.eventos.some((e: { tipo: string; motivo?: string }) => e.tipo === "atajada" && e.motivo === "desvio")).toBe(true);
+    expect(registro.rondas.some((r: RegistroArena["rondas"][number]) => lados.some(l => { const s = r.decisiones[l].ordenes.gestion?.sustitucion; return !!s && !Array.isArray(s); }))).toBe(true);
+    expect(reproducirArena(registro)).toEqual(registro);
+  });
   it("detecta la primera línea cruzada y exige salir del campo", () => {
     expect(cruceDeBanda({ x: 104, y: 67 }, { x: 108, y: 69 })).toMatchObject({ borde: "fondo", punto: { x: 105, y: 67.5 } });
     expect(cruceDeBanda({ x: 104, y: 67 }, { x: 106, y: 71 })).toMatchObject({ borde: "lateral", punto: { x: 104.5, y: 68 } });
@@ -121,7 +128,7 @@ describe("Reanudaciones por salida real del balón", () => {
   });
 
   it("las reglas nuevas son explícitas; los archivos sin marca conservan el motor anterior", () => {
-    const config = crearConfigArena(); expect(config.reglas).toBe("reinicios-v2");
+    const config = crearConfigArena(); expect(config.reglas).toBe("reinicios-v3");
     delete config.reglas; expect(() => validarConfigArena(config)).not.toThrow();
     expect(() => validarConfigArena({ ...config, reglas: "otra" as never })).toThrow("Reglas");
   });

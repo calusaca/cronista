@@ -1,11 +1,19 @@
 import { z } from "zod";
-import { ARENA, CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES } from "../sim/limites";
+import { ARENA, CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES, TEMPERATURA_C } from "../sim/limites";
 import { formaciones } from "./tipos";
 
+/** Brief 044: la temperatura solo se admite con calor o frío y dentro de su banda. */
+export const entornoArena = z.strictObject({ clima: z.enum(CLIMAS_PARTIDO).optional(), temperaturaC: z.number().int().optional(), superficie: z.enum(SUPERFICIES).optional(), cesped: z.enum(CESPEDES).optional(), presion: z.strictObject({ local: z.enum(NIVELES_PRESION), visita: z.enum(NIVELES_PRESION) }).optional() })
+  .superRefine((e, ctx) => {
+    if (e.temperaturaC === undefined) return;
+    if (e.clima !== "calor" && e.clima !== "frio") { ctx.addIssue({ code: "custom", path: ["temperaturaC"], message: "Temperature is only allowed with hot or cold weather" }); return; }
+    const banda = TEMPERATURA_C[e.clima];
+    if (e.temperaturaC < banda.min || e.temperaturaC > banda.max) ctx.addIssue({ code: "custom", path: ["temperaturaC"], message: `Temperature for ${e.clima === "calor" ? "hot" : "cold"} weather must be ${banda.min}..${banda.max} °C` });
+  });
 export const ajustesArena = z.strictObject({
   seed: z.number().int().min(0).max(4294967295), segundos: z.number().int().min(1).max(ARENA.duracionMaxS),
   local: z.enum([...formaciones, "auto"]), visita: z.enum([...formaciones, "auto"]),
-  entorno: z.strictObject({ clima: z.enum(CLIMAS_PARTIDO).optional(), temperaturaC: z.number().int().min(-8).max(41).optional(), superficie: z.enum(SUPERFICIES).optional(), cesped: z.enum(CESPEDES).optional(), presion: z.strictObject({ local: z.enum(NIVELES_PRESION), visita: z.enum(NIVELES_PRESION) }).optional() }).optional(),
+  entorno: entornoArena.optional(),
 });
 export const peticionSesion = ajustesArena.extend({ presentacion: z.enum(["preparada", "directo", "buffer"]).default("directo"), seleccion: z.discriminatedUnion("modo", [
   z.strictObject({ modo: z.literal("programado") }), z.strictObject({ modo: z.literal("azar") }),

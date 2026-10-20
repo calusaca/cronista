@@ -5,7 +5,8 @@ import { estructura } from "../arena/catalogo";
 import { formaciones, type FormacionArena, type RegistroArena } from "../arena/tipos";
 import { estadoVisual, narrarEventoArena } from "../arena/vista";
 import { etiquetasPerfil } from "../arena/personalidades";
-import { ARENA, CLIMAS_PARTIDO } from "../sim/limites";
+import { ARENA, CLIMAS_PARTIDO, TEMPERATURA_C } from "../sim/limites";
+import { entornoDeFormulario } from "../arena/entorno-formulario";
 import type { Condiciones } from "../sim/tipos";
 import { IndicadorCarga, useAvisoCarga } from "./Actividad";
 import Link from "./Enlace";
@@ -33,7 +34,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [local, setLocal] = useState<FormacionArena | "auto">("auto");
   const [visita, setVisita] = useState<FormacionArena | "auto">("auto");
   const [clima, setClima] = useState<Condiciones["clima"] | "auto">("auto");
-  const [temperatura, setTemperatura] = useState("32");
+  const [temperatura, setTemperatura] = useState(String(ARENA.temperaturaDefectoC.calor));
   const [superficie, setSuperficie] = useState<Condiciones["superficie"] | "auto">("auto");
   const [cesped, setCesped] = useState<"corto" | "alto">("corto");
   const [presion, setPresion] = useState<"auto" | "baja" | "media">("auto");
@@ -109,11 +110,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
     if (buffer) { bufferRecibido.current = true; setBufferInicioTick(buffer.inicioTick); setBufferTerminada(buffer.terminada || resultado.registro.final.tick * ARENA.pasoS >= resultado.registro.config.duracionS || Boolean(resultado.registro.final.finalizado)); setBufferActivo(true); }
   };
-  const entornoElegido: Partial<Condiciones> = {
-    ...(clima !== "auto" ? { clima, ...(clima === "calor" || clima === "frio" ? { temperaturaC: Number(temperatura) } : {}) } : {}),
-    ...(superficie !== "auto" ? { superficie, ...(superficie === "natural" ? { cesped } : {}) } : {}),
-    ...(presion !== "auto" ? { presion: { local: presion, visita: presion === "baja" ? "media" : "alta" } } : {}),
-  };
+  const entornoElegido = entornoDeFormulario({ clima, temperatura, superficie, cesped, presion });
   const ejecutar = async (payload: unknown) => {
     setSesionActual(null); setBufferActivo(false);
     solicitud.current?.abort();
@@ -145,12 +142,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const simular = (ev: FormEvent) => {
     ev.preventDefault(); if (bloqueado || vista !== "guardados") return;
     if (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295)) { setError(t("Enter a whole seed from 0 to 4294967295.", "Escribe una semilla entera entre 0 y 4294967295.")); return; }
-    const entorno: Partial<Condiciones> = {
-      ...(clima !== "auto" ? { clima, ...(clima === "calor" || clima === "frio" ? { temperaturaC: Number(temperatura) } : {}) } : {}),
-      ...(superficie !== "auto" ? { superficie, ...(superficie === "natural" ? { cesped } : {}) } : {}),
-      ...(presion !== "auto" ? { presion: { local: presion, visita: presion === "baja" ? "media" : "alta" } } : {}),
-    };
-    void ejecutar({ accion: "simular", seed: seed === "" ? crypto.getRandomValues(new Uint32Array(1))[0] : Number(seed), segundos, local, visita, entorno });
+    void ejecutar({ accion: "simular", seed: seed === "" ? crypto.getRandomValues(new Uint32Array(1))[0] : Number(seed), segundos, local, visita, entorno: entornoElegido });
   };
   const cargar = async (archivo: File | undefined) => {
     if (!archivo || bloqueado) return;
@@ -196,8 +188,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
         <label>{t("Simulated duration", "Duración simulada")}<select className="field" value={segundos} disabled={bloqueado} onChange={e => setSegundos(Number(e.target.value))}><option value="30">30 s</option><option value="60">60 s</option><option value="180">180 s</option></select></label>
         {vista === "guardados" && <button className="btn" disabled={bloqueado}>{t("Create recording without AI", "Crear grabación sin IA")}</button>}
         <details className="arena-settings-more"><summary>{t("Choose weather, pitch and crowd pressure", "Elegir clima, cancha y presión del público")}</summary><div className="arena-environment-settings">
-          <label>{t("Weather", "Clima")}<select className="field" value={clima} disabled={bloqueado} onChange={e => { const c = e.target.value as typeof clima; setClima(c); if (c === "calor") setTemperatura("32"); if (c === "frio") setTemperatura("-2"); }}><option value="auto">{t("Generated", "Generado")}</option>{CLIMAS_PARTIDO.map(c => <option key={c} value={c}>{({ despejado: t("Clear", "Despejado"), calor: t("Heat", "Calor"), lluvia: t("Rain", "Lluvia"), frio: t("Cold", "Frío"), niebla: t("Fog", "Niebla") })[c]}</option>)}</select></label>
-          {(clima === "calor" || clima === "frio") && <label>{t("Temperature °C", "Temperatura °C")}<input className="field" type="number" required min={clima === "calor" ? 29 : -8} max={clima === "calor" ? 41 : 5} value={temperatura} disabled={bloqueado} onChange={e => setTemperatura(e.target.value)} /></label>}
+          <label>{t("Weather", "Clima")}<select className="field" value={clima} disabled={bloqueado} onChange={e => { const c = e.target.value as typeof clima; setClima(c); if (c === "calor" || c === "frio") setTemperatura(String(ARENA.temperaturaDefectoC[c])); }}><option value="auto">{t("Generated", "Generado")}</option>{CLIMAS_PARTIDO.map(c => <option key={c} value={c}>{({ despejado: t("Clear", "Despejado"), calor: t("Heat", "Calor"), lluvia: t("Rain", "Lluvia"), frio: t("Cold", "Frío"), niebla: t("Fog", "Niebla") })[c]}</option>)}</select></label>
+          {(clima === "calor" || clima === "frio") && <label>{t("Temperature °C", "Temperatura °C")}<input className="field" type="number" required min={TEMPERATURA_C[clima].min} max={TEMPERATURA_C[clima].max} value={temperatura} disabled={bloqueado} onChange={e => setTemperatura(e.target.value)} /></label>}
           <label>{t("Surface", "Superficie")}<select className="field" value={superficie} disabled={bloqueado} onChange={e => setSuperficie(e.target.value as typeof superficie)}><option value="auto">{t("Home ground", "Cancha del local")}</option><option value="natural">{t("Natural", "Natural")}</option><option value="sintetica">{t("Artificial", "Sintética")}</option></select></label>
           {superficie === "natural" && <label>{t("Grass", "Césped")}<select className="field" value={cesped} disabled={bloqueado} onChange={e => setCesped(e.target.value as typeof cesped)}><option value="corto">{t("Short", "Corto")}</option><option value="alto">{t("Long", "Alto")}</option></select></label>}
           <label>{t("Crowd pressure: home / away", "Presión del público: local / visita")}<select className="field" value={presion} disabled={bloqueado} onChange={e => setPresion(e.target.value as typeof presion)}><option value="auto">{t("Generated", "Generada")}</option><option value="baja">{t("Low / medium", "Baja / media")}</option><option value="media">{t("Medium / high", "Media / alta")}</option></select></label>

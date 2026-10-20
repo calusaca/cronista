@@ -15,7 +15,7 @@ export function colocarCentro(estado: EstadoArena, lado: Lado) {
     const nominal = transformar(base, j.lado);
     // Comprimir la formación hacia su mitad conserva las distancias entre líneas;
     // recortar todas las x a la misma línea superponía algunos compañeros.
-    nominal.x *= (j.lado === lado ? 50 : 43) / ARENA.largoM;
+    nominal.x *= (j.lado === lado ? ARENA.centroPropioMaxM : ARENA.centroRivalMaxM) / ARENA.largoM;
     j.posicion = transformar(nominal, j.lado); j.velocidad = { x: 0, y: 0 };
   }
   ejecutor.posicion = { ...PUNTO_CENTRAL };

@@ -150,3 +150,35 @@ del mismo mapeo que pueden divergir en silencio.
   como deuda, no se toca.
 - Cualquier cambio de narración, voz o UI más allá de aceptar el arreglo de
   sustituciones.
+
+## Adenda tras la auditoría (20 de octubre)
+
+La auditoría adversaria de la primera implementación confirmó las dos mutaciones
+exigidas, la reproducción exacta de v1/v2/v3 y la desaparición del doble conteo
+(0 `tiro_fuera` tras 146 desvíos en semillas 1–200, frente a 139 de 141 con v2).
+Encontró una regresión y varias precisiones que cambian o aclaran este brief:
+
+- **El rechace es balón suelto.** Darle al vuelo el `lado` del portero hacía que un
+  compañero que lo recogía generase `recepcion` con el portero como pasador y que el
+  editorial narrase un pase inexistente («found X with that pass»), y que solo el
+  equipo atacante persiguiera el balón con anclas invertidas (tres goles distintos
+  en semillas 30, 52 y 125). Decisión: el rechace conserva el `lado` del vuelo
+  original (movimiento idéntico a v2) y cambia solo `tipo`, `autor` (portero) y
+  `receptor`; cualquier jugador que lo toque produce `recuperacion` sin relación.
+  El generador del fixture v3 entra en el repo para que sea regenerable.
+- **Punto 9, precisión:** `crearConfigArena` no sortea la temperatura cuando falta;
+  asigna un valor fijo dentro de la banda del clima. Ese valor pasa a `limites.ts`
+  junto con los literales que seguían en `motor.ts` y `controladores.ts`
+  (remate, áreas de reinicio, factor de falta, destino del desvío, verticalidad y
+  las dimensiones de la cancha en el prompt).
+- **Hallazgo C, precisión:** por la ruta HTTP, «calor a 0 °C» ya devolvía 400 por
+  `validarConfig` (mensaje genérico, no efectos de calor). Lo que el `superRefine`
+  añade es rechazar temperatura con clima que no la admite o sin clima, con mensaje
+  explícito; `/api/arena/sesiones` debe exponer ese mismo mensaje.
+- Las pruebas derivan las temperaturas de `TEMPERATURA_C` en lugar de repetir 32/41/0.
+- La vista de cambios pendientes debe tener una prueba que falle si se muestra solo
+  el primer par.
+- **Límites aceptados, no corregidos:** la forma arreglo de `sustitucion` también es
+  aceptada por el validador bajo v1/v2 (los registros reales de v1/v2 no la usan y
+  se reproducen igual); el caché del plan fusionado cambia la salida y queda
+  descartado; el esquema `anyOf` anidado no se validó contra Azure OpenAI en vivo.

@@ -478,6 +478,28 @@ export const ARENA = {
   dueloBase: 0.35, dueloNivel: 0.004, dueloFuerza: 0.002,
   dueloMin: 0.1, dueloMax: 0.75, ignorarAutorS: 0.4,
   areaLargoM: 16.5, areaAnchoM: 40.32,
+  /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`). */
+  reglas: "reinicios-v3",
+  /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
+  plantillaArena: 16,
+  /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
+  desvioProbabilidad: 0.35,
+  /** Desplazamiento lateral (m) del destino del desvío respecto del centro del arco. */
+  desvioLateralM: 6,
+  /** Distancia mínima (m) de los rivales al punto de saque: banda, esquina y meta. */
+  distanciaSaqueBandaM: 2.1, distanciaSaqueEsquinaM: 10.2, distanciaSaqueMetaM: 9.65,
+  /** Saque de centro: x propia máxima (m) del equipo que saca y de su rival. */
+  centroPropioMaxM: 50, centroRivalMaxM: 43,
+  /** Destino del desvío: metros más allá de la línea de fondo propia del portero. */
+  desvioFondoM: 1,
+  /** Con reinicios, el remate apunta este margen (m) detrás de la línea de gol rival. */
+  remateTrasLineaM: 0.5,
+  /** Saque de meta: margen (m) fuera del área para los rivales. */
+  margenAreaMetaM: 0.5,
+  /** Punto de saque de esquina (m) desde cada línea y distancia del saque de meta a la línea de fondo. */
+  esquinaM: 0.3, saqueMetaM: 5.5,
+  /** Temperatura (°C) asignada cuando se pide calor o frío sin indicarla; dentro de TEMPERATURA_C. */
+  temperaturaDefectoC: { calor: 32, frio: -2 },
   amplitud: { estrecha: 0.8, media: 1, amplia: 1.1 },
   alturaBloqueM: { bajo: -6, medio: 0, alto: 6 },
 } as const;
@@ -486,6 +508,10 @@ export const ARENA = {
 export const TECNICA_ARENA = {
   semilla: 0x7465636e, revisionMinS: 10, revisionMaxS: 25,
   cambioPlanMinS: 20, ventanaMemoriaS: 30, maxCambios: 5, maxVentanas: 3,
+  /** Brief 044: pares {sale, entra} admitidos en una misma ventana (misma interrupción). */
+  cambiosPorVentana: 3,
+  /** Peso base de la verticalidad del entrenador al puntuar un pase: base + verticalidad/100. */
+  direccionPaseBase: 0.6,
   pausaS: 1.5, cambioMinS: 20, cambiosSeparacionS: 15,
   energiaCambio: 0.87, confianzaInicial: 60, emocionMin: 0, emocionMax: 100,
   presionCalor: 0.25, desgasteRitmo: 0.5, energiaPorMetro: 0.0005,
@@ -506,6 +532,8 @@ export const ARBITRAJE_ARENA = {
   faltaBase: 0.015, faltaAgresividad: 0.07, faltaIndisciplina: 0.04,
   temerariaDesde: 0.6, excesivaDesde: 0.985,
   criterioMin: 40, criterioMax: 85, minJugadores: 7,
+  /** Factor de contacto del árbitro: base + criterioContacto/100. */
+  criterioBase: 0.5,
 } as const;
 
 /** Preferencias sintéticas de arena-v2; no son capacidades ni cifras calibradas. */

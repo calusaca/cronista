@@ -4,13 +4,15 @@ import { z } from "zod";
 import { crearControladorProgramado } from "../../../arena/controladores";
 import { ejecutarArena, reproducirArena } from "../../../arena/coordinador";
 import { crearConfigArena } from "../../../arena/motor";
+import { entornoArena } from "../../../arena/peticiones";
 import { formaciones } from "../../../arena/tipos";
-import { ARENA, CESPEDES, CLIMAS_PARTIDO, NIVELES_PRESION, SUPERFICIES } from "../../../sim/limites";
+import { ARENA } from "../../../sim/limites";
 
 export const dynamic = "force-dynamic";
 const peticion = z.discriminatedUnion("accion", [
   z.strictObject({ accion: z.literal("simular"), seed: z.number().int().min(0).max(4294967295), segundos: z.number().int().min(1).max(ARENA.duracionMaxS), local: z.enum([...formaciones, "auto"]), visita: z.enum([...formaciones, "auto"]),
-    entorno: z.strictObject({ clima: z.enum(CLIMAS_PARTIDO).optional(), temperaturaC: z.number().int().min(-8).max(41).optional(), superficie: z.enum(SUPERFICIES).optional(), cesped: z.enum(CESPEDES).optional(), presion: z.strictObject({ local: z.enum(NIVELES_PRESION), visita: z.enum(NIVELES_PRESION) }).optional() }).optional(),
+    // superRefine de temperatura por clima (brief 044) compartido con /api/arena/sesiones.
+    entorno: entornoArena.optional(),
   }),
   z.strictObject({ accion: z.literal("reproducir"), registro: z.unknown() }),
 ]);

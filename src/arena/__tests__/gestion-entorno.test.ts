@@ -12,7 +12,7 @@ import { gestionarProgramado } from "../entrenadores";
 import { resumir } from "../entorno";
 import { distancia } from "../geometria";
 import { crearConfigArena, crearEstadoArena, MotorArena } from "../motor";
-import { formaciones, type EstadoArena, type GestionEquipo, type ObservacionArena, type OrdenesEquipo } from "../tipos";
+import { formaciones, type EstadoArena, type GestionEquipo, type ObservacionArena, type OrdenesEquipo, type ParSustitucion } from "../tipos";
 import { estadoVisual, narrarEventoArena } from "../vista";
 
 const programados = () => ({ local: crearControladorProgramado(), visita: crearControladorProgramado() });
@@ -94,8 +94,8 @@ describe("Arena v3: entrenadores, banco y decisiones", () => {
   it("rechaza sustitutos rivales, reingresos, presupuestos agotados y citas futuras", () => {
     const obs = revision(), plan = planProgramado(obs);
     for (const modificar of [
-      (p: OrdenesEquipo) => { p.gestion!.sustitucion!.entra = obs.estado.banco!.find(j => j.lado === "visita")!.id; },
-      (p: OrdenesEquipo) => { p.gestion!.sustitucion!.entra = p.gestion!.sustitucion!.sale; },
+      (p: OrdenesEquipo) => { (p.gestion!.sustitucion as ParSustitucion).entra = obs.estado.banco!.find(j => j.lado === "visita")!.id; },
+      (p: OrdenesEquipo) => { (p.gestion!.sustitucion as ParSustitucion).entra = (p.gestion!.sustitucion as ParSustitucion).sale; },
       (p: OrdenesEquipo) => { p.gestion!.fuentes = ["a999999"]; },
       (p: OrdenesEquipo) => { p.ordenes[0]!.jugador = "arbitro"; },
     ]) { const copia = structuredClone(plan); modificar(copia); expect(() => validarOrdenes(copia, obs)).toThrow(); }

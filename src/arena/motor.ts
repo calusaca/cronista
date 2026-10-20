@@ -16,7 +16,7 @@ import { opcionPase, planProgramado } from "./controladores";
 import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } from "./personalidades";
 import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
-import { formaciones, lados, perfilesEntrenador, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto, type VersionArena, type TipoReinicioArena } from "./tipos";
+import { formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto, type VersionArena, type TipoReinicioArena } from "./tipos";
 
 export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones> } = {}): ConfigArena {
   const version = opciones.version ?? ARENA.version;
@@ -25,7 +25,7 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
   if (opciones.entorno && version === ARENA.version) {
     const c = { ...partido.condiciones!, ...opciones.entorno };
     if (c.clima !== "calor" && c.clima !== "frio") delete c.temperaturaC;
-    else if (opciones.entorno.clima && opciones.entorno.temperaturaC === undefined) c.temperaturaC = c.clima === "calor" ? 32 : -2;
+    else if (opciones.entorno.clima && opciones.entorno.temperaturaC === undefined) c.temperaturaC = ARENA.temperaturaDefectoC[c.clima];
     if (c.superficie === "sintetica") delete c.cesped;
     else c.cesped ??= "corto";
     partido.condiciones = c;
@@ -38,7 +38,7 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
     return elegirFormacion(plantilla, entrenadores[lado].preferidas);
   };
   const config: ConfigArena = {
-    version, partido, ...(version === ARENA.version ? { reglas: "reinicios-v2" as const } : {}),
+    version, partido, ...(version === ARENA.version ? { reglas: ARENA.reglas } : {}),
     duracionS: opciones.duracionS ?? ARENA.duracionS,
     intervaloS: opciones.intervaloS ?? ARENA.intervaloS,
     formaciones: { local: forma("local"), visita: forma("visita") },
@@ -49,7 +49,7 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
 }
 export function validarConfigArena(config: ConfigArena): void {
   if (config.version !== undefined && ![ARENA.version, ARENA.versionPersonalidades, ARENA.versionLegado].includes(config.version)) throw new Error("Versión de motor de arena desconocida");
-  if (config.reglas !== undefined && (!["reinicios-v1", "reinicios-v2"].includes(config.reglas) || config.version !== ARENA.version)) throw new Error("Reglas de reinicio desconocidas");
+  if (config.reglas !== undefined && (!(reglasArena as readonly string[]).includes(config.reglas) || config.version !== ARENA.version)) throw new Error("Reglas de reinicio desconocidas");
   validarConfig(config.partido);
   for (const lado of lados) {
     z.string().min(1).max(100).parse(config.partido[lado].nombre);
@@ -77,7 +77,7 @@ export function validarConfigArena(config: ConfigArena): void {
 }
 
 function plantillaArena(partido: SimConfig, lado: Lado, completa: boolean): JugadorArena[] {
-  return partido[lado].jugadores.slice(0, completa ? 16 : 11).map((j, n) => ({
+  return partido[lado].jugadores.slice(0, completa ? ARENA.plantillaArena : 11).map((j, n) => ({
     id: `${lado}-${n}`, lado, nombre: j.nombre, dorsal: j.dorsal, puesto: j.posicion,
     nivel: partido.variantes?.niveles && j.nivel !== undefined ? j.nivel : (partido[lado].ataque + partido[lado].defensa) / 2,
     posicion: { x: ARENA.largoM / 2, y: lado === "local" ? 0 : ARENA.anchoM }, velocidad: { x: 0, y: 0 }, energia: 1,
@@ -97,7 +97,7 @@ export function crearEstadoArena(config: ConfigArena): EstadoArena {
       balon: { posicion: { ...portador.posicion }, poseedor: portador.id, vuelo: null }, marcador: { local: 0, visita: 0 },
       arbitro: crearArbitro(config.partido.seed, portador.posicion, true), entrenadores: { local: entrenador("local"), visita: entrenador("visita") },
       aficion: { local: { animo: ENTORNO_ARENA.animoInicial, reaccion: "atencion", evento: null }, visita: { animo: ENTORNO_ARENA.animoInicial, reaccion: "atencion", evento: null } }, pausa: null, finalizado: null };
-    if (config.reglas === "reinicios-v2") {
+    if (centroReglamentario(config)) {
       const ejecutor = colocarCentro(estado, "local"), hastaTick = Math.round(T.pausaS / ARENA.pasoS);
       estado.balon = { posicion: { ...PUNTO_CENTRAL }, poseedor: ejecutor.id, vuelo: null };
       estado.saque = { tipo: "centro", lado: "local", ejecutor: ejecutor.id, punto: { ...PUNTO_CENTRAL }, hastaTick };
@@ -141,6 +141,9 @@ export function adelantados(estado: EstadoArena, lado: Lado): string[] {
   return estado.jugadores.filter(j => j.lado === lado && transformar(j.posicion, lado).x > linea + ARENA.toleranciaM).map(j => j.id);
 }
 
+/** El saque de centro reglamentario (inicial y tras gol) existe desde reinicios-v2. */
+const centroReglamentario = (config: ConfigArena) => config.reglas !== undefined && config.reglas !== "reinicios-v1";
+
 export class MotorArena {
   readonly estado: EstadoArena;
   readonly eventos: EventoArena[] = [];
@@ -148,11 +151,11 @@ export class MotorArena {
   private ultimaAccion = -Infinity;
   private ultimaDisputa = -Infinity;
   private salidaConduccion: Punto | null = null;
-  private get conReinicios() { return this.config.reglas === "reinicios-v1" || this.config.reglas === "reinicios-v2"; }
+  private get conReinicios() { return this.config.reglas !== undefined; }
   constructor(readonly config: ConfigArena, inicial: EstadoArena = crearEstadoArena(config)) {
     validarConfigArena(config);
     this.estado = structuredClone(inicial);
-    if (config.reglas === "reinicios-v2" && inicial.tick === 0 && inicial.saque?.tipo === "centro" && inicial.balon.poseedor === inicial.saque.ejecutor) {
+    if (centroReglamentario(config) && inicial.tick === 0 && inicial.saque?.tipo === "centro" && inicial.balon.poseedor === inicial.saque.ejecutor) {
       const ejecutor = this.estado.jugadores.find(j => j.id === inicial.saque!.ejecutor)!;
       this.evento("reinicio", ejecutor, PUNTO_CENTRAL, PUNTO_CENTRAL, null, { reinicio: "centro" });
     }
@@ -211,20 +214,27 @@ export class MotorArena {
   private realizarCambios(): void {
     if (!this.estado.entrenadores) return;
     for (const lado of lados) {
-      const tecnico = this.estado.entrenadores[lado], solicitud = tecnico.pendiente;
-      if (!solicitud) continue;
-      const sale = this.estado.jugadores.find(j => j.id === solicitud.sale && j.lado === lado);
-      const suplente = this.estado.banco!.find(j => j.id === solicitud.entra && j.lado === lado);
+      const tecnico = this.estado.entrenadores[lado], pares = paresSustitucion(tecnico.pendiente);
+      if (!pares.length) continue;
       tecnico.pendiente = null;
-      if (!sale || !suplente || tecnico.cambios >= T.maxCambios || tecnico.ventanas >= T.maxVentanas) continue;
-      const entra = { ...suplente, puesto: sale.puesto, posicion: { x: ARENA.largoM / 2, y: lado === "local" ? 0 : ARENA.anchoM }, velocidad: { x: 0, y: 0 }, capitan: false };
-      sale.capitan = false;
-      this.estado.jugadores = this.estado.jugadores.map(j => j.id === sale.id ? entra : j);
-      this.estado.banco = this.estado.banco!.filter(j => j.id !== entra.id);
-      this.estado.retirados!.push(sale);
-      tecnico.cambios++; tecnico.ventanas++; tecnico.ultimoCambioTick = this.estado.tick;
-      const evento = this.evento("cambio", entra, sale.posicion, entra.posicion, null, { sale: sale.id, entrenador: this.config.entrenadores![lado].nombre, motivo: "sustitucion" });
-      tecnico.ultimaDecision = { tick: this.estado.tick, motivo: "sustitucion", fuentes: [evento.id] };
+      // Todos los pares comparten la interrupción: una sola ventana, un cambio por par.
+      // Un par que dejó de ser posible (p. ej. el titular fue expulsado) se omite.
+      if (tecnico.ventanas >= T.maxVentanas) continue;
+      let realizados = 0;
+      for (const par of pares) {
+        const sale = this.estado.jugadores.find(j => j.id === par.sale && j.lado === lado);
+        const suplente = this.estado.banco!.find(j => j.id === par.entra && j.lado === lado);
+        if (!sale || !suplente || tecnico.cambios >= T.maxCambios) continue;
+        const entra = { ...suplente, puesto: sale.puesto, posicion: { x: ARENA.largoM / 2, y: lado === "local" ? 0 : ARENA.anchoM }, velocidad: { x: 0, y: 0 }, capitan: false };
+        sale.capitan = false;
+        this.estado.jugadores = this.estado.jugadores.map(j => j.id === sale.id ? entra : j);
+        this.estado.banco = this.estado.banco!.filter(j => j.id !== entra.id);
+        this.estado.retirados!.push(sale);
+        tecnico.cambios++; realizados++; tecnico.ultimoCambioTick = this.estado.tick;
+        const evento = this.evento("cambio", entra, sale.posicion, entra.posicion, null, { sale: sale.id, entrenador: this.config.entrenadores![lado].nombre, motivo: "sustitucion" });
+        tecnico.ultimaDecision = { tick: this.estado.tick, motivo: "sustitucion", fuentes: [...(realizados > 1 ? tecnico.ultimaDecision!.fuentes : []), evento.id] };
+      }
+      if (realizados) tecnico.ventanas++;
     }
     this.asegurarCapitanes();
   }
@@ -256,7 +266,7 @@ export class MotorArena {
     const nivel = entorno ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel;
     const error = (1 - nivel / 100) * (tipo === "tiro" ? ARENA.errorTiroM : ARENA.errorPaseM)
       + (entorno ? entorno.errorLluviaM + entorno.errorPresionM + (tipo === "pase" ? entorno.errorNieblaM + entorno.errorCespedM : 0) : lluvia);
-    const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? .5 : -.5) : 0), y: destino.y + (rng.next() * 2 - 1) * error };
+    const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + (rng.next() * 2 - 1) * error };
     const objetivo = this.conReinicios ? bruto : enCancha(bruto);
     const fuera = adelantados(this.estado, j.lado);
     this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera } };
@@ -272,8 +282,9 @@ export class MotorArena {
     const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, j.lado);
     // V2 respeta un pase/conducción explícito aun cerca del arco. La personalidad
     // decide solo al elegir una acción local; no reemplaza una orden válida del LLM.
-    const paseLocal = j.personalidad ? opcionPase(j, this.observar(j.lado)) : undefined;
     const accionExplicita = usarOrden && ["pasar", "conducir", "tirar"].includes(orden.accion);
+    // Solo una acción local usa la opción de pase; con orden explícita se descartaba.
+    const paseLocal = j.personalidad && !accionExplicita ? opcionPase(j, this.observar(j.lado)) : undefined;
     const tiroLocal = j.personalidad
       ? !accionExplicita && prefiereTirar(j, distancia(j.posicion, arco), !!paseLocal)
       : distancia(j.posicion, arco) <= ARENA.radioTiroM;
@@ -350,21 +361,21 @@ export class MotorArena {
   private prepararSaque(tipo: TipoReinicioArena, lado: Lado, punto: Punto, ultimoToque?: string): void {
     this.realizarCambios();
     const propios = this.estado.jugadores.filter(j => j.lado === lado);
-    const centroNuevo = tipo === "centro" && this.config.reglas === "reinicios-v2";
+    const centroNuevo = tipo === "centro" && centroReglamentario(this.config);
     const ejecutor = centroNuevo ? colocarCentro(this.estado, lado) : tipo === "meta" ? propios.find(j => j.puesto === "POR")! : propios.filter(j => j.puesto !== "POR").sort((a, b) => distancia(a.posicion, punto) - distancia(b.posicion, punto) || a.id.localeCompare(b.id))[0]!;
     const desde = { ...this.estado.balon.posicion };
     for (const j of this.estado.jugadores) {
       if (tipo === "centro" && !centroNuevo) {
         const base = anclas(this.estado.entrenadores![j.lado].formacion, j.lado, "base")[j.puesto]!;
-        const nominal = transformar(base, j.lado); nominal.x = Math.min(nominal.x, j.lado === lado ? 50 : 43);
+        const nominal = transformar(base, j.lado); nominal.x = Math.min(nominal.x, j.lado === lado ? ARENA.centroPropioMaxM : ARENA.centroRivalMaxM);
         j.posicion = transformar(nominal, j.lado);
       } else if (j.lado !== lado) {
-        const minimo = tipo === "banda" ? 2.1 : tipo === "esquina" ? 10.2 : 9.65;
+        const minimo = tipo === "banda" ? ARENA.distanciaSaqueBandaM : tipo === "esquina" ? ARENA.distanciaSaqueEsquinaM : ARENA.distanciaSaqueMetaM;
         if (distancia(j.posicion, punto) < minimo) {
           const dx = ARENA.largoM / 2 - punto.x, dy = ARENA.anchoM / 2 - punto.y, d = Math.hypot(dx, dy);
           j.posicion = enCancha({ x: punto.x + dx / d * minimo, y: punto.y + dy / d * minimo });
         }
-        if (tipo === "meta") { const nominal = transformar(j.posicion, lado); nominal.x = Math.max(nominal.x, ARENA.areaLargoM + .5); j.posicion = transformar(nominal, lado); }
+        if (tipo === "meta") { const nominal = transformar(j.posicion, lado); nominal.x = Math.max(nominal.x, ARENA.areaLargoM + ARENA.margenAreaMetaM); j.posicion = transformar(nominal, lado); }
       }
       j.velocidad = { x: 0, y: 0 };
     }
@@ -403,7 +414,7 @@ export class MotorArena {
     } else {
       if (vuelo?.tipo === "tiro") { const autor = this.estado.jugadores.find(j => j.id === vuelo.autor)!; this.evento("tiro_fuera", autor, vuelo.origen, cruce.punto); }
       const esquina = ultimo.lado === defiende;
-      this.prepararSaque(esquina ? "esquina" : "meta", esquina ? ataca : defiende, esquina ? { x: cruce.punto.x === 0 ? .3 : ARENA.largoM - .3, y: cruce.punto.y < ARENA.anchoM / 2 ? .3 : ARENA.anchoM - .3 } : transformar({ x: 5.5, y: ARENA.anchoM / 2 }, defiende), ultimo.jugador);
+      this.prepararSaque(esquina ? "esquina" : "meta", esquina ? ataca : defiende, esquina ? { x: cruce.punto.x === 0 ? ARENA.esquinaM : ARENA.largoM - ARENA.esquinaM, y: cruce.punto.y < ARENA.anchoM / 2 ? ARENA.esquinaM : ARENA.anchoM - ARENA.esquinaM } : transformar({ x: ARENA.saqueMetaM, y: ARENA.anchoM / 2 }, defiende), ultimo.jugador);
     }
     return true;
   }
@@ -421,7 +432,7 @@ export class MotorArena {
   private resolverFalta(defensor: JugadorArena, portador: JugadorArena): boolean {
     if (!this.estado.entrenadores) return false;
     const p = defensor.personalidad!, rng = prngDerivado(this.config.partido.seed, `falta:arena-v3:${this.estado.tick}:${defensor.id}`);
-    const probabilidad = (R.faltaBase + R.faltaAgresividad * p.agresividad / 100 + R.faltaIndisciplina * (1 - p.disciplina / 100)) * (0.5 + this.estado.arbitro!.criterioContacto! / 100);
+    const probabilidad = (R.faltaBase + R.faltaAgresividad * p.agresividad / 100 + R.faltaIndisciplina * (1 - p.disciplina / 100)) * (R.criterioBase + this.estado.arbitro!.criterioContacto! / 100);
     if (!rng.chance(probabilidad)) return false;
     const severidad = rng.next(), gravedad = severidad >= R.excesivaDesde ? "fuerza_excesiva" : severidad >= R.temerariaDesde ? "temeraria" : "imprudente";
     const falta = this.evento("falta", defensor, defensor.posicion, portador.posicion, portador.id, { gravedad });
@@ -460,8 +471,10 @@ export class MotorArena {
       this.evento("fuera_juego", j, desde, j.posicion);
       this.reiniciar(rival(j.lado)); return;
     }
-    const tipo = vuelo ? j.lado === vuelo.lado ? "recepcion" : vuelo.tipo === "tiro" && j.puesto === "POR" ? "atajada" : "intercepcion" : "recuperacion";
-    this.evento(tipo, j, desde, j.posicion, vuelo?.autor ?? null);
+    // Un rechace es un balón suelto: quien lo recoja, de cualquier lado, lo recupera sin pasador.
+    const suelto = !vuelo || vuelo.tipo === "rechace";
+    const tipo = suelto ? "recuperacion" : j.lado === vuelo.lado ? "recepcion" : vuelo.tipo === "tiro" && j.puesto === "POR" ? "atajada" : "intercepcion";
+    this.evento(tipo, j, desde, j.posicion, suelto ? null : vuelo.autor);
     this.estado.balon = { posicion: { ...j.posicion }, poseedor: j.id, vuelo: null, ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}) };
     this.ultimaAccion = this.estado.tick;
     this.ultimaDisputa = this.estado.tick;
@@ -486,7 +499,7 @@ export class MotorArena {
     const vuelo = balon.vuelo;
     const desde = { ...balon.posicion };
     if (vuelo) {
-      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo === "tiro" ? ARENA.velocidadTiroMps : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
+      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo !== "pase" ? ARENA.velocidadTiroMps : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
       const factor = d ? Math.min(1, velocidad * ARENA.pasoS / d) : 1;
       balon.posicion = factor === 1 ? { ...vuelo.destino } : { x: desde.x + (vuelo.destino.x - desde.x) * factor, y: desde.y + (vuelo.destino.y - desde.y) * factor };
     }
@@ -502,10 +515,15 @@ export class MotorArena {
     }).filter(c => c.contacto).sort((a, b) => a.t - b.t || a.distancia - b.distancia || a.j.id.localeCompare(b.j.id));
     if (contactos[0]) {
       const j = contactos[0].j;
-      if (this.conReinicios && vuelo?.tipo === "tiro" && j.lado !== vuelo.lado && j.puesto === "POR" && prngDerivado(this.config.partido.seed, `desvio:${this.estado.tick}:${j.id}`).chance(.35)) {
-        const punto = { ...j.posicion }, x = j.lado === "local" ? -1 : ARENA.largoM + 1;
+      if (this.conReinicios && vuelo?.tipo === "tiro" && j.lado !== vuelo.lado && j.puesto === "POR" && prngDerivado(this.config.partido.seed, `desvio:${this.estado.tick}:${j.id}`).chance(ARENA.desvioProbabilidad)) {
+        const punto = { ...j.posicion }, x = j.lado === "local" ? -ARENA.desvioFondoM : ARENA.largoM + ARENA.desvioFondoM;
         this.evento("atajada", j, vuelo.origen, punto, vuelo.autor, { motivo: "desvio" });
-        this.estado.balon = { posicion: punto, poseedor: null, ultimoToque: { jugador: j.id, lado: j.lado }, vuelo: { ...vuelo, origen: punto, destino: { x, y: ARENA.anchoM / 2 + (punto.y < ARENA.anchoM / 2 ? -6 : 6) }, inicioTick: this.estado.tick, adelantados: [] } };
+        const destino = { x, y: ARENA.anchoM / 2 + (punto.y < ARENA.anchoM / 2 ? -ARENA.desvioLateralM : ARENA.desvioLateralM) };
+        // reinicios-v1/v2 conservaban el vuelo como "tiro" del rematador (y contaban un
+        // segundo tiro_fuera si salía); desde v3 el desvío es un rechace del portero: un
+        // balón suelto que conserva el lado del remate (movimiento y anclas como en v2).
+        const rechace = this.config.reglas === ARENA.reglas ? { tipo: "rechace" as const, autor: j.id, receptor: null } : {};
+        this.estado.balon = { posicion: punto, poseedor: null, ultimoToque: { jugador: j.id, lado: j.lado }, vuelo: { ...vuelo, ...rechace, origen: punto, destino, inicioTick: this.estado.tick, adelantados: [] } };
         return;
       }
       this.recibir(j); return;
@@ -522,6 +540,14 @@ export class MotorArena {
       // Un pase que se detiene sigue pendiente de contacto: se conserva quién
       // golpeó y la referencia de fuera de juego hasta la siguiente intervención.
     }
+  }
+  /** Los eventos entran en orden de tick: basta mirar la cola del registro. */
+  private transicionEnTick(): boolean {
+    for (let i = this.eventos.length - 1; i >= 0 && this.eventos[i]!.tick >= this.estado.tick; i--) {
+      const e = this.eventos[i]!;
+      if (e.tick === this.estado.tick && (["plan_equipo", "cambio", "falta", "amarilla", "roja"].includes(e.tipo) || this.conReinicios && e.tipo === "reinicio")) return true;
+    }
+    return false;
   }
   avanzar(planes: Record<Lado, OrdenesEquipo>, hastaTick: number): void {
     for (const _ of this.avanzarPorFotogramas(planes, hastaTick)) { /* Consumo sin esperas para ejecución y reproducción. */ }
@@ -545,7 +571,7 @@ export class MotorArena {
       this.estado.tick++;
       if (!pausado) this.moverBalon();
       if (this.estado.arbitro) moverArbitro(this.estado.arbitro, this.estado.balon.posicion);
-      const transicion = this.estado.entrenadores && this.eventos.some(e => e.tick === this.estado.tick && (["plan_equipo", "cambio", "falta", "amarilla", "roja"].includes(e.tipo) || this.conReinicios && e.tipo === "reinicio"));
+      const transicion = this.estado.entrenadores && this.transicionEnTick();
       if (this.estado.tick % Math.round(ARENA.fotogramaS / ARENA.pasoS) === 0 || this.estado.tick === hastaTick || this.estado.finalizado || transicion) {
         this.fotogramas.push(structuredClone(this.estado));
         yield;
