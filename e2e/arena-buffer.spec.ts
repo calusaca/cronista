@@ -105,7 +105,10 @@ test("narración continua: cubre Speech lento y fallido con voz audible, incluso
     expect(medicion.maxSilencioMs).toBeLessThanOrEqual(5000);
     await testInfo.attach("continuidad-voz.json", { body: JSON.stringify(medicion, null, 2), contentType: "application/json" });
     await page.getByRole("button", { name: "Turn narration off" }).click();
-    const cantidad = medicion.fuentes.length; await page.waitForTimeout(2200);
+    // Se cuenta tras el clic: entre la medición anterior y el clic puede arrancar una fuente legítima.
+    const cantidad = await page.evaluate(() => (window as unknown as { continuidad: unknown[] }).continuidad.length);
+    expect(cantidad).toBeGreaterThanOrEqual(medicion.fuentes.length);
+    await page.waitForTimeout(2200);
     expect(await page.evaluate(() => (window as unknown as { continuidad: unknown[] }).continuidad.length)).toBe(cantidad);
   } finally { liberar(); }
 });
