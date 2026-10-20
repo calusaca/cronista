@@ -22,7 +22,13 @@ como una pista continua. Compilación ACR `cha` correcta y HTTP/navegador públi
 aprobados, incluidos seis audios reales y los 33 eventos del duelo archivado.
 [Evidencia y límites](../evidencia/partido-preparado/publicacion.json).
 
-La revisión actual `cronista-arena--0000003` añade la emisión casi en vivo con
+La revisión actual es `cronista-arena--0000009` (20 de octubre, imagen
+`arena-20261020065222`, brief 044: reglas `reinicios-v3`, ventanas de hasta tres
+sustituciones y temperatura validada por clima). Smoke HTTP real con dos
+controladores Azure OpenAI y navegador público aprobados; la 0000008 queda sin
+tráfico para volver si hiciera falta. [Evidencia](../evidencia/correcciones-044/README.md).
+
+La revisión `cronista-arena--0000003` añadió la emisión casi en vivo con
 20 segundos de reserva, voz breve preparada por delante y enlace al mismo
 encuentro para otros espectadores. Imagen `arena-20261019183630`, compilación ACR
 `chb` correcta; publicación y navegador público verificados el 19 de octubre,

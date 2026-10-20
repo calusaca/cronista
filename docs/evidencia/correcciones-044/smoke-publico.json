@@ -1,0 +1,300 @@
+{
+  "checkedUtc": "2026-10-20T06:55:35.213Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "scope": "public_container_app_real_azure_services",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "models": {
+    "modelos": [
+      {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    ],
+    "estado": "ok"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true
+  },
+  "originalHealthHttp": 200,
+  "match": {
+    "id": "b050c3c5-5fa1-4055-91ef-750af11820be",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      "visita": {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-20T06:56:22.427Z"
+  },
+  "stream": {
+    "contentType": "text/event-stream; charset=utf-8",
+    "firstAdvanceMs": 4383,
+    "messages": 137,
+    "advances": 124,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "lastId": 137,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 72023,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          3677.1120410000003,
+          3394.8628529999987,
+          4380.417987000008,
+          3990.239579000001
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 16775,
+            "salida": 1045,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17036,
+            "salida": 1197,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 3,
+            "respuestasConUso": 3,
+            "entrada": 2421,
+            "salida": 490,
+            "cache": 0
+          }
+        }
+      }
+    },
+    "elapsedMs": 71978
+  },
+  "rules": "reinicios-v3",
+  "matchResult": {
+    "version": "arena-v3",
+    "finalTick": 600,
+    "score": {
+      "local": 0,
+      "visita": 2
+    },
+    "events": 45,
+    "referee": true,
+    "coaches": [
+      "local",
+      "visita"
+    ],
+    "players": 22,
+    "traits": true,
+    "decisions": [
+      {
+        "side": "local",
+        "tick": 0,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "side": "visita",
+        "tick": 0,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-rapido:reasoning-low"
+      },
+      {
+        "side": "local",
+        "tick": 300,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      {
+        "side": "visita",
+        "tick": 300,
+        "type": "llm",
+        "source": "controlador",
+        "reason": "valida",
+        "requests": 1,
+        "controller": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    ],
+    "sha256": "cad3d28f5042d35579360cdc85a81d4c94c4082ef5c174cd58c9f548883ac8b7"
+  },
+  "replay": {
+    "consistent": true,
+    "events": 45
+  },
+  "voice": {
+    "http": 200,
+    "bytes": 283968,
+    "type": "audio/mpeg",
+    "characters": 516,
+    "text": "Comienza el partido entre Sporting Brezal y Deportivo Ormidia. Saque de centro para Sporting Brezal; ejecuta Marco Zariido (10). Marco Zariido (10) intenta un pase de 30 m hacia Elías Brelinera. Elías Brelinera (9) recibe el balón. Elías Brelinera (9) intenta un pase de 5 m hacia Joel Palinoya. Joel Palinoya (16) recibe el balón. Joel Palinoya (16) intenta un pase de 22 m hacia Marco Zariido. Benja Quininena (8) intercepta la trayectoria del balón. Benja Quininena (8) intenta un pase de 18 m hacia Nico Zaraena.",
+    "audioSha256": "e72000703297f71b6a8bb7b59fc41896908d032d2a5508affb59c732469033f8"
+  },
+  "analyst": {
+    "tick": 600,
+    "agente": "foundry-agent:cronista-analista:1",
+    "solicitudes": 3,
+    "herramientas": [
+      {
+        "nombre": "consultar_eventos",
+        "argumentos": {
+          "desdeTick": 0,
+          "hastaTick": 600,
+          "tipo": "tiro"
+        },
+        "hechos": [
+          "arena:a12",
+          "arena:a30"
+        ]
+      }
+    ],
+    "uso": {
+      "entrada": 2102,
+      "salida": 280
+    },
+    "comentario": {
+      "tick": 600,
+      "modelo": "foundry-agent:cronista-analista:1",
+      "modo": "llm",
+      "principal": "arena:a12",
+      "hechos": [
+        {
+          "id": "arena:a12",
+          "tipo": "accion_arena",
+          "texto_es": "Nico Dorarales (7) remata hacia la portería rival.",
+          "texto_en": "Nico Dorarales (7) shoots towards the opposing goal.",
+          "eventos": [
+            "a12"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Nico Dorarales",
+            "equipo": "Deportivo Ormidia",
+            "dorsal": 7,
+            "distancia": 19
+          }
+        },
+        {
+          "id": "arena:a30",
+          "tipo": "accion_arena",
+          "texto_es": "Nico Zaraena (17) remata hacia la portería rival.",
+          "texto_en": "Nico Zaraena (17) shoots towards the opposing goal.",
+          "eventos": [
+            "a30"
+          ],
+          "relevancia": 50,
+          "datos": {
+            "jugador": "Nico Zaraena",
+            "equipo": "Deportivo Ormidia",
+            "dorsal": 17,
+            "distancia": 28
+          }
+        }
+      ],
+      "oraciones": [
+        {
+          "texto_es": "Deportivo Ormidia ha generado una ocasión confirmada de tiro: Nico Dorarales (7) remató hacia la portería rival desde 19 metros.",
+          "texto_en": "Deportivo Ormidia has produced one confirmed shooting chance: Nico Dorarales (7) shot toward the opposing goal from 19 meters.",
+          "hecho": "arena:a12",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "Deportivo Ormidia ha generado dos ocasiones confirmadas de tiro: Nico Dorarales (7) remató desde 19 metros y Nico Zaraena (17) remató desde 28 metros hacia la portería rival.",
+              "texto_en": "Deportivo Ormidia has produced two confirmed shooting chances: Nico Dorarales (7) shot from 19 meters and Nico Zaraena (17) shot from 28 meters toward the opposing goal.",
+              "hecho": "arena:a12",
+              "apoyo": [
+                "arena:a30"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 2 no está en el hecho (ES)"
+            },
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 17 no está en el hecho (ES)"
+            },
+            {
+              "oracion": 0,
+              "regla": "V3",
+              "detalle": "el número 28 no está en el hecho (ES)"
+            },
+            {
+              "oracion": 0,
+              "regla": "V4",
+              "detalle": "«Nico Zaraena» no pertenece al hecho (ES)"
+            }
+          ]
+        },
+        {
+          "intento": 3,
+          "oraciones": [
+            {
+              "texto_es": "Deportivo Ormidia ha generado una ocasión confirmada de tiro: Nico Dorarales (7) remató hacia la portería rival desde 19 metros.",
+              "texto_en": "Deportivo Ormidia has produced one confirmed shooting chance: Nico Dorarales (7) shot toward the opposing goal from 19 meters.",
+              "hecho": "arena:a12",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  },
+  "status": "passed",
+  "finishedUtc": "2026-10-20T06:57:45.687Z"
+}

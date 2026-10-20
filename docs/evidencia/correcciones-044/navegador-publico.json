@@ -1,0 +1,21 @@
+{
+  "checkedUtc": "2026-10-20T06:56:04.559Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "loadMs": 5247,
+      "h1": "Two teams. One shared pitch.",
+      "buttons": 54,
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "loadMs": 2748,
+      "h1": "Two teams. One shared pitch.",
+      "buttons": 54,
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}
