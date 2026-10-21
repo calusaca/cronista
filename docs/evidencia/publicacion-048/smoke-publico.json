@@ -1,0 +1,811 @@
+{
+  "checkedUtc": "2026-10-21T22:16:38.932Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": null,
+  "scope": "public_container_app_real_azure_services_brief_048",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+      "es": {
+        "narrador": {
+          "voz": "es-MX-JorgeNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "es-MX-DaliaNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "es-MX-GerardoNeural",
+          "motivo": "predeterminada"
+        }
+      },
+      "en": {
+        "narrador": {
+          "voz": "en-US-JennyNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "en-US-DavisNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "en-US-GuyNeural",
+          "motivo": "predeterminada"
+        }
+      }
+    },
+    "catalogo": "consultado"
+  },
+  "match": {
+    "id": "1505d6a3-b3c2-4ba1-a69f-0d0e01c514ac",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      "visita": {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-21T22:17:06.003Z"
+  },
+  "stream": {
+    "messages": 144,
+    "advances": 124,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "interventions": [
+      {
+        "id": "estadista:marcador+remates:200",
+        "rol": "estadista",
+        "tick": 200,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Atlético Ormidia 1, Club Quebralta 0.",
+            "en": "Score: Atlético Ormidia 1, Club Quebralta 0.",
+            "hecho": "estadista:marcador:200"
+          },
+          {
+            "es": "Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 0 (0 a puerta).",
+            "en": "Shots: Atlético Ormidia 1 (1 on target), Club Quebralta 0 (0 on target).",
+            "hecho": "estadista:remates:200"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a13"
+            ],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a12",
+              "a13"
+            ],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: Tomás Ibarra, ¿cómo está el marcador?",
+          "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 0. Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 0 (0 a puerta).",
+          "narrador: Muy bien, Tomás. Seguimos."
+        ],
+        "turnosBreve": [
+          "narrador: Vamos con Tomás Ibarra y los números.",
+          "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 0."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:189",
+        "rol": "comentarista",
+        "tick": 189,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Teo Doreena (17) para Atlético Ormidia.",
+            "en": "Goal by Teo Doreena (17) for Atlético Ormidia.",
+            "hecho": "arena:a13"
+          },
+          {
+            "es": "El marcador queda Atlético Ormidia 1, Club Quebralta 0.",
+            "en": "The score is Atlético Ormidia 1, Club Quebralta 0.",
+            "hecho": "estadista:marcador:189"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a13"
+            ]
+          },
+          {
+            "eventos": [
+              "a13"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:189",
+                "eventos": [
+                  "a13"
+                ],
+                "intervalo": [
+                  0,
+                  189
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Ana Cedeño, repasemos el gol de Teo Doreena.",
+          "comentarista: Gol de Teo Doreena (17) para Atlético Ormidia. El marcador queda Atlético Ormidia 1, Club Quebralta 0.",
+          "narrador: Anotado, Ana."
+        ],
+        "turnosBreve": [
+          "narrador: Te escucho, Ana Cedeño.",
+          "comentarista: Gol de Teo Doreena (17) para Atlético Ormidia."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:atajada:280",
+        "rol": "comentarista",
+        "tick": 280,
+        "tema": "atajada",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Tomás Valales (1) detiene el remate de Fabio Zararánez (9).",
+            "en": "Tomás Valales (1) stops Fabio Zararánez's (9) shot.",
+            "hecho": "arena:a20"
+          },
+          {
+            "es": "El marcador sigue Atlético Ormidia 1, Club Quebralta 0.",
+            "en": "The score remains Atlético Ormidia 1, Club Quebralta 0.",
+            "hecho": "estadista:marcador:280"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a20"
+            ]
+          },
+          {
+            "eventos": [
+              "a13"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:280",
+                "eventos": [
+                  "a13"
+                ],
+                "intervalo": [
+                  0,
+                  280
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Ana, vamos con la atajada de Tomás Valales.",
+          "comentarista: Tomás Valales (1) detiene el remate de Fabio Zararánez (9). El marcador sigue Atlético Ormidia 1, Club Quebralta 0.",
+          "narrador: Gracias, Ana."
+        ],
+        "turnosBreve": [
+          "narrador: Te escucho, Ana.",
+          "comentarista: Tomás Valales (1) detiene el remate de Fabio Zararánez (9)."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:remates+atajadas:400",
+        "rol": "estadista",
+        "tick": 400,
+        "tema": "remates+atajadas",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 1 (1 a puerta).",
+            "en": "Shots: Atlético Ormidia 1 (1 on target), Club Quebralta 1 (1 on target).",
+            "hecho": "estadista:remates:400"
+          },
+          {
+            "es": "Atajadas: Tomás Valales (Atlético Ormidia), 1.",
+            "en": "Saves: Tomás Valales (Atlético Ormidia), 1.",
+            "hecho": "estadista:atajadas:400"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a12",
+              "a13",
+              "a19",
+              "a20"
+            ]
+          },
+          {
+            "eventos": [
+              "a20"
+            ]
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: Tomás, los remates.",
+          "estadista: Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 1 (1 a puerta). Atajadas: Tomás Valales (Atlético Ormidia), 1.",
+          "narrador: Muy bien, Tomás. Seguimos."
+        ],
+        "turnosBreve": [
+          "narrador: Tomás, con el dato.",
+          "estadista: Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 1 (1 a puerta)."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:457",
+        "rol": "comentarista",
+        "tick": 457,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Elías Galelánez (6) marca para Club Quebralta.",
+            "en": "Elías Galelánez (6) scores for Club Quebralta.",
+            "hecho": "arena:a33"
+          },
+          {
+            "es": "Marcador: Atlético Ormidia 1, Club Quebralta 1.",
+            "en": "Score: Atlético Ormidia 1, Club Quebralta 1.",
+            "hecho": "estadista:marcador:457"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a33"
+            ]
+          },
+          {
+            "eventos": [
+              "a13",
+              "a33"
+            ],
+            "intervalo": [
+              0,
+              457
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "ronda",
+        "turnos": [
+          "narrador: Sobre el gol de Elías Galelánez, Ana, ¿qué tenemos?",
+          "comentarista: Elías Galelánez (6) marca para Club Quebralta.",
+          "narrador: Tomás, ¿cómo está el marcador?",
+          "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 1."
+        ],
+        "turnosBreve": [
+          "narrador: Ana, ¿qué ves?",
+          "comentarista: Elías Galelánez (6) marca para Club Quebralta."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:579",
+        "rol": "comentarista",
+        "tick": 579,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Teo Doreena (17) para Atlético Ormidia.",
+            "en": "Goal by Teo Doreena (17) for Atlético Ormidia.",
+            "hecho": "arena:a42"
+          },
+          {
+            "es": "Marcador: Atlético Ormidia 2, Club Quebralta 1.",
+            "en": "Score: Atlético Ormidia 2, Club Quebralta 1.",
+            "hecho": "estadista:marcador:579"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a42",
+              "a13",
+              "a33"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:579",
+                "eventos": [
+                  "a13",
+                  "a33",
+                  "a42"
+                ],
+                "intervalo": [
+                  0,
+                  579
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          },
+          {
+            "eventos": [
+              "a13",
+              "a33",
+              "a42"
+            ],
+            "intervalo": [
+              0,
+              579
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "ronda",
+        "turnos": [
+          "narrador: Ana, repasemos el gol de Teo Doreena.",
+          "comentarista: Gol de Teo Doreena (17) para Atlético Ormidia.",
+          "narrador: El marcador, Tomás.",
+          "estadista: Marcador: Atlético Ormidia 2, Club Quebralta 1."
+        ],
+        "turnosBreve": [
+          "narrador: Adelante, Ana.",
+          "comentarista: Gol de Teo Doreena (17) para Atlético Ormidia."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:remates+acciones:600",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "remates+acciones",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Remates: Atlético Ormidia 2 (2 a puerta), Club Quebralta 2 (2 a puerta).",
+            "en": "Shots: Atlético Ormidia 2 (2 on target), Club Quebralta 2 (2 on target).",
+            "hecho": "estadista:remates:600"
+          },
+          {
+            "es": "Proporción de acciones en los últimos 30 segundos: Atlético Ormidia 59 %, Club Quebralta 41 %.",
+            "en": "Share of actions in the last 30 seconds: Atlético Ormidia 59%, Club Quebralta 41%.",
+            "hecho": "estadista:acciones:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a12",
+              "a13",
+              "a19",
+              "a20",
+              "a32",
+              "a33",
+              "a41",
+              "a42"
+            ]
+          },
+          {
+            "eventos": [
+              "a23",
+              "a24",
+              "a25",
+              "a26",
+              "a27",
+              "a28",
+              "a29",
+              "a30",
+              "a31",
+              "a35",
+              "a36",
+              "a37",
+              "a38",
+              "a39",
+              "a40",
+              "a44",
+              "a45"
+            ],
+            "intervalo": [
+              300,
+              600
+            ]
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "final",
+        "turnos": [
+          "narrador: Tomás, los números del partido.",
+          "estadista: Remates: Atlético Ormidia 2 (2 a puerta), Club Quebralta 2 (2 a puerta). Proporción de acciones en los últimos 30 segundos: Atlético Ormidia 59 %, Club Quebralta 41 %."
+        ],
+        "turnosBreve": [
+          "narrador: Vamos con Tomás y los números.",
+          "estadista: Remates: Atlético Ormidia 2 (2 a puerta), Club Quebralta 2 (2 a puerta)."
+        ],
+        "motivosD": []
+      }
+    ],
+    "lastId": 144,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 71161,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          3420.9665479999985,
+          3719.9699259999998,
+          3217.302846999999,
+          3532.104403000005
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17567,
+            "salida": 1056,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17574,
+            "salida": 1201,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 8,
+            "respuestasConUso": 8,
+            "entrada": 13772,
+            "salida": 1529,
+            "cache": 0
+          }
+        }
+      }
+    },
+    "elapsedMs": 71092
+  },
+  "consistency": {
+    "stream": 7,
+    "reproduccion": [
+      "estadista:marcador+remates:200",
+      "comentarista:gol:189",
+      "comentarista:atajada:280",
+      "estadista:remates+atajadas:400",
+      "comentarista:gol:457",
+      "comentarista:gol:579",
+      "estadista:remates+acciones:600"
+    ],
+    "emision": [
+      "estadista:marcador+remates:200",
+      "comentarista:gol:189",
+      "comentarista:atajada:280",
+      "estadista:remates+atajadas:400",
+      "comentarista:gol:457",
+      "comentarista:gol:579",
+      "estadista:remates+acciones:600"
+    ]
+  },
+  "voice": {
+    "comentarista_es": {
+      "id": "comentarista:gol:189",
+      "tick": 189,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 189,
+          "texto": "Ana Cedeño, repasemos el gol de Teo Doreena."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 189,
+          "texto": "Gol de Teo Doreena (17) para Atlético Ormidia. El marcador queda Atlético Ormidia 1, Club Quebralta 0."
+        },
+        {
+          "rol": "narrador",
+          "tick": 189,
+          "texto": "Anotado, Ana."
+        }
+      ],
+      "text": "Ana Cedeño, repasemos el gol de Teo Doreena. Gol de Teo Doreena (17) para Atlético Ormidia. El marcador queda Atlético Ormidia 1, Club Quebralta 0. Anotado, Ana.",
+      "bytes": 94896,
+      "type": "audio/mpeg",
+      "characters": 161,
+      "voz": "es-MX-DaliaNeural",
+      "audioSha256": "94f2d812879ac7d07b3bd73ebb5117b404af4673b2af8a4b5110f101a772d1cf"
+    },
+    "comentarista_en": {
+      "id": "comentarista:gol:189",
+      "tick": 189,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 189,
+          "texto": "Priya Chandra, let's go over Teo Doreena's goal."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 189,
+          "texto": "Goal by Teo Doreena (17) for Atlético Ormidia. The score is Atlético Ormidia 1, Club Quebralta 0."
+        },
+        {
+          "rol": "narrador",
+          "tick": 189,
+          "texto": "Noted, Priya."
+        }
+      ],
+      "text": "Priya Chandra, let's go over Teo Doreena's goal. Goal by Teo Doreena (17) for Atlético Ormidia. The score is Atlético Ormidia 1, Club Quebralta 0. Noted, Priya.",
+      "bytes": 90144,
+      "type": "audio/mpeg",
+      "characters": 160,
+      "voz": "en-US-DavisNeural",
+      "audioSha256": "0b86437fb2a0777accdb89854b5f9956c071f2a8af0113a7b3c42a63c4c495ab"
+    },
+    "estadista_es": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Tomás Ibarra, ¿cómo está el marcador?"
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Marcador: Atlético Ormidia 1, Club Quebralta 0. Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 0 (0 a puerta)."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Muy bien, Tomás. Seguimos."
+        }
+      ],
+      "text": "Tomás Ibarra, ¿cómo está el marcador? Marcador: Atlético Ormidia 1, Club Quebralta 0. Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 0 (0 a puerta). Muy bien, Tomás. Seguimos.",
+      "bytes": 110880,
+      "type": "audio/mpeg",
+      "characters": 185,
+      "voz": "es-MX-GerardoNeural",
+      "audioSha256": "6b7eabb048ddd19ed2b08165e7534ec21533ef060c6716a5e634f50f4864f7cc"
+    },
+    "estadista_en": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Owen Platt, where does the score stand?"
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Score: Atlético Ormidia 1, Club Quebralta 0. Shots: Atlético Ormidia 1 (1 on target), Club Quebralta 0 (0 on target)."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Good, Owen. Back to the play."
+        }
+      ],
+      "text": "Owen Platt, where does the score stand? Score: Atlético Ormidia 1, Club Quebralta 0. Shots: Atlético Ormidia 1 (1 on target), Club Quebralta 0 (0 on target). Good, Owen. Back to the play.",
+      "bytes": 112896,
+      "type": "audio/mpeg",
+      "characters": 187,
+      "voz": "en-US-GuyNeural",
+      "audioSha256": "d82444ed604496fff9590303ac92af8a07f86b7cb2e44c4ed3a9c90d2b0896cd"
+    },
+    "dialogo_completa_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: Tomás Ibarra, ¿cómo está el marcador?",
+        "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 0. Remates: Atlético Ormidia 1 (1 a puerta), Club Quebralta 0 (0 a puerta).",
+        "narrador: Muy bien, Tomás. Seguimos."
+      ],
+      "bytes": 110880,
+      "characters": 185,
+      "sha256": "6b7eabb048ddd19ed2b08165e7534ec21533ef060c6716a5e634f50f4864f7cc"
+    },
+    "dialogo_completa_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: Owen Platt, where does the score stand?",
+        "estadista: Score: Atlético Ormidia 1, Club Quebralta 0. Shots: Atlético Ormidia 1 (1 on target), Club Quebralta 0 (0 on target).",
+        "narrador: Good, Owen. Back to the play."
+      ],
+      "bytes": 112896,
+      "characters": 187,
+      "sha256": "d82444ed604496fff9590303ac92af8a07f86b7cb2e44c4ed3a9c90d2b0896cd"
+    },
+    "dialogo_breve_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Vamos con Tomás Ibarra y los números.",
+        "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 0."
+      ],
+      "bytes": 47808,
+      "characters": 85,
+      "sha256": "9763d4dbf40c19f5b46462ec6bc7b717e751e684382d66ebd0ef8e0d4d206e07"
+    },
+    "dialogo_breve_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Let's hear the numbers, Owen Platt.",
+        "estadista: Score: Atlético Ormidia 1, Club Quebralta 0."
+      ],
+      "bytes": 47952,
+      "characters": 80,
+      "sha256": "8aacd09bd8ff68da47148eac29e1d37d7a54ba0b276eca0b04be5e0f17635db0"
+    },
+    "narrador_es": {
+      "bytes": 243360,
+      "characters": 438,
+      "text": "Comienza el partido entre Atlético Ormidia y Club Quebralta. Saque de centro para Atlético Ormidia; ejecuta Dante Mendelosa (6). Dante Mendelosa (6) intenta un pase de 32 m hacia Rafael Fenaido. Rafael Fenaido (15) recibe el balón. Rafael Fenaido (15) intenta un pase de 27 m hacia Dante Mendelosa. Dante Mendelosa (6) recibe el balón. Dante Mendelosa (6) intenta un pase de 14 m hacia Rafael Fenaido. Rafael Fenaido (15) recibe el balón."
+    }
+  },
+  "status": "passed",
+  "dialogue": {
+    "forms": [
+      "estadista",
+      "pregunta",
+      "pregunta",
+      "estadista",
+      "ronda",
+      "ronda",
+      "final"
+    ],
+    "withDialogue": 7,
+    "total": 7,
+    "motivosD": []
+  },
+  "unknownIntervention": 404,
+  "motor": {
+    "reglas": "reinicios-v4",
+    "marcador": {
+      "local": 2,
+      "visita": 1
+    },
+    "eventos": 45,
+    "centros": 0,
+    "saquesManos": 1,
+    "atajadas": 1,
+    "goles": 3,
+    "decisiones": [
+      "valida",
+      "valida",
+      "valida",
+      "valida"
+    ],
+    "accionesLlm": [
+      "cubrir",
+      "profundidad",
+      "apoyar",
+      "mover",
+      "pasar",
+      "presionar"
+    ]
+  },
+  "finishedUtc": "2026-10-21T22:18:37.816Z",
+  "rondaAudio": [
+    {
+      "id": "comentarista:gol:457",
+      "idioma": "es",
+      "http": 200,
+      "tipo": "audio/mpeg",
+      "fragmentos": [
+        "narrador: Sobre el gol de Elías Galelánez, Ana, ¿qué tenemos?",
+        "comentarista: Elías Galelánez (6) marca para Club Quebralta.",
+        "narrador: Tomás, ¿cómo está el marcador?",
+        "estadista: Marcador: Atlético Ormidia 1, Club Quebralta 1."
+      ],
+      "caracteres": 177,
+      "bytes": 99936,
+      "duracionEstimadaS": 16.7,
+      "caracteresPorSegundo": 10.6,
+      "sha256": "6fd33af44abfeb3fc06e1e1051971408354957ef7e1ba9a5d6c61f87693a6619"
+    },
+    {
+      "id": "comentarista:gol:457",
+      "idioma": "en",
+      "http": 429,
+      "bytes": 0,
+      "duracionEstimadaS": 0,
+      "caracteresPorSegundo": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "comentarista:gol:579",
+      "idioma": "es",
+      "http": 429,
+      "bytes": 0,
+      "duracionEstimadaS": 0,
+      "caracteresPorSegundo": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "comentarista:gol:579",
+      "idioma": "en",
+      "http": 429,
+      "bytes": 0,
+      "duracionEstimadaS": 0,
+      "caracteresPorSegundo": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

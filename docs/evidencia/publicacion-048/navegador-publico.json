@@ -1,0 +1,28 @@
+{
+  "checkedUtc": "2026-10-21T22:19:02.598Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "partido": "1505d6a3-b3c2-4ba1-a69f-0d0e01c514ac",
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "loadMs": 7368,
+      "tarjetas": {
+        "narrador": "ME\nMark Ellison · PLAY-BY-PLAY\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nJoel Lorera (3) receives the ball.\n\nTomás Valales (1) puts the ball back in play from the hands towards Joel Lorera (21 m).\n\nInspect facts and checks",
+        "comentarista": "PC\nPriya Chandra · ANALYSIS WITH CITED FACTS\n\n57.9 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nGoal by Teo Doreena (17) for Atlético Ormidia.\n\nInspect facts and checks",
+        "estadista": "OP\nOwen Platt · MATCH DATA\n\n60.0 s · Deterministic\n\nShots: Atlético Ormidia 2 (2 on target), Club Quebralta 2 (2 on target).\n\nShare of actions in the last 30 seconds: Atlético Ormidia 59%, Club Quebralta 41%.\n\nInspect facts and checks"
+      },
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "loadMs": 4528,
+      "tarjetas": {
+        "narrador": "ME\nMark Ellison · PLAY-BY-PLAY\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nJoel Lorera (3) receives the ball.\n\nTomás Valales (1) puts the ball back in play from the hands towards Joel Lorera (21 m).\n\nInspect facts and checks",
+        "comentarista": "PC\nPriya Chandra · ANALYSIS WITH CITED FACTS\n\n57.9 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nGoal by Teo Doreena (17) for Atlético Ormidia.\n\nInspect facts and checks",
+        "estadista": "OP\nOwen Platt · MATCH DATA\n\n60.0 s · Deterministic\n\nShots: Atlético Ormidia 2 (2 on target), Club Quebralta 2 (2 on target).\n\nShare of actions in the last 30 seconds: Atlético Ormidia 59%, Club Quebralta 41%.\n\nInspect facts and checks"
+      },
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}
