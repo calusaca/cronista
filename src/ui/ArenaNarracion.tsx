@@ -58,11 +58,12 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
       return s;
     };
     // La intervención se lee del diario por su id (modo buffer, sin memoria): nunca se regenera.
+    // Brief 048: la repetición guardada pide siempre la variante completa.
     const solicitarInvitado = async (i: IntervencionArena) => {
-      const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id }) });
+      const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante: "completa" }) });
       if (!r.ok) throw new Error("Intervención");
       const s = await r.json() as Segmento;
-      if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick } })) throw new Error("Intervención inconsistente");
+      if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: "completa" } })) throw new Error("Intervención inconsistente");
       return s;
     };
     void (async () => {
@@ -167,6 +168,6 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     {sesion && !disponible && <p className="arena-muted">{t("Audio is currently unavailable.", "El audio no está disponible en este momento.")}</p>}
     <p role="status" data-progress-ready={progreso.listos} data-progress-total={progreso.total}>{textos[estado]}</p>
     <audio ref={audio} controls src={url ?? undefined} aria-label={t("Match narration audio", "Audio de narración del partido")} onTimeUpdate={sincronizar} onSeeked={sincronizar} onEnded={terminar} onError={() => { if (url) { setEstado("error"); setModo("apagado"); } }} />
-    {segmento && <details data-testid="arena-narration-transcript" data-narration-role={rolDe(segmento)} data-narration-tick={segmento.desdeTick}><summary>{t("Transcript and match evidence", "Transcripción y evidencia del partido")} · {(segmento.desdeTick / 10).toFixed(0)}–{(segmento.hastaTick / 10).toFixed(0)} s</summary><p>{segmento.texto}</p><p className="arena-muted">{segmento.fuentes.join(" · ")}{!!segmento.fotogramas?.length && ` · ${t("Observed positions at", "Posiciones observadas a los")} ${segmento.fotogramas.map(tick => `${(tick / 10).toFixed(1)} s`).join(" · ")}`}</p></details>}
+    {segmento && <details data-testid="arena-narration-transcript" data-narration-role={rolDe(segmento)} data-narration-tick={segmento.desdeTick} data-narration-variant={"variante" in segmento ? segmento.variante : undefined}><summary>{t("Transcript and match evidence", "Transcripción y evidencia del partido")} · {(segmento.desdeTick / 10).toFixed(0)}–{(segmento.hastaTick / 10).toFixed(0)} s</summary>{segmento.fragmentos.map((f, k) => <p key={k} data-narration-role={f.rol ?? "narrador"}>{f.texto}</p>)}<p className="arena-muted">{segmento.fuentes.join(" · ")}{!!segmento.fotogramas?.length && ` · ${t("Observed positions at", "Posiciones observadas a los")} ${segmento.fotogramas.map(tick => `${(tick / 10).toFixed(1)} s`).join(" · ")}`}</p></details>}
   </section>;
 }

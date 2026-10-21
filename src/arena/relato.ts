@@ -3,7 +3,8 @@ import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz } from
 import { RELATO_INTERVALOS } from "./protocolo";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
 import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
-import type { IntervencionArena } from "./protocolo";
+import type { IntervencionArena, VarianteIntercambio } from "./protocolo";
+import { varianteEfectiva } from "./turnos";
 import { comentarioEditorial, elegirVarianteVoz, type RecuerdoVoz } from "./editorial";
 
 export const RELATO_INTERVALO_TICKS = RELATO_INTERVALOS.completo;
@@ -142,7 +143,34 @@ function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: num
  * solo lo supera, se recorta a su primera oración (primer dato del estadista).
  * v3.1: sin memoria. La cesión sale de `cesiones[idioma][rol]` por `varianteVoz(seed, id)`:
  * un SSML por intervención e idioma, una sola entrada de caché para todos los espectadores. */
-export function relatoIntervencion(intervencion: IntervencionArena, seed: number, idioma: "es" | "en") {
+export function relatoIntervencion(intervencion: IntervencionArena, seed: number, idioma: "es" | "en", variante: VarianteIntercambio = "completa") {
+  if (intervencion.turnos?.length) return relatoTurnos(intervencion, seed, idioma, variante);
+  return { ...relato045(intervencion, seed, idioma), variante: "completa" as VarianteIntercambio, turnos: 0 };
+}
+
+/** Brief 048 · Un fragmento por turno de la variante servida, leído tal cual del diario (los turnos
+ * están materializados: aquí no se elige ni se compone nada). `breve` sin `turnosBreve` sirve la
+ * completa; la respuesta declara la variante efectiva. */
+function relatoTurnos(intervencion: IntervencionArena, seed: number, idioma: "es" | "en", pedida: VarianteIntercambio) {
+  const es = idioma === "es", tick = intervencion.tick;
+  const variante = varianteEfectiva(intervencion, pedida);
+  const turnos = variante === "breve" ? intervencion.turnosBreve! : intervencion.turnos!;
+  const intensidad = { narrador: .25, comentarista: .18, estadista: .1 } as const;
+  const fragmentos: FragmentoVoz[] = turnos.map((t, k) => ({
+    tick, texto: es ? t.texto_es : t.texto_en, emocion: "serena" as const, intensidad: intensidad[t.rol], variante: varianteVoz(seed, `${intervencion.id}:${k}`),
+    fuentes: [...new Set(t.oraciones.flatMap(o => intervencion.evidencia[o]?.eventos ?? []))], fotogramas: [], rol: t.rol,
+  }));
+  const fuentes = [...new Set(fragmentos.flatMap(f => f.fuentes))];
+  return {
+    desdeTick: tick, hastaTick: tick, modo: "buffer" as const, idioma, texto: fragmentos.map(f => f.texto).join(" "), fragmentos, fuentes, fotogramas: [] as number[],
+    eventosDisponibles: 0, eventosNarrados: turnos.reduce((n, t) => n + t.oraciones.length, 0), conduccionesNarradas: 0, prioridad: MESA_ARENA.prioridadInvitado, cierre: false, tipoRelato: "invitado" as const,
+    firmaEstado: undefined, claveVoz: intervencion.id, temaVoz: `${intervencion.rol}:${intervencion.tema}`, rol: intervencion.rol, intervencion: intervencion.id, modoIntervencion: intervencion.modo, cesion: turnos[0]?.rol === "narrador",
+    variante, turnos: turnos.length,
+  };
+}
+
+/** Camino del 045 para intervenciones sin `turnos` (diarios anteriores o composición rechazada). */
+function relato045(intervencion: IntervencionArena, seed: number, idioma: "es" | "en") {
   const es = idioma === "es", tick = intervencion.tick;
   const textos = intervencion.oraciones.map(o => es ? o.texto_es : o.texto_en);
   const completo = textos.join(" ");

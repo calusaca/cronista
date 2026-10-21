@@ -160,21 +160,64 @@ export function intervencionEstadista(datos: readonly DatoEstadista[], tick: num
 
 /** Estado del servidor por sesión. Nada depende de la escucha de un consumidor. */
 export class DisparadorEstadista {
-  ultimaCandidaturaTick = 0;
   private ultimaEmitidaTick = -1;
   private ultimos = new Map<string, string>();
+  /** v1.3 (3) · Revisión por tema y del temporizador: cada escritura la incrementa; un deshacer solo
+   * restaura si la revisión sigue siendo la que dejó su propia escritura. */
+  private revisiones = new Map<string, number>();
+  private revisionTemporizador = 0;
+  private temporizador = 0;
+  get ultimaCandidaturaTick() { return this.temporizador; }
+  set ultimaCandidaturaTick(tick: number) { this.temporizador = tick; this.revisionTemporizador++; }
+  private escribir(tema: string, valor: string | undefined) {
+    if (valor === undefined) this.ultimos.delete(tema); else this.ultimos.set(tema, valor);
+    this.revisiones.set(tema, (this.revisiones.get(tema) ?? 0) + 1);
+  }
   constructor(private fuente: (registro: RegistroArena, tick: number) => DatoEstadista[] = datosEstadista) {}
   vence(tick: number, final = false) { return final ? tick !== this.ultimaEmitidaTick : tick - this.ultimaCandidaturaTick >= Math.round(MESA_ARENA.estadistaCadaS / ARENA.pasoS); }
+  private cambiado(d: DatoEstadista) { return d.ocupaPlaza && this.ultimos.get(d.tema) !== JSON.stringify(d.valor); }
   /** Al vencer, se rearma SIEMPRE (haya o no candidatura). Un dato solo entra si cambió
    * su valor respecto a la última candidatura del mismo tema; solo compiten los datos con
-   * plaza (v3.1: el `reloj` no). */
-  evaluar(registro: RegistroArena, tick: number, final = false): IntervencionArena | null {
-    if (!this.vence(tick, final)) return null;
+   * plaza (v3.1: el `reloj` no). Brief 048: con `forzar` vence en este mismo avance (evento
+   * `cambio`) y los temas `preferidos` que cambiaron van primero; después, la tabla. */
+  evaluar(registro: RegistroArena, tick: number, final = false, opciones: { preferidos?: readonly TemaEstadista[]; forzar?: boolean } = {}): IntervencionArena | null {
+    if (!opciones.forzar && !this.vence(tick, final)) return null;
     this.ultimaCandidaturaTick = tick;
-    const datos = this.fuente(registro, tick).filter(d => d.ocupaPlaza && this.ultimos.get(d.tema) !== JSON.stringify(d.valor)).slice(0, MESA_ARENA.maxDatosEstadista);
+    const preferidos = opciones.preferidos ?? [];
+    const cambiados = this.fuente(registro, tick).filter(d => this.cambiado(d));
+    const datos = [...preferidos.flatMap(t => cambiados.filter(d => d.tema === t)), ...cambiados.filter(d => !preferidos.includes(d.tema))].slice(0, MESA_ARENA.maxDatosEstadista);
     if (!datos.length) return null;
-    for (const d of datos) this.ultimos.set(d.tema, JSON.stringify(d.valor));
+    for (const d of datos) this.escribir(d.tema, JSON.stringify(d.valor));
     this.ultimaEmitidaTick = tick;
     return intervencionEstadista(datos, tick);
+  }
+  /** Brief 048 · Dato de mesa: consulta SIN consumir el primer dato con plaza y valor cambiado
+   * entre `temas`, en ese orden. */
+  candidato(registro: RegistroArena, tick: number, temas: readonly string[]): DatoEstadista | undefined {
+    const datos = this.fuente(registro, tick);
+    for (const tema of temas) { const d = datos.find(d => d.tema === tema && this.cambiado(d)); if (d) return d; }
+    return undefined;
+  }
+  /** Brief 048 v1.1 (7) · El dato sigue vigente si no se emitió su valor y el prefijo vigente
+   * conserva ese mismo valor. */
+  sigueVigente(dato: DatoEstadista, prefijo: RegistroArena): boolean {
+    if (!this.cambiado(dato)) return false;
+    const actual = this.fuente(prefijo, prefijo.final.tick).find(d => d.tema === dato.tema);
+    return !!actual && JSON.stringify(actual.valor) === JSON.stringify(dato.valor);
+  }
+  /** Brief 048 · El dato de mesa dicho en una ronda: actualiza `ultimos` (no `ultimaEmitidaTick`,
+   * exclusivo de las candidaturas del estadista) y rearma el temporizador con max(actual, tick).
+   * Devuelve cómo deshacerlo si la publicación falla. */
+  registrar(dato: DatoEstadista, tick: number): () => void {
+    const previo = { valor: this.ultimos.get(dato.tema), tick: this.ultimaCandidaturaTick };
+    this.escribir(dato.tema, JSON.stringify(dato.valor));
+    this.ultimaCandidaturaTick = Math.max(this.ultimaCandidaturaTick, tick);
+    const propia = { tema: this.revisiones.get(dato.tema), temporizador: this.revisionTemporizador };
+    // v1.3 (3) · Deshacer por revisión: solo se restaura lo que nadie volvió a escribir después (otra
+    // emisión del tema o un rearme del temporizador, aunque sea con el mismo valor o el mismo tick).
+    return () => {
+      if (this.revisiones.get(dato.tema) === propia.tema) this.escribir(dato.tema, previo.valor);
+      if (this.revisionTemporizador === propia.temporizador) this.ultimaCandidaturaTick = previo.tick;
+    };
   }
 }

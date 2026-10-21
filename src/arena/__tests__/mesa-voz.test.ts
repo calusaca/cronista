@@ -1,6 +1,13 @@
 // Brief 045 · Voz por rol: un SSML con hasta dos <voice>, cesión decidida por caracteres,
 // degradación según el catálogo y su declaración en /api/arena/herramientas.
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { planProgramado } from "../controladores";
+import type { ModeloConfigurado } from "../modelos";
+import { GestorSesiones, PRESUPUESTO_AUDIO_ENCUENTRO, rechazoCuotaVoz } from "../sesiones";
+import { POST as relatoHttp } from "../../app/api/arena/sesiones/[id]/relato/route";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { verificarUpdate, type HechoVerificable } from "../../cadena/verificador";
 import type { Llm } from "../../lib/llm";
@@ -10,6 +17,9 @@ import { varianteVoz } from "../expresion";
 import { comentarArena, contextoNarradorArena } from "../narrador";
 import type { IntervencionArena } from "../protocolo";
 import { relatoIntervencion } from "../relato";
+import { VOZ_BUFFER } from "../buffer";
+import { componerIntercambio, comprobarTurnos, memoriaDialogoVacia } from "../dialogo";
+import { estimarDuracionS, segmentoVozValido, varianteEfectiva } from "../turnos";
 import type { RegistroArena } from "../tipos";
 import { asignarVoces, catalogoVoces, claveAudio, olvidarCatalogoVoces, prepararVoz, vocesDe } from "../voz";
 import { GET as herramientas } from "../../app/api/arena/herramientas/route";
@@ -48,14 +58,16 @@ describe("045 · SSML de una intervención", () => {
     expect(voces(prepararVoz(relato.fragmentos, "es").ssml)).toHaveLength(1);
   });
 
-  it("C1 · maxCaracteresOracion más la cesión más larga cabe en maxCaracteresIntervencion: el recorte siempre conserva la cesión", () => {
-    const cesiones = (["es", "en"] as const).flatMap(idioma => (["comentarista", "estadista"] as const).flatMap(rol => cesionesDe(idioma, rol)));
-    expect(MESA_ARENA.maxCaracteresOracion + Math.max(...cesiones.map(c => c.length))).toBeLessThanOrEqual(MESA_ARENA.maxCaracteresIntervencion);
-    // Dos oraciones al máximo superan el clip: queda la primera, con su cesión.
+  it("C1 (048) · invariantes de § 3.5 desde las constantes: el último escalón siempre cabe y el clip máximo dura menos que duracionMaxS", () => {
+    expect(MESA_ARENA.maxCaracteresOracion).toBeLessThanOrEqual(MESA_ARENA.maxCaracteresIntervencion);
+    expect(MESA_ARENA.maxCaracteresIntervencion / MESA_ARENA.dialogo.caracteresPorSegundoVoz).toBeLessThan(VOZ_BUFFER.duracionMaxS);
+    // Camino del 045 (diarios sin turnos): dos oraciones al máximo superan el clip; queda la primera
+    // (si la cesión ya no cabe, se omite la cesión, nunca el dato).
     for (const idioma of ["es", "en"] as const) {
       const relato = relatoIntervencion(conTexto(estadista, MESA_ARENA.maxCaracteresOracion), seed, idioma);
-      expect(relato.fragmentos.map(f => f.rol)).toEqual(["narrador", "estadista"]);
-      expect(relato.fragmentos[1]!.texto).toHaveLength(MESA_ARENA.maxCaracteresOracion);
+      expect(relato.fragmentos.at(-1)!.rol).toBe("estadista");
+      expect(relato.fragmentos.at(-1)!.texto).toHaveLength(MESA_ARENA.maxCaracteresOracion);
+      expect(relato.fragmentos.map(f => f.texto).join(" ").length).toBeLessThanOrEqual(MESA_ARENA.maxCaracteresIntervencion);
     }
   });
 
@@ -88,6 +100,13 @@ describe("045 · SSML de una intervención", () => {
       expect(relato.fuentes).toEqual([...new Set(i.evidencia[0]!.eventos)]);
       expect(relato.fragmentos.map(f => f.texto).join("").length).toBeLessThanOrEqual(MESA_ARENA.maxCaracteresIntervencion);
     }
+    // 048 · El recorte es el escalón 3 de la escalera: la completa conserva solo la primera oración,
+    // que es la verificada arriba, y la composición pasa D1–D5.
+    const x = componerIntercambio({ intervencion: i, registro, seed, forma: "pregunta", memoria: memoriaDialogoVacia() });
+    expect(x.intervencion.auditDialogo!.escalones).toContain("3:primera-oracion");
+    const turnoC = x.intervencion.turnos!.find(t => t.rol === "comentarista")!;
+    expect(turnoC.oraciones.map(k => x.intervencion.oraciones[k])).toEqual([i.oraciones[0]]);
+    expect(comprobarTurnos(x.intervencion, registro)).toEqual([]);
   });
 
   it("C2 · sin memoria: dos llamadas para la misma intervención e idioma producen el mismo SSML (misma claveAudio)", async () => {
@@ -200,5 +219,198 @@ describe("045 · degradación de voces", () => {
     expect(await catalogoVoces()).toEqual(todas); expect(transporte).toHaveBeenCalledTimes(4);
     vi.setSystemTime(exito + MESA_ARENA.catalogoVocesCacheS * 1000 + 1);
     await catalogoVoces(); expect(transporte).toHaveBeenCalledTimes(5);
+  });
+});
+
+describe("048 · SSML de un intercambio", () => {
+  const v4 = JSON.parse(readFileSync("src/arena/__fixtures__/arena-reinicios-v4.json", "utf8")) as RegistroArena;
+  const t4 = v4.eventos.find(e => e.tipo === "gol")!.tick;
+  const pre = { ...v4, eventos: v4.eventos.filter(e => e.tick <= t4), fotogramas: v4.fotogramas.filter(f => f.tick <= t4), final: [...v4.fotogramas].reverse().find(f => f.tick <= t4)! };
+  const gol = v4.eventos.find(e => e.tipo === "gol")!;
+  const componer = async (forma: "pregunta" | "ronda") => {
+    const i = (await comentarArena(pre, t4, undefined, { principal: `arena:${gol.id}`, tema: "gol" }))!;
+    const dato = datosEstadista(pre, t4).find(d => d.tema === "marcador")!;
+    return componerIntercambio({ intervencion: i, registro: pre, seed: v4.config.partido.seed, forma, dato, memoria: memoriaDialogoVacia() }).intervencion;
+  };
+
+  it("tantos <voice> como turnos (3 y 4), en el orden de los roles; un fragmento por turno", async () => {
+    for (const forma of ["pregunta", "ronda"] as const) {
+      const i = await componer(forma);
+      expect(comprobarTurnos(i, pre)).toEqual([]);
+      expect(i.turnos!.length).toBe(forma === "pregunta" ? 3 : 4);
+      for (const idioma of ["es", "en"] as const) {
+        const relato = relatoIntervencion(i, v4.config.partido.seed, idioma);
+        expect(relato.variante).toBe("completa"); expect(relato.turnos).toBe(i.turnos!.length);
+        expect(relato.fragmentos.map(f => f.rol)).toEqual(i.turnos!.map(t => t.rol));
+        expect(relato.fragmentos.map(f => f.texto)).toEqual(i.turnos!.map(t => idioma === "es" ? t.texto_es : t.texto_en));
+        expect(relato.fragmentos.every(f => f.tick === i.tick)).toBe(true);
+        const asignadas = asignarVoces(idioma), p = prepararVoz(relato.fragmentos, idioma);
+        expect(voces(p.ssml)).toEqual(i.turnos!.map(t => asignadas[t.rol].voz));
+        expect(p.ssml.match(/<speak /g)).toHaveLength(1);
+      }
+    }
+  });
+
+  it("mismo SSML y misma claveAudio para el mismo id, idioma y variante; distintos entre variantes", async () => {
+    const i = await componer("ronda");
+    expect(i.turnosBreve).toBeDefined();
+    for (const idioma of ["es", "en"] as const) {
+      const clave = (variante: "completa" | "breve") => { const r = relatoIntervencion(i, v4.config.partido.seed, idioma, variante); return { r, p: prepararVoz(r.fragmentos, idioma) }; };
+      const a = clave("completa"), b = clave("completa"), c = clave("breve"), d = clave("breve");
+      expect(b.p.ssml).toBe(a.p.ssml); expect(claveAudio(b.p, i.tick)).toBe(claveAudio(a.p, i.tick));
+      expect(d.p.ssml).toBe(c.p.ssml); expect(claveAudio(d.p, i.tick)).toBe(claveAudio(c.p, i.tick));
+      expect(c.p.ssml).not.toBe(a.p.ssml); expect(claveAudio(c.p, i.tick)).not.toBe(claveAudio(a.p, i.tick));
+      expect(c.r.variante).toBe("breve"); expect(c.r.fragmentos.map(f => f.rol)).toEqual(i.turnosBreve!.map(t => t.rol));
+    }
+    // `breve` sobre una intervención sin turnosBreve sirve la completa y lo declara.
+    const sinBreve = { ...i, turnosBreve: undefined };
+    expect(relatoIntervencion(sinBreve, v4.config.partido.seed, "es", "breve")).toMatchObject({ variante: "completa", turnos: i.turnos!.length });
+  });
+
+  it("v1.1 (8) · los textos más largos posibles en ES y EN con cuatro turnos caben en duracionMaxS según la estimación", () => {
+    const estimacion = MESA_ARENA.maxCaracteresIntervencion / MESA_ARENA.dialogo.caracteresPorSegundoVoz + (MESA_ARENA.dialogo.maxTurnos - 1) * MESA_ARENA.dialogo.pausaTurnoS;
+    expect(estimacion).toBeLessThanOrEqual(VOZ_BUFFER.duracionMaxS);
+    // La medida que usa la escalera: cuatro turnos que suman exactamente el máximo en ES y EN.
+    const largo = MESA_ARENA.maxCaracteresIntervencion - (MESA_ARENA.dialogo.maxTurnos - 1);
+    const partes = [Math.floor(largo / 4), Math.floor(largo / 4), Math.floor(largo / 4), largo - 3 * Math.floor(largo / 4)];
+    const turnos = partes.map(n => ({ texto_es: "a".repeat(n), texto_en: "b".repeat(n) }));
+    expect(turnos.map(t => t.texto_es).join(" ")).toHaveLength(MESA_ARENA.maxCaracteresIntervencion);
+    expect(estimarDuracionS(turnos)).toBeCloseTo(estimacion);
+    expect(estimarDuracionS(turnos)).toBeLessThanOrEqual(VOZ_BUFFER.duracionMaxS);
+  });
+});
+
+describe("048 · ruta de relato con variantes (lectura del diario, nunca composición)", () => {
+  const rutas: string[] = [];
+  const compartido = globalThis as typeof globalThis & { __cronistaSesiones?: GestorSesiones };
+  let previo: GestorSesiones | undefined;
+  afterEach(async () => { compartido.__cronistaSesiones = previo; await Promise.all(rutas.splice(0).map(p => rm(p, { recursive: true, force: true }))); });
+  const llmDe = (completar: Llm["completar"]): Llm => ({ id: "modelo-prueba", completar });
+  const fielLlm = (contador: { n: number }) => llmDe(async (_s, m) => { contador.n++; const c = JSON.parse(m[0]!.contenido) as { hechos: HechoVerificable[]; principal: string }, h = c.hechos.find(h => h.id === c.principal)!; return JSON.stringify({ oraciones: [{ texto_es: h.texto_es, texto_en: h.texto_en, hecho: h.id, apoyo: [] }] }); });
+  const preparar = async (contador: { n: number }, segundos = 60) => {
+    previo = compartido.__cronistaSesiones;
+    vi.stubEnv("ARENA_BLOB_ENDPOINT", ""); vi.stubEnv("ARENA_VOZ", "1");
+    vi.stubEnv("AZURE_SPEECH_ENDPOINT", "https://ejemplo.cognitiveservices.azure.com"); vi.stubEnv("AZURE_SPEECH_KEY", "prueba");
+    const directorio = await mkdtemp(join(tmpdir(), "cronista-voz-048-")); rutas.push(directorio);
+    const catalogo: ModeloConfigurado[] = [{ publico: { id: "p", nombre: "P", controlador: "p" }, crear: () => llmDe(async (_s, m) => JSON.stringify(planProgramado(JSON.parse(m[0]!.contenido)))) }];
+    const g = new GestorSesiones({ directorio, ritmoMsPorSegundo: 0, catalogo: () => catalogo, narrador: () => fielLlm(contador) });
+    compartido.__cronistaSesiones = g;
+    const { id } = await g.crear({ seed: 42, segundos, local: "auto", visita: "auto", seleccion: { modo: "manual", local: "p", visita: "p" }, presentacion: "buffer" });
+    await g.esperarFinal(id);
+    // Speech simulado: el catálogo falla (sin degradación) y la síntesis devuelve bytes.
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>(async url => String(url).includes("/voices/list") ? new Response("x", { status: 500 }) : new Response(new Uint8Array([1, 2, 3]))));
+    return { g, id, directorio };
+  };
+  const pedir = (id: string, cuerpo: object) => relatoHttp(new Request("http://localhost/relato", { method: "POST", body: JSON.stringify(cuerpo) }), { params: Promise.resolve({ id }) });
+
+  it("sirve exactamente los turnos guardados (texto y SSML) en las dos variantes, sin llamar al LLM; `breve` sin turnosBreve sirve la completa", async () => {
+    const contador = { n: 0 }, { g, id } = await preparar(contador);
+    const tras = contador.n, r = await g.reproduccion(id);
+    const con = r.intervenciones.filter(i => i.turnos?.length);
+    expect(con.length).toBeGreaterThan(1);
+    // Una recomposición desde cero (memoria vacía) cambiaría al menos un nombre ya presentado.
+    expect(con.some(i => i.turnos!.some(t => t.rol === "narrador" && !t.texto_es.includes(MESA_ARENA.nombres.es.comentarista) && !t.texto_es.includes(MESA_ARENA.nombres.es.estadista)))).toBe(true);
+    let comprobadas = 0, agotadas = 0;
+    // Primero las completas (ES y después EN), luego las breves.
+    for (const variante of ["completa", "breve"] as const) for (const idioma of ["es", "en"] as const) for (const i of con) {
+      const respuesta = await pedir(id, { desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante });
+      // v1.3 (1): pedir todo en dos idiomas agota la bolsa de los invitados; solo ese 429 se admite.
+      if (respuesta.status === 429) { expect((await respuesta.json()).error).toBe("Bolsa de voz de los invitados agotada"); agotadas++; continue; }
+      expect(respuesta.status).toBe(200); comprobadas++;
+      const datos = await respuesta.json();
+      const efectiva = variante === "breve" && i.turnosBreve ? "breve" : "completa", turnos = efectiva === "breve" ? i.turnosBreve! : i.turnos!;
+      expect(datos).toMatchObject({ variante: efectiva, turnos: turnos.length, tipoRelato: "invitado", intervencion: i.id });
+      expect(datos.fragmentos.map((f: { texto: string }) => f.texto)).toEqual(turnos.map(t => idioma === "es" ? t.texto_es : t.texto_en));
+      expect(datos.fragmentos.map((f: { rol: string }) => f.rol)).toEqual(turnos.map(t => t.rol));
+      const esperado = prepararVoz(relatoIntervencion(i, r.registro.config.partido.seed, idioma, variante).fragmentos, idioma);
+      expect(prepararVoz(datos.fragmentos, idioma).ssml).toBe(esperado.ssml);
+      // v1.2 (9) D04 · cada fragmento lleva como fuentes los eventos de las oraciones de su turno.
+      turnos.forEach((t, k) => {
+        const fuentes = [...new Set(t.oraciones.flatMap(o => i.evidencia[o]!.eventos))];
+        expect(datos.fragmentos[k].fuentes).toEqual(fuentes);
+        if (t.rol !== "narrador" && i.evidencia[t.oraciones[0]!]!.eventos.length) expect(datos.fragmentos[k].fuentes.length).toBeGreaterThan(0);
+      });
+    }
+    // Dentro de la cuota se comprueban al menos todas las completas en ES (las primeras pedidas).
+    expect(comprobadas).toBeGreaterThanOrEqual(con.length);
+    expect(comprobadas + agotadas).toBe(con.length * 4);
+    expect(contador.n).toBe(tras);
+    // `variante` sin `intervencion` no se admite en la rama del narrador.
+    expect((await pedir(id, { desdeTick: 0, hastaTick: 50, modo: "buffer", idioma: "es", variante: "breve" })).status).toBe(400);
+  });
+
+  it("v1.1 (2) · un diario del 045 (sin turnos) se sirve como una sola variante completa, también si se pide la breve", async () => {
+    const contador = { n: 0 }, { g, id, directorio } = await preparar(contador);
+    const r = await g.reproduccion(id);
+    const objetivo = r.intervenciones.find(i => i.rol === "comentarista" && i.turnos)!;
+    // Se reescribe el diario quitando los campos del 048 a una intervención, como en un diario del 045.
+    const archivo = join(directorio, `${id}.ndjson`);
+    const lineas = readFileSync(archivo, "utf8").split("\n").filter(Boolean).map(l => JSON.parse(l) as { publicacion: { tipo: string; intervencion?: IntervencionArena } });
+    for (const m of lineas) if (m.publicacion.intervencion?.id === objetivo.id) {
+      const { forma: _f, turnos: _t, turnosBreve: _b, auditDialogo: _a, ...resto } = m.publicacion.intervencion;
+      m.publicacion.intervencion = { ...resto, oraciones: resto.oraciones.filter(o => !o.hecho.startsWith("estadista:")), evidencia: resto.evidencia.filter((_, k) => !resto.oraciones[k]!.hecho.startsWith("estadista:")) };
+    }
+    writeFileSync(archivo, lineas.map(l => JSON.stringify(l)).join("\n") + "\n");
+    compartido.__cronistaSesiones = new GestorSesiones({ directorio });
+    for (const variante of ["completa", "breve"] as const) {
+      const datos = await (await pedir(id, { desdeTick: objetivo.tick, hastaTick: objetivo.tick, modo: "buffer", idioma: "es", intervencion: objetivo.id, variante })).json();
+      expect(datos.variante).toBe("completa");
+      expect(datos.fragmentos.at(-1).rol).toBe("comentarista");
+      expect(segmentoVozValido(datos, { desde: objetivo.tick, hasta: objetivo.tick, idioma: "es", intervencion: { id: objetivo.id, tick: objetivo.tick, variante: varianteEfectiva({}, variante) } })).toBe(true);
+    }
+  });
+
+  /** Recorrido en orden temporal como el consumidor: por tick, apertura, tramos del narrador, las
+   * intervenciones de ese tramo (breve y completa) y, al final, el cierre; por cada idioma. */
+  const recorrido = async (segundos: number, idiomas: readonly ("es" | "en")[], conInvitados: boolean) => {
+    const contador = { n: 0 }, { g, id } = await preparar(contador, segundos);
+    const r = await g.reproduccion(id), fin = r.registro.final.tick;
+    type Paso = { tick: number; orden: number; clave: string; tipo: "narrador" | "invitado" | "cierre"; cuerpo: object };
+    const plan: Paso[] = [];
+    for (const idioma of idiomas) {
+      plan.push({ tick: 0, orden: 0, clave: `${idioma}:entrada`, tipo: "narrador", cuerpo: { desdeTick: 0, hastaTick: Math.min(50, fin), modo: "buffer", idioma, entradaTick: 0 } });
+      for (let desde = 0; desde < fin; desde += 50) plan.push({ tick: desde, orden: 1, clave: `${idioma}:${desde}`, tipo: "narrador", cuerpo: { desdeTick: desde, hastaTick: Math.min(desde + 50, fin), modo: "buffer", idioma } });
+      if (conInvitados) for (const i of r.intervenciones) for (const variante of ["breve", "completa"] as const) if (variante === "completa" || i.turnosBreve)
+        plan.push({ tick: i.tick, orden: 2, clave: `${idioma}:${i.id}:${variante}`, tipo: "invitado", cuerpo: { desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante } });
+      plan.push({ tick: fin + 1, orden: 3, clave: `${idioma}:cierre`, tipo: "cierre", cuerpo: { desdeTick: Math.floor((fin - 1) / 50) * 50, hastaTick: fin, modo: "buffer", idioma, cierre: true } });
+    }
+    plan.sort((a, b) => a.tick - b.tick || a.orden - b.orden);
+    const estado = new Map<string, number>(), errores = new Map<string, string>();
+    for (const p of plan) { const res = await pedir(id, p.cuerpo); estado.set(p.clave, res.status); if (res.status !== 200) errores.set(p.clave, (await res.json()).error); }
+    const de = (tipo: Paso["tipo"]) => plan.filter(p => p.tipo === tipo).map(p => p.clave);
+    return { estado, errores, narrador: de("narrador"), invitados: de("invitado"), cierres: de("cierre") };
+  };
+
+  // v1.3 (1–2) · Cada recorrido se comprueba por separado (sin mezclar estados entre recorridos).
+  const recorridos = [[60, ["es"]], [60, ["es", "en"]], [120, ["es"]], [120, ["es", "en"]], [180, ["es"]], [180, ["es", "en"]]] as const;
+  for (const [segundos, idiomas] of recorridos) it(`v1.3 (1) · ${segundos} s ${idiomas.join("+")}, ambas variantes intercaladas: los rechazos del narrador son idénticos con y sin invitados; los cierres, 200 donde lo eran sin invitados; los invitados solo gastan su bolsa`, async () => {
+    const B = MESA_ARENA.dialogo.bolsaSpeechInvitados;
+    const sin = await recorrido(segundos, idiomas, false), con = await recorrido(segundos, idiomas, true);
+    const rechazos = (x: typeof sin) => x.narrador.map(k => [k, x.estado.get(k)!] as const).filter(([, s]) => s !== 200);
+    expect(rechazos(con)).toEqual(rechazos(sin));
+    for (const k of sin.cierres) expect([k, "sin", sin.estado.get(k)]).toEqual([k, "sin", 200]);
+    for (const k of con.cierres) expect([k, "con", con.estado.get(k)]).toEqual([k, "con", sin.estado.get(k)]);
+    expect(con.invitados.length).toBeGreaterThan(0);
+    expect(con.invitados.filter(k => con.estado.get(k) === 200).length).toBeLessThanOrEqual(B.solicitudes);
+    for (const k of con.invitados.filter(k => con.estado.get(k) !== 200)) expect([k, con.estado.get(k), con.errores.get(k)]).toEqual([k, 429, "Bolsa de voz de los invitados agotada"]);
+    // v1.3 (2): a 180 s ES+EN el narrador solo ya supera su presupuesto (límite anterior al 048, declarado).
+    if (segundos === 180 && idiomas.length === 2) expect(rechazos(sin).length).toBeGreaterThan(0);
+    else expect(rechazos(sin)).toEqual([]);
+  }, 120_000);
+
+  it("v1.3 (1) · rechazoCuotaVoz: con la bolsa de invitados llena, el narrador conserva todas sus solicitudes (repro de Codex)", () => {
+    const P = PRESUPUESTO_AUDIO_ENCUENTRO, B = MESA_ARENA.dialogo.bolsaSpeechInvitados;
+    const admitidos = (conInvitados: boolean) => {
+      const r: { tipo: string; caracteres: number; clase: "narrador" | "invitado" }[] = [];
+      if (conInvitados) for (let k = 0; k < B.solicitudes; k++) if (!rechazoCuotaVoz(r, Math.floor(B.caracteres / B.solicitudes), "invitado")) r.push({ tipo: "audio", caracteres: Math.floor(B.caracteres / B.solicitudes), clase: "invitado" });
+      let n = 0;
+      for (let k = 0; k < P.solicitudes; k++) if (!rechazoCuotaVoz(r, 250, "narrador")) { r.push({ tipo: "audio", caracteres: 250, clase: "narrador" }); n++; }
+      return { n, cierre: rechazoCuotaVoz(r, 335, "cierre") };
+    };
+    const sin = admitidos(false), con = admitidos(true);
+    expect(con).toEqual(sin);
+    expect(sin.n).toBe(P.solicitudes - MESA_ARENA.dialogo.reservaSpeechCierreSolicitudes);
+    expect(sin.cierre).toBeNull();
+    expect(rechazoCuotaVoz(Array.from({ length: B.solicitudes }, () => ({ tipo: "audio", caracteres: 1, clase: "invitado" as const })), 1, "invitado")).toBe("Bolsa de voz de los invitados agotada");
   });
 });

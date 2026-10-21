@@ -1,0 +1,174 @@
+{
+  "fecha": "2026-10-21T21:31:56.118Z",
+  "seed": 7,
+  "reglas": "reinicios-v4",
+  "intervenciones": [
+    {
+      "id": "estadista:marcador+remates:200",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás Ibarra, ¿cómo está el marcador?",
+        "estadista: Marcador: Juventud Valdecristal 0, Racing Pradoalto 0. Remates: Juventud Valdecristal 1 (0 a puerta), Racing Pradoalto 0 (0 a puerta).",
+        "narrador: Anotado, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás Ibarra, con el dato.",
+        "estadista: Marcador: Juventud Valdecristal 0, Racing Pradoalto 0."
+      ],
+      "caracteres": 188
+    },
+    {
+      "id": "comentarista:atajada:210",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana Cedeño, vamos con la atajada de Joel Mendueta.",
+        "comentarista: El remate de Hugo Nevera fue detenido por Joel Mendueta, de Juventud Valdecristal.",
+        "narrador: Las atajadas, Tomás.",
+        "estadista: Atajadas: Joel Mendueta (Juventud Valdecristal), 1."
+      ],
+      "breve": [
+        "narrador: Ana Cedeño, ¿qué ves?",
+        "comentarista: El remate de Hugo Nevera fue detenido por Joel Mendueta, de Juventud Valdecristal."
+      ],
+      "caracteres": 205
+    },
+    {
+      "id": "estadista:remates+acciones:410",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, los remates.",
+        "estadista: Remates: Juventud Valdecristal 1 (0 a puerta), Racing Pradoalto 1 (1 a puerta). Proporción de acciones en los últimos 30 segundos: Juventud Valdecristal 67 %, Racing Pradoalto 33 %."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Remates: Juventud Valdecristal 1 (0 a puerta), Racing Pradoalto 1 (1 a puerta)."
+      ],
+      "caracteres": 200
+    },
+    {
+      "id": "comentarista:tiempo:460",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: El intento de pase de Benja Maraena hacia Hugo Nevera fue de 29 metros.",
+        "narrador: Muy bien, Ana. Seguimos."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: El intento de pase de Benja Maraena hacia Hugo Nevera fue de 29 metros."
+      ],
+      "caracteres": 124
+    },
+    {
+      "id": "estadista:acciones+faltas:610",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, el reparto de acciones.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Juventud Valdecristal 65 %, Racing Pradoalto 35 %. Sin faltas en los primeros 61 segundos.",
+        "narrador: Gracias, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Juventud Valdecristal 65 %, Racing Pradoalto 35 %."
+      ],
+      "caracteres": 186
+    },
+    {
+      "id": "comentarista:tiempo:710",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Te escucho, Ana.",
+        "comentarista: El intento de pase de Benja Maraena tuvo a Hugo Nevera como destinatario, a 18 metros. Ambos equipos llevan un remate, pero solo Racing Pradoalto ha rematado a puerta.",
+        "narrador: Anotado, Ana."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: El intento de pase de Benja Maraena tuvo a Hugo Nevera como destinatario, a 18 metros."
+      ],
+      "caracteres": 199
+    },
+    {
+      "id": "estadista:acciones+cambios:810",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo se reparten las acciones?",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Juventud Valdecristal 53 %, Racing Pradoalto 47 %."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Juventud Valdecristal 53 %, Racing Pradoalto 47 %."
+      ],
+      "caracteres": 139
+    },
+    {
+      "id": "estadista:cambios+marcador:840",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo van los cambios?",
+        "estadista: Cambios: Juventud Valdecristal 1 de 5 en 1 de 3 ventanas; Racing Pradoalto 1 de 5 en 1 de 3 ventanas. Marcador: Juventud Valdecristal 1, Racing Pradoalto 0."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Cambios: Juventud Valdecristal 1 de 5 en 1 de 3 ventanas; Racing Pradoalto 1 de 5 en 1 de 3 ventanas."
+      ],
+      "caracteres": 191
+    },
+    {
+      "id": "comentarista:gol:840",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos el gol de Thiago Celinoya.",
+        "comentarista: La secuencia de Juventud Valdecristal tuvo como desenlace el gol de Thiago Celinoya.",
+        "narrador: Muy bien, Ana. Seguimos."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La secuencia de Juventud Valdecristal tuvo como desenlace el gol de Thiago Celinoya."
+      ],
+      "caracteres": 158
+    },
+    {
+      "id": "estadista:remates+acciones:900",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "final",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Para cerrar, Tomás, los números.",
+        "estadista: Remates: Juventud Valdecristal 2 (1 a puerta), Racing Pradoalto 1 (1 a puerta)."
+      ],
+      "breve": [
+        "narrador: Vamos con Tomás y los números.",
+        "estadista: Remates: Juventud Valdecristal 2 (1 a puerta), Racing Pradoalto 1 (1 a puerta)."
+      ],
+      "caracteres": 111
+    }
+  ]
+}

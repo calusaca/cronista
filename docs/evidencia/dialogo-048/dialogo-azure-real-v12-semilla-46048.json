@@ -1,0 +1,177 @@
+{
+  "fecha": "2026-10-21T21:31:25.436Z",
+  "seed": 46048,
+  "reglas": "reinicios-v4",
+  "intervenciones": [
+    {
+      "id": "comentarista:amarilla:90",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana Cedeño, ¿qué ves?",
+        "comentarista: La recepción de Bruno Quineardi completó el pase de 30 metros de Lucio Barinich.",
+        "narrador: Anotado, Ana."
+      ],
+      "breve": [
+        "narrador: Ana Cedeño, ¿qué ves?",
+        "comentarista: La recepción de Bruno Quineardi completó el pase de 30 metros de Lucio Barinich."
+      ],
+      "caracteres": 124
+    },
+    {
+      "id": "comentarista:atajada:190",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos la atajada de Aarón Breleena.",
+        "comentarista: El remate fue desviado por Aarón Breleena, pero el balón siguió en juego.",
+        "narrador: Las atajadas, Tomás Ibarra.",
+        "estadista: Atajadas: Aarón Breleena (Deportivo Caleteo), 1."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: El remate fue desviado por Aarón Breleena, pero el balón siguió en juego."
+      ],
+      "caracteres": 192
+    },
+    {
+      "id": "estadista:marcador+remates:390",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo está el marcador?",
+        "estadista: Marcador: Deportivo Caleteo 0, Club Arenablanca 0. Remates: Deportivo Caleteo 0 (0 a puerta), Club Arenablanca 1 (1 a puerta).",
+        "narrador: Gracias, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Marcador: Deportivo Caleteo 0, Club Arenablanca 0."
+      ],
+      "caracteres": 174
+    },
+    {
+      "id": "estadista:cambios+marcador:420",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Los cambios, Tomás.",
+        "estadista: Cambios: Deportivo Caleteo 0 de 5 en 0 de 3 ventanas; Club Arenablanca 1 de 5 en 1 de 3 ventanas. Marcador: Deportivo Caleteo 0, Club Arenablanca 1.",
+        "narrador: Muy bien, Tomás. Seguimos."
+      ],
+      "breve": [
+        "narrador: Vamos con Tomás y los números.",
+        "estadista: Cambios: Deportivo Caleteo 0 de 5 en 0 de 3 ventanas; Club Arenablanca 1 de 5 en 1 de 3 ventanas."
+      ],
+      "caracteres": 202
+    },
+    {
+      "id": "comentarista:gol:420",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos el gol de Mateo Valeánez.",
+        "comentarista: Mateo Valeánez anotó para Club Arenablanca desde 23 metros.",
+        "narrador: Tomás, los remates.",
+        "estadista: Remates: Deportivo Caleteo 0 (0 a puerta), Club Arenablanca 2 (2 a puerta)."
+      ],
+      "breve": [
+        "narrador: Adelante, Ana.",
+        "comentarista: Mateo Valeánez anotó para Club Arenablanca desde 23 metros."
+      ],
+      "caracteres": 196
+    },
+    {
+      "id": "estadista:acciones+faltas:620",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, el reparto de acciones.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 45 %, Club Arenablanca 55 %."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 45 %, Club Arenablanca 55 %."
+      ],
+      "caracteres": 127
+    },
+    {
+      "id": "comentarista:tiempo:670",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Te escucho, Ana.",
+        "comentarista: La reanudación de Deportivo Caleteo fue un envío de 32 metros desde las manos de Aarón Breleena hacia Aarón Feninich.",
+        "narrador: Anotado, Ana."
+      ],
+      "breve": [
+        "narrador: Te escucho, Ana.",
+        "comentarista: La reanudación de Deportivo Caleteo fue un envío de 32 metros desde las manos de Aarón Breleena hacia Aarón Feninich."
+      ],
+      "caracteres": 149
+    },
+    {
+      "id": "estadista:acciones+reinicios:820",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo se reparten las acciones?",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 55 %, Club Arenablanca 45 %."
+      ],
+      "breve": [
+        "narrador: Adelante, Tomás.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 55 %, Club Arenablanca 45 %."
+      ],
+      "caracteres": 135
+    },
+    {
+      "id": "comentarista:atajada:850",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos la atajada de Lucio Soreardi.",
+        "comentarista: Lucio Soreardi detuvo el remate de Ulises Breleón.",
+        "narrador: Las atajadas, Tomás.",
+        "estadista: Atajadas: Aarón Breleena (Deportivo Caleteo), 1; Lucio Soreardi (Club Arenablanca), 1."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: Lucio Soreardi detuvo el remate de Ulises Breleón."
+      ],
+      "caracteres": 200
+    },
+    {
+      "id": "estadista:remates+acciones:900",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "final",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, los números del partido.",
+        "estadista: Remates: Deportivo Caleteo 1 (1 a puerta), Club Arenablanca 2 (2 a puerta). Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 64 %, Club Arenablanca 36 %."
+      ],
+      "breve": [
+        "narrador: Adelante, Tomás.",
+        "estadista: Remates: Deportivo Caleteo 1 (1 a puerta), Club Arenablanca 2 (2 a puerta)."
+      ],
+      "caracteres": 204
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "fecha": "2026-10-21T18:44:50.156Z",
+  "seed": 46048,
+  "reglas": "reinicios-v4",
+  "intervenciones": [
+    {
+      "id": "comentarista:amarilla:90",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana Cedeño, repasemos la amarilla a Bruno Paloich.",
+        "comentarista: Tras el intercambio de pases, el balón está de nuevo en poder de Bruno Quineardi."
+      ],
+      "breve": [
+        "narrador: Ana Cedeño, ¿qué ves?",
+        "comentarista: Tras el intercambio de pases, el balón está de nuevo en poder de Bruno Quineardi."
+      ],
+      "caracteres": 140
+    },
+    {
+      "id": "comentarista:atajada:190",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, vamos con la atajada de Aarón Breleena.",
+        "comentarista: La intervención de Aarón Breleena dejó el balón en juego tras desviar el remate.",
+        "narrador: Las atajadas, Tomás Ibarra.",
+        "estadista: Atajadas: Aarón Breleena (Deportivo Caleteo), 1."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La intervención de Aarón Breleena dejó el balón en juego tras desviar el remate."
+      ],
+      "caracteres": 200
+    },
+    {
+      "id": "estadista:marcador+remates:390",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo está el marcador?",
+        "estadista: Marcador: Deportivo Caleteo 0, Club Arenablanca 0. Remates: Deportivo Caleteo 0 (0 a puerta), Club Arenablanca 1 (1 a puerta).",
+        "narrador: Gracias, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Marcador: Deportivo Caleteo 0, Club Arenablanca 0."
+      ],
+      "caracteres": 174
+    },
+    {
+      "id": "estadista:cambios+marcador:420",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Los cambios, Tomás.",
+        "estadista: Cambios: Deportivo Caleteo 0 de 5 en 0 de 3 ventanas; Club Arenablanca 1 de 5 en 1 de 3 ventanas. Marcador: Deportivo Caleteo 0, Club Arenablanca 1.",
+        "narrador: Anotado, Tomás."
+      ],
+      "breve": [
+        "narrador: Vamos con Tomás y los números.",
+        "estadista: Cambios: Deportivo Caleteo 0 de 5 en 0 de 3 ventanas; Club Arenablanca 1 de 5 en 1 de 3 ventanas."
+      ],
+      "caracteres": 188
+    },
+    {
+      "id": "comentarista:gol:420",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos el gol de Mateo Valeánez.",
+        "comentarista: La secuencia de Club Arenablanca tuvo como desenlace el gol de Mateo Valeánez."
+      ],
+      "breve": [
+        "narrador: Adelante, Ana.",
+        "comentarista: La secuencia de Club Arenablanca tuvo como desenlace el gol de Mateo Valeánez."
+      ],
+      "caracteres": 121
+    },
+    {
+      "id": "estadista:remates+acciones:620",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo van los remates?",
+        "estadista: Remates: Deportivo Caleteo 0 (0 a puerta), Club Arenablanca 2 (2 a puerta). Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 45 %, Club Arenablanca 55 %."
+      ],
+      "breve": [
+        "narrador: Adelante, Tomás.",
+        "estadista: Remates: Deportivo Caleteo 0 (0 a puerta), Club Arenablanca 2 (2 a puerta)."
+      ],
+      "caracteres": 205
+    },
+    {
+      "id": "comentarista:tiempo:670",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La reanudación de Aarón Breleena desde sus manos tuvo como destinatario a Aarón Feninich, a 32 metros."
+      ],
+      "breve": [
+        "narrador: Te escucho, Ana.",
+        "comentarista: La reanudación de Aarón Breleena desde sus manos tuvo como destinatario a Aarón Feninich, a 32 metros."
+      ],
+      "caracteres": 125
+    },
+    {
+      "id": "estadista:acciones+faltas:820",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo se reparten las acciones?",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 55 %, Club Arenablanca 45 %."
+      ],
+      "breve": [
+        "narrador: Vamos con Tomás y los números.",
+        "estadista: Proporción de acciones en los últimos 30 segundos: Deportivo Caleteo 55 %, Club Arenablanca 45 %."
+      ],
+      "caracteres": 135
+    },
+    {
+      "id": "comentarista:atajada:850",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos la atajada de Lucio Soreardi.",
+        "comentarista: El remate de Ulises Breleón fue detenido por Lucio Soreardi."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: El remate de Ulises Breleón fue detenido por Lucio Soreardi."
+      ],
+      "caracteres": 104
+    },
+    {
+      "id": "estadista:remates+atajadas:900",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "final",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, los números del partido.",
+        "estadista: Remates: Deportivo Caleteo 1 (1 a puerta), Club Arenablanca 2 (2 a puerta). Atajadas: Aarón Breleena (Deportivo Caleteo), 1; Lucio Soreardi (Club Arenablanca), 1."
+      ],
+      "breve": [
+        "narrador: Adelante, Tomás.",
+        "estadista: Remates: Deportivo Caleteo 1 (1 a puerta), Club Arenablanca 2 (2 a puerta)."
+      ],
+      "caracteres": 193
+    }
+  ]
+}

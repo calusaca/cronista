@@ -1,0 +1,159 @@
+{
+  "fecha": "2026-10-21T21:32:24.257Z",
+  "seed": 26,
+  "reglas": "reinicios-v4",
+  "intervenciones": [
+    {
+      "id": "comentarista:gol:160",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana Cedeño, repasemos el gol de Thiago Mendarich.",
+        "comentarista: Thiago Mendarich pasó de interceptar el balón a cerrar la secuencia con un gol para Unión Marisal.",
+        "narrador: Muy bien, Ana. Seguimos."
+      ],
+      "breve": [
+        "narrador: Ana Cedeño, ¿qué ves?",
+        "comentarista: Thiago Mendarich pasó de interceptar el balón a cerrar la secuencia con un gol para Unión Marisal."
+      ],
+      "caracteres": 188
+    },
+    {
+      "id": "estadista:marcador+remates:200",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: El marcador, Tomás Ibarra.",
+        "estadista: Marcador: Olímpico Puertoscuro 0, Unión Marisal 1. Remates: Olímpico Puertoscuro 0 (0 a puerta), Unión Marisal 1 (1 a puerta).",
+        "narrador: Gracias, Tomás."
+      ],
+      "breve": [
+        "narrador: Vamos con Tomás Ibarra y los números.",
+        "estadista: Marcador: Olímpico Puertoscuro 0, Unión Marisal 1."
+      ],
+      "caracteres": 167
+    },
+    {
+      "id": "estadista:atajadas+acciones:400",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Las atajadas, Tomás.",
+        "estadista: Sin atajadas en los primeros 40 segundos. Proporción de acciones en los últimos 30 segundos: Olímpico Puertoscuro 33 %, Unión Marisal 67 %.",
+        "narrador: Anotado, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Sin atajadas en los primeros 40 segundos."
+      ],
+      "caracteres": 174
+    },
+    {
+      "id": "comentarista:tiempo:410",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La recepción de Thiago Mendarich confirmó que el pase de 21 metros de Marco Orarena llegó a destino para Unión Marisal.",
+        "narrador: Muy bien, Ana. Seguimos."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La recepción de Thiago Mendarich confirmó que el pase de 21 metros de Marco Orarena llegó a destino para Unión Marisal."
+      ],
+      "caracteres": 172
+    },
+    {
+      "id": "estadista:cambios+marcador:530",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, ¿cómo van los cambios?",
+        "estadista: Cambios: Olímpico Puertoscuro 1 de 5 en 1 de 3 ventanas; Unión Marisal 0 de 5 en 0 de 3 ventanas. Marcador: Olímpico Puertoscuro 0, Unión Marisal 2.",
+        "narrador: Gracias, Tomás."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Cambios: Olímpico Puertoscuro 1 de 5 en 1 de 3 ventanas; Unión Marisal 0 de 5 en 0 de 3 ventanas."
+      ],
+      "caracteres": 198
+    },
+    {
+      "id": "comentarista:gol:530",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "pregunta",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, repasemos el gol de Marco Orarena.",
+        "comentarista: La secuencia de Unión Marisal tuvo como desenlace el gol de Marco Orarena desde 23 metros.",
+        "narrador: Anotado, Ana."
+      ],
+      "breve": [
+        "narrador: Ana, ¿qué ves?",
+        "comentarista: La secuencia de Unión Marisal tuvo como desenlace el gol de Marco Orarena desde 23 metros."
+      ],
+      "caracteres": 145
+    },
+    {
+      "id": "estadista:cambios+remates:630",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "estadista",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Los cambios, Tomás.",
+        "estadista: Cambios: Olímpico Puertoscuro 1 de 5 en 1 de 3 ventanas; Unión Marisal 1 de 5 en 1 de 3 ventanas. Remates: Olímpico Puertoscuro 0 (0 a puerta), Unión Marisal 2 (2 a puerta)."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Cambios: Olímpico Puertoscuro 1 de 5 en 1 de 3 ventanas; Unión Marisal 1 de 5 en 1 de 3 ventanas."
+      ],
+      "caracteres": 201
+    },
+    {
+      "id": "comentarista:gol:740",
+      "rol": "comentarista",
+      "modo": "llm",
+      "forma": "ronda",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Ana, vamos con el gol de Rafael Castoosa.",
+        "comentarista: La secuencia tuvo como desenlace el gol de Rafael Castoosa para Unión Marisal.",
+        "narrador: Tomás, ¿cómo está el marcador?",
+        "estadista: Marcador: Olímpico Puertoscuro 0, Unión Marisal 3."
+      ],
+      "breve": [
+        "narrador: Te escucho, Ana.",
+        "comentarista: La secuencia tuvo como desenlace el gol de Rafael Castoosa para Unión Marisal."
+      ],
+      "caracteres": 207
+    },
+    {
+      "id": "estadista:remates+acciones:900",
+      "rol": "estadista",
+      "modo": "determinista",
+      "forma": "final",
+      "motivosD": [],
+      "turnos": [
+        "narrador: Tomás, los números del partido.",
+        "estadista: Remates: Olímpico Puertoscuro 0 (0 a puerta), Unión Marisal 3 (3 a puerta). Proporción de acciones en los últimos 30 segundos: Olímpico Puertoscuro 46 %, Unión Marisal 54 %."
+      ],
+      "breve": [
+        "narrador: Tomás, con el dato.",
+        "estadista: Remates: Olímpico Puertoscuro 0 (0 a puerta), Unión Marisal 3 (3 a puerta)."
+      ],
+      "caracteres": 204
+    }
+  ]
+}

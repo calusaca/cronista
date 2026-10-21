@@ -22,11 +22,32 @@ export interface EvidenciaMesa {
   citas?: CitaMesa[];
 }
 export interface CitaMesa { hecho: string; eventos: string[]; intervalo?: [number, number]; fuente?: string }
+/** Brief 048 · Formas del intercambio. v1.1: la forma `dato` queda fuera de esta entrega (el tipo
+ * la conserva por contrato, pero `componerIntercambio` nunca la produce y D2 la rechaza). */
+export type FormaDialogo = "pregunta" | "dato" | "ronda" | "estadista" | "final";
+export type FuncionTurno = "pregunta" | "cesion" | "respuesta" | "dato" | "cierre";
+export type VarianteIntercambio = "completa" | "breve";
+export interface TurnoMesa {
+  rol: RolMesa; funcion: FuncionTurno;
+  /** Texto hablado completo del turno. */
+  texto_es: string; texto_en: string;
+  /** Índices en `intervencion.oraciones`, en orden. */
+  oraciones: number[];
+  /** "marco.repaso#2", "marco.estadista.remates#1", "cierre#0", "cesion.estadista#1"… */
+  plantilla?: string;
+  /** Turno C: índice de la oración que retoma (sin uso en v1.1: no hay forma `dato`). */
+  conector?: { plantilla: string; antesDe: number };
+  /** Hechos que dan valor a {jugador}/{accion}/tema; `refiere[0]` es el evento disparador. */
+  refiere?: string[];
+}
+export interface AuditDialogo { motivos: { regla: "D1" | "D2" | "D3" | "D4" | "D5"; detalle: string }[]; escalones: string[] }
 /** Candidatura generada UNA vez en el servidor y publicada en el diario de la sesión. */
 export interface IntervencionArena {
   id: string; rol: Exclude<RolMesa, "narrador">; tick: number; tema: string;
   oraciones: Oracion[]; hechos: HechoVerificable[]; evidencia: EvidenciaMesa[];
   audit: ComentarioArena["audit"]; modo: "llm" | "plantilla" | "determinista"; modelo?: string;
+  /** Brief 048 (opcionales; las intervenciones del 045 siguen siendo válidas). */
+  forma?: FormaDialogo; turnos?: TurnoMesa[]; turnosBreve?: TurnoMesa[]; auditDialogo?: AuditDialogo;
 }
 export type PublicacionSesion = PublicacionArena
   | { tipo: "sesion"; id?: string; asignacion: AsignacionModelos }

@@ -7,18 +7,31 @@ import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import catalogoReserva from "../arena/voz-reserva.json";
 import { elegirReservaVoz, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
-import { descartesTurno, segmentoVozValido, siguienteTurno, type EntradaTurno, type Rol } from "../arena/turnos";
-import type { IntervencionArena } from "../arena/protocolo";
-import { MESA_ARENA } from "../sim/limites";
+import { calmaEnFotograma, descartesTurno, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type Rol } from "../arena/turnos";
+import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
+import { ARENA, MESA_ARENA } from "../sim/limites";
 
-type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string };
+type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
+/** Brief 048 v1.1 · Estado explícito de cada variante de un intercambio en este consumidor. */
+type VarianteLocal = { estado: "inexistente" | "sin-pedir" | "pidiendo" | "valida" | "invalida" | "fallida"; clip?: Clip };
+type InvitadoLocal = { intervencion: IntervencionArena; completa: VarianteLocal; breve: VarianteLocal };
+const estadoCoordinador = (v: VarianteLocal): EstadoVariante => v.estado === "valida" ? { estado: "valida", duracionS: v.clip!.audio.duration } : v.estado === "sin-pedir" || v.estado === "pidiendo" ? { estado: "pendiente" } : { estado: v.estado };
 type Activa = { fuente: AudioBufferSourceNode; fin: number; prioridad: number; recuerdo: RecuerdoVoz; rol: Rol };
 type Reserva = { texto: string; audio: AudioBuffer; cierre: boolean };
 /** Brief 045: los invitados tienen su propia preparación (una a la vez) y sus propios clips;
  * nunca ocupan la concurrencia del narrador. */
 type Sonido = { silenciada: boolean; activacion: number; activadoTick: number; entradaPendiente: boolean; idioma: "es" | "en"; contexto: AudioContext; clips: Map<string, Clip>; peticiones: Map<string, AbortController>; desde: number; cierrePedido: boolean; cierreFallido: boolean; cerrando: boolean; ultimoFin: number; reservas: Reserva[]; memoria: RecuerdoVoz[]; activa?: Activa;
-  invitados: Map<string, Clip>; peticionesInvitado: Map<string, AbortController>; pedidas: Set<string>; finUltimaNoticia: number | null; finUltimoInvitado: number | null; ultimoInvitado: { rol: Rol; tick: number } | null };
+  /** 048: por id de intervención, sus dos variantes; peticiones por `${id}|${variante}`; `pedidas` = ids terminados
+   * (arrancados, descartados o caducados); `sonadas` = eventos cuya noticia ya sonó. */
+  invitados: Map<string, InvitadoLocal>; peticionesInvitado: Map<string, AbortController>; pedidas: Set<string>; sonadas: Set<string>; finUltimaNoticia: number | null; finUltimoInvitado: number | null; ultimoInvitado: { rol: Rol; tick: number } | null };
+
+/** 048 · Una intervención termina en este consumidor (arrancó, se descartó o caducó): se abortan sus
+ * peticiones, se sueltan sus dos variantes y no se vuelve a pedir. */
+function terminarInvitado(s: Sonido, id: string) {
+  for (const variante of ["completa", "breve"] as const) { const clave = `${id}|${variante}`; s.peticionesInvitado.get(clave)?.abort(); s.peticionesInvitado.delete(clave); }
+  s.invitados.delete(id); s.pedidas.add(id);
+}
 
 /** El partido tiene un reloj propio. La voz lee ese cursor, prepara contenido
  * por adelantado y solo reproduce hechos que ya alcanzó la presentación. */
@@ -77,7 +90,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       const contexto = new AudioContext({ sampleRate: 24000 });
       const desde = Math.floor(tick / BUFFER_ARENA.tramoTicks) * BUFFER_ARENA.tramoTicks;
       s = { silenciada: false, activacion: 0, activadoTick: tick, entradaPendiente: true, idioma, contexto, clips: new Map(), peticiones: new Map(), desde, cierrePedido: false, cierreFallido: false, cerrando: false, ultimoFin: contexto.currentTime, reservas: [], memoria: [],
-        invitados: new Map(), peticionesInvitado: new Map(), pedidas: new Set(), finUltimaNoticia: null, finUltimoInvitado: null, ultimoInvitado: null };
+        invitados: new Map(), peticionesInvitado: new Map(), pedidas: new Set(), sonadas: new Set(), finUltimaNoticia: null, finUltimoInvitado: null, ultimoInvitado: null };
       sonido.current = s;
       const nuevo = s;
       // Reserva incluida en la aplicación, sin dependencia de red o voces locales.
@@ -88,7 +101,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     s.silenciada = false; s.activacion++; s.activadoTick = tick; s.entradaPendiente = true; s.ultimoFin = s.contexto.currentTime;
     for (const [clave, a] of s.peticiones) if (clave.startsWith("entrada:")) { a.abort(); s.peticiones.delete(clave); }
     for (const [clave, c] of s.clips) if (c.segmento.fragmentos[0]!.tick < tick || clave.startsWith("entrada:")) s.clips.delete(clave);
-    for (const [clave, c] of s.invitados) if (c.segmento.desdeTick < tick) s.invitados.delete(clave);
+    for (const [id, inv] of s.invitados) if (inv.intervencion.tick < tick) terminarInvitado(s, id);
     reanudarAudio(true);
     setVoz(true); setVersion(v => v + 1);
   };
@@ -136,32 +149,43 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       if (hasta - desde < BUFFER_ARENA.tramoTicks && !terminada) break;
       s.desde = hasta; pedir(desde, hasta);
     }
-    // Brief 045: cada intervención publicada se pide una vez por su id del diario, en orden de
-    // tick y antes de que caduque; preparar o descartar no la marca como escuchada.
-    const pedirInvitado = (intervencion: IntervencionArena) => {
-      const a = new AbortController(), clave = intervencion.id, tick = intervencion.tick; s.peticionesInvitado.set(clave, a); s.pedidas.add(clave);
+    // Brief 045: cada intervención publicada se pide por su id del diario, en orden de tick y antes de
+    // que caduque; preparar o descartar no la marca como escuchada. 048 v1.1 (9): primero la breve
+    // (si existe) y la completa solo si la ventana conocida admite su duración estimada.
+    const pedirVariante = (inv: InvitadoLocal, variante: VarianteIntercambio) => {
+      const { id, tick } = inv.intervencion, clave = `${id}|${variante}`, a = new AbortController();
+      s.peticionesInvitado.set(clave, a); inv[variante] = { estado: "pidiendo" };
       const signal = AbortSignal.any([a.signal, AbortSignal.timeout(15_000)]);
       void (async () => {
         try {
           // v3.1: sin memoria; la intervención es la misma para todos los espectadores.
-          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: tick, hastaTick: tick, modo: "buffer", idioma, intervencion: clave }) });
+          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: tick, hastaTick: tick, modo: "buffer", idioma, intervencion: id, variante }) });
           if (!r.ok) throw new Error("Intervención no disponible");
           const segmento = await r.json() as Segmento;
-          if (!segmentoVozValido(segmento, { desde: tick, hasta: tick, idioma, intervencion: { id: clave, tick } })) throw new Error("Intervención inconsistente");
+          if (!segmentoVozValido(segmento, { desde: tick, hasta: tick, idioma, intervencion: { id, tick, variante: varianteEfectiva(inv.intervencion, variante) } })) throw new Error("Intervención inconsistente");
           const audio = await s.contexto.decodeAudioData(Uint8Array.from(atob(segmento.audio!.base64), c => c.charCodeAt(0)).buffer);
           if (g !== generacion.current || signal.aborted) return;
-          // Un clip demasiado largo se descarta sin arrancar: no se recorta audio.
-          if (!Number.isFinite(audio.duration) || audio.duration <= 0 || audio.duration > VOZ_BUFFER.duracionMaxS || audio.numberOfChannels !== 1) return;
-          s.invitados.set(clave, { segmento, audio, consumido: false });
-        } catch { /* El narrador sigue; un invitado ausente no es un fallo de la emisión. */ }
-        finally { s.peticionesInvitado.delete(clave); if (g === generacion.current) setVersion(v => v + 1); }
+          // Un clip demasiado largo queda inválido sin arrancar: no se recorta audio.
+          inv[variante] = audio.numberOfChannels === 1 && estadoPorDuracion(audio.duration).estado === "valida" ? { estado: "valida", clip: { segmento, audio, consumido: false } } : { estado: "invalida" };
+        } catch {
+          // El narrador sigue; un invitado ausente (429 incluido) no es un fallo de la emisión.
+          if (!a.signal.aborted) inv[variante] = { estado: "fallida" };
+        } finally { s.peticionesInvitado.delete(clave); if (g === generacion.current) setVersion(v => v + 1); }
       })();
     };
     for (const intervencion of [...actual.current.intervenciones].sort((a, b) => a.tick - b.tick)) {
       if (s.peticionesInvitado.size >= 1) break;
       if (s.pedidas.has(intervencion.id) || intervencion.tick > hastaTick || intervencion.tick > tickVisible + BUFFER_ARENA.adelantoAudioS * 10) continue;
-      if ((tickVisible - intervencion.tick) / 10 > MESA_ARENA.caducidadInvitadoS) { s.pedidas.add(intervencion.id); continue; }
-      pedirInvitado(intervencion);
+      if ((tickVisible - intervencion.tick) / 10 > MESA_ARENA.caducidadInvitadoS) { terminarInvitado(s, intervencion.id); continue; }
+      let inv = s.invitados.get(intervencion.id);
+      if (!inv) { inv = { intervencion, completa: { estado: "sin-pedir" }, breve: { estado: intervencion.turnosBreve?.length ? "sin-pedir" : "inexistente" } }; s.invitados.set(intervencion.id, inv); }
+      if (inv.breve.estado === "sin-pedir") { pedirVariante(inv, "breve"); break; }
+      if (inv.completa.estado !== "sin-pedir") continue;
+      // v1.2 (6–7): un diario del 045 pide su única variante; un intercambio del 048, solo si el mismo
+      // horizonte de la selección (noticias pendientes incluidas) admite la duración estimada.
+      const ventana = horizonteS(actual.current.registro, Math.max(tickVisible / 10, intervencion.tick * ARENA.pasoS), terminada, s.sonadas, s.activadoTick / 10, tickVisible / 10);
+      const admite = ventana !== null && estimarDuracionS(intervencion.turnos ?? []) <= ventana;
+      if (!intervencion.turnos?.length || admite || inv.breve.estado === "inexistente" && ventana === null) { pedirVariante(inv, "completa"); break; }
     }
     if (terminada && hastaTick > 0 && s.desde >= hastaTick && !s.cierrePedido && s.peticiones.size < VOZ_BUFFER.concurrencia) {
       s.cierrePedido = true;
@@ -190,13 +214,16 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               partidoS: segundo, ahoraAudioS: s.contexto.currentTime,
               fuenteActiva: s.activa ? { rol: s.activa.rol, prioridad: s.activa.prioridad, finS: s.activa.fin } : null,
               finUltimaNoticiaS: s.finUltimaNoticia, finUltimoInvitadoS: s.finUltimoInvitado, ultimoInvitado: s.ultimoInvitado,
-              pausaVigente: !!cursor.pausa && cursor.pausa.hastaTick > cursor.tick,
+              // 048: pausa vigente o balón en las manos del portero.
+              pausaVigente: calmaEnFotograma(cursor),
+              // 048 v1.1 (5): horizonte conservador; una noticia alcanzada y aún pendiente lo anula.
+              ventanaS: horizonteS(datos.registro, segundo, datos.terminada, s.sonadas, s.activadoTick / 10),
               terminada: r.estado === "final", cerrando: s.cerrando,
               // v3.1: la entrada precede a todo invitado: pendiente de pedir, en vuelo o sin consumir.
               aperturaPendiente: s.entradaPendiente || [...s.peticiones.keys()].some(k => k.startsWith("entrada:")) || [...s.clips.entries()].some(([k, c]) => k.startsWith("entrada:") && !c.consumido),
-              candidatas: [...s.invitados.entries()].filter(([, c]) => !c.consumido).map(([id, c]) => ({ id, rol: c.segmento.rol ?? "narrador", tick: c.segmento.desdeTick, duracionS: c.audio.duration })),
+              candidatas: [...s.invitados.values()].filter(inv => !s.pedidas.has(inv.intervencion.id)).map(inv => ({ id: inv.intervencion.id, rol: inv.intervencion.rol, tick: inv.intervencion.tick, origen: inv.intervencion.turnos?.length ? "048" as const : "045" as const, completa: estadoCoordinador(inv.completa), breve: estadoCoordinador(inv.breve) })),
             };
-            for (const id of descartesTurno(entrada)) s.invitados.delete(id);
+            for (const id of descartesTurno(entrada)) terminarInvitado(s, id);
             entrada.candidatas = entrada.candidatas.filter(c => s.invitados.has(c.id));
             const turno = siguienteTurno(entrada);
             const clips = [...s.clips.entries()].sort(([, a], [, b]) => (b.segmento.prioridad ?? 10) - (a.segmento.prioridad ?? 10) || b.segmento.fragmentos[0]!.tick - a.segmento.fragmentos[0]!.tick);
@@ -221,7 +248,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               const fuente = s.contexto.createBufferSource(); fuente.buffer = clip.audio; fuente.connect(s.contexto.destination);
               const activa: Activa = { fuente, fin: plan.fin, prioridad, recuerdo, rol: "narrador" }; s.activa = activa; clip.consumido = true;
               const noticia = prioridad >= VOZ_BUFFER.prioridadInterrupcion;
-              if (noticia) s.finUltimaNoticia = plan.fin;
+              if (noticia) { s.finUltimaNoticia = plan.fin; for (const e of clip.segmento.fuentes) s.sonadas.add(e); }
               if (clip.segmento.cierre) s.cerrando = true;
               fuente.onended = () => {
                 if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect();
@@ -230,7 +257,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               };
               fuente.start(plan.cuando); s.memoria = recordarVoz(s.memoria, recuerdo); setPasaje(clip.segmento); setHablando(true); break;
             }
-            const invitado = turno && !s.activa && !s.cerrando ? s.invitados.get(turno.id) : undefined;
+            const invitado = turno && !s.activa && !s.cerrando ? s.invitados.get(turno.id)?.[turno.variante].clip : undefined;
             if (turno && invitado) {
               const tick = invitado.segmento.desdeTick, rol = invitado.segmento.rol ?? "comentarista";
               // Exención del atraso del narrador (cierre = true solo para el plan), sin activar el cierre.
@@ -240,7 +267,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
                 const recuerdo: RecuerdoVoz = turno.recuerdo;
                 const fuente = s.contexto.createBufferSource(); fuente.buffer = invitado.audio; fuente.connect(s.contexto.destination);
                 const activa: Activa = { fuente, fin: plan.fin, prioridad: MESA_ARENA.prioridadInvitado, recuerdo, rol }; s.activa = activa;
-                invitado.consumido = true; s.invitados.delete(turno.id);
+                // 048: al arrancar una variante se descarta la otra.
+                invitado.consumido = true; terminarInvitado(s, turno.id);
                 s.ultimoInvitado = { rol, tick }; s.finUltimoInvitado = plan.fin;
                 fuente.onended = () => {
                   if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect();
@@ -295,7 +323,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       {terminada && <button className="btn" onClick={alRepeticion}>{t("Open available replay", "Abrir repetición disponible")}</button>}
     </div>
     {voz && <p role="status" data-testid="arena-voice-status">{hablando ? pasaje?.cierre ? t("Closing commentary", "Comentario de cierre") : t("Narration playing", "Narración en reproducción") : pasaje?.cierre ? t("End of narration", "Fin de la narración") : t("Preparing the next passage", "Preparando la siguiente intervención")}</p>}
-    {pasaje && <details data-testid="arena-voice-transcript" data-narration-tick={pasaje.fragmentos[0]?.tick} data-narration-kind={"tipoRelato" in pasaje ? pasaje.tipoRelato : "comentario"} data-narration-role={pasaje.rol ?? "narrador"}><summary>{t("Narration transcript and evidence", "Transcripción y evidencia de la narración")}</summary><p>{pasaje.texto}</p><p className="arena-muted">{pasaje.fuentes.join(" · ")}</p></details>}
+    {pasaje && <details data-testid="arena-voice-transcript" data-narration-tick={pasaje.fragmentos[0]?.tick} data-narration-kind={"tipoRelato" in pasaje ? pasaje.tipoRelato : "comentario"} data-narration-role={pasaje.rol ?? "narrador"} data-narration-variant={pasaje.variante}><summary>{t("Narration transcript and evidence", "Transcripción y evidencia de la narración")}</summary>{pasaje.fragmentos.map((f, k) => <p key={k} data-narration-role={f.rol ?? "narrador"}>{f.texto}</p>)}<p className="arena-muted">{pasaje.fuentes.join(" · ")}</p></details>}
     {voz && error && <p role="alert">{t("A passage was unavailable. Backup commentary covers the wait while narration retries.", "Una intervención no estuvo disponible. Los comentarios de respaldo cubren la espera mientras la narración reintenta.")}</p>}
     {!disponible && <p className="arena-muted">{t("Audio is unavailable on this server. Follow the text description below.", "El audio no está disponible en este servidor. Sigue la descripción de texto abajo.")}</p>}
   </section>;

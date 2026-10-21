@@ -700,11 +700,14 @@ export const MESA_ARENA = {
   comentaristaCadaS: 25, maxComentaristaPorSesion: 6, plazoComentaristaMs: 6000,
   /** Hechos permitidos que recibe el comentarista y oraciones máximas de su salida. */
   hechosComentarista: 8, maxOracionesComentarista: 2,
-  /** Cesión + invitado en un clip; caracteres máximos de cesión + invitado. */
-  fragmentosPorIntervencion: 2, maxCaracteresIntervencion: 280,
+  /** Caracteres máximos del texto hablado de una variante (todos sus turnos).
+   * [048] antes 280: 280 caracteres a 9,5 c/s duran ≈ 29 s > VOZ_BUFFER.duracionMaxS (24 s) y el
+   * consumidor descartaba el clip. 210 / 9,5 ≈ 22 s.
+   * [048] se elimina fragmentosPorIntervencion: el máximo de fragmentos es dialogo.maxTurnos. */
+  maxCaracteresIntervencion: 210,
   /** v3.1 · Caracteres por oración del comentarista (maxLength del esquema + rechazo V1) y por
-   * dato del estadista (prueba sobre fixtures y semillas). 200 + la cesión más larga cabe en 280,
-   * así que el recorte a una oración o un dato siempre cabe. */
+   * dato del estadista (prueba sobre fixtures y semillas). [048] ≤ maxCaracteresIntervencion: el
+   * último escalón de la escalera (un solo turno con la oración o el dato) siempre cabe. */
   maxCaracteresOracion: 200,
   /** v3.1 · Llamadas a `completar` por sesión, narrador + comentarista, reintentos y plazos
    * agotados incluidos (`conPresupuesto` en src/lib/llm.ts). Cubre 3 comentarios + 6
@@ -737,5 +740,83 @@ export const MESA_ARENA = {
     en: ["{jugador} ({equipo}) features in the latest key action, from {distancia} metres.",
          "The most recent play carries the mark of {jugador}, of {equipo}.",
          "{equipo} shows up in the latest relevant action, through {jugador}."],
+  },
+  /** Brief 048 · Diálogo entre voces (v1.1: formas pregunta, ronda, estadista y final; sin la
+   * forma `dato`, sin conectores y sin los marcos causales `secuencia` y `centro`). */
+  dialogo: {
+    /** Turnos por intervención (un fragmento de voz y un <voice> por turno). */
+    maxTurnos: 4,
+    /** Caracteres por segundo de voz: el mínimo medido en los cuatro mp3 públicos del 045
+     * (9,5–10,3 c/s, cesión y cambio de voz incluidos). Solo sirve para estimar y para el informe. */
+    caracteresPorSegundoVoz: 9.5,
+    /** v1.1 (8) · Segundos que la estimación suma por cada turno más allá del primero (cambio de
+     * <voice> y pausa entre frases). NO medido: lo fija la implementación para que cuatro turnos
+     * con maxCaracteresIntervencion quepan en VOZ_BUFFER.duracionMaxS (210 / 9,5 + 3 · 0,4 ≈ 23,3 s);
+     * se recalibra con el smoke junto a caracteresPorSegundoVoz. */
+    pausaTurnoS: 0.4,
+    /** v1.3 (1) · Bolsa propia de Speech de los invitados (solicitudes y caracteres de SSML), aparte
+     * del presupuesto del narrador (PRESUPUESTO_AUDIO_ENCUENTRO, el anterior al 048): se suma al total
+     * y nunca se presta en ningún sentido, así que un invitado no puede causar un 429 del narrador.
+     * Del orden de la cuota calibrada en la v1.2 (0,2 × 80 / 24.000). Coste máximo añadido por
+     * encuentro: esta bolsa. Medición del narrador sin invitados (8 semillas, apertura + tramos +
+     * cierre): 60 s ES+EN ≤ 28 solicitudes y 9.411 caracteres; 120 s ≤ 52 y 17.636; 180 s ≤ 76 y
+     * 26.058, que ya supera su presupuesto (límite anterior al 048, v1.3 (2)). */
+    bolsaSpeechInvitados: { solicitudes: 16, caracteres: 4800 },
+    /** v1.2 (2) · Reserva propia del cierre del narrador, dentro de su presupuesto, que ningún otro
+     * tramo puede usar: dos cierres (ES y EN) de ≤ 335 caracteres de SSML medidos, con margen. */
+    reservaSpeechCierreCaracteres: 800,
+    reservaSpeechCierreSolicitudes: 2,
+    /** Plantillas recientes por función que no se repiten si hay alternativa. */
+    memoriaPlantillas: 2,
+    /** Temas del dato de mesa por disparo del comentarista, en orden de preferencia. */
+    temasPorDisparador: {
+      gol: ["marcador", "remates"], atajada: ["atajadas", "remates"], tiro_fuera: ["remates"],
+      amarilla: ["faltas"], roja: ["faltas"], final_anticipado: ["marcador"], tiempo: ["remates", "acciones", "pases"],
+    },
+    acciones: {
+      es: { gol: "el gol de {jugador}", atajada: "la atajada de {jugador}", tiro_fuera: "el remate de {jugador}", amarilla: "la amarilla a {jugador}", roja: "la roja a {jugador}" },
+      en: { gol: "{jugador}'s goal", atajada: "{jugador}'s save", tiro_fuera: "{jugador}'s shot", amarilla: "the booking for {jugador}", roja: "the red card for {jugador}" },
+    },
+    /** v1.1 (3) · Marcos neutrales: nombran la acción del disparador y piden la lectura del
+     * invitado, sin presuponer causas. */
+    marcos: {
+      es: {
+        repaso: ["{nombre}, repasemos {accion}.", "{nombre}, vamos con {accion}.", "Sobre {accion}, {nombre}, ¿qué tenemos?"],
+        estadista: {
+          marcador: ["{nombre}, ¿cómo está el marcador?", "El marcador, {nombre}."],
+          remates: ["{nombre}, ¿cómo van los remates?", "{nombre}, los remates."],
+          atajadas: ["{nombre}, ¿cuántas atajadas llevamos?", "Las atajadas, {nombre}."],
+          faltas: ["{nombre}, ¿cómo van las faltas?", "{nombre}, la disciplina."],
+          cambios: ["{nombre}, ¿cómo van los cambios?", "Los cambios, {nombre}."],
+          acciones: ["{nombre}, ¿cómo se reparten las acciones?", "{nombre}, el reparto de acciones."],
+          reinicios: ["{nombre}, ¿cómo van los reinicios?", "Los reinicios, {nombre}."],
+          pases: ["{nombre}, ¿cómo están los pases?", "{nombre}, la distancia de pase."],
+        },
+        final: ["{nombre}, los números del partido.", "{nombre}, cerramos con los datos.", "Para cerrar, {nombre}, los números."],
+      },
+      en: {
+        repaso: ["{nombre}, let's go over {accion}.", "{nombre}, take us through {accion}.", "{nombre}, what do we have on {accion}?"],
+        estadista: {
+          marcador: ["{nombre}, where does the score stand?", "The score, {nombre}."],
+          remates: ["{nombre}, how are the shots looking?", "{nombre}, the shots."],
+          atajadas: ["{nombre}, how many saves so far?", "The saves, {nombre}."],
+          faltas: ["{nombre}, how are the fouls looking?", "{nombre}, discipline."],
+          cambios: ["{nombre}, where are the substitutions?", "The substitutions, {nombre}."],
+          acciones: ["{nombre}, how is the share of actions?", "{nombre}, the share of actions."],
+          reinicios: ["{nombre}, how are the restarts?", "The restarts, {nombre}."],
+          pases: ["{nombre}, how are the passes?", "{nombre}, the pass distance."],
+        },
+        final: ["{nombre}, the match numbers.", "{nombre}, let's close with the data.", "To close, {nombre}, the numbers."],
+      },
+    },
+    cierres: {
+      es: ["Gracias, {nombre}.", "Anotado, {nombre}.", "Muy bien, {nombre}. Seguimos."],
+      en: ["Thanks, {nombre}.", "Noted, {nombre}.", "Good, {nombre}. Back to the play."],
+    },
+    /** v1.2 (4) · Cierres propios de la forma `final`: tras el pitazo nunca «seguimos». */
+    cierresFinal: {
+      es: ["Gracias, {nombre}, por los números del partido.", "Así quedan los números, {nombre}. Gracias.", "Gracias, {nombre}. Hasta aquí los datos."],
+      en: ["Thanks, {nombre}, for the match numbers.", "Those are the numbers, {nombre}. Thanks.", "Thanks, {nombre}. That is all the data."],
+    },
   },
 } as const;

@@ -815,3 +815,71 @@ La forma `dato` queda fuera: es rara (V3) y es la que más estado concurrente a�
     se prueba sobre la ventana de memoria con las listas agotadas. Se mantiene C12a.
 13. **Cifras y procedimiento.** El procedimiento de medición de ventanas se versiona en `src/arena/` con sus
     umbrales derivados de constantes; las cifras históricas del brief quedan como medidas, no como reglas.
+
+## Versión 1.2 (21 de octubre): correcciones tras Codex y la auditoría de la implementación
+
+Fuentes: [Codex](../evidencia/dialogo-048/codex-implementacion-1.md), [auditoría](../evidencia/dialogo-048/auditoria-implementacion-1.md)
+y una prueba con el comentarista real de Azure ([evidencia](../evidencia/dialogo-048/dialogo-azure-real-v1.json)). Prevalece
+sobre lo anterior.
+
+1. **Pertinencia de la pregunta.** El marco `repaso` solo se usa si el evento disparador está en el contexto del
+   comentarista y la primera oración publicada lo cita como hecho principal. `principalEsperado` es exactamente el
+   disparador, sin caer al último hecho. En otro caso, marco genérico (cesión sin nombrar la acción). Prueba: un
+   disparo por amarilla o roja produce marco genérico; mutación que restaure la caída al último hecho → rojo.
+2. **Presupuesto de Speech por cuotas.** Los invitados no pueden consumir más de `cuotaSpeechInvitados` (constante
+   nueva, fracción del presupuesto del encuentro en SSML y solicitudes). El cierre tiene una reserva propia
+   (`reservaSpeechCierre*`) que ningún otro tramo puede usar. Los valores se calibran midiendo el consumo del narrador
+   sin invitados en 180 s ES+EN. Prueba con peticiones intercaladas en orden temporal (apertura, tramos, invitados,
+   tramos, cierre) en 60, 120 y 180 s, ES+EN, con ambas variantes: ningún tramo del narrador ni cierre recibe 429
+   por culpa de los invitados.
+3. **Publicación serializada.** `MesaSesion` serializa composición, registro del dato, publicación y confirmación de
+   memoria en una sola cola, así que no se intercalan dos intercambios. El deshacer del dato solo restaura si el
+   estado del tema sigue siendo el que registró (comparar y restaurar). Pruebas: publicación retenida con otro
+   intercambio y una emisión periódica concurrentes.
+4. **Forma `final`.** Siempre se publica. Si el estadista periódico ya habló en el tick final, el resumen final
+   puede repetir marcador y remates. Sus cierres son propios del final y nunca dicen «seguimos» ni equivalentes.
+5. **Ronda recortada.** Si la escalera retira el turno del estadista, la intercambio conserva el cierre del
+   narrador cuando cabe.
+6. **Origen de la candidatura.** `CandidataTurno` distingue `origen: "045" | "048"`. La excepción del 045 (arrancar
+   sin consultar la ventana) solo vale para diarios del 045; un intercambio 048 colapsado sigue la regla de la v1.1 (1).
+7. **Petición de la completa.** Usa el mismo horizonte que la selección, noticias pendientes incluidas.
+8. **D3.** Rechaza cualquier conector con motivo D3; la prueba exige ese motivo.
+9. **Pruebas nuevas por mutantes supervivientes.** A02 (procedencia de `refiere`), A03 (`refiere` posterior al
+   tick), A05 (cesión seguida del turno de su destinatario), B13 (una candidata pendiente no desplaza a una
+   válida), D04 (fragmentos con `fuentes`), E04 (la Mesa muestra el texto del hecho referido), F02 (lista blanca de
+   marcos permitidos en vez de lista negra), y en e2e G01 (no pedir la completa fuera de ventana), G03 (ventana con
+   noticia pendiente) y G04 (descartar la otra variante al arrancar).
+10. **Límites honestos añadidos.** La variante que suena insinúa si viene una noticia en unos 20 s. V1–V8 no
+    impiden que el comentarista repita cifras de un dato en apoyo ni afirman causalidad: la pertinencia la acota el
+    punto 1, no el verificador. El margen de duración de un intercambio de cuatro turnos es de ~1 s a 9,5 c/s.
+
+## Versión 1.3 (21 de octubre): cierre de la tercera iteración
+
+La segunda revisión de Codex ([evidencia](../evidencia/dialogo-048/codex-implementacion-2.md)) dejó dos hallazgos
+mayores. Es la última iteración permitida; estas decisiones los resuelven por construcción y prevalecen.
+
+1. **Bolsa propia de Speech para los invitados.** El presupuesto de audio del encuentro del narrador vuelve a ser
+   el anterior al 048 (`PRESUPUESTO_AUDIO_ENCUENTRO`, con la reserva del cierre de la v1.2 dentro de él). Los
+   invitados consumen **solo** de una bolsa aparte, `bolsaSpeechInvitados` (solicitudes y caracteres de SSML,
+   constante nueva, del orden de la cuota calibrada en la v1.2), que se suma al total y nunca se presta al
+   narrador ni al revés. Así un invitado no puede causar un 429 del narrador. Coste: como máximo esa bolsa de más
+   por encuentro, declarado en límites. Prueba con peticiones intercaladas en 60, 120 y 180 s, ES y ES+EN, con
+   ambas variantes: los rechazos del narrador son **idénticos** con y sin invitados en cada recorrido, comprobados
+   por separado (sin `??` entre recorridos), y los cierres son 200 en todos los recorridos donde lo eran sin
+   invitados. Mutación: invitados que cobran de la bolsa del narrador → rojo.
+2. **Límite aceptado a 180 s ES+EN.** Que el narrador solo supere su presupuesto a 180 s bilingüe es anterior al
+   048 y no lo agravan los invitados (punto 1). Queda como límite declarado y deuda en la bitácora; ampliar el
+   presupuesto es una decisión de coste de Carlos.
+3. **Estadista dentro de la cola.** La evaluación periódica del estadista (`evaluar`, incluidos el final y los
+   disparos por cambio) entra en la misma cola serializada de `MesaSesion` que los intercambios, así que no hay
+   escrituras del estado del estadista fuera de la cola. El deshacer usa una revisión por tema (contador que
+   incrementa cada escritura) y solo restaura si la revisión sigue siendo la suya. Prueba: el caso reproducido
+   por Codex (ronda en el tick 367 con `marcador` retenida, evaluación por cambio en el mismo tick, fallo de la
+   ronda) termina con `marcador` pendiente, `cambios` y `remates` publicados y `ultimaCandidaturaTick` = 367.
+   Mutación: evaluación fuera de la cola o deshacer sin revisión → rojo.
+
+**Nota de cierre de la v1.3 (punto 3).** Con la evaluación dentro de la cola, la evaluación por cambio espera a
+que la ronda retenida falle y se deshaga, así que publica `cambios` y `marcador` (de nuevo pendiente) con el
+temporizador en 367: no se pierde ningún dato y no hay escrituras fuera de la cola. Ese es el resultado normativo
+para `MesaSesion`; la secuencia literal de Codex se comprueba sobre `DisparadorEstadista`, donde la revisión por
+tema produce el resultado descrito en el punto 3.

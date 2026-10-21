@@ -34,6 +34,25 @@ interface Opciones {
 }
 const intervencionesDe = (mensajes: readonly MensajeSesion[]): IntervencionArena[] => mensajes.flatMap(m => m.publicacion.tipo === "intervencion" ? [m.publicacion.intervencion] : []);
 const duracionRetencionMs = 24 * 60 * 60 * 1000;
+/** Presupuesto de voz por encuentro (solicitudes de audio y caracteres de SSML reservados). */
+export const PRESUPUESTO_AUDIO_ENCUENTRO = { solicitudes: 80, caracteres: 24_000 } as const;
+/** Brief 048: clase de la síntesis de voz. v1.3 (1): el narrador (tramos y cierre) consume solo de
+ * PRESUPUESTO_AUDIO_ENCUENTRO, con la reserva del cierre (v1.2) dentro; los invitados, solo de su
+ * bolsa propia `bolsaSpeechInvitados`. Ninguna de las dos se presta a la otra. */
+export type ClaseVoz = "narrador" | "cierre" | "invitado";
+/** Rechazo de presupuesto de voz para una nueva síntesis (null si cabe). Pura. */
+export function rechazoCuotaVoz(reservas: readonly { tipo: string; caracteres?: number; clase?: ClaseVoz }[], caracteres: number, clase: ClaseVoz): string | null {
+  const audio = reservas.filter(x => x.tipo === "audio"), suma = (xs: typeof audio) => xs.reduce((s, x) => s + (x.caracteres ?? 0), 0);
+  const P = PRESUPUESTO_AUDIO_ENCUENTRO, D = MESA_ARENA.dialogo;
+  if (clase === "invitado") {
+    const invitados = audio.filter(x => x.clase === "invitado"), B = D.bolsaSpeechInvitados;
+    return invitados.length + 1 > B.solicitudes || suma(invitados) + caracteres > B.caracteres ? "Bolsa de voz de los invitados agotada" : null;
+  }
+  const narrador = audio.filter(x => x.clase !== "invitado");
+  if (narrador.length + 1 > P.solicitudes || suma(narrador) + caracteres > P.caracteres) return "Se alcanzó el límite de consultas de este encuentro";
+  if (clase !== "cierre" && (narrador.length + 1 > P.solicitudes - D.reservaSpeechCierreSolicitudes || suma(narrador) + caracteres > P.caracteres - D.reservaSpeechCierreCaracteres)) return "Presupuesto de voz reservado para el cierre";
+  return null;
+}
 const identificadorValido = (id: string) => /^[a-f0-9-]{36}$/.test(id);
 
 /** Coordinador de una réplica. El diario permite reconectar, sin volver a inferir. */
@@ -275,29 +294,29 @@ export class GestorSesiones {
     return { ...prefijo, rondas: prefijo.rondas.filter(r => r.inicioTick <= prefijo.final.tick) };
   }
   /** Reserva durable ANTES del servicio; un proceso interrumpido no repite el gasto. */
-  async extra<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres = 0): Promise<T> {
+  async extra<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres = 0, clase?: ClaseVoz): Promise<T> {
     if (tipo !== "audio") return this.extraIndividual(id, tipo, clave, tarea, caracteres);
     const solicitud = JSON.stringify([id, tipo, clave]);
     const pendiente = this.consultasEnCurso.get(solicitud);
     if (pendiente) return pendiente as Promise<T>;
-    const trabajo = this.extraIndividual(id, tipo, clave, tarea, caracteres);
+    const trabajo = this.extraIndividual(id, tipo, clave, tarea, caracteres, clase);
     this.consultasEnCurso.set(solicitud, trabajo);
     try { return await trabajo; }
     finally { this.consultasEnCurso.delete(solicitud); }
   }
-  private async extraIndividual<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres = 0): Promise<T> {
+  private async extraIndividual<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres = 0, clase?: ClaseVoz): Promise<T> {
     if ([...this.extrasActivos.values()].reduce((s, n) => s + n, 0) >= 2) throw new ErrorSesion("Hay otras consultas en curso; espera a que terminen", 429);
     this.archivo(id, "meta.json");
     this.extrasActivos.set(id, (this.extrasActivos.get(id) ?? 0) + 1);
-    try { await this.obtener(id); return await this.ejecutarExtra(id, tipo, clave, tarea, caracteres); }
+    try { await this.obtener(id); return await this.ejecutarExtra(id, tipo, clave, tarea, caracteres, clase); }
     finally {
       const n = (this.extrasActivos.get(id) ?? 1) - 1; if (n) this.extrasActivos.set(id, n); else this.extrasActivos.delete(id);
       await this.liberarSiInactivo();
     }
   }
-  private async ejecutarExtra<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres: number): Promise<T> {
+  private async ejecutarExtra<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres: number, clase?: ClaseVoz): Promise<T> {
     await this.obtener(id);
-    type Reservas = Record<string, { tipo: string; estado: "pendiente" | "completa" | "error"; archivo?: string; resultado?: T; caracteres?: number }>;
+    type Reservas = Record<string, { tipo: string; estado: "pendiente" | "completa" | "error"; archivo?: string; resultado?: T; caracteres?: number; clase?: ClaseVoz }>;
     const nombre = this.archivo(id, "extras.json");
     const cache = this.archivo(id, `${tipo}-${createHash("sha256").update(clave).digest("hex")}.json`);
     const exclusiva = async <R>(fn: (r: Reservas, a: AlmacenArena) => Promise<R>): Promise<R> => {
@@ -317,22 +336,27 @@ export class GestorSesiones {
       // La voz expresiva reserva también el SSML; el texto hablado conserva
       // su límite de 6.000 y la reserva nunca supera el total por sesión.
       if (!Number.isInteger(caracteres) || caracteres < 0 || caracteres > 24_000) throw new ErrorSesion("Presupuesto de voz inválido", 400);
-      if (Object.values(r).filter(x => x.tipo === tipo).length >= (tipo === "analisis" ? 2 : 80) || Object.values(r).reduce((s, x) => s + (x.caracteres ?? 0), 0) + caracteres > 24_000) throw new ErrorSesion("Se alcanzó el límite de consultas de este encuentro", 429);
+      const usadas = Object.values(r).filter(x => x.tipo === tipo).length, reservados = Object.values(r).reduce((s, x) => s + (x.caracteres ?? 0), 0);
+      // El audio se presupuesta por clase en rechazoCuotaVoz (048 v1.3: narrador e invitados por separado).
+      if (tipo === "analisis" && (usadas >= 2 || reservados + caracteres > PRESUPUESTO_AUDIO_ENCUENTRO.caracteres)) throw new ErrorSesion("Se alcanzó el límite de consultas de este encuentro", 429);
+      // Brief 048 v1.3 (1): bolsa propia de los invitados y reserva del cierre, presupuestadas con el SSML.
+      const cuota = tipo === "audio" ? rechazoCuotaVoz(Object.values(r), caracteres, clase ?? "narrador") : null;
+      if (cuota) throw new ErrorSesion(cuota, 429);
       const diario = `servicios-${new Date().toISOString().slice(0, 10)}.json`;
       let total: Record<string, number>;
       try { total = JSON.parse(await a.leer(diario)); }
       catch (error) { if ((error as { code?: string }).code === "ENOENT" || (error as { statusCode?: number }).statusCode === 404) total = {}; else throw error; }
       if ((total[tipo] ?? 0) >= (tipo === "analisis" ? 20 : 800) || (total.caracteres ?? 0) + caracteres > 120_000) throw new ErrorSesion("Presupuesto diario de este servicio agotado", 429);
       total[tipo] = (total[tipo] ?? 0) + 1; total.caracteres = (total.caracteres ?? 0) + caracteres; await a.escribir(diario, JSON.stringify(total));
-      r[clave] = { tipo, estado: "pendiente", caracteres }; await a.escribir(nombre, JSON.stringify(r)); return null;
+      r[clave] = { tipo, estado: "pendiente", caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); return null;
     });
     if (existente) return existente.valor;
     try {
       const valor = await tarea();
-      await exclusiva(async (r, a) => { await a.escribir(cache, JSON.stringify(valor), true); r[clave] = { tipo, estado: "completa", archivo: cache, caracteres }; await a.escribir(nombre, JSON.stringify(r)); });
+      await exclusiva(async (r, a) => { await a.escribir(cache, JSON.stringify(valor), true); r[clave] = { tipo, estado: "completa", archivo: cache, caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); });
       return valor;
     } catch (error) {
-      await exclusiva(async (r, a) => { r[clave] = { tipo, estado: "error", caracteres }; await a.escribir(nombre, JSON.stringify(r)); }).catch(() => {});
+      await exclusiva(async (r, a) => { r[clave] = { tipo, estado: "error", caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); }).catch(() => {});
       throw error;
     }
   }

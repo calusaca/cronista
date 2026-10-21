@@ -18,17 +18,22 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const p = z.strictObject({ desdeTick: z.number().int().nonnegative().max(1800), hastaTick: z.number().int().positive().max(1800), idioma: z.enum(["es", "en"]), modo: z.enum(["vivo", "completo", "buffer"]), cierre: z.boolean().optional(), entradaTick: z.number().int().nonnegative().max(1800).optional(),
       // Brief 045: identificador del diario; la intervención se lee, nunca se regenera.
       intervencion: z.string().min(1).max(120).optional(),
+      // Brief 048: variante del intercambio (solo con `intervencion`); por defecto, la completa.
+      variante: z.enum(["completa", "breve"]).optional(),
       memoria: memoria.optional() }).parse(cuerpo);
     const { id } = await ctx.params, gestor = gestorSesiones();
+    if (p.variante !== undefined && p.intervencion === undefined) throw new ErrorSesion("La variante solo se admite con una intervención", 400);
     if (p.intervencion !== undefined) {
       const intervencion = await gestor.intervencionPublicada(id, p.intervencion);
       if (p.modo !== "buffer" || p.cierre || p.entradaTick !== undefined || p.desdeTick !== intervencion.tick || p.hastaTick !== intervencion.tick) throw new ErrorSesion("Ventana de intervención inválida", 400);
       const registro = await gestor.vistaPublicada(id, intervencion.tick);
       // v3.1: la memoria del espectador no influye en la intervención; si llega, se ignora.
-      const relato = relatoIntervencion(intervencion, registro.config.partido.seed, p.idioma);
+      // 048 v1.1 (6): los turnos se sirven tal cual están materializados en el diario; nunca se recomponen.
+      const relato = relatoIntervencion(intervencion, registro.config.partido.seed, p.idioma, p.variante ?? "completa");
       // Voz efectiva por rol, con la degradación del catálogo que publica /herramientas.
       const preparada = prepararVoz(relato.fragmentos, p.idioma, vocesDe(asignarVoces(p.idioma, await catalogoVoces())));
-      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados);
+      // 048 v1.2 (2): la síntesis de un invitado respeta la cuota de invitados y la reserva del cierre (si no, 429).
+      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados, "invitado");
       return Response.json({ ...relato, audio }, { headers: { "cache-control": "private, max-age=86400" } });
     }
     const registro = await gestor.vistaPublicada(id, p.hastaTick);
@@ -37,7 +42,8 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const preparada = prepararVoz(relato.fragmentos, p.idioma);
     // Una síntesis compartida ya reservada termina y queda en caché aunque
     // se desconecte un espectador. El proveedor mantiene su timeout de 15 s.
-    const audio = await gestor.extra(id, "audio", claveAudio(preparada, p.hastaTick), () => sintetizarVoz(preparada, p.hastaTick), preparada.caracteresPresupuestados);
+    // 048 v1.2 (2): solo el cierre puede usar la reserva propia del cierre.
+    const audio = await gestor.extra(id, "audio", claveAudio(preparada, p.hastaTick), () => sintetizarVoz(preparada, p.hastaTick), preparada.caracteresPresupuestados, p.cierre ? "cierre" : "narrador");
     return Response.json({ ...relato, audio }, { headers: { "cache-control": "private, max-age=86400" } });
   } catch (error) { return respuestaErrorSesion(error); }
 }
