@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-21T14:21:52.105Z",
+  "checkedUtc": "2026-10-21T17:38:10.610Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261021141908",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261021173526",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -216,8 +216,8 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 71918,
-      "sha256": "a82541720b5696501e8285cccc5ea24405b223353a43fcb05852261bd5c00279"
+      "bytes": 95019,
+      "sha256": "410cebffa0bb287496385e66a4ec16290fa3df3316bdb0d8a21336c88b1bdf3e"
     },
     {
       "path": "src/app/layout.tsx",
@@ -260,14 +260,24 @@
       "sha256": "d47c682a0a19e0a46bce2892b4e2513bcdeae629e9ddd42fcce4d120fc37ddf4"
     },
     {
+      "path": "src/arena/__fixtures__/arena-reinicios-v4.json",
+      "bytes": 1957138,
+      "sha256": "b94b4061ec1cf0eb17d32484b1a8281d38e0edb458a5b05856fd112f15a99e66"
+    },
+    {
       "path": "src/arena/__fixtures__/arena-v2.json",
       "bytes": 125760,
       "sha256": "f61f8056d9543b4a13a2772eb0aa99e931d3a12e7a10e1c16f78a85aac5a61d1"
     },
     {
       "path": "src/arena/__fixtures__/generar-reinicios-v3.ts",
-      "bytes": 3851,
-      "sha256": "420cb34095e5e98a3dd63fad557690244e900b803062d82a87eb60f8b6bd60f0"
+      "bytes": 3875,
+      "sha256": "050e9ab79c538ed8ca18fb6ce5f84e4bdb9f0a337124a143d6a371db2171c3f4"
+    },
+    {
+      "path": "src/arena/__fixtures__/generar-reinicios-v4.ts",
+      "bytes": 3969,
+      "sha256": "fb8ac5992b77294f7ea6f932d650987ec94af6dd80c7c0671b267ffaaac2bb5f"
     },
     {
       "path": "src/arena/__tests__/arena.test.ts",
@@ -286,8 +296,8 @@
     },
     {
       "path": "src/arena/__tests__/correcciones044.test.ts",
-      "bytes": 23747,
-      "sha256": "1836791093eca486eb68c0673afdbc790d19f6f47d0302429d372fce243fa259"
+      "bytes": 23783,
+      "sha256": "1fcf667357b20528cd395b63faa60d50b027ba0bdefea11a93b8f79aa9a2fc04"
     },
     {
       "path": "src/arena/__tests__/directo.test.ts",
@@ -330,6 +340,21 @@
       "sha256": "4d593f313f011ffb49082452f7f7727cff808982aa76c5c75068ba92f3b8f2ff"
     },
     {
+      "path": "src/arena/__tests__/metricas-lote.test.ts",
+      "bytes": 8408,
+      "sha256": "67cd90fa93663f5efdeb9204ebab71d47dc796fc16843ce96f07493d5364e446"
+    },
+    {
+      "path": "src/arena/__tests__/motor046.stats.test.ts",
+      "bytes": 2084,
+      "sha256": "8085661531ca87ee6ab07eec04ccd3df243f7097ce19e8c72e85184d88d8585c"
+    },
+    {
+      "path": "src/arena/__tests__/motor046.test.ts",
+      "bytes": 72161,
+      "sha256": "915b8767dd899d0865573d3f68e3669521f17a982f10e190651b8a63a58df3bd"
+    },
+    {
       "path": "src/arena/__tests__/narrador.test.ts",
       "bytes": 3280,
       "sha256": "18ff6e86d73c590349f9ead082f8e03f59cc29f2a1e154b43fefdf51c7a72d15"
@@ -347,7 +372,7 @@
     {
       "path": "src/arena/__tests__/reinicios.test.ts",
       "bytes": 9098,
-      "sha256": "6fdb7354430077e2e3744ef417d906e0870b8ee6ed14bc794a37fc3bfdbbc39c"
+      "sha256": "a3af8b44ebc35e143dda069685f5a3b3e3ad759f23892e4ec0f8ba2a49a8efd1"
     },
     {
       "path": "src/arena/__tests__/reproduccion-preparada.test.ts",
@@ -395,6 +420,11 @@
       "sha256": "1b372d876f0677b0542ee977e994a185a8a5d744350a230d4e30848de2998c84"
     },
     {
+      "path": "src/arena/ataque.ts",
+      "bytes": 6876,
+      "sha256": "a75a4fb8fe5fef740017276307238cca7949b24872c2ff6a555200ba78168c8f"
+    },
+    {
       "path": "src/arena/buffer.ts",
       "bytes": 4208,
       "sha256": "ff0eb2fc419750a186fa5727d96eec36bf12383f467c4c58b86f9f17b966710c"
@@ -416,8 +446,8 @@
     },
     {
       "path": "src/arena/controladores.ts",
-      "bytes": 17069,
-      "sha256": "76881559b7dfeccc3bec5241356269f48cc9a9761d62a93ea2e378291dcd9957"
+      "bytes": 19218,
+      "sha256": "47eec096f490daf331d33e0689b320d283b02b5ca97d3ec1807a342994966444"
     },
     {
       "path": "src/arena/coordinador.ts",
@@ -495,14 +525,24 @@
       "sha256": "f1d5000bc6da3ab336b856e13f59242179fba264a66ef4b4e6219134cbd7445d"
     },
     {
+      "path": "src/arena/metricas-lote-cli.ts",
+      "bytes": 1801,
+      "sha256": "fce2a12a4db51f1c6b61cf1982b0c705ab41725544f6c823e4a187ddab7586a9"
+    },
+    {
+      "path": "src/arena/metricas-lote.ts",
+      "bytes": 19116,
+      "sha256": "b410d66fd624e613119a36851d7aa1fc4b8f72f747af3e8aac7c12f19e374942"
+    },
+    {
       "path": "src/arena/modelos.ts",
       "bytes": 4092,
       "sha256": "27e98eed6e9c327ad57881fe0e61754b5d2e5843d055f6a5675df5cf8cb00c78"
     },
     {
       "path": "src/arena/motor.ts",
-      "bytes": 44722,
-      "sha256": "f358bc28806ab3a13574644f55a053c6b6c65b00763b867f302d90434d236067"
+      "bytes": 54803,
+      "sha256": "81a125ce7fbe092a45e677dd0c02e24f72ed51e775d09527abfa8f8d41bc8e99"
     },
     {
       "path": "src/arena/narrador.ts",
@@ -525,6 +565,11 @@
       "sha256": "64e0a5c4efe7ba18aa65a5da7aed6f3b4dfd7e503b97b5a05416069b58c80e6a"
     },
     {
+      "path": "src/arena/portero.ts",
+      "bytes": 7089,
+      "sha256": "b97e4ce855bf72485fc7c5ecb3dc676f35385dff68d12347d41f59a8f6a1cf34"
+    },
+    {
       "path": "src/arena/protocolo.ts",
       "bytes": 3845,
       "sha256": "0b1759ac5bc078ce637e6bbfb7c7abc01ad0a564e9ab8569df3ad8dc2c834dff"
@@ -536,8 +581,8 @@
     },
     {
       "path": "src/arena/relato.ts",
-      "bytes": 15582,
-      "sha256": "383edb49fba092d906639347f8fd72ed2b1286542f1446c0d0ba3753e866df0c"
+      "bytes": 15895,
+      "sha256": "fbae64867ecbc0de456a6af079c5e4fd547d9a64a912818bd376b8679cd978e5"
     },
     {
       "path": "src/arena/sesiones.ts",
@@ -546,8 +591,8 @@
     },
     {
       "path": "src/arena/tipos.ts",
-      "bytes": 9446,
-      "sha256": "2cdf16be765fa7e33d9ea1355145daa525927204ce1561c3a075a430a3190c8b"
+      "bytes": 10055,
+      "sha256": "fe0379c23bcf3ecf87d32c13c172c761abeaa293088cf2138c5e5202450733ec"
     },
     {
       "path": "src/arena/turnos.ts",
@@ -556,8 +601,8 @@
     },
     {
       "path": "src/arena/vista.ts",
-      "bytes": 6966,
-      "sha256": "294b2b089222af84f039006aa2ad4f8c5656c9e6f617fbaa914eeb5a7a6bdf16"
+      "bytes": 7644,
+      "sha256": "21316b3702ff2323ae686f75736fa948537a15e4c39876af9b2236a62a688b8c"
     },
     {
       "path": "src/arena/voz-muestras-cli.ts",
@@ -1061,8 +1106,8 @@
     },
     {
       "path": "src/sim/limites.ts",
-      "bytes": 35214,
-      "sha256": "47c46397b255245a3bcdf0584f0bcf30794d3435bab0eb223f3a80527ca595a2"
+      "bytes": 42095,
+      "sha256": "ae8bd1e0f92b4a3bc75d7bba42fb58156fcc68740bec8ca1726c3d3ddc5fc4c2"
     },
     {
       "path": "src/sim/micro.ts",
@@ -1111,8 +1156,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 37506,
-      "sha256": "17a2d41852cbb2ee2410ea5cf4704aa72b9108e587cf1cfcdcb13f9a4353da2f"
+      "bytes": 38747,
+      "sha256": "9097c788f7b38fc65049c2233b4c82982a8e2a33b9d0f6e4e5a8f7a088443cce"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -1126,8 +1171,8 @@
     },
     {
       "path": "src/ui/ArenaDescripcion.tsx",
-      "bytes": 3138,
-      "sha256": "0c814f04a28015702fa55b4467e03f74452ecd426919e7ce2533e6755974dc52"
+      "bytes": 3627,
+      "sha256": "1efd1c2fc3e0807f50dedf54a42082bdbbc649e6cbb7044def0692d9ec23a20d"
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
@@ -1141,13 +1186,13 @@
     },
     {
       "path": "src/ui/ArenaInteligencia.tsx",
-      "bytes": 4267,
-      "sha256": "b5b43e73bef5e1a1a914846f6a4d145e54228c6f9cb2583ae99bb03bb8b1bfea"
+      "bytes": 4291,
+      "sha256": "bc4b3f1a3eb371bf9d590c467c0ee15005aae3911f420c7fcfd3ee2378bc3d67"
     },
     {
       "path": "src/ui/ArenaMesa.tsx",
-      "bytes": 5483,
-      "sha256": "f96f0fd0aa49a8ac17004ae7afff785869c08b171a5a21be264ce9f0970090cd"
+      "bytes": 5835,
+      "sha256": "38f6728d37746c2d0062343ede4a6058475e169bb7d0f57aece2e809af1debf9"
     },
     {
       "path": "src/ui/ArenaNarracion.tsx",

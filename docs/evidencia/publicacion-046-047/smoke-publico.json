@@ -1,0 +1,605 @@
+{
+  "checkedUtc": "2026-10-21T17:47:53.105Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": null,
+  "scope": "public_container_app_real_azure_services_briefs_046_047",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+      "es": {
+        "narrador": {
+          "voz": "es-MX-JorgeNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "es-MX-DaliaNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "es-MX-GerardoNeural",
+          "motivo": "predeterminada"
+        }
+      },
+      "en": {
+        "narrador": {
+          "voz": "en-US-JennyNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "en-US-DavisNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "en-US-GuyNeural",
+          "motivo": "predeterminada"
+        }
+      }
+    },
+    "catalogo": "consultado"
+  },
+  "match": {
+    "id": "907b5dbb-2c0a-43f4-bf3e-9c66ce04762b",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      "visita": {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-21T17:48:19.612Z"
+  },
+  "stream": {
+    "messages": 143,
+    "advances": 123,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "interventions": [
+      {
+        "id": "comentarista:atajada:120",
+        "rol": "comentarista",
+        "tick": 120,
+        "tema": "atajada",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Elías Baroánez (1) detiene el remate de Bruno Soriosa (9).",
+            "en": "Elías Baroánez (1) stops Bruno Soriosa (9)'s shot.",
+            "hecho": "arena:a8"
+          },
+          {
+            "es": "El marcador sigue 0-0 entre Club Caleteo y Olímpico Pradoalto.",
+            "en": "The score remains 0-0 between Club Caleteo and Olímpico Pradoalto.",
+            "hecho": "estadista:marcador:120"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a8"
+            ]
+          },
+          {
+            "eventos": [],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:120",
+                "eventos": [],
+                "intervalo": [
+                  0,
+                  120
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "estadista:marcador+remates:200",
+        "rol": "estadista",
+        "tick": 200,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Club Caleteo 0, Olímpico Pradoalto 0.",
+            "en": "Score: Club Caleteo 0, Olímpico Pradoalto 0.",
+            "hecho": "estadista:marcador:200"
+          },
+          {
+            "es": "Remates: Club Caleteo 0 (0 a puerta), Olímpico Pradoalto 1 (1 a puerta).",
+            "en": "Shots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 1 (1 on target).",
+            "hecho": "estadista:remates:200"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a7",
+              "a8"
+            ],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null
+      },
+      {
+        "id": "comentarista:amarilla:252",
+        "rol": "comentarista",
+        "tick": 252,
+        "tema": "amarilla",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Fabio Brelelido (7) recibe el balón para Club Caleteo.",
+            "en": "Fabio Brelelido (7) receives the ball for Club Caleteo.",
+            "hecho": "arena:a12"
+          },
+          {
+            "es": "Tras 25 segundos, Olímpico Pradoalto suma 1 remate y 1 a puerta.",
+            "en": "After 25 seconds, Olímpico Pradoalto has 1 shot and 1 on target.",
+            "hecho": "estadista:remates:252"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a12"
+            ]
+          },
+          {
+            "eventos": [
+              "a7",
+              "a8"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:remates:252",
+                "eventos": [
+                  "a7",
+                  "a8"
+                ],
+                "intervalo": [
+                  0,
+                  252
+                ],
+                "fuente": "inicial"
+              },
+              {
+                "hecho": "estadista:reloj:252",
+                "eventos": [],
+                "intervalo": [
+                  252,
+                  252
+                ],
+                "fuente": "fotograma:252"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "comentarista:gol:326",
+        "rol": "comentarista",
+        "tick": 326,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Bruno Soriosa (9).",
+            "en": "Goal by Bruno Soriosa (9).",
+            "hecho": "arena:a20"
+          },
+          {
+            "es": "El marcador es Club Caleteo 0, Olímpico Pradoalto 1.",
+            "en": "The score is Club Caleteo 0, Olímpico Pradoalto 1.",
+            "hecho": "estadista:marcador:326"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a20"
+            ]
+          },
+          {
+            "eventos": [
+              "a20"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:326",
+                "eventos": [
+                  "a20"
+                ],
+                "intervalo": [
+                  0,
+                  326
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "estadista:marcador+remates:400",
+        "rol": "estadista",
+        "tick": 400,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Club Caleteo 0, Olímpico Pradoalto 1.",
+            "en": "Score: Club Caleteo 0, Olímpico Pradoalto 1.",
+            "hecho": "estadista:marcador:400"
+          },
+          {
+            "es": "Remates: Club Caleteo 0 (0 a puerta), Olímpico Pradoalto 2 (2 a puerta).",
+            "en": "Shots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 2 (2 on target).",
+            "hecho": "estadista:remates:400"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a20"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a7",
+              "a8",
+              "a19",
+              "a20"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null
+      },
+      {
+        "id": "comentarista:atajada:440",
+        "rol": "comentarista",
+        "tick": 440,
+        "tema": "atajada",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Elías Baroánez (1) desvía el remate de Bruno Soriosa (9) y el balón sigue en juego.",
+            "en": "Elías Baroánez (1) deflects Bruno Soriosa (9)'s shot and the ball stays in play.",
+            "hecho": "arena:a26"
+          },
+          {
+            "es": "El marcador es Club Caleteo 0, Olímpico Pradoalto 1.",
+            "en": "The score is Club Caleteo 0, Olímpico Pradoalto 1.",
+            "hecho": "estadista:marcador:440"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a26"
+            ]
+          },
+          {
+            "eventos": [
+              "a20"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:440",
+                "eventos": [
+                  "a20"
+                ],
+                "intervalo": [
+                  0,
+                  440
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "estadista:remates+atajadas:600",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "remates+atajadas",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Remates: Club Caleteo 0 (0 a puerta), Olímpico Pradoalto 4 (3 a puerta).",
+            "en": "Shots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 4 (3 on target).",
+            "hecho": "estadista:remates:600"
+          },
+          {
+            "es": "Atajadas: Elías Baroánez (Club Caleteo), 2.",
+            "en": "Saves: Elías Baroánez (Club Caleteo), 2.",
+            "hecho": "estadista:atajadas:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a7",
+              "a8",
+              "a19",
+              "a20",
+              "a25",
+              "a26",
+              "a30"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a8",
+              "a26"
+            ]
+          }
+        ],
+        "auditFinalRejections": null
+      }
+    ],
+    "lastId": 143,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 75759,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          3895.709010999999,
+          3275.1084999999985,
+          3633.2796460000027,
+          8835.453416999997
+        ],
+        "solicitudesEquipo": 5,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17488,
+            "salida": 972,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 3,
+            "respuestasConUso": 3,
+            "entrada": 27935,
+            "salida": 1967,
+            "cache": 9472
+          },
+          "narrador": {
+            "llamadas": 10,
+            "respuestasConUso": 10,
+            "entrada": 20046,
+            "salida": 2035,
+            "cache": 6912
+          }
+        }
+      }
+    },
+    "elapsedMs": 75720
+  },
+  "consistency": {
+    "stream": 7,
+    "reproduccion": [
+      "comentarista:atajada:120",
+      "estadista:marcador+remates:200",
+      "comentarista:amarilla:252",
+      "comentarista:gol:326",
+      "estadista:marcador+remates:400",
+      "comentarista:atajada:440",
+      "estadista:remates+atajadas:600"
+    ],
+    "emision": [
+      "comentarista:atajada:120",
+      "estadista:marcador+remates:200",
+      "comentarista:amarilla:252",
+      "comentarista:gol:326",
+      "estadista:marcador+remates:400",
+      "comentarista:atajada:440",
+      "estadista:remates+atajadas:600"
+    ]
+  },
+  "voice": {
+    "comentarista_es": {
+      "id": "comentarista:atajada:120",
+      "tick": 120,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 120,
+          "texto": "Ana Cedeño, ¿qué ves?"
+        },
+        {
+          "rol": "comentarista",
+          "tick": 120,
+          "texto": "Elías Baroánez (1) detiene el remate de Bruno Soriosa (9). El marcador sigue 0-0 entre Club Caleteo y Olímpico Pradoalto."
+        }
+      ],
+      "text": "Ana Cedeño, ¿qué ves? Elías Baroánez (1) detiene el remate de Bruno Soriosa (9). El marcador sigue 0-0 entre Club Caleteo y Olímpico Pradoalto.",
+      "bytes": 78192,
+      "type": "audio/mpeg",
+      "characters": 143,
+      "voz": "es-MX-DaliaNeural",
+      "audioSha256": "2ed36705c7c6215ea5f1588a9350979fc23f82334d48f7fe7887a32d4bb25664"
+    },
+    "comentarista_en": {
+      "id": "comentarista:atajada:120",
+      "tick": 120,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 120,
+          "texto": "Priya Chandra, what do you see?"
+        },
+        {
+          "rol": "comentarista",
+          "tick": 120,
+          "texto": "Elías Baroánez (1) stops Bruno Soriosa (9)'s shot. The score remains 0-0 between Club Caleteo and Olímpico Pradoalto."
+        }
+      ],
+      "text": "Priya Chandra, what do you see? Elías Baroánez (1) stops Bruno Soriosa (9)'s shot. The score remains 0-0 between Club Caleteo and Olímpico Pradoalto.",
+      "bytes": 85680,
+      "type": "audio/mpeg",
+      "characters": 149,
+      "voz": "en-US-DavisNeural",
+      "audioSha256": "98d01aa7e2c9715d734d54d84c7adcccaca7a61569e59b70a078be6041ae0a91"
+    },
+    "estadista_es": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Adelante, Tomás Ibarra."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Marcador: Club Caleteo 0, Olímpico Pradoalto 0. Remates: Club Caleteo 0 (0 a puerta), Olímpico Pradoalto 1 (1 a puerta)."
+        }
+      ],
+      "text": "Adelante, Tomás Ibarra. Marcador: Club Caleteo 0, Olímpico Pradoalto 0. Remates: Club Caleteo 0 (0 a puerta), Olímpico Pradoalto 1 (1 a puerta).",
+      "bytes": 87840,
+      "type": "audio/mpeg",
+      "characters": 144,
+      "voz": "es-MX-GerardoNeural",
+      "audioSha256": "dd58ee1b301b44ac34b60f842d831fe6fd5a5bb87f75d780bbd1c2fd4567203b"
+    },
+    "estadista_en": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Go ahead, Owen Platt."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Score: Club Caleteo 0, Olímpico Pradoalto 0. Shots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 1 (1 on target)."
+        }
+      ],
+      "text": "Go ahead, Owen Platt. Score: Club Caleteo 0, Olímpico Pradoalto 0. Shots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 1 (1 on target).",
+      "bytes": 89712,
+      "type": "audio/mpeg",
+      "characters": 139,
+      "voz": "en-US-GuyNeural",
+      "audioSha256": "3efd5fed784221b11ddf7df0223016dfc6f0d91bed08dba2732ce448d902b200"
+    },
+    "narrador_es": {
+      "bytes": 204336,
+      "characters": 374,
+      "text": "Comienza el partido entre Club Caleteo y Olímpico Pradoalto. Saque de centro para Club Caleteo; ejecuta Rafael Galoido (10). Rafael Galoido (10) intenta un pase de 18 m hacia Fabio Brelelido. Fabio Brelelido (7) recibe el balón. Aarón Marelino (10) toma el control del balón. Aarón Marelino (10) intenta un pase de 7 m hacia Bruno Soriosa. Bruno Soriosa (9) recibe el balón."
+    }
+  },
+  "unknownIntervention": 404,
+  "motor": {
+    "reglas": "reinicios-v4",
+    "marcador": {
+      "local": 0,
+      "visita": 1
+    },
+    "eventos": 32,
+    "centros": 0,
+    "saquesManos": 1,
+    "atajadas": 2,
+    "goles": 1,
+    "decisiones": [
+      "valida",
+      "valida",
+      "valida",
+      "valida"
+    ],
+    "accionesLlm": [
+      "mover",
+      "cubrir",
+      "apoyar",
+      "pasar",
+      "conducir",
+      "profundidad",
+      "presionar",
+      "tirar"
+    ]
+  },
+  "status": "passed",
+  "finishedUtc": "2026-10-21T17:49:44.305Z"
+}

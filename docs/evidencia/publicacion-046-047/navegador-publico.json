@@ -1,0 +1,28 @@
+{
+  "checkedUtc": "2026-10-21T17:49:50.736Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "partido": "907b5dbb-2c0a-43f4-bf3e-9c66ce04762b",
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "loadMs": 6980,
+      "tarjetas": {
+        "narrador": "ME\nMark Ellison · PLAY-BY-PLAY\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nBruno Soriosa (9) shoots towards the opposing goal.\n\nBefore that, Bruno Soriosa (9) had taken control of the ball.\n\nInspect facts and checks",
+        "comentarista": "PC\nPriya Chandra · ANALYSIS WITH CITED FACTS\n\n44.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nElías Baroánez (1) deflects Bruno Soriosa (9)'s shot and the ball stays in play.\n\nThe score is Club Caleteo 0, Olímpico Pradoalto 1.\n\nInspect facts and checks",
+        "estadista": "OP\nOwen Platt · MATCH DATA\n\n60.0 s · Deterministic\n\nShots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 4 (3 on target).\n\nSaves: Elías Baroánez (Club Caleteo), 2.\n\nInspect facts and checks"
+      },
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "loadMs": 5175,
+      "tarjetas": {
+        "narrador": "ME\nMark Ellison · PLAY-BY-PLAY\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nBruno Soriosa (9) shoots towards the opposing goal.\n\nBefore that, Bruno Soriosa (9) had taken control of the ball.\n\nInspect facts and checks",
+        "comentarista": "PC\nPriya Chandra · ANALYSIS WITH CITED FACTS\n\n44.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nElías Baroánez (1) deflects Bruno Soriosa (9)'s shot and the ball stays in play.\n\nThe score is Club Caleteo 0, Olímpico Pradoalto 1.\n\nInspect facts and checks",
+        "estadista": "OP\nOwen Platt · MATCH DATA\n\n60.0 s · Deterministic\n\nShots: Club Caleteo 0 (0 on target), Olímpico Pradoalto 4 (3 on target).\n\nSaves: Elías Baroánez (Club Caleteo), 2.\n\nInspect facts and checks"
+      },
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}
