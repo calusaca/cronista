@@ -1,0 +1,577 @@
+{
+  "checkedUtc": "2026-10-21T13:44:00.054Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": null,
+  "scope": "public_container_app_real_azure_services_brief_045",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+      "es": {
+        "narrador": {
+          "voz": "es-MX-JorgeNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "es-MX-DaliaNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "es-MX-GerardoNeural",
+          "motivo": "predeterminada"
+        }
+      },
+      "en": {
+        "narrador": {
+          "voz": "en-US-JennyNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "en-US-DavisNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "en-US-GuyNeural",
+          "motivo": "predeterminada"
+        }
+      }
+    },
+    "catalogo": "consultado"
+  },
+  "match": {
+    "id": "cd0e2ad0-a8b6-45fb-ba6d-1a9ca3f9a905",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      },
+      "visita": {
+        "id": "rapido",
+        "nombre": "GPT-5.4 mini",
+        "controlador": "azure-openai:cronista-rapido:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-21T13:44:07.852Z"
+  },
+  "stream": {
+    "messages": 144,
+    "advances": 124,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "interventions": [
+      {
+        "id": "estadista:marcador+remates:200",
+        "rol": "estadista",
+        "tick": 200,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Quebralta 0, Unión Valdecristal 0.",
+            "en": "Score: Juventud Quebralta 0, Unión Valdecristal 0.",
+            "hecho": "estadista:marcador:200"
+          },
+          {
+            "es": "Sin remates en los primeros 20 segundos.",
+            "en": "No shots in the first 20 seconds.",
+            "hecho": "estadista:remates:200"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null
+      },
+      {
+        "id": "comentarista:tiempo:250",
+        "rol": "comentarista",
+        "tick": 250,
+        "tema": "tiempo",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Aarón Valosa (7) recibe el balón para Unión Valdecristal.",
+            "en": "Aarón Valosa (7) receives the ball for Unión Valdecristal.",
+            "hecho": "arena:a17"
+          },
+          {
+            "es": "El marcador sigue 0-0.",
+            "en": "The score remains 0-0.",
+            "hecho": "estadista:marcador:250"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a17"
+            ]
+          },
+          {
+            "eventos": [],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:250",
+                "eventos": [],
+                "intervalo": [
+                  0,
+                  250
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "comentarista:gol:290",
+        "rol": "comentarista",
+        "tick": 290,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Aarón Valosa (7) para Unión Valdecristal.",
+            "en": "Goal by Aarón Valosa (7) for Unión Valdecristal.",
+            "hecho": "arena:a19"
+          },
+          {
+            "es": "El marcador queda Juventud Quebralta 0, Unión Valdecristal 1.",
+            "en": "The score stands at Juventud Quebralta 0, Unión Valdecristal 1.",
+            "hecho": "estadista:marcador:290"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a19"
+            ]
+          },
+          {
+            "eventos": [
+              "a19"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:290",
+                "eventos": [
+                  "a19"
+                ],
+                "intervalo": [
+                  0,
+                  290
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "estadista:marcador+remates:400",
+        "rol": "estadista",
+        "tick": 400,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Quebralta 0, Unión Valdecristal 1.",
+            "en": "Score: Juventud Quebralta 0, Unión Valdecristal 1.",
+            "hecho": "estadista:marcador:400"
+          },
+          {
+            "es": "Remates: Juventud Quebralta 0 (0 a puerta), Unión Valdecristal 1 (1 a puerta).",
+            "en": "Shots: Juventud Quebralta 0 (0 on target), Unión Valdecristal 1 (1 on target).",
+            "hecho": "estadista:remates:400"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a19"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a18",
+              "a19"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null
+      },
+      {
+        "id": "comentarista:gol:429",
+        "rol": "comentarista",
+        "tick": 429,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Ramiro Marelales (9) para Juventud Quebralta.",
+            "en": "Goal by Ramiro Marelales (9) for Juventud Quebralta.",
+            "hecho": "arena:a30"
+          },
+          {
+            "es": "Con ese tanto, el marcador queda Juventud Quebralta 1, Unión Valdecristal 1.",
+            "en": "With that goal, the score is Juventud Quebralta 1, Unión Valdecristal 1.",
+            "hecho": "estadista:marcador:429"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a30"
+            ]
+          },
+          {
+            "eventos": [
+              "a19",
+              "a30"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:429",
+                "eventos": [
+                  "a19",
+                  "a30"
+                ],
+                "intervalo": [
+                  0,
+                  429
+                ],
+                "fuente": "inicial"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      },
+      {
+        "id": "estadista:marcador+remates:600",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Quebralta 1, Unión Valdecristal 2.",
+            "en": "Score: Juventud Quebralta 1, Unión Valdecristal 2.",
+            "hecho": "estadista:marcador:600"
+          },
+          {
+            "es": "Remates: Juventud Quebralta 1 (1 a puerta), Unión Valdecristal 2 (2 a puerta).",
+            "en": "Shots: Juventud Quebralta 1 (1 on target), Unión Valdecristal 2 (2 on target).",
+            "hecho": "estadista:remates:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a19",
+              "a30",
+              "a39"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a18",
+              "a19",
+              "a29",
+              "a30",
+              "a38",
+              "a39"
+            ]
+          }
+        ],
+        "auditFinalRejections": null
+      },
+      {
+        "id": "comentarista:gol:568",
+        "rol": "comentarista",
+        "tick": 568,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Iker Mendaroya (17).",
+            "en": "Goal by Iker Mendaroya (17).",
+            "hecho": "arena:a39"
+          },
+          {
+            "es": "Tras 56 segundos, Unión Valdecristal suma 2 remates, ambos a puerta, por 1 de Juventud Quebralta.",
+            "en": "After 56 seconds, Unión Valdecristal has 2 shots, both on target, to 1 for Juventud Quebralta.",
+            "hecho": "estadista:remates:568"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a39"
+            ]
+          },
+          {
+            "eventos": [
+              "a18",
+              "a19",
+              "a29",
+              "a30",
+              "a38",
+              "a39"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:remates:568",
+                "eventos": [
+                  "a18",
+                  "a19",
+                  "a29",
+                  "a30",
+                  "a38",
+                  "a39"
+                ]
+              },
+              {
+                "hecho": "estadista:reloj:568",
+                "eventos": [],
+                "intervalo": [
+                  568,
+                  568
+                ],
+                "fuente": "fotograma:568"
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": []
+      }
+    ],
+    "lastId": 144,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 73026,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          3991.848818999999,
+          3700.325521999999,
+          4550.493301000002,
+          4678.354529999997
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 16935,
+            "salida": 1075,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 16988,
+            "salida": 1366,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 9,
+            "respuestasConUso": 9,
+            "entrada": 18954,
+            "salida": 1898,
+            "cache": 4608
+          }
+        }
+      }
+    },
+    "elapsedMs": 72957
+  },
+  "consistency": {
+    "stream": 7,
+    "reproduccion": [
+      "estadista:marcador+remates:200",
+      "comentarista:tiempo:250",
+      "comentarista:gol:290",
+      "estadista:marcador+remates:400",
+      "comentarista:gol:429",
+      "estadista:marcador+remates:600",
+      "comentarista:gol:568"
+    ],
+    "emision": [
+      "estadista:marcador+remates:200",
+      "comentarista:tiempo:250",
+      "comentarista:gol:290",
+      "estadista:marcador+remates:400",
+      "comentarista:gol:429",
+      "estadista:marcador+remates:600",
+      "comentarista:gol:568"
+    ]
+  },
+  "voice": {
+    "comentarista_es": {
+      "id": "comentarista:tiempo:250",
+      "tick": 250,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Adelante, Ana Cedeño."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 250,
+          "texto": "Aarón Valosa (7) recibe el balón para Unión Valdecristal. El marcador sigue 0-0."
+        }
+      ],
+      "text": "Adelante, Ana Cedeño. Aarón Valosa (7) recibe el balón para Unión Valdecristal. El marcador sigue 0-0.",
+      "bytes": 62784,
+      "type": "audio/mpeg",
+      "characters": 102,
+      "voz": "es-MX-DaliaNeural",
+      "audioSha256": "6a3130cdafba8fe378f5ad1abf3e75560714f7ae8c5f497101dfd3016afca41a"
+    },
+    "comentarista_en": {
+      "id": "comentarista:tiempo:250",
+      "tick": 250,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Go ahead, Priya Chandra."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 250,
+          "texto": "Aarón Valosa (7) receives the ball for Unión Valdecristal. The score remains 0-0."
+        }
+      ],
+      "text": "Go ahead, Priya Chandra. Aarón Valosa (7) receives the ball for Unión Valdecristal. The score remains 0-0.",
+      "bytes": 62208,
+      "type": "audio/mpeg",
+      "characters": 106,
+      "voz": "en-US-DavisNeural",
+      "audioSha256": "aa9e93c3c2d6c2fceb1d9e125fb51a1ba785edf2f2d766859b3a5f92b78ce0c2"
+    },
+    "estadista_es": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Adelante, Tomás Ibarra."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Marcador: Juventud Quebralta 0, Unión Valdecristal 0. Sin remates en los primeros 20 segundos."
+        }
+      ],
+      "text": "Adelante, Tomás Ibarra. Marcador: Juventud Quebralta 0, Unión Valdecristal 0. Sin remates en los primeros 20 segundos.",
+      "bytes": 68688,
+      "type": "audio/mpeg",
+      "characters": 118,
+      "voz": "es-MX-GerardoNeural",
+      "audioSha256": "806558028ebff4399c8286335e623891974b2da1d81a7f96fea776bf0eba928a"
+    },
+    "estadista_en": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Go ahead, Owen Platt."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Score: Juventud Quebralta 0, Unión Valdecristal 0. No shots in the first 20 seconds."
+        }
+      ],
+      "text": "Go ahead, Owen Platt. Score: Juventud Quebralta 0, Unión Valdecristal 0. No shots in the first 20 seconds.",
+      "bytes": 67824,
+      "type": "audio/mpeg",
+      "characters": 106,
+      "voz": "en-US-GuyNeural",
+      "audioSha256": "d6b392dafe352f0787cf4e2420803b676deddc7b8cc082668270745e95cc275d"
+    },
+    "narrador_es": {
+      "bytes": 318384,
+      "characters": 592,
+      "text": "Comienza el partido entre Juventud Quebralta y Unión Valdecristal. Saque de centro para Juventud Quebralta; ejecuta Hugo Quineloya (16). Hugo Quineloya (16) intenta un pase de 18 m hacia Ulises Castinera. Ulises Castinera (6) recibe el balón. Ulises Castinera (6) intenta un pase de 9 m hacia Hugo Quineloya. Hugo Quineloya (16) recibe el balón. Falta de Teo Brelelido (15) sobre Hugo Quineloya; contacto imprudente. Reinicio experimental desde Hugo Quineloya (16); se recoloca el balón. Hugo Quineloya (16) intenta un pase de 7 m hacia Ulises Castinera. Ulises Castinera (6) recibe el balón."
+    }
+  },
+  "unknownIntervention": 404,
+  "status": "passed",
+  "finishedUtc": "2026-10-21T13:45:29.040Z"
+}

@@ -316,3 +316,15 @@ test("voz independiente: termina el partido mientras continúa el relato y despu
   await expect(page.getByTestId("arena-clock")).toHaveText("0:02 / 0:02");
   await page.getByRole("button", { name: "Turn narration off" }).click();
 });
+
+test("búfer: una instantánea que ya llega cancelada libera los controles (CI 39610110045)", async ({ page }) => {
+  const original = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
+  const id = "00000000-0000-4000-8000-000000000451", corte = 20;
+  const registro = { ...original, fotogramas: original.fotogramas.filter(f => f.tick <= corte), eventos: original.eventos.filter(e => e.tick <= corte), rondas: [], final: original.fotogramas.find(f => f.tick === corte) };
+  // Cancelar antes de recibir la instantánea: el servidor ya la sirve como «cancelada».
+  await page.route(`**/api/arena/sesiones/${id}/emision`, r => r.fulfill({ json: { registro, comentarios: [], intervenciones: [], asignacion: { modo: "programado", local: { nombre: "Local" }, visita: { nombre: "Visita" } }, metricas: {}, estado: "cancelada", ultimoMensaje: 1 } }));
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  await expect(page.getByTestId("arena-live-status")).toHaveText("Match cancelled");
+  await expect(page.getByRole("button", { name: "Saved matches", exact: true })).toBeEnabled();
+  await expect(page.getByTestId("arena-pitch-live-status")).toHaveCount(0);
+});

@@ -110,6 +110,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
+    // Una instantánea que ya llega cancelada, interrumpida o con error no abre la emisión:
+    // igual que el mensaje `terminada` equivalente, libera los controles (CI 39610110045).
+    const fallida = "estado" in resultado && ["cancelada", "interrumpida", "error"].includes(String(resultado.estado));
+    if (buffer && fallida) { bufferRecibido.current = false; setBufferActivo(false); return; }
     if (buffer) { bufferRecibido.current = true; setBufferInicioTick(buffer.inicioTick); setBufferTerminada(buffer.terminada || resultado.registro.final.tick * ARENA.pasoS >= resultado.registro.config.duracionS || Boolean(resultado.registro.final.finalizado)); setBufferActivo(true); }
   };
   const entornoElegido = entornoDeFormulario({ clima, temperatura, superficie, cesped, presion });

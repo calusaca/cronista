@@ -144,8 +144,13 @@ test("arena: cancelar en vivo y personalizar la inteligencia con evidencia", asy
   const errores: string[] = []; page.on("pageerror", e => errores.push(e.message));
   await page.goto("/arena");
 
-  await page.getByRole("button", { name: "Start live match", exact: true }).click();
-  await expect(page.getByTestId("arena-live-status")).toContainText(/Live|Coaches|Connecting/);
+  // El servidor admite un solo encuentro con modelos a la vez (429): si el de una prueba
+  // anterior aún termina, se reintenta. Tras un arranque aceptado el botón queda deshabilitado.
+  const iniciar = page.getByRole("button", { name: "Start live match", exact: true });
+  await expect(async () => {
+    if (await iniciar.isEnabled()) await iniciar.click();
+    await expect(page.getByTestId("arena-live-status")).toContainText(/Live|Coaches|Connecting/, { timeout: 2000 });
+  }).toPass({ timeout: 45_000 });
   await page.getByRole("button", { name: "Cancel live match" }).click();
   await expect(page.getByTestId("arena-live-status")).toHaveText("Match cancelled");
   await guardados(page);
