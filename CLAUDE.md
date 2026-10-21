@@ -41,7 +41,7 @@ Ya existen personalización, replay incremental, overlay JSON, ligas, condicione
 consecuencias, pizarra 3D, relato por posesiones con dorsales, formaciones y cancha
 esquemática reproducible con fichas y balón, registro completo pase por pase y
 exportación de dataset. Relato fluido/detallado ES/EN inspirado en patrones de seis
-transcripts locales, sin incorporar sus datos al simulador. El replay es simulado, sin un feed
+transcripts locales ([solo locales, fuera del repo](docs/referencias-transcripts.md)), sin incorporar sus datos al simulador. El replay es simulado, sin un feed
 externo en vivo. No hay Fabric ni AKS y los idiomas son ES/EN. No se agrega alcance
 sin actualizar el diseño correspondiente.
 

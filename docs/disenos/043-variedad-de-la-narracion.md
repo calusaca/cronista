@@ -1,5 +1,7 @@
 # Variedad de la narración y uso de los transcripts
 
+> Nota (22 oct 2026): los transcripts de `docs/DatosPrueba` son material ajeno, solo local y fuera del repositorio; ver [referencias](../referencias-transcripts.md).
+
 ## Alcance de esta revisión
 
 Revisión solicitada después de publicar la sincronía del brief 042. Es un análisis

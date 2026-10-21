@@ -19,3 +19,6 @@ next-env.d.ts
 
 # artefacto vacío de herramienta externa
 .primos/
+
+# Transcripts de transmisiones reales: material ajeno con derechos, solo local (brief 048 usa huellas).
+docs/DatosPrueba/

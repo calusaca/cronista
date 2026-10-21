@@ -2,8 +2,9 @@
 // plantillas y comprobación D1–D5. Ninguna cifra ni texto de MESA_ARENA se repite a mano: se leen
 // de MESA_ARENA. Las oraciones del comentarista salen de comentarArena con un LLM simulado (o del
 // respaldo verificado), salvo en la escalera y los casos negativos, donde se simulan a propósito.
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import huellasTranscripts from "../__fixtures__/huellas-transcripts.json";
+import { conjuntoHuellas, huellaTramo, LONGITUD_HUELLA, normalizarTramo } from "../__fixtures__/huellas-transcripts";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { HechoVerificable } from "../../cadena/verificador";
 import type { Llm, Mensaje } from "../../lib/llm";
@@ -382,23 +383,22 @@ describe("048 · plantillas (MESA_ARENA.dialogo)", () => {
     for (const i of ["es", "en"] as const) for (const t of D.cierresFinal[i]) for (const w of palabras(t)) expect(sigue[i], t).not.toContain(w);
   });
 
-  it("ningún tramo literal de cuatro o más palabras aparece en los transcripts de docs/DatosPrueba", () => {
-    const normalizar = (t: string) => t.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-    const dir = "docs/DatosPrueba", archivos = readdirSync(dir).filter(f => f.endsWith(".txt"));
-    expect(archivos.length).toBeGreaterThanOrEqual(6);
-    // Las marcas de tiempo («0:066 seconds», «1:02:031 hour, 2 minutes, 3 seconds») se retiran para no cortar frases.
-    const corpus = ` ${archivos.map(f => normalizar(readFileSync(join(dir, f), "utf8").replace(/\d+(?::\d+)+(?:\s*(?:\d+\s*)?(?:hours?|minutes?|seconds?),?)*/g, " "))).join(" ")} `.replace(/\s+/g, " ");
+  it("ningún tramo literal de cuatro o más palabras aparece en los transcripts de referencia (huellas)", () => {
+    // Los transcripts son material ajeno y no se versionan: se comparan huellas SHA-256 de tramos
+    // normalizados de 4 palabras (src/arena/__fixtures__/generar-huellas-transcripts.ts).
+    expect(huellasTranscripts.archivos).toBeGreaterThanOrEqual(6);
+    const huellas = conjuntoHuellas(huellasTranscripts.huellas);
+    expect(huellas.size * LONGITUD_HUELLA).toBe(huellasTranscripts.huellas.length);
     const tramos: string[] = [];
     for (const t of todas()) for (const segmento of t.split(/\{[^}]*\}/)) {
-      const palabras = normalizar(segmento).split(" ").filter(Boolean);
+      const palabras = normalizarTramo(segmento).split(" ").filter(Boolean);
       for (let k = 0; k + 4 <= palabras.length; k++) tramos.push(palabras.slice(k, k + 4).join(" "));
     }
     expect(tramos.length).toBeGreaterThan(0);
-    const presentes = tramos.filter(tr => corpus.includes(` ${tr} `));
+    const presentes = tramos.filter(tr => huellas.has(huellaTramo(tr)));
     expect(presentes).toEqual([]);
-    // Control: el detector sí encuentra un tramo real del corpus.
-    const real = corpus.trim().split(" ").slice(100, 104).join(" ");
-    expect(corpus.includes(` ${real} `)).toBe(true);
+    // Control: el detector sí reconoce una expresión genérica de ubicación que aparece en el corpus.
+    expect(huellas.has(huellaTramo(normalizarTramo("por el sector izquierdo")))).toBe(true);
   });
 });
 

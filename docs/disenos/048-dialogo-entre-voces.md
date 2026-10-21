@@ -1,5 +1,7 @@
 # 048 — Diálogo entre voces: intercambios de 2 a 4 turnos en la mesa de transmisión
 
+> Nota (22 oct 2026): los transcripts de `docs/DatosPrueba` son material ajeno, solo local y fuera del repositorio; ver [referencias](../referencias-transcripts.md).
+
 ## Estado
 
 Brief **cerrado** el 21 de octubre de 2026. Lo escribe Opus porque Fable no tiene cupo y lo

@@ -1,5 +1,7 @@
 # Tres voces: narrador, comentarista y estadista
 
+> Nota (22 oct 2026): los transcripts de `docs/DatosPrueba` son material ajeno, solo local y fuera del repositorio; ver [referencias](../referencias-transcripts.md).
+
 ## Alcance de esta revisión
 
 Propuesta pedida por Carlos el 20 de octubre tras el brief 044: una transmisión
