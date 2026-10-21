@@ -1,0 +1,48 @@
+| claro | texto principal / fondo | rgb(32,40,31) | rgb(246,245,241) | 13.9 | 4.5 | OK |
+| claro | texto atenuado / tarjeta | rgb(100,112,98) | rgb(255,255,255) | 5.2 | 4.5 | OK |
+| claro | marcador / caja del marcador | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 3 | OK |
+| claro | nombre equipo / marcador | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 4.5 | OK |
+| claro | reloj / fondo | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 4.5 | OK |
+| claro | botón primario | rgb(255,255,255) | rgb(28,122,72) | 5.35 | 4.5 | OK |
+| claro | pestaña activa | rgb(255,255,255) | rgb(32,40,31) | 15.17 | 4.5 | OK |
+| claro | dorsal local / ficha | rgb(255,255,255) | rgb(28,122,72) | 5.35 | 4.5 | OK |
+| claro | dorsal visita / ficha | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 4.5 | OK |
+| claro | ficha local / césped | rgb(28,122,72) | rgb(223,240,229) | 4.52 | 3 | OK |
+| claro | anillo local / césped | rgb(255,255,255) | rgb(223,240,229) | 1.18 | 3 | FALLA |
+| claro | ficha visita / césped | rgb(255,255,255) | rgb(223,240,229) | 1.18 | 3 | FALLA |
+| claro | balón / césped | rgb(32,40,31) | rgb(223,240,229) | 12.81 | 3 | OK |
+| claro | líneas / césped | rgb(185,183,170) | rgb(223,240,229) | 1.7 | 3 | FALLA |
+| claro | nombre mesa / tarjeta | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 4.5 | OK |
+| claro | rótulo narrador / tarjeta | rgb(100,112,98) | rgb(255,255,255) | 5.2 | 4.5 | OK |
+| claro | rótulo comentarista / tarjeta | rgb(100,112,98) | rgb(255,255,255) | 5.2 | 4.5 | OK |
+| claro | rótulo estadista / tarjeta | rgb(100,112,98) | rgb(255,255,255) | 5.2 | 4.5 | OK |
+| claro | avatar narrador | — | — | — | — | AUSENTE |
+| claro | avatar comentarista | — | — | — | — | AUSENTE |
+| claro | avatar estadista | — | — | — | — | AUSENTE |
+| claro | hora acción / tarjeta | rgb(32,40,31) | rgb(255,255,255) | 15.17 | 4.5 | OK |
+| claro | barra superior | rgb(28,122,72) | rgb(246,245,241) | 4.9 | 4.5 | OK |
+| oscuro | texto principal / fondo | rgb(231,235,230) | rgb(19,23,21) | 15.01 | 4.5 | OK |
+| oscuro | texto atenuado / tarjeta | rgb(151,163,151) | rgb(27,33,29) | 6.24 | 4.5 | OK |
+| oscuro | marcador / caja del marcador | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 3 | OK |
+| oscuro | nombre equipo / marcador | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 4.5 | OK |
+| oscuro | reloj / fondo | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 4.5 | OK |
+| oscuro | botón primario | rgb(14,20,16) | rgb(76,177,120) | 6.99 | 4.5 | OK |
+| oscuro | pestaña activa | rgb(27,33,29) | rgb(231,235,230) | 13.59 | 4.5 | OK |
+| oscuro | dorsal local / ficha | rgb(14,20,16) | rgb(76,177,120) | 6.99 | 4.5 | OK |
+| oscuro | dorsal visita / ficha | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 4.5 | OK |
+| oscuro | ficha local / césped | rgb(76,177,120) | rgb(30,58,42) | 4.64 | 3 | OK |
+| oscuro | anillo local / césped | rgb(27,33,29) | rgb(30,58,42) | 1.32 | 3 | FALLA |
+| oscuro | ficha visita / césped | rgb(27,33,29) | rgb(30,58,42) | 1.32 | 3 | FALLA |
+| oscuro | balón / césped | rgb(231,235,230) | rgb(30,58,42) | 10.29 | 3 | OK |
+| oscuro | líneas / césped | rgb(74,85,76) | rgb(30,58,42) | 1.59 | 3 | FALLA |
+| oscuro | nombre mesa / tarjeta | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 4.5 | OK |
+| oscuro | rótulo narrador / tarjeta | rgb(151,163,151) | rgb(27,33,29) | 6.24 | 4.5 | OK |
+| oscuro | rótulo comentarista / tarjeta | rgb(151,163,151) | rgb(27,33,29) | 6.24 | 4.5 | OK |
+| oscuro | rótulo estadista / tarjeta | rgb(151,163,151) | rgb(27,33,29) | 6.24 | 4.5 | OK |
+| oscuro | avatar narrador | — | — | — | — | AUSENTE |
+| oscuro | avatar comentarista | — | — | — | — | AUSENTE |
+| oscuro | avatar estadista | — | — | — | — | AUSENTE |
+| oscuro | hora acción / tarjeta | rgb(231,235,230) | rgb(27,33,29) | 13.59 | 4.5 | OK |
+| oscuro | barra superior | rgb(76,177,120) | rgb(19,23,21) | 6.78 | 4.5 | OK |
+
+Pares fuera de criterio (falla o ausente obligatorio): 12

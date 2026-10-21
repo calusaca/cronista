@@ -1,0 +1,63 @@
+{
+ "semillas": 100,
+ "duracionS": 120,
+ "global": {
+  "goles": 254,
+  "autogoles": 0,
+  "tiros": 483,
+  "atajadas": 195,
+  "desvios": 60,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionDePortero": 0,
+  "pases": 2019,
+  "recepciones": 2007,
+  "faltas": 66,
+  "metas": 7,
+  "esquinas": 55,
+  "metasPorConduccion": 0,
+  "golesSinTiro": 2,
+  "golesPorPartido": 2.54,
+  "sdGoles": 1.43,
+  "tirosPorPartido": 4.83,
+  "pasesCompletados": 0.994,
+  "metasPorPartido": 0.07,
+  "metasPorConduccionPorPartido": 0,
+  "esquinasPorPartido": 0.55,
+  "faltasPorPartido": 0.66
+ },
+ "manoAMano": {
+  "episodios": 367,
+  "golesEnEpisodio": 138,
+  "conversion": 0.376,
+  "fraccionDeGoles": 0.543,
+  "acercMediana": 1.35,
+  "acercP75": 3.6,
+  "fraccionMayor1m": 0.594,
+  "fraccionMayor3m": 0.3
+ },
+ "centros": {
+  "pasesBanda": 170,
+  "centros": 71,
+  "motivoCentro": 61,
+  "centroRecibido": 43,
+  "golTras5s": 28,
+  "saqueManos": 397,
+  "fueraJuego": 250,
+  "proporcion": 0.418
+ },
+ "portero": {
+  "atajadasConBalon": 135,
+  "robosTrasAtajada": 0,
+  "robosEnManos": 0,
+  "golesTrasRobo": 0,
+  "tramosEnArea": 0,
+  "robosDbg": []
+ },
+ "laterales": {
+  "ticksPasarImposible": 16,
+  "rondasJugadorBloqueadas": 2,
+  "ticksConducir": 10602,
+  "ticksConducirParado": 1699,
+  "fraccionConducirParado": 0.16
+ }
+}

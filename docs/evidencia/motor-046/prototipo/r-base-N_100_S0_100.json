@@ -1,0 +1,69 @@
+{
+ "semillas": 100,
+ "duracionS": 120,
+ "global": {
+  "goles": 235,
+  "autogoles": 0,
+  "tiros": 423,
+  "atajadas": 143,
+  "desvios": 55,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionDePortero": 0,
+  "pases": 1973,
+  "recepciones": 2003,
+  "faltas": 63,
+  "metas": 99,
+  "esquinas": 54,
+  "metasPorConduccion": 88,
+  "golesSinTiro": 4,
+  "golesPorPartido": 2.35,
+  "sdGoles": 1.39,
+  "tirosPorPartido": 4.23,
+  "pasesCompletados": 1.015,
+  "metasPorPartido": 0.99,
+  "metasPorConduccionPorPartido": 0.88,
+  "esquinasPorPartido": 0.54,
+  "faltasPorPartido": 0.63
+ },
+ "manoAMano": {
+  "episodios": 321,
+  "golesEnEpisodio": 152,
+  "conversion": 0.474,
+  "fraccionDeGoles": 0.647,
+  "acercMediana": 0,
+  "acercP75": 0,
+  "fraccionMayor1m": 0.044,
+  "fraccionMayor3m": 0.019
+ },
+ "centros": {
+  "pasesBanda": 122,
+  "centros": 9,
+  "motivoCentro": 0,
+  "centroRecibido": 0,
+  "golTras5s": 0,
+  "saqueManos": 0,
+  "fueraJuego": 244,
+  "proporcion": 0.074
+ },
+ "portero": {
+  "atajadasConBalon": 88,
+  "robosTrasAtajada": 16,
+  "robosEnManos": 19,
+  "golesTrasRobo": 15,
+  "tramosEnArea": 0,
+  "robosDbg": [
+   "seed=104 tick=487 por=local-0 -> visita-10 en (8.7,34.0)",
+   "seed=121 tick=469 por=local-0 -> visita-15 en (7.0,34.0)",
+   "seed=124 tick=395 por=visita-11 -> local-15 en (8.3,34.0)",
+   "seed=124 tick=615 por=local-0 -> visita-10 en (7.3,34.0)",
+   "seed=128 tick=112 por=visita-0 -> local-15 en (7.6,34.0)"
+  ]
+ },
+ "laterales": {
+  "ticksPasarImposible": 53,
+  "rondasJugadorBloqueadas": 3,
+  "ticksConducir": 13374,
+  "ticksConducirParado": 4909,
+  "fraccionConducirParado": 0.367
+ }
+}

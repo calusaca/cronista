@@ -1,0 +1,73 @@
+{
+ "semillas": 100,
+ "duracionS": 120,
+ "pasesDesdeBandaUltimoTercio": 127,
+ "centrosAlArea": 16,
+ "destinos": {
+  "atras": 57,
+  "frontal_fuera_area": 31,
+  "area": 16,
+  "misma_banda_adelante": 23
+ },
+ "golesEn5sTrasCentro": 5,
+ "tirosDesdeBanda": 10,
+ "episodiosConBalonEnBanda": 301,
+ "finEpisodio": {
+  "pase_no_centro": 111,
+  "falta": 5,
+  "sale_de_la_zona_conduciendo": 23,
+  "recepcion": 1,
+  "reinicio/meta": 84,
+  "reinicio/banda": 14,
+  "centro": 16,
+  "recuperacion": 37,
+  "tiro": 10
+ },
+ "episodiosConOpcionViable": 21,
+ "finConOpcion": {
+  "sale_de_la_zona_conduciendo": 5,
+  "reinicio/meta": 5,
+  "recuperacion": 10,
+  "reinicio/banda": 1
+ },
+ "decisionesEnBanda": {
+  "decisiones": 8039,
+  "conCompaneroEnArea": 2023,
+  "sinCompaneroEnArea": 6016,
+  "motivosDescarte": {
+   "viable": 544,
+   "avance<-8m": 926,
+   "linea_cortada(margen)": 340,
+   "distancia>32m": 946
+  },
+  "resultado": {
+   "pase_atras": 57,
+   "sin_accion(conduce)": 7834,
+   "conducir(orden)": 68,
+   "pase_fuera_del_area": 54,
+   "pase_al_area(centro)": 16,
+   "tiro": 10
+  },
+  "mejorElegidoEnArea": 0,
+  "motivoNoPase": {
+   "prefiereConducir(personalidad)|sin_companero_en_area": 4130,
+   "prefiereConducir(personalidad)|hay_companero_en_area|alguno_viable": 484,
+   "opcionPase_sin_candidato|sin_companero_en_area": 1708,
+   "opcionPase_sin_candidato|hay_companero_en_area": 598,
+   "prefiereConducir(personalidad)|hay_companero_en_area": 914
+  }
+ }
+}
+seed=1 a82 tick=1062 visita-7->visita-6 desde(84.9,63.9) hasta(81.2,50.7) atras
+seed=3 a8 tick=106 local-13->local-15 desde(80.9,3.9) hasta(80.9,21.8) frontal_fuera_area
+seed=6 a12 tick=217 local-5->local-15 desde(75.8,9.3) hasta(90.4,31.2) area
+seed=7 a35 tick=492 visita-12->visita-9 desde(74.5,57.3) hasta(71.1,49.0) atras
+seed=7 a48 tick=680 local-14->local-13 desde(95.8,59.9) hasta(95.4,35.1) area
+seed=8 a6 tick=89 local-15->local-6 desde(75.1,62.3) hasta(67.1,33.3) atras
+
+
+seed=2 visita-6 ticks 1181-1200 fin=sale_de_la_zona_conduciendo
+seed=4 visita-9 ticks 923-971 fin=reinicio/meta (a72@972)
+seed=13 local-7 ticks 1036-1093 fin=recuperacion (a76@1094)
+seed=26 local-3 ticks 922-1051 fin=sale_de_la_zona_conduciendo
+seed=26 local-3 ticks 1064-1200 fin=sale_de_la_zona_conduciendo

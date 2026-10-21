@@ -480,8 +480,9 @@ export const ARENA = {
   dueloBase: 0.35, dueloNivel: 0.004, dueloFuerza: 0.002,
   dueloMin: 0.1, dueloMax: 0.75, ignorarAutorS: 0.4,
   areaLargoM: 16.5, areaAnchoM: 40.32,
-  /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`). */
-  reglas: "reinicios-v3",
+  /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`).
+   * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros). */
+  reglas: "reinicios-v4",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -504,6 +505,119 @@ export const ARENA = {
   temperaturaDefectoC: { calor: 32, frio: -2 },
   amplitud: { estrecha: 0.8, media: 1, amplia: 1.1 },
   alturaBloqueM: { bajo: -6, medio: 0, alto: 6 },
+} as const;
+
+/** Brief 046 · Portero (reinicios-v4). Cifras sintéticas por calibrar. */
+export const PORTERO_ARENA = {
+  /** Radio (m) desde el centro del arco propio en el que un poseedor rival sin defensores de
+   * campo por delante activa la salida. Mayor que ARENA.radioTiroM para salir antes del remate. */
+  manoAManoRadioM: 28,
+  /** Salida: distancia al balón que conserva = max(holguraM, fraccion × distancia arco–balón). */
+  salidaFraccion: 0.3, salidaHolguraM: 1,
+  /** Distancia máxima (m) de la salida desde el centro del arco (dentro del área de 16,5 m). */
+  salidaMaxM: 14,
+  /** Radio de atajada ante un remate: controlPorteroM × min(1, d/reaccionM), nunca menor que
+   * cuerpoM; d = distancia del origen del remate al portero. Un remate a bocajarro reduce el
+   * tiempo de reacción. */
+  reaccionM: 8, cuerpoM: 0.5,
+  /** Balón en las manos: plazo (s) para ponerlo en juego. Siempre mayor que
+   * ARENA.accionCadaS / min(TECNICA_ARENA.ritmo) (2 / 0,85 ≈ 2,35 s), así que existe una
+   * ventana para soltar. Mientras dura, ARENA.recuperacionCadaS no se aplica al portero: nadie
+   * puede disputarle el balón. */
+  manosMaxS: 4,
+  /** Distancia (m) que los rivales respetan con el portero que tiene el balón en las manos;
+   * hasta vencer el plazo, el portero no suelta mientras un rival esté más cerca. */
+  distanciaManosM: 4,
+  /** Brief 046 v1.2 · histéresis: los rivales se mantienen a distanciaManosM + margenManosM del
+   * portero con manos; el saque voluntario solo se bloquea a menos de distanciaManosM. Con la
+   * tolerancia de llegada (ARENA.toleranciaM) un rival respetuoso nunca bloquea el saque. */
+  margenManosM: 1.5,
+  /** v1.2 · un saque desde las manos a más de estos metros va por arriba: usa la fase aérea del
+   * centro (solo se toca a ≤ ATAQUE_ARENA.caidaM de su caída). Ajuste 1 de 2 permitido por la v1.2:
+   * 20 → 25, porque con 20 un saque aéreo de 24,8 m (semilla 23) se interceptaba en la caída al
+   * segundo exacto y el lote 1–100 incumplía «intercepción inmediata = 0». */
+  saqueAereoMinM: 25,
+  /** v1.2 · un saque corto exige línea limpia: ningún rival a menos de estos metros del segmento. */
+  lineaSaqueMinM: 3,
+  /** Alcance máximo (m) del saque voluntario del portero desde las manos (el pase normal es
+   * paseMaxM). El saque forzado al vencer el plazo no tiene límite de distancia (brief 046 v1.1). */
+  saqueManosMaxM: 40,
+} as const;
+
+/** Brief 046 · Conducción y centros (reinicios-v4). Coordenadas orientadas: el atacante va hacia x = largoM. */
+export const ATAQUE_ARENA = {
+  /** x orientada desde la que la banda (|y − ancho/2| ≥ areaAnchoM/2) es zona de centro. */
+  zonaCentroXM: 75,
+  /** La conducción nunca apunta a menos de estos metros de la línea de fondo ni de banda. */
+  margenFondoM: 2, margenBandaM: 2,
+  /** Un `conducir` a menos de esta distancia (m) de su destino se renueva (antes, 0,2 m). */
+  renovarConduccionM: 2,
+  /** Punto de giro en la zona de centro: (largoM − giroFondoM, borde del área − giroInteriorM). */
+  giroFondoM: 6, giroInteriorM: 2,
+  /** Objetivos del centro: palo cercano y lejano a paloXM de la línea y ±paloYM del centro del
+   * arco; punto penal a penalXM. */
+  paloXM: 5.5, paloYM: 3, penalXM: 11,
+  /** Un compañero de campo a ≤ llegadaM del objetivo puede ser el receptor del centro. */
+  llegadaM: 14,
+  /** Distancia máxima (m) de un centro. */
+  centroMaxM: 40,
+  /** Fase aérea: el centro solo se puede tocar en puntos de su trayectoria a ≤ caidaM de su destino. */
+  caidaM: 5,
+  /** Un jugador que prefiere conducir solo centra desde esta x o en el punto de giro. */
+  conductorCentroXM: 95,
+  /** Jugadores que atacan el área: palo cercano, palo lejano, punto penal (M08 del brief 033). */
+  rematadores: 3,
+  /** La llegada no rebasa la línea de fuera de juego vigente menos este margen (m). */
+  margenFueraJuegoM: 0.5,
+  /** v1.2 · el destino de un `centrar` queda al menos a estos metros de la línea de gol rival. */
+  margenLineaCentroM: 1.5,
+} as const;
+
+/**
+ * Brief 046 · Métricas de lote de la arena (controladores programados) y sus bandas. Las calcula
+ * `src/arena/metricas-lote.ts`, que muestrea todos los ticks. Un denominador cero es «sin
+ * muestra» y nunca cuenta como cumplimiento. `rapido` corre en `npm test` (semillas 1–30) y
+ * `completo` en `npm run test:stats` (semillas 1–100), donde además el mismo lote bajo
+ * reinicios-v3 debe incumplir `contraste` (pérdidas tras atajada, mediana del desplazamiento y
+ * proporción de centros; v1.2: también goles tras saque). v1.2: las bandas de saques desde las
+ * manos sustituyen a la antigua «pérdida del portero en su área» y se exigen también en el segundo
+ * lote (segundoLoteDesde).
+ */
+export const LOTE_ARENA_046 = {
+  duracionS: 120,
+  /** Banda del último tercio para la proporción de centros: x orientada ≥ esta cifra y fuera del ancho del área. */
+  bandaMetricaXM: 70,
+  /** Ticks consecutivos mínimos de un episodio de mano a mano. */
+  manoAManoTicks: 3,
+  /** Ventana (s) tras el último tick del episodio para buscar su desenlace. */
+  desenlaceS: 3,
+  /** Desplazamiento (m) del portero que cuenta como salida en un episodio. */
+  desplazamientoM: 1,
+  /** Velocidad (m/s) por debajo de la cual un poseedor con `conducir` cuenta como frenado. */
+  conducirLentoMps: 1,
+  /** v1.2 · saques desde las manos: una pérdida en ≤ saqueInmediataS es «intercepción inmediata»; un
+   * gol rival sin toque defensor en ≤ golTrasSaqueS tras el saque es «gol tras saque». */
+  saqueInmediataS: 1, golTrasSaqueS: 10,
+  /** v1.2 · las bandas de saques se exigen también en este segundo lote de `completo.semillas`. */
+  segundoLoteDesde: 101,
+  rapido: {
+    semillaDesde: 1, semillas: 30,
+    robosEnManosMax: 0, perdidasTrasAtajadaMax: 0,
+    intercepcionesInmediatasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
+    desplazamientoMedianaMinM: 1, fraccionDesplazadoMin: 0.45,
+    proporcionCentrosMin: 0.25, centrosPorPartidoMin: 0.3,
+    metasConduccionPorPartidoMax: 0.05, golesPorPartido: { min: 1.5, max: 3 },
+    tiroFueraTrasDesvioMax: 0, recepcionPorteroRechaceMax: 0, conducirFrenadoMax: 0.25,
+  },
+  completo: {
+    semillaDesde: 1, semillas: 100,
+    robosEnManosMax: 0, perdidasTrasAtajadaMax: 0,
+    intercepcionesInmediatasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
+    desplazamientoMedianaMinM: 1, fraccionDesplazadoMin: 0.45, conversion: { min: 0.25, max: 0.42 },
+    proporcionCentrosMin: 0.3, centrosPorPartidoMin: 0.4,
+    metasConduccionPorPartidoMax: 0.05, golesPorPartido: { min: 1.8, max: 2.8 },
+    tiroFueraTrasDesvioMax: 0, recepcionPorteroRechaceMax: 0, conducirFrenadoMax: 0.25,
+  },
 } as const;
 
 /** Mini-encuentro v3: parámetros sintéticos, en segundos reales de simulación. */

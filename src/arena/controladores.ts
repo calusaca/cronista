@@ -1,5 +1,6 @@
 import type { Llm, Mensaje } from "../lib/llm";
-import { ARENA, PERSONALIDAD_ARENA as P, TECNICA_ARENA as T } from "../sim/limites";
+import { ARENA, ATAQUE_ARENA as A, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { enAreaRival } from "./ataque";
 import { asignarPuestos } from "./alineacion";
 import { gestionarProgramado, planDelEntrenador } from "./entrenadores";
 import { anclas, transformar } from "./catalogo";
@@ -46,7 +47,15 @@ export function validarOrdenes(raw: unknown, obs: ObservacionArena): OrdenesEqui
   for (const o of plan.ordenes) {
     if (o.accion === "pasar") {
       if (!o.receptor || o.receptor === o.jugador || !propios.includes(o.receptor)) throw new Error("Receptor inválido");
-    } else if (o.receptor !== null) throw new Error("Solo un pase admite receptor");
+    } else if (o.accion === "centrar") {
+      // Brief 046: destino dentro del área rival; receptor null o un compañero de campo propio.
+      if (!enAreaRival(o.destino, obs.lado)) throw new Error("Centro fuera del área rival");
+      // v1.2: el portero no centra y el destino no queda sobre la línea de gol.
+      if (obs.estado.jugadores.find(j => j.id === o.jugador)?.puesto === "POR") throw new Error("El portero no puede centrar");
+      if (transformar(o.destino, obs.lado).x > ARENA.largoM - A.margenLineaCentroM) throw new Error("Centro demasiado cerca de la línea de gol");
+      const receptor = o.receptor === null ? undefined : obs.estado.jugadores.find(j => j.id === o.receptor && j.lado === obs.lado);
+      if (o.receptor !== null && (!receptor || o.receptor === o.jugador || receptor.puesto === "POR")) throw new Error("Receptor de centro inválido");
+    } else if (o.receptor !== null) throw new Error("Solo un pase o un centro admiten receptor");
   }
   // Orden estable: la serialización o el orden elegido por el modelo no decide
   // quién se mueve o toca el balón antes.
@@ -126,6 +135,15 @@ export function crearControladorProgramado(): ControladorEquipo {
   return { id: "programado:geometria-v3", tipo: "programado", async decidir(obs) { return planProgramado(obs); } };
 }
 
+/** Brief 046: las dos frases de centros y portero, construidas solo con constantes (la prueba
+ * las construye también con valores alterados). */
+export function frasesCentroPortero(c: { largoM: number; zonaCentroXM: number; centroMaxM: number; accionCadaS: number; manosMaxS: number; distanciaManosM: number } = {
+  largoM: ARENA.largoM, zonaCentroXM: A.zonaCentroXM, centroMaxM: A.centroMaxM, accionCadaS: ARENA.accionCadaS, manosMaxS: PO.manosMaxS, distanciaManosM: PO.distanciaManosM,
+}): string {
+  return `centrar envía el balón por arriba a un destino dentro del área rival, a ${c.centroMaxM} m como máximo, desde la banda o el último tramo (local con x>=${c.zonaCentroXM}; visita con x<=${c.largoM - c.zonaCentroXM}); receptor es un ID propio de campo o null (el compañero de campo más cercano al destino); antes de llegar, el jugador conduce hacia el área.
+El portero sale solo ante un mano a mano y el balón en sus manos no se disputa: los rivales se quedan a ${c.distanciaManosM} m y lo pone en juego entre ${c.accionCadaS} y ${c.manosMaxS} s, sin que haga falta ordenarlo.`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -137,6 +155,7 @@ Propón intenciones, nunca resultados. El motor mueve jugadores y resuelve baló
 Coordenadas en metros: x=0..${ARENA.largoM}, y=0..${ARENA.anchoM}. Local ataca hacia x=${ARENA.largoM}; visita hacia x=0.
 No conoces órdenes nuevas del rival ni eventos futuros. Conserva amplitud, profundidad, apoyos y resguardo.
 Al defender coordina presión, cobertura y bloque. El portero debe proteger su arco.
+${frasesCentroPortero()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad
@@ -147,10 +166,10 @@ los expulsados no pueden recibir órdenes ni ser sustituidos.
 Responde SOLO JSON con estas claves y ninguna otra:
 {"observacion":"ID recibido","lado":"local o visita","intencion":"objetivo táctico breve, máximo 300 caracteres",
 "amplitud":"estrecha|media|amplia","bloque":"bajo|medio|alto","gestion":null,"ordenes":[
-{"jugador":"ID propio","accion":"mover|apoyar|profundidad|cubrir|presionar|conducir|pasar|tirar",
+{"jugador":"ID propio","accion":"mover|apoyar|profundidad|cubrir|presionar|conducir|pasar|tirar|centrar",
 "destino":{"x":0,"y":0},"receptor":null}]}
 Incluye EXACTAMENTE una orden por cada uno de tus once IDs. Para pasar, receptor es otro ID propio;
-en las demás acciones receptor es null. La intención es una instrucción pública breve, no razonamiento privado.
+para centrar, otro ID propio de campo o null; en las demás acciones receptor es null. La intención es una instrucción pública breve, no razonamiento privado.
 Usa coordenadas enteras y una intención concisa; evita texto redundante.
 Si hay entrenadores en estado: actúa como el entrenador de tu lado, respeta su personalidad y
 usa SOLO los IDs activos (pueden ser menos de once). Incluye también "gestion": null cuando

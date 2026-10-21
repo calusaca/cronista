@@ -33,7 +33,7 @@ function rejugar(registro: RegistroArena, reglas: NonNullable<ConfigArena["regla
 describe("044 · rechace del portero (reinicios-v3)", () => {
   it("reproduce exactamente el fixture v3 (desvío que sale y ventana con arreglo de sustituciones)", async () => {
     const registro = await leer("arena-reinicios-v3");
-    expect(registro.config.reglas).toBe(ARENA.reglas);
+    expect(registro.config.reglas).toBe("reinicios-v3");
     const desvio = registro.eventos.find(e => e.tipo === "atajada" && e.motivo === "desvio")!;
     expect(desvio).toBeDefined();
     const siguiente = registro.eventos.find(e => e.tick > desvio.tick && e.tipo !== "pase" && e.tipo !== "recepcion")!;
@@ -47,7 +47,7 @@ describe("044 · rechace del portero (reinicios-v3)", () => {
     const archivo = await leer("arena-reinicios-v2");
     const desvio = archivo.eventos.find(e => e.tipo === "atajada" && e.motivo === "desvio")!;
     const salida = archivo.eventos.find(e => e.tick > desvio.tick && e.tipo === "reinicio")!;
-    const v2 = rejugar(archivo, "reinicios-v2", salida.tick + 1), v3 = rejugar(archivo, ARENA.reglas, salida.tick + 1);
+    const v2 = rejugar(archivo, "reinicios-v2", salida.tick + 1), v3 = rejugar(archivo, "reinicios-v3", salida.tick + 1);
     const entre = (m: MotorArena) => m.eventos.filter(e => e.tick >= desvio.tick && e.tick <= salida.tick);
     // Hasta el desvío ambos motores son idénticos.
     expect(v3.eventos.filter(e => e.tick <= desvio.tick)).toEqual(v2.eventos.filter(e => e.tick <= desvio.tick));
@@ -88,8 +88,8 @@ describe("044 · rechace del portero (reinicios-v3)", () => {
 
   it("un rechace que entra en el arco propio es autogol del portero", () => {
     let seed = 1;
-    while (remateAlPortero(seed, ARENA.reglas).motor.eventos[0]?.motivo !== "desvio") { seed++; expect(seed).toBeLessThan(200); }
-    const { motor, planes, portero } = remateAlPortero(seed, ARENA.reglas);
+    while (remateAlPortero(seed, "reinicios-v3").motor.eventos[0]?.motivo !== "desvio") { seed++; expect(seed).toBeLessThan(200); }
+    const { motor, planes, portero } = remateAlPortero(seed, "reinicios-v3");
     // Balón suelto: autor el portero, lado el del remate.
     expect(motor.estado.balon.vuelo).toMatchObject({ tipo: "rechace", autor: portero.id, lado: "visita", receptor: null });
     expect(motor.estado.balon.ultimoToque).toEqual({ jugador: portero.id, lado: "local" });
@@ -109,14 +109,14 @@ describe("044 · rechace del portero (reinicios-v3)", () => {
 
   /** Primera semilla (barrido) en la que el portero desvía el remate del escenario. */
   function semillaConDesvio(recoge?: Lado): number {
-    for (let seed = 1; seed < 400; seed++) if (remateAlPortero(seed, ARENA.reglas, recoge).motor.eventos[0]?.motivo === "desvio") return seed;
+    for (let seed = 1; seed < 400; seed++) if (remateAlPortero(seed, "reinicios-v3", recoge).motor.eventos[0]?.motivo === "desvio") return seed;
     throw new Error("Sin desvío en el barrido");
   }
   const registroDe = (motor: MotorArena) => ({ version: motor.config.version, config: motor.config, inicial: motor.fotogramas[0], eventos: motor.eventos, fotogramas: motor.fotogramas, final: motor.estado, rondas: [] }) as unknown as RegistroArena;
 
   it.each(["local", "visita"] as const)("un rechace recogido por un jugador %s es una recuperación sin pasador", recoge => {
     const seed = semillaConDesvio(recoge);
-    const { motor, planes, portero, recogedor } = remateAlPortero(seed, ARENA.reglas, recoge);
+    const { motor, planes, portero, recogedor } = remateAlPortero(seed, "reinicios-v3", recoge);
     expect(motor.estado.balon.vuelo).toMatchObject({ tipo: "rechace", autor: portero.id });
     motor.avanzar(planes, 10);
     const tras = motor.eventos.filter(e => e.tick > motor.eventos[0]!.tick && e.tipo !== "pase" && e.tipo !== "tiro");
@@ -138,7 +138,7 @@ describe("044 · rechace del portero (reinicios-v3)", () => {
   it("barrido de partidos v3: ningún rechace aparece como pase del portero", async () => {
     let desvios = 0;
     for (let seed = 1; seed <= 60; seed++) {
-      const r = await ejecutarArena(crearConfigArena({ seed, duracionS: 120 }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+      const r = await ejecutarArena(crearConfigArena({ seed, duracionS: 120, reglas: "reinicios-v3" }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
       r.eventos.forEach((e, i) => {
         if (e.tipo !== "atajada" || e.motivo !== "desvio") return;
         desvios++;

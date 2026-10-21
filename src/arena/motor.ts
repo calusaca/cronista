@@ -1,7 +1,7 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ENTORNO_ARENA, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ENTORNO_ARENA, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -16,10 +16,14 @@ import { opcionPase, planProgramado } from "./controladores";
 import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } from "./personalidades";
 import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
-import { formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto, type VersionArena, type TipoReinicioArena } from "./tipos";
+import { despejeManos, destinoSalida, enAreaPropia, limitarAreaPropia, manoAMano, radioAtajada, respetarManos, saqueAdmisible, saqueForzado, ticksManos } from "./portero";
+import { conduccionPorDefecto, destinosLlegada, enZonaCentro, limitarConduccion, lineaFueraDeJuego, opcionCentro, puedeCentrar, receptorCentro } from "./ataque";
+import { formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
 
-export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones> } = {}): ConfigArena {
+export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones>; reglas?: ReglasArena } = {}): ConfigArena {
   const version = opciones.version ?? ARENA.version;
+  // Brief 046: fijar reglas archivadas (p. ej. generadores de fixtures v3); solo con el motor actual.
+  if (opciones.reglas !== undefined && version !== ARENA.version) throw new Error("Reglas de reinicio desconocidas");
   const base = opciones.partido ?? configDeSemilla(opciones.seed ?? 42);
   const partido = version === ARENA.version ? prepararPartido(base) : base;
   if (opciones.entorno && version === ARENA.version) {
@@ -38,7 +42,7 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
     return elegirFormacion(plantilla, entrenadores[lado].preferidas);
   };
   const config: ConfigArena = {
-    version, partido, ...(version === ARENA.version ? { reglas: ARENA.reglas } : {}),
+    version, partido, ...(version === ARENA.version ? { reglas: opciones.reglas ?? ARENA.reglas } : {}),
     duracionS: opciones.duracionS ?? ARENA.duracionS,
     intervaloS: opciones.intervaloS ?? ARENA.intervaloS,
     formaciones: { local: forma("local"), visita: forma("visita") },
@@ -136,13 +140,16 @@ export function datosEquipos(config: ConfigArena, estado?: EstadoArena): Observa
 /** Aproximación puntual en el instante del golpe; la sanción solo se produce
  * cuando uno de estos jugadores interviene recibiendo el balón. */
 export function adelantados(estado: EstadoArena, lado: Lado): string[] {
-  const defensores = estado.jugadores.filter(j => j.lado !== lado).map(j => transformar(j.posicion, lado).x).sort((a, b) => b - a);
-  const linea = Math.max(ARENA.largoM / 2, transformar(estado.balon.posicion, lado).x, defensores[1] ?? ARENA.largoM);
+  const linea = lineaFueraDeJuego(estado, lado);
   return estado.jugadores.filter(j => j.lado === lado && transformar(j.posicion, lado).x > linea + ARENA.toleranciaM).map(j => j.id);
 }
 
 /** El saque de centro reglamentario (inicial y tras gol) existe desde reinicios-v2. */
 const centroReglamentario = (config: ConfigArena) => config.reglas !== undefined && config.reglas !== "reinicios-v1";
+/** Brief 046: ¿las reglas de la configuración son `desde` o posteriores? Compara por orden en
+ * `reglasArena`; sin reglas (archivos antiguos) nunca. */
+export const reglasDesde = (config: ConfigArena, desde: ReglasArena): boolean =>
+  config.reglas !== undefined && reglasArena.indexOf(config.reglas) >= reglasArena.indexOf(desde);
 
 export class MotorArena {
   readonly estado: EstadoArena;
@@ -152,6 +159,8 @@ export class MotorArena {
   private ultimaDisputa = -Infinity;
   private salidaConduccion: Punto | null = null;
   private get conReinicios() { return this.config.reglas !== undefined; }
+  /** Todo el comportamiento del brief 046 (portero, centros y laterales) vive tras esta condición. */
+  private get v4() { return reglasDesde(this.config, "reinicios-v4"); }
   constructor(readonly config: ConfigArena, inicial: EstadoArena = crearEstadoArena(config)) {
     validarConfigArena(config);
     this.estado = structuredClone(inicial);
@@ -249,16 +258,20 @@ export class MotorArena {
     })) as Record<Lado, OrdenesEquipo>;
   }
   private frenarJugadores(): void {
+    const manos = this.v4 ? this.estado.balon.manos : undefined;
     for (const j of this.estado.jugadores) {
       const rapidez = Math.hypot(j.velocidad.x, j.velocidad.y);
       const factor = rapidez ? Math.max(0, 1 - ARENA.aceleracionMps2 * ARENA.pasoS / rapidez) : 0;
-      const siguiente = enCancha({ x: j.posicion.x + j.velocidad.x * factor * ARENA.pasoS, y: j.posicion.y + j.velocidad.y * factor * ARENA.pasoS });
+      let siguiente = enCancha({ x: j.posicion.x + j.velocidad.x * factor * ARENA.pasoS, y: j.posicion.y + j.velocidad.y * factor * ARENA.pasoS });
+      // Brief 046 v1.1: la inercia de una pausa tampoco saca del área al portero con el balón en las manos.
+      if (manos?.portero === j.id) siguiente = limitarAreaPropia(siguiente, j.lado);
       j.velocidad = { x: (siguiente.x - j.posicion.x) / ARENA.pasoS, y: (siguiente.y - j.posicion.y) / ARENA.pasoS }; j.posicion = siguiente;
     }
     const portador = this.estado.jugadores.find(j => j.id === this.estado.balon.poseedor);
     if (portador) this.estado.balon.posicion = { ...portador.posicion };
   }
-  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null): void {
+  /** `extra` (solo reinicios-v4): `motivo` del evento (`centro`, `saque_manos`) y vuelo `centro`. */
+  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null, extra: { motivo?: "centro" | "saque_manos"; centro?: true; aereo?: true } = {}): void {
     const desde = { ...j.posicion };
     const rng = prngDerivado(this.config.partido.seed, `arena:golpe:${this.estado.tick}:${j.id}`);
     const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado, distancia(desde, destino)) : null;
@@ -269,20 +282,27 @@ export class MotorArena {
     const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + (rng.next() * 2 - 1) * error };
     const objetivo = this.conReinicios ? bruto : enCancha(bruto);
     const fuera = adelantados(this.estado, j.lado);
-    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera } };
-    this.evento(tipo, j, desde, objetivo, receptor);
+    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}) } };
+    this.evento(tipo, j, desde, objetivo, receptor, extra.motivo ? { motivo: extra.motivo } : {});
     this.ultimaAccion = this.estado.tick;
   }
   private accionBalon(planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>): void {
     const j = this.estado.jugadores.find(p => p.id === this.estado.balon.poseedor);
     const ritmo = j && this.estado.entrenadores ? T.ritmo[this.estado.entrenadores[j.lado].plan.ritmo] : 1;
+    const manos = this.v4 ? this.estado.balon.manos : undefined;
+    if (j && manos) { this.soltarManos(j, manos, planes, ejecutadas, ritmo); return; }
     if (!j || (this.estado.tick - this.ultimaAccion) * ARENA.pasoS < ARENA.accionCadaS / ritmo) return;
     const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
     const usarOrden = !ejecutadas.has(j.id);
     const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, j.lado);
+    const receptorOrden = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor) : undefined;
+    // Brief 046, lateral A (v4): un `pasar` hacia un receptor inexistente o fuera de alcance no
+    // bloquea al poseedor; en este tick decide en local y la orden sigue pendiente.
+    const pasarImposible = this.v4 && usarOrden && orden.accion === "pasar" && (!receptorOrden || distancia(j.posicion, receptorOrden.posicion) > ARENA.paseMaxM);
     // V2 respeta un pase/conducción explícito aun cerca del arco. La personalidad
     // decide solo al elegir una acción local; no reemplaza una orden válida del LLM.
-    const accionExplicita = usarOrden && ["pasar", "conducir", "tirar"].includes(orden.accion);
+    // Bajo v1–v3, `centrar` no es explícita: decide en local (límite declarado del brief 046).
+    const accionExplicita = usarOrden && (["pasar", "conducir", "tirar"].includes(orden.accion) || this.v4 && orden.accion === "centrar") && !pasarImposible;
     // Solo una acción local usa la opción de pase; con orden explícita se descartaba.
     const paseLocal = j.personalidad && !accionExplicita ? opcionPase(j, this.observar(j.lado)) : undefined;
     const tiroLocal = j.personalidad
@@ -291,8 +311,13 @@ export class MotorArena {
     if ((usarOrden && orden.accion === "tirar") || tiroLocal) {
       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
     }
+    if (this.v4 && usarOrden && orden.accion === "centrar") { this.centrarOrden(j, orden, ejecutadas); return; }
+    if (this.v4 && !accionExplicita && j.puesto !== "POR" && enZonaCentro(transformar(j.posicion, j.lado)) && puedeCentrar(j)) {
+      const centro = opcionCentro(j, this.estado);
+      if (centro) { this.sacarBalon(j, "pase", centro.destino, centro.receptor.id, { motivo: "centro", centro: true }); ejecutadas.add(j.id); return; }
+    }
     if (usarOrden && orden.accion === "conducir") { ejecutadas.add(j.id); this.ultimaAccion = this.estado.tick; return; }
-    const receptor = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor)
+    const receptor = usarOrden && orden.accion === "pasar" && !pasarImposible ? receptorOrden
       : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : opcionPase(j, this.observar(j.lado));
     if (receptor && distancia(j.posicion, receptor.posicion) <= ARENA.paseMaxM) {
       // Extrapolación de velocidad actual, no consulta a una posición futura.
@@ -301,6 +326,52 @@ export class MotorArena {
       this.sacarBalon(j, "pase", destino, receptor.id); ejecutadas.add(j.id);
     }
   }
+  /** Extrapolación de la velocidad actual del receptor (como el pase local). */
+  private destinoPase(j: JugadorArena, receptor: JugadorArena): Punto {
+    const viaje = distancia(j.posicion, receptor.posicion) / ARENA.velocidadBalonMps;
+    return enCancha({ x: receptor.posicion.x + receptor.velocidad.x * viaje, y: receptor.posicion.y + receptor.velocidad.y * viaje });
+  }
+  /** Brief 046 (v4): el portero con el balón en las manos. Nunca tira, conduce ni centra. */
+  private soltarManos(j: JugadorArena, manos: NonNullable<EstadoArena["balon"]["manos"]>, planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>, ritmo: number): void {
+    // 1. Antes de accionCadaS / ritmo desde la posesión, no hace nada.
+    if ((this.estado.tick - manos.desdeTick) * ARENA.pasoS < ARENA.accionCadaS / ritmo) return;
+    let receptor: JugadorArena | undefined;
+    let destino: Punto;
+    const rivales = this.estado.jugadores.filter(p => p.lado !== j.lado);
+    if (this.estado.tick >= manos.hastaTick) {
+      // 3. Vencido el plazo, el saque forzado tiene prioridad sobre cualquier pase ordinario. v1.2:
+      //    solo entre saques admisibles (largo aéreo o corto con línea limpia); si no hay, despeje aéreo.
+      receptor = saqueForzado(j, this.estado, p => this.destinoPase(j, p));
+      destino = receptor ? this.destinoPase(j, receptor) : despejeManos(j.posicion);
+    } else {
+      // 2. Antes del plazo solo suelta sin rivales a menos de distanciaManosM.
+      if (rivales.some(p => distancia(p.posicion, j.posicion) < PO.distanciaManosM)) return;
+      const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
+      const explicito = !ejecutadas.has(j.id) && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === j.lado && p.id !== j.id) : undefined;
+      receptor = explicito && distancia(j.posicion, explicito.posicion) <= PO.saqueManosMaxM ? explicito : opcionPase(j, this.observar(j.lado));
+      if (!receptor) return;
+      destino = this.destinoPase(j, receptor);
+      // v1.2: un saque corto con un rival cerca de la línea no sale; espera (o el forzado).
+      if (!saqueAdmisible(j.posicion, destino, rivales).admisible) return;
+    }
+    const aereo = !receptor || saqueAdmisible(j.posicion, destino, rivales).aereo;
+    this.sacarBalon(j, "pase", destino, receptor?.id ?? null, { motivo: "saque_manos", ...(aereo ? { aereo: true as const } : {}) }); ejecutadas.add(j.id);
+  }
+  /** Brief 046 (v4): orden `centrar` del LLM. Si aún no es ejecutable, el poseedor conduce con
+   * `conduccionPorDefecto` (en moverJugadores) y la orden queda pendiente. */
+  private centrarOrden(j: JugadorArena, orden: OrdenJugador, ejecutadas: Set<string>): void {
+    if (transformar(j.posicion, j.lado).x < A.zonaCentroXM || distancia(j.posicion, orden.destino) > A.centroMaxM) return;
+    const designado = orden.receptor ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === j.lado) : undefined;
+    const receptor = designado ?? receptorCentro(j, orden.destino, this.estado);
+    this.sacarBalon(j, "pase", orden.destino, receptor?.id ?? null, { motivo: "centro", centro: true }); ejecutadas.add(j.id);
+  }
+  /** Brief 046 (v4): el portero recibe el balón en las manos dentro de su área. Se acota su
+   * posición (≥ controlM de su línea) y se anula su velocidad (v1.1). */
+  private darManos(j: JugadorArena, desdeTick: number, hastaTick: number): void {
+    j.posicion = limitarAreaPropia(j.posicion, j.lado); j.velocidad = { x: 0, y: 0 };
+    this.estado.balon.posicion = { ...j.posicion };
+    this.estado.balon.manos = { portero: j.id, desdeTick, hastaTick };
+  }
   private moverJugadores(planes: Record<Lado, OrdenesEquipo>, posesionInicial: Lado | undefined): void {
     this.salidaConduccion = null;
     const antes = structuredClone(this.estado.jugadores);
@@ -308,6 +379,11 @@ export class MotorArena {
     const poseedor = antes.find(j => j.id === balon.poseedor);
     const ladoBalon = poseedor?.lado ?? balon.vuelo?.lado;
     const perseguidores = Object.fromEntries(lados.map(lado => [lado, antes.filter(j => j.lado === lado && j.puesto !== "POR").sort((a, b) => distancia(a.posicion, balon.posicion) - distancia(b.posicion, balon.posicion) || a.id.localeCompare(b.id))[0]?.id]));
+    // Brief 046 (v4): condiciones evaluadas una vez por tick sobre el estado anterior al paso.
+    const v4 = this.v4;
+    const salida = v4 ? { local: manoAMano(this.estado, "local", PO.manoAManoRadioM), visita: manoAMano(this.estado, "visita", PO.manoAManoRadioM) } : null;
+    const manos = v4 ? balon.manos : undefined, porteroManos = manos ? antes.find(j => j.id === manos.portero) : undefined;
+    const llegada = v4 && ladoBalon ? destinosLlegada(this.estado, ladoBalon, planes[ladoBalon].ordenes, ladoBalon !== posesionInicial) : null;
     for (const j of this.estado.jugadores) {
       const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
       let destino = { ...orden.destino };
@@ -318,14 +394,23 @@ export class MotorArena {
         if (ladoBalon !== j.lado) nominal.x += ARENA.alturaBloqueM[planes[j.lado].bloque];
         destino = enCancha(transformar(nominal, j.lado));
       }
+      const llega = llegada?.get(j.id);
+      if (llega) destino = { ...llega };
       if (j.id === balon.vuelo?.receptor) destino = { ...balon.vuelo.destino };
       if ((ladoBalon !== j.lado || balon.poseedor === null && balon.vuelo === null) && perseguidores[j.lado] === j.id) destino = { ...balon.posicion };
       if (orden.accion === "presionar" && ladoBalon !== j.lado && j.puesto !== "POR") destino = { ...balon.posicion };
       if (j.id === balon.poseedor) {
         // Los pases/tiros ya ejecutados no arrastran al portador a su propio
         // receptor: al conducir, el control local busca progresar.
-        if (orden.accion !== "conducir" || distancia(j.posicion, destino) < ARENA.toleranciaM) destino = enCancha({ x: j.posicion.x + (j.lado === "local" ? ARENA.avanceConduccionM : -ARENA.avanceConduccionM), y: j.posicion.y });
+        if (v4) destino = this.destinoPoseedor(j, orden, destino, !!manos);
+        else if (orden.accion !== "conducir" || distancia(j.posicion, destino) < ARENA.toleranciaM) destino = enCancha({ x: j.posicion.x + (j.lado === "local" ? ARENA.avanceConduccionM : -ARENA.avanceConduccionM), y: j.posicion.y });
       }
+      // Salida a achicar: objetiva, ninguna orden la activa ni la impide.
+      if (salida?.[j.lado] && j.puesto === "POR" && j.id !== balon.poseedor) destino = destinoSalida(balon.posicion, j.lado);
+      // Ningún rival se dirige a menos de distanciaManosM del portero con el balón en las manos.
+      if (porteroManos && j.lado !== porteroManos.lado) destino = respetarManos(destino, j.posicion, porteroManos.posicion);
+      const porteroEnArea = v4 && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado);
+      if (porteroEnArea) destino = limitarAreaPropia(destino, j.lado);
       if (j.puesto === "POR" && j.id !== balon.poseedor) {
         const propio = transformar(destino, j.lado);
         propio.x = limitar(propio.x, ARENA.controlM, ARENA.areaLargoM);
@@ -348,7 +433,9 @@ export class MotorArena {
       const ax = deseada.x - j.velocidad.x, ay = deseada.y - j.velocidad.y;
       const delta = Math.hypot(ax, ay), factor = delta ? Math.min(1, ARENA.aceleracionMps2 * ARENA.pasoS / delta) : 0;
       const velocidad = { x: j.velocidad.x + ax * factor, y: j.velocidad.y + ay * factor };
-      const bruto = { x: j.posicion.x + velocidad.x * ARENA.pasoS, y: j.posicion.y + velocidad.y * ARENA.pasoS };
+      let bruto = { x: j.posicion.x + velocidad.x * ARENA.pasoS, y: j.posicion.y + velocidad.y * ARENA.pasoS };
+      // La posición, no solo el destino: ninguna separación lo empuja fuera del área ni tras su línea.
+      if (porteroEnArea) bruto = limitarAreaPropia(bruto, j.lado);
       if (this.conReinicios && j.id === balon.poseedor && cruceDeBanda(j.posicion, bruto)) this.salidaConduccion = bruto;
       const siguiente = enCancha(bruto);
       const recorrido = distancia(j.posicion, siguiente);
@@ -357,6 +444,14 @@ export class MotorArena {
       const calor = entorno?.desgaste ?? (this.config.partido.condiciones?.clima === "calor" ? ARENA.factorCalor : 1);
       j.energia = limitar(j.energia - recorrido * (entorno ? T.energiaPorMetro * (1 + Math.max(0, ritmo - 1) * T.desgasteRitmo) : ARENA.energiaPorMetro) * calor + (recorrido < ARENA.toleranciaM ? ARENA.recuperacionEnergiaS * ARENA.pasoS : 0), ARENA.energiaMin, 1);
     }
+  }
+  /** Brief 046 (v4): destino del poseedor. El de campo conduce hacia el área (sin cruzar la línea)
+   * y renueva un `conducir` alcanzado; el portero nunca conduce por defecto. */
+  private destinoPoseedor(j: JugadorArena, orden: OrdenJugador, destino: Punto, manos: boolean): Punto {
+    const limitado = limitarConduccion(destino, j.lado);
+    const conduce = orden.accion === "conducir" && distancia(j.posicion, limitado) >= A.renovarConduccionM;
+    if (j.puesto === "POR") return conduce && !manos ? limitado : { ...j.posicion };
+    return conduce ? limitado : conduccionPorDefecto(j);
   }
   private prepararSaque(tipo: TipoReinicioArena, lado: Lado, punto: Punto, ultimoToque?: string): void {
     this.realizarCambios();
@@ -426,6 +521,7 @@ export class MotorArena {
     const desde = this.estado.balon.posicion;
     this.evento("reinicio", portero, desde, portero.posicion);
     this.estado.balon = { posicion: { ...portero.posicion }, poseedor: portero.id, vuelo: null };
+    if (this.v4 && enAreaPropia(portero.posicion, portero.lado)) this.darManos(portero, this.estado.tick, this.estado.tick + ticksManos());
     this.ultimaAccion = this.estado.tick;
     if (this.estado.entrenadores) this.estado.pausa = { hastaTick: this.estado.tick + Math.round(T.pausaS / ARENA.pasoS), lado, punto: { ...portero.posicion }, motivo: "reinicio" };
   }
@@ -459,8 +555,12 @@ export class MotorArena {
     this.realizarCambios();
     const receptor = this.estado.jugadores.find(j => j.id === portador.id) ?? this.estado.jugadores.filter(j => j.lado === portador.lado).sort((a, b) => distancia(a.posicion, portador.posicion) - distancia(b.posicion, portador.posicion))[0]!;
     this.estado.balon = { posicion: { ...receptor.posicion }, poseedor: receptor.id, vuelo: null };
+    const finPausa = this.estado.tick + Math.round(T.pausaS / ARENA.pasoS);
+    // Brief 046 v1.1: la falta sobre el portero en su área se reanuda con el balón en las manos y
+    // un plazo nuevo (mínimo para soltar y máximo) que empieza al terminar la pausa.
+    if (this.v4 && receptor.puesto === "POR" && enAreaPropia(receptor.posicion, receptor.lado)) this.darManos(receptor, finPausa, finPausa + ticksManos());
     this.evento("reinicio", receptor, portador.posicion, receptor.posicion, null, { motivo: "falta", fuentes: [falta.id] });
-    this.estado.pausa = { hastaTick: this.estado.tick + Math.round(T.pausaS / ARENA.pasoS), lado: receptor.lado, punto: { ...receptor.posicion }, motivo: "falta" };
+    this.estado.pausa = { hastaTick: finPausa, lado: receptor.lado, punto: { ...receptor.posicion }, motivo: "falta" };
     this.ultimaAccion = this.estado.tick; this.ultimaDisputa = this.estado.tick;
     return true;
   }
@@ -476,6 +576,8 @@ export class MotorArena {
     const tipo = suelto ? "recuperacion" : j.lado === vuelo.lado ? "recepcion" : vuelo.tipo === "tiro" && j.puesto === "POR" ? "atajada" : "intercepcion";
     this.evento(tipo, j, desde, j.posicion, suelto ? null : vuelo.autor);
     this.estado.balon = { posicion: { ...j.posicion }, poseedor: j.id, vuelo: null, ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}) };
+    // Brief 046 (v4): el portero que recibe dentro de su área, sea cual sea el tipo, lo tiene en las manos.
+    if (this.v4 && j.puesto === "POR" && enAreaPropia(j.posicion, j.lado)) this.darManos(j, this.estado.tick, this.estado.tick + ticksManos());
     this.ultimaAccion = this.estado.tick;
     this.ultimaDisputa = this.estado.tick;
   }
@@ -485,6 +587,8 @@ export class MotorArena {
     if (portador) {
       if (this.conReinicios) { balon.ultimoToque = { jugador: portador.id, lado: portador.lado }; if (this.salidaConduccion && this.resolverSalida(balon.posicion, this.salidaConduccion)) return; }
       balon.posicion = { ...portador.posicion };
+      // Brief 046 (v4): con el balón en las manos no hay duelo ni falta (recuperacionCadaS no aplica).
+      if (this.v4 && balon.manos) return;
       if ((this.estado.tick - this.ultimaDisputa) * ARENA.pasoS < ARENA.recuperacionCadaS) return;
       const rivales = this.estado.jugadores.filter(j => j.lado !== portador.lado && distancia(j.posicion, portador.posicion) <= ARENA.controlM).sort((a, b) => distancia(a.posicion, portador.posicion) - distancia(b.posicion, portador.posicion) || a.id.localeCompare(b.id));
       const defensor = rivales[0];
@@ -509,9 +613,13 @@ export class MotorArena {
       const punto = proyeccion(j.posicion, desde, extremo);
       const propia = transformar(j.posicion, j.lado);
       const area = propia.x <= ARENA.areaLargoM && Math.abs(propia.y - ARENA.anchoM / 2) <= ARENA.areaAnchoM / 2;
-      const radio = j.puesto === "POR" && area ? ARENA.controlPorteroM : ARENA.controlM;
+      // Brief 046 (v4): ante un remate el radio del portero depende de la distancia de origen.
+      const radio = j.puesto === "POR" && area ? (this.v4 && vuelo?.tipo === "tiro" ? radioAtajada(distancia(vuelo.origen, j.posicion)) : ARENA.controlPorteroM) : ARENA.controlM;
       const ignorar = vuelo && ((j.id === vuelo.autor && (vuelo.reinicio || (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS)) || this.conReinicios && j.id === balon.ultimoToque?.jugador && (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS);
-      return { j, ...punto, contacto: !ignorar && punto.distancia <= radio };
+      // Fase aérea del centro (v1.1) y del saque largo del portero (v1.2): solo cuentan los contactos cuyo punto proyectado sobre la
+      // trayectoria queda a ≤ caidaM del destino (perturbado) del vuelo.
+      const aereo = this.v4 && (vuelo?.centro || vuelo?.aereo) && distancia({ x: desde.x + (extremo.x - desde.x) * punto.t, y: desde.y + (extremo.y - desde.y) * punto.t }, vuelo.destino) > A.caidaM;
+      return { j, ...punto, contacto: !ignorar && !aereo && punto.distancia <= radio };
     }).filter(c => c.contacto).sort((a, b) => a.t - b.t || a.distancia - b.distancia || a.j.id.localeCompare(b.j.id));
     if (contactos[0]) {
       const j = contactos[0].j;
@@ -522,7 +630,7 @@ export class MotorArena {
         // reinicios-v1/v2 conservaban el vuelo como "tiro" del rematador (y contaban un
         // segundo tiro_fuera si salía); desde v3 el desvío es un rechace del portero: un
         // balón suelto que conserva el lado del remate (movimiento y anclas como en v2).
-        const rechace = this.config.reglas === ARENA.reglas ? { tipo: "rechace" as const, autor: j.id, receptor: null } : {};
+        const rechace = reglasDesde(this.config, "reinicios-v3") ? { tipo: "rechace" as const, autor: j.id, receptor: null } : {};
         this.estado.balon = { posicion: punto, poseedor: null, ultimoToque: { jugador: j.id, lado: j.lado }, vuelo: { ...vuelo, ...rechace, origen: punto, destino, inicioTick: this.estado.tick, adelantados: [] } };
         return;
       }

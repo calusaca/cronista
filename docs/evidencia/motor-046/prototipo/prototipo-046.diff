@@ -1,0 +1,210 @@
+--- a/src/arena/motor.ts
++++ b/src/arena/motor.ts
+@@ -143,6 +143,35 @@
+ 
+ /** El saque de centro reglamentario (inicial y tras gol) existe desde reinicios-v2. */
+ const centroReglamentario = (config: ConfigArena) => config.reglas !== undefined && config.reglas !== "reinicios-v1";
++const FIX = (process.env.FIX ?? "1,2,3,L").split(",");
++const F = (k: string) => FIX.includes(k);
++const num = (k: string, d: number) => process.env[k] !== undefined ? Number(process.env[k]) : d;
++const PO = { radioM: num("MAM_R", 28), holguraM: num("HOLG", 1), fraccion: num("SAL_F", 0.3), salidaMaxM: num("SAL_MAX", 14), reaccionM: num("REAC", 8), cuerpoM: num("CUERPO", 0.5), manosMaxS: num("MANOS", 4), distanciaManosM: 4, saqueManosMaxM: 40 };
++const CE = { zonaXM: num("ZONA", 75), margenFondoM: 2, margenBandaM: 2, giroFondoM: 6, giroInteriorM: 2, paloXM: 5.5, paloYM: 3, penalXM: 11, llegadaM: num("LLEG", 10), maxM: 40, caidaM: num("CAIDA", 5), conductorXM: 95, rematadores: num("REM", 2), renovarM: 2, margenFJ: 0.5 };
++const enAreaPropia = (p: Punto, lado: Lado) => { const o = transformar(p, lado); return o.x <= ARENA.areaLargoM && Math.abs(o.y - ARENA.anchoM / 2) <= ARENA.areaAnchoM / 2; };
++export function manoAMano(estado: EstadoArena, ladoPortero: Lado): JugadorArena | null {
++  if (estado.saque || estado.pausa && estado.tick < estado.pausa.hastaTick) return null;
++  const p = estado.jugadores.find(j => j.id === estado.balon.poseedor);
++  if (!p || p.lado === ladoPortero || p.puesto === "POR") return null;
++  const pp = transformar(p.posicion, p.lado);
++  if (Math.hypot(pp.x - ARENA.largoM, pp.y - ARENA.anchoM / 2) > PO.radioM) return null;
++  const campo = estado.jugadores.filter(j => j.lado === ladoPortero && j.puesto !== "POR");
++  return campo.every(c => transformar(c.posicion, p.lado).x <= pp.x) ? p : null;
++}
++const enZonaCentro = (o: Punto) => o.x >= CE.zonaXM && Math.abs(o.y - ARENA.anchoM / 2) >= ARENA.areaAnchoM / 2;
++const puntoGiro = (o: Punto) => ({ x: ARENA.largoM - CE.giroFondoM, y: ARENA.anchoM / 2 + Math.sign(o.y - ARENA.anchoM / 2 || 1) * (ARENA.areaAnchoM / 2 - CE.giroInteriorM) });
++function conduccionDefecto(j: JugadorArena): Punto {
++  const o = transformar(j.posicion, j.lado);
++  if (!F("2")) return enCancha({ x: j.posicion.x + (j.lado === "local" ? ARENA.avanceConduccionM : -ARENA.avanceConduccionM), y: j.posicion.y });
++  let d: Punto;
++  if (o.x < CE.zonaXM) d = { x: o.x + ARENA.avanceConduccionM, y: o.y };
++  else if (enZonaCentro(o)) d = puntoGiro(o);
++  else { const gx = ARENA.largoM - o.x, gy = ARENA.anchoM / 2 - o.y, n = Math.hypot(gx, gy) || 1; d = { x: o.x + gx / n * ARENA.avanceConduccionM, y: o.y + gy / n * ARENA.avanceConduccionM }; }
++  if (F("2")) d = { x: Math.min(d.x, ARENA.largoM - CE.margenFondoM), y: limitar(d.y, CE.margenBandaM, ARENA.anchoM - CE.margenBandaM) };
++  return enCancha(transformar(d, j.lado));
++}
++const objetivosCentro = (o: Punto) => { const s = Math.sign(o.y - ARENA.anchoM / 2) || 1; return [
++  { x: ARENA.largoM - CE.paloXM, y: ARENA.anchoM / 2 + s * CE.paloYM }, { x: ARENA.largoM - CE.penalXM, y: ARENA.anchoM / 2 }, { x: ARENA.largoM - CE.paloXM, y: ARENA.anchoM / 2 - s * CE.paloYM }]; };
+ 
+ export class MotorArena {
+   readonly estado: EstadoArena;
+@@ -273,6 +302,21 @@
+     this.evento(tipo, j, desde, objetivo, receptor);
+     this.ultimaAccion = this.estado.tick;
+   }
++  private opcionCentro(j: JugadorArena): { destino: Punto; receptor: JugadorArena } | undefined {
++    const o = transformar(j.posicion, j.lado);
++    const rivales = this.estado.jugadores.filter(p => p.lado !== j.lado), propios = this.estado.jugadores.filter(p => p.lado === j.lado && p.id !== j.id && p.puesto !== "POR");
++    let mejor: { destino: Punto; receptor: JugadorArena; puntos: number } | undefined;
++    for (const t of objetivosCentro(o)) {
++      const destino = transformar(t, j.lado);
++      if (distancia(j.posicion, destino) > CE.maxM) continue;
++      const receptor = propios.filter(p => distancia(p.posicion, destino) <= CE.llegadaM).sort((a, b) => distancia(a.posicion, destino) - distancia(b.posicion, destino) || a.id.localeCompare(b.id))[0];
++      if (!receptor) continue;
++      const contrarios = process.env.SINPOR ? rivales.filter(r => r.puesto !== "POR") : rivales;
++      const puntos = Math.min(...contrarios.map(r => distancia(r.posicion, destino))) - distancia(receptor.posicion, destino);
++      if (puntos > -num("DISPUTA", 0) && (!mejor || puntos > mejor.puntos)) mejor = { destino, receptor, puntos };
++    }
++    return mejor;
++  }
+   private accionBalon(planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>): void {
+     const j = this.estado.jugadores.find(p => p.id === this.estado.balon.poseedor);
+     const ritmo = j && this.estado.entrenadores ? T.ritmo[this.estado.entrenadores[j.lado].plan.ritmo] : 1;
+@@ -280,10 +324,26 @@
+     const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
+     const usarOrden = !ejecutadas.has(j.id);
+     const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, j.lado);
+-    // V2 respeta un pase/conducción explícito aun cerca del arco. La personalidad
+-    // decide solo al elegir una acción local; no reemplaza una orden válida del LLM.
+-    const accionExplicita = usarOrden && ["pasar", "conducir", "tirar"].includes(orden.accion);
+-    // Solo una acción local usa la opción de pase; con orden explícita se descartaba.
++    const manos = F("3") ? (this.estado.balon as any).manos : null;
++    if (manos) {
++      const explicito = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === j.lado) : undefined;
++      const despejado = !process.env.ESPERA || this.estado.jugadores.every(p => p.lado === j.lado || distancia(p.posicion, j.posicion) >= PO.distanciaManosM);
++      let receptor = !despejado ? undefined : explicito && distancia(j.posicion, explicito.posicion) <= PO.saqueManosMaxM ? explicito : opcionPase(j, this.observar(j.lado));
++      if (!receptor && this.estado.tick >= manos.hastaTick) {
++        const rivales = this.estado.jugadores.filter(p => p.lado !== j.lado);
++        receptor = this.estado.jugadores.filter(p => p.lado === j.lado && p.id !== j.id && distancia(j.posicion, p.posicion) <= PO.saqueManosMaxM)
++          .map(p => ({ p, m: Math.min(...rivales.map(r => proyeccion(r.posicion, j.posicion, p.posicion).distancia)) })).sort((a, b) => b.m - a.m || a.p.id.localeCompare(b.p.id))[0]?.p;
++      }
++      if (receptor) {
++        const viaje = distancia(j.posicion, receptor.posicion) / ARENA.velocidadBalonMps;
++        const destino = enCancha({ x: receptor.posicion.x + receptor.velocidad.x * viaje, y: receptor.posicion.y + receptor.velocidad.y * viaje });
++        this.sacarBalon(j, "pase", destino, receptor.id); this.eventos.at(-1)!.motivo = "saque_manos"; ejecutadas.add(j.id);
++      }
++      return;
++    }
++    const receptorOrden = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor) : undefined;
++    const pasarImposible = F("L") && usarOrden && orden.accion === "pasar" && (!receptorOrden || distancia(j.posicion, receptorOrden.posicion) > ARENA.paseMaxM);
++    const accionExplicita = usarOrden && ["pasar", "conducir", "tirar"].includes(orden.accion) && !pasarImposible;
+     const paseLocal = j.personalidad && !accionExplicita ? opcionPase(j, this.observar(j.lado)) : undefined;
+     const tiroLocal = j.personalidad
+       ? !accionExplicita && prefiereTirar(j, distancia(j.posicion, arco), !!paseLocal)
+@@ -291,11 +351,18 @@
+     if ((usarOrden && orden.accion === "tirar") || tiroLocal) {
+       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
+     }
++    if (F("2") && !accionExplicita && j.puesto !== "POR") {
++      const o = transformar(j.posicion, j.lado);
++      const giro = transformar(puntoGiro(o), j.lado);
++      if (enZonaCentro(o) && (!prefiereConducir(j) || o.x >= CE.conductorXM || distancia(j.posicion, giro) < CE.renovarM)) {
++        const c = this.opcionCentro(j);
++        if (c) { this.sacarBalon(j, "pase", c.destino, c.receptor.id); (this.estado.balon.vuelo as any).centro = true; this.eventos.at(-1)!.motivo = "centro"; ejecutadas.add(j.id); return; }
++      }
++    }
+     if (usarOrden && orden.accion === "conducir") { ejecutadas.add(j.id); this.ultimaAccion = this.estado.tick; return; }
+-    const receptor = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor)
++    const receptor = usarOrden && orden.accion === "pasar" && !pasarImposible ? receptorOrden
+       : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : opcionPase(j, this.observar(j.lado));
+     if (receptor && distancia(j.posicion, receptor.posicion) <= ARENA.paseMaxM) {
+-      // Extrapolación de velocidad actual, no consulta a una posición futura.
+       const viaje = distancia(j.posicion, receptor.posicion) / ARENA.velocidadBalonMps;
+       const destino = enCancha({ x: receptor.posicion.x + receptor.velocidad.x * viaje, y: receptor.posicion.y + receptor.velocidad.y * viaje });
+       this.sacarBalon(j, "pase", destino, receptor.id); ejecutadas.add(j.id);
+@@ -307,6 +374,21 @@
+     const balon = this.estado.balon;
+     const poseedor = antes.find(j => j.id === balon.poseedor);
+     const ladoBalon = poseedor?.lado ?? balon.vuelo?.lado;
++    const mam = F("1") ? { local: manoAMano(this.estado, "local"), visita: manoAMano(this.estado, "visita") } : { local: null, visita: null };
++    const manos = F("3") ? (balon as any).manos : null, porManos = manos ? antes.find(j => j.id === manos.portero) : undefined;
++    const llegada = new Map<string, Punto>();
++    if (F("2") && ladoBalon) {
++      const A = ladoBalon, o = transformar(balon.posicion, A);
++      if (enZonaCentro(o) && (poseedor?.lado === A && poseedor.puesto !== "POR" || (balon.vuelo as any)?.centro)) {
++        const obj = objetivosCentro(o), destinos = [obj[0]!, obj[2]!, obj[1]!];
++        const defs = antes.filter(j => j.lado !== A).map(j => transformar(j.posicion, A).x).sort((a, b) => b - a);
++        const linea = Math.max(ARENA.largoM / 2, o.x, defs[1] ?? ARENA.largoM) - CE.margenFJ;
++        const cambio = ladoBalon !== posesionInicial;
++        antes.filter(j => j.lado === A && j.puesto !== "POR" && j.id !== balon.poseedor && j.id !== balon.vuelo?.receptor && (cambio || ["apoyar", "profundidad"].includes(planes[A].ordenes.find(x => x.jugador === j.id)!.accion)))
++          .sort((a, b) => transformar(b.posicion, A).x - transformar(a.posicion, A).x || a.id.localeCompare(b.id)).slice(0, CE.rematadores)
++          .forEach((c, i) => { const d = destinos[i]!; llegada.set(c.id, enCancha(transformar({ x: Math.min(d.x, linea), y: d.y }, A))); });
++      }
++    }
+     const perseguidores = Object.fromEntries(lados.map(lado => [lado, antes.filter(j => j.lado === lado && j.puesto !== "POR").sort((a, b) => distancia(a.posicion, balon.posicion) - distancia(b.posicion, balon.posicion) || a.id.localeCompare(b.id))[0]?.id]));
+     for (const j of this.estado.jugadores) {
+       const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
+@@ -318,13 +400,29 @@
+         if (ladoBalon !== j.lado) nominal.x += ARENA.alturaBloqueM[planes[j.lado].bloque];
+         destino = enCancha(transformar(nominal, j.lado));
+       }
++      if (llegada.has(j.id)) destino = { ...llegada.get(j.id)! };
+       if (j.id === balon.vuelo?.receptor) destino = { ...balon.vuelo.destino };
+       if ((ladoBalon !== j.lado || balon.poseedor === null && balon.vuelo === null) && perseguidores[j.lado] === j.id) destino = { ...balon.posicion };
+       if (orden.accion === "presionar" && ladoBalon !== j.lado && j.puesto !== "POR") destino = { ...balon.posicion };
+       if (j.id === balon.poseedor) {
+         // Los pases/tiros ya ejecutados no arrastran al portador a su propio
+         // receptor: al conducir, el control local busca progresar.
+-        if (orden.accion !== "conducir" || distancia(j.posicion, destino) < ARENA.toleranciaM) destino = enCancha({ x: j.posicion.x + (j.lado === "local" ? ARENA.avanceConduccionM : -ARENA.avanceConduccionM), y: j.posicion.y });
++        if (orden.accion !== "conducir" || distancia(j.posicion, destino) < (F("L") ? CE.renovarM : ARENA.toleranciaM)) destino = conduccionDefecto(j);
++        else if (F("2")) { const o = transformar(destino, j.lado); destino = enCancha(transformar({ x: Math.min(o.x, ARENA.largoM - CE.margenFondoM), y: limitar(o.y, CE.margenBandaM, ARENA.anchoM - CE.margenBandaM) }, j.lado)); }
++      }
++      if (F("1") && j.puesto === "POR" && j.id !== balon.poseedor && mam[j.lado]) {
++        const b = transformar(balon.posicion, j.lado), cy = ARENA.anchoM / 2, dx = b.x, dy = b.y - cy, d = Math.hypot(dx, dy) || 1;
++        const s = Math.min(PO.salidaMaxM, Math.max(ARENA.controlM, d - Math.max(PO.holguraM, PO.fraccion * d)));
++        destino = transformar({ x: dx / d * s, y: cy + dy / d * s }, j.lado);
++      }
++      if (F("3") && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado)) {
++        const propio = transformar(j.posicion, j.lado);
++        propio.x = limitar(propio.x, ARENA.controlM, ARENA.areaLargoM); propio.y = limitar(propio.y, (ARENA.anchoM - ARENA.areaAnchoM) / 2, (ARENA.anchoM + ARENA.areaAnchoM) / 2);
++        destino = transformar(propio, j.lado);
++      }
++      if (porManos && j.lado !== porManos.lado) {
++        const dd = distancia(destino, porManos.posicion);
++        if (dd < PO.distanciaManosM) { let ux = destino.x - porManos.posicion.x, uy = destino.y - porManos.posicion.y; if (!dd) { ux = j.posicion.x - porManos.posicion.x; uy = j.posicion.y - porManos.posicion.y; } const n = Math.hypot(ux, uy) || 1; destino = enCancha({ x: porManos.posicion.x + ux / n * PO.distanciaManosM, y: porManos.posicion.y + uy / n * PO.distanciaManosM }); }
+       }
+       if (j.puesto === "POR" && j.id !== balon.poseedor) {
+         const propio = transformar(destino, j.lado);
+@@ -349,6 +447,7 @@
+       const delta = Math.hypot(ax, ay), factor = delta ? Math.min(1, ARENA.aceleracionMps2 * ARENA.pasoS / delta) : 0;
+       const velocidad = { x: j.velocidad.x + ax * factor, y: j.velocidad.y + ay * factor };
+       const bruto = { x: j.posicion.x + velocidad.x * ARENA.pasoS, y: j.posicion.y + velocidad.y * ARENA.pasoS };
++      if (F("3") && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado)) { const o = transformar(bruto, j.lado); o.x = limitar(o.x, ARENA.controlM, ARENA.areaLargoM); o.y = limitar(o.y, (ARENA.anchoM - ARENA.areaAnchoM) / 2, (ARENA.anchoM + ARENA.areaAnchoM) / 2); const b2 = transformar(o, j.lado); bruto.x = b2.x; bruto.y = b2.y; }
+       if (this.conReinicios && j.id === balon.poseedor && cruceDeBanda(j.posicion, bruto)) this.salidaConduccion = bruto;
+       const siguiente = enCancha(bruto);
+       const recorrido = distancia(j.posicion, siguiente);
+@@ -426,6 +525,7 @@
+     const desde = this.estado.balon.posicion;
+     this.evento("reinicio", portero, desde, portero.posicion);
+     this.estado.balon = { posicion: { ...portero.posicion }, poseedor: portero.id, vuelo: null };
++    if (F("3") && enAreaPropia(portero.posicion, portero.lado)) (this.estado.balon as any).manos = { portero: portero.id, desdeTick: this.estado.tick, hastaTick: this.estado.tick + Math.round(PO.manosMaxS / ARENA.pasoS) };
+     this.ultimaAccion = this.estado.tick;
+     if (this.estado.entrenadores) this.estado.pausa = { hastaTick: this.estado.tick + Math.round(T.pausaS / ARENA.pasoS), lado, punto: { ...portero.posicion }, motivo: "reinicio" };
+   }
+@@ -476,6 +576,7 @@
+     const tipo = suelto ? "recuperacion" : j.lado === vuelo.lado ? "recepcion" : vuelo.tipo === "tiro" && j.puesto === "POR" ? "atajada" : "intercepcion";
+     this.evento(tipo, j, desde, j.posicion, suelto ? null : vuelo.autor);
+     this.estado.balon = { posicion: { ...j.posicion }, poseedor: j.id, vuelo: null, ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}) };
++    if (F("3") && j.puesto === "POR" && enAreaPropia(j.posicion, j.lado)) (this.estado.balon as any).manos = { portero: j.id, desdeTick: this.estado.tick, hastaTick: this.estado.tick + Math.round(PO.manosMaxS / ARENA.pasoS) };
+     this.ultimaAccion = this.estado.tick;
+     this.ultimaDisputa = this.estado.tick;
+   }
+@@ -485,6 +586,7 @@
+     if (portador) {
+       if (this.conReinicios) { balon.ultimoToque = { jugador: portador.id, lado: portador.lado }; if (this.salidaConduccion && this.resolverSalida(balon.posicion, this.salidaConduccion)) return; }
+       balon.posicion = { ...portador.posicion };
++      if (F("3") && (balon as any).manos) return;
+       if ((this.estado.tick - this.ultimaDisputa) * ARENA.pasoS < ARENA.recuperacionCadaS) return;
+       const rivales = this.estado.jugadores.filter(j => j.lado !== portador.lado && distancia(j.posicion, portador.posicion) <= ARENA.controlM).sort((a, b) => distancia(a.posicion, portador.posicion) - distancia(b.posicion, portador.posicion) || a.id.localeCompare(b.id));
+       const defensor = rivales[0];
+@@ -509,9 +611,10 @@
+       const punto = proyeccion(j.posicion, desde, extremo);
+       const propia = transformar(j.posicion, j.lado);
+       const area = propia.x <= ARENA.areaLargoM && Math.abs(propia.y - ARENA.anchoM / 2) <= ARENA.areaAnchoM / 2;
+-      const radio = j.puesto === "POR" && area ? ARENA.controlPorteroM : ARENA.controlM;
++      const radio = j.puesto === "POR" && area ? (F("1") && vuelo?.tipo === "tiro" ? Math.max(PO.cuerpoM, ARENA.controlPorteroM * Math.min(1, distancia(vuelo.origen, j.posicion) / PO.reaccionM)) : ARENA.controlPorteroM) : ARENA.controlM;
+       const ignorar = vuelo && ((j.id === vuelo.autor && (vuelo.reinicio || (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS)) || this.conReinicios && j.id === balon.ultimoToque?.jugador && (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS);
+-      return { j, ...punto, contacto: !ignorar && punto.distancia <= radio };
++      const aereo = F("2") && (vuelo as any)?.centro && distancia(extremo, vuelo!.destino) > CE.caidaM;
++      return { j, ...punto, contacto: !ignorar && !aereo && punto.distancia <= radio };
+     }).filter(c => c.contacto).sort((a, b) => a.t - b.t || a.distancia - b.distancia || a.j.id.localeCompare(b.j.id));
+     if (contactos[0]) {
+       const j = contactos[0].j;

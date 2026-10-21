@@ -1,0 +1,241 @@
+{
+  "fecha": "2026-10-21T16:45:17.720Z",
+  "reglas": "reinicios-v4",
+  "final": {
+    "local": 0,
+    "visita": 0
+  },
+  "eventos": 50,
+  "centros": 2,
+  "decisiones": [
+    {
+      "lado": "local",
+      "tick": 0,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "profundidad",
+        "cubrir",
+        "apoyar",
+        "apoyar",
+        "profundidad",
+        "cubrir",
+        "cubrir",
+        "conducir",
+        "profundidad"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 0,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "apoyar"
+      ]
+    },
+    {
+      "lado": "local",
+      "tick": 150,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "cubrir",
+        "profundidad",
+        "cubrir",
+        "apoyar",
+        "apoyar",
+        "profundidad",
+        "pasar",
+        "cubrir",
+        "conducir",
+        "profundidad"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 150,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "presionar"
+      ]
+    },
+    {
+      "lado": "local",
+      "tick": 300,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "profundidad",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "apoyar"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 300,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "profundidad",
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "centrar",
+        "profundidad",
+        "pasar"
+      ]
+    },
+    {
+      "lado": "local",
+      "tick": 450,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "profundidad",
+        "cubrir",
+        "profundidad",
+        "apoyar",
+        "profundidad",
+        "cubrir",
+        "cubrir",
+        "pasar",
+        "centrar"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 450,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "mover",
+        "apoyar"
+      ]
+    },
+    {
+      "lado": "local",
+      "tick": 600,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "cubrir",
+        "profundidad",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "tirar",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "apoyar"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 600,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "profundidad",
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "pasar",
+        "profundidad",
+        "centrar"
+      ]
+    },
+    {
+      "lado": "local",
+      "tick": 750,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "pasar",
+        "profundidad",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "pasar",
+        "tirar"
+      ]
+    },
+    {
+      "lado": "visita",
+      "tick": 750,
+      "origen": "controlador",
+      "motivo": "valida",
+      "acciones": [
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "apoyar",
+        "cubrir",
+        "cubrir",
+        "cubrir",
+        "presionar",
+        "tirar",
+        "centrar"
+      ]
+    }
+  ],
+  "reproduccionIdentica": true
+}

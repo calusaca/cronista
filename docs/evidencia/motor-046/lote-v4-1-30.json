@@ -1,0 +1,59 @@
+{
+ "generado": "2026-10-21T17:26:37.300Z",
+ "commit": "da10b4d185d421b2734bdfc31c73156617186add",
+ "arbolConCambios": true,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "banda": "rapido",
+ "incumplimientos": [],
+ "segundos": 4.9,
+ "metricas": {
+  "reglas": "reinicios-v4",
+  "semillas": {
+   "desde": 1,
+   "hasta": 30
+  },
+  "duracionS": 120,
+  "partidos": 30,
+  "golesPorPartido": 2.1333333333333333,
+  "desviacionGoles": 1.0873004286866725,
+  "tirosPorPartido": 4.566666666666666,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 47,
+  "perdidasTrasAtajada": 0,
+  "perdidasArea": 0,
+  "perdidasAreaPorPartido": 0,
+  "manoAMano": {
+   "episodios": 104,
+   "goles": 35,
+   "conversion": 0.33653846153846156,
+   "fraccionDeGoles": 0.546875,
+   "desplazamientoMedianaM": 2.0304432462718296,
+   "desplazamientoP75M": 3.4720680230939114,
+   "fraccionDesplazado": 0.6442307692307693
+  },
+  "centros": {
+   "pasesBanda": 49,
+   "alArea": 23,
+   "proporcion": 0.46938775510204084,
+   "motivoCentro": 20,
+   "porPartido": 0.6666666666666666
+  },
+  "saquesManos": 134,
+  "saquesPerdidos": 5,
+  "saquesPerdidosPorPartido": 0.16666666666666666,
+  "intercepcionesInmediatas": 0,
+  "golesTrasSaque": 0,
+  "golesTrasSaquePorPartido": 0,
+  "metas": 2,
+  "metasConduccion": 0,
+  "metasConduccionPorPartido": 0,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 3622,
+   "frenados": 558,
+   "fraccion": 0.154058531198233
+  },
+  "fuerasDeJuego": 82
+ }
+}

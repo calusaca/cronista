@@ -16,7 +16,10 @@ export function ArenaMesa({ comentarios, intervenciones, tick, idioma }: { comen
   const narrador = comentarios.filter(c => c.tick <= tick).at(-1);
   const ultima = (rol: Exclude<RolMesa, "narrador">) => intervenciones.filter(i => i.rol === rol && i.tick <= tick).sort((a, b) => a.tick - b.tick).at(-1);
   const auditoria = (audit: ComentarioArena["audit"]) => audit.map(a => <p key={a.intento}>{t("Attempt", "Intento")} {a.intento}: {a.motivos.length ? a.motivos.map(m => `${m.regla}: ${m.detalle}`).join(" · ") : t("passed the V1–V8 rules", "aprobado por las reglas V1–V8")}</p>);
+  // Brief 047: iniciales decorativas derivadas del nombre ficticio existente (no es copy nuevo).
+  const iniciales = (nombre: string) => nombre.split(/\s+/).map(p => p[0]).join("").slice(0, 2).toUpperCase();
   const tarjeta = (rol: RolMesa, contenido: ReactNode) => <article key={rol} className="arena-mesa-card" data-mesa-role={rol} data-testid={`arena-mesa-${rol}`}>
+    <span className="arena-mesa-avatar" aria-hidden="true">{iniciales(MESA_ARENA.nombres[idioma][rol])}</span>
     <h3>{MESA_ARENA.nombres[idioma][rol]} <span className="arena-muted">· {rotulo[rol]}</span></h3>
     {contenido}
   </article>;
@@ -24,7 +27,7 @@ export function ArenaMesa({ comentarios, intervenciones, tick, idioma }: { comen
     const i = ultima(rol);
     if (!i) return tarjeta(rol, <p className="arena-muted">{rol === "comentarista" ? t("The analysis will appear in a calm moment, citing confirmed facts.", "El análisis aparecerá en un momento de calma, citando hechos confirmados.") : t("Match data will appear here as it changes.", "Los datos del partido aparecerán aquí cuando cambien.")}</p>);
     return tarjeta(rol, <div data-intervencion={i.id} data-intervencion-tick={i.tick}>
-      <p className="arena-muted" data-testid={`arena-mesa-${rol}-modo`}>{instante(i.tick)} · {modo(i.modo)}{i.modelo && i.modo === "llm" ? ` · ${i.modelo}` : ""}</p>
+      <p className="arena-muted arena-mesa-meta" data-testid={`arena-mesa-${rol}-modo`}>{instante(i.tick)} · {modo(i.modo)}{i.modelo && i.modo === "llm" ? ` · ${i.modelo}` : ""}</p>
       {i.oraciones.map((o, k) => <p key={k}>{es ? o.texto_es : o.texto_en}</p>)}
       <details><summary>{t("Inspect facts and checks", "Consultar hechos y verificaciones")}</summary>
         {i.oraciones.map((o, k) => {
@@ -45,7 +48,7 @@ export function ArenaMesa({ comentarios, intervenciones, tick, idioma }: { comen
   return <section className="arena-intelligence arena-mesa" aria-label={t("Broadcast desk", "Mesa de transmisión")} data-testid="arena-mesa">
     <h2>{t("Broadcast desk", "Mesa de transmisión")}</h2>
     {tarjeta("narrador", narrador ? <div>
-      <p className="arena-muted">{instante(narrador.tick)} · {modo(narrador.modo)} · {narrador.modelo}</p>
+      <p className="arena-muted arena-mesa-meta">{instante(narrador.tick)} · {modo(narrador.modo)} · {narrador.modelo}</p>
       {narrador.oraciones.map((o, i) => <p key={i}>{es ? o.texto_es : o.texto_en}</p>)}
       <details><summary>{t("Inspect facts and checks", "Consultar hechos y verificaciones")}</summary>
         {narrador.hechos.filter(h => narrador.oraciones.some(o => o.hecho === h.id)).map(h => <p key={h.id}><strong>{h.eventos.join(" · ")}</strong> · {es ? h.texto_es : h.texto_en}</p>)}

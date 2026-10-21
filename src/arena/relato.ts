@@ -19,6 +19,9 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   if (e.tipo === "atajada") return (es ? [`¡Ataja ${j}!`, `¡${j} detiene el remate!`, `¡El remate lo ataja ${j}!`, `¡Atajada de ${j}!`] : [`${j} makes the save!`, `${j} stops the shot!`, `The shot is saved by ${j}!`, `A save by ${j}!`])[variante]!;
   if (breve && e.tipo === "tiro") return (es ? [`¡Remata ${j}!`, `¡Disparo de ${j}!`, `¡${j} prueba el remate!`, `¡Le pega ${j}!`] : [`${j} shoots!`, `An attempt from ${j}!`, `${j} takes the shot!`, `${j} goes for goal!`])[variante]!;
   if (breve && e.tipo === "fuera_juego") return (es ? [`Fuera de juego de ${j}.`, `Señalan posición adelantada de ${j}.`, `${j} estaba en fuera de juego.`, `La acción se detiene: fuera de juego de ${j}.`] : [`${j} is offside.`, `Offside against ${j}.`, `${j} was caught offside.`, `Play stops for offside against ${j}.`])[variante]!;
+  // Brief 046: el centro tiene frase breve propia; el saque desde las manos usa el texto de `vista`.
+  if (breve && e.tipo === "pase" && e.motivo === "centro") return es ? `¡Centro de ${j}!` : `${j} sends in a cross!`;
+  if (e.tipo === "pase" && e.motivo === "saque_manos") return es ? h.texto_es : h.texto_en;
   if (breve && e.tipo === "pase" && receptor) return es ? `${j} busca a ${receptor}.` : `${j} looks for ${receptor}.`;
   if (breve && e.tipo === "recepcion") return es ? `Recibe ${j}.` : `${j} receives it.`;
   return es ? h.texto_es : h.texto_en;

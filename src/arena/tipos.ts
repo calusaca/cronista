@@ -7,7 +7,8 @@ export const formaciones = ["4-3-3", "4-2-3-1", "4-4-2", "4-1-4-1", "4-1-2-1-2",
 export type FormacionArena = (typeof formaciones)[number];
 export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalidades | typeof ARENA.versionLegado;
 /** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", ARENA.reglas] as const;
+/** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`). */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -74,11 +75,18 @@ export interface Vuelo {
   tipo: "pase" | "tiro" | "rechace"; autor: string; lado: Lado; receptor: string | null;
   origen: Punto; destino: Punto; inicioTick: number; adelantados: string[];
   reinicio?: TipoReinicioArena;
+  /** Brief 046 (reinicios-v4): centro con fase aérea; solo se toca cerca de su destino. */
+  centro?: true;
+  /** Brief 046 v1.2: saque largo del portero desde las manos; misma fase aérea que el centro. */
+  aereo?: true;
 }
 export interface EstadoArena {
   tick: number;
   jugadores: JugadorArena[];
-  balon: { posicion: Punto; poseedor: string | null; vuelo: Vuelo | null; ultimoToque?: { jugador: string; lado: Lado } };
+  balon: { posicion: Punto; poseedor: string | null; vuelo: Vuelo | null; ultimoToque?: { jugador: string; lado: Lado };
+    /** Brief 046 (reinicios-v4): el portero tiene el balón en las manos dentro de su área y no se
+     * le puede disputar. Desaparece en cuanto el motor reasigna el balón. */
+    manos?: { portero: string; desdeTick: number; hastaTick: number } };
   saque?: SaqueArena | null;
   marcador: Record<Lado, number>;
   arbitro?: ArbitroArena;
@@ -119,7 +127,7 @@ export const esquemaOrdenes = z.strictObject({
   bloque: z.enum(["bajo", "medio", "alto"]),
   ordenes: z.array(z.strictObject({
     jugador: z.string().min(1).max(40),
-    accion: z.enum(["mover", "apoyar", "profundidad", "cubrir", "presionar", "conducir", "pasar", "tirar"]),
+    accion: z.enum(["mover", "apoyar", "profundidad", "cubrir", "presionar", "conducir", "pasar", "tirar", "centrar"]),
     destino: punto,
     receptor: z.string().min(1).max(40).nullable(),
   })).min(1).max(11),

@@ -1,0 +1,4 @@
+{"encuadre":"escritorio","tema":"light","anchoDocumento":1440,"marcadorAbajo":713,"mesaEnAcompanante":305,"accionesEnAcompanante":883,"dorsalPx":17.7,"altoDocumento":5761,"desborde":false,"errores":[]}
+{"encuadre":"escritorio","tema":"dark","anchoDocumento":1440,"marcadorAbajo":713,"mesaEnAcompanante":305,"accionesEnAcompanante":883,"dorsalPx":17.7,"altoDocumento":5761,"desborde":false,"errores":[]}
+{"encuadre":"movil","tema":"light","anchoDocumento":360,"marcadorAbajo":1118,"mesaEnAcompanante":2092,"accionesEnAcompanante":2778,"dorsalPx":9,"altoDocumento":10804,"desborde":false,"errores":[]}
+{"encuadre":"movil","tema":"dark","anchoDocumento":360,"marcadorAbajo":1118,"mesaEnAcompanante":2092,"accionesEnAcompanante":2778,"dorsalPx":9,"altoDocumento":10804,"desborde":false,"errores":[]}

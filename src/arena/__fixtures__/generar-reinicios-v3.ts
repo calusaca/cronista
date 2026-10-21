@@ -41,7 +41,7 @@ export function cumpleFixtureV3(r: RegistroArena): boolean {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   for (let seed = 1; seed < 1000; seed++) {
-    const r = await ejecutarArena(crearConfigArena({ seed, duracionS: 40, intervaloS: 10 }), { local: controladorDobleCambio(), visita: crearControladorProgramado() });
+    const r = await ejecutarArena(crearConfigArena({ seed, duracionS: 40, intervaloS: 10, reglas: "reinicios-v3" }), { local: controladorDobleCambio(), visita: crearControladorProgramado() });
     if (!cumpleFixtureV3(r)) continue;
     for (const ronda of r.rondas) for (const d of Object.values(ronda.decisiones)) d.tiempoMs = 0;
     writeFileSync(fileURLToPath(new URL("./arena-reinicios-v3.json", import.meta.url)), JSON.stringify(r));

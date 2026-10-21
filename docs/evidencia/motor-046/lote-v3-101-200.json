@@ -1,0 +1,70 @@
+{
+ "generado": "2026-10-21T17:28:04.198Z",
+ "commit": "da10b4d185d421b2734bdfc31c73156617186add",
+ "arbolConCambios": true,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "banda": "completo",
+ "incumplimientos": [
+  "perdidasTrasAtajada=15 > 0",
+  "intercepcionesInmediatas=19 > 0",
+  "golesTrasSaquePorPartido=0.13 > 0.05",
+  "desplazamientoMedianaM=0 < 1",
+  "fraccionDesplazado=0.04361370716510903 < 0.45",
+  "conversion=0.4735202492211838 ∉ [0.25; 0.42]",
+  "proporcionCentros=0.07377049180327869 < 0.3",
+  "centrosPorPartido=0 < 0.4",
+  "metasConduccionPorPartido=0.88 > 0.05",
+  "conducirFrenado=0.36705548078361 > 0.25"
+ ],
+ "segundos": 20.3,
+ "metricas": {
+  "reglas": "reinicios-v3",
+  "semillas": {
+   "desde": 101,
+   "hasta": 200
+  },
+  "duracionS": 120,
+  "partidos": 100,
+  "golesPorPartido": 2.35,
+  "desviacionGoles": 1.3883443376914821,
+  "tirosPorPartido": 4.23,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 88,
+  "perdidasTrasAtajada": 15,
+  "perdidasArea": 19,
+  "perdidasAreaPorPartido": 0.19,
+  "manoAMano": {
+   "episodios": 321,
+   "goles": 152,
+   "conversion": 0.4735202492211838,
+   "fraccionDeGoles": 0.6468085106382979,
+   "desplazamientoMedianaM": 0,
+   "desplazamientoP75M": 0,
+   "fraccionDesplazado": 0.04361370716510903
+  },
+  "centros": {
+   "pasesBanda": 122,
+   "alArea": 9,
+   "proporcion": 0.07377049180327869,
+   "motivoCentro": 0,
+   "porPartido": 0
+  },
+  "saquesManos": 311,
+  "saquesPerdidos": 26,
+  "saquesPerdidosPorPartido": 0.26,
+  "intercepcionesInmediatas": 19,
+  "golesTrasSaque": 13,
+  "golesTrasSaquePorPartido": 0.13,
+  "metas": 99,
+  "metasConduccion": 88,
+  "metasConduccionPorPartido": 0.88,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 13374,
+   "frenados": 4909,
+   "fraccion": 0.36705548078361
+  },
+  "fuerasDeJuego": 244
+ }
+}

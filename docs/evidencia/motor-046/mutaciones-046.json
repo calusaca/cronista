@@ -1,0 +1,406 @@
+{
+ "ronda": 3,
+ "codigo": "brief 046 v1.2",
+ "entorno": "copias aisladas en el scratchpad; el árbol vivo no se muta; restauración por copia y md5",
+ "filas": [
+  {
+   "id": "1",
+   "prueba": "1 · tras una atajada",
+   "mutacion": "Quitar el return por balon.manos en moverBalon",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "2",
+   "prueba": "2 · balon.manos se crea",
+   "mutacion": "Crear manos sin comprobar el área (recibir)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "3a",
+   "prueba": "3 · no suelta antes",
+   "mutacion": "Quitar el saque forzado",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "3b",
+   "prueba": "3 · no suelta antes",
+   "mutacion": "Quitar la espera (rival a menos de distanciaManosM)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "3c",
+   "prueba": "3 · no suelta antes",
+   "mutacion": "Permitir soltar en el tick de la atajada",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "3d",
+   "prueba": "3 · no suelta antes",
+   "mutacion": "v1.1 #2: el pase ordinario antes que el forzado (regla del prototipo)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "3e",
+   "prueba": "3b · v1.1",
+   "mutacion": "v1.1 #2: limitar el saque forzado a saqueManosMaxM",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "4",
+   "prueba": "4 · con el balón en las manos",
+   "mutacion": "Quitar el límite de posición (solo destino)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "5",
+   "prueba": "5 · los destinos rivales",
+   "mutacion": "Quitar la proyección en moverJugadores",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "6",
+   "prueba": "6 · manosMaxS supera",
+   "mutacion": "Bajar manosMaxS por debajo de accionCadaS / min(ritmo)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "7a",
+   "prueba": "7 · mano a mano a 20 m",
+   "mutacion": "Condicionar la salida a la orden",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "7b",
+   "prueba": "7 · mano a mano a 20 m",
+   "mutacion": "Usar < en vez de ≤ en el criterio de defensores",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "7c",
+   "prueba": "7 · mano a mano a 20 m",
+   "mutacion": "Quitar la salida",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "8",
+   "prueba": "8 · radio de reacción",
+   "mutacion": "Devolver siempre controlPorteroM",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "9",
+   "prueba": "9 · un extremo",
+   "mutacion": "Quitar el límite de destino",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "10",
+   "prueba": "10 · sin opción de centro",
+   "mutacion": "Mantener la conducción recta en la zona",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "11a",
+   "prueba": "11 · centro al palo lejano",
+   "mutacion": "Destino a los pies del receptor",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "11b",
+   "prueba": "11 · centro al palo lejano",
+   "mutacion": "Quitar la condición de personalidad",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "12a",
+   "prueba": "12 · fase aérea",
+   "mutacion": "Quitar la regla aérea",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "12b",
+   "prueba": "12 · fase aérea",
+   "mutacion": "v1.1 #5: medir el extremo del paso en vez del punto proyectado",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "13a",
+   "prueba": "13 · llegada al área",
+   "mutacion": "Ignorar la línea de fuera de juego",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "13b",
+   "prueba": "13 · llegada al área",
+   "mutacion": "Incluir cubrir",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "13c",
+   "prueba": "13 · llegada al área",
+   "mutacion": "v1.1 #8: ignorar el cambio de posesión en el motor",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "14",
+   "prueba": "14 · lateral A",
+   "mutacion": "Quitar la caída a decisión local",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "15",
+   "prueba": "15 · lateral B",
+   "mutacion": "Volver a la tolerancia de 0,2 m",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "16a",
+   "prueba": "16 · validarOrdenes",
+   "mutacion": "No comprobar el área en el validador",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "16b",
+   "prueba": "16 · validarOrdenes",
+   "mutacion": "Cifras escritas a mano en el prompt",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "16c",
+   "prueba": "16 · validarOrdenes",
+   "mutacion": "v1.1 #9: aceptar el portero propio como receptor del centro",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "17a",
+   "prueba": "17 · v1–v3 se reproducen",
+   "mutacion": "Activar las reglas nuevas con conReinicios en vez de reglasDesde(v4)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "17b",
+   "prueba": "17 · v1–v3 se reproducen",
+   "mutacion": "Volver a === ARENA.reglas en el desvío",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "18",
+   "prueba": "18 · textos ES/EN",
+   "mutacion": "Quitar la rama de motivo (texto genérico de pase)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v1.1-3",
+   "prueba": "v1.1 · 3: durante una pausa",
+   "mutacion": "Sin límite del área en frenarJugadores",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v1.1-4",
+   "prueba": "v1.1 · 4: falta sobre el portero",
+   "mutacion": "Falta sobre el portero sin manos",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "r2-1a",
+   "prueba": "3c · v1.1 #2",
+   "mutacion": "Ronda 2 · margen del saque forzado medido sobre el segmento de pase (regla anterior)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "r2-1b",
+   "prueba": "3 · no suelta antes",
+   "mutacion": "Ronda 2 · margen sobre el segmento (prueba de motor)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "r2-2",
+   "prueba": "5 · los destinos rivales",
+   "mutacion": "Ronda 2 · recortar al campo sin garantizar la distancia (enCancha directo)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "r2-3",
+   "prueba": "v1.1 · 4: falta sobre el portero",
+   "mutacion": "Ronda 2 · desdeTick = tick de la falta",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v1.1-10",
+   "prueba": "v1.1 · 10: matriz",
+   "mutacion": "Conducción v4 (lateral B y destino) activada con conReinicios",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-1a",
+   "prueba": "1 · histéresis",
+   "mutacion": "margenManosM = 0 (sin histéresis)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-1b",
+   "prueba": "5 · los destinos rivales",
+   "mutacion": "respetarManos proyecta a distanciaManosM",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-2a",
+   "prueba": "2 · un saque largo",
+   "mutacion": "La fase aérea no se aplica al saque largo",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-2b",
+   "prueba": "2 · un saque largo",
+   "mutacion": "El saque largo no marca el vuelo como aéreo",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-3a",
+   "prueba": "3 · un saque corto exige",
+   "mutacion": "El saque voluntario no exige línea limpia",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-3b",
+   "prueba": "3 · un saque corto exige",
+   "mutacion": "El forzado no filtra los saques admisibles",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-3c",
+   "prueba": "3b · sin saques admisibles",
+   "mutacion": "Saque corto admisible sin comprobar la línea",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-4a",
+   "prueba": "v1.2 · saque perdido",
+   "mutacion": "Intercepción inmediata con < en vez de ≤",
+   "resultado": "ROJO (Tests  1 failed | 5 skipped (6))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-4b",
+   "prueba": "v1.2 · saque perdido",
+   "mutacion": "Gol tras saque ignora el toque defensor",
+   "resultado": "ROJO (Tests  1 failed | 5 skipped (6))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-4c",
+   "prueba": "v1.2 · saque perdido",
+   "mutacion": "Sin definición de saque para reglas sin motivo (v3)",
+   "resultado": "ROJO (Tests  1 failed | 5 skipped (6))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-5a",
+   "prueba": "5 · validación de centrar",
+   "mutacion": "El portero puede centrar",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "v12-5b",
+   "prueba": "5 · validación de centrar",
+   "mutacion": "Centro sobre la línea de gol",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M33",
+   "prueba": "M33 ·",
+   "mutacion": "B2 · saque voluntario sin límite de saqueManosMaxM",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M35",
+   "prueba": "M35 ·",
+   "mutacion": "B2 · receptor de centro puede ser el portero",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M39",
+   "prueba": "M39 ·",
+   "mutacion": "B2 · portero con manos obedece conducir",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M40",
+   "prueba": "M40 ·",
+   "mutacion": "B2 · borde del área −0,5 m",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M42",
+   "prueba": "M42 ·",
+   "mutacion": "B2 · ventaja de centro negativa (> −5)",
+   "resultado": "ROJO (Tests  1 failed | 36 skipped (37))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "M44",
+   "prueba": "M44 ·",
+   "mutacion": "B2 · robo duro sin faltas",
+   "resultado": "ROJO (Tests  1 failed | 5 skipped (6))",
+   "restaurado": "md5 idéntico"
+  },
+  {
+   "id": "r2-4",
+   "prueba": "e2e/arena.spec.ts:314 (Playwright, copia aislada con build propio)",
+   "mutacion": "Ronda 2 · paginación fija en modo seguir (const desde = pagina * POR_PAGINA)",
+   "resultado": "ROJO (1 failed: Expected substring \"a40\"); control sin mutar: 1 passed",
+   "restaurado": "md5 idéntico"
+  }
+ ]
+}

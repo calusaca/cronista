@@ -12,7 +12,20 @@ test("reinicios: banda, esquina, meta y centro se ven junto al campo y en la des
   await expect(page.getByTestId("arena-ball")).toHaveAttribute("cx", "52.5");
   await expect(page.getByTestId("arena-ball")).toHaveAttribute("cy", "34");
   await page.getByRole("button", { name: "Saved matches", exact: true }).click();
-  for (const [seed, tipos] of [[6, ["banda"]], [4, ["esquina"]], [3, ["centro"]], [5, ["meta"]]] as const) {
+  // Brief 046: con reinicios-v4 casi no hay saques de meta por conducción, así que la tabla de
+  // semillas se calcula aquí: la primera con cada tipo de reinicio, con los ajustes de /api/arena.
+  const { ejecutarArena } = await import("../src/arena/coordinador");
+  const { crearConfigArena } = await import("../src/arena/motor");
+  const { crearControladorProgramado } = await import("../src/arena/controladores");
+  const semillas: [number, readonly ("banda" | "esquina" | "centro" | "meta")[]][] = [];
+  for (const tipo of ["banda", "esquina", "centro", "meta"] as const) {
+    for (let seed = 1; seed <= 300; seed++) {
+      const r = await ejecutarArena(crearConfigArena({ seed, duracionS: 60 }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+      if (r.eventos.some(e => e.tipo === "reinicio" && e.reinicio === tipo && e.tick > 0)) { semillas.push([seed, [tipo]]); break; }
+    }
+  }
+  expect(semillas).toHaveLength(4);
+  for (const [seed, tipos] of semillas) {
     const respuesta = await request.post("/api/arena", { data: { accion: "simular", seed, segundos: 60, local: "auto", visita: "auto" } });
     expect(respuesta.ok()).toBe(true);
     const registro = await respuesta.json() as RegistroArena;

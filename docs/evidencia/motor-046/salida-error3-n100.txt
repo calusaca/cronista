@@ -1,0 +1,22 @@
+{
+ "semillas": 100,
+ "duracionS": 120,
+ "goles": 223,
+ "golesMarcadosPorElPorteroQueEncaja": 0,
+ "tramosConPorteroPoseedor": 444,
+ "finDeTramos": {
+  "pase_del_portero": 409,
+  "fuera_juego": 6,
+  "fin_partido": 7,
+  "robo_rival": 20,
+  "tiro_fuera": 2
+ },
+ "posesionesTrasAtajada": 90,
+ "robosTrasAtajada": 18,
+ "golesTrasRoboAlPortero": 18,
+ "porcentajeGoles": 8.1,
+ "medianaSegundosConBalonAntesDelRobo": 1.2,
+ "medianaRetrocesoPorteroM": 0
+}
+seed=7 gol=a54 tick=746 (74.6 s) marca=local-13; portero=visita-11 con balón ticks 713-721 (0.9 s), abre=a51:atajada, robo=a52@722 por local-13
+  cadena: a50:tiro@713 local-13 ; a51:atajada@713 visita-11->local-13 ; a52:recuperacion@722 local-13 ; a53:tiro@743 local-13 ; a54:gol@746 local-13 ; a55:reinicio@746 visita-7

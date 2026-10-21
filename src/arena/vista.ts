@@ -37,6 +37,11 @@ export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, 
     return idioma === "es" ? `${saque} para ${equipo}; ejecuta ${nombre}.` : `${saque} for ${equipo}; ${nombre} takes it.`;
   }
   if (evento.tipo === "gol" && evento.autogol) return idioma === "es" ? `Autogol de ${nombre}; gol para ${registro.config.partido[evento.lado].nombre}.` : `Own goal by ${nombre}; goal for ${registro.config.partido[evento.lado].nombre}.`;
+  // Brief 046: centro y saque desde las manos (motivo del pase, reinicios-v4).
+  if (evento.tipo === "pase" && evento.motivo === "centro") return idioma === "es"
+    ? `${nombre} centra al área hacia ${receptor?.nombre ?? "un compañero"} (${metros} m).` : `${nombre} crosses into the box towards ${receptor?.nombre ?? "a teammate"} (${metros} m).`;
+  if (evento.tipo === "pase" && evento.motivo === "saque_manos") return idioma === "es"
+    ? `${nombre} pone el balón en juego desde sus manos hacia ${receptor?.nombre ?? "el centro del campo"} (${metros} m).` : `${nombre} puts the ball back in play from the hands towards ${receptor?.nombre ?? "midfield"} (${metros} m).`;
   if (evento.tipo === "atajada" && evento.motivo === "desvio") return idioma === "es" ? `${nombre} desvía el remate; el balón sigue en juego.` : `${nombre} deflects the shot; the ball stays in play.`;
   const textos = idioma === "es" ? {
     pase: `${nombre} intenta un pase de ${metros} m hacia ${receptor?.nombre ?? "un compañero"}.`,

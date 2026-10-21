@@ -2461,16 +2461,9 @@ button.stats-row:hover {
 .arena-score strong { font-size: 30px; white-space: nowrap; }
 .arena-pitch-wrap { margin-top: 14px; }
 .arena-pitch-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
-.arena-grass { fill: var(--hl); stroke: var(--pitch-line); stroke-width: 0.25; }
-.arena-lines { stroke: var(--pitch-line); stroke-width: 0.25; fill: none; }
-.arena-player circle { stroke: var(--surface); stroke-width: 0.3; }
-.arena-player text { font-family: var(--font-sans), sans-serif; font-size: 2.3px; font-weight: 700; }
-.arena-local circle { fill: var(--accent); }
-.arena-local text { fill: var(--accent-ink); }
-.arena-visita circle { fill: var(--surface); stroke: var(--ink); }
-.arena-visita text { fill: var(--ink); }
+/* Brief 047: césped, líneas, fichas y selección viven en el bloque «transmisión nocturna» del final. */
+.arena-player text { font-family: var(--font-sans), sans-serif; font-weight: 700; }
 .arena-player { cursor: pointer; }
-.arena-player-selected > circle, .arena-player:focus-visible > circle { stroke: var(--ink); stroke-width: 0.7; stroke-dasharray: 1 0.6; }
 .arena-player:focus-visible { outline: none; }
 .arena-captain-mark rect, .arena-referee rect { fill: #ffce58; stroke: #171d24; stroke-width: 0.35; }
 .arena-captain-mark text { fill: #171d24; font-size: 1.8px; }
@@ -2478,7 +2471,6 @@ button.stats-row:hover {
 .arena-referee-info { display: flex; align-items: start; gap: 10px; margin-top: 14px; padding: 12px; background: var(--hl); border-radius: 8px; font-size: 13px; }
 .arena-referee-info p { margin: 4px 0 0; color: var(--muted); line-height: 1.5; }
 .arena-referee-swatch { flex: 0 0 12px; height: 12px; margin-top: 3px; border-radius: 2px; background: #ffce58; border: 1px solid #171d24; }
-.arena-ball { fill: var(--ink); stroke: var(--surface); stroke-width: 0.3; }
 .arena-direction { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); }
 .arena-playback { margin-top: 20px; align-items: center; }
 .arena-playback label { display: flex; align-items: center; font-weight: 400; }
@@ -2639,8 +2631,340 @@ button.stats-row:hover {
   .arena-source-tabs a { margin-left: 0; }
 }
 
-.arena-match-clock { text-align: center; font-weight: 700; margin: 8px 0; }
 
 #arena-description { scroll-margin-top: 96px; }
 .arena-description-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
 .arena-description-controls output { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   Brief 047 · Arena «transmisión deportiva nocturna».
+   Solo dentro de /arena: los tokens globales se redefinen bajo :root:has(main.arena-shell)
+   (especificidad 0,2,1 > 0,2,0 del oscuro global). Las crónicas siguen con el brief 010.
+   Pseudoelementos siempre con content: "" (no alteran nombres accesibles).
+   Prohibido transform/transition/animation CSS en .arena-player, .arena-ball y
+   .arena-referee: la escala de las fichas va en .arena-token.
+   ========================================================================== */
+:root:has(main.arena-shell) {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --line: #d9dfe9;
+  --ink: #0f172a;
+  --muted: #4f5d78;
+  --accent: #3f6a00;
+  --accent-ink: #ffffff;
+  --hl: #eef5dc;
+  --hl-line: #b7cf7a;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --chip: #e6eaf2;
+  --shadow: 0 10px 30px rgba(15, 23, 42, .10);
+  --pitch-line: #e8f2ea;
+  --ar-surface-2: #f4f6fa;
+  --ar-primary-bg: #0b1220;
+  --ar-primary-ink: #d4ff3a;
+  --ar-live: #d1242f;
+  /* Rótulo de TV: constante en los dos temas. */
+  --ar-bug: #0b1220;
+  --ar-bug-2: #18233a;
+  --ar-bug-ink: #ffffff;
+  --ar-bug-muted: #a9b8d0;
+  --ar-score-bg: #d4ff3a;
+  --ar-score-ink: #0b1220;
+  /* Equipaciones en la cancha: constantes. */
+  --ar-home: #0c1640;
+  --ar-home-ink: #ffffff;
+  --ar-home-ring: #ffffff;
+  --ar-home-ui: #1b2f7a;
+  --ar-away: #f5f7fb;
+  --ar-away-ink: #13203f;
+  --ar-away-ring: #13203f;
+  --ar-away-ui: #13203f;
+  --ar-grass-a: #2f7d47;
+  --ar-grass-b: #2a7341;
+  --ar-runoff: #1f5a33;
+  --ar-select: #d4ff3a;
+  --ar-ball: #ffffff;
+  --ar-role-narrador: #3f6a00;
+  --ar-role-comentarista: #b4441b;
+  --ar-role-estadista: #0b7268;
+  --ar-role-ink: #ffffff;
+  /* Espacios, radios. */
+  --ar-s1: 4px;
+  --ar-s2: 8px;
+  --ar-s3: 12px;
+  --ar-s4: 16px;
+  --ar-s5: 24px;
+  --ar-s6: 32px;
+  --ar-s7: 48px;
+  --ar-r-sm: 6px;
+  --ar-r: 12px;
+  --ar-r-lg: 18px;
+  --ar-r-pill: 999px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):has(main.arena-shell) {
+    --bg: #0b1220;
+    --surface: #131c2e;
+    --line: #26324a;
+    --ink: #eef2f8;
+    --muted: #9fb0c9;
+    --accent: #d4ff3a;
+    --accent-ink: #0b1220;
+    --hl: #1a2540;
+    --hl-line: #3b4d75;
+    --danger: #ff8a80;
+    --danger-soft: #3a1d24;
+    --chip: #1f2a44;
+    --shadow: 0 12px 36px rgba(0, 0, 0, .5);
+    --ar-surface-2: #1a2540;
+    --ar-primary-bg: #d4ff3a;
+    --ar-primary-ink: #0b1220;
+    --ar-live: #ff5a5f;
+    --ar-home-ui: #8fb0ff;
+    --ar-away-ui: #f5f7fb;
+    --ar-runoff: #173f27;
+    --ar-role-narrador: #d4ff3a;
+    --ar-role-comentarista: #ff9a6b;
+    --ar-role-estadista: #5ee0d0;
+    --ar-role-ink: #0b1220;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"]:has(main.arena-shell) {
+  --bg: #0b1220;
+  --surface: #131c2e;
+  --line: #26324a;
+  --ink: #eef2f8;
+  --muted: #9fb0c9;
+  --accent: #d4ff3a;
+  --accent-ink: #0b1220;
+  --hl: #1a2540;
+  --hl-line: #3b4d75;
+  --danger: #ff8a80;
+  --danger-soft: #3a1d24;
+  --chip: #1f2a44;
+  --shadow: 0 12px 36px rgba(0, 0, 0, .5);
+  --ar-surface-2: #1a2540;
+  --ar-primary-bg: #d4ff3a;
+  --ar-primary-ink: #0b1220;
+  --ar-live: #ff5a5f;
+  --ar-home-ui: #8fb0ff;
+  --ar-away-ui: #f5f7fb;
+  --ar-runoff: #173f27;
+  --ar-role-narrador: #d4ff3a;
+  --ar-role-comentarista: #ff9a6b;
+  --ar-role-estadista: #5ee0d0;
+  --ar-role-ink: #0b1220;
+  color-scheme: dark;
+}
+
+/* ---------- base de la arena: botones, primario, deshabilitado ---------- */
+.arena-shell { padding: var(--ar-s4) var(--ar-s6) var(--ar-s7); font-size: 15px; line-height: 1.5; }
+.arena-shell .btn, .arena-topbar .btn { transition: background-color 120ms, border-color 120ms, color 120ms; }
+.arena-shell .btn-primary { background: var(--ar-primary-bg); border-color: var(--ar-primary-bg); color: var(--ar-primary-ink); }
+.arena-shell .btn-primary:hover { border-color: var(--accent); }
+.arena-shell .btn:disabled, .arena-topbar .btn:disabled, .arena-seek:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ---------- Z1 · barra superior ---------- */
+.arena-topbar { background: var(--ar-bug); border-bottom: 1px solid var(--ar-bug-2); color: var(--ar-bug-ink); }
+.arena-topbar .brand-mark { color: var(--ar-score-bg); }
+.arena-topbar .brand-tag { color: var(--ar-bug-muted); }
+.arena-topbar .topbar-links a { color: var(--ar-bug-ink); }
+.arena-topbar .btn { background: transparent; border-color: var(--ar-bug-2); color: var(--ar-bug-ink); }
+.arena-topbar .btn:hover { border-color: var(--ar-bug-muted); }
+.arena-topbar :focus-visible { outline: 2px solid var(--ar-select); outline-offset: 2px; }
+
+/* ---------- Z2 · cabecera de la arena ---------- */
+.arena-intro { position: relative; isolation: isolate; overflow: hidden; max-width: none; margin: 0 0 var(--ar-s4); padding: var(--ar-s5) var(--ar-s6); border: 1px solid var(--ar-bug-2); border-radius: var(--ar-r-lg); background: var(--ar-bug); color: var(--ar-bug-ink); box-shadow: var(--shadow); }
+.arena-intro::before, .arena-intro::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
+/* Dos focos desde las esquinas superiores. */
+.arena-intro::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 140% at 0% 0%, color-mix(in srgb, var(--ar-score-bg) 10%, transparent), transparent 70%),
+    radial-gradient(ellipse 45% 130% at 100% 0%, color-mix(in srgb, var(--ar-bug-ink) 6%, transparent), transparent 70%);
+}
+/* Motivo de cancha a la derecha: línea media y círculo central, recortados por la banda. */
+.arena-intro::after {
+  top: -48px;
+  right: -32px;
+  width: 360px;
+  height: 320px;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--ar-bug-ink) 6%, transparent) 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 50%, transparent 0 86px, color-mix(in srgb, var(--ar-bug-ink) 6%, transparent) 87px 90px, transparent 91px),
+    linear-gradient(90deg, transparent calc(50% - 2px), color-mix(in srgb, var(--ar-bug-ink) 6%, transparent) calc(50% - 2px) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.arena-intro .overline { display: inline-flex; align-items: center; gap: var(--ar-s2); margin: 0; padding: var(--ar-s1) var(--ar-s3); border-radius: var(--ar-r-pill); background: var(--ar-bug-2); color: var(--ar-bug-muted); font-size: 11px; line-height: 1.4; letter-spacing: .08em; }
+.arena-intro .overline::before { content: ""; flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--ar-score-bg); }
+.arena-intro h1 { margin: var(--ar-s2) 0; color: var(--ar-bug-ink); font: 900 clamp(30px, 4.2vw, 52px)/1.05 var(--font-display), sans-serif; letter-spacing: -0.035em; }
+.arena-intro p:not(.overline) { max-width: 70ch; margin: 0; color: var(--ar-bug-muted); font-size: 15px; line-height: 1.5; }
+
+/* Control segmentado: el ::before es la pista (ítem de rejilla tras los dos botones). */
+.arena-source-tabs { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: center; gap: 0; margin: 0 0 var(--ar-s2); }
+.arena-source-tabs::before { content: ""; grid-row: 1; grid-column: 1 / 3; align-self: stretch; background: var(--ar-surface-2); border: 1px solid var(--line); border-radius: var(--ar-r-pill); }
+.arena-source-tabs .btn { grid-row: 1; z-index: 1; margin: var(--ar-s1); padding: var(--ar-s2) var(--ar-s4); border-color: transparent; border-radius: var(--ar-r-pill); background: transparent; color: var(--ink); }
+.arena-source-tabs .btn:nth-of-type(1) { grid-column: 1; }
+.arena-source-tabs .btn:nth-of-type(2) { grid-column: 2; }
+.arena-source-tabs .btn:hover { border-color: var(--line); }
+.arena-source-tabs [aria-pressed="true"] { background: var(--ar-primary-bg); border-color: var(--ar-primary-bg); color: var(--ar-primary-ink); }
+.arena-source-tabs a { grid-row: 1; grid-column: 3; justify-self: end; margin-left: var(--ar-s4); color: var(--accent); font-size: 14px; font-weight: 600; text-align: right; }
+
+/* ---------- Z3 · configuración y directo ---------- */
+.arena-setup, .arena-plans { margin: var(--ar-s2) 0; padding: var(--ar-s3) var(--ar-s4); border-radius: var(--ar-r-lg); }
+.arena-setup > summary, .arena-plans > summary, .arena-limits > summary { display: flex; align-items: center; gap: var(--ar-s2); list-style: none; cursor: pointer; font: 700 16px/1.3 var(--font-display), sans-serif; }
+.arena-setup > summary::-webkit-details-marker, .arena-plans > summary::-webkit-details-marker, .arena-limits > summary::-webkit-details-marker { display: none; }
+.arena-setup > summary::before, .arena-plans > summary::before, .arena-limits > summary::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; margin: 0 var(--ar-s1); border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); }
+.arena-setup[open] > summary::before, .arena-plans[open] > summary::before, .arena-limits[open] > summary::before { transform: rotate(45deg); }
+.arena-limits { border-radius: var(--ar-r-lg); }
+
+.arena-live { margin: var(--ar-s2) 0 var(--ar-s3); padding: var(--ar-s4) var(--ar-s5); border-radius: var(--ar-r-lg); }
+.arena-live h2, .arena-intelligence h2 { margin: var(--ar-s1) 0 var(--ar-s2); font: 700 20px/1.2 var(--font-display), sans-serif; }
+.arena-live p { margin: var(--ar-s2) 0 0; line-height: 1.5; }
+.arena-live > div:first-child > p { margin: 0; color: var(--muted); }
+.arena-live-controls { gap: var(--ar-s2); }
+.arena-live [role="status"] { display: flex; align-items: center; gap: var(--ar-s2); width: fit-content; max-width: 100%; padding: var(--ar-s1) var(--ar-s3); border: 1px solid var(--line); border-radius: var(--ar-r-pill); background: var(--ar-surface-2); font-size: 14px; }
+.arena-live [role="status"]::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.arena-live a[href^="/arena?partido="] { display: inline-flex; align-items: center; padding: var(--ar-s1) var(--ar-s3); border: 1px solid var(--line); border-radius: var(--ar-r); background: var(--surface); color: var(--ink); font-weight: 600; text-decoration: none; }
+.arena-live a[href^="/arena?partido="]:hover { border-color: var(--muted); }
+@media (min-width: 1100px) {
+  .arena-live { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--ar-s5); align-items: start; }
+  .arena-live > div:first-child { grid-column: 1; grid-row: 1 / span 8; }
+  .arena-live > :not(:first-child) { grid-column: 2; margin-top: var(--ar-s1); }
+  .arena-live > :nth-child(2) { margin-top: 0; }
+  /* Rótulo y selector en una sola línea: el panel cabe junto al marcador en 1440×900. */
+  .arena-live .arena-live-controls { align-items: center; }
+  .arena-live .arena-live-controls label { display: flex; align-items: center; gap: var(--ar-s2); white-space: nowrap; }
+}
+.arena-tools { gap: var(--ar-s2); margin: var(--ar-s3) 0 var(--ar-s1); }
+@media (max-width: 900px) { .arena-tools > .arena-muted { flex-basis: 100%; } }
+
+/* ---------- Z4 · marcador tipo transmisión ---------- */
+.arena-board { padding: var(--ar-s4); border-radius: var(--ar-r-lg); box-shadow: var(--shadow); }
+.arena-score { gap: var(--ar-s3); padding: var(--ar-s2) var(--ar-s3); border-radius: var(--ar-r); background: var(--ar-bug); color: var(--ar-bug-ink); box-shadow: var(--shadow); }
+.arena-score > span { display: flex; align-items: center; gap: var(--ar-s2); min-width: 0; font: 700 15px/1.2 var(--font-display), sans-serif; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
+.arena-score > span:last-child { justify-content: flex-end; text-align: right; }
+.arena-score > span:first-child::before, .arena-score > span:last-child::after { content: ""; flex: 0 0 6px; width: 6px; height: 28px; border-radius: 2px; }
+.arena-score > span:first-child::before { background: var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ui); }
+.arena-score > span:last-child::after { background: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-score strong { padding: 0 var(--ar-s3); border-radius: var(--ar-r-sm); background: var(--ar-score-bg); color: var(--ar-score-ink); font: 900 40px/1.15 var(--font-display), sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Reloj: pestaña centrada bajo el marcador. El punto en vivo va en el div, nunca en el output. */
+.arena-match-clock { display: flex; align-items: center; gap: var(--ar-s2); width: fit-content; max-width: 100%; margin: 0 auto; padding: 2px var(--ar-s3); border-radius: 0 0 var(--ar-r-sm) var(--ar-r-sm); background: var(--ar-bug-2); color: var(--ar-bug-ink); font: 700 15px/1.4 var(--font-display), sans-serif; font-variant-numeric: tabular-nums; }
+.arena-match-clock[data-en-vivo]::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--ar-live); animation: arena-pulso-vivo 1.6s ease-in-out infinite; }
+@keyframes arena-pulso-vivo { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+.arena-direction { margin-top: var(--ar-s2); font-size: 13px; }
+.arena-direction span:first-child { color: var(--ar-home-ui); }
+.arena-direction span:last-child { color: var(--muted); }
+
+/* ---------- Z5 · cancha y fichas ---------- */
+.arena-pitch-wrap { margin-top: var(--ar-s3); overflow: hidden; border-radius: var(--ar-r-lg); background: var(--ar-runoff); }
+.arena-runoff { fill: var(--ar-runoff); }
+.arena-grass { fill: var(--ar-grass-a); stroke: none; }
+.arena-stripe { fill: var(--ar-grass-b); }
+.arena-lines { fill: none; stroke: var(--pitch-line); stroke-width: 0.35; stroke-linecap: round; }
+.arena-spot { fill: var(--pitch-line); stroke: none; }
+.arena-goal { fill: color-mix(in srgb, var(--pitch-line) 18%, transparent); }
+/* El g exterior ya está trasladado: el origen (0,0) de .arena-token es el centro del jugador. */
+.arena-token { transform: scale(var(--ar-token-escala, 1.1)); }
+.arena-token > circle { stroke-width: 0.45; }
+.arena-token > text { font-family: var(--font-display), sans-serif; font-size: 2.4px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.arena-local .arena-token > circle { fill: var(--ar-home); stroke: var(--ar-home-ring); }
+.arena-local .arena-token > text { fill: var(--ar-home-ink); }
+.arena-visita .arena-token > circle { fill: var(--ar-away); stroke: var(--ar-away-ring); }
+.arena-visita .arena-token > text { fill: var(--ar-away-ink); }
+.arena-player-selected > .arena-token > circle, .arena-player:focus-visible > .arena-token > circle { stroke: var(--ar-select); stroke-width: 0.7; stroke-dasharray: none; }
+.arena-player:focus-visible > .arena-token > circle { stroke-dasharray: 1 0.5; }
+.arena-ball { fill: var(--ar-ball); stroke: var(--ar-bug); stroke-width: 0.3; }
+
+/* ---------- Z6 · transporte ---------- */
+.arena-referee-info { margin-top: var(--ar-s3); padding: var(--ar-s3); gap: var(--ar-s3); border-radius: var(--ar-r); background: var(--ar-surface-2); font-size: 13px; }
+.arena-playback { gap: var(--ar-s3); margin-top: var(--ar-s3); padding: var(--ar-s2) var(--ar-s3); border-radius: var(--ar-r) var(--ar-r) 0 0; background: var(--ar-surface-2); }
+.arena-playback .btn-primary { min-width: 112px; min-height: 44px; border-radius: var(--ar-r-pill); }
+.arena-playback .btn:not(.btn-primary) { background: transparent; border-color: transparent; color: var(--ink); }
+.arena-playback .btn:not(.btn-primary):hover { border-color: var(--line); }
+.arena-playback label { gap: var(--ar-s2); }
+.arena-seek { display: block; width: 100%; height: calc(28px + var(--ar-s3)); margin: 0; padding: 0 var(--ar-s3) var(--ar-s3); border-radius: 0 0 var(--ar-r) var(--ar-r); background: var(--ar-surface-2); accent-color: var(--accent); }
+.arena-board > .arena-muted:last-child { margin: var(--ar-s3) 0 0; font-size: 13px; }
+
+/* ---------- Z7 · Mesa de transmisión ---------- */
+.arena-mesa-card[data-mesa-role="narrador"] { --rol: var(--ar-role-narrador); }
+.arena-mesa-card[data-mesa-role="comentarista"] { --rol: var(--ar-role-comentarista); }
+.arena-mesa-card[data-mesa-role="estadista"] { --rol: var(--ar-role-estadista); }
+.arena-mesa-card { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: var(--ar-s3); align-items: start; margin-top: var(--ar-s2); padding: var(--ar-s3); border-top: 0; border-left: 3px solid var(--rol, var(--line)); border-radius: var(--ar-r); background: var(--ar-surface-2); transition: background-color 120ms; }
+.arena-mesa-card > :not(.arena-mesa-avatar) { grid-column: 2; }
+.arena-mesa-avatar { display: grid; place-items: center; grid-column: 1; grid-row: 1 / span 3; width: 40px; height: 40px; border-radius: 50%; background: var(--rol); color: var(--ar-role-ink); font: 900 14px/1 var(--font-display), sans-serif; letter-spacing: .02em; }
+.arena-mesa-card h3 { margin: 0 0 var(--ar-s1); font: 700 15px/1.3 var(--font-display), sans-serif; }
+.arena-mesa-card h3 .arena-muted { display: inline-block; margin-left: var(--ar-s1); padding: 0 var(--ar-s2); border: 1px solid currentColor; border-radius: var(--ar-r-pill); color: var(--rol); font: 700 11px/1.6 var(--font-sans), sans-serif; letter-spacing: .08em; text-transform: uppercase; vertical-align: middle; }
+.arena-companion .arena-mesa-card > div > p { margin: var(--ar-s1) 0; color: var(--ink); font-size: 15px; line-height: 1.5; }
+.arena-companion .arena-mesa-card .arena-mesa-meta { display: inline-block; margin: 0 0 var(--ar-s1); padding: 0 var(--ar-s2); border-radius: var(--ar-r-sm); background: var(--chip); color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.arena-mesa-card summary { cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600; }
+.arena-companion .arena-mesa-card > p.arena-muted { margin: var(--ar-s1) 0 0; padding: var(--ar-s2) var(--ar-s3); border: 1px dashed var(--line); border-radius: var(--ar-r-sm); font-style: italic; }
+.arena-companion .arena-mesa > p.arena-muted:last-child { margin: var(--ar-s3) 0 0; color: var(--muted); font-size: 12px; }
+
+/* ---------- Z8 · acompañante, narración, últimas acciones e inteligencia ---------- */
+.arena-grid { gap: var(--ar-s5); }
+.arena-companion { border-radius: var(--ar-r-lg); background: var(--surface); box-shadow: var(--shadow); }
+.arena-companion > .arena-intelligence, .arena-live-feed { padding: var(--ar-s4); }
+.arena-companion h2 { font-size: 18px; }
+.arena-intelligence .overline { display: inline-block; margin: 0; padding: var(--ar-s1) var(--ar-s2); border-radius: var(--ar-r-pill); background: var(--chip); color: var(--muted); font-size: 11px; line-height: 1.3; }
+.arena-intelligence { border-radius: var(--ar-r-lg); }
+.arena-live-feed li { align-items: baseline; gap: var(--ar-s2); }
+.arena-live-feed time { flex: 0 0 auto; min-width: 44px; padding: 0 var(--ar-s1); border-radius: var(--ar-r-sm); background: var(--chip); color: var(--ink); font-size: 12px; text-align: center; }
+.arena-live-feed li:first-child { padding-left: var(--ar-s2); border-left: 3px solid var(--accent); }
+.arena-evidence-link { margin: var(--ar-s1) var(--ar-s1) 0 0; padding: var(--ar-s1) var(--ar-s2); border-radius: var(--ar-r-pill); background: var(--chip); color: var(--accent); font: 600 12px/1.3 var(--font-sans), sans-serif; }
+.arena-evidence-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-intelligence table { font-variant-numeric: tabular-nums; }
+.arena-intelligence tbody th::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: var(--ar-s2); border-radius: 2px; vertical-align: middle; }
+.arena-intelligence tbody tr:nth-child(1) th::before { background: var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ui); }
+.arena-intelligence tbody tr:nth-child(2) th::before { background: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-intelligence audio { width: 100%; }
+.arena-intelligence-evidence { border-radius: 0 var(--ar-r-sm) var(--ar-r-sm) 0; background: var(--ar-surface-2); }
+
+/* ---------- Z9 · estados vacío, carga y error ---------- */
+.arena-empty { margin: var(--ar-s2) 0; padding: var(--ar-s3); border: 1px dashed var(--line); border-radius: var(--ar-r); background: var(--ar-surface-2); color: var(--muted); font-size: 14px; line-height: 1.5; }
+.arena-board > .arena-empty:first-child { display: flex; align-items: center; gap: var(--ar-s2); margin: 0 0 var(--ar-s3); padding: var(--ar-s2) var(--ar-s3); }
+.arena-board > .arena-empty:first-child::before { content: ""; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.arena-notice { gap: var(--ar-s3); margin: var(--ar-s3) 0; padding: var(--ar-s3) var(--ar-s4); border-left: 3px solid var(--accent); border-radius: var(--ar-r); background: var(--ar-surface-2); }
+.arena-shell [role="alert"] { padding: var(--ar-s2) var(--ar-s3); border-left: 3px solid var(--danger); border-radius: var(--ar-r-sm); background: var(--danger-soft); color: var(--ink); }
+.arena-shell .arena-notice[role="alert"] { padding: var(--ar-s3) var(--ar-s4); border-radius: var(--ar-r); }
+
+/* ---------- Z10 · debajo del pliegue ---------- */
+.arena-context, .arena-rosters, .arena-events, .arena-decisions { border-radius: var(--ar-r-lg); }
+.arena-coach { border-radius: var(--ar-r); }
+.arena-coach[data-testid="arena-coach-local"] { border-top: 3px solid var(--ar-home-ui); }
+.arena-coach[data-testid="arena-coach-visita"] { border-top: 3px solid var(--ar-away-ui); }
+.arena-team-plan:nth-of-type(1) { padding-top: var(--ar-s3); border-top: 3px solid var(--ar-home-ui); }
+.arena-team-plan:nth-of-type(2) { padding-top: var(--ar-s3); border-top: 3px solid var(--ar-away-ui); }
+.arena-shirt { background: var(--ar-home); color: var(--ar-home-ink); box-shadow: 0 0 0 1px var(--ar-home-ui); }
+.arena-roster-visita .arena-shirt { background: var(--ar-away); color: var(--ar-away-ink); border: 1px solid var(--ar-away-ring); box-shadow: none; }
+.arena-event-time { padding: var(--ar-s1) var(--ar-s2); border-radius: var(--ar-r-sm); background: var(--chip); }
+.arena-context > h2, .arena-roster-heading h2, .arena-events h2 { font: 700 24px/1.25 var(--font-display), sans-serif; }
+.arena-context > h2::after, .arena-roster-heading h2::after, .arena-events h2::after { content: ""; display: block; width: 32px; height: 3px; margin-top: var(--ar-s2); border-radius: 2px; background: var(--accent); }
+
+/* ---------- móvil ---------- */
+@media (max-width: 520px) {
+  .arena-shell { --ar-token-escala: 1.35; padding: var(--ar-s3) var(--ar-s3) var(--ar-s6); }
+  .arena-intro { padding: var(--ar-s4); }
+  .arena-intro::after { right: -160px; }
+  .arena-board { padding: var(--ar-s2); }
+  .arena-score { gap: var(--ar-s1); padding: var(--ar-s2); }
+  .arena-score > span { font-size: 12px; }
+  .arena-score > span:first-child::before, .arena-score > span:last-child::after { flex-basis: 4px; width: 4px; height: 22px; }
+  .arena-score strong { padding: 0 var(--ar-s2); font-size: 30px; }
+  .arena-shell button, .arena-shell .btn, .arena-topbar .btn, .arena-live a[href^="/arena?partido="] { min-height: 44px; }
+  .arena-source-tabs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .arena-source-tabs::before { grid-column: 1 / -1; }
+  .arena-source-tabs .btn { min-width: 0; white-space: normal; }
+  .arena-source-tabs a { grid-row: 2; grid-column: 1 / -1; justify-self: start; margin: var(--ar-s2) 0 0; text-align: left; }
+  .arena-live { padding: var(--ar-s3); }
+  .arena-playback { padding: var(--ar-s2); }
+  .arena-seek { padding: 0 var(--ar-s2) var(--ar-s2); height: calc(28px + var(--ar-s2)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arena-match-clock[data-en-vivo]::before { animation: none; }
+  .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card { transition: none; }
+}
