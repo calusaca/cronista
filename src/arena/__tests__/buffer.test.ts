@@ -1,8 +1,9 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, expect, it } from "vitest";
-import { BUFFER_ARENA, firmaEstadoVoz, planVozBuffer, RelojBuffer, RitmoProduccionBuffer, rondaVisible } from "../buffer";
+import { afterEach, describe, expect, it } from "vitest";
+import { MESA_ARENA } from "../../sim/limites";
+import { BUFFER_ARENA, firmaEstadoVoz, planVozBuffer, RelojBuffer, RitmoProduccionBuffer, rondaVisible, VOZ_BUFFER } from "../buffer";
 import { GestorSesiones } from "../sesiones";
 import { construirRelato } from "../relato";
 import { reproducirArena } from "../coordinador";
@@ -183,4 +184,20 @@ it("el cierre usa el marcador confirmado y espera al final del encuentro", async
   expect(cierre.texto).toContain("Final del partido"); expect(cierre.fragmentos[0]?.tick).toBe(600);
   expect("cierre" in cierre && cierre.cierre).toBe(true);
   expect(cierre.fuentes).toEqual(r.eventos.filter(e => e.tipo === "gol").map(e => e.id));
+});
+
+// Brief 045
+describe("045 · planVozBuffer con la prioridad del invitado", () => {
+  it("un invitado nunca interrumpe una fuente ≥ 0 y una noticia ≥ prioridadInterrupcion sí lo corta", () => {
+    for (const anterior of [0, 10, MESA_ARENA.prioridadInvitado, VOZ_BUFFER.prioridadInterrupcion, 100]) {
+      const plan = planVozBuffer(20, 3, 20, 100, 105, MESA_ARENA.prioridadInvitado, anterior);
+      expect(plan?.interrumpirAnterior ?? false).toBe(false);
+    }
+    expect(planVozBuffer(20, 3, 20, 100, 105, VOZ_BUFFER.prioridadInterrupcion, MESA_ARENA.prioridadInvitado)?.interrumpirAnterior).toBe(true);
+    expect(planVozBuffer(20, 3, 20, 100, 105, VOZ_BUFFER.prioridadInterrupcion - 1, MESA_ARENA.prioridadInvitado)).toBeNull();
+    // Exención de atraso para invitados (cierre = true solo en el plan): una candidatura de
+    // más de atrasoNormalS sigue siendo planificable; la caducidad la decide siguienteTurno.
+    expect(planVozBuffer(20, 3, 20 + VOZ_BUFFER.atrasoNormalS + 1, 100, 0, MESA_ARENA.prioridadInvitado, 0)).toBeNull();
+    expect(planVozBuffer(20, 3, 20 + VOZ_BUFFER.atrasoNormalS + 1, 100, 0, MESA_ARENA.prioridadInvitado, 0, true)).not.toBeNull();
+  });
 });

@@ -2,7 +2,8 @@ import { hechosArena, type HechoArena } from "./inteligencia";
 import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz } from "./expresion";
 import { RELATO_INTERVALOS } from "./protocolo";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
-import { ARENA } from "../sim/limites";
+import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import type { IntervencionArena } from "./protocolo";
 import { comentarioEditorial, elegirVarianteVoz, type RecuerdoVoz } from "./editorial";
 
 export const RELATO_INTERVALO_TICKS = RELATO_INTERVALOS.completo;
@@ -89,7 +90,7 @@ export function construirRelato(registro: RegistroArena, desdeTick: number, hast
 /** Cada ventana ofrece una jugada seleccionada o un comentario del estado actual.
  * Todo el contexto de una intervención termina en su propio tick de publicación. */
 function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: number, idioma: "es" | "en", hechos: HechoArena[], cierre = false, entradaTick?: number, memoria: readonly RecuerdoVoz[] = []) {
-  const prioridadEvento: Partial<Record<EventoArena["tipo"], number>> = { gol: 100, roja: 95, final_anticipado: 90, atajada: 80, tiro_fuera: 70, tiro: 60, amarilla: 85, falta: 40, fuera_juego: 40, cambio: 50, reinicio: 35 };
+  const prioridadEvento = PRIORIDAD_EVENTO_ARENA;
   const candidatos = registro.eventos.filter(e => (e.tick > desdeTick || desdeTick === 0 && e.tick === 0) && e.tick <= hastaTick && prioridadEvento[e.tipo]);
   candidatos.sort((a, b) => prioridadEvento[b.tipo]! - prioridadEvento[a.tipo]! || b.tick - a.tick);
   const evento = candidatos[0], hecho = evento && hechos.find(h => h.eventos.includes(evento.id));
@@ -130,4 +131,32 @@ function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: num
     }
   }
   return { desdeTick, hastaTick, modo: "buffer" as const, idioma, texto: fragmentos.map(f => f.texto).join(" "), fragmentos, fuentes: fragmentos.flatMap(f => f.fuentes), fotogramas: fragmentos.flatMap(f => f.fotogramas), eventosDisponibles: hechos.filter(h => h.tick <= (entradaTick ?? hastaTick)).length, eventosNarrados, conduccionesNarradas: 0, prioridad, cierre, tipoRelato, firmaEstado, claveVoz, temaVoz, ...(entradaTick === undefined ? {} : { entradaTick }) };
+}
+
+/** Brief 045: un clip por intervención. Fragmento opcional de cesión del narrador y un
+ * fragmento con TODAS las oraciones del invitado. La duración se decide por caracteres:
+ * si cesión + invitado supera el máximo se omite la cesión (nunca el dato); si el invitado
+ * solo lo supera, se recorta a su primera oración (primer dato del estadista).
+ * v3.1: sin memoria. La cesión sale de `cesiones[idioma][rol]` por `varianteVoz(seed, id)`:
+ * un SSML por intervención e idioma, una sola entrada de caché para todos los espectadores. */
+export function relatoIntervencion(intervencion: IntervencionArena, seed: number, idioma: "es" | "en") {
+  const es = idioma === "es", tick = intervencion.tick;
+  const textos = intervencion.oraciones.map(o => es ? o.texto_es : o.texto_en);
+  const completo = textos.join(" ");
+  const usadas = completo.length > MESA_ARENA.maxCaracteresIntervencion ? 1 : textos.length;
+  const invitado = textos.slice(0, usadas).join(" ");
+  const nombre = MESA_ARENA.nombres[idioma][intervencion.rol];
+  const cesiones = MESA_ARENA.cesiones[idioma][intervencion.rol].map(c => c.replace("{nombre}", nombre));
+  const cesion = cesiones[varianteVoz(seed, intervencion.id) % cesiones.length]!;
+  const conCesion = cesion.length + invitado.length <= MESA_ARENA.maxCaracteresIntervencion;
+  const fuentes = [...new Set(intervencion.evidencia.slice(0, usadas).flatMap(e => e.eventos))];
+  const fragmentos: FragmentoVoz[] = [
+    ...(conCesion ? [{ tick, texto: cesion, emocion: "serena" as const, intensidad: .25, variante: 0, fuentes: [], fotogramas: [], rol: "narrador" as const }] : []),
+    { tick, texto: invitado, emocion: "serena", intensidad: intervencion.rol === "estadista" ? .1 : .18, variante: varianteVoz(seed, `${intervencion.id}:invitado`), fuentes, fotogramas: [], rol: intervencion.rol },
+  ];
+  return {
+    desdeTick: tick, hastaTick: tick, modo: "buffer" as const, idioma, texto: fragmentos.map(f => f.texto).join(" "), fragmentos, fuentes, fotogramas: [] as number[],
+    eventosDisponibles: 0, eventosNarrados: usadas, conduccionesNarradas: 0, prioridad: MESA_ARENA.prioridadInvitado, cierre: false, tipoRelato: "invitado" as const,
+    firmaEstado: undefined, claveVoz: intervencion.id, temaVoz: `${intervencion.rol}:${intervencion.tema}`, rol: intervencion.rol, intervencion: intervencion.id, modoIntervencion: intervencion.modo, cesion: conCesion,
+  };
 }

@@ -2602,6 +2602,9 @@ button.stats-row:hover {
 .arena-intelligence li { line-height: 1.6; margin-bottom: 12px; }
 .arena-intelligence table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .arena-intelligence th, .arena-intelligence td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); }
+.arena-mesa-card { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; min-width: 0; }
+.arena-mesa-card h3 { margin: 0 0 6px; font-size: 15px; overflow-wrap: anywhere; }
+.arena-mesa-card details { overflow-wrap: anywhere; }
 .arena-intelligence-evidence { border-left: 3px solid var(--accent); padding: 8px 14px; background: var(--hl); }
 @media (max-width: 480px) { .arena-live, .arena-intelligence { padding: 14px; } .arena-live-controls button { width: 100%; } .arena-intelligence-controls .field { max-width: 100%; } }
 @media (max-width: 700px) { .arena-environment, .arena-effects-grid, .arena-coaches { grid-template-columns: minmax(0, 1fr); } .arena-environment { gap: 14px; } }

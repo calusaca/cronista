@@ -7,6 +7,8 @@ export type EmocionVoz = "serena" | "tension" | "emocion" | "sorpresa" | "jubilo
 export interface FragmentoVoz {
   tick: number; texto: string; emocion: EmocionVoz; intensidad: number; variante: number;
   fuentes: string[]; fotogramas: number[];
+  /** Brief 045: voz que pronuncia el fragmento; ausente equivale a "narrador". */
+  rol?: "narrador" | "comentarista" | "estadista";
 }
 export const limitarIntensidad = (n: number) => Math.max(0, Math.min(1, n));
 export function varianteVoz(seed: number, id: string) { return prngDerivado(seed, `voz-expresiva-v1:${id}`).int(0, 3); }

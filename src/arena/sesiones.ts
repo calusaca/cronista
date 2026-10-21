@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ARENA } from "../sim/limites";
+import { ARENA, MESA_ARENA } from "../sim/limites";
 import { ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -8,11 +8,13 @@ import { peticionSesion } from "./peticiones";
 import type { AsignacionModelos, EstadoSesion, InstantaneaEmision, MensajeSesion, MetricasSesion, PublicacionSesion, ReproduccionArena } from "./protocolo";
 import type { RegistroArena } from "./tipos";
 import { aplicarPublicacion } from "./protocolo";
-import { crearLlmDesdeEnv, type Llm } from "../lib/llm";
+import { conPresupuesto, crearLlmDesdeEnv, type Llm } from "../lib/llm";
 import { contextoNarradorArena, narrarArena } from "./narrador";
 import { almacenDesdeEnv, type AlmacenArena, type BloqueoAlmacen } from "./almacen";
 import { iniciarTelemetria, trazar } from "../lib/telemetria";
 import { RitmoProduccionBuffer } from "./buffer";
+import { MesaSesion } from "./mesa";
+import type { IntervencionArena } from "./protocolo";
 
 export class ErrorSesion extends Error { constructor(message: string, readonly status: number) { super(message); } }
 interface Sesion {
@@ -27,7 +29,10 @@ interface Opciones {
   maxRetenidas?: number;
   narrador?: () => Llm;
   almacen?: AlmacenArena;
+  /** Solo pruebas: plazo del comentarista; por defecto MESA_ARENA.plazoComentaristaMs. */
+  plazoComentaristaMs?: number;
 }
+const intervencionesDe = (mensajes: readonly MensajeSesion[]): IntervencionArena[] => mensajes.flatMap(m => m.publicacion.tipo === "intervencion" ? [m.publicacion.intervencion] : []);
 const duracionRetencionMs = 24 * 60 * 60 * 1000;
 const identificadorValido = (id: string) => /^[a-f0-9-]{36}$/.test(id);
 
@@ -112,7 +117,10 @@ export class GestorSesiones {
       const config = crearConfigArena({ seed: p.seed, duracionS: p.segundos, intervaloS: 30, ...(p.local !== "auto" ? { local: p.local } : {}), ...(p.visita !== "auto" ? { visita: p.visita } : {}), entorno: p.entorno });
       const modeloNarrador = process.env.ARENA_NARRADOR_MODELO ? catalogo.find(m => m.publico.id === process.env.ARENA_NARRADOR_MODELO) : undefined;
       if (process.env.ARENA_NARRADOR_MODELO && p.seleccion.modo !== "programado" && !modeloNarrador) throw new Error("Narrador fuera del catálogo");
-      const narrador = p.seleccion.modo !== "programado" ? this.opciones.narrador?.() ?? (process.env.ARENA_NARRADOR_LLM === "1" && process.env.ARENA_WEB_LLM === "1" ? modeloNarrador?.crear() ?? crearLlmDesdeEnv(process.env, { maxRetries: 0 }) : undefined) : undefined;
+      const modeloSesion = p.seleccion.modo !== "programado" ? this.opciones.narrador?.() ?? (process.env.ARENA_NARRADOR_LLM === "1" && process.env.ARENA_WEB_LLM === "1" ? modeloNarrador?.crear() ?? crearLlmDesdeEnv(process.env, { maxRetries: 0 }) : undefined) : undefined;
+      // Brief 045 v3.1: un presupuesto de llamadas por sesión, compartido por el narrador y la
+      // mesa (la misma instancia envuelta una vez); agotado, ambos caen a plantilla.
+      const narrador = modeloSesion ? conPresupuesto(modeloSesion, MESA_ARENA.presupuestoLlamadasModelo) : undefined;
       const sesion: Sesion = { id: randomUUID(), estado: "ejecutando", creada: Date.now(), asignacion, mensajes: [], suscriptores: new Set(), cancelar: new AbortController(), cola: Promise.resolve(), metricas: { duracionMs: 0, decisiones: 0, respaldos: 0, esperaModeloMs: [] } };
       await almacen.escribir(this.archivo(sesion.id, "meta.json"), JSON.stringify({ id: sesion.id, creada: sesion.creada, asignacion }), true);
       this.sesiones.set(sesion.id, sesion);
@@ -121,14 +129,16 @@ export class GestorSesiones {
       sesion.tarea = trazar("arena.sesion", { "arena.sesion.id": sesion.id, "arena.seed": p.seed, "arena.modo": asignacion.modo, "arena.version": config.version ?? "arena-v1" }, async span => {
         let ultimoTick = 0, prefijo: RegistroArena | null = null, comentarios = 0, comentarioTick = -150;
         const ritmoBuffer = new RitmoProduccionBuffer(undefined, this.opciones.ritmoMsPorSegundo ?? 1000);
-        let narracion: Promise<void> | undefined;
+        let narracion: Promise<void> | undefined, cerrada = false;
+        // Brief 045: candidaturas de comentarista y estadista, una sola vez, en el diario.
+        const mesa = new MesaSesion({ llm: narrador, signal: sesion.cancelar.signal, plazoMs: this.opciones.plazoComentaristaMs, publicar: intervencion => this.publicar(sesion, { tipo: "intervencion", intervencion }) });
         const programarComentario = () => {
           if (!narrador || narracion || comentarios >= 3 || !prefijo || prefijo.final.tick - comentarioTick < 150) return;
           const snapshot = structuredClone(prefijo), tick = snapshot.final.tick;
           if (!contextoNarradorArena(snapshot, tick).length) return;
           comentarios++; comentarioTick = tick;
           narracion = narrarArena(snapshot, tick, narrador, { signal: sesion.cancelar.signal })
-            .then(async comentario => { if (comentario && !sesion.cancelar.signal.aborted) await this.publicar(sesion, { tipo: "comentario", comentario }); })
+            .then(async comentario => { if (comentario && !sesion.cancelar.signal.aborted && !cerrada) await this.publicar(sesion, { tipo: "comentario", comentario }); })
             .catch(() => {})
             .finally(() => { narracion = undefined; });
         };
@@ -154,16 +164,19 @@ export class GestorSesiones {
               }
               await this.publicar(sesion, publicacion);
               prefijo = aplicarPublicacion(prefijo, publicacion);
-              if (publicacion.tipo === "avance") programarComentario();
+              if (publicacion.tipo === "avance") { programarComentario(); await mesa.avanzar(prefijo!, publicacion.eventos); }
             },
           });
           if (!this.bloqueo?.vigente()) throw new Error("Coordinación perdida");
           await almacen.escribir(this.archivo(sesion.id, "json"), JSON.stringify(registro) + "\n");
           await narracion;
+          await mesa.final(registro);
           sesion.estado = "completa";
         } catch {
           sesion.estado = sesion.cancelar.signal.aborted ? "cancelada" : "error";
         } finally {
+          // v3.1: antes de `terminada`, en todos los caminos: nada publica después.
+          cerrada = true; mesa.cerrar();
           sesion.metricas.duracionMs = Date.now() - sesion.creada;
           sesion.metricas.uso = { ...uso(), narrador: narrador?.uso?.() ?? null };
           span.setAttributes({ "arena.estado": sesion.estado, "arena.decisiones": sesion.metricas.decisiones, "arena.respaldos": sesion.metricas.respaldos, "arena.duracion_ms": sesion.metricas.duracionMs });
@@ -234,7 +247,7 @@ export class GestorSesiones {
   /** Un mismo resultado para todos los espectadores; leer nunca ejecuta modelos. */
   async reproduccion(id: string): Promise<ReproduccionArena> {
     const registro = await this.registro(id), sesion = await this.obtener(id);
-    return { registro, comentarios: sesion.mensajes.flatMap(m => m.publicacion.tipo === "comentario" ? [m.publicacion.comentario] : []), asignacion: sesion.asignacion, metricas: sesion.metricas };
+    return { registro, comentarios: sesion.mensajes.flatMap(m => m.publicacion.tipo === "comentario" ? [m.publicacion.comentario] : []), intervenciones: intervencionesDe(sesion.mensajes), asignacion: sesion.asignacion, metricas: sesion.metricas };
   }
   /** Copia coherente del diario y su cursor: el SSE posterior continúa desde aquí. */
   async emision(id: string): Promise<InstantaneaEmision> {
@@ -243,7 +256,7 @@ export class GestorSesiones {
     for (const m of mensajes) registro = aplicarPublicacion(registro, m.publicacion);
     if (!registro) throw new ErrorSesion("La emisión está comenzando; vuelve a conectar", 409);
     const ultima = mensajes.at(-1)!.publicacion;
-    return { registro, comentarios: mensajes.flatMap(m => m.publicacion.tipo === "comentario" ? [m.publicacion.comentario] : []), asignacion: sesion.asignacion, metricas: { ...sesion.metricas }, estado: ultima.tipo === "terminada" ? ultima.estado : "ejecutando", ultimoMensaje: mensajes.at(-1)!.id };
+    return { registro, comentarios: mensajes.flatMap(m => m.publicacion.tipo === "comentario" ? [m.publicacion.comentario] : []), intervenciones: intervencionesDe(mensajes), asignacion: sesion.asignacion, metricas: { ...sesion.metricas }, estado: ultima.tipo === "terminada" ? ultima.estado : "ejecutando", ultimoMensaje: mensajes.at(-1)!.id };
   }
   async vistaPublicada(id: string, hastaTick: number): Promise<RegistroArena> {
     const sesion = await this.obtener(id);
@@ -322,6 +335,12 @@ export class GestorSesiones {
       await exclusiva(async (r, a) => { r[clave] = { tipo, estado: "error", caracteres }; await a.escribir(nombre, JSON.stringify(r)); }).catch(() => {});
       throw error;
     }
+  }
+  /** Brief 045: el audio de una intervención se construye desde el diario; nunca se regenera. */
+  async intervencionPublicada(id: string, intervencionId: string): Promise<IntervencionArena> {
+    const intervencion = intervencionesDe((await this.obtener(id)).mensajes).find(i => i.id === intervencionId);
+    if (!intervencion) throw new ErrorSesion("Intervención no publicada", 404);
+    return intervencion;
   }
   async comentarioPublicado(id: string, tick: number, principal: string) {
     const sesion = await this.obtener(id);

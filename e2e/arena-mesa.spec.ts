@@ -1,0 +1,325 @@
+// Brief 045 · Mesa de transmisión con emisión sintética controlada: rutas simuladas como en
+// arena-buffer.spec.ts, Speech simulado con duraciones fijas y demoras inyectadas, e
+// intervenciones servidas por la instantánea (y el resto por el diario SSE). Las prioridades
+// del narrador salen de PRIORIDAD_EVENTO_ARENA; la editorial (10) y las duraciones son del fixture.
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { expect, test, type Page, type Route } from "@playwright/test";
+import { BUFFER_ARENA, VOZ_BUFFER } from "../src/arena/buffer";
+import { datosEstadista, intervencionEstadista } from "../src/arena/estadista";
+import { comentarArena } from "../src/arena/narrador";
+import { wavMono } from "../src/arena/pista-audio";
+import type { IntervencionArena } from "../src/arena/protocolo";
+import { construirRelato, relatoIntervencion } from "../src/arena/relato";
+import type { RegistroArena } from "../src/arena/tipos";
+import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../src/sim/limites";
+
+type Fuente = { inicio: number; fin: number; duracion: number; detenida: boolean; relojS: number; etiqueta?: { role: string; kind: string; tick: number; texto: string } };
+type Pedido = { desdeTick: number; hastaTick: number; modo: string; idioma: string; intervencion?: string; cierre?: boolean; entradaTick?: number; memoria?: { texto: string }[] };
+const sr = 24000;
+const audio = async (s: number) => Buffer.from(await wavMono([Float32Array.from({ length: Math.round(s * sr) }, (_, i) => 0.05 * Math.sin(i / 9))], sr).arrayBuffer()).toString("base64");
+const prefijo = (r: RegistroArena, t: number): RegistroArena => ({ ...r, eventos: r.eventos.filter(e => e.tick <= t), fotogramas: r.fotogramas.filter(f => f.tick <= t), rondas: r.rondas.filter(x => x.inicioTick < t), final: [...r.fotogramas].reverse().find(f => f.tick <= t)! });
+const conPlaza = (r: RegistroArena, t: number) => datosEstadista(prefijo(r, t), t).filter(d => d.ocupaPlaza);
+const esperar = (ms: number) => new Promise(r => setTimeout(r, ms));
+const relojS = (texto: string) => { const m = /^(\d+):(\d{2})/.exec(texto.trim()); return m ? Number(m[1]) * 60 + Number(m[2]) : NaN; };
+const catalogoReserva = JSON.parse(await readFile("src/arena/voz-reserva.json", "utf8")) as Record<"es" | "en", { texto: string }[]>;
+const PRIORIDAD_REINICIO = PRIORIDAD_EVENTO_ARENA.reinicio!, PRIORIDAD_TIRO = PRIORIDAD_EVENTO_ARENA.tiro!;
+
+/** C11a: cada invitado arranca con el cursor visible en [tick·pasoS, tick·pasoS + caducidadInvitadoS]
+ * (tolerancia de 1 s por la resolución del reloj). */
+function cursorEnVentana(fuentes: Fuente[], intervenciones: IntervencionArena[]) {
+  for (const f of fuentes.filter(x => x.etiqueta?.kind === "invitado")) {
+    const i = intervenciones.find(x => x.tick === f.etiqueta!.tick && x.rol === f.etiqueta!.role)!;
+    expect(i, JSON.stringify(f)).toBeDefined();
+    expect(f.relojS, `${i.id} arrancó con el cursor en ${f.relojS} s`).toBeGreaterThanOrEqual(i.tick * ARENA.pasoS - 1);
+    expect(f.relojS, `${i.id} arrancó con el cursor en ${f.relojS} s`).toBeLessThanOrEqual(i.tick * ARENA.pasoS + MESA_ARENA.caducidadInvitadoS + 1);
+  }
+}
+
+async function instrumentar(page: Page) {
+  await page.addInitScript(() => {
+    const fuentes: Fuente[] = []; (window as unknown as { mesa: Fuente[] }).mesa = fuentes;
+    const reloj = () => { const m = /^(\d+):(\d{2})/.exec(document.querySelector('[data-testid="arena-clock"]')?.textContent?.trim() ?? ""); return m ? Number(m[1]) * 60 + Number(m[2]) : NaN; };
+    const Base = window.AudioContext;
+    window.AudioContext = class extends Base {
+      override createBufferSource() {
+        const f = super.createBufferSource(), iniciar = f.start.bind(f), detener = f.stop.bind(f);
+        const dato: Fuente = { inicio: 0, fin: 0, duracion: 0, detenida: false, relojS: NaN };
+        f.start = (cuando = 0) => {
+          const retraso = Math.max(0, cuando - this.currentTime);
+          dato.inicio = performance.now() + retraso * 1000; dato.duracion = f.buffer!.duration; dato.fin = dato.inicio + dato.duracion * 1000;
+          dato.relojS = reloj() + retraso; fuentes.push(dato); iniciar(cuando);
+        };
+        f.stop = (cuando = 0) => { if (dato.fin > performance.now() + 20) dato.detenida = true; dato.fin = Math.min(dato.fin, performance.now() + Math.max(0, cuando - this.currentTime) * 1000); detener(cuando); };
+        f.addEventListener("ended", () => { dato.fin = Math.min(dato.fin, performance.now()); });
+        return f;
+      }
+    };
+    let previo = "";
+    document.addEventListener("DOMContentLoaded", () => new MutationObserver(() => {
+      const el = document.querySelector<HTMLElement>('[data-testid="arena-voice-transcript"]');
+      if (!el) return;
+      const d = { role: el.dataset.narrationRole ?? "", kind: el.dataset.narrationKind ?? "", tick: Number(el.dataset.narrationTick), texto: el.querySelector("p")?.textContent ?? "" };
+      const clave = JSON.stringify(d); if (clave === previo) return; previo = clave;
+      const f = [...fuentes].reverse().find(x => !x.etiqueta); if (f) f.etiqueta = d;
+    }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true }));
+  });
+}
+
+const asignacion = { modo: "programado", local: { nombre: "Local" }, visita: { nombre: "Visita" } };
+async function preparar(page: Page, id: string, registro: RegistroArena, intervenciones: IntervencionArena[], corte: number) {
+  const inicial = prefijo(registro, corte);
+  const enSnapshot = intervenciones.filter(i => i.tick <= corte), despues = intervenciones.filter(i => i.tick > corte);
+  await page.route(`**/api/arena/sesiones/${id}/emision`, r => r.fulfill({ json: { registro: inicial, comentarios: [], intervenciones: enSnapshot, asignacion, metricas: {}, estado: "ejecutando", ultimoMensaje: 1 } }));
+  const publicaciones = [
+    ...registro.rondas.filter(x => x.inicioTick >= corte).map(ronda => ({ tipo: "ordenes", ronda })),
+    { tipo: "avance", estado: registro.final, fotogramas: registro.fotogramas.filter(f => f.tick > corte), eventos: registro.eventos.filter(e => e.tick > corte) },
+    ...despues.map(intervencion => ({ tipo: "intervencion", intervencion })),
+    { tipo: "terminada", estado: "completa", metricas: { decisiones: 4, respaldos: 0, duracionMs: 0 } },
+  ];
+  await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: publicaciones.map((publicacion, i) => `id: ${i + 2}\nevent: arena\ndata: ${JSON.stringify({ id: i + 2, publicacion })}\n\n`).join("") }));
+  await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
+}
+
+/** Segmento del narrador con una sola fuente, a la manera de construirRelato. */
+const segmento = (p: { desdeTick: number; hastaTick: number; idioma: string; entradaTick?: number }, tick: number, texto: string, prioridad: number, base64: string | null, extra: object = {}) => ({
+  desdeTick: p.desdeTick, hastaTick: p.hastaTick, modo: "buffer", idioma: p.idioma, ...(p.entradaTick === undefined ? {} : { entradaTick: p.entradaTick }), texto,
+  fragmentos: texto ? [{ tick, texto, emocion: "serena", intensidad: .2, variante: 0, fuentes: [], fotogramas: [] }] : [], fuentes: [], fotogramas: [],
+  eventosDisponibles: 0, eventosNarrados: texto ? 1 : 0, conduccionesNarradas: 0, prioridad, cierre: false, tipoRelato: "comentario", claveVoz: texto ? `prueba:${tick}` : undefined, audio: base64 ? { base64, tipo: "audio/wav" } : null, ...extra,
+});
+
+test("mesa: narrador, comentarista y estadista se ceden la palabra sin solaparse en una línea de tiempo controlada", async ({ page }, testInfo) => {
+  test.setTimeout(150_000);
+  const registro = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
+  const id = "00000000-0000-4000-8000-000000000045", corte = 200, s = ARENA.pasoS;
+  const fiel: Parameters<typeof comentarArena>[2] = { id: "modelo-prueba", completar: async (_s, m) => { const c = JSON.parse(m[0]!.contenido); const h = c.hechos.find((h: { id: string }) => h.id === c.principal); return JSON.stringify({ oraciones: [{ texto_es: h.texto_es, texto_en: h.texto_en, hecho: h.id, apoyo: [] }] }); } };
+  const est1 = intervencionEstadista(conPlaza(registro, 10).slice(0, 1), 10);
+  const com1 = (await comentarArena(prefijo(registro, 200), 200, fiel))!;
+  const est2 = intervencionEstadista(conPlaza(registro, 300).slice(0, 1), 300);
+  const com2 = (await comentarArena(prefijo(registro, 400), 400, undefined))!;
+  const estFinal = intervencionEstadista(conPlaza(registro, 600).slice(1, 2), 600);
+  expect(com1.modo).toBe("llm"); expect(com2.modo).toBe("plantilla");
+  expect(est2.oraciones[0]!.texto_en).not.toBe(est1.oraciones[0]!.texto_en); // dato cambiado (gol en el tick 231)
+  const intervenciones = [est1, com1, est2, com2, estFinal];
+  const duracion: Record<string, number> = { [est1.id]: 4, [com1.id]: 6, [est2.id]: 3, [com2.id]: 3.2, [estFinal.id]: 2.6 };
+  const clips: Record<string, string> = {};
+  for (const d of new Set([1.5, 1.7, 2, 2.5, ...Object.values(duracion)])) clips[d] = await audio(d);
+  // Ventanas del narrador (desdeTick → tick, texto, prioridad, duración): rellenan los huecos sin dejar 2 s de silencio,
+  // salvo antes del reinicio, donde entra una reserva que el reinicio corta.
+  const narrador: Record<number, [number, string, number, number]> = {
+    0: [30, "Ed 3 s", 10, 2], 50: [100, "Ed 10 s", 10, 2], 100: [150, "Reinicio 15 s", PRIORIDAD_REINICIO, 1.5], 150: [175, "Ed 17 s", 10, 2],
+    200: [230, "Tiro 23 s", PRIORIDAD_TIRO, 1.5], 250: [260, "Ed 26 s", 10, 2.5], 300: [340, "Ed 34 s", 10, 2.5], 350: [375, "Ed 37 s", 10, 2],
+  };
+  const textosNarrador = new Set(["Apertura", "Final del partido.", ...Object.values(narrador).map(v => v[1]), ...catalogoReserva.es.map(c => c.texto), ...catalogoReserva.en.map(c => c.texto)]);
+  const pedidos: Pedido[] = [], respondidas: Record<string, number> = {};
+  await preparar(page, id, registro, intervenciones, corte);
+  await page.route(`**/api/arena/sesiones/${id}/relato`, async (r: Route) => {
+    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    if (p.intervencion) {
+      await esperar(300);
+      const i = intervenciones.find(x => x.id === p.intervencion)!;
+      respondidas[i.id] ??= Date.now();
+      return r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma as "es" | "en"), audio: { base64: clips[duracion[i.id]!], tipo: "audio/wav" } } }).catch(() => {});
+    }
+    // C8: la apertura responde más tarde que el primer invitado (tick 10).
+    if (p.entradaTick !== undefined) { await esperar(1200); respondidas.entrada ??= Date.now(); return r.fulfill({ json: segmento(p, p.entradaTick, "Apertura", 10, clips[1.5]!, { tipoRelato: "entrada" }) }).catch(() => {}); }
+    await esperar(200);
+    if (p.cierre) return r.fulfill({ json: segmento(p, p.hastaTick, "Final del partido.", 0, clips[1.7]!, { cierre: true, tipoRelato: "cierre" }) }).catch(() => {});
+    const v = narrador[p.desdeTick];
+    return r.fulfill({ json: v ? segmento(p, v[0], v[1], v[2], clips[v[3]]!, { tipoRelato: v[2] >= VOZ_BUFFER.prioridadInterrupcion ? "jugada" : "comentario" }) : segmento(p, p.hastaTick, "", 10, null) }).catch(() => {});
+  });
+  await instrumentar(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  const t0 = await page.evaluate(() => performance.now());
+  await page.getByRole("button", { name: "Enable narration", exact: true }).click();
+  const transcripcion = page.getByTestId("arena-voice-transcript");
+  await expect(transcripcion).toHaveAttribute("data-narration-kind", "entrada", { timeout: 5000 });
+  await expect(transcripcion).toHaveAttribute("data-narration-role", "estadista", { timeout: 12000 });
+  await expect(transcripcion).toHaveAttribute("data-narration-tick", String(est1.tick));
+  await expect(page.getByTestId("arena-mesa-estadista")).toContainText(est1.oraciones[0]!.texto_en);
+  await expect(transcripcion).toHaveAttribute("data-narration-role", "comentarista", { timeout: 25000 });
+  await expect(page.getByTestId("arena-mesa-comentarista-modo")).toContainText("IA / AI");
+  await expect(page.getByTestId("arena-voice-status")).toHaveText("End of narration", { timeout: 70000 });
+  await page.waitForTimeout(1500);
+  const fuentes = (await page.evaluate(() => (window as unknown as { mesa: Fuente[] }).mesa)).map(f => ({ ...f, inicioS: (f.inicio - t0) / 1000, finS: (f.fin - t0) / 1000 }));
+  await testInfo.attach("mesa-linea-de-tiempo.json", { body: JSON.stringify({ fuentes, pedidos }, null, 2), contentType: "application/json" });
+  await mkdir(".cache", { recursive: true }); await writeFile(".cache/arena-mesa-linea.json", JSON.stringify({ fuentes, pedidos, narrador }, null, 2));
+  const de = (pred: (f: typeof fuentes[number]) => boolean) => fuentes.filter(pred);
+  const invitado = (i: IntervencionArena) => de(f => f.etiqueta?.kind === "invitado" && f.etiqueta.tick === i.tick)[0];
+  // 0: arranca el narrador, aunque su apertura respondió después que el primer invitado.
+  expect(respondidas.entrada).toBeGreaterThan(respondidas[est1.id]!);
+  expect(fuentes[0]!.etiqueta).toMatchObject({ kind: "entrada", role: "narrador" });
+  // Cada intervención: un clip, un rol, una petición por su id del diario (desde = hasta = tick), sin memoria.
+  for (const i of [est1, com1, est2, com2]) { expect(invitado(i), i.id).toBeDefined(); expect(invitado(i)!.etiqueta!.role).toBe(i.rol); }
+  const deInvitados = pedidos.filter(p => p.intervencion);
+  for (const p of deInvitados) { const i = intervenciones.find(x => x.id === p.intervencion)!; expect([p.desdeTick, p.hastaTick, p.modo]).toEqual([i.tick, i.tick, "buffer"]); expect(p).not.toHaveProperty("memoria"); }
+  expect(new Set(deInvitados.map(p => p.intervencion)).size).toBe(deInvitados.length);
+  // C2: la memoria de las peticiones del narrador solo lleva textos del narrador o ids de intervención.
+  const recuerdos = pedidos.filter(p => !p.intervencion).flatMap(p => p.memoria ?? []).map(m => m.texto);
+  for (const texto of recuerdos) expect(textosNarrador.has(texto) || /^(comentarista|estadista):/.test(texto), texto).toBe(true);
+  expect(recuerdos.some(t => /^(comentarista|estadista):/.test(t))).toBe(true);
+  // C11a: cursor visible en cada arranque de invitado.
+  cursorEnVentana(fuentes, intervenciones);
+  // ≈2: estadista #1 sin noticia previa ≥ prioridadInterrupcion (calma null), tras la apertura.
+  const reinicio = de(f => f.etiqueta?.texto === "Reinicio 15 s")[0]!, tiro = de(f => f.etiqueta?.texto === "Tiro 23 s")[0]!;
+  expect(invitado(est1)!.inicio).toBeGreaterThanOrEqual(fuentes[0]!.fin - 60);
+  expect(invitado(est1)!.inicio).toBeLessThan(reinicio.inicio);
+  // 15: el reinicio corta la reserva que sonaba.
+  const cortada = de(f => f.fin <= reinicio.inicio + 50 && f.fin >= reinicio.inicio - 80 && f !== reinicio);
+  expect(cortada.some(f => f.detenida && f.etiqueta?.role === "narrador" && f.etiqueta.kind === "comentario" && !f.etiqueta.texto.startsWith("Ed "))).toBe(true);
+  // 20: comentarista #1 tras calma (desde el fin del reinicio) y separación; una sola fuente.
+  const c1 = invitado(com1)!;
+  expect(c1.inicio - reinicio.fin).toBeGreaterThanOrEqual(MESA_ARENA.calmaMinS * 1000 - 50);
+  expect(c1.inicio - invitado(est1)!.fin).toBeGreaterThanOrEqual(MESA_ARENA.separacionInvitadosS * 1000 - 50);
+  // 23: el tiro corta al comentarista; el comentarista no cortó nada.
+  expect(c1.detenida).toBe(true); expect(Math.abs(c1.fin - tiro.inicio)).toBeLessThan(100);
+  for (const i of [est1, com1, est2, com2]) { const f = invitado(i)!; expect(de(o => o !== f && o.detenida && Math.abs(o.fin - f.inicio) < 60)).toEqual([]); }
+  // 30 y 40: orden alternado, separación respetada.
+  const orden = [est1, com1, est2, com2].map(i => invitado(i)!).sort((a, b) => a.inicio - b.inicio).map(f => f.etiqueta!.role);
+  expect(orden).toEqual(["estadista", "comentarista", "estadista", "comentarista"]);
+  expect(invitado(est2)!.inicio - c1.fin).toBeGreaterThanOrEqual(MESA_ARENA.separacionInvitadosS * 1000 - 50);
+  await expect(page.getByTestId("arena-mesa-comentarista-modo")).toContainText("Template fallback");
+  // 60: cierre del narrador; ningún invitado arranca tras el cierre; el estadista final solo como texto.
+  const cierre = de(f => f.etiqueta?.kind === "cierre")[0]!;
+  expect(cierre).toBeDefined();
+  expect(de(f => f.etiqueta?.kind === "invitado" && f.inicio >= cierre.inicio)).toEqual([]);
+  expect(invitado(estFinal)).toBeUndefined();
+  await expect(page.getByTestId("arena-mesa-estadista")).toContainText(estFinal.oraciones[0]!.texto_en);
+  await expect(page.getByTestId("arena-mesa-estadista")).toContainText(`${(estFinal.tick * s).toFixed(1)} s`);
+  // Sin solapes (reservas y transiciones incluidas) y silencio máximo dentro del límite hasta el cierre.
+  const ordenadas = [...fuentes].sort((a, b) => a.inicio - b.inicio);
+  ordenadas.forEach((f, k) => { if (k) expect(f.inicio, JSON.stringify([ordenadas[k - 1], f])).toBeGreaterThanOrEqual(ordenadas[k - 1]!.fin - 60); });
+  let fin = ordenadas[0]!.inicio, silencio = 0;
+  for (const f of ordenadas) { silencio = Math.max(silencio, f.inicio - fin); fin = Math.max(fin, f.fin); }
+  expect(silencio).toBeLessThanOrEqual(VOZ_BUFFER.silencioMaxS * 1000);
+  // Móvil 360 px sin desborde, ES/EN.
+  await page.setViewportSize({ width: 360, height: 780 });
+  await page.getByRole("button", { name: "Switch to Spanish" }).click();
+  await expect(page.getByTestId("arena-mesa")).toContainText("Mesa de transmisión");
+  for (const r of ["relato", "análisis con hechos citados", "dato del partido"]) await expect(page.getByTestId("arena-mesa")).toContainText(r);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+});
+
+test("mesa: con noticias continuas y audio del invitado demorado no arranca ningún invitado ni una cesión suelta", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  const original = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
+  // Sin pausas: ninguna excepción de calma por pausa vigente.
+  const registro = structuredClone(original); for (const f of [registro.inicial, ...registro.fotogramas, registro.final]) { delete f.pausa; delete f.saque; }
+  const id = "00000000-0000-4000-8000-000000000046", corte = 200;
+  const intervenciones = [intervencionEstadista(conPlaza(registro, 60).slice(0, 1), 60), (await comentarArena(prefijo(registro, 120), 120, undefined))!, intervencionEstadista(conPlaza(registro, 180).slice(1, 2), 180)];
+  // Observación (C11b): hasta tick·pasoS + caducidadInvitadoS de la última intervención. Las noticias siguen
+  // hasta el tramo que contiene ese instante; después hay calma y ningún invitado (ya caducado) puede arrancar.
+  const finVentanaS = Math.max(...intervenciones.map(i => i.tick)) * ARENA.pasoS + MESA_ARENA.caducidadInvitadoS;
+  const ultimoTramoConNoticia = Math.floor(finVentanaS / ARENA.pasoS / BUFFER_ARENA.tramoTicks) * BUFFER_ARENA.tramoTicks;
+  const noticia = await audio(BUFFER_ARENA.tramoTicks * ARENA.pasoS), invitadoAudio = await audio(2);
+  await preparar(page, id, registro, intervenciones, corte);
+  let invitadas = 0;
+  await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
+    const p = r.request().postDataJSON() as Pedido;
+    if (p.intervencion) {
+      invitadas++; await esperar(3000);
+      const i = intervenciones.find(x => x.id === p.intervencion)!;
+      return r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma as "es" | "en"), audio: { base64: invitadoAudio, tipo: "audio/wav" } } }).catch(() => {});
+    }
+    if (p.entradaTick !== undefined) return r.fulfill({ json: segmento(p, p.entradaTick, "Entrada", PRIORIDAD_TIRO, noticia, { tipoRelato: "entrada" }) }).catch(() => {});
+    if (p.desdeTick > ultimoTramoConNoticia) return r.fulfill({ json: segmento(p, p.hastaTick, "", 10, null) }).catch(() => {});
+    // Una noticia por ventana del narrador (prioridad creciente: cada una corta a la anterior), sin huecos.
+    return r.fulfill({ json: segmento(p, p.desdeTick + 1, `Noticia ${p.desdeTick}`, VOZ_BUFFER.prioridadInterrupcion + p.desdeTick / BUFFER_ARENA.tramoTicks, noticia, { tipoRelato: "jugada" }) }).catch(() => {});
+  });
+  await instrumentar(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  await page.getByRole("button", { name: "Enable narration", exact: true }).click();
+  await expect.poll(() => invitadas, { timeout: 10000 }).toBeGreaterThan(0);
+  const reloj = page.getByTestId("arena-clock");
+  await expect.poll(async () => relojS(await reloj.textContent() ?? ""), { timeout: 60000 }).toBeGreaterThanOrEqual(finVentanaS);
+  const finVentana = await page.evaluate(() => performance.now());
+  // Cola de calma tras la ventana: con la caducidad vigente, tampoco aquí arranca nadie.
+  await expect.poll(async () => relojS(await reloj.textContent() ?? ""), { timeout: 30000 }).toBeGreaterThanOrEqual(finVentanaS + BUFFER_ARENA.tramoTicks * ARENA.pasoS + 2 * MESA_ARENA.calmaMinS + 1);
+  const fuentes = await page.evaluate(() => (window as unknown as { mesa: Fuente[] }).mesa);
+  await testInfo.attach("mesa-omision.json", { body: JSON.stringify({ fuentes, finVentana }, null, 2), contentType: "application/json" });
+  expect(fuentes.length).toBeGreaterThan(3);
+  cursorEnVentana(fuentes, intervenciones);
+  expect(fuentes.filter(f => f.etiqueta && f.etiqueta.role !== "narrador")).toEqual([]);
+  const cesiones = new Set((["es", "en"] as const).flatMap(idioma => (["comentarista", "estadista"] as const).flatMap(rol => MESA_ARENA.cesiones[idioma][rol].map(c => c.replace("{nombre}", MESA_ARENA.nombres[idioma][rol])))));
+  expect(fuentes.some(f => f.etiqueta && (cesiones.has(f.etiqueta.texto) || f.etiqueta.kind === "invitado"))).toBe(false);
+  // C11b: dentro de la ventana, solo noticias del narrador y sin hueco ≥ calmaMinS entre fuentes consecutivas.
+  const enVentana = [...fuentes].filter(f => f.inicio < finVentana).sort((a, b) => a.inicio - b.inicio);
+  expect(enVentana.every(f => f.etiqueta?.kind === "jugada" || f.etiqueta?.kind === "entrada"), JSON.stringify(enVentana)).toBe(true);
+  let cubierto = enVentana[0]!.inicio, hueco = 0;
+  for (const f of enVentana) { hueco = Math.max(hueco, f.inicio - cubierto); cubierto = Math.max(cubierto, f.fin); }
+  hueco = Math.max(hueco, finVentana - cubierto);
+  expect(hueco, JSON.stringify(enVentana)).toBeLessThan(MESA_ARENA.calmaMinS * 1000);
+  // La Mesa muestra igualmente las tarjetas de texto.
+  await expect(page.getByTestId("arena-mesa-estadista")).toContainText(intervenciones[2]!.oraciones[0]!.texto_en);
+  await expect(page.getByTestId("arena-mesa-comentarista")).toContainText(intervenciones[1]!.oraciones[0]!.texto_en);
+});
+
+test("mesa: «Escuchar desde el inicio» inserta las intervenciones del diario en la pista guardada", async ({ page }) => {
+  test.setTimeout(120_000);
+  const registro = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
+  const est = intervencionEstadista(conPlaza(registro, 300).slice(0, 1), 300);
+  const com = (await comentarArena(prefijo(registro, 450), 450, undefined))!;
+  const intervenciones = [com, est]; // el diario no tiene por qué venir ordenado
+  const tramoS = 1, invitadoS = 0.5, largoS = VOZ_BUFFER.duracionMaxS + 1;
+  const tramo = await audio(tramoS), voz = await audio(invitadoS), larga = await audio(largoS);
+  const tramos = Math.ceil(registro.final.tick / 100);
+  // Escenarios: todo bien; el comentarista falla con 503; el estadista trae un clip más largo que duracionMaxS.
+  const escenarios = [
+    { id: "00000000-0000-4000-8000-000000000047", falla: null, largo: null },
+    { id: "00000000-0000-4000-8000-000000000048", falla: com.id, largo: null },
+    { id: "00000000-0000-4000-8000-000000000049", falla: null, largo: est.id },
+  ];
+  for (const { id, falla, largo } of escenarios) {
+    const pedidos: Pedido[] = [];
+    await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
+    await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: [{ tipo: "sesion", id, asignacion }, { tipo: "terminada", estado: "completa", metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } }].map((publicacion, i) => `id: ${i + 1}\nevent: arena\ndata: ${JSON.stringify({ id: i + 1, publicacion })}\n\n`).join("") }));
+    await page.route(`**/api/arena/sesiones/${id}/reproduccion`, r => r.fulfill({ json: { registro, comentarios: [], intervenciones, asignacion, metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } } }));
+    await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
+      const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+      if (p.intervencion) {
+        if (p.intervencion === falla) return r.fulfill({ status: 503, json: { error: "Speech no disponible en esta prueba" } });
+        const i = intervenciones.find(x => x.id === p.intervencion)!;
+        return r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma as "es" | "en"), audio: { base64: i.id === largo ? larga : voz, tipo: "audio/wav" } } });
+      }
+      return r.fulfill({ json: { ...construirRelato(registro, p.desdeTick, p.hastaTick, p.modo as "completo", p.idioma as "es" | "en"), audio: { base64: tramo, tipo: "audio/wav" } } });
+    });
+    await page.goto(`/arena?partido=${id}`);
+    await expect(page.getByTestId("arena-live-status")).toContainText("Match ready", { timeout: 20000 });
+    const narracion = page.getByTestId("arena-narration");
+    await narracion.getByRole("button", { name: "Listen from the start" }).click();
+    await expect(narracion.locator("audio")).toHaveAttribute("src", /blob:/);
+    // El progreso cuenta tramos más intervenciones y descuenta las omitidas: al terminar, listos = total.
+    const incluidas = intervenciones.filter(i => i.id !== falla && i.id !== largo);
+    const estado = narracion.getByRole("status");
+    await expect(estado).toHaveAttribute("data-progress-total", String(tramos + incluidas.length));
+    await expect(estado).toHaveAttribute("data-progress-ready", String(tramos + incluidas.length));
+    if (!falla && !largo) expect(incluidas).toHaveLength(intervenciones.length);
+    // Cada id se pide exactamente una vez, por su id del diario y sin memoria.
+    for (const i of intervenciones) {
+      const suyos = pedidos.filter(p => p.intervencion === i.id);
+      expect(suyos).toHaveLength(1);
+      expect(suyos[0]).toMatchObject({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer" });
+      expect(suyos[0]).not.toHaveProperty("memoria");
+    }
+    await expect.poll(() => narracion.locator("audio").evaluate((a: HTMLAudioElement) => Number.isFinite(a.duration) ? a.duration : 0)).toBeGreaterThan(0);
+    const duracion = await narracion.locator("audio").evaluate((a: HTMLAudioElement) => { a.pause(); return a.duration; });
+    expect(Math.abs(duracion - (tramos * tramoS + incluidas.length * invitadoS))).toBeLessThanOrEqual(0.1);
+    // Recorrido de la pista: cada invitado incluido aparece con su rol en su instante; los omitidos, nunca.
+    const transcripcion = page.getByTestId("arena-narration-transcript");
+    const ir = (t: number) => narracion.locator("audio").evaluate((a: HTMLAudioElement, t) => { a.currentTime = t; }, t);
+    let inicio = 0;
+    for (const tramoInicio of Array.from({ length: tramos }, (_, k) => k * 100)) {
+      await ir(inicio + tramoS / 2);
+      await expect(transcripcion).toHaveAttribute("data-narration-role", "narrador");
+      await expect(transcripcion).toHaveAttribute("data-narration-tick", String(tramoInicio));
+      inicio += tramoS;
+      for (const i of incluidas.filter(x => x.tick > tramoInicio && x.tick <= tramoInicio + 100)) {
+        await ir(inicio + invitadoS / 2);
+        await expect(transcripcion).toHaveAttribute("data-narration-role", i.rol);
+        await expect(transcripcion).toHaveAttribute("data-narration-tick", String(i.tick));
+        await expect(page.getByTestId("arena-clock")).toHaveText(new RegExp(`^0:${i.tick * ARENA.pasoS} /`));
+        inicio += invitadoS;
+      }
+    }
+    await narracion.getByRole("button", { name: "Stop narration" }).click();
+  }
+});

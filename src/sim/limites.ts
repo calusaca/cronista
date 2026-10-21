@@ -1,3 +1,5 @@
+import type { TipoEventoArena } from "../arena/tipos";
+
 // Umbrales estadísticos del simulador — ÚNICA fuente de estas cifras.
 // Las pruebas los importan; ninguna prueba repite un número de este archivo a mano.
 // Si un umbral parece mal, se reporta a Fable; no se mueve para que una prueba pase.
@@ -550,4 +552,76 @@ export const PERSONALIDAD_ARENA = {
 export const ARBITRO_ARENA = {
   velocidadMps: 5.5, aceleracionMps2: 3,
   distanciaLongitudM: 10, distanciaLateralM: 12, margenM: 3,
+} as const;
+
+/**
+ * Brief 045: prioridad de voz del narrador por tipo de evento de arena (antes, tabla local
+ * de `relato.ts`). Un tipo ausente (pase, recepción…) no genera noticia hablada. El
+ * comentarista se dispara por evento desde `MESA_ARENA.comentaristaDesdePrioridad`.
+ */
+export const PRIORIDAD_EVENTO_ARENA: Readonly<Partial<Record<TipoEventoArena, number>>> = {
+  gol: 100, roja: 95, final_anticipado: 90, atajada: 80, tiro_fuera: 70, tiro: 60,
+  amarilla: 85, falta: 40, fuera_juego: 40, cambio: 50, reinicio: 35,
+};
+
+/** Brief 045 · Mesa de transmisión: narrador, comentarista y estadista. */
+export const MESA_ARENA = {
+  /** Por debajo de VOZ_BUFFER.prioridadInterrupcion (35), por encima del editorial (10). */
+  prioridadInvitado: 20,
+  /** Segundos de audio desde el fin de la última noticia; menor que VOZ_BUFFER.reservaTrasS. */
+  calmaMinS: 1.5,
+  /** Segundos de audio entre el fin de un invitado y el inicio del siguiente. */
+  separacionInvitadosS: 6,
+  /** Segundos de partido; una candidatura más vieja no arranca. */
+  caducidadInvitadoS: 12,
+  /** Cadencia de candidaturas del estadista (segundos de partido). */
+  estadistaCadaS: 20,
+  /** Ventana (s) de la proporción de acciones y de la distancia media de pase; mínimo de acciones. */
+  ventanaAccionesS: 30, minAcciones: 6,
+  /** Datos por candidatura del estadista, en el orden de la tabla del brief. */
+  maxDatosEstadista: 2,
+  /** tiro_fuera, atajada, amarilla, roja, gol, final_anticipado. */
+  comentaristaDesdePrioridad: 70,
+  /** Cadencia (s), tope por sesión y plazo (ms) del comentarista. */
+  comentaristaCadaS: 25, maxComentaristaPorSesion: 6, plazoComentaristaMs: 6000,
+  /** Hechos permitidos que recibe el comentarista y oraciones máximas de su salida. */
+  hechosComentarista: 8, maxOracionesComentarista: 2,
+  /** Cesión + invitado en un clip; caracteres máximos de cesión + invitado. */
+  fragmentosPorIntervencion: 2, maxCaracteresIntervencion: 280,
+  /** v3.1 · Caracteres por oración del comentarista (maxLength del esquema + rechazo V1) y por
+   * dato del estadista (prueba sobre fixtures y semillas). 200 + la cesión más larga cabe en 280,
+   * así que el recorte a una oración o un dato siempre cabe. */
+  maxCaracteresOracion: 200,
+  /** v3.1 · Llamadas a `completar` por sesión, narrador + comentarista, reintentos y plazos
+   * agotados incluidos (`conPresupuesto` en src/lib/llm.ts). Cubre 3 comentarios + 6
+   * candidaturas a la primera; los reintentos consumen de aquí. */
+  presupuestoLlamadasModelo: 12,
+  /** v3.1 · Caché del catálogo real de Speech: una hora si respondió; un minuto tras un fallo
+   * (antes cada consulta reintentaba con hasta 5 s de espera). */
+  catalogoVocesCacheS: 3600, catalogoVocesReintentoS: 60,
+  /** Nombres ficticios: no coinciden con locutores reales ni con los de los transcripts. */
+  nombres: {
+    es: { narrador: "Rodrigo Valle", comentarista: "Ana Cedeño", estadista: "Tomás Ibarra" },
+    en: { narrador: "Mark Ellison", comentarista: "Priya Chandra", estadista: "Owen Platt" },
+  },
+  /** v3.1 · Cesiones por idioma y rol; al comentarista nunca se le cede «con el dato». */
+  cesiones: {
+    es: {
+      comentarista: ["{nombre}, ¿qué ves?", "Te escucho, {nombre}.", "Adelante, {nombre}."],
+      estadista: ["{nombre}, con el dato.", "Vamos con {nombre} y los números.", "Adelante, {nombre}."],
+    },
+    en: {
+      comentarista: ["{nombre}, what do you see?", "Over to you, {nombre}.", "Go ahead, {nombre}."],
+      estadista: ["{nombre}, with the numbers.", "Let's hear the numbers, {nombre}.", "Go ahead, {nombre}."],
+    },
+  },
+  /** Solo datos del hecho principal; cada una pasa verificarUpdate en la prueba. */
+  respaldosComentarista: {
+    es: ["{jugador} ({equipo}) protagoniza la última acción destacada, a {distancia} metros.",
+         "La jugada más reciente lleva la firma de {jugador}, de {equipo}.",
+         "{equipo} aparece en la última acción relevante, con {jugador}."],
+    en: ["{jugador} ({equipo}) features in the latest key action, from {distancia} metres.",
+         "The most recent play carries the mark of {jugador}, of {equipo}.",
+         "{equipo} shows up in the latest relevant action, through {jugador}."],
+  },
 } as const;

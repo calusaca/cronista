@@ -14,7 +14,7 @@ import { ArenaPlantilla } from "./ArenaPlantilla";
 import { ArenaContexto } from "./ArenaContexto";
 import { ArenaEnDirecto } from "./ArenaEnDirecto";
 import { ArenaInteligencia } from "./ArenaInteligencia";
-import { ArenaComentarios } from "./ArenaComentarios";
+import { ArenaMesa } from "./ArenaMesa";
 import { ArenaAsistente } from "./ArenaAsistente";
 import { ArenaNarracion } from "./ArenaNarracion";
 import type { ComentarioArena } from "../arena/narrador";
@@ -22,7 +22,7 @@ import { aplicarPublicacion } from "../arena/protocolo";
 import { rondaVisible } from "../arena/buffer";
 import { ArenaDescripcion } from "./ArenaDescripcion";
 import { ArenaEmisionBuffer } from "./ArenaEmisionBuffer";
-import type { PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
+import type { IntervencionArena, PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
 
 const reloj = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 export function Arena({ inicial }: { inicial: RegistroArena }) {
@@ -51,6 +51,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const bufferRecibido = useRef(false);
   const [estadoDirecto, setEstadoDirecto] = useState("esperando");
   const [comentarios, setComentarios] = useState<ComentarioArena[]>([]);
+  const [intervenciones, setIntervenciones] = useState<IntervencionArena[]>([]);
   const [sesionActual, setSesionActual] = useState<string | null>(null);
   const [archivoActual, setArchivoActual] = useState<"duelo" | "ejemplo-v3" | "ejemplo" | null>(null);
   const solicitud = useRef<AbortController | null>(null), cursor = useRef(0);
@@ -93,8 +94,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (p.tipo === "terminada" && presentacionActual.current === "buffer") { setBufferTerminada(true); if (p.estado !== "completa") setBufferActivo(false); }
     if (p.tipo === "sesion" && p.id) setSesionActual(p.id);
     if (p.tipo === "esperando" || p.tipo === "avance" || p.tipo === "fin") setEstadoDirecto(p.tipo === "avance" ? "jugando" : p.tipo === "fin" ? "finalizando" : "esperando");
-    if (p.tipo === "inicio") { setArchivoActual(null); setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null); setImportado(false); setComentarios([]); }
+    if (p.tipo === "inicio") { setArchivoActual(null); setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null); setImportado(false); setComentarios([]); setIntervenciones([]); }
     if (p.tipo === "comentario") setComentarios(anteriores => [...anteriores, p.comentario]);
+    if (p.tipo === "intervencion") setIntervenciones(anteriores => anteriores.some(i => i.id === p.intervencion.id) ? anteriores : [...anteriores, p.intervencion]);
     if (p.tipo === "avance" && presentacionActual.current !== "buffer") { const s = p.estado.tick * ARENA.pasoS; setTiempo(s); cursor.current = s; }
     if (p.tipo === "inicio" || p.tipo === "ordenes" || p.tipo === "ronda" || p.tipo === "avance") setRegistro(anterior => aplicarPublicacion(anterior, p) ?? anterior);
   };
@@ -105,7 +107,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (activa) { bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
   const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
-    setRegistro(resultado.registro); setComentarios(resultado.comentarios); setSesionActual(id);
+    setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
     if (buffer) { bufferRecibido.current = true; setBufferInicioTick(buffer.inicioTick); setBufferTerminada(buffer.terminada || resultado.registro.final.tick * ARENA.pasoS >= resultado.registro.config.duracionS || Boolean(resultado.registro.final.finalizado)); setBufferActivo(true); }
@@ -130,7 +132,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       if (solicitud.current !== controlador) return;
       setRegistro(siguiente); setTiempo(0); cursor.current = 0;
       setArchivoActual(payload === "duelo" || payload === "ejemplo-v3" || payload === "ejemplo" ? payload : null);
-      setComentarios([]);
+      setComentarios([]); setIntervenciones([]);
       setSeleccionado(null);
       setImportado((cuerpo as { accion: string }).accion === "reproducir");
     } catch {
@@ -245,15 +247,15 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <p className="arena-muted">{bufferActivo ? t("Live match at normal speed.", "Partido en vivo a velocidad normal.") : t("Continuous simulated movement; explicit ball cuts at simplified restarts. Playback starts paused.", "Movimiento continuo simulado; el balón se recoloca en reinicios simplificados. La reproducción empieza pausada.")}{reducido && t(" Reduced motion: discrete states.", " Movimiento reducido: estados discretos.")}</p>
         </section>
         <aside className="arena-companion" aria-label={t("Narration and commentary", "Narración y comentarios")} data-testid="arena-companion">
-          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
-          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
+          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={intervenciones} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
+          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={intervenciones} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <section className="arena-live-feed" aria-label={t("Live text narration", "Narración de texto en vivo")} data-testid="arena-live-text">
             <h2>{t("Latest actions", "Últimas acciones")}</h2>
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>
             <p className="arena-muted">{t("Confirmed actions, synchronized with the pitch. Text is available with audio off.", "Acciones confirmadas, sincronizadas con la cancha. Puedes leerlas con el audio apagado.")}</p>
             {!eventos.length ? <p>{t("Waiting for kick-off. Start a live match or play a saved match.", "Esperando el inicio. Inicia un partido en vivo o reproduce uno guardado.")}</p> : <ol>{eventos.slice(-5).reverse().map(e => <li key={e.id} data-event-tick={e.tick}><time>{reloj(e.tick * ARENA.pasoS)}</time><span>{narrarEventoArena(e, registro, idioma)}</span></li>)}</ol>}
           </section>
-          <ArenaComentarios comentarios={comentarios} tick={estado.tick} idioma={idioma} compacto />
+          <ArenaMesa comentarios={comentarios} intervenciones={intervenciones} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           <ArenaInteligencia registro={registro} estado={estado} idioma={idioma} jugador={jugadorActivo.id} />
         </aside>
       </div>

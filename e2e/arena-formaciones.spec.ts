@@ -58,7 +58,8 @@ test("interfaz: narración y audio junto a la cancha, sin anticipar eventos y si
   await expect(page.getByTestId("arena-clock")).toHaveText("0:00 / 1:00");
   const panel = page.getByTestId("arena-companion"), texto = panel.getByTestId("arena-live-text");
   await expect(panel.getByTestId("arena-narration")).toBeVisible();
-  await expect(panel.getByRole("region", { name: "Verified commentary" })).toBeVisible();
+  await expect(panel.getByRole("region", { name: "Broadcast desk" })).toBeVisible(); // Brief 045: Mesa de transmisión
+  await expect(panel.getByTestId("arena-mesa").locator("[data-mesa-role]")).toHaveCount(3);
   await expect(panel.getByTestId("arena-intelligence")).toBeAttached();
   const cancha = await page.locator(".arena-board").boundingBox(), lado = await panel.boundingBox();
   expect(Math.abs(cancha!.y - lado!.y)).toBeLessThan(2); expect(lado!.x).toBeGreaterThan(cancha!.x + cancha!.width);

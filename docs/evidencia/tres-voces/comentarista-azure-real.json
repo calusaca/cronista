@@ -1,0 +1,102 @@
+{
+  "fecha": "2026-10-21T13:27:54.755Z",
+  "salidas": [
+    {
+      "tick": 300,
+      "ms": 10259,
+      "modo": "llm",
+      "modelo": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "oraciones": [
+        {
+          "texto_es": "El pase de 21 metros de Darío Nevinardi tuvo como receptor a Emilio Barinánez para Olímpico Brezal.",
+          "texto_en": "Emilio Barinánez was the recipient of Darío Nevinardi's 21-metre pass for Olímpico Brezal.",
+          "hecho": "arena:a13",
+          "apoyo": [
+            "arena:a12"
+          ]
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "El pase de 21 metros de Darío Nevinardi terminó con la recepción de Emilio Barinánez para Olímpico Brezal.",
+              "texto_en": "Darío Nevinardi's 21-metre pass ended with Emilio Barinánez receiving the ball for Olímpico Brezal.",
+              "hecho": "arena:a13",
+              "apoyo": [
+                "arena:a12"
+              ]
+            }
+          ],
+          "motivos": [
+            {
+              "oracion": 0,
+              "regla": "V8",
+              "detalle": "cierre en vivo («terminó»): antes del final el partido no está terminado ni decidido (ES)"
+            },
+            {
+              "oracion": 0,
+              "regla": "V8",
+              "detalle": "cierre en vivo («ended»): antes del final el partido no está terminado ni decidido (EN)"
+            }
+          ]
+        },
+        {
+          "intento": 2,
+          "oraciones": [
+            {
+              "texto_es": "El pase de 21 metros de Darío Nevinardi tuvo como receptor a Emilio Barinánez para Olímpico Brezal.",
+              "texto_en": "Emilio Barinánez was the recipient of Darío Nevinardi's 21-metre pass for Olímpico Brezal.",
+              "hecho": "arena:a13",
+              "apoyo": [
+                "arena:a12"
+              ]
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    },
+    {
+      "tick": 600,
+      "ms": 5663,
+      "modo": "llm",
+      "modelo": "azure-openai:gpt-6.1-sol:reasoning-low",
+      "oraciones": [
+        {
+          "texto_es": "El intento de pase de Vicente Oreales hacia Darío Nevinardi fue de 38 metros.",
+          "texto_en": "Vicente Oreales's attempted pass towards Darío Nevinardi was 38 metres long.",
+          "hecho": "arena:a32",
+          "apoyo": []
+        },
+        {
+          "texto_es": "Sporting Montefrío Bajo lleva dos remates a puerta, frente a uno de Olímpico Brezal.",
+          "texto_en": "Sporting Montefrío Bajo has two shots on target, compared with one for Olímpico Brezal.",
+          "hecho": "estadista:remates:600",
+          "apoyo": []
+        }
+      ],
+      "audit": [
+        {
+          "intento": 1,
+          "oraciones": [
+            {
+              "texto_es": "El intento de pase de Vicente Oreales hacia Darío Nevinardi fue de 38 metros.",
+              "texto_en": "Vicente Oreales's attempted pass towards Darío Nevinardi was 38 metres long.",
+              "hecho": "arena:a32",
+              "apoyo": []
+            },
+            {
+              "texto_es": "Sporting Montefrío Bajo lleva dos remates a puerta, frente a uno de Olímpico Brezal.",
+              "texto_en": "Sporting Montefrío Bajo has two shots on target, compared with one for Olímpico Brezal.",
+              "hecho": "estadista:remates:600",
+              "apoyo": []
+            }
+          ],
+          "motivos": []
+        }
+      ]
+    }
+  ]
+}

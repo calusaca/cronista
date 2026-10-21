@@ -59,7 +59,10 @@ test("arena: analista con evidencia y narración completa por tramos, sin servic
   await expect(page.getByTestId("arena-assistant-answer")).toContainText(h.texto_en);
   expect(consultas).toEqual([{ tick: 120, pregunta: "momento", jugador: null, audiencia: "fan" }]);
   await page.route(`**/api/arena/sesiones/${id}/relato`, route => {
-    const p = route.request().postDataJSON(); tramos.push({ desdeTick: p.desdeTick, hastaTick: p.hastaTick });
+    const p = route.request().postDataJSON();
+    // Brief 045 v3.1: las intervenciones de la mesa se piden por id; aquí fallan y se omiten (ver arena-mesa.spec.ts).
+    if (p.intervencion) return route.fulfill({ status: 503, json: { error: "Sin voz de invitados en esta prueba" } });
+    tramos.push({ desdeTick: p.desdeTick, hastaTick: p.hastaTick });
     const s = construirRelato(registro, p.desdeTick, p.hastaTick, p.modo, p.idioma);
     return route.fulfill({ json: { ...s, audio: { base64: audioPrueba, tipo: "audio/wav" } } });
   });
@@ -402,7 +405,10 @@ test("arena: prepara todos los audios antes de sonar, sigue un reloj continuo y 
   let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; });
   let solicitudes = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, async route => {
-    const p = route.request().postDataJSON(); solicitudes++;
+    const p = route.request().postDataJSON();
+    // Brief 045 v3.1: las intervenciones de la mesa se piden por id; aquí fallan y se omiten (ver arena-mesa.spec.ts).
+    if (p.intervencion) return route.fulfill({ status: 503, json: { error: "Sin voz de invitados en esta prueba" } }).catch(() => {});
+    solicitudes++;
     if (p.desdeTick === 100) await barrera;
     await route.fulfill({ json: { ...construirRelato(registro, p.desdeTick, p.hastaTick, p.modo, p.idioma), audio: { base64: audioPrueba, tipo: "audio/wav" } } }).catch(() => {});
   });
@@ -410,7 +416,9 @@ test("arena: prepara todos los audios antes de sonar, sigue un reloj continuo y 
   await expect(page.getByTestId("arena-live-status")).toContainText("Match ready");
   const voz = page.getByTestId("arena-narration");
   await voz.getByRole("button", { name: "Listen from the start" }).click();
-  await expect(voz.getByRole("status")).toHaveText("Preparing narration: 1/2 passages");
+  // El progreso cuenta tramos e intervenciones del diario (brief 045 v3.1).
+  const { intervenciones } = await (await request.get(`/api/arena/sesiones/${id}/reproduccion`)).json() as { intervenciones: unknown[] };
+  await expect(voz.getByRole("status")).toHaveText(`Preparing narration: 1/${2 + intervenciones.length} passages`);
   await expect(voz.locator("audio")).not.toHaveAttribute("src", /blob:/);
   await expect(page.getByTestId("arena-clock")).toHaveText("0:00 / 0:12");
   liberar();

@@ -160,7 +160,10 @@ test("búfer: una síntesis lenta no detiene el partido y la preparación es ind
     await expect.poll(async () => (await (await request.get(`/api/arena/sesiones/${id}/emision`)).json()).registro?.final.tick).toBeGreaterThanOrEqual(200);
     await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { analista: false, voz: true } }));
     await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-      const p = r.request().postDataJSON(); tramos.push(p); await barrera;
+      const p = r.request().postDataJSON();
+      // Brief 045: las intervenciones de la mesa se piden aparte por su id; esta prueba mide los tramos del narrador.
+      if (p.intervencion) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } });
+      tramos.push(p); await barrera;
       const registro = (await (await request.get(`/api/arena/sesiones/${id}/emision`)).json()).registro as RegistroArena;
       const relato = construirRelato(registro, p.desdeTick, p.hastaTick, "buffer", p.idioma, { cierre: p.cierre, entradaTick: p.entradaTick });
       await r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: audioCorto, tipo: "audio/wav" } : null } }).catch(() => {});
@@ -217,6 +220,7 @@ test("búfer: descarta audio atrasado al cambiar idioma y se recupera de un fall
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { analista: false, voz: true } }));
   let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; }); let solicitudes = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
+    if (r.request().postDataJSON().intervencion) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } });
     solicitudes++; await barrera; await r.fulfill({ status: 503, json: { error: "Respuesta tardía de prueba" } }).catch(() => {});
   });
   await page.goto(`/arena?partido=${id}&vista=buffer`);
@@ -297,6 +301,7 @@ test("voz independiente: termina el partido mientras continúa el relato y despu
   const audio = Buffer.from(await wavMono([new Float32Array(96000)], 24000).arrayBuffer()).toString("base64");
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
   await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
+    if (r.request().postDataJSON().intervencion) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } });
     const p = r.request().postDataJSON(), relato = construirRelato(registro, p.desdeTick, p.hastaTick, "buffer", p.idioma, { cierre: p.cierre, entradaTick: p.entradaTick });
     return r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: audio, tipo: "audio/wav" } : null } });
   });

@@ -97,6 +97,22 @@ export function crearLlmEquipoDesdeEnv(lado: "local" | "visita", env: Env = proc
   return crearLlmDesdeEnv(configuracion, { maxRetries: 0 });
 }
 
+/** Brief 045 v3.1 · Presupuesto de llamadas compartido: cuenta cada invocación de
+ * `completar` (también las que agotan plazo o fallan) y, al alcanzar `max`, lanza sin
+ * llamar al modelo. Delega `id` y `uso`. Cuenta llamadas, no tokens ni coste. */
+export function conPresupuesto(llm: Llm, max: number): Llm {
+  let llamadas = 0;
+  return {
+    id: llm.id,
+    ...(llm.uso ? { uso: () => llm.uso!() } : {}),
+    async completar(system, mensajes, opciones) {
+      if (llamadas >= max) throw new Error("Presupuesto de llamadas agotado");
+      llamadas++;
+      return llm.completar(system, mensajes, opciones);
+    },
+  };
+}
+
 let porDefecto: Llm | undefined;
 
 /** API del brief: `completar(system, mensajes)` con el LLM que elija el entorno. */

@@ -2,7 +2,7 @@ import type { EstadoArena, RegistroArena } from "./tipos";
 import { firmaEstadoVoz } from "./buffer";
 
 /** Memoria del consumidor: solo intervenciones cuyo audio llegó a empezar. */
-export interface RecuerdoVoz { tick: number; texto: string; clave?: string; tema?: string; estado?: "iniciada" | "completa" | "interrumpida" }
+export interface RecuerdoVoz { tick: number; texto: string; clave?: string; tema?: string; estado?: "iniciada" | "completa" | "interrumpida"; rol?: "narrador" | "comentarista" | "estadista" }
 export const normalizarVoz = (texto: string) => texto.toLocaleLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 export function recordarVoz(memoria: readonly RecuerdoVoz[], intervencion: RecuerdoVoz): RecuerdoVoz[] {
   return [...memoria.filter(m => m.tick <= intervencion.tick && m.tick >= intervencion.tick - 600), intervencion].slice(-12);
@@ -100,19 +100,7 @@ export function comentarioEditorial(registro: RegistroArena, tick: number, idiom
       agregar(es ? [`${j} recuperó la pelota para ${equipo} en este tramo.`, `En la última recuperación apareció ${j}, de ${equipo}.`]
         : [`${j} won the ball for ${equipo} in this spell.`, `${j}, of ${equipo}, made that recent recovery.`], `recuperacion:${recuperacion.id}`, "recuperacion", 70, [recuperacion.id]);
     }
-    for (const lado of ["local", "visita"] as const) {
-      const propios = recientes.filter(e => e.lado === lado), remates = propios.filter(e => e.tipo === "tiro"), recepciones = propios.filter(e => e.tipo === "recepcion");
-      const equipo = registro.config.partido[lado].nombre;
-      if (remates.length) agregar(es ? [`${equipo} ya tuvo ${remates.length === 1 ? "un remate" : `${remates.length} remates`} en los últimos quince segundos.`, `En este tramo de quince segundos, ${remates.length} ${remates.length === 1 ? "remate" : "remates"} de ${equipo}.`]
-        : [`${equipo} had ${remates.length} ${remates.length === 1 ? "shot" : "shots"} in the last fifteen seconds.`, `In this fifteen-second spell, ${remates.length} ${remates.length === 1 ? "attempt" : "attempts"} from ${equipo}.`], `remates:${remates.at(-1)!.id}`, "balance-remates", 45, remates.map(e => e.id));
-      if (recepciones.length >= 2) agregar(es ? [`${equipo} completó ${recepciones.length} recepciones en los últimos quince segundos.`, `En la circulación reciente de ${equipo}, ${recepciones.length} envíos encontraron receptor.`]
-        : [`${equipo} completed ${recepciones.length} receptions in the last fifteen seconds.`, `${recepciones.length} deliveries found a teammate for ${equipo} in this recent spell.`], `circulacion:${recepciones.at(-1)!.id}`, "balance-pases", 40, recepciones.map(e => e.id));
-    }
-    const marcador = { ...registro.inicial.marcador };
-    for (const e of eventos) if (e.tipo === "gol") marcador[e.lado]++;
-    const local = registro.config.partido.local.nombre, visita = registro.config.partido.visita.nombre, segundos = Math.floor(tick / 10);
-    agregar(es ? [`Al llegar a los ${segundos} segundos: ${local}, ${marcador.local}; ${visita}, ${marcador.visita}.`, `El marcador a los ${segundos} segundos: ${local} ${marcador.local}, ${visita} ${marcador.visita}.`]
-      : [`At ${segundos} seconds: ${local}, ${marcador.local}; ${visita}, ${marcador.visita}.`, `The score at ${segundos} seconds: ${local} ${marcador.local}, ${visita} ${marcador.visita}.`], `marcador:${marcador.local}:${marcador.visita}`, "marcador", 30, eventos.filter(e => e.tipo === "gol").map(e => e.id), [0]);
+    // Brief 045: los balances de remates y pases y el marcador pasan al estadista (estadista.ts).
   }
   const disponibles = candidatos.filter(c => !repetidaVoz(historial, { ...c, tick }));
   // El tema tiene descanso incluso cuando cambiaron los actores o las cifras.

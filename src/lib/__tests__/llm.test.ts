@@ -7,7 +7,7 @@ import { analizar } from "../../analista/analista";
 import { mensajeInicial, SYSTEM_PROMPT } from "../../cadena/prompt";
 import { simular } from "../../sim/motor";
 import { configDeSemilla } from "../../sim/plantillas";
-import { crearLlmDesdeEnv, type Mensaje } from "../llm";
+import { conPresupuesto, crearLlmDesdeEnv, type Llm, type Mensaje } from "../llm";
 import { API_VERSION_FOUNDRY, crearLlmFoundry } from "../llm-foundry";
 import { borradorDesdeHechos, crearLlmStub } from "../llm-stub";
 
@@ -112,6 +112,30 @@ describe("Foundry (offline, fetch inyectado)", () => {
     const f = (async () => new Response(JSON.stringify({ type: "error", error: { type: "invalid_request_error", message: "no" } }), { status: 400 })) as typeof fetch;
     const llm = crearLlmFoundry({ ...cfgDe(ENV_FOUNDRY), fetch: f, maxRetries: 0 });
     await expect(llm.completar("s", [{ rol: "user", contenido: "x" }])).rejects.toThrow();
+  });
+});
+
+describe("conPresupuesto (brief 045 v3.1): presupuesto de llamadas compartido", () => {
+  it("N llamadas pasan, la N+1 lanza sin tocar el modelo; id y uso delegan", async () => {
+    const n = 3, uso = { llamadas: 7, respuestasConUso: 1, entrada: 2, salida: 3, cache: 0 };
+    let llamadas = 0;
+    const base: Llm = { id: "stub-presupuesto", uso: () => uso, completar: async (_s, m) => { llamadas++; return m[0]!.contenido; } };
+    const envuelto = conPresupuesto(base, n);
+    expect(envuelto.id).toBe(base.id);
+    for (let k = 0; k < n; k++) expect(await envuelto.completar("s", [{ rol: "user", contenido: `p${k}` }])).toBe(`p${k}`);
+    await expect(envuelto.completar("s", [{ rol: "user", contenido: "otra" }])).rejects.toThrow("Presupuesto de llamadas agotado");
+    expect(llamadas).toBe(n);
+    expect(envuelto.uso?.()).toBe(uso);
+    expect(conPresupuesto({ id: "sin-uso", completar: async () => "" }, n).uso).toBeUndefined();
+  });
+
+  it("también cuentan las llamadas que fallan o agotan su plazo", async () => {
+    let llamadas = 0;
+    const envuelto = conPresupuesto({ id: "falla", completar: async () => { llamadas++; throw new Error("plazo agotado"); } }, 2);
+    await expect(envuelto.completar("s", [])).rejects.toThrow("plazo agotado");
+    await expect(envuelto.completar("s", [])).rejects.toThrow("plazo agotado");
+    await expect(envuelto.completar("s", [])).rejects.toThrow("Presupuesto de llamadas agotado");
+    expect(llamadas).toBe(2);
   });
 });
 
