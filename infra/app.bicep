@@ -1,5 +1,10 @@
 targetScope = 'resourceGroup'
 
+@description('Réplicas siempre encendidas. 1 durante la evaluación del hackathon (hasta el 10 nov 2026) para evitar un arranque en frío de 30–40 s; 0 después para no generar coste en reposo.')
+@minValue(0)
+@maxValue(1)
+param minReplicas int = 1
+
 param location string = resourceGroup().location
 param registryName string
 param appName string = 'cronista'
@@ -75,7 +80,7 @@ resource app 'Microsoft.App/containerApps@2025-01-01' = {
           }
         ]
       }]
-      scale: { minReplicas: 0, maxReplicas: 1 }
+      scale: { minReplicas: minReplicas, maxReplicas: 1 }
     }
   }
 }

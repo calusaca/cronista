@@ -1,4 +1,9 @@
 targetScope = 'resourceGroup'
+@description('Réplicas siempre encendidas. 1 durante la evaluación del hackathon (hasta el 10 nov 2026) para evitar un arranque en frío de 30–40 s; 0 después para no generar coste en reposo.')
+@minValue(0)
+@maxValue(1)
+param minReplicas int = 1
+
 param registryName string
 param imageTag string
 param openAiEndpoint string
@@ -64,7 +69,7 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
         { type: 'Readiness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 10, failureThreshold: 3 }
         { type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 20, failureThreshold: 3 }
       ] }]
-      scale: { minReplicas: 0, maxReplicas: 1 }
+      scale: { minReplicas: minReplicas, maxReplicas: 1 }
     }
   }
 }
