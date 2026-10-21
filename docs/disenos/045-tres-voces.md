@@ -4,12 +4,17 @@
 
 Propuesta pedida por Carlos el 20 de octubre tras el brief 044: una transmisión
 con tres roles que se ceden la palabra, como en las retransmisiones reales. Es un
-brief de diseño; la implementación espera un «dale» explícito. Aplica solo a la
-emisión de la arena (`/arena`, vistas en directo y búfer) en ES/EN. No cambia la
-crónica principal, el Analista histórico, el simulador ni `RegistroArena`.
+brief de diseño; Carlos autorizó la implementación el 20 de octubre («dale»),
+condicionada a cerrar el texto. Aplica solo a la emisión de la arena (`/arena`,
+vistas en directo y búfer) en ES/EN. No cambia la crónica principal, el Analista
+histórico, el simulador ni `RegistroArena`.
 
-Versión 2, tras la revisión de Codex (GPT-6) del 20 de octubre contra el código:
-quince hallazgos, todos incorporados o resueltos aquí.
+**Versión 3 (21 de octubre), cerrada.** La versión 2 incorporó los quince
+hallazgos de la primera revisión de Codex (GPT-6.1 Sol, solo lectura); la
+segunda revisión ([evidencia](../evidencia/tres-voces/codex-revision-v2.md))
+dejó seis parciales y cinco bloqueos nuevos, y la verificación propia de Fable
+añadió uno (atraso del plan de voz). Todos están resueltos en esta versión; las
+decisiones se marcan con **[v3]**.
 
 ## Qué muestran los seis transcripts
 
@@ -61,9 +66,10 @@ motor.
    del narrador es la función: conecta hechos (secuencia → desenlace, balances
    entre equipos), no describe la jugada en curso. Si el LLM falla o es
    rechazado, respaldo determinista: plantilla elegida entre
-   `MESA_ARENA.respaldosComentarista` por idioma, construida solo con los datos
-   del hecho principal y verificada por la misma `verificarUpdate` (la prueba lo
-   exige). Se publica con `rol: "comentarista"` y modo `llm` | `plantilla`.
+   `MESA_ARENA.respaldosComentarista` por idioma con `elegirVarianteVoz`,
+   construida solo con los datos del hecho principal y verificada por la misma
+   `verificarUpdate` (la prueba lo exige). Se publica con `rol: "comentarista"`
+   y modo `llm` | `plantilla`.
 3. **Estadista.** **Código determinista con pruebas, sin LLM** (regla del
    proyecto). Módulo `src/arena/estadista.ts`: `datosEstadista(registro, tick)`
    devuelve datos con textos ES/EN por plantilla y evidencia explícita. Tabla
@@ -72,29 +78,32 @@ motor.
    | Tema | Entrada | Fórmula | Periodo | Redondeo / sin muestra |
    | --- | --- | --- | --- | --- |
    | `marcador` | `inicial.marcador` + eventos `gol` ≤ tick | suma por lado | acumulado | entero; siempre disponible |
-   | `reloj` | tick | `tick · pasoS` | instante | segundos enteros |
-   | `remates` | eventos `tiro` por lado | conteo; «a puerta» = remates cuyo desenlace es `gol` o `atajada` asociado al mismo remate (misma `lado`, primer desenlace posterior sin otro `tiro` en medio) | acumulado | entero; con 0 remates se dice «sin remates» citando el intervalo |
-   | `atajadas` | eventos `atajada` por portero | conteo | acumulado | entero |
+   | `reloj` | tick | `tick · ARENA.pasoS` | instante | segundos enteros |
+   | `remates` | **[v3]** solo eventos `tiro` por lado; `tiro_fuera`, `atajada` y `gol` son desenlaces, nunca remates | conteo; «a puerta» = remates cuyo primer desenlace posterior (sin otro `tiro` de ningún lado en medio) es un `gol` del mismo `lado` y `jugador`, o una `atajada` cuyo `receptor` es el `jugador` del remate (la atajada lleva el `lado` del portero; el motor guarda al rematador en `receptor`, `src/arena/motor.ts`) | acumulado | entero; con 0 remates se dice «sin remates» citando el intervalo |
+   | `atajadas` | eventos `atajada` por `jugador` (portero) | conteo | acumulado | entero |
    | `acciones` | eventos `pase`, `recepcion`, `recuperacion`, `intercepcion` por lado (`TipoEventoArena`; el motor no registra conducciones como eventos) | proporción de acciones del lado sobre el total, rotulada «proporción de acciones», no «posesión» | últimos `MESA_ARENA.ventanaAccionesS` s | porcentaje entero; con < `MESA_ARENA.minAcciones` acciones no se emite |
    | `faltas` | eventos `falta`, `amarilla`, `roja` por lado | conteos | acumulado | entero |
-   | `cambios` | eventos `cambio` por lado y `TECNICA_ARENA.maxCambios/maxVentanas` | usados y restantes | acumulado | entero; 0 usados cita el intervalo |
+   | `cambios` | **[v3]** contadores `cambios` y `ventanas` de `EstadoEntrenador` por lado en el último fotograma ≤ tick (`estado.entrenadores[lado]`, fuente autoritativa del brief 044), con `TECNICA_ARENA.maxCambios/maxVentanas`; los eventos `cambio` ≤ tick son la evidencia | usados y restantes, jugadores y ventanas | acumulado | entero; 0 usados cita el intervalo; sin `entrenadores` en el fotograma no se emite |
    | `reinicios` | eventos `reinicio` por tipo | conteo | acumulado | entero |
    | `pases` | eventos `pase` con `distanciaM` | media | últimos `ventanaAccionesS` s | metro entero; < `minAcciones` no se emite |
 
    Evidencia: cada dato lista `eventos` (los que entran en la fórmula) y, cuando
-   el valor no procede de eventos (marcador inicial, reloj, conteo cero), el
-   intervalo `[desdeTick, hastaTick]` inspeccionado y `inicial` como fuente.
-   **No hay tabla de liga**: la emisión no dispone de una clasificación con
-   procedencia y no se calcula ninguna. Para registros anteriores a
-   `reinicios-v3`, los `tiro_fuera` que siguen a una `atajada` con `motivo:
-   "desvio"` del mismo remate no cuentan como segundo remate (deduplicación
-   documentada en el brief 044). Un dato solo se emite si cambió respecto a la
-   última candidatura del mismo tema en la sesión (comparación por valor, en el
-   servidor).
+   el valor no procede de eventos (marcador inicial, reloj, conteo cero,
+   contadores del entrenador), el intervalo `[desdeTick, hastaTick]`
+   inspeccionado y la fuente (`inicial` o `fotograma:<tick>`). **No hay tabla
+   de liga**: la emisión no dispone de una clasificación con procedencia y no se
+   calcula ninguna. **[v3] Registros anteriores a `reinicios-v3`:** el doble
+   desenlace de un desvío (`atajada` con `motivo: "desvio"` seguida de
+   `tiro_fuera` del mismo vuelo) no altera el conteo porque solo cuentan los
+   eventos `tiro`; para «a puerta» ese remate cuenta una vez, por la atajada.
+   Es una normalización de este brief; el 044 documentó el duplicado y lo
+   corrigió solo para v3, sin tocar v1/v2. Un dato solo se emite si cambió
+   respecto a la última candidatura del mismo tema en la sesión (comparación
+   por valor, en el servidor). Cada candidatura lleva como máximo
+   `MESA_ARENA.maxDatosEstadista` datos, ordenados por la tabla.
 
-Nombres ficticios por idioma en `MESA_ARENA.nombres` (p. ej. ES «Rodrigo Valle»,
-«Ana Cedeño», «Tomás Ibarra»; EN «Mark Ellison», «Priya Chandra», «Owen Platt»);
-no coinciden con locutores reales ni con los que aparecen en los transcripts.
+Nombres ficticios por idioma en `MESA_ARENA.nombres`; no coinciden con
+locutores reales ni con los que aparecen en los transcripts.
 
 ### Candidaturas en el servidor, reproducción en el consumidor
 
@@ -103,67 +112,131 @@ no coinciden con locutores reales ni con los que aparecen en los transcripts.
   con `id` estable (`${rol}:${tema}:${tick}`), `rol`, `tick`, `tema`, `oraciones`,
   `hechos`, `evidencia`, `audit`, `modo` (`llm` | `plantilla` | `determinista`).
   Instantánea (`emision`), reproducción (`reproduccion`) y recuperación exponen
-  `intervenciones` junto a `comentarios`; `aplicarPublicacion`, `RegistroArena` y
-  `hechosArena` no cambian. Leer, reconectar o reproducir nunca genera otra
-  intervención.
-- Disparadores de candidatura (servidor, al avanzar el prefijo): estadista cada
-  `MESA_ARENA.estadistaCadaS` s de partido y al final; comentarista tras un hecho
-  permitido con prioridad ≥ `MESA_ARENA.comentaristaDesdePrioridad` o al cumplirse
-  `MESA_ARENA.comentaristaCadaS` s sin intervención suya, hasta
-  `MESA_ARENA.maxComentaristaPorSesion`. Generación LLM por `src/lib/llm.ts` con
-  el mismo modelo del narrador, plazo `MESA_ARENA.plazoComentaristaMs`, un
-  reintento con feedback (como `narrarArena`), presupuesto compartido con el
-  vigente de la sesión; al agotarlo, respaldo por plantilla.
+  `intervenciones` junto a `comentarios` (`ReproduccionArena` e
+  `InstantaneaEmision` ganan el campo; `comentarioPublicado` gana un hermano
+  `intervencionPublicada(id, intervencionId)`); `aplicarPublicacion`,
+  `RegistroArena` y `hechosArena` no cambian. Leer, reconectar o reproducir
+  nunca genera otra intervención.
+- **[v3] Disparadores de candidatura**, estado del servidor por sesión (nada
+  depende de la escucha de ningún consumidor):
+  - Estadista: al avanzar el prefijo, cuando `tick − ultimaCandidaturaEstadistaTick
+    ≥ MESA_ARENA.estadistaCadaS / ARENA.pasoS`, y una vez más con el tick final.
+    Si ningún dato cambió, no hay candidatura y el temporizador **sí** se rearma
+    (se vuelve a intentar al siguiente vencimiento).
+  - Comentarista: por evento, cuando el prefijo incorpora un evento cuya
+    prioridad en `PRIORIDAD_EVENTO_ARENA` (la tabla hoy local de `relato.ts`,
+    exportada desde `src/sim/limites.ts`) es ≥ `MESA_ARENA.comentaristaDesdePrioridad`;
+    por tiempo, cuando `tick − ultimaCandidaturaComentaristaTick ≥
+    comentaristaCadaS / pasoS`. Ambos rearman el mismo temporizador al generar
+    una candidatura (aceptada por el verificador o respaldo); una generación en
+    curso bloquea otra; tope `maxComentaristaPorSesion` por sesión.
+  - Generación LLM por `src/lib/llm.ts` con el mismo modelo del narrador, plazo
+    `MESA_ARENA.plazoComentaristaMs`, un reintento con feedback (como
+    `narrarArena`), presupuesto compartido con el vigente de la sesión; al
+    agotarlo, respaldo por plantilla.
 - **Cada consumidor decide la reproducción** con su memoria local de escucha
-  (`RecuerdoVoz` gana `rol`). Preparar o descartar una candidatura no la marca
-  como escuchada; solo iniciar su audio. «No repetir mientras no cambie» es
-  propiedad de las candidaturas (servidor), no de la memoria local.
+  (`RecuerdoVoz` gana `rol?: "narrador" | "comentarista" | "estadista"`; el
+  esquema de `memoria` de la ruta de relato lo admite). Preparar o descartar
+  una candidatura no la marca como escuchada; solo iniciar su audio. «No
+  repetir mientras no cambie» es propiedad de las candidaturas (servidor), no
+  de la memoria local.
 
 ### Un clip por intervención: cesión y voz invitada en el mismo audio
 
 La cesión del narrador y la intervención del invitado se sintetizan en **un solo
-documento SSML con dos elementos `<voice>`** (narrador → invitado): un clip, una
-prioridad, un tick, una entrada de memoria y una duración decodificada ≤
-`VOZ_BUFFER.duracionMaxS`. No hay cesiones sueltas ni retomas sintetizadas: el
-siguiente clip del narrador es la retoma. La cesión se elige entre
-`MESA_ARENA.cesiones` por idioma con `elegirVarianteVoz`; si la intervención
-cabe sin ella (duración), se incluye; si no, se omite la cesión y no el dato.
-`prepararVoz` y `ssmlComentario` aceptan `rol` por fragmento y eligen la voz por
-rol; `sintetizarVoz` no cambia su contrato de salida.
+documento SSML con dos elementos `<voice>`** hermanos (narrador → invitado): un
+clip, una prioridad, un tick y una entrada de memoria. No hay cesiones sueltas
+ni retomas sintetizadas: el siguiente clip del narrador es la retoma.
 
-El consumidor pide estas intervenciones por la ruta de relato existente con
-`modo: "buffer"` y un `tipoRelato: "invitado"`; para ese tipo acepta hasta
-`MESA_ARENA.fragmentosPorIntervencion` (2) fragmentos, con el resto de
-validaciones intactas (`src/ui/ArenaEmisionBuffer.tsx`). Caducidad: una
-intervención no arranca si `partidoS − tick/10 > MESA_ARENA.caducidadInvitadoS`.
+- **[v3] Transporte.** El consumidor pide la intervención por la ruta de relato
+  existente con `modo: "buffer"` y un campo nuevo del esquema estricto,
+  `intervencion: <id del diario>` (con `desdeTick = hastaTick = tick` de la
+  intervención). El servidor la lee del diario con `intervencionPublicada`
+  (nunca la regenera), construye el segmento con `tipoRelato: "invitado"`,
+  `rol`, `prioridad = MESA_ARENA.prioridadInvitado`, `cierre: false`, y
+  sintetiza con la caché `extra` como hoy.
+- **[v3] Fragmentos.** Exactamente **uno o dos** `FragmentoVoz`, cada uno con
+  `rol` (campo nuevo de `FragmentoVoz`): el primero, opcional, es la cesión
+  (`rol: "narrador"`, elegida entre `MESA_ARENA.cesiones` por idioma con
+  `elegirVarianteVoz`, con el nombre del invitado); el segundo agrupa **todas**
+  las oraciones del invitado en un solo texto (`rol` del invitado). `prepararVoz`
+  agrupa fragmentos contiguos del mismo rol en un `<voice>` y resuelve la voz
+  por rol e idioma; `ssmlComentario` asigna `rol` a sus fragmentos;
+  `sintetizarVoz` no cambia su contrato de salida y `voz` pasa a ser la del
+  invitado (el hash de `claveAudio` ya cubre todo el SSML). El consumidor
+  (`src/ui/ArenaEmisionBuffer.tsx`) valida para `tipoRelato === "invitado"`:
+  `1 ≤ fragmentos.length ≤ 2`, todos con `tick` igual al de la intervención,
+  `audio` obligatorio si hay texto; las demás validaciones se mantienen para
+  los otros tipos.
+- **[v3] Duración, decidida por caracteres en el servidor, sin circularidad.**
+  Si `caracteres(cesión) + caracteres(invitado) ≤ MESA_ARENA.maxCaracteresIntervencion`
+  se incluye la cesión; si no, se omite la cesión y no el dato. Si el invitado
+  solo supera el máximo, el estadista recorta a su primer dato y el
+  comentarista a su primera oración (ambas siguen verificadas por sí mismas).
+  En el consumidor, un clip decodificado con `duration > VOZ_BUFFER.duracionMaxS`
+  se descarta sin arrancar (no se recorta audio).
 
 ### Coordinador de turnos
 
-Función pura `siguienteTurno(entrada): { clip, memoria } | null` en
-`src/arena/turnos.ts`, con `entrada = { registro, partidoS, ahoraAudioS,
-fuenteActiva: { rol, prioridad, finS } | null, ultimaNoticiaS, candidatas:
-{ id, rol, tick, prioridad, duracionS }[], memoria: RecuerdoVoz[] }`. El reloj de
-audio y las duraciones decodificadas se inyectan; la función no lee el DOM ni
-Web Audio. Reglas, con constantes en `MESA_ARENA`:
+**[v3]** Función pura `siguienteTurno(entrada): { id, recuerdo } | null` en
+`src/arena/turnos.ts`. No lee el DOM ni Web Audio; el consumidor la llama en
+cada fotograma **antes** de la rama de reservas y arranca el clip devuelto; solo
+si `fuente.start` ocurre añade `recuerdo` a la memoria con `recordarVoz`.
+
+```ts
+interface EntradaTurno {
+  partidoS: number;                 // cursor visible
+  ahoraAudioS: number;              // reloj Web Audio
+  fuenteActiva: { rol: Rol; prioridad: number; finS: number } | null; // reservas incluidas (prioridad −1)
+  finUltimaNoticiaS: number | null; // fin (reloj de audio) del último clip del narrador con prioridad ≥ VOZ_BUFFER.prioridadInterrupcion; null si aún no hubo
+  finUltimoInvitadoS: number | null; ultimoInvitado: { rol: Rol; tick: number } | null;
+  pausaVigente: boolean;            // estado.pausa.hastaTick > tick en el fotograma del cursor
+  terminada: boolean; cerrando: boolean;
+  candidatas: { id: string; rol: Rol; tick: number; duracionS: number }[]; // solo con audio decodificado
+}
+```
+
+Reglas, con constantes en `MESA_ARENA`:
 
 - **Noticias del narrador: política vigente sin cambios.** `planVozBuffer`
-  sigue decidiendo con `VOZ_BUFFER.prioridadInterrupcion` (35) y comparación de
-  prioridades; reinicios y remates cortan a quien esté hablando, como exige el
-  brief 042.
-- **Los invitados nunca interrumpen.** Comentarista y estadista solo arrancan
-  con `fuenteActiva === null` (ninguna fuente audible, reservas incluidas) y
-  entran al plan con `prioridad = MESA_ARENA.prioridadInvitado` (20, por debajo
-  del umbral de interrupción), de modo que cualquier noticia ≥ 35 los corta y
-  ellos no cortan nada.
-- **Ventana de calma.** Un invitado arranca solo si `partidoS − ultimaNoticiaS
-  ≥ MESA_ARENA.calmaMinS` o hay `pausa` vigente en el fotograma del cursor
-  (`estado.pausa.hastaTick > tick`). Al reanudarse el juego no se detiene al
-  invitado por sí mismo: lo detiene la primera noticia del narrador (saque,
-  pase con prioridad de jugada, remate), que ya existe en la cola.
-- **Orden entre invitados.** Si ambos tienen candidatura, primero el
-  comentarista cuando su tick es más reciente que la última intervención del
-  estadista; si no, el estadista. Separación mínima entre invitados
-  `MESA_ARENA.separacionInvitadosS`.
+  sigue decidiendo con `VOZ_BUFFER.prioridadInterrupcion` (35) y comparación
+  estricta de prioridades. **[v3] Promesa acotada:** un clip del narrador
+  **admitido** (no caducado, duración válida) con prioridad ≥ 35 corta al
+  invitado, porque 35 > `prioridadInvitado`; entre fuentes del narrador se
+  conserva la comparación vigente (un reinicio 35 no corta un gol 100).
+- **Los invitados nunca interrumpen.** Solo arrancan con `fuenteActiva === null`
+  (ninguna fuente audible, reservas incluidas: la excepción `prioridadAnterior
+  < 0` de `planVozBuffer` no se alcanza porque el filtro es previo) y entran
+  con `prioridad = MESA_ARENA.prioridadInvitado` (20): por debajo del umbral,
+  no cortan nada; por encima de los comentarios editoriales (10), ganan el
+  hueco libre frente a ellos.
+- **[v3] Ventana de calma, medida en el reloj de audio desde el fin de la
+  última noticia:** un invitado arranca si `finUltimaNoticiaS === null` o
+  `ahoraAudioS − finUltimaNoticiaS ≥ MESA_ARENA.calmaMinS`, o si `pausaVigente`.
+  `calmaMinS` (1,5 s) es menor que `VOZ_BUFFER.reservaTrasS` (2 s): una
+  candidatura decodificada y admisible ocupa el hueco antes de que entre una
+  reserva; si aún no está decodificada, la reserva suena y el invitado espera a
+  que termine. Al reanudarse el juego no se detiene al invitado por sí mismo:
+  lo detiene la primera noticia del narrador con prioridad ≥ 35 (saque,
+  remate, falta, cambio), si la hay; los pases no tienen prioridad en
+  `PRIORIDAD_EVENTO_ARENA` y no cortan.
+- **[v3] Atraso y caducidad, separados del cierre final.** Para
+  `tipoRelato === "invitado"` el consumidor **no aplica** el filtro de atraso
+  (`atrasoNormalS`, hoy en la línea del descarte previo) ni el de repetición
+  (`repetidaVoz`), y llama a `planVozBuffer` con el último argumento `cierre =
+  true` **solo como exención del atraso** (el segmento lleva `cierre: false`,
+  no activa `s.cerrando` y la ruta del servidor no entra en la rama de cierre).
+  La caducidad la aplica `siguienteTurno`: una candidatura no arranca si
+  `partidoS − tick · ARENA.pasoS > MESA_ARENA.caducidadInvitadoS`, ni si
+  `tick · pasoS > partidoS`.
+- **[v3] Separación y orden.** `ahoraAudioS − finUltimoInvitadoS ≥
+  separacionInvitadosS` (o `finUltimoInvitadoS === null`). Con candidaturas
+  de ambos roles se alterna: primero el rol distinto de `ultimoInvitado.rol`
+  (comentarista si no hubo ninguno); dentro de un rol, la de tick más
+  reciente; las demás del mismo rol se descartan como superadas.
+- **[v3] Final.** Con `terminada || cerrando` no arranca ningún invitado: el
+  cierre del narrador tiene precedencia y después no suena nadie (brief 041).
+  La candidatura final del estadista se muestra en la Mesa como texto.
 - **Silencio.** Techo y exclusiones del brief 041 intactos (pausa manual,
   pestaña oculta, audio desactivado o bloqueado); las reservas siguen siendo
   del narrador.
@@ -172,30 +245,49 @@ Web Audio. Reglas, con constantes en `MESA_ARENA`:
 
 ```ts
 export const MESA_ARENA = {
-  prioridadInvitado: 20,          // por debajo de VOZ_BUFFER.prioridadInterrupcion
-  calmaMinS: 4,                   // segundos sin noticia del narrador para que entre un invitado
-  separacionInvitadosS: 10,       // entre dos intervenciones de invitados
-  caducidadInvitadoS: 12,         // una intervención más vieja que esto no arranca
+  prioridadInvitado: 20,          // por debajo de VOZ_BUFFER.prioridadInterrupcion (35), por encima del editorial (10)
+  calmaMinS: 1.5,                 // s de audio desde el fin de la última noticia; < VOZ_BUFFER.reservaTrasS
+  separacionInvitadosS: 6,        // s de audio entre el fin de un invitado y el inicio del siguiente
+  caducidadInvitadoS: 12,         // s de partido; más vieja no arranca
   estadistaCadaS: 20,             // cadencia de candidaturas del estadista
   ventanaAccionesS: 30, minAcciones: 6,
   maxDatosEstadista: 2,
-  comentaristaDesdePrioridad: 70, // tiro_fuera, atajada, gol, roja
+  comentaristaDesdePrioridad: 70, // tiro_fuera, atajada, amarilla, roja, gol, final_anticipado
   comentaristaCadaS: 25, maxComentaristaPorSesion: 6, plazoComentaristaMs: 6000,
   hechosComentarista: 8, maxOracionesComentarista: 2,
-  fragmentosPorIntervencion: 2,
-  nombres: { es: {...}, en: {...} }, cesiones: { es: [...], en: [...] }, respaldosComentarista: { es: [...], en: [...] },
+  fragmentosPorIntervencion: 2, maxCaracteresIntervencion: 280,
+  nombres: {
+    es: { narrador: "Rodrigo Valle", comentarista: "Ana Cedeño", estadista: "Tomás Ibarra" },
+    en: { narrador: "Mark Ellison", comentarista: "Priya Chandra", estadista: "Owen Platt" },
+  },
+  cesiones: {
+    es: ["{nombre}, ¿qué ves?", "Te escucho, {nombre}.", "{nombre}, con el dato.", "Adelante, {nombre}."],
+    en: ["{nombre}, what do you see?", "Over to you, {nombre}.", "{nombre}, with the numbers.", "Go ahead, {nombre}."],
+  },
+  respaldosComentarista: {        // solo datos del hecho principal; cada una pasa verificarUpdate en la prueba
+    es: ["{jugador} ({equipo}) protagoniza la última acción destacada, a {distancia} metros.",
+         "La jugada más reciente lleva la firma de {jugador}, de {equipo}.",
+         "{equipo} aparece en la última acción relevante, con {jugador}."],
+    en: ["{jugador} ({equipo}) features in the latest key action, from {distancia} metres.",
+         "The most recent play carries the mark of {jugador}, of {equipo}.",
+         "{equipo} shows up in the latest relevant action, through {jugador}."],
+  },
 } as const;
 ```
 
-Ninguna prueba repite estas cifras a mano. Con estos valores, en un partido de
-60 s con una calma de 4 s cada 20 s y un remate, los tres roles tienen
-oportunidad de hablar; la prueba e2e lo construye explícitamente (abajo).
+Ninguna prueba repite estas cifras a mano. **[v3]** El brief ya no afirma que
+un partido arbitrario garantice los tres roles en 60 s: la oportunidad depende
+de huecos sin noticia, de que las candidaturas lleguen decodificadas y de las
+reservas. La prueba e2e construye una línea de tiempo explícita (abajo) con
+margen audible; en partidos reales los invitados hablan en los tramos sin
+noticia del narrador (que hoy ocupa el comentario editorial) y pueden ser
+cortados.
 
 ### Voz
 
-Una voz por rol e idioma, lista permitida ampliada en `voz.ts`. Voces fijadas
-tras consultar el catálogo real de Speech el 20 de octubre (lectura, sin
-síntesis; 17 voces es-MX y 70 en-US):
+Una voz por rol e idioma, lista permitida y `estilosAdmitidos` ampliados en
+`voz.ts`. Voces fijadas tras consultar el catálogo real de Speech el 20 de
+octubre (lectura, sin síntesis; 17 voces es-MX y 70 en-US):
 
 | Rol | ES | EN | Estilo |
 | --- | --- | --- | --- |
@@ -232,40 +324,68 @@ muestran y reproducen las intervenciones del diario; no se generan nuevas.
 
 ## Pruebas exigidas
 
-- `turnos.test.ts` con entradas explícitas (`fuenteActiva`, `ahoraAudioS`,
-  `ultimaNoticiaS`, candidatas con duración): un invitado no arranca con fuente
-  activa; arranca solo en calma o pausa vigente; una noticia ≥ 35 lo corta y él
-  nunca corta; separación y caducidad; orden comentarista/estadista; la memoria
-  devuelta no marca candidatas no iniciadas.
+- `turnos.test.ts` con `EntradaTurno` explícitas: un invitado no arranca con
+  fuente activa (incluida una reserva con prioridad −1); arranca con
+  `finUltimaNoticiaS === null`, con calma cumplida o con pausa vigente, y no
+  antes; separación y caducidad; alternancia comentarista/estadista y descarte
+  de candidaturas superadas del mismo rol; `terminada`/`cerrando` bloquean; el
+  `recuerdo` devuelto lleva `rol` y solo se añade al arrancar. Una prueba de
+  `buffer.test.ts` comprueba que `planVozBuffer` con prioridad
+  `prioridadInvitado` nunca devuelve `interrumpirAnterior` sobre una fuente
+  ≥ 0 y que una noticia ≥ `prioridadInterrupcion` sí interrumpe a 20.
 - `estadista.test.ts`: cada dato de la tabla coincide con un conteo
-  independiente sobre los fixtures v1, v2 y v3 (incluida la deduplicación
-  pre-v3); cada dato lista su evidencia (eventos o intervalo + `inicial`); con
-  menos de `minAcciones` no hay proporción; un valor sin cambio no produce
-  candidatura.
+  independiente sobre los fixtures v1, v2 y v3 (incluido un desvío pre-v3 con
+  `tiro_fuera` posterior: un remate, a puerta); «a puerta» asocia la atajada
+  por `receptor` (prueba con remates de ambos lados seguidos); `cambios` lee
+  los contadores del entrenador; cada dato lista su evidencia (eventos o
+  intervalo + fuente); con menos de `minAcciones` no hay proporción; un valor
+  sin cambio no produce candidatura y el temporizador se rearma.
 - Comentarista: una oración sin hecho, con nombre inventado, predicción o
   juicio no pagado se rechaza y cae al respaldo; cada respaldo de
-  `MESA_ARENA.respaldosComentarista` pasa `verificarUpdate` con hechos reales;
-  ninguna intervención aparece en `RegistroArena` ni en `hechosArena`; el tope
-  por sesión y el plazo se respetan con un LLM simulado lento.
+  `MESA_ARENA.respaldosComentarista` pasa `verificarUpdate` con hechos reales
+  en ES y EN; ninguna intervención aparece en `RegistroArena` ni en
+  `hechosArena`; el tope por sesión, el plazo y el rearme del temporizador se
+  respetan con un LLM simulado lento; el disparador por evento usa
+  `PRIORIDAD_EVENTO_ARENA`.
 - Servidor: candidaturas generadas una vez; instantánea, reproducción y
-  recuperación exponen las mismas `intervenciones`; leer y reconectar no llaman
-  al LLM (contador en el stub).
+  recuperación exponen las mismas `intervenciones`; leer, reconectar y pedir
+  el audio de una intervención por `intervencion` no llaman al LLM (contador
+  en el stub); un `intervencion` desconocido devuelve 404.
 - Voz: el SSML contiene dos `<voice>` en una intervención con cesión y uno sin
-  ella; la voz se elige por rol; con una voz ausente del catálogo (simulado) la
-  degradación sigue la precedencia y `herramientas` la declara.
+  ella; la cesión se omite al superar `maxCaracteresIntervencion` y el
+  invitado se recorta a un dato/una oración; la voz se elige por rol; con una
+  voz ausente del catálogo (simulado) la degradación sigue la precedencia y
+  `herramientas` la declara.
 - UI: `renderToStaticMarkup` con las tres tarjetas, rótulos ES/EN y ninguna
-  intervención posterior al cursor.
-- E2e de arena con emisión sintética controlada (rutas simuladas como en
-  `e2e/arena-buffer.spec.ts`): un partido de 60 s con calmas suficientes, datos
-  que cambian y un remate durante un turno del comentarista; Speech simulado con
-  duraciones y demoras inyectadas. Se comprueba que suenan los tres roles, que
-  las fuentes no se solapan, que el remate corta al comentarista, que
-  `data-narration-role` cambia, que el silencio máximo respeta el límite vigente
-  con las exclusiones del brief 041, y móvil 360 px. Prueba aparte con calma
-  insuficiente y audio tardío: omisión sin cesión suelta.
+  intervención posterior al cursor; el consumidor acepta dos fragmentos solo
+  con `tipoRelato: "invitado"`.
+- **[v3] E2e de arena con emisión sintética controlada** (rutas simuladas como en
+  `e2e/arena-buffer.spec.ts`, Speech simulado con duraciones fijas y demoras
+  inyectadas, `intervenciones` servidas por la instantánea simulada). Línea
+  de tiempo del partido de 60 s, en segundos de partido:
+
+  | s | Qué ocurre | Qué se comprueba |
+  | --- | --- | --- |
+  | 0 | Apertura del narrador (1,5 s) | arranca el narrador |
+  | 5 | Estadista #1 (tick 50, 4 s), sin noticia previa ≥ 35 | arranca (calma `null`), `data-narration-role="estadista"` |
+  | 15 | Reinicio del narrador (prioridad 35, 1,5 s) | corta cualquier reserva; fija `finUltimaNoticiaS` |
+  | 20 | Comentarista #1 (tick 200, 6 s, modo `llm`) | arranca tras calma y separación; una sola fuente |
+  | 23 | Tiro (prioridad 60, 1,5 s) | **corta al comentarista** (`interrumpida`); el comentarista no cortó nada |
+  | 30 | Estadista #2 (tick 300, 3 s) con dato cambiado | arranca; orden alternado respetado |
+  | 40 | Comentarista #2 (tick 400, modo `plantilla`) | arranca; rótulo de modo visible |
+  | 60 | Final: cierre del narrador; estadista final solo texto | ningún invitado tras `cerrando` |
+
+  Se comprueba además que las fuentes no se solapan (intervalos audibles
+  medidos, reservas y transiciones incluidas), que el silencio máximo respeta
+  el límite vigente con las exclusiones del brief 041, y móvil 360 px. Prueba
+  aparte con noticia cada segundo y audio del invitado con 3 s de demora:
+  ningún invitado arranca, no hay cesión suelta y la Mesa muestra igualmente
+  las tarjetas de texto.
 - Mutaciones: quitar `fuenteActiva === null` rompe turnos; hacer que el
-  estadista no liste evidencia rompe la suya; dejar pasar una oración sin hecho
-  rompe la del comentarista; emitir un dato sin cambio rompe la de candidaturas.
+  estadista no liste evidencia rompe la suya; dejar pasar una oración sin
+  hecho rompe la del comentarista; emitir un dato sin cambio rompe la de
+  candidaturas; **[v3]** contar `tiro_fuera` como remate rompe la del desvío
+  pre-v3; asociar la atajada por `lado` rompe la de «a puerta».
 - `npm test`, `npm run typecheck` y los e2e de arena en verde; publicación y
   smoke público con voz real (tres voces oídas) antes de marcar ✅.
 
@@ -275,9 +395,10 @@ muestran y reproducen las intervenciones del diario; no se generan nuevas.
   pertinencia de un análisis**. El comentarista se rotula como análisis con
   hechos citados, no como opinión libre, porque el verificador no admite juicio
   sin respaldo.
-- Las ventanas de calma de 4 s son más cortas que las pausas reales de una
-  retransmisión; los invitados serán breves y a veces cortados. Es el precio de
-  no alterar el motor.
+- Los huecos entre noticias del narrador son más cortos que las pausas reales de
+  una retransmisión; los invitados serán breves y a veces cortados, y un
+  partido concreto puede no dar oportunidad a los tres. Es el precio de no
+  alterar el motor.
 - El estadista habla solo de lo que el registro contiene; «proporción de
   acciones» no es posesión en tiempo.
 - Más caracteres sintetizados: medir en el smoke el aumento de llamadas a Speech
