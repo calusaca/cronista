@@ -1,21 +1,21 @@
 {
-  "checkedUtc": "2026-10-21T13:45:52.901Z",
+  "checkedUtc": "2026-10-21T14:22:05.756Z",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
   "partido": "cd0e2ad0-a8b6-45fb-ba6d-1a9ca3f9a905",
   "jsErrors": [],
   "http5xx": [],
   "pages": {
     "desktop": {
-      "loadMs": 6888,
+      "loadMs": 5126,
       "tarjetas": {
-        "narrador": "Mark Ellison · play-by-play\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nHugo Quineloya (16) receives the ball after a 29 m pass from Ulises Castinera (6).\n\nTeo Brelelido (15) attempts a 23 m pass towards Aarón Valosa (7).\n\nInspect facts and checks",
-        "comentarista": "Priya Chandra · analysis with cited facts\n\n56.8 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nGoal by Iker Mendaroya (17).\n\nAfter 56 seconds, Unión Valdecristal has 2 shots, both on target, to 1 for Juventud Quebralta.\n\nInspect facts and checks",
-        "estadista": "Owen Platt · match data\n\n60.0 s · Deterministic\n\nScore: Juventud Quebralta 1, Unión Valdecristal 2.\n\nShots: Juventud Quebralta 1 (1 on target), Unión Valdecristal 2 (2 on target).\n\nInspect facts and checks"
+        "narrador": "Mark Ellison · play-by-play\n\nCommentary will appear as play is confirmed, with its evidence here.",
+        "comentarista": "Priya Chandra · analysis with cited facts\n\nThe analysis will appear in a calm moment, citing confirmed facts.",
+        "estadista": "Owen Platt · match data\n\nMatch data will appear here as it changes."
       },
       "horizontalOverflow": false
     },
     "mobile360": {
-      "loadMs": 5775,
+      "loadMs": 6578,
       "tarjetas": {
         "narrador": "Mark Ellison · play-by-play\n\n32.0 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nHugo Quineloya (16) receives the ball after a 29 m pass from Ulises Castinera (6).\n\nTeo Brelelido (15) attempts a 23 m pass towards Aarón Valosa (7).\n\nInspect facts and checks",
         "comentarista": "Priya Chandra · analysis with cited facts\n\n56.8 s · IA / AI · azure-openai:cronista-rapido:reasoning-low\n\nGoal by Iker Mendaroya (17).\n\nAfter 56 seconds, Unión Valdecristal has 2 shots, both on target, to 1 for Juventud Quebralta.\n\nInspect facts and checks",
