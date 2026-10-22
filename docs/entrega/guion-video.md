@@ -1,67 +1,69 @@
-# Guion del video — versión realizable con la evidencia actual
+# Demo video shot list — 1:55 maximum
 
-Actualizado el 17 de octubre de 2026. Borrador de pantalla montado: `demo-en-borrador.mp4`,
-1:50 exactos, 1280×900, subtítulos EN quemados y sin audio. Decodificado completo
-sin errores; fotogramas revisados. Es una demo local con caché, no un despliegue público.
-El [servicio público](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io)
-ya pasó el recorrido funcional por separado; el video conserva su captura local original.
-La narración propuesta tiene 233 palabras; puede añadirse voz o conservar subtítulos.
-Se muestra una crónica real de GPT-6.1 Sol, sus citas y el proceso que realmente
-ocurrió. **No se necesita encontrar un error del modelo para terminar el video.**
-No usar el modo `ensayo`, una frase falsa de maqueta ni el falso positivo histórico
-de la semilla 7 como si fueran una alucinación atrapada. El resultado 0/163 frente
-a 0/167 se muestra sin atribuir una ventaja factual que no observamos.
+Updated 22 October 2026 for the published arena revision `cronista-arena--0000013` and the recap
+demo. Replaces the 17 October script, whose local recording (`demo-en-borrador.mp4`, 1:50, no
+audio) showed only the recap app and is now superseded.
 
-| Tiempo | En pantalla | Voz EN |
-|---|---|---|
-| 0:00–0:12 | Home real, semilla 246. Cursor sobre una frase; clic para iluminar sus eventos. | An AI match report can sound convincing. But can you prove what it says? CRONISTA makes every published sentence inspectable, right down to the events behind it. |
-| 0:12–0:30 | Frase seleccionada y eventos resaltados. Abrir Analyst para exponer hecho, números e IDs. | Our simulator creates fictional football matches. A deterministic Analyst extracts facts and links them to events. The Writer turns those facts into English and Spanish. Then the Verifier checks citations, numbers, names, and supported claims before publication. |
-| 0:30–0:45 | View process: intentos registrados del partido. Mantener visibles sus estados reales. | The Writer runs on Microsoft Foundry through Azure OpenAI. This view shows its actual drafts and verdicts. Rejected output gets feedback and a limited retry; unresolved failures lead to an explicitly labeled analyst record. |
-| 0:45–1:00 | EN → ES; volver a EN. Fan ↔ Analyst. | Click a sentence and its evidence lights up. Switch languages or inspect the underlying facts. Player ratings also unfold into the events that earned them. The story changes; the recorded match does not. |
-| 1:00–1:17 | Gol de la portada → pizarra 2D → 3D. Esperar el trayecto del balón; rótulo de posiciones estáticas visible. | A goal becomes a tactics board, including a three-dimensional view. Only the ball moves, because that trajectory is recorded. Player pieces stay in their recorded zones. We make the limits visible. |
-| 1:17–1:32 | Data: cifras y enlace de descarga. Plano breve del diagrama de arquitectura del README. | Everything is synthetic: teams, players, events. The downloadable dataset includes its methodology and statistical checks. Automated tests exercise the simulator, verification rules, and the reader's path through the application. |
-| 1:32–1:50 | Cartela: “20 matches · baseline 0/163 flagged · pipeline 0/167 flagged · no reduction demonstrated”. Cierre en la home. | Across twenty real-model matches, both the baseline and pipeline passed these checks. That sample showed no reduction in findings, and our verifier has documented limits. What readers gain is an audit trail they can inspect. CRONISTA: personalize the story. Never the truth. |
+**Rules of the cut** (official rules §4.4): under two minutes; footage of the real public apps;
+English captions burned in; no third-party trademarks, footage or music. The only audio is the
+project's own Azure Speech voices and a plain English voice-over; no background music. Nothing in
+the narration may claim more than the linked evidence shows; the recap evaluation is presented as
+"no reduction demonstrated", and no rule rejection is called a caught hallucination.
 
-La [sonda del 10 oct](../evidencia/verificador-2026-10-10.md) ya mostró una
-frase ajena a los hechos que pasa las reglas. Cero hallazgos del mismo verificador
-no equivale a cero alucinaciones; la evaluación semántica independiente sigue
-pendiente. El video hace explícitos los límites y no afirma una garantía universal.
+**Audio sources (already recorded, real Azure Speech, Chromium-decoded):**
 
-## Preparación y montaje
+| Clip | Content | Length | File |
+|---|---|---|---|
+| A | EN three-voice exchange: narrator question → commentator → narrator close | 18.8 s | [`publico-dialogo_completa_en.mp3`](../evidencia/publicacion-048/publico-dialogo_completa_en.mp3) |
+| B | EN short variant (handover + first sentence) | 8.0 s | [`publico-dialogo_breve_en.mp3`](../evidencia/publicacion-048/publico-dialogo_breve_en.mp3) |
+| C | ES four-voice round: narrator → commentator → narrator → statistician (177 characters, ~16.7 s) | 16.7 s | [`publico-ronda-457-es.mp3`](../evidencia/publicacion-048/publico-ronda-457-es.mp3) |
+| D | EN statistician exchange | 18.8 s | [`publico-estadista_en.mp3`](../evidencia/publicacion-048/publico-estadista_en.mp3) |
 
-1. Arrancar con la configuración real de Azure, nunca con `CRONISTA_LLM=ensayo`.
-   El pie debe identificar Microsoft Foundry y la crónica debe estar en modo LLM.
-2. `npm run capture:demo -- http://127.0.0.1:3418` guarda capturas y un clip de
-   pantalla sin voz en `.cache/demo-recording/`. Son material de montaje local,
-   no una demo pública ni el video final de entrega. Se capturan acciones reales;
-   no se modifican las respuestas ni los estados del DOM.
-3. Las capturas aprobadas visualmente se pueden copiar a `docs/entrega/capturas/`.
-   Evitar capturar Azure Portal, claves, correo o pestañas personales.
-4. Grabar o añadir voz EN al montaje, y subtítulos EN. Sin música ni metraje de terceros.
-   Leer los textos del proceso tal como aparezcan; no llamar «corrección» a un
-   primer intento aprobado ni «alucinación» a una regla demasiado estricta.
-5. Ensayar y medir la narración. Cortar pausas y planos secundarios para conservar
-   margen bajo dos minutos. Ver el archivo final completo y probar la URL pública
-   antes de declarar la entrega terminada.
+Lengths were measured from the MP3 frames; the public smoke lists their SHA-256 hashes. Screen
+footage is captured live from the public URLs on the day of recording (scenes 2–6 can use the
+match in [`smoke-publico.json`](../evidencia/publicacion-048/smoke-publico.json) via its share
+link if it is still within the 24-hour retention; otherwise start a new one). If a live match
+cannot be started because the daily quota is spent, scene 2 uses **Saved matches → Load recorded
+model duel**, and the caption says "recorded duel, no new inference".
 
-No afirmar que está desplegado en Azure Container Apps hasta que exista el hosting
-y pase el smoke externo. No afirmar Microsoft Agent Framework: la orquestación
-actual es TypeScript propio. El registro original de 41 llamadas y su falso
-positivo permanece reproducible; la revalidación posterior usa las respuestas
-guardadas, sin llamar de nuevo al modelo.
+## Scene by scene (total 1:52)
 
-## Reproducir el montaje offline
+| Time | On screen | Audio | Caption (burned in) | Judging criterion it serves |
+|---|---|---|---|---|
+| 0:00–0:08 | Arena home in dark mode, scoreboard 0–0, pitch with 22 shirts, referee. Cursor hovers the three desk cards. | Voice-over: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable." | *CRONISTA — multi-agent match broadcast · every sentence traceable* | UX & presentation (hook); category (multi-agent) |
+| 0:08–0:22 | **Live** tab: Random coaches shows two deployment names; press **Start live match**. Scoreboard reads *Coaches are deciding · simulation clock paused*, then *Live · 19 s ready*. | Voice-over: "Two LLM coaches on separate Azure OpenAI deployments receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both." | *Home: GPT-5.6 Luna · Away: GPT-5.4 mini · same observation, strict JSON, 60 s deadline, programmed fallback* | Agentic design (distinct roles, shared state); technological implementation |
+| 0:22–0:32 | Open **Team plans and player orders**: a validated plan with per-player orders (for example `centrar`), mentality and stated reason, with no programmed fallback shown. | Voice-over: "Plans are validated against the engine. An invalid or late answer gets one correction with feedback, then a recorded programmed fallback. The match never stalls." | *Validated plan · 1 correction with feedback · fallback recorded, never silent* | Agentic design (failure recovery) |
+| 0:32–0:52 | Press **Enable narration**. Pitch plays; desk cards fill: narrator card, then **Latest exchange** with the three turns highlighted as each voice speaks. | **Clip A** (18.8 s, real EN audio): narrator question → commentator analysis → narrator close. No voice-over on top. | Live transcript of clip A, each line prefixed by the speaker's role: *Narrator (templates) · Commentator (LLM, verified) · Narrator* | UX & presentation; category (effective handoffs); multi-language storytelling |
+| 0:52–1:04 | Click **Inspect facts and checks** on the commentator card: fact IDs, event IDs, verdict "Approved by V1–V8", mode `llm` with deployment name; scroll to a rejected attempt with its rule. | Voice-over: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template." | *V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims* | Explainability; technological implementation |
+| 1:04–1:16 | **Ask about this match**: choose *What just happened?* (the other prompts are *What has my selected player done?* and *Which chances have there been?*), style Analyst, press **Ask the match analyst**; answer appears; open **Inspect tools and evidence** showing `consultar_eventos` with tick bounds. | Voice-over: "A versioned Microsoft Foundry agent answers viewer questions with read-only tools over the confirmed play only. Its sentences pass the same verifier." | *Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks* | Technological implementation (hero technology); agentic design |
+| 1:16–1:28 | Press **ES**: page, desk names and voices switch. Change **Understand this moment** to *Follow selected player* after clicking a shirt number. | **Clip C** starts (ES four-voice round) at low level under a short voice-over: "Spanish or English, fan, analyst or one player: the same intelligence, rendered for each viewer." | *ES / EN · Fan · Analyst · Follow a player — same facts, different experience* | Personalization; multi-language; UX |
+| 1:28–1:40 | Cut to the recap demo, seed 246: click a sentence, events light up; **View process** shows drafts and verdicts. | Voice-over: "The same verifier guards the automated recap: click any sentence to see its events, and read every rejected draft. We claim traceability, not better prose." | *Automated recap · GPT-6.1 Sol · 0/163 baseline, 0/167 pipeline flagged · no reduction demonstrated* | Challenge coverage (automated match recap); honesty for real-world impact |
+| 1:40–1:52 | Static card (own design, no logos): architecture diagram from the README; second card with Azure services; third card with the test counts and CI badge; final frame returns to the arena pitch. | Voice-over: "It runs on Azure Container Apps with Blob, Key Vault, Application Insights, Speech and Foundry. Nearly two thousand automated tests run in CI. Everything is synthetic. CRONISTA: narrate the match, prove every sentence." | *Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions* then *All data synthetic · open source · claims link to evidence* | Technological implementation; real-world impact; adherence to category |
 
-Después de `capture:demo`, con FFmpeg disponible y soporte libx264/libass:
+Voice-over word count: 204 words over about 80 seconds of spoken time (the rest is the project's
+own audio), at most 2.75 words per second in any scene. Clip B and clip D are spares: if clip A is replaced by a
+freshly recorded exchange, keep the same caption format.
 
-```bash
-CRONISTA_FFMPEG=/ruta/a/ffmpeg python3 scripts/render-demo.py
-```
+## What the video must not do
 
-El resultado queda en `.cache/demo-edit/cronista-demo-en.mp4`; la copia de revisión
-está en `docs/entrega/demo-en-borrador.mp4`. El script genera `subtitulos-en.srt`
-desde la columna de narración y usa las cartelas de `tarjetas-video.html`.
-Los clips se ralentizan y las capturas se mantienen para dar tiempo de lectura;
-no se cambia ningún dato, borrador o veredicto. La captura fuente sin montaje
-permanece en `.cache/demo-recording/` (no se versiona). Los subtítulos corresponden
-al montaje de 110 segundos, no al clip fuente de unos veinte segundos.
+- Show Azure Portal, keys, e-mail or personal tabs; record only the two public URLs and the
+  static cards.
+- Use Premier League, club, broadcaster or Microsoft logos; the cards are plain text on the
+  arena's own palette.
+- Call the verifier rejection a "caught hallucination" or say the pipeline writes better prose.
+- Claim Microsoft Agent Framework, MCP or A2A, Fabric or AKS.
+- Imply the arena is a regulation match, that voices were human-reviewed, or that model
+  superiority was measured.
+
+## Production notes
+
+1. Record at 1440×900 in Chromium with the arena in dark mode; keep 2× playback speed off during
+   the desk scene so the highlighted turns follow the audio.
+2. Capture scene 4 with real narration enabled; if Speech is slow, the bundled backup clips will
+   sound. Re-take rather than cut, so the caption matches what is heard.
+3. Mix clips A and C from the evidence files or from the session's own cached MP3s (identical
+   bytes for the same SSML); normalise loudness, no music bed.
+4. Burn captions from the table above (`subtitulos-en.srt` is regenerated from this file;
+   `tarjetas-video.html` holds the three static cards).
+5. Verify the final file end to end, measure its length (must be under 2:00), test the public URL
+   from another network, then publish on YouTube or Vimeo and replace `VIDEO_URL` in the README.

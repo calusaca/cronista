@@ -1,6 +1,7 @@
 import { wavMono } from "../src/arena/pista-audio";
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
+import { crearSesion } from "./sesiones";
 import { contextoNarradorArena } from "../src/arena/narrador";
 import { construirRelato } from "../src/arena/relato";
 import type { RegistroArena } from "../src/arena/tipos";
@@ -15,7 +16,7 @@ async function guardados(page: Page) {
 const audioPrueba = Buffer.from(await wavMono([new Float32Array(240000)], 24000).arrayBuffer()).toString("base64");
 
 test("arena: la voz en vivo pide tramos de tres segundos y permite detenerlos", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { seed: 73, segundos: 30, local: "auto", visita: "auto", seleccion: { modo: "programado" } } });
+  const creada = await crearSesion(request, { seed: 73, segundos: 30, local: "auto", visita: "auto", seleccion: { modo: "programado" } });
   expect(creada.status()).toBe(201); const { id } = await creada.json();
   const tramos: { desdeTick: number; hastaTick: number; modo: string }[] = [];
   try {
@@ -42,7 +43,7 @@ test("arena: la voz en vivo pide tramos de tres segundos y permite detenerlos", 
 });
 
 test("arena: analista con evidencia y narración completa por tramos, sin servicios de pago", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" } } });
+  const creada = await crearSesion(request, { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" } });
   expect(creada.status()).toBe(201); const { id } = await creada.json();
   await page.addInitScript(id => sessionStorage.setItem("cronista:arena:sesion", id), id);
   await page.route("**/api/arena/herramientas", route => route.fulfill({ json: { analista: true, voz: true } }));
@@ -121,7 +122,7 @@ test("arena: duelo real archivado entre dos modelos, sin respaldos ni nuevas inf
 });
 
 test("arena: transmisión incremental, reconexión al mismo encuentro y archivo final", async ({ page, request }) => {
-  const r = await request.post("/api/arena/sesiones", { data: { seed: 99, segundos: 8, local: "auto", visita: "auto", seleccion: { modo: "programado" } } });
+  const r = await crearSesion(request, { seed: 99, segundos: 8, local: "auto", visita: "auto", seleccion: { modo: "programado" } });
   expect(r.status()).toBe(201); const { id } = await r.json();
   await page.addInitScript(id => sessionStorage.setItem("cronista:arena:sesion", id), id);
   await page.goto("/arena");
@@ -402,7 +403,7 @@ test("arena: generar primero entrega el partido pausado, comparte el registro y 
 });
 
 test("arena: prepara todos los audios antes de sonar, sigue un reloj continuo y cancela sin publicar audio parcial", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" }, presentacion: "preparada" } });
+  const creada = await crearSesion(request, { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" }, presentacion: "preparada" });
   const { id } = await creada.json();
   await page.route("**/api/arena/herramientas", route => route.fulfill({ json: { voz: true, analista: false } }));
   await expect.poll(async () => (await request.get(`/api/arena/sesiones/${id}/registro`)).status()).toBe(200);
@@ -477,7 +478,7 @@ test("arena: prepara una pista continua con los seis MP3 reales archivados, sin 
 });
 
 test("arena: cancelar la preparación o cambiar idioma descarta las respuestas atrasadas", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" }, presentacion: "preparada" } });
+  const creada = await crearSesion(request, { seed: 42, segundos: 12, local: "auto", visita: "auto", seleccion: { modo: "programado" }, presentacion: "preparada" });
   const { id } = await creada.json();
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
   let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; });

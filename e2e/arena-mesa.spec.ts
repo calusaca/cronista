@@ -611,7 +611,7 @@ test("048 v1.2 G03 · una noticia alcanzada pero pendiente de sonar anula la ven
   const i = componerIntercambio({ intervencion: (await comentarArena(prefijo(registro, tInvitado), tInvitado, fielE2e))!, registro: prefijo(registro, tInvitado), seed, forma: "pregunta", memoria }).intervencion;
   expect(comprobarTurnos(i, registro)).toEqual([]);
   // Apertura larga: termina justo después de alcanzar el gol; la noticia del gol llega con el cursor ≥ 9 s.
-  const aperturaS = 7.8, noticiaS = 1.5, breveS = 3, completaS = 5, llegaGolS = 9;
+  const aperturaS = 7.8, noticiaS = 1.5, breveS = 3, completaS = 5, llegaGolS = 9.5; // 9,5 s: margen de ~0,7 s para el hueco previo (CI lento), dentro del atraso admitido del gol (VOZ_BUFFER.atrasoImportanteS).
   const clips = { completa: await audio(completaS), breve: await audio(breveS), apertura: await audio(aperturaS), noticia: await audio(noticiaS) };
   await preparar(page, id, registro, [i], 200);
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {

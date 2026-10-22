@@ -1,53 +1,45 @@
-# Elevator pitch (borrador — se congela al entregar)
+# Submission text (English, ready to paste)
 
-**EN corto (96 palabras; adaptar al límite real del formulario):**
+Frozen on 22 October 2026 against the published arena revision `cronista-arena--0000013`
+([evidence](../evidencia/publicacion-048/)) and the recap demo. Every figure below is backed by a
+file in `docs/evidencia/`; see the [README](../../README.md) for the links. Change nothing here
+without re-checking that evidence.
 
-CRONISTA turns synthetic football events into bilingual match reports with
-clickable evidence. A deterministic Analyst supplies cited facts, a Writer on
-Microsoft Foundry produces prose, and a deterministic Verifier checks each
-sentence before publication. Readers inspect the original drafts, switch
-languages, explore player ratings, and replay goals in 3D. Every team and player
-is fictional. Our recorded 20-match evaluation found zero flagged sentence
-pairs in both baseline and pipeline output; it did not demonstrate a reduction.
-The contribution is inspectable evidence and an explicit recovery path, with
-documented limits. Built with Azure OpenAI and automated tests.
+## Elevator pitch (≤ 100 words)
 
-**EN ampliado:**
+CRONISTA is a multi-agent football broadcast on Azure. Two LLM coaches on separate Azure OpenAI
+deployments compete on a shared deterministic engine while a three-voice desk (template narrator,
+fact-citing LLM commentator, deterministic statistician) hands the floor around in Spanish or
+English through Azure Speech. A Microsoft Foundry agent answers viewer questions with read-only
+tools. Every sentence passes deterministic checks and links to its events; failed sentences are
+retried, then replaced by verified templates. It solves AI narration's trust problem:
+explainable, personalized, bilingual intelligence judges can inspect. Hosted on Azure Container
+Apps with Blob, Key Vault and Application Insights.
 
-CRONISTA generates bilingual football match chronicles with a clickable evidence
-trail. A staged pipeline — deterministic Analyst, LLM
-Writer on Microsoft Foundry, deterministic Verifier — turns synthetic match
-events into explainable match intelligence: the Verifier checks citations,
-numbers, names and maintained claim patterns, and retries failures with feedback,
-and the Glass Box shows every draft it rejected and why. It runs a living
-fictional world: eight countries, leagues with standings and suspensions that
-carry across matchdays, weather that provably slows the second half (A/B over
-500 matches — and the chronicle may only say "the heat told" when it was
-measured in that match), bicycle kicks and halfway-line goals with hard
-coherence constraints, auditable player ratings, verified live replays, and a
-3D goal diorama where only the ball moves — because only the ball's trajectory
-is recorded data. Readers click any sentence to see its evidence and switch
-language, fan/analyst view, or team perspective — personalizing the story,
-never the truth. A separate full-match commentary connects every recorded action
-to a schematic pitch, with shirt numbers, team formations and labelled modelled
-support runs. We red-teamed our own verifier across five adversarial
-rounds; the crafted lies it rejects ship as a permanent battery within 1,429
-unit tests. The automated suites also contain 55 statistical checks and 62 browser
-journeys. In a 20-match GPT-6.1 Sol evaluation, both the first-draft baseline
-and published pipeline output had zero sentence-level Verifier findings
-(0/163 and 0/167 bilingual units). This sample did not demonstrate fewer
-findings with the pipeline. Independent semantic evaluation is still needed
-for unrestricted prose. Built with Microsoft Foundry / Azure OpenAI
-and GitHub Actions, hosted on Azure Container Apps.
+## Extended description (≤ 250 words)
 
-[Try the public demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io).
+**What we built.** CRONISTA turns synthetic football events into explainable match intelligence
+through two Azure-hosted experiences. The **live arena** is a multi-agent system: two LLM team
+controllers (Azure OpenAI, strict JSON plans, deadlines, programmed fallback) compete on a shared
+deterministic 2D engine with coaches, substitutions, weather, an active goalkeeper and crosses. A
+broadcast desk narrates it in Spanish or English: a template narrator plays the ball, an LLM
+commentator analyses only with cited facts and passes verifier rules V1–V8 or falls back to a
+verified template, and a deterministic statistician quotes the numbers. Exchanges are journaled
+and voiced by Azure Speech, one voice per role. A versioned Microsoft Foundry agent with read-only
+tools answers viewer questions on the confirmed play. The **verified recap** demo writes bilingual
+reports whose sentences show their events, with every rejected draft inspectable.
 
-Resultado y límites: `docs/evidencia/eval-gpt-6.1-sol/informe.txt`.
-El único rechazo de la cadena fue un falso positivo V8; no presentarlo como
-una alucinación atrapada. Ese falso positivo ya fue corregido; la evaluación
-original se conserva con su evaluador archivado y la revalidación posterior es
-offline, sin una nueva corrida del modelo. El resultado de ensayo del 7,6 % no
-corresponde al LLM real.
-<!-- Nota: verificar al congelar que todo lo afirmado siga siendo cierto
-     (regla: el pitch promete solo lo entregado) y que quepa en el límite
-     del formulario; reconciliar cifras con la suite del momento. -->
+**Microsoft and Azure technologies.** Azure OpenAI, Microsoft Foundry Agent Service and
+Evaluation, Azure AI Speech, Azure Container Apps and Jobs, Container Registry, Blob Storage,
+Key Vault, managed identity, Application Insights, Bicep, GitHub Actions. Orchestration is custom
+TypeScript; Agent Framework, MCP and A2A are not used.
+
+**What it proves.** Latest public run: 4/4 coach decisions were valid, 7/7 desk exchanges
+composed without structural failures, and real audio played in both languages. 1,788 unit tests,
+58 statistical checks and 129 browser journeys run in CI. Stated limits: a short synthetic
+prototype, rules that check citations and numbers rather than the relevance of an analysis, and
+no demonstrated prose improvement over a first draft.
+
+[Open the live arena](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) ·
+[Verified recap demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io) ·
+[Judges' guide](judges-guide.md)

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
+import { crearSesion } from "./sesiones";
 import { construirRelato } from "../src/arena/relato";
 import { wavMono } from "../src/arena/pista-audio";
 import type { RegistroArena } from "../src/arena/tipos";
@@ -166,7 +167,7 @@ test("búfer: empieza antes del final, interpola, pausa y comparte sin volver a 
 
 test("búfer: una síntesis lenta no detiene el partido y la preparación es independiente", async ({ page, request }) => {
   const errores: string[] = []; page.on("pageerror", e => errores.push(e.message));
-  const creada = await request.post("/api/arena/sesiones", { data: ajustes }); const { id } = await creada.json();
+  const creada = await crearSesion(request, ajustes); const { id } = await creada.json();
   const tramos: { desdeTick: number; hastaTick: number; modo: string; cierre?: boolean; entradaTick?: number }[] = [];
   let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; });
   try {
@@ -228,7 +229,7 @@ test("búfer: una demora prolongada agota la reserva y la reconexión continúa 
 });
 
 test("búfer: descarta audio atrasado al cambiar idioma y se recupera de un fallo de voz", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { ...ajustes, segundos: 12, presentacion: "preparada" } }); const { id } = await creada.json();
+  const creada = await crearSesion(request, { ...ajustes, segundos: 12, presentacion: "preparada" }); const { id } = await creada.json();
   await expect.poll(async () => (await request.get(`/api/arena/sesiones/${id}/registro`)).status()).toBe(200);
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { analista: false, voz: true } }));
   let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; }); let solicitudes = 0;
@@ -306,7 +307,7 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
 });
 
 test("voz independiente: termina el partido mientras continúa el relato y después suena el cierre", async ({ page, request }) => {
-  const creada = await request.post("/api/arena/sesiones", { data: { ...ajustes, segundos: 2, presentacion: "preparada" } }), { id } = await creada.json();
+  const creada = await crearSesion(request, { ...ajustes, segundos: 2, presentacion: "preparada" }), { id } = await creada.json();
   await expect.poll(async () => (await request.get(`/api/arena/sesiones/${id}/registro`)).status()).toBe(200);
   const registro = (await (await request.get(`/api/arena/sesiones/${id}/registro`)).json()) as RegistroArena;
   await page.route(`**/api/arena/sesiones/${id}/emision`, r => r.fulfill({ json: { registro, comentarios: [], asignacion: { modo: "programado", local: { nombre: "Local" }, visita: { nombre: "Visita" } }, metricas: {}, estado: "ejecutando", ultimoMensaje: 1 } }));
