@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-22T15:26:52.220Z",
+  "checkedUtc": "2026-10-22T16:25:19.721Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022152338",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022162205",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -216,8 +216,13 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 108371,
-      "sha256": "13e329e32e309cd767429b61262ca1c8538b9af5c418bc1c46444e3a5d0578a8"
+      "bytes": 116661,
+      "sha256": "1f9390fcdb4e43cd173663ca20f4e2700f08794276f28df265c54b739eee3c9d"
+    },
+    {
+      "path": "src/app/icon.svg",
+      "bytes": 638,
+      "sha256": "1326ab5144a30806ea6002a5188632fa3b73aaf6978cd4b9ecd762283caa6daa"
     },
     {
       "path": "src/app/layout.tsx",
@@ -316,8 +321,8 @@
     },
     {
       "path": "src/arena/__tests__/canto-gol.test.ts",
-      "bytes": 22671,
-      "sha256": "d5022f3c5afeb23f2de27701e29f9c4aa7f624b2f5b5b45066b39befd192d77b"
+      "bytes": 23867,
+      "sha256": "8724a2fedd5246cab97fb73d1ae0153f7bfb0f5265ef823f3f8c601426bda1a3"
     },
     {
       "path": "src/arena/__tests__/competencia.test.ts",
@@ -365,9 +370,19 @@
       "sha256": "2f706bd7ae01cf88cc53b384704ddd874a1711354641aa678b1580e30ef9e991"
     },
     {
+      "path": "src/arena/__tests__/grito-gol.test.ts",
+      "bytes": 24074,
+      "sha256": "76b748c2e335d1dd9f4125544ce81332965b9094838ac8525510126c801f6b7d"
+    },
+    {
       "path": "src/arena/__tests__/http-vista.test.ts",
       "bytes": 2163,
       "sha256": "60f07d448479082d4ce44c2021cb4c880d9ba68b00bf51d834591afafa5cd605"
+    },
+    {
+      "path": "src/arena/__tests__/identidad.test.ts",
+      "bytes": 12250,
+      "sha256": "e60bd5ba19da079013890d392ca9aefeb51b874076d5167c87b86889eb260350"
     },
     {
       "path": "src/arena/__tests__/mesa-voz.test.ts",
@@ -446,8 +461,8 @@
     },
     {
       "path": "src/arena/__tests__/transcripcion.test.ts",
-      "bytes": 38016,
-      "sha256": "096069bf040b960dee4575746981cfbd654478f63f39bee4274ccbabdc16112f"
+      "bytes": 38339,
+      "sha256": "9a2da209eecc29e82c51731d5d802eb19bf893e4d1b0a7d6d41d42f7d161eac8"
     },
     {
       "path": "src/arena/__tests__/turnos.test.ts",
@@ -456,8 +471,8 @@
     },
     {
       "path": "src/arena/__tests__/voz-expresiva.test.ts",
-      "bytes": 19711,
-      "sha256": "0a1650dd50eba6a310afd9f52ac19548693b446a62363c20016d67d0f320ec97"
+      "bytes": 24894,
+      "sha256": "7b29a5dc68a1c15a7665397879173accfb72f658f3c595c3e362661414464820"
     },
     {
       "path": "src/arena/agente-cli.ts",
@@ -566,8 +581,8 @@
     },
     {
       "path": "src/arena/expresion.ts",
-      "bytes": 3989,
-      "sha256": "601ef026dfaea53e4720782aa1cc2247b348f68505fc53d1da6aea6af778b7fb"
+      "bytes": 4103,
+      "sha256": "1353a50916b2b1514cf59cfef6c6379197f5fd9cff26b8deb2f8b13b98838212"
     },
     {
       "path": "src/arena/favoritos.ts",
@@ -583,6 +598,11 @@
       "path": "src/arena/geometria.ts",
       "bytes": 692,
       "sha256": "f364330d86edb65af9f7167363f7440d2c5f9ebecb2aa53d2097d0414588881f"
+    },
+    {
+      "path": "src/arena/identidad.ts",
+      "bytes": 5917,
+      "sha256": "df4db23bf28d5d0967ed238160b47ef63c363543eade0052903a6337d9a4e3d2"
     },
     {
       "path": "src/arena/inteligencia.ts",
@@ -661,8 +681,8 @@
     },
     {
       "path": "src/arena/relato.ts",
-      "bytes": 23046,
-      "sha256": "a8bbd638bd131b40822ad9f0935add9159c4ecb9e968beb145858165990f6f9d"
+      "bytes": 28148,
+      "sha256": "3463a82e2a378f42035bb7ff70f09e837692d3636cff6e3042e941d57755f6b2"
     },
     {
       "path": "src/arena/remate.ts",
@@ -721,8 +741,8 @@
     },
     {
       "path": "src/arena/voz.ts",
-      "bytes": 14972,
-      "sha256": "eaa84bb1642a67bdee08d0db8dde69eafd3ad308c8d386b335ef9b368f4fee71"
+      "bytes": 15673,
+      "sha256": "ae8c83768c5956ad4bd449fd160d367ea2a0a262aad0fb697a5ea7d73a2672c5"
     },
     {
       "path": "src/cadena/__fixtures__/llms-falsos.ts",
@@ -1221,8 +1241,8 @@
     },
     {
       "path": "src/sim/limites.ts",
-      "bytes": 61427,
-      "sha256": "7f9c13c3190b024a26f9aba93c519b81164eeb7ffcd4a1fb63cb15d74b97052c"
+      "bytes": 68019,
+      "sha256": "6d71bc2e9e55663a7578d6200a80a6a6ffff4bdb646a7ea023d6d38868edb733"
     },
     {
       "path": "src/sim/micro.ts",
@@ -1246,8 +1266,8 @@
     },
     {
       "path": "src/sim/plantillas.ts",
-      "bytes": 4203,
-      "sha256": "0a4166f6ece927c1b7aebb54d424bb284b7c44168612b34039f5ea944f20a4fe"
+      "bytes": 4210,
+      "sha256": "62f1ed431d41cb164677ecc539fc5e7c72ddae2f4a115799d639b88d8d4d4a1d"
     },
     {
       "path": "src/sim/prng.ts",
@@ -1271,8 +1291,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 43923,
-      "sha256": "50ceec16c8b286fc5faa4ee6e5bb9bb093e292c9b5597b3e8d5779a238a39ce3"
+      "bytes": 45920,
+      "sha256": "249d786c83273c003d8de73cf6c1e81868dfdb196d08f511990c5eb2a804b179"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -1281,13 +1301,13 @@
     },
     {
       "path": "src/ui/ArenaCelebracion.tsx",
-      "bytes": 1999,
-      "sha256": "01f3f1ea19afb27f9e4b8fff30c9fadcd2e31a4007ad7b14f82bb8e3bb100245"
+      "bytes": 2606,
+      "sha256": "90bd39fc33b02cf40689f773bc01cb9c2237193769e65cced25583f3945d0bf9"
     },
     {
       "path": "src/ui/ArenaCifras.tsx",
-      "bytes": 8372,
-      "sha256": "0eb1ed6cdd241806f7771fd32d86714d2fd9cf3b9674cdc5b5fd237bc55e3502"
+      "bytes": 8853,
+      "sha256": "0d3f6abf09d276dbccec5c315394d9c526fe2e43c68f74176ae7fc637313214e"
     },
     {
       "path": "src/ui/ArenaCifrasJugador.tsx",
@@ -1296,8 +1316,8 @@
     },
     {
       "path": "src/ui/ArenaContexto.tsx",
-      "bytes": 9782,
-      "sha256": "f09fcd23e75d3b1aa7263d88241f943860651785df4a5b36d1a2156cb0b810cb"
+      "bytes": 10031,
+      "sha256": "fe714e8c080e0e246d9deb609a2641428801b068b5036016c46bc34d7ccc4abc"
     },
     {
       "path": "src/ui/ArenaDescargas.tsx",
@@ -1306,8 +1326,8 @@
     },
     {
       "path": "src/ui/ArenaDescripcion.tsx",
-      "bytes": 3627,
-      "sha256": "1efd1c2fc3e0807f50dedf54a42082bdbbc649e6cbb7044def0692d9ec23a20d"
+      "bytes": 3764,
+      "sha256": "7eb1dc555624968eceeab57ffa5147aa3bafd2a5705a5349277894d49062d37a"
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
@@ -1341,8 +1361,8 @@
     },
     {
       "path": "src/ui/ArenaPlantilla.tsx",
-      "bytes": 9690,
-      "sha256": "628a8191715139bb5cdc9839b0d4fccc7a5f7d72f8a406e9ed578b0e75728769"
+      "bytes": 10207,
+      "sha256": "1146fb49777dd4a225c7bd771875ed3527a73558d5954a78dc5344cf4f6e12ab"
     },
     {
       "path": "src/ui/CajaDeCristal.tsx",
@@ -1365,9 +1385,19 @@
       "sha256": "954b8192c049920e9a7c09a2b7731612c6ea6175d8abe4815f7792ccd2869259"
     },
     {
+      "path": "src/ui/Emblema.tsx",
+      "bytes": 1417,
+      "sha256": "4b05e98f8cf26a00374da5b1ab0348c620216df73303014995e8e8c67818325f"
+    },
+    {
       "path": "src/ui/Enlace.tsx",
       "bytes": 1032,
       "sha256": "497f994d4270b88ae000109a1cd1eefdd68dd9b8343634560cb4566a3332baa4"
+    },
+    {
+      "path": "src/ui/Escudo.tsx",
+      "bytes": 3149,
+      "sha256": "766b3cf84a73be4860fbdaa86f2f75c4d6e80cb470da79fd1d9650ad67d1801d"
     },
     {
       "path": "src/ui/Formaciones.tsx",
@@ -1386,8 +1416,13 @@
     },
     {
       "path": "src/ui/Iconos.tsx",
-      "bytes": 5146,
-      "sha256": "c25711f8bb8169d9cbc25ced15c4a5b8b7d3bba57621a3f987326207070e5103"
+      "bytes": 5153,
+      "sha256": "01af5be8fe2a73fec34d177e310473c934d929b4d29916ae1304de382c5cb862"
+    },
+    {
+      "path": "src/ui/IconosArena.tsx",
+      "bytes": 3106,
+      "sha256": "d489c0554e4663b85a9a35011e8fe90416031366389441a529577fc4185bee0a"
     },
     {
       "path": "src/ui/Linea.tsx",
@@ -1426,8 +1461,8 @@
     },
     {
       "path": "src/ui/Simulador.tsx",
-      "bytes": 4443,
-      "sha256": "5926ed3521cde115756b83de5e10c027440129431662a17cb5202638d12b2e25"
+      "bytes": 4516,
+      "sha256": "f00b6d63ea12886a7b30f31e1d2990ed40ecbcfc09ad2de43e7afcef06e0d687"
     },
     {
       "path": "src/ui/Stats.tsx",
@@ -1446,8 +1481,8 @@
     },
     {
       "path": "src/ui/__tests__/arena-canto-gol.test.tsx",
-      "bytes": 9250,
-      "sha256": "e6c2230d9bc2556babc66642f9701a8eb733116f68d075a6a5c8da0fde03ba95"
+      "bytes": 9307,
+      "sha256": "326ff25c606f0ac3cfa2eb7cfbced6910a851215c96d3e45100a0a168767e1a8"
     },
     {
       "path": "src/ui/__tests__/arena-cifras.test.tsx",
@@ -1473,6 +1508,11 @@
       "path": "src/ui/__tests__/arena-mesa.test.ts",
       "bytes": 9512,
       "sha256": "197f6bcbece7322b7c2f185a8cd93f291e9facad8b32a8d04b44e02b2ba4c4f0"
+    },
+    {
+      "path": "src/ui/__tests__/identidad-ui.test.tsx",
+      "bytes": 15847,
+      "sha256": "d281953a454d2a7de4d37f2f1bdd73f0974b555301c4271e57962969fe618e94"
     },
     {
       "path": "src/ui/__tests__/xg.test.ts",

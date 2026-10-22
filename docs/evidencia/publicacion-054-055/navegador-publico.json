@@ -1,0 +1,62 @@
+{
+  "checkedUtc": "2026-10-22T16:46:38.655Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "partido": "3c8ee0e4-0108-46f0-b4dc-1f953acf0607",
+  "gol": {
+    "tick": 336,
+    "jugador": "local-9"
+  },
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "banner": "SV\nGOAL Sporting Valdecristal · Hugo Brelinales",
+      "marcadorDataGol": "local",
+      "escudos": 2,
+      "emblema": 1,
+      "favicon": "/icon.svg?icon.02t8amhel_6fj.svg",
+      "canchaAbajo": 830,
+      "panel": "FINAL STATS 1:00 SV SPORTING VALDECRISTAL ATLÉTICO BREZAL AB 62% 38% Possession 0.19 0.03 Geometric shot index (sum) · estimated 1 1 Shots 1 1 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 1 1 Offsides 7 / 10 5 / 6 Passes completed 78% 83% Pass accu",
+      "descargas": [
+        {
+          "etiqueta": "Download commentary (Markdown)",
+          "archivo": "cronista-arena-54055-comentarios-en.md",
+          "bytes": 18167,
+          "inicio": "# Sporting Valdecristal 1–0 Atlético Brezal · Broadcast transcript\nSimulated match · seed 54055 · 60 s · arena-v3 · language EN · session 3c8ee0e4-0108-46f0-b4d"
+        },
+        {
+          "etiqueta": "Download commentary (JSON)",
+          "archivo": "cronista-arena-54055-comentarios-en.json",
+          "bytes": 107935,
+          "inicio": "{\n \"version\": \"transcripcion-arena-v1\",\n \"generado\": \"2026-10-22T16:46:44.672Z\",\n \"idioma\": \"en\",\n \"importable\": false,\n \"partido\": {\n  \"seed\": 54055,\n  \"versio"
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "banner": "SV\nGOAL Sporting Valdecristal · Hugo Brelinales",
+      "marcadorDataGol": "local",
+      "escudos": 2,
+      "emblema": 1,
+      "favicon": "/icon.svg?icon.02t8amhel_6fj.svg",
+      "canchaAbajo": 791,
+      "panel": "FINAL STATS 1:00 SV SPORTING VALDECRISTAL ATLÉTICO BREZAL AB 62% 38% Possession 0.19 0.03 Geometric shot index (sum) · estimated 1 1 Shots 1 1 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 1 1 Offsides 7 / 10 5 / 6 Passes completed 78% 83% Pass accu",
+      "descargas": [
+        {
+          "etiqueta": "Download commentary (Markdown)",
+          "archivo": "cronista-arena-54055-comentarios-en.md",
+          "bytes": 18167,
+          "inicio": "# Sporting Valdecristal 1–0 Atlético Brezal · Broadcast transcript\nSimulated match · seed 54055 · 60 s · arena-v3 · language EN · session 3c8ee0e4-0108-46f0-b4d"
+        },
+        {
+          "etiqueta": "Download commentary (JSON)",
+          "archivo": "cronista-arena-54055-comentarios-en.json",
+          "bytes": 107935,
+          "inicio": "{\n \"version\": \"transcripcion-arena-v1\",\n \"generado\": \"2026-10-22T16:46:49.170Z\",\n \"idioma\": \"en\",\n \"importable\": false,\n \"partido\": {\n  \"seed\": 54055,\n  \"versio"
+        }
+      ],
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}

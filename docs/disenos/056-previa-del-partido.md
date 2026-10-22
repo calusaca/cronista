@@ -1018,3 +1018,14 @@ octubre, meta de envío el 26.
 
 Orden de recorte dentro de B si el tiempo aprieta: e2e (4) → reactivación (§ 3) → repetición
 guardada (§ 5.6). Lo que se recorte deja su constante y su prueba fuera, no a medias, y se anota.
+
+## Versión 1.2 (22 de octubre, coordinador): dos ajustes durante la implementación
+
+1. **Selectores de la tarjeta.** El DOM de §4.1/§8 rompía dos e2e existentes en modo estricto
+   (`e2e/arena.spec.ts` busca `[data-player=…]` sin acotar y `e2e/arena-identidad.spec.ts` busca `header`). Dentro de
+   la tarjeta se usa `<div className="arena-lineup-head">` en lugar de `<header>` y `data-lineup-player` en lugar de
+   `data-player`. Ningún e2e existente se modifica.
+2. **Fichas encimadas.** Con la escala derivada, las líneas de 0,69 y 0,80 quedaban a 5,7 unidades con fichas de 6,4 de
+   diámetro (4-2-3-1 y 4-2-2-2). El dibujo muestra solo el dorsal (los nombres están en la lista de texto de la tarjeta)
+   y el eje de profundidad se estira con una constante de `PREVIA_ARENA.tarjeta` para que la distancia entre centros de
+   cualquier par de fichas sea ≥ diámetro + 1 unidad, probado en las 12 formaciones del catálogo.

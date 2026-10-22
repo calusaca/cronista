@@ -1,0 +1,745 @@
+{
+  "checkedUtc": "2026-10-22T16:44:54.038Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": null,
+  "scope": "public_container_app_real_azure_services_briefs_054_055",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+      "es": {
+        "narrador": {
+          "voz": "es-MX-JorgeNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "es-MX-DaliaNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "es-MX-GerardoNeural",
+          "motivo": "predeterminada"
+        }
+      },
+      "en": {
+        "narrador": {
+          "voz": "en-US-JennyNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "en-US-DavisNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "en-US-GuyNeural",
+          "motivo": "predeterminada"
+        }
+      }
+    },
+    "catalogo": "consultado"
+  },
+  "match": {
+    "id": "3c8ee0e4-0108-46f0-b4dc-1f953acf0607",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "sol6",
+        "nombre": "GPT-6 Sol",
+        "controlador": "azure-openai:cronista-sol6:reasoning-low"
+      },
+      "visita": {
+        "id": "luna6",
+        "nombre": "GPT-6 Luna",
+        "controlador": "azure-openai:cronista-luna6:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-22T16:45:00.842Z"
+  },
+  "stream": {
+    "messages": 141,
+    "advances": 122,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "interventions": [
+      {
+        "id": "estadista:marcador+remates:200",
+        "rol": "estadista",
+        "tick": 200,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Sporting Valdecristal 0, Atlético Brezal 0.",
+            "en": "Score: Sporting Valdecristal 0, Atlético Brezal 0.",
+            "hecho": "estadista:marcador:200"
+          },
+          {
+            "es": "Sin remates en los primeros 20 segundos.",
+            "en": "No shots in the first 20 seconds.",
+            "hecho": "estadista:remates:200"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: El marcador, Tomás Ibarra.",
+          "estadista: Marcador: Sporting Valdecristal 0, Atlético Brezal 0. Sin remates en los primeros 20 segundos.",
+          "narrador: Gracias, Tomás."
+        ],
+        "turnosBreve": [
+          "narrador: Vamos con Tomás Ibarra y los números.",
+          "estadista: Marcador: Sporting Valdecristal 0, Atlético Brezal 0."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:tiempo:250",
+        "rol": "comentarista",
+        "tick": 250,
+        "tema": "tiempo",
+        "modo": "plantilla",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Aarón Barera (Sporting Valdecristal) protagoniza la última acción destacada, a 4 metros.",
+            "en": "Aarón Barera (Sporting Valdecristal) features in the latest key action, from 4 metres.",
+            "hecho": "arena:a17"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a17"
+            ]
+          }
+        ],
+        "auditFinalRejections": [
+          {
+            "oracion": 1,
+            "regla": "V3",
+            "detalle": "el marcador «0–0» no es uno que el hecho afirme (ES)"
+          },
+          {
+            "oracion": 1,
+            "regla": "V3",
+            "detalle": "el número 0 no está en el hecho (ES)"
+          },
+          {
+            "oracion": 1,
+            "regla": "V4",
+            "detalle": "«Llevamos» no es un nombre del hecho ni una palabra permitida (ES)"
+          }
+        ],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Te escucho, Ana Cedeño.",
+          "comentarista: Aarón Barera (Sporting Valdecristal) protagoniza la última acción destacada, a 4 metros.",
+          "narrador: Muy bien, Ana. Seguimos."
+        ],
+        "turnosBreve": [
+          "narrador: Ana Cedeño, ¿qué ves?",
+          "comentarista: Aarón Barera (Sporting Valdecristal) protagoniza la última acción destacada, a 4 metros."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:336",
+        "rol": "comentarista",
+        "tick": 336,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Gol de Hugo Brelinales (9).",
+            "en": "Goal by Hugo Brelinales (9).",
+            "hecho": "arena:a24"
+          },
+          {
+            "es": "Marcador: Sporting Valdecristal 1, Atlético Brezal 0.",
+            "en": "Score: Sporting Valdecristal 1, Atlético Brezal 0.",
+            "hecho": "estadista:marcador:336"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a24"
+            ]
+          },
+          {
+            "eventos": [
+              "a24"
+            ],
+            "intervalo": [
+              0,
+              336
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "ronda",
+        "turnos": [
+          "narrador: Ana, repasemos el gol de Hugo Brelinales.",
+          "comentarista: Gol de Hugo Brelinales (9).",
+          "narrador: Tomás, ¿cómo está el marcador?",
+          "estadista: Marcador: Sporting Valdecristal 1, Atlético Brezal 0."
+        ],
+        "turnosBreve": [
+          "narrador: Ana, ¿qué ves?",
+          "comentarista: Gol de Hugo Brelinales (9)."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:atajada:455",
+        "rol": "comentarista",
+        "tick": 455,
+        "tema": "atajada",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Emilio Galaino detuvo el remate de Adrián Paliell.",
+            "en": "Emilio Galaino stopped Adrián Paliell's shot.",
+            "hecho": "arena:a33"
+          },
+          {
+            "es": "El marcador sigue 1-0 para Sporting Valdecristal, con 1 remate a puerta para cada equipo.",
+            "en": "The score remains 1-0 for Sporting Valdecristal, with 1 shot on target for each team.",
+            "hecho": "estadista:marcador:455"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a33"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:atajadas:455",
+                "eventos": [
+                  "a33"
+                ]
+              }
+            ]
+          },
+          {
+            "eventos": [
+              "a24",
+              "a23",
+              "a32",
+              "a33"
+            ],
+            "citas": [
+              {
+                "hecho": "estadista:marcador:455",
+                "eventos": [
+                  "a24"
+                ],
+                "intervalo": [
+                  0,
+                  455
+                ],
+                "fuente": "inicial"
+              },
+              {
+                "hecho": "estadista:remates:455",
+                "eventos": [
+                  "a23",
+                  "a24",
+                  "a32",
+                  "a33"
+                ]
+              }
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Ana, vamos con la atajada de Emilio Galaino.",
+          "comentarista: Emilio Galaino detuvo el remate de Adrián Paliell. El marcador sigue 1-0 para Sporting Valdecristal, con 1 remate a puerta para cada equipo.",
+          "narrador: Anotado, Ana."
+        ],
+        "turnosBreve": [
+          "narrador: Ana, ¿qué ves?",
+          "comentarista: Emilio Galaino detuvo el remate de Adrián Paliell."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:remates+atajadas:540",
+        "rol": "estadista",
+        "tick": 540,
+        "tema": "remates+atajadas",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Remates: Sporting Valdecristal 1 (1 a puerta), Atlético Brezal 1 (1 a puerta).",
+            "en": "Shots: Sporting Valdecristal 1 (1 on target), Atlético Brezal 1 (1 on target).",
+            "hecho": "estadista:remates:540"
+          },
+          {
+            "es": "Atajadas: Emilio Galaino (Sporting Valdecristal), 1.",
+            "en": "Saves: Emilio Galaino (Sporting Valdecristal), 1.",
+            "hecho": "estadista:atajadas:540"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a23",
+              "a24",
+              "a32",
+              "a33"
+            ]
+          },
+          {
+            "eventos": [
+              "a33"
+            ]
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: Tomás, los remates.",
+          "estadista: Remates: Sporting Valdecristal 1 (1 a puerta), Atlético Brezal 1 (1 a puerta). Atajadas: Emilio Galaino (Sporting Valdecristal), 1.",
+          "narrador: Gracias, Tomás."
+        ],
+        "turnosBreve": [
+          "narrador: Adelante, Tomás.",
+          "estadista: Remates: Sporting Valdecristal 1 (1 a puerta), Atlético Brezal 1 (1 a puerta)."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:acciones+faltas:600",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "acciones+faltas",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Proporción de acciones en los últimos 30 segundos: Sporting Valdecristal 38 %, Atlético Brezal 62 %.",
+            "en": "Share of actions in the last 30 seconds: Sporting Valdecristal 38%, Atlético Brezal 62%.",
+            "hecho": "estadista:acciones:600"
+          },
+          {
+            "es": "Sin faltas en los primeros 60 segundos.",
+            "en": "No fouls in the first 60 seconds.",
+            "hecho": "estadista:faltas:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a22",
+              "a26",
+              "a27",
+              "a28",
+              "a29",
+              "a30",
+              "a31",
+              "a34",
+              "a35",
+              "a36",
+              "a39",
+              "a40",
+              "a41"
+            ],
+            "intervalo": [
+              300,
+              600
+            ]
+          },
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "final",
+        "turnos": [
+          "narrador: Para cerrar, Tomás, los números.",
+          "estadista: Proporción de acciones en los últimos 30 segundos: Sporting Valdecristal 38 %, Atlético Brezal 62 %. Sin faltas en los primeros 60 segundos."
+        ],
+        "turnosBreve": [
+          "narrador: Tomás, con el dato.",
+          "estadista: Proporción de acciones en los últimos 30 segundos: Sporting Valdecristal 38 %, Atlético Brezal 62 %."
+        ],
+        "motivosD": []
+      }
+    ],
+    "lastId": 141,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 73289,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          4741.292507000035,
+          4611.286852000048,
+          5328.463071000064,
+          4602.898695999989
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17446,
+            "salida": 1074,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17566,
+            "salida": 1131,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 8,
+            "respuestasConUso": 8,
+            "entrada": 16164,
+            "salida": 1303,
+            "cache": 4608
+          }
+        }
+      }
+    },
+    "elapsedMs": 73257
+  },
+  "consistency": {
+    "stream": 6,
+    "reproduccion": [
+      "estadista:marcador+remates:200",
+      "comentarista:tiempo:250",
+      "comentarista:gol:336",
+      "comentarista:atajada:455",
+      "estadista:remates+atajadas:540",
+      "estadista:acciones+faltas:600"
+    ],
+    "emision": [
+      "estadista:marcador+remates:200",
+      "comentarista:tiempo:250",
+      "comentarista:gol:336",
+      "comentarista:atajada:455",
+      "estadista:remates+atajadas:540",
+      "estadista:acciones+faltas:600"
+    ]
+  },
+  "voice": {
+    "comentarista_es": {
+      "id": "comentarista:tiempo:250",
+      "tick": 250,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Te escucho, Ana Cedeño."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 250,
+          "texto": "Aarón Barera (Sporting Valdecristal) protagoniza la última acción destacada, a 4 metros."
+        },
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Muy bien, Ana. Seguimos."
+        }
+      ],
+      "text": "Te escucho, Ana Cedeño. Aarón Barera (Sporting Valdecristal) protagoniza la última acción destacada, a 4 metros. Muy bien, Ana. Seguimos.",
+      "bytes": 82512,
+      "type": "audio/mpeg",
+      "characters": 137,
+      "voz": "es-MX-DaliaNeural",
+      "audioSha256": "9b9d139f93ce8587019b0904ead8675121e2b4e0bb40405a5188f6094adae17f"
+    },
+    "comentarista_en": {
+      "id": "comentarista:tiempo:250",
+      "tick": 250,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Over to you, Priya Chandra."
+        },
+        {
+          "rol": "comentarista",
+          "tick": 250,
+          "texto": "Aarón Barera (Sporting Valdecristal) features in the latest key action, from 4 metres."
+        },
+        {
+          "rol": "narrador",
+          "tick": 250,
+          "texto": "Good, Priya. Back to the play."
+        }
+      ],
+      "text": "Over to you, Priya Chandra. Aarón Barera (Sporting Valdecristal) features in the latest key action, from 4 metres. Good, Priya. Back to the play.",
+      "bytes": 78336,
+      "type": "audio/mpeg",
+      "characters": 145,
+      "voz": "en-US-DavisNeural",
+      "audioSha256": "b87ab573672c50b91f82d6983b58b1e49926061c0aadefdb2d5027aed492dc2b"
+    },
+    "estadista_es": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "El marcador, Tomás Ibarra."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Marcador: Sporting Valdecristal 0, Atlético Brezal 0. Sin remates en los primeros 20 segundos."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Gracias, Tomás."
+        }
+      ],
+      "text": "El marcador, Tomás Ibarra. Marcador: Sporting Valdecristal 0, Atlético Brezal 0. Sin remates en los primeros 20 segundos. Gracias, Tomás.",
+      "bytes": 84384,
+      "type": "audio/mpeg",
+      "characters": 137,
+      "voz": "es-MX-GerardoNeural",
+      "audioSha256": "91fd95062c08bd697abf08f105b806390c19e54edbd10f1378186eaecc855286"
+    },
+    "estadista_en": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "The score, Owen Platt."
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Score: Sporting Valdecristal 0, Atlético Brezal 0. No shots in the first 20 seconds."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Thanks, Owen."
+        }
+      ],
+      "text": "The score, Owen Platt. Score: Sporting Valdecristal 0, Atlético Brezal 0. No shots in the first 20 seconds. Thanks, Owen.",
+      "bytes": 79488,
+      "type": "audio/mpeg",
+      "characters": 121,
+      "voz": "en-US-GuyNeural",
+      "audioSha256": "c4e06f3a8542c43ee232115753ffc446cdfa1120d88831b44bb9c3508084fb23"
+    },
+    "dialogo_completa_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: El marcador, Tomás Ibarra.",
+        "estadista: Marcador: Sporting Valdecristal 0, Atlético Brezal 0. Sin remates en los primeros 20 segundos.",
+        "narrador: Gracias, Tomás."
+      ],
+      "bytes": 84384,
+      "characters": 137,
+      "sha256": "91fd95062c08bd697abf08f105b806390c19e54edbd10f1378186eaecc855286"
+    },
+    "dialogo_completa_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: The score, Owen Platt.",
+        "estadista: Score: Sporting Valdecristal 0, Atlético Brezal 0. No shots in the first 20 seconds.",
+        "narrador: Thanks, Owen."
+      ],
+      "bytes": 79488,
+      "characters": 121,
+      "sha256": "c4e06f3a8542c43ee232115753ffc446cdfa1120d88831b44bb9c3508084fb23"
+    },
+    "dialogo_breve_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Vamos con Tomás Ibarra y los números.",
+        "estadista: Marcador: Sporting Valdecristal 0, Atlético Brezal 0."
+      ],
+      "bytes": 50112,
+      "characters": 91,
+      "sha256": "ecf4d755154ed56cde90e8c5c325a8b96d59af5efbf68697f19bed9bf2809b49"
+    },
+    "dialogo_breve_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Let's hear the numbers, Owen Platt.",
+        "estadista: Score: Sporting Valdecristal 0, Atlético Brezal 0."
+      ],
+      "bytes": 49824,
+      "characters": 86,
+      "sha256": "468adc537f508d43e52aabc481c1a280818faf871a43eb7d8beaab3bdc9ea975"
+    },
+    "canto_1_es": {
+      "tick": 336,
+      "texto": "¡Gol, gol, gol, gooool! ¡Hugo Brelinales, gol! Sporting Valdecristal se adelanta, uno a cero, a los 33 segundos.",
+      "canto": {
+        "tramos": [
+          {
+            "texto": "¡Gol, gol, gol, gooool!",
+            "tipo": "grito",
+            "grito": "gol_gol_gooool"
+          },
+          {
+            "texto": "¡Hugo Brelinales, gol!",
+            "tipo": "goleador"
+          },
+          {
+            "texto": "Sporting Valdecristal se adelanta, uno a cero, a los 33 segundos.",
+            "tipo": "hechos"
+          }
+        ]
+      },
+      "bytes": 66384,
+      "duracionS": 11.1,
+      "sha256": "4a12bfab0e33ff4271c15a974eed57679ebb6abd4776a51a03187802d959fb72"
+    },
+    "canto_1_en": {
+      "tick": 336,
+      "texto": "Go, go, go, goooal! Hugo Brelinales, goal! Sporting Valdecristal take the lead, one–nil, after 33 seconds.",
+      "canto": {
+        "tramos": [
+          {
+            "texto": "Go, go, go, goooal!",
+            "tipo": "grito",
+            "grito": "gol_gol_gooool"
+          },
+          {
+            "texto": "Hugo Brelinales, goal!",
+            "tipo": "goleador"
+          },
+          {
+            "texto": "Sporting Valdecristal take the lead, one–nil, after 33 seconds.",
+            "tipo": "hechos"
+          }
+        ]
+      },
+      "bytes": 66384,
+      "duracionS": 11.1,
+      "sha256": "adaa0d1660d69c4b44fece79819c7e0f78dea2404238dcd438524efcca246071"
+    },
+    "narrador_es": {
+      "bytes": 238608,
+      "characters": 424,
+      "text": "Comienza el partido entre Sporting Valdecristal y Atlético Brezal. Saque de centro para Sporting Valdecristal; ejecuta Joel Fenelich (8). Joel Fenelich (8) intenta un pase de 33 m hacia Nico Dorosa. Nico Dorosa (11) recibe el balón. Nico Dorosa (11) intenta un pase de 7 m hacia Aarón Barera. Aarón Barera (6) recibe el balón. Aarón Barera (6) intenta un pase de 33 m hacia Hugo Brelinales. Nico Dorosa (11) recibe el balón."
+    }
+  },
+  "dialogue": {
+    "forms": [
+      "estadista",
+      "pregunta",
+      "ronda",
+      "pregunta",
+      "estadista",
+      "final"
+    ],
+    "withDialogue": 6,
+    "total": 6,
+    "motivosD": []
+  },
+  "goal": {
+    "reglas": "reinicios-v5",
+    "goles": 1
+  },
+  "unknownIntervention": 404,
+  "motor": {
+    "reglas": "reinicios-v5",
+    "marcador": {
+      "local": 1,
+      "visita": 0
+    },
+    "eventos": 41,
+    "centros": 0,
+    "saquesManos": 3,
+    "atajadas": 1,
+    "goles": 1,
+    "decisiones": [
+      "valida",
+      "valida",
+      "valida",
+      "valida"
+    ],
+    "accionesLlm": [
+      "cubrir",
+      "profundidad",
+      "apoyar",
+      "conducir",
+      "mover",
+      "presionar",
+      "tirar"
+    ]
+  },
+  "status": "passed",
+  "finishedUtc": "2026-10-22T16:46:27.998Z"
+}
