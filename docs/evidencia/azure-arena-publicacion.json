@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-22T04:01:52.105Z",
+  "checkedUtc": "2026-10-22T05:52:00.087Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022035830",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022054915",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -326,8 +326,8 @@
     },
     {
       "path": "src/arena/__tests__/editorial.test.ts",
-      "bytes": 7525,
-      "sha256": "9943cc779660f5451edde3825f8c59c634b34a4d319a6600a65e4bfb5301aa78"
+      "bytes": 6697,
+      "sha256": "5384de05280a840e0ab8a1cc9955faa5ef4f665778b9c73902cf6e470d620f17"
     },
     {
       "path": "src/arena/__tests__/estadista.test.ts",
@@ -403,6 +403,11 @@
       "path": "src/arena/__tests__/reproduccion-preparada.test.ts",
       "bytes": 4904,
       "sha256": "12122012093fecfaebf7cb3aba0b4b7704342443b749a3a0faeb593eab470904"
+    },
+    {
+      "path": "src/arena/__tests__/reservas-voz.test.ts",
+      "bytes": 12319,
+      "sha256": "1cf45da166c6dcf800ccab013a5d6d08ad76c19fe374e91bd42db94a44268504"
     },
     {
       "path": "src/arena/__tests__/servicios-azure.test.ts",
@@ -486,8 +491,8 @@
     },
     {
       "path": "src/arena/editorial.ts",
-      "bytes": 10084,
-      "sha256": "41cf61df4b0d3026ea2e0e7179c98badc14faecb045967c9a2b128d85294a68e"
+      "bytes": 12710,
+      "sha256": "b7bda5aa6c15f2e53a696c28918423bc536c258f82cd59a202ab4672692b8620"
     },
     {
       "path": "src/arena/entorno-formulario.ts",
@@ -625,6 +630,11 @@
       "sha256": "a2dab0511b0a2a711eb1637b7bba052da48033fed46e35c81eafc64b8c4923f0"
     },
     {
+      "path": "src/arena/reservas-voz.ts",
+      "bytes": 2458,
+      "sha256": "3b02634eb05fa3ab5be5a5e15e88fcfba29ba56a2c9abeb78ce490b1d3cd3c6e"
+    },
+    {
       "path": "src/arena/sesiones.ts",
       "bytes": 32424,
       "sha256": "fa8a8cfd8b5a2a84a3d16751f9cc4b01e01c45ea52aed390451ab03983928189"
@@ -653,11 +663,6 @@
       "path": "src/arena/voz-muestras-cli.ts",
       "bytes": 5168,
       "sha256": "5dd42843d55d5ef6abb4a153cf31693b1758ded24489afd3964a601f71de8a9f"
-    },
-    {
-      "path": "src/arena/voz-reserva.json",
-      "bytes": 1133741,
-      "sha256": "d9505c58d0a1c4bbf04c4bad6eb6c15bf00f8a9aa0e6a8a0327946b1e0163503"
     },
     {
       "path": "src/arena/voz.ts",
@@ -1151,8 +1156,8 @@
     },
     {
       "path": "src/sim/limites.ts",
-      "bytes": 50277,
-      "sha256": "1bbe68207da4627e89fbd04e9ab247b5e7235a3cdf0f1deadbd77f32e6a80a14"
+      "bytes": 51081,
+      "sha256": "74d602b841384c1aa3ca84d09d96d1ae281e48b028ecab7ec27030b9161b4919"
     },
     {
       "path": "src/sim/micro.ts",
@@ -1231,8 +1236,8 @@
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
-      "bytes": 31566,
-      "sha256": "9806b21bb1733392e244ef092819dafdceada0ac82d432baca465396bc0a70dd"
+      "bytes": 33856,
+      "sha256": "23bb3706056909f03928d5340fcbc7be55fe8434a5da72e92b423144a15a051a"
     },
     {
       "path": "src/ui/ArenaEnDirecto.tsx",
@@ -1663,6 +1668,321 @@
       "path": "public/muestra-10.jsonl",
       "bytes": 241833,
       "sha256": "258f9310b56b523f6f101849e16ab3ef695e56fa1c843e7d6a988ca75f2de9d0"
+    },
+    {
+      "path": "public/voz-reserva/en/01.mp3",
+      "bytes": 30672,
+      "sha256": "a1121c59335a57169f33a6c2b0302f8c03b244c7f04e77c53730a4cb2ff87a0c"
+    },
+    {
+      "path": "public/voz-reserva/en/02.mp3",
+      "bytes": 26640,
+      "sha256": "90697ecb3d37c38c4d7828e68e95709e16f1385779ca4c285082949f1c72341f"
+    },
+    {
+      "path": "public/voz-reserva/en/03.mp3",
+      "bytes": 26208,
+      "sha256": "dcfc04f7cfc41aa9974cd03b218c3d9e34729f70c6d293f89d3f4aac5e49ab43"
+    },
+    {
+      "path": "public/voz-reserva/en/04.mp3",
+      "bytes": 32256,
+      "sha256": "d9e8421d0a7a6908a07720a9f72fcedcc7275a9bb98dee6403dd0323139fbc94"
+    },
+    {
+      "path": "public/voz-reserva/en/05.mp3",
+      "bytes": 36000,
+      "sha256": "d98ee27d52ba67bbacb06d4c4c9e91f5d3fea22447c4462692e6a7352d7a8f6d"
+    },
+    {
+      "path": "public/voz-reserva/en/06.mp3",
+      "bytes": 33264,
+      "sha256": "7c4903c3905b86e8685fe1a0773e3dd61a0606079b761581b53d53f40ea5aeea"
+    },
+    {
+      "path": "public/voz-reserva/en/07.mp3",
+      "bytes": 30960,
+      "sha256": "47ad13b5cef2b13b55d6e9af2fcc6426c700ff12c232c4ecf49f005396589d2b"
+    },
+    {
+      "path": "public/voz-reserva/en/08.mp3",
+      "bytes": 30672,
+      "sha256": "a689a5ad069c64020ae1d66cbde0d58cc55aa1d37732f357ca4536f3e6258f49"
+    },
+    {
+      "path": "public/voz-reserva/en/09.mp3",
+      "bytes": 31248,
+      "sha256": "b0e4439bc6158ee44d34f6445b0268f7ad48c11c7b804a177895a9bca096490a"
+    },
+    {
+      "path": "public/voz-reserva/en/10.mp3",
+      "bytes": 29088,
+      "sha256": "468fbede703a634dac8de12cea4f5e2b20d830cadb532d34520d1ff92d352947"
+    },
+    {
+      "path": "public/voz-reserva/en/11.mp3",
+      "bytes": 30240,
+      "sha256": "b2ca50f762e16394c22de1db03093ea9eb9c2d94a9ae22343080458a095df4a9"
+    },
+    {
+      "path": "public/voz-reserva/en/12.mp3",
+      "bytes": 29952,
+      "sha256": "7a7b9655cf936748d3d7b1dc3d3fa208961ddd563910f94d2963d1c8a0e633f7"
+    },
+    {
+      "path": "public/voz-reserva/en/13.mp3",
+      "bytes": 27072,
+      "sha256": "b2c044c7765db88f43934e3f6af3b2027ef4d55c9a592fb36d5539e8626b8f78"
+    },
+    {
+      "path": "public/voz-reserva/en/14.mp3",
+      "bytes": 29088,
+      "sha256": "ec3c828d375de40039d80c79e9fb2ee8e2fe805bb4c15a183336f552202d92ba"
+    },
+    {
+      "path": "public/voz-reserva/en/15.mp3",
+      "bytes": 30816,
+      "sha256": "c034fdfcaa77bafd3c57ba15b6531880fd6e5dcb997eb70b75b396024099f922"
+    },
+    {
+      "path": "public/voz-reserva/en/16.mp3",
+      "bytes": 30096,
+      "sha256": "6e0f342694b5aeaf4672cd709536a2c00d86c8b7e7038235f2588e9bf54f392a"
+    },
+    {
+      "path": "public/voz-reserva/en/17.mp3",
+      "bytes": 29520,
+      "sha256": "5c9798f41d774b5a5061ae836a0a436e244b4ca915c03666dd2469079d53f769"
+    },
+    {
+      "path": "public/voz-reserva/en/18.mp3",
+      "bytes": 31824,
+      "sha256": "796057b4016e8b21bacd1955e2141150966ee0124fe18d4093c0f5e625963a8d"
+    },
+    {
+      "path": "public/voz-reserva/en/19.mp3",
+      "bytes": 30096,
+      "sha256": "6154a0aab54e72320c55c5debb0349d7c45179f6f9d8a898a9c94687edf05d77"
+    },
+    {
+      "path": "public/voz-reserva/en/20.mp3",
+      "bytes": 28368,
+      "sha256": "4bcc0221c8401081daca2ec63f6aacc57baf2760dcac672236d7bbf9e8bf605e"
+    },
+    {
+      "path": "public/voz-reserva/en/21.mp3",
+      "bytes": 35568,
+      "sha256": "33be05a1b7305678daf3cb45bd4754525203c0767cdd16bb933ce3b089920de8"
+    },
+    {
+      "path": "public/voz-reserva/en/22.mp3",
+      "bytes": 32688,
+      "sha256": "e7dbf0814dfc212fcfb24a490a977c9f11040a519210d49bbab82aa1079fd398"
+    },
+    {
+      "path": "public/voz-reserva/en/23.mp3",
+      "bytes": 34992,
+      "sha256": "e7e044c7bf6863d7ae70322595f9d30422ed6207691bfe4fd1937dee38871c75"
+    },
+    {
+      "path": "public/voz-reserva/en/24.mp3",
+      "bytes": 28224,
+      "sha256": "cbc6c40c37c361d0699bd34b3225ece200e9e86f46ba7c38f821ca8c93fedc0a"
+    },
+    {
+      "path": "public/voz-reserva/en/25.mp3",
+      "bytes": 27792,
+      "sha256": "a80092a4c0511bee84194b49ad26b4b629162276a45f216ce6dc706bdba8d983"
+    },
+    {
+      "path": "public/voz-reserva/en/26.mp3",
+      "bytes": 25632,
+      "sha256": "0b1b7b98dd563fcddaee87819fa848168fedb06632318442d33abd954cb9eb1e"
+    },
+    {
+      "path": "public/voz-reserva/en/27.mp3",
+      "bytes": 28656,
+      "sha256": "437e21795af6a908c789946e7f8b6e7dda723d0dd9bf003b25033ff377d8c2c1"
+    },
+    {
+      "path": "public/voz-reserva/en/28.mp3",
+      "bytes": 31968,
+      "sha256": "e003deb26cf69568a07bb39b3648d83c2f7c6970e9f9d07277a029c0f4a06b67"
+    },
+    {
+      "path": "public/voz-reserva/en/29.mp3",
+      "bytes": 25488,
+      "sha256": "d2ff1cc1c8489538bfaa237db2c1aac1a63cce88302e2e5b2ad53f5bacf51723"
+    },
+    {
+      "path": "public/voz-reserva/en/30.mp3",
+      "bytes": 31104,
+      "sha256": "f25d13d74836ccc5c071b33b6275b9e2e25910dca414812542de69cb7ead17c1"
+    },
+    {
+      "path": "public/voz-reserva/en/cierre.mp3",
+      "bytes": 32832,
+      "sha256": "d504f21eda59a5dfe3693fdecb29377cfc31f8a23f514d81f99de10d0be5e4a1"
+    },
+    {
+      "path": "public/voz-reserva/es/01.mp3",
+      "bytes": 34848,
+      "sha256": "ed761f793bc0b4503d67bf84dae7179a2751bff42f061467a0a811d696181004"
+    },
+    {
+      "path": "public/voz-reserva/es/02.mp3",
+      "bytes": 30096,
+      "sha256": "41cfe32fdc1bb0c22de4cfa74d002bddcfb7f1e77663b65347453ef5f9983f56"
+    },
+    {
+      "path": "public/voz-reserva/es/03.mp3",
+      "bytes": 32688,
+      "sha256": "cd2ffa04a1ba71d9d7a13e4365b58b131d3ccfc917a695575668a8c429c64627"
+    },
+    {
+      "path": "public/voz-reserva/es/04.mp3",
+      "bytes": 32256,
+      "sha256": "757165641602284c56b24ac1e5f9c37acbf8cdbc8c6ee48a8991914f6ea5533b"
+    },
+    {
+      "path": "public/voz-reserva/es/05.mp3",
+      "bytes": 36720,
+      "sha256": "b8c268760c480c2ddae3e4ec2fb56e51417dfa63e1dd42ade483269e789c96ad"
+    },
+    {
+      "path": "public/voz-reserva/es/06.mp3",
+      "bytes": 36288,
+      "sha256": "a0599efcba00e40a4ad3646716a2e5f08844a5536527a35f6c3594dae842a0b7"
+    },
+    {
+      "path": "public/voz-reserva/es/07.mp3",
+      "bytes": 33552,
+      "sha256": "3bd06c663a653f8af9a35e9118d0c789a5b2add3e8f18584bcf6d249e2f777c6"
+    },
+    {
+      "path": "public/voz-reserva/es/08.mp3",
+      "bytes": 37152,
+      "sha256": "83f7d80b5a05f3b4284fbab187331651ff14b3daccb4fe91147939a89b177dac"
+    },
+    {
+      "path": "public/voz-reserva/es/09.mp3",
+      "bytes": 40752,
+      "sha256": "a7375f465fb71ea0af60068dbc45ea23dc3f7514d066f4fc342fe2c1dbe43f89"
+    },
+    {
+      "path": "public/voz-reserva/es/10.mp3",
+      "bytes": 35280,
+      "sha256": "060c64d8c9032c2f6c57af26ac87fca555787c1d53e42df733a53af62500a585"
+    },
+    {
+      "path": "public/voz-reserva/es/11.mp3",
+      "bytes": 31824,
+      "sha256": "8fcc51dd1221a8aff279f9514f0afe7236383dc5c4b4f407a66c9e34b96776d3"
+    },
+    {
+      "path": "public/voz-reserva/es/12.mp3",
+      "bytes": 30672,
+      "sha256": "a32a0a8183a178e17eaf7ba5aeb32c3721f2e341852d5c485af37c7c3a2967f2"
+    },
+    {
+      "path": "public/voz-reserva/es/13.mp3",
+      "bytes": 30384,
+      "sha256": "3b7bfc83ec00c67e711255f62ad524f4e4b796bbad7a5cd842fb4a4d9361c81a"
+    },
+    {
+      "path": "public/voz-reserva/es/14.mp3",
+      "bytes": 32256,
+      "sha256": "fab97342fe60adff98fa501a894830e84b2d56a1dfbcbad19220281788bc9f7d"
+    },
+    {
+      "path": "public/voz-reserva/es/15.mp3",
+      "bytes": 32256,
+      "sha256": "1ab1d2face5f15d352d96c239897cd2d40bf23542423d1b5cf9a030e24eb29b5"
+    },
+    {
+      "path": "public/voz-reserva/es/16.mp3",
+      "bytes": 33984,
+      "sha256": "a4fb1d1c522babb7c7d1d1c280f1e2f4280399477840affa6f6359117ddeed3b"
+    },
+    {
+      "path": "public/voz-reserva/es/17.mp3",
+      "bytes": 31680,
+      "sha256": "64702ebd746af2851c303e08ad186a255873473e1d4fa09802549823c0d52afd"
+    },
+    {
+      "path": "public/voz-reserva/es/18.mp3",
+      "bytes": 29232,
+      "sha256": "53227bf31e65c46a4146c6772806f4f4bebd66e9e3b785accbb9cc0679203ef2"
+    },
+    {
+      "path": "public/voz-reserva/es/19.mp3",
+      "bytes": 30240,
+      "sha256": "0d94db4f6506abaf30dccca5e4d77396191ffbb1ac30eb6fcafe973186c60e8f"
+    },
+    {
+      "path": "public/voz-reserva/es/20.mp3",
+      "bytes": 30384,
+      "sha256": "7cabc198541065387b0b67ba4fae6ce77b059b9dfe8be446912cb8bf44a1a982"
+    },
+    {
+      "path": "public/voz-reserva/es/21.mp3",
+      "bytes": 35856,
+      "sha256": "c3b3cc022b4ac6fecdc6016062e92caedf9de42caa94727f534a7beabb7ad674"
+    },
+    {
+      "path": "public/voz-reserva/es/22.mp3",
+      "bytes": 31248,
+      "sha256": "36819f834d309f6699a955dd4d2bf7035cecf4490a29d8b9bbcff1a6df05f7d9"
+    },
+    {
+      "path": "public/voz-reserva/es/23.mp3",
+      "bytes": 36144,
+      "sha256": "da6fb7cb7cc29b92e549475c8016f8c90bcf0bf649e7657aa37cb0e03de3c755"
+    },
+    {
+      "path": "public/voz-reserva/es/24.mp3",
+      "bytes": 33408,
+      "sha256": "86435a133c30242be0de9c13d19c5dfc4b931b7eddd1ff643229361e1d6bbc89"
+    },
+    {
+      "path": "public/voz-reserva/es/25.mp3",
+      "bytes": 32688,
+      "sha256": "185673bbaa020049bc6006564be58318348f6637f26d793fbeed0f7411806c2b"
+    },
+    {
+      "path": "public/voz-reserva/es/26.mp3",
+      "bytes": 30096,
+      "sha256": "95956505915048363ae5a4631e02798347247a7cc8ebbe864c0528dc8f593304"
+    },
+    {
+      "path": "public/voz-reserva/es/27.mp3",
+      "bytes": 28944,
+      "sha256": "acaf9e2b712ed14b72d03e36f8bf42b8fafe191b870f4f7e65d618897b62411a"
+    },
+    {
+      "path": "public/voz-reserva/es/28.mp3",
+      "bytes": 31392,
+      "sha256": "4103e0e68040de6d3bee4a4e380bd4d1dc7234924d0aa3ec9adf0786ffd5ae81"
+    },
+    {
+      "path": "public/voz-reserva/es/29.mp3",
+      "bytes": 27792,
+      "sha256": "d36dfe02b3388561ee055df02c463e5eddb505df6b7c2f21f552ee23cb957cce"
+    },
+    {
+      "path": "public/voz-reserva/es/30.mp3",
+      "bytes": 31536,
+      "sha256": "eacddece6a924401b8b3bcd36ad59b15df6d432abdbddb825d8a04793f3dda8e"
+    },
+    {
+      "path": "public/voz-reserva/es/cierre.mp3",
+      "bytes": 35712,
+      "sha256": "120e90d497860ee6d735e42d8489b98b60588d7fea6aed2f04f295a69c6c4f52"
+    },
+    {
+      "path": "public/voz-reserva/indice.json",
+      "bytes": 14714,
+      "sha256": "33f2b3a3d9df75399273746ac60c4464e92f16cd86e2a7d3e0472c60caad7bc9"
     },
     {
       "path": "docs/dataset/ficha.json",

@@ -388,3 +388,141 @@ y su prueba 11; smoke desplegado para el ✅ (sin él queda ⏳).
   `saqueAereoMinM`.
 - **Narración.** Si V1–V8 rechazara el texto del alto, el narrador de plantilla lanzaría una excepción; la
   prueba 10 lo detecta antes del despliegue.
+
+## Versión 1.1 (22 de octubre): decisiones tras la revisión de Codex
+
+La revisión de Codex de la versión 1 ([informe](../evidencia/motor-051/codex-brief-v1.md)) dio NO CERRADO con
+nueve hallazgos. Fable verificó cada uno contra el código y el prototipo; **estas decisiones prevalecen** sobre
+el texto anterior donde lo contradigan y se numeran como los hallazgos. Los lotes se regeneraron con las
+decisiones que cambian cifras (1, 3, 4, 5, 8); los JSON de `docs/evidencia/motor-051/lotes/` y las tablas
+generadas `lotes/tablas.md` son la referencia, no las tablas de § 2 y § 8.
+
+1. **«A puerta» es exactamente `rematesPorLado`.** Verificado: `estadista.ts:36-41` solo cierra la búsqueda
+   ante otro `tiro`, `gol`, `atajada` o `tiro_fuera` e ignora intercepciones, recepciones y recuperaciones;
+   el helper de la v1 cerraba antes. Decisión: el helper **importa** `rematesPorLado` (como el 049) y esa es
+   la única definición de «a puerta» para las bandas (fracción a puerta, atajadas / a puerta, experimento
+   controlado). La clasificación física por remate (gol, atrapada, desvío, ancho, alto, bloqueado, otro) es
+   un contador aparte, `desenlaceFisico`, que alimenta solo sus propias bandas (fuera, altos, bloqueados,
+   desvíos / atajadas) y un contador informativo `discrepancias045` (remates en los que ambas lecturas no
+   coinciden), reportado sin banda. Medido con ambas definiciones en los siete lotes (v3, v4 ×3, v5 ×3):
+   0 discrepancias; las cifras de a puerta no cambian. Pruebas nuevas con listas sintéticas:
+   `tiro(A) → intercepcion(B) → gol(A)` (045: a puerta; físico: bloqueado; discrepancia 1),
+   `tiro → recuperacion → gol`, `tiro → falta → reinicio`, `tiro → recepcion(compañero)`, `tiro → tiro_fuera alto`.
+2. **Estirada sin división por cero.** Verificado: `alcancePortero` devuelve `cuerpoM` a bocajarro
+   (`min(1, t/reaccionS)` pequeño) y el contrato de § 4.7 dividía por `alcance − cuerpoM`; el prototipo ya
+   tenía la salvaguarda. Contrato: `estirada = alcance > cuerpoM ? acotar((distanciaLateral − cuerpoM)/(alcance − cuerpoM), 0, 1) : 0`.
+   `probabilidadDesvio` debe devolver siempre un número finito dentro de [`desvioMin`, `desvioMax`]; prueba
+   con alcance = `cuerpoM` y distancia lateral menor e igual al radio, y una aserción `Number.isFinite`.
+3. **Una sola velocidad efectiva.** Verificado: el prototipo movía el balón con `velocidadRemate × velocidadBalon`
+   del entorno (`entorno.ts:40`: sintética ×1,12, césped alto ×0,9) y calculaba la reacción solo con
+   `velocidadRemate`; en las semillas 1–200, 102 partidos son en sintética y 49 en césped alto, así que el
+   hallazgo era material. Decisión: `moverBalon` calcula una vez `velocidadEfectiva = velocidadRemate(potencia) ×
+   efectosEntorno(...).velocidadBalon` y la usa tanto para el desplazamiento como para
+   `t = distancia(origen, portero) / velocidadEfectiva`. Pruebas con entorno (sintética y césped alto) a una
+   distancia no saturada (portero a 4 m del origen): el alcance difiere del caso sin entorno en el factor
+   esperado; con saturación no cambia. **Cifras regeneradas** (abajo).
+4. **Dos contadores de intercepción inmediata, con bandas separadas.** Verificado: el contador auxiliar de la
+   v1 usaba la distancia perturbada del evento, no el indicador aéreo, y el JSON no evaluaba el radio. Decisión:
+   el helper conserva `intercepcionesInmediatas` **tal cual el 046** (primer toque rival en ≤ `saqueInmediataS`)
+   y añade `intercepcionesInmediatasCercanas` (lo mismo **y** el punto del toque, `hasta` del evento, a ≤
+   `inmediataRadioM` = 15 m del `desde` del saque). Bandas: **cercanas = 0** en `rapido` y en los dos lotes
+   `completo` (la prohibición del saque regalado, v1.2 #4); **temporal ≤ 0,01 por partido** en cada lote
+   `completo` y ≤ 1 en `rapido`. Es el único límite del 046 que cambia (de 0 a 0,01 por partido) y se declara
+   como tal: un saque aéreo de ≥ `saqueAereoMinM` (25 m) a 17–19 m/s entra en `caidaM` de su caída en
+   1,05–1,2 s, y la convención `tick + 1` de los eventos `pase` lo mide 0,1 s antes, así que «cero en cien
+   partidos» no es una propiedad del diseño sino del azar de las semillas (el 046 ya movió `saqueAereoMinM` por
+   la misma semilla 23). La zona ciega que señala Codex (pérdida rápida lejana por un saque defectuoso) queda
+   cubierta por la banda temporal y por `saquesPerdidos` ≤ 0,35. Se rechaza guardar `aereo` en el evento
+   `pase`: los registros v1–v4 no lo tendrían y bajo v4 ambos contadores ya valen 0. Pruebas con listas
+   sintéticas y límites exactos: saque corto defectuoso (toque a 5 m en 0,6 s: cuenta en ambos), saque largo
+   defectuoso (toque a 10 m en 0,6 s: ambos), disputa aérea legal (toque a 21 m en 1,0 s: solo temporal),
+   toque a 15,0 m en 1,0 s (ambos, límites inclusivos), toque en 1,1 s (ninguno). Lotes regenerados:
+   temporal / cercanas = 1 / 0 (1–30), 1 / 0 (1–100), 0 / 0 (101–200); base v4 del repo 0 / 0.
+5. **Distancia perpendicular a la recta.** Verificado: `geometria.ts:6-10` acota `t` a [0, 1], así que
+   `proyeccion` mide la distancia al **segmento**; un portero sobre la prolongación habría dado una separación
+   distinta de la perpendicular. Decisión: `lateral = |cruz| / |arco − o|` con `cruz = (k − o) × (arco − o)`
+   (producto cruzado normalizado, en coordenadas orientadas). Casos: `|arco − o| = 0` (rematador sobre el
+   centro del arco) → se ignora al portero y aplica la regla del palo lejano; `cruz = 0` o `lateral ≤
+   indiferenciaM` → palo lejano; rematador exactamente en y = 34 → lado +y (orientado). Pruebas: portero antes,
+   dentro y después del segmento, a ambos lados, con la misma separación perpendicular → mismo lado; los tres
+   casos degenerados. Lotes regenerados (cambio de cifras despreciable).
+6. **Es la línea balón–centro del arco, no la bisectriz.** Verificado: `C + u·posicionamientoM` sigue la línea
+   centro del arco–balón, que fuera del eje no coincide con la bisectriz del ángulo entre los postes. Decisión:
+   se mantiene la fórmula (es la medida) y se renombra en todo el brief y en el código: «posicionamiento sobre
+   la línea balón–centro del arco»; `destinoPosicionamiento` reutiliza la dirección de `destinoSalida`. Prueba
+   con un balón cercano y lateral (p. ej. orientado (95, 10)), donde la bisectriz angular y la línea difieren en
+   más de 1 m: el destino es el de la línea.
+7. **Matriz real de mutaciones en lugar del contraste como garantía.** Verificado: quitar velocidad variable,
+   estirada o posicionamiento no devuelve v5 a v4, así que la frase de la prueba 13 no se sostenía. Decisión:
+   se retira esa garantía; el contraste v4 queda como comprobación **conjunta** del cambio. Se añaden pruebas de
+   integración (motor, semillas buscadas por la prueba, `reglas: "reinicios-v5"`) que fallan al eliminar por
+   separado: (a) el término de potencia del desvío, (b) el de nivel, (c) el de estirada (cada uno con un
+   escenario en el que el desenlace atrapada/desvío cambia al quitarlo), (d) el entorno en la reacción (3),
+   (e) el posicionamiento durante un **vuelo** rival (un pase rival a ≤ `manoAManoRadioM` mueve al portero
+   aunque no haya poseedor), (f) la velocidad variable (ticks de vuelo). Son las mutaciones 15–20 de la tabla y
+   la auditoría las aplica junto a las 14 anteriores. No se añade banda para el desvío: `desvíos / atajadas` se
+   reporta (0,39–0,52 en el candidato) y las pruebas (a)–(c) cubren los términos.
+8. **Reproducción y trazabilidad.** Verificado: los scripts importaban `../proto/motor.ts` y rutas absolutas
+   de esta máquina, los JSON del prototipo no guardaban el commit y los lotes 046 del candidato decían
+   `reglas: "reinicios-v4"`. Decisión: `prototipo/reconstruir.sh <raíz del repo> <dir vacío>` crea la estructura
+   exacta (`<dir>/proto/{motor.orig.ts, motor.ts, parchar.py}`, `<dir>/med/*.mts`), reescribe las rutas,
+   aplica el parche e imprime el commit base y la huella md5 del motor parcheado; probado hoy en un directorio
+   limpio: reproduce las métricas del prototipo semilla a semilla. Todos los JSON llevan `commit` y una etiqueta
+   `motor` inequívoca (`experimental-v5 (prototipo; …)` o `base-v4 (copia parcheada con V5=0)`), y los lotes
+   046 del candidato llevan `reglas: "prototipo-v5"`. Las tablas de evidencia las genera `prototipo/tablas.py`
+   en `lotes/tablas.md`; el brief remite a ellas.
+9. **Una sola P1 que cabe en un día.** Verificado: P1 exigía la prueba 11 y P2 la posponía; además hay seis
+   sitios del 046 que fijan el sentido de v4 (`reinicios.test.ts:131`, `motor046.test.ts:793` y `:798`,
+   `motor046.stats.test.ts:15`, `generar-reinicios-v4.ts:52` y `:57`) y el presupuesto solo contaba
+   simulaciones. Decisión: se elimina P2. **Cortes nuevos:** la frase del prompt (`frasesRemate`) y su prueba
+   11 salen del brief (brief posterior; el LLM ya ve el resultado de cada remate en `recientes`); el smoke
+   desplegado **no** forma parte de la implementación: la fila de bitácora queda ⏳ hasta verlo correr, como
+   en el 046. P1 única, con presupuesto:
+   - compatibilidad (literal v4 en los seis sitios, `reglasArena`, getter `v5`, v1–v4 exactos): 0,5 h;
+   - `REMATE_ARENA`, `remate.ts` y pruebas puras (1, 2, 3, 5, 6 puras): 1,5 h;
+   - motor (`sacarBalon`, `moverBalon`, `resolverSalida`, `moverJugadores`) y pruebas de integración 4, 7, 8,
+     más (a)–(f) del punto 7: 2,5 h;
+   - textos de `vista` y `relato`, texto de límites en `Arena.tsx`, prueba 10 y 049 (1): 0,5 h;
+   - helper (desenlace físico, `rematesPorLado`, `partidoConNiveles`, dos contadores de intercepción),
+     `LOTE_ARENA_051`, prueba 14, lotes y contraste: 1 h;
+   - fixture v5 (búsqueda ≈ 10 min de cómputo) y matriz de versiones (9): 0,5 h;
+   - auditoría propia de las 20 mutaciones con restauración por md5 y evidencia JSON: 1,5 h.
+   Total ≈ 8 h. Si a las 17:00 no están en verde los bloques de compatibilidad, motor y helper, se recorta
+   primero la prueba (e) del punto 7 y después el experimento controlado de jugadores de campo (queda el de
+   porteros, que es el discriminante); nunca el fixture ni la matriz de versiones.
+
+**Cifras regeneradas con las decisiones 1, 3, 4 y 5** (prototipo; tablas completas en
+[`lotes/tablas.md`](../evidencia/motor-051/lotes/tablas.md)):
+
+| Métrica | v4 1–100 | v5 1–30 | v5 1–100 | v5 101–200 |
+| --- | --- | --- | --- | --- |
+| Goles por partido / sin remate | 2,59 / 0,02 | 2,27 / 0 | 2,18 / 0 | 2,21 / 0 |
+| Remates por partido | 5,03 | 4,60 | 5,05 | 5,06 |
+| A puerta (`rematesPorLado`); discrepancias con la física | 0,918; 0 | 0,790; 0 | 0,723; 0 | 0,735; 0 |
+| Conversión | 0,511 | 0,493 | 0,432 | 0,437 |
+| Atajadas / a puerta; desvíos / atajadas | 0,444; 0,337 | 0,376; 0,390 | 0,403; 0,449 | 0,406; 0,517 |
+| Fuera; altos / fuera | 0,018; 0 | 0,167; 0,261 (6 altos) | 0,236; 0,227 | 0,235; 0,311 |
+| Bloqueados | 0,044 | 0,029 | 0,032 | 0,024 |
+| Colocación a los lados | 0,255 | 0,893 | 0,872 | 0,844 |
+| Controlado, porteros 40 → 90 (atajadas / a puerta) | −0,001 | +0,305 | +0,206 | — |
+| Controlado, campo 40 → 90 (conversión) | +0,124 | — | +0,202 | — |
+| 046: intercepciones inmediatas temporal / cercanas | 0 / 0 | 1 / 0 | 1 / 0 | 0 / 0 |
+| 046: conversión mano a mano; mediana de salida (m); centros por partido | 0,365; 1,34; 0,71 | 0,396; 1,30; 0,67 | 0,353; 1,48; 0,56 | 0,366; 1,24; 0,68 |
+
+Las bandas de § 8 no cambian de valor; se añaden las dos de intercepción del punto 4 y la banda de a puerta
+pasa a leerse sobre `rematesPorLado`. El candidato cumple todas en los tres lotes.
+
+### Qué cambia para Opus
+
+- `a puerta` = `rematesPorLado` importado; `desenlaceFisico` aparte; contador `discrepancias045` sin banda (1).
+- `estirada` con la rama `alcance ≤ cuerpoM → 0`; `probabilidadDesvio` finita y acotada (2).
+- `velocidadEfectiva` única en `moverBalon`, usada para mover el balón y para el tiempo de reacción (3).
+- Helper con `intercepcionesInmediatas` (046, banda ≤ 0,01 por partido en `completo`, ≤ 1 en `rapido`) e
+  `intercepcionesInmediatasCercanas` (`inmediataRadioM` = 15 en `LOTE_ARENA_046`, banda 0); pruebas de límites
+  exactos (4).
+- `objetivoRemate` con producto cruzado normalizado y los tres casos degenerados (5).
+- `destinoPosicionamiento` sobre la línea balón–centro del arco; nombre y comentario sin «bisectriz» (6).
+- Pruebas de integración (a)–(f) como mutaciones 15–20; el contraste v4 es conjunto, no por regla (7).
+- Evidencia con `commit`, etiqueta `motor`, `reglas: "prototipo-v5"`; nada de esto afecta al código del repo (8).
+- Sin frase de prompt ni prueba 11; sin P2; migrar los seis sitios del 046 al literal `"reinicios-v4"` y el
+  rechazo de `reinicios-v5` a `reinicios-v6`; presupuesto y orden de recorte del punto 9.
