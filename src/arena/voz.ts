@@ -4,6 +4,7 @@ import { trazar } from "../lib/telemetria";
 import { createHash } from "node:crypto";
 import type { FragmentoVoz, TipoTramoCanto } from "./expresion";
 import type { RegistroArena } from "./tipos";
+import type { GritoCanto } from "./relato";
 import { CANTO_GOL, MESA_ARENA } from "../sim/limites";
 
 export const VERSION_VOZ = "voz-expresiva-v1";
@@ -64,7 +65,16 @@ function parteCanto(f: FragmentoVoz, rol: RolVoz, voz: string, idioma: Idioma): 
   if (rol !== "narrador" || f.emocion !== "jubilo" || !Array.isArray(tramos) || !tramos.length || tramos.some(t => !t.texto || !tiposCanto.includes(t.tipo)) || f.texto !== tramos.map(t => t.texto).join(" ")) throw new Error("Interpretación de voz inválida");
   const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
   const frases = tramos.map(t => {
-    const p = CANTO_GOL.tramos[t.tipo], deseado: string = CANTO_GOL.estilos[idioma][t.tipo];
+    // Brief 054: el grito lleva su clave del catálogo; el texto debe ser el del catálogo en este idioma y
+    // el rate es el del grito (pitch, volume y grado, comunes, de CANTO_GOL.tramos.grito).
+    let p: { rate: number; pitch: number; volume: number; grado: number };
+    if (t.tipo === "grito") {
+      const catalogo: readonly GritoCanto[] = CANTO_GOL.gritos;
+      const grito = typeof t.grito === "string" ? catalogo.find(g => g.clave === t.grito) : undefined;
+      if (!grito || t.texto !== grito[idioma].texto) throw new Error("Interpretación de voz inválida");
+      p = { ...CANTO_GOL.tramos.grito, rate: grito[idioma].rate };
+    } else p = CANTO_GOL.tramos[t.tipo];
+    const deseado: string = CANTO_GOL.estilos[idioma][t.tipo];
     const estilo = estilosAdmitidos[voz]!.includes(deseado) ? deseado : undefined;
     const prosodia = `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">${escapar(t.texto)}</prosody>`;
     return estilo ? `<mstts:express-as style="${estilo}" styledegree="${p.grado.toFixed(2)}">${prosodia}</mstts:express-as>` : prosodia;

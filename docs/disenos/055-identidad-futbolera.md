@@ -704,3 +704,233 @@ cabecera de jornada, alineaciones TV, iconos en la ficha del jugador.
   oscuros: invisible pero inofensivo, el relleno oscuro delimita la forma).
 - **Medidas tomadas sobre la revisión pública 0000018** (22 oct). Si se despliega otra antes
   del «antes», se recaptura.
+
+## Versión 1.1 (22 de octubre): decisiones tras la revisión de Codex
+
+Codex (GPT-6.1 Sol, solo lectura) revisó la versión 1 y la declaró **no cerrada**
+([informe íntegro](../evidencia/identidad-055/codex-brief-v1.md): 6 altas, 6 medias). Fable
+verificó cada hallazgo contra `globals.css`, `Arena.tsx`, `ArenaDescripcion.tsx`,
+`plantillas.ts` y `Iconos.tsx`, y recalculó los contrastes citados. **Lo que sigue prevalece
+sobre el texto anterior** donde se contradigan; la numeración es la del informe. Al final,
+la lista de cambios para Opus y la P1 realista.
+
+### 1. Pastilla líder de la visita ilegible con equipación oscura (alta) — aceptado
+
+Verificado: `globals.css:3014` pinta `.arena-stat-value[data-lead][data-side="visita"]` con
+`background: var(--ar-away-ui); color: var(--ar-away-ink)`. Dentro de `.arena-stats` el 049
+redefine `--ar-away-ui` como `--ar-away-ui-bug` (= `uiOscuro`), y con una visita oscura
+`--ar-away-ink` pasa a blanco: blanco sobre `uiOscuro` mide **1,58–2,14** (recalculado).
+Regla única: **las dos pastillas usan `color: var(--ar-bug)`** (`#0b1220` sobre los diez
+`uiOscuro` mide 8,76–17,46). Prueba unitaria nueva: para cada entrada de la paleta,
+`contrasteWcag("--ar-bug" leído del CSS, uiOscuro) ≥ minTexto`. El script de contraste añade
+los pares «pastilla líder local» y «pastilla líder visita» (`.arena-stat-value[data-lead][data-side=…]`,
+`color` sobre su propio `background-color`, 4,5, no obligatorios: solo existen con líder) y se
+ejecuta sobre un partido con local claro y visita oscura.
+
+### 2. El anillo de selección se vuelve un disco por la cascada (alta) — aceptado
+
+Verificado: `.arena-local .arena-token > circle` (0,2,1) y `.arena-visita .arena-token > circle`
+pintan `fill` y `stroke` de **todos** los círculos del token; `.arena-select-ring` (0,1,0) pierde,
+y `.arena-player[data-favorite] > .arena-token > circle` (0,3,1) también lo repintaría.
+Decisión: el círculo base recibe `className="arena-kit"` y **todas** las reglas de camiseta,
+favorito y celebración del 047/049/050 que hoy dicen `.arena-token > circle` pasan a
+`.arena-token > .arena-kit` (lista: `globals.css:2880, 2882, 2884, 2886, 2887, 3061, 3062`;
+la del anillo de gol ya es `circle.arena-goal-ring`). Los anillos nuevos tienen clase propia y
+reglas con especificidad ≥ (0,3,1): `.arena-player > .arena-token > .arena-select-ring` y
+`.arena-player > .arena-token > .arena-fav-ring`. Pruebas (e2e, estilos computados sobre la ficha
+seleccionada): `fill` del anillo ∈ {`none`, `rgba(0, 0, 0, 0)`}, `stroke` = `--ar-select`
+computado, `r = 2.6` > 1,9 del `.arena-kit`, y el `text` del dorsal es el **segundo** hijo
+(antes del anillo) con `fill` = `tinta` del kit; el `.arena-kit` conserva `stroke` = `tinta`.
+Contar un círculo deja de ser una aserción (§ 8).
+
+### 3. El favorito sigue sin contraste (alta) — aceptado
+
+Verificado: `--ar-live` frente a las dos franjas mide 1,04/1,10 en claro y 1,66/1,90 en
+oscuro; era una deuda heredada del 049 que este brief mantenía. Decisión: el favorito en la
+cancha pasa a un **anillo propio punteado en lima**: `<circle className="arena-fav-ring" r="3.05" aria-hidden="true" />`
+dentro de `.arena-token`, después del dorsal y de `.arena-select-ring` si existe, antes de la
+marca de capitán; CSS `fill: none; stroke: var(--ar-select); stroke-width: .45; stroke-dasharray: .6 .6`
+(lima frente al césped 4,38/5,01). La selección es el anillo **sólido** de r 2,6; el favorito el
+**punteado** de r 3,05: forma y radio redundantes con el color. Durante la celebración
+(`[data-gol]`) el `.arena-fav-ring` se oculta (`display: none`) para no competir con el anillo
+de gol de r 3,2; la estrella del marcador y de la ficha siguen diciendo quién es el favorito.
+`.arena-kit` ya no cambia con `data-favorite`. Pruebas e2e en cuatro estados: favorito solo,
+seleccionado solo, ambos y celebración (fixture con gol del favorito: `arena-fav-ring`
+`display: none`, `arena-goal-ring` último hijo); en cada uno, anillos presentes/ausentes y
+estilos computados como en § 2. El par «anillo favorito / césped» entra en `contraste.mjs`
+(`.arena-fav-ring`, `stroke`, 3, no obligatorio). El punto `.arena-fav-star` de la ficha del
+jugador deja `--ar-live` y pasa a `--ar-score-bg` como el del marcador (mismo color para el mismo
+significado).
+
+### 4. Contorno del escudo claro = `--ar-bug` (media) — aceptado
+
+Verificado: para las cinco equipaciones claras `tinta = #0b1220 = --ar-bug`, contorno 1:1
+sobre el marcador. El criterio pasa a **silueta**: `max(contraste(relleno, fondo), contraste(contorno, fondo)) ≥ 3`
+(claras: relleno 11,9–17,5; oscuras: contorno blanco 18,7). Cada parte del escudo lleva clase:
+`.arena-crest-forma` (relleno `c1`), `.arena-crest-patron` (0–3 elementos en `c2`),
+`.arena-crest-campo` (campo sólido `c1`), `.arena-crest-iniciales` (`text`, `tinta`),
+`.arena-crest-contorno` (`stroke` `tinta`). El script mide `.arena-score .arena-crest-iniciales`
+(`fill`) frente a `.arena-score .arena-crest-campo` (`fill`, 4,5, obligatorio) y la silueta
+(`.arena-crest-forma` `fill` y `.arena-crest-contorno` `stroke`, cada uno frente a `.arena-score`
+`background-color`; el script toma el **mayor** de los dos: nueva forma de par `[selFg1, selFg2]`
+con regla `max`, 3, obligatorio). Fuera `rect:nth-of-type(2)`.
+
+### 5. Cargar un ejemplo no pliega la configuración (alta) — aceptado, sin cambiar comportamiento
+
+Verificado: `ejecutar()` (`Arena.tsx:141–168`) y `recibirPreparado` no tocan `configurando`;
+solo `actividadDirecto(true)` y la URL `?partido=` lo ponen en `false`; las pestañas lo ponen
+en `true`. Y `ArenaEnDirecto` está fuera del `details`. **No se cambia**: los e2e vuelven a usar
+«Create recording without AI» y «Home formation» tras una carga (`arena.spec.ts:203–218`), así
+que plegar tras cargar los rompería. Estados reales, que la evidencia mide por separado:
+
+| Estado | `details.arena-setup` | Sala de control (≈ px) | Dónde queda la Mesa |
+| --- | --- | --- | --- |
+| Portada | abierto | ≈ 560 | bajo el pliegue del acompañante |
+| Ejemplo o grabación cargados | abierto (como hoy) | ≈ 560 | bajo el pliegue |
+| Partido en vivo iniciado | plegado | ≈ 250 (pestañas + resumen + panel en vivo) | visible tras la narración |
+| URL `?partido=` | plegado | ≈ 250 | visible tras la narración |
+
+Se retira la frase «al iniciar o cargar la configuración se pliega». Objetivo medible
+sustituto: `mesaEnAcompanante ≤ 700` en los dos estados plegados; en los abiertos solo se
+registra. El párrafo de § 15 se corrige igual.
+
+### 6. Contrato de foco y desplazamiento del CTA (media) — aceptado
+
+`#arena-control` recibe `tabIndex={-1}` y `scroll-margin-top: 96px` (mismo valor que
+`#arena-watch`, `globals.css:2620`), con `outline: 2px solid var(--ar-select)` solo en
+`:focus-visible`. La navegación por fragmento mueve el foco al destino con `tabindex="-1"` y
+desplaza tanto la página como el contenedor con scroll interno del acompañante (comportamiento
+de `scrollIntoView` de los ancestros). El CTA no lleva `onClick`. E2e, en escritorio y a 360 px,
+desde teclado (`Tab` hasta el CTA, `Enter`): `document.activeElement.id === "arena-control"`,
+`boundingBox` de `#arena-control` dentro del viewport y bajo `header`, y el primer control
+(«Live») visible (`toBeInViewport`); además, con el acompañante desplazado internamente al
+fondo antes de pulsar (`scrollTop = scrollHeight`), el resultado es el mismo. Si Chromium no
+desplaza el contenedor interno en algún caso, se añade `onClick` con `scrollIntoView({ block: "start" })`
++ `focus()` y se anota.
+
+### 7. Filas sin icono y color de las tarjetas (media) — aceptado
+
+Verificado: `ArenaDescripcion` tiene tres hijos por `li`. Decisión: `IconoEventoArena`
+**siempre** devuelve el `span.arena-event-icon` (vacío y sin `data-kind` cuando `claseIcono`
+es `null`), así cada fila tiene cuatro celdas; rejilla
+`grid-template-columns: auto 18px minmax(0, 1fr) auto` con `grid-template-areas: "tiempo icono texto id"`
+y las cuatro clases/áreas explícitas; a 360 px `"tiempo icono texto" "id id id"`. En el feed el
+`span` vacío ocupa 18 px fijos para alinear los textos. Tarjetas: `Iconos.tsx` fija
+`fill="var(--card-yellow)"` y `var(--danger)` como atributos; sobre el rótulo de cifras
+`--danger` claro (`#b42318`) mide 2,86 frente a `--ar-bug`. Tokens nuevos
+`--ar-card-yellow-bug: #ffce58` (el amarillo del árbitro) y `--ar-card-red-bug: #ff8a80`
+(el `--danger` oscuro), y reglas `.arena-stat-label [data-kind="amarilla"] rect { fill: var(--ar-card-yellow-bug) }`
+y `…[data-kind="roja"] rect { fill: var(--ar-card-red-bug) }` (una regla CSS gana a un atributo
+de presentación). El script mide el `rect` real de los dos iconos en el panel y en el feed
+(`fill`, 3). Prueba de UI con lista mixta (pase, gol, amarilla, reinicio) comprobando cuatro
+hijos por fila y `data-kind` solo donde toca.
+
+### 8. Mutaciones que seguirían en verde (alta) — aceptado
+
+Aserciones concretas, una por mutación:
+
+- **`::before` restaurado en el marcador** → e2e: `getComputedStyle(span, "::before").content === "none"`
+  y `width === "0px"` para `.arena-score > span:first-child::before` y `span:last-child::after`,
+  y lo mismo para `.arena-stats-teams span::before`.
+- **Anillo opaco / color / dorsal tapado** → § 2 (estilos computados y orden de hijos).
+- **Solo el primer círculo local** → el script y el e2e miden `.arena-local .arena-kit`,
+  `.arena-visita .arena-kit`, `.arena-select-ring` y `.arena-fav-ring` por separado.
+- **Feed con cinco eventos** → el e2e lee del JSON del ejemplo el `tick` del primer `gol` y de la
+  primera `amarilla` (si la hay) y lleva el deslizador a `tick · pasoS` con `fill`, de modo que
+  ese evento está entre los cinco últimos; comprueba `data-kind="gol"` en el `li` con ese
+  `data-event-tick`. Además comprueba `#arena-description li[data-event-id="<id del gol>"] .arena-event-icon[data-kind="gol"]`
+  (lista de 40, independiente del feed).
+- **Identidad vs nombre mostrado** → `IdentidadClub` lleva `nombre` (tal cual se recibió) y
+  `clave` (normalizada); la prueba de determinismo compara `toEqual` tras descartar `nombre`.
+- **`aria-hidden` quitado del escudo** → `renderToStaticMarkup` del marcador: ningún
+  `svg.arena-crest` sin `aria-hidden="true"` y el nombre accesible del botón de equipo (e2e
+  `getByRole("button", { name: nombre, exact: true })`, ya existente) sigue resolviendo.
+- **Paridad favicon/emblema** → la prueba compara los `d` y el `circle` como conjunto ordenado.
+
+### 9. El «antes» falla por diseño (media) — aceptado
+
+`capturas.mjs` del 055 recibe `antes | despues`: con `antes` **registra** las métricas (incluidas
+`favicon = 404` y `canchaAbajo > 900`) y sale con 0 salvo desborde o error JS; con `despues`
+aplica los umbrales y falla. Orden de medida en las dos vistas (portada y `?partido=`):
+`goto` → `arena-pitch.waitFor()` → `scrollTo(0, 0)` → **medir** `marcadorAbajo`, `canchaAbajo`,
+`altoCabecera`, `controlDentroAcompanante` → captura → después las interacciones (deslizador,
+`#arena-watch`). `controlDentroAcompanante = companion.contains(document.getElementById("arena-control"))`
+(relación DOM, no `offsetTop`). `mesaEnAcompanante` se registra en los cuatro estados de § 5.
+
+### 10. `drop-shadow` inválido (media) — aceptado
+
+Cierto: `drop-shadow()` no admite cuatro longitudes. Sustituido por
+`.arena-score[data-gol="local"] > span:first-child .arena-crest, .arena-score[data-gol="visita"] > span:last-child .arena-crest { outline: 2px solid var(--ar-score-bg); outline-offset: 1px; border-radius: 4px; }`
+(válido sobre un `svg` en línea, sin `transform`). El e2e del canto de gol del 055 comprueba
+`outline-color` computado = `--ar-score-bg` sobre el escudo del lado que marca y ninguno sobre
+el otro, en los dos lados.
+
+### 11. Escudo permanente frente a equipación del partido (media) — aceptado
+
+Decisión: el **escudo es permanente**: `c1 = principal.fondo`, `c2 = alternativa.fondo`,
+`tinta = principal.tinta`, siempre, viste lo que viste el club. Solo las **fichas, camisetas,
+barras y bordes** (tokens de § 5.5) cambian cuando la visita usa la alternativa, y
+`.arena-kit-note` lo dice. § 5.6 («el escudo acompaña a la camiseta») queda sustituido; `Escudo`
+deja de recibir `equipacion` y recibe solo `identidad`. Identidades esperadas fijas: prueba
+«dorada» con los cinco clubes de los ejemplos públicos (`arena-llm-v1/v3`, `arena-duelo-v3`) y
+los dos de `arena-reinicios-v3.json`: `kit`, `patron`, `forma` e `iniciales` escritos en el test
+tras la primera implementación y comentados como datos, no como umbrales. Estabilidad: ninguna
+identidad se **persiste** (los favoritos guardan el nombre, no el escudo), así que una
+reasignación de bits antes de la entrega no rompe nada; después de la entrega cambiaría escudos
+entre visitas, y se prohíbe salvo brief nuevo. Lámina: `docs/evidencia/identidad-055/lamina.mjs`
+(`tsx`, `renderToStaticMarkup`) genera `lamina.html` con los 8 × |LUGARES| escudos y sus kits
+para la revisión visual de parecidos (criterio 13.4); se mira entera antes de ✅ y se anotan los
+ajustes, si los hay, en la bitácora.
+
+### 12. Alcance de un día (alta) — aceptado
+
+Suma honesta con los cambios de la 1.1: identidad + paleta + pruebas 1,5 h; escudo, tokens,
+`.arena-kit`, dos anillos, pastillas, inserciones 3 h; Z2 con contrato del CTA 2 h; Z1 1 h;
+Z4 con rejilla de cuatro celdas 1,25 h; scripts, lámina, e2e, suites y bitácora 1,75 h →
+**10,5 h**. No cabe entero en un día: se separa en bloques con corte (abajo). `LUGARES` **se
+exporta** de `plantillas.ts` (una palabra; sin cambio de comportamiento; el criterio 13.3 admite
+ese único diff en `src/sim`). Rendimiento: `Arena.tsx` calcula **una vez** por nombres
+`const identidad = useMemo(() => identidadPartido(nombres.local.nombre, nombres.visita.nombre), [nombres.local.nombre, nombres.visita.nombre])`
+(`identidadPartido` devuelve `{ local, visita, kits, variables }`) y lo pasa como prop a
+`ArenaMarcador`, `ArenaRotuloGol`, `ArenaCifras`, `ArenaPlantilla` y `ArenaContexto`; ningún hijo
+llama a `identidadClub` en el render del reloj.
+
+### Qué cambia para Opus (lista)
+
+1. Pastillas líder de cifras con `color: var(--ar-bug)` en los dos lados (§ 1).
+2. Círculo base `.arena-kit`; todas las reglas `.arena-token > circle` del 047/049/050 pasan a
+   `.arena-kit`; anillos `.arena-select-ring` (sólido, r 2,6) y `.arena-fav-ring` (punteado,
+   r 3,05, oculto en celebración) con reglas de especificidad ≥ (0,3,1); `.arena-goal-ring`
+   sigue siendo el último hijo (§§ 2–3).
+3. Escudo permanente (`c1/c2/tinta` de principal/alternativa), clases por parte, criterio de
+   silueta; `Escudo({ identidad, size })` (§§ 4, 11).
+4. No cambia `configurando`: tabla de estados y métrica de la Mesa solo en estados plegados (§ 5).
+5. `#arena-control` con `tabIndex={-1}`, `scroll-margin-top`, foco y e2e de teclado (§ 6).
+6. `IconoEventoArena` siempre devuelve la celda; rejilla de cuatro áreas; tokens
+   `--ar-card-yellow-bug`/`--ar-card-red-bug` para las tarjetas sobre el bug (§ 7).
+7. Aserciones por mutación de § 8; `IdentidadClub.clave`; `identidadPartido` memoizado (§§ 8, 12).
+8. `capturas.mjs` con modo `antes`/`despues`, medida antes de interactuar,
+   `controlDentroAcompanante` por DOM (§ 9).
+9. Realce de gol del escudo con `outline`, no `drop-shadow` (§ 10).
+10. `export const LUGARES` en `plantillas.ts`; lámina de escudos; prueba dorada (§§ 11–12).
+
+### P1 realista y orden de corte (sustituye a § 12)
+
+Implementación empieza hoy, 22 de octubre; entrega el 27; el video se regraba después.
+
+- **Bloque A (núcleo, obligatorio, ≈ 6,5 h):** identidad + paleta + pruebas; escudos, tokens,
+  `.arena-kit`, anillos, pastillas e inserciones; emblema + `icon.svg` + paridad; scripts de
+  contraste y lámina; e2e `arena-identidad` reducido a los pasos 1, 3 y 5 (§ 10) más los cuatro
+  estados de anillos; suites y bitácora. **Es la entrega mínima cerrable**: criterios 13.2–13.5
+  y las partes de 13.1 que no dependen de Z2 (`favicon = 200`, `kits` distintos).
+- **Bloque B (Z2 partido primero, ≈ 2 h):** solo si A está en verde a las **16:00** del primer
+  día; si A termina después, B pasa al día siguiente por la mañana y la bitácora lo dice.
+  Añade los pasos 2 y 6 del e2e y los umbrales `marcadorAbajo`/`canchaAbajo`/`altoCabecera`.
+- **Bloque C (Z4 iconos, ≈ 1,25 h):** solo con B en verde antes de las **19:00**, o a la
+  mañana siguiente tras B. Añade el paso 4 del e2e.
+- **P2** (apple-icon, cabecera de jornada, alineaciones TV, iconos en la ficha): solo con A, B y
+  C en verde y antes del 24 de octubre a las 16:00, para dejar el 25–26 al video y a la entrega.
+
+Orden de recorte si el tiempo aprieta: P2 → C → B. A no se recorta; si A no cabe, se escala a
+Carlos antes de decidir qué quitar. Lo no alcanzado se anota como recorte del 055, con las
+métricas registradas por el script en modo `antes`.

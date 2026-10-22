@@ -20,7 +20,9 @@ type Tramo = { texto: string; rate: number; pitch: number; volume: number; grado
 const pct = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
 const unaOracion = (voz: string, lang: string, tramos: Tramo[]) => `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="${lang}"><voice name="${voz}"><s>${tramos.map(t => `<mstts:express-as style="${t.estilo}" styledegree="${t.grado.toFixed(2)}"><prosody rate="${pct(t.rate)}" pitch="${pct(t.pitch)}" volume="${pct(t.volume)}">${esc(t.texto)}</prosody></mstts:express-as>`).join("")}<break time="${CANTO_GOL.pausaFinalMs}ms"/></s></voice></speak>`;
 
-const G = CANTO_GOL.tramos.grito, N = CANTO_GOL.tramos.goleador, H = CANTO_GOL.tramos.hechos;
+// Brief 054 v1.1 (3): el rate de control del experimento (−30, el del 050) queda fijado aquí como literal
+// histórico: CANTO_GOL.tramos.grito ya no lleva rate (cada grito del catálogo aporta el suyo).
+const G = { ...CANTO_GOL.tramos.grito, rate: -30 }, N = CANTO_GOL.tramos.goleador, H = CANTO_GOL.tramos.hechos;
 const VOZ = { es: "es-MX-JorgeNeural", en: "en-US-JennyNeural" } as const, LANG = { es: "es-MX", en: "en-US" } as const;
 const ESTILO = { es: CANTO_GOL.estilos.es.grito, en: CANTO_GOL.estilos.en.grito } as const;
 /** Grito solo: la prosodia de CANTO_GOL.tramos.grito salvo el rate indicado. */

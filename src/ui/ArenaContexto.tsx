@@ -2,11 +2,13 @@
 
 import { etiquetasEntrenador } from "../arena/entrenadores";
 import { efectosEntorno, resumir } from "../arena/entorno";
-import { ARENA, TECNICA_ARENA } from "../sim/limites";
+import { ARENA, IDENTIDAD_ARENA, TECNICA_ARENA } from "../sim/limites";
+import type { IdentidadPartido } from "../arena/identidad";
+import { Escudo } from "./Escudo";
 import { explicarMotivo } from "../arena/vista";
 import { paresSustitucion, type EntrenadorArena, type EstadoArena, type RegistroArena } from "../arena/tipos";
 
-export function ArenaContexto({ registro, estado, idioma, seleccionar, saltar }: { registro: RegistroArena; estado: EstadoArena; idioma: "es" | "en"; seleccionar: (id: string) => void; saltar: (segundos: number) => void }) {
+export function ArenaContexto({ registro, estado, idioma, seleccionar, saltar, identidad }: { registro: RegistroArena; estado: EstadoArena; idioma: "es" | "en"; seleccionar: (id: string) => void; saltar: (segundos: number) => void; identidad?: IdentidadPartido }) {
   if (!estado.entrenadores) return null;
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const c = registro.config.partido.condiciones!;
@@ -47,7 +49,7 @@ export function ArenaContexto({ registro, estado, idioma, seleccionar, saltar }:
       const nombreDe = (id: string) => plantilla.find(j => j.id === id)?.nombre ?? id;
       const pendientes = paresSustitucion(s.pendiente).map(p => `${nombreDe(p.entra)} ↑ · ${nombreDe(p.sale)} ↓`).join(" · ");
       return <article className="arena-coach" key={lado} data-testid={`arena-coach-${lado}`}>
-        <p className="overline">{registro.config.partido[lado].nombre}</p><h3>{e.nombre}</h3><p className="arena-coach-profile">{etiquetasEntrenador[e.perfil][idioma]}</p>
+        <p className="overline">{identidad && <Escudo identidad={identidad[lado]} size={IDENTIDAD_ARENA.escudoPx.entrenador} />}{registro.config.partido[lado].nombre}</p><h3>{e.nombre}</h3><p className="arena-coach-profile">{etiquetasEntrenador[e.perfil][idioma]}</p>
         <dl className="arena-factors"><div><dt>{t("Formation", "Formación")}</dt><dd>{s.formacion}</dd></div><div><dt>{t("Intent", "Intención")}</dt><dd>{mentalidades[s.plan.mentalidad]}</dd></div><div><dt>{t("Block / pace", "Bloque / ritmo")}</dt><dd>{bloques[s.plan.bloque]} · {ritmos[s.plan.ritmo]}</dd></div><div><dt>{t("Substitutions / windows", "Cambios / ventanas")}</dt><dd>{s.cambios}/{TECNICA_ARENA.maxCambios} · {s.ventanas}/{TECNICA_ARENA.maxVentanas}</dd></div></dl>
         <p className="arena-muted">{t("Style", "Estilo")}: {t("Attack", "Ataque")} {e.ofensiva} · {t("Risk", "Riesgo")} {e.riesgo} · {t("Adaptability", "Adaptabilidad")} {e.adaptabilidad}</p>
         <div className="arena-coach-mood"><span>{t("Confidence", "Confianza")} <strong>{s.confianza}</strong></span><span>{t("Frustration", "Frustración")} <strong>{s.frustracion}</strong></span><span>{t("Urgency", "Urgencia")} <strong>{s.urgencia}</strong></span></div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { narrarEventoArena } from "../arena/vista";
 import type { EventoArena, RegistroArena } from "../arena/tipos";
 import { ARENA } from "../sim/limites";
+import { IconoEventoArena } from "./IconosArena";
 
 const POR_PAGINA = 40;
 const reloj = (tick: number) => `${Math.floor(tick * ARENA.pasoS / 60)}:${String(Math.floor(tick * ARENA.pasoS % 60)).padStart(2, "0")}`;
@@ -28,7 +29,7 @@ export function ArenaDescripcion({ eventos, registro, idioma, saltar }: { evento
         <button className="btn" disabled={siguiendo || pagina === ultima} onClick={() => setElegida(pagina + 1)}>{t("Later actions", "Acciones siguientes")}</button>
         <button className="btn" aria-pressed={elegida === null} onClick={() => setElegida(null)}>{t("Follow the match", "Seguir el partido")}</button>
       </div>
-      <ol start={desde + 1}>{visibles.map(e => <li key={e.id} data-event-id={e.id} data-event-tick={e.tick}><button onClick={() => saltar(e.tick * ARENA.pasoS)} className="arena-event-time">{reloj(e.tick)}</button><span>{narrarEventoArena(e, registro, idioma)}</span><code>{e.id}</code></li>)}</ol>
+      <ol start={desde + 1}>{visibles.map(e => <li key={e.id} data-event-id={e.id} data-event-tick={e.tick}><button onClick={() => saltar(e.tick * ARENA.pasoS)} className="arena-event-time">{reloj(e.tick)}</button><IconoEventoArena evento={e} /><span className="arena-event-text">{narrarEventoArena(e, registro, idioma)}</span><code className="arena-event-id">{e.id}</code></li>)}</ol>
     </>}
     <p className="arena-muted">{t("Descriptions use engine-event templates. They do not pass through the recap's V1–V8 verifier.", "Las descripciones usan plantillas de eventos del motor. No pasan por el verificador V1–V8 de la crónica.")}</p>
   </section>;

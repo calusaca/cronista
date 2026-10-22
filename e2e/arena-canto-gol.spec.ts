@@ -198,7 +198,12 @@ test("gol en la última ventana con cierre tardío y una respuesta normal reteni
   // La entrada de la narración (respuesta normal, no de cierre) queda retenida hasta que arranca el cierre;
   // el cierre responde tarde (1,5 s).
   const entrada = retenida(), entregadas: string[] = [];
-  await emision(page, "00000000-0000-4000-8000-000000000051", registro, relato => relato.cierre ? cierre : relato.prioridad === PRIORIDAD_EVENTO_ARENA.gol ? canto : corto,
+  // Brief 054 v1.1 (2): el grito se compara con el primer tramo del canto que devuelve /relato.
+  let grito: string | undefined;
+  await emision(page, "00000000-0000-4000-8000-000000000051", registro, relato => {
+    if (relato.prioridad === PRIORIDAD_EVENTO_ARENA.gol) grito = relato.fragmentos[0]?.canto?.tramos[0]?.texto;
+    return relato.cierre ? cierre : relato.prioridad === PRIORIDAD_EVENTO_ARENA.gol ? canto : corto;
+  },
     p => p.cierre ? new Promise(ok => setTimeout(ok, 1500)) : p.entradaTick !== undefined ? entrada.promesa : undefined, entregadas,
     // La respuesta retenida llega sin firma de estado: sigue siendo válida al liberarse (el estado del balón ya
     // cambió), así que lo único que impide que suene tras el cierre es el corte del consumidor.
@@ -210,7 +215,8 @@ test("gol en la última ventana con cierre tardío y una respuesta normal reteni
   await page.getByRole("button", { name: "Enable narration" }).click();
   const transcripcion = page.getByTestId("arena-voice-transcript");
   await expect(transcripcion).toHaveAttribute("data-narration-tick", String(gol.tick), { timeout: 20000 });
-  await expect(transcripcion).toContainText(CANTO_GOL.plantillas.grito.en);
+  expect(grito).toBeTruthy();
+  await expect(transcripcion).toContainText(grito!);
   await expect(transcripcion).toHaveAttribute("data-narration-kind", "cierre", { timeout: 20000 });
   await expect(transcripcion).toContainText("Full time");
   expect(entregadas.some(e => e.startsWith("entrada:"))).toBe(false);

@@ -9,7 +9,7 @@ import type { Lado } from "../../sim/tipos";
 import { VOZ_BUFFER } from "../buffer";
 import { expresionEvento } from "../expresion";
 import { crearConfigArena, crearEstadoArena } from "../motor";
-import { cantoGol, construirRelato, golTardio, marcadorHablado, marcadorTrasGol, situacionGol, type SituacionGol } from "../relato";
+import { cantoGol, catalogoGritos, construirRelato, golTardio, gritosPartido, marcadorHablado, marcadorTrasGol, situacionGol, type SituacionGol } from "../relato";
 import type { EventoArena, RegistroArena } from "../tipos";
 
 const leer = (ruta: string) => JSON.parse(readFileSync(ruta, "utf8")) as RegistroArena;
@@ -58,7 +58,9 @@ describe("050 · hechos del canto", () => {
           const c = cantoGol(e, r, idioma, v)!;
           const goleador = nombreDe(r, e.jugador), equipo = r.config.partido[e.lado].nombre;
           expect(c.tramos.map(t => t.tipo)).toEqual(["grito", "goleador", "hechos"]);
-          expect(c.tramos[0]!.texto).toBe(P.grito[idioma]);
+          // Brief 054: el grito sale del mapa del partido y su texto, del catálogo CANTO_GOL.gritos.
+          const clave = gritosPartido(r, idioma).get(e.id)!;
+          expect(c.tramos[0]).toEqual({ texto: catalogoGritos().find(g => g.clave === clave)![idioma].texto, tipo: "grito", grito: clave });
           expect(c.tramos[1]!.texto).toBe(P.goleador[idioma][v]!.replace("{goleador}", goleador));
           const hechos = c.tramos[2]!.texto;
           expect(hechos).toContain(equipo);
@@ -207,7 +209,7 @@ describe("050 · autogol", () => {
       const c = cantoGol(gol, r, idioma, 2)!;
       expect(c.tramos.map(t => t.tipo)).toEqual(["autogol", "hechos"]);
       expect(c.tramos[0]!.texto).toBe(P.autogol[idioma].replace("{goleador}", defensor.nombre));
-      expect(c.texto).not.toContain(P.grito[idioma]);
+      for (const g of catalogoGritos()) expect(c.texto).not.toContain(g[idioma].texto);
       expect(c.tramos[1]!.texto).toContain(r.config.partido.visita.nombre);
       expect(c.tramos[1]!.texto).not.toContain(r.config.partido.local.nombre);
     }
@@ -253,9 +255,10 @@ describe("050 · presupuesto, estructura y lista negra", () => {
   ];
   const masLargo = (xs: string[]) => xs.reduce((a, b) => b.length > a.length ? b : a);
   const equipo = masLargo(plantillas.flatMap(p => p.equipos)), jugador = masLargo(plantillas.flatMap(p => p.jugadores));
-  /** Todos los cantos: 4 variantes × marcadores 0..12 × lado × tardío × autogol × ES/EN, con los nombres más largos. */
+  /** Todos los cantos: 4 variantes × marcadores 0..12 × lado × tardío × autogol × ES/EN, con los nombres más largos.
+   * Brief 054 § 3.5: cada canto con grito se recorre con los diez gritos del catálogo. */
   function todos() {
-    const r = structuredClone(fixtures.v3!);
+    const r = structuredClone(fixtures.v3!); r.fotogramas = []; r.rondas = [];
     r.config.duracionS = ARENA.duracionMaxS; r.config.partido.local.nombre = equipo; r.config.partido.visita.nombre = equipo;
     r.inicial.jugadores[1]!.nombre = jugador; r.inicial.jugadores[12]!.nombre = jugador;
     const fin = Math.round(ARENA.duracionMaxS / ARENA.pasoS) - 1, temprano = Math.floor(CANTO_GOL.tardioDesdeFraccion * ARENA.duracionMaxS / ARENA.pasoS) - 1;
@@ -269,7 +272,8 @@ describe("050 · presupuesto, estructura y lista negra", () => {
         x.eventos = [gol];
         for (const idioma of idiomas) for (let k = 0; k < 4; k++) {
           const c = cantoGol(gol, x, idioma, k)!;
-          salida.push({ idioma, situacion: situacionGol(lado, despues), tardio: golTardio(tick, x.config.duracionS, despues), texto: c.texto, hechos: c.tramos.at(-1)!.texto, tipos: c.tramos.map(t => t.tipo) });
+          const textos = c.tramos[0]!.tipo === "grito" ? catalogoGritos().map(g => [g[idioma].texto, ...c.tramos.slice(1).map(t => t.texto)].join(" ")) : [c.texto];
+          for (const texto of textos) salida.push({ idioma, situacion: situacionGol(lado, despues), tardio: golTardio(tick, x.config.duracionS, despues), texto, hechos: c.tramos.at(-1)!.texto, tipos: c.tramos.map(t => t.tipo) });
         }
       }
     }
@@ -299,6 +303,12 @@ describe("050 · presupuesto, estructura y lista negra", () => {
         expect(porIdioma[0]!.length).toBe(r.eventos.filter(e => e.tipo === "gol").length);
         expect(porIdioma[0]!.map(f => f.canto!.tramos.map(t => t.tipo))).toEqual(porIdioma[1]!.map(f => f.canto!.tramos.map(t => t.tipo)));
         for (const f of porIdioma.flat()) expect(f.texto).toBe(f.canto!.tramos.map(t => t.texto).join(" "));
+        // Brief 054: el mapa completo de gritos del fixture, gol por gol, en el tramo 0 y con el texto del catálogo.
+        porIdioma.forEach((fragmentos, k) => {
+          const idioma = idiomas[k]!, mapa = gritosPartido(r, idioma);
+          const vistos = fragmentos.filter(f => f.canto!.tramos[0]!.tipo === "grito").map(f => [f.fuentes.find(id => mapa.has(id)), f.canto!.tramos[0]!.grito, f.canto!.tramos[0]!.texto]);
+          expect(vistos).toEqual([...mapa].map(([id, clave]) => [id, clave, catalogoGritos().find(g => g.clave === clave)![idioma].texto]));
+        });
       }
       for (const e of r.eventos.filter(e => e.tipo === "gol")) {
         const desde = Math.floor((e.tick - 1) / RELATO_INTERVALOS.buffer) * RELATO_INTERVALOS.buffer, hasta = Math.min(desde + RELATO_INTERVALOS.buffer, fin);

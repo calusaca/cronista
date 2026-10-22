@@ -3,8 +3,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz } from "../expresion";
-import { cantoGol, construirRelato } from "../relato";
+import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz, type TramoCanto } from "../expresion";
+import { cantoGol, catalogoGritos, construirRelato } from "../relato";
 import { CANTO_GOL } from "../../sim/limites";
 import { claveAudio, prepararVoz, sintetizarVoz } from "../voz";
 import { GestorSesiones } from "../sesiones";
@@ -158,7 +158,8 @@ describe("050 · prepararVoz con canto", () => {
     return { tick: evento.tick, texto: c.texto, emocion: "jubilo", intensidad: 0.92, variante, fuentes: [evento.id], fotogramas: [], canto: { tramos: c.tramos } };
   };
   const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
-  const prosodia = (tipo: keyof typeof CANTO_GOL.tramos) => { const p = CANTO_GOL.tramos[tipo]; return `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">`; };
+  /** Prosodia esperada de un tramo: el grito con el rate de su entrada del catálogo (054), los demás de CANTO_GOL.tramos. */
+  const prosodia = (t: TramoCanto, idioma: "es" | "en") => { const p = t.tipo === "grito" ? { ...CANTO_GOL.tramos.grito, rate: catalogoGritos().find(g => g.clave === t.grito)![idioma].rate } : CANTO_GOL.tramos[t.tipo]; return `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">`; };
   const expresiones = (ssml: string) => [...ssml.matchAll(/<mstts:express-as style="([^"]+)" styledegree="([^"]+)">/g)].map(m => ({ estilo: m[1]!, grado: m[2]! }));
 
   it("M5/M6 · ES (Jorge): un <s>, tres express-as cheerful con la prosodia y el styledegree de CANTO_GOL y un solo break final", () => {
@@ -170,7 +171,7 @@ describe("050 · prepararVoz con canto", () => {
     const tipos = f.canto!.tramos.map(t => t.tipo);
     expect(expresiones(ssml)).toEqual(tipos.map(t => ({ estilo: CANTO_GOL.estilos.es[t], grado: CANTO_GOL.tramos[t].grado.toFixed(2) })));
     expect(expresiones(ssml).every(x => x.estilo === "cheerful")).toBe(true);
-    for (const t of f.canto!.tramos) expect(ssml).toContain(`${prosodia(t.tipo)}${t.texto.replace(/'/g, "&apos;")}</prosody>`);
+    for (const t of f.canto!.tramos) expect(ssml).toContain(`${prosodia(t, "es")}${t.texto.replace(/'/g, "&apos;")}</prosody>`);
     // Sin <s> ni <break> entre tramos: el cierre de un express-as va directo al siguiente.
     expect(ssml).toMatch(/<\/prosody><\/mstts:express-as><mstts:express-as/);
   });
@@ -189,7 +190,7 @@ describe("050 · prepararVoz con canto", () => {
     const guy = prepararVoz([fragmentoCanto("en")], "en");
     expect(guy.voz).toBe("en-US-GuyNeural");
     expect(expresiones(guy.ssml).map(x => x.estilo)).toEqual(["shouting", "excited", "excited"]);
-    expect(guy.ssml).toContain(`<s><mstts:express-as style="shouting" styledegree="${CANTO_GOL.tramos.grito.grado.toFixed(2)}">${prosodia("grito")}`);
+    expect(guy.ssml).toContain(`<s><mstts:express-as style="shouting" styledegree="${CANTO_GOL.tramos.grito.grado.toFixed(2)}">${prosodia(fragmentoCanto("en").canto!.tramos[0]!, "en")}`);
     expect(expresiones(prepararVoz([fragmentoCanto("es")], "es").ssml).map(x => x.estilo)).toEqual(["cheerful", "cheerful", "cheerful"]);
     vi.stubEnv("ARENA_VOZ_ES", "es-MX-DaliaNeural");
     const dalia = prepararVoz([fragmentoCanto("es")], "es");
@@ -202,7 +203,7 @@ describe("050 · prepararVoz con canto", () => {
     e.autogol = true; e.jugador = r.inicial.jugadores.find(j => j.lado !== e.lado && j.puesto !== "POR")!.id;
     const { ssml } = prepararVoz([fragmentoCanto("es", 0, r, e)], "es");
     expect(expresiones(ssml)).toEqual((["autogol", "hechos"] as const).map(t => ({ estilo: CANTO_GOL.estilos.es[t], grado: CANTO_GOL.tramos[t].grado.toFixed(2) })));
-    expect(ssml).toContain(prosodia("autogol")); expect(ssml).not.toContain(prosodia("grito"));
+    expect(ssml).toContain(prosodia({ texto: "", tipo: "autogol" }, "es")); expect(ssml).not.toContain(`pitch="${porciento(CANTO_GOL.tramos.grito.pitch)}" volume="${porciento(CANTO_GOL.tramos.grito.volume)}"`);
   });
 
   it("lanza con rol de invitado, con emoción distinta de jubilo o con texto distinto de la unión", () => {
@@ -232,6 +233,66 @@ describe("050 · prepararVoz con canto", () => {
   });
 });
 
+// Brief 054 · SSML por grito: rate de su entrada del catálogo, pitch/volume/styledegree comunes de
+// CANTO_GOL.tramos.grito y estilo de CANTO_GOL.estilos según la voz efectiva; validación del tramo.
+describe("054 · SSML por grito", () => {
+  const gol = duelo.eventos.find(e => e.tipo === "gol")!, G = CANTO_GOL.tramos.grito;
+  const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
+  const esc = (t: string) => t.replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[c]!);
+  /** Canto del gol del duelo con el tramo 0 sustituido (grito `clave`, texto del catálogo salvo que se indique otro). */
+  const conGrito = (idioma: "es" | "en", clave: string | undefined, texto?: string): FragmentoVoz => {
+    const c = cantoGol(gol, duelo, idioma, 0)!, g = catalogoGritos().find(g => g.clave === clave);
+    const tramos: TramoCanto[] = [{ texto: texto ?? g![idioma].texto, tipo: "grito", ...clave === undefined ? {} : { grito: clave } }, ...c.tramos.slice(1)];
+    return { tick: gol.tick, texto: tramos.map(t => t.texto).join(" "), emocion: "jubilo", intensidad: 0.92, variante: 0, fuentes: [gol.id], fotogramas: [], canto: { tramos } };
+  };
+  // Voces admitidas para el narrador y si admiten el estilo del grito (catálogo real del 22 oct).
+  const voces = { es: [["es-MX-JorgeNeural", true], ["es-MX-DaliaNeural", false], ["es-MX-GerardoNeural", false]], en: [["en-US-JennyNeural", true], ["en-US-GuyNeural", true], ["en-US-DavisNeural", false]] } as const;
+
+  it("M18 · cada grito, idioma y voz del narrador: un <s>, tres express-as (o prosody), el primero con el rate del grito y un solo break final", () => {
+    let n = 0;
+    for (const idioma of ["es", "en"] as const) for (const [voz, conEstilo] of voces[idioma]) {
+      vi.stubEnv(`ARENA_VOZ_${idioma.toUpperCase()}`, voz);
+      for (const g of catalogoGritos()) {
+        const f = conGrito(idioma, g.clave), { ssml, voz: efectiva, texto } = prepararVoz([f], idioma);
+        expect(efectiva).toBe(voz); expect(texto).toBe(f.texto);
+        expect(ssml.match(/<s>/g)).toHaveLength(1); expect(ssml.match(/<\/s>/g)).toHaveLength(1);
+        expect(ssml.match(/<break /g)).toHaveLength(1);
+        expect(ssml).toContain(`<break time="${CANTO_GOL.pausaFinalMs}ms"/></s>`);
+        const primera = `<prosody rate="${porciento(g[idioma].rate)}" pitch="${porciento(G.pitch)}" volume="${porciento(G.volume)}">${esc(g[idioma].texto)}</prosody>`;
+        expect(ssml.match(/<prosody /g)).toHaveLength(3);
+        if (conEstilo) {
+          expect(ssml.match(/<mstts:express-as /g)).toHaveLength(3);
+          expect(ssml, `${voz} ${g.clave}`).toContain(`<s><mstts:express-as style="${CANTO_GOL.estilos[idioma].grito}" styledegree="${G.grado.toFixed(2)}">${primera}</mstts:express-as>`);
+        } else {
+          expect(ssml).not.toContain("express-as");
+          expect(ssml, `${voz} ${g.clave}`).toContain(`<s>${primera}`);
+        }
+        n++;
+      }
+    }
+    expect(n).toBe(2 * 3 * catalogoGritos().length);
+  });
+
+  it("M20 · tramo `grito` sin clave, con clave inexistente, con el texto del otro idioma o con otro texto → lanza", () => {
+    const g = catalogoGritos()[1]!;
+    expect(() => prepararVoz([conGrito("es", g.clave)], "es")).not.toThrow();
+    expect(() => prepararVoz([conGrito("es", undefined, g.es.texto)], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([conGrito("es", "no_existe", g.es.texto)], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([conGrito("es", g.clave, g.en.texto)], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([conGrito("en", g.clave, g.es.texto)], "en")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([conGrito("es", g.clave, catalogoGritos()[0]!.es.texto)], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([conGrito("es", g.clave, `${g.es.texto} ¡Gol!`)], "es")).toThrow("Interpretación de voz inválida");
+  });
+
+  it("claveAudio cambia al cambiar el grito con el mismo goleador (una entrada de caché por grito, sin solicitudes nuevas)", () => {
+    for (const idioma of ["es", "en"] as const) {
+      const claves = catalogoGritos().map(g => prepararVoz([conGrito(idioma, g.clave)], idioma)).map(p => claveAudio(p, gol.tick));
+      expect(new Set(claves).size).toBe(catalogoGritos().length);
+      expect(claveAudio(prepararVoz([conGrito(idioma, catalogoGritos()[0]!.clave)], idioma), gol.tick)).toBe(claves[0]);
+    }
+  });
+});
+
 // Brief 050 v1.1 (10b) · Coste de Speech del canto frente al control anterior (la etiqueta «¡Gol de X!» /
 // «Goal by X!» del 049, variante 0, con la interpretación `jubilo` sin canto), por gol de v3/v4 en ES y EN.
 // La banda no se escribe a mano: el delta de cada gol se deriva de las constantes (marcas de tres tramos
@@ -241,8 +302,9 @@ describe("050 · coste de SSML del canto (integración)", () => {
   const esc = (t: string) => t.replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[c]!);
   const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
   /** Marcas del canto según CANTO_GOL para la voz efectiva (todas las voces del narrador por defecto admiten sus estilos). */
-  const marcasCanto = (idioma: "es" | "en", tipos: (keyof typeof CANTO_GOL.tramos)[]) => "<s>".length + tipos.reduce((n, t) => {
-    const p = CANTO_GOL.tramos[t];
+  // Brief 054: el rate del grito es el de su entrada del catálogo.
+  const marcasCanto = (idioma: "es" | "en", tramos: readonly TramoCanto[]) => "<s>".length + tramos.reduce((n, tramo) => {
+    const t = tramo.tipo, p = t === "grito" ? { ...CANTO_GOL.tramos.grito, rate: catalogoGritos().find(g => g.clave === tramo.grito)![idioma].rate } : CANTO_GOL.tramos[t];
     return n + `<mstts:express-as style="${CANTO_GOL.estilos[idioma][t]}" styledegree="${p.grado.toFixed(2)}">`.length + `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">`.length + "</prosody></mstts:express-as>".length;
   }, 0) + `<break time="${CANTO_GOL.pausaFinalMs}ms"/></s>`.length;
 
@@ -261,7 +323,7 @@ describe("050 · coste de SSML del canto (integración)", () => {
       // Marcas del control medidas en su SSML: el contenido de <voice> menos su texto.
       const interiorControl = control.ssml.match(/<voice name="[^"]+">(.*)<\/voice>/)![1]!;
       const marcasControl = interiorControl.length - esc(textoControl).length;
-      const esperado = marcasCanto(idioma, f.canto!.tramos.map(t => t.tipo)) - marcasControl + f.canto!.tramos.reduce((n, t) => n + esc(t.texto).length, 0) - esc(textoControl).length; // los tramos van juntos, sin el espacio de `texto`
+      const esperado = marcasCanto(idioma, f.canto!.tramos) - marcasControl + f.canto!.tramos.reduce((n, t) => n + esc(t.texto).length, 0) - esc(textoControl).length; // los tramos van juntos, sin el espacio de `texto`
       const delta = canto.caracteresPresupuestados - control.caracteresPresupuestados;
       expect(delta, `${e.id} ${idioma}`).toBe(esperado);
       expect(delta).toBeGreaterThan(0);

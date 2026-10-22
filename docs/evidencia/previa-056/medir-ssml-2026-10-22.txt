@@ -1,0 +1,9 @@
+es completaA texto 185 ssml 578
+es breveA texto 100 ssml 363
+es completaC texto 180 ssml 573
+es breveC texto 109 ssml 374
+en completaA texto 203 ssml 665
+en breveA texto 99 ssml 362
+en completaC texto 184 ssml 646
+en breveC texto 108 ssml 442
+suma 8 casos (A y C, 2 variantes, 2 idiomas): 4003 → 3 piezas ≈ 6005

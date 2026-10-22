@@ -15,7 +15,7 @@ import { hechosArena } from "../inteligencia";
 import { MesaSesion } from "../mesa";
 import { comentarArena, narrarArena, type ComentarioArena } from "../narrador";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../protocolo";
-import { construirRelato } from "../relato";
+import { catalogoGritos, construirRelato, gritosPartido } from "../relato";
 import type { EventoArena, RegistroArena } from "../tipos";
 import {
   construirTranscripcion, escaparMarkdown, finalDelPrefijo, nombreDescarga, ROTULOS_TRANSCRIPCION, transcripcionJson, transcripcionMarkdown,
@@ -87,7 +87,10 @@ describe("053 · relato por plantillas", () => {
     expect(tr.lineas[0]!.texto_es).toMatch(/^Comienza el partido/);
     expect(tr.lineas[1]!.texto_es).toBe(hechosArena(r, r.final.tick).find(h => h.id === `arena:${pase.id}`)!.texto_es);
     expect(tr.lineas[1]!.evidencia.eventos).toEqual([pase.id]);
-    expect(tr.lineas[2]!.texto_es).toMatch(/^¡Go+l/);
+    // Brief 054: el canto empieza por el grito del mapa del partido (texto del catálogo).
+    const grito = catalogoGritos().find(g => g.clave === gritosPartido(r, "es").get(gol.id))!;
+    expect(tr.lineas[2]!.texto_es.startsWith(`${grito.es.texto} `)).toBe(true);
+    expect(tr.lineas[2]!.texto_en.startsWith(`${grito.en.texto} `)).toBe(true);
     expect(tr.lineas[2]!.evidencia.eventos).toEqual([gol.id]);
     expect(tr.lineas[3]!.texto_es).toMatch(/^Final del partido/);
     expect(tr.lineas.map(l => l.tick)).toEqual([0, pase.tick, gol.tick, r.final.tick]);

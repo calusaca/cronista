@@ -135,11 +135,15 @@ a {
 
 .brand {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
   text-decoration: none;
   min-width: 0;
 }
+
+/* Brief 055 § 3.1 · Emblema (balón en C): currentColor; el punto usa --emblem-live si existe. */
+.brand-emblem { flex: 0 0 auto; color: var(--accent); }
+@media (max-width: 480px) { .brand-emblem { width: 24px; height: 24px; } }
 
 .brand-mark {
   font-family: var(--font-display), system-ui, sans-serif;
@@ -2692,6 +2696,10 @@ button.stats-row:hover {
   --ar-runoff: #1f5a33;
   --ar-select: #d4ff3a;
   --ar-ball: #ffffff;
+  /* Brief 055 (v1.1 § 7) · Tarjetas de los iconos sobre el rótulo de TV (--ar-bug), constantes:
+     el amarillo de la tarjeta del árbitro y el --danger oscuro. */
+  --ar-card-yellow-bug: #ffce58;
+  --ar-card-red-bug: #ff8a80;
   --ar-role-narrador: #3f6a00;
   --ar-role-comentarista: #b4441b;
   --ar-role-estadista: #0b7268;
@@ -2769,6 +2777,15 @@ button.stats-row:hover {
   color-scheme: dark;
 }
 
+/* Brief 055 § 5.5 · Equipaciones del partido. Arena.tsx pone en el style de main.arena-shell
+   --ar-home/-ink/-ring, --ar-away/-ink/-ring y los cuatro --ar-*-ui-claro/-oscuro (IDENTIDAD_ARENA).
+   Se resuelven sobre main (no sobre :root) porque una var() se resuelve donde se declara. Las
+   reservas son los valores del 047, por si faltara el style. */
+main.arena-shell { --ar-home-ui: var(--ar-home-ui-claro, #1b2f7a); --ar-away-ui: var(--ar-away-ui-claro, #13203f);
+                   --ar-home-ui-bug: var(--ar-home-ui-oscuro, #8fb0ff); --ar-away-ui-bug: var(--ar-away-ui-oscuro, #f5f7fb); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) main.arena-shell { --ar-home-ui: var(--ar-home-ui-oscuro, #8fb0ff); --ar-away-ui: var(--ar-away-ui-oscuro, #f5f7fb); } }
+:root[data-theme="dark"] main.arena-shell { --ar-home-ui: var(--ar-home-ui-oscuro, #8fb0ff); --ar-away-ui: var(--ar-away-ui-oscuro, #f5f7fb); }
+
 /* ---------- base de la arena: botones, primario, deshabilitado ---------- */
 .arena-shell { padding: var(--ar-s4) var(--ar-s6) var(--ar-s7); font-size: 15px; line-height: 1.5; }
 .arena-shell .btn, .arena-topbar .btn { transition: background-color 120ms, border-color 120ms, color 120ms; }
@@ -2779,6 +2796,7 @@ button.stats-row:hover {
 /* ---------- Z1 · barra superior ---------- */
 .arena-topbar { background: var(--ar-bug); border-bottom: 1px solid var(--ar-bug-2); color: var(--ar-bug-ink); }
 .arena-topbar .brand-mark { color: var(--ar-score-bg); }
+.arena-topbar .brand-emblem { color: var(--ar-score-bg); --emblem-live: var(--ar-live); }
 .arena-topbar .brand-tag { color: var(--ar-bug-muted); }
 .arena-topbar .topbar-links a { color: var(--ar-bug-ink); }
 .arena-topbar .btn { background: transparent; border-color: var(--ar-bug-2); color: var(--ar-bug-ink); }
@@ -2855,9 +2873,11 @@ button.stats-row:hover {
 .arena-score { gap: var(--ar-s3); padding: var(--ar-s2) var(--ar-s3); border-radius: var(--ar-r); background: var(--ar-bug); color: var(--ar-bug-ink); box-shadow: var(--shadow); }
 .arena-score > span { display: flex; align-items: center; gap: var(--ar-s2); min-width: 0; font: 700 15px/1.2 var(--font-display), sans-serif; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
 .arena-score > span:last-child { justify-content: flex-end; text-align: right; }
-.arena-score > span:first-child::before, .arena-score > span:last-child::after { content: ""; flex: 0 0 6px; width: 6px; height: 28px; border-radius: 2px; }
-.arena-score > span:first-child::before { background: var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ui); }
-.arena-score > span:last-child::after { background: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+/* Brief 055 § 5.6 · Escudos (siempre aria-hidden). En el marcador sustituyen a las barras de color. */
+.arena-crest { flex: 0 0 auto; vertical-align: middle; margin-inline-end: var(--ar-s1); }
+.arena-crest-iniciales { font-family: var(--font-display), sans-serif; font-weight: 900; letter-spacing: .02em; }
+.arena-score .arena-crest, .arena-stats-teams .arena-crest { margin: 0; }
+.arena-team-plan h2, .arena-coach .overline, .arena-player-card .overline, [data-testid="arena-restart"] { display: flex; flex-wrap: wrap; align-items: center; }
 .arena-score strong { padding: 0 var(--ar-s3); border-radius: var(--ar-r-sm); background: var(--ar-score-bg); color: var(--ar-score-ink); font: 900 40px/1.15 var(--font-display), sans-serif; font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Reloj: pestaña centrada bajo el marcador. El punto en vivo va en el div, nunca en el output. */
 .arena-match-clock { display: flex; align-items: center; gap: var(--ar-s2); width: fit-content; max-width: 100%; margin: 0 auto; padding: 2px var(--ar-s3); border-radius: 0 0 var(--ar-r-sm) var(--ar-r-sm); background: var(--ar-bug-2); color: var(--ar-bug-ink); font: 700 15px/1.4 var(--font-display), sans-serif; font-variant-numeric: tabular-nums; }
@@ -2865,7 +2885,8 @@ button.stats-row:hover {
 @keyframes arena-pulso-vivo { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 .arena-direction { margin-top: var(--ar-s2); font-size: 13px; }
 .arena-direction span:first-child { color: var(--ar-home-ui); }
-.arena-direction span:last-child { color: var(--muted); }
+.arena-direction span:nth-child(2) { color: var(--muted); }
+.arena-kit-note { flex-basis: 100%; color: var(--muted); font-size: 12px; }
 
 /* ---------- Z5 · cancha y fichas ---------- */
 .arena-pitch-wrap { margin-top: var(--ar-s3); overflow: hidden; border-radius: var(--ar-r-lg); background: var(--ar-runoff); }
@@ -2877,14 +2898,20 @@ button.stats-row:hover {
 .arena-goal { fill: color-mix(in srgb, var(--pitch-line) 18%, transparent); }
 /* El g exterior ya está trasladado: el origen (0,0) de .arena-token es el centro del jugador. */
 .arena-token { transform: scale(var(--ar-token-escala, 1.1)); }
-.arena-token > circle { stroke-width: 0.45; }
+.arena-token > .arena-kit { stroke-width: 0.45; }
 .arena-token > text { font-family: var(--font-display), sans-serif; font-size: 2.4px; font-weight: 900; font-variant-numeric: tabular-nums; }
-.arena-local .arena-token > circle { fill: var(--ar-home); stroke: var(--ar-home-ring); }
+.arena-local .arena-token > .arena-kit { fill: var(--ar-home); stroke: var(--ar-home-ring); }
 .arena-local .arena-token > text { fill: var(--ar-home-ink); }
-.arena-visita .arena-token > circle { fill: var(--ar-away); stroke: var(--ar-away-ring); }
+.arena-visita .arena-token > .arena-kit { fill: var(--ar-away); stroke: var(--ar-away-ring); }
 .arena-visita .arena-token > text { fill: var(--ar-away-ink); }
-.arena-player-selected > .arena-token > circle, .arena-player:focus-visible > .arena-token > circle { stroke: var(--ar-select); stroke-width: 0.7; stroke-dasharray: none; }
-.arena-player:focus-visible > .arena-token > circle { stroke-dasharray: 1 0.5; }
+/* Brief 055 (v1.1 §§ 2–3) · El .arena-kit conserva siempre el anillo de la camiseta. Selección:
+   anillo lima SÓLIDO r 2,6; favorito: anillo lima PUNTEADO r 3,05 (forma y radio redundantes con el
+   color). Especificidad (0,3,3) > reglas de camiseta; el anillo de gol (0,4,1) sigue siendo el último hijo. */
+g.arena-player > g.arena-token > circle.arena-select-ring { fill: none; stroke: var(--ar-select); stroke-width: .55; stroke-dasharray: none; }
+g.arena-player > g.arena-token > circle.arena-fav-ring { fill: none; stroke: var(--ar-select); stroke-width: .45; stroke-dasharray: .6 .6; }
+g.arena-player[data-gol] > g.arena-token > circle.arena-fav-ring { display: none; }
+.arena-player:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 1px; }
+g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke-dasharray: 1 .5; }
 .arena-ball { fill: var(--ar-ball); stroke: var(--ar-bug); stroke-width: 0.3; }
 
 /* ---------- Z6 · transporte ---------- */
@@ -2975,7 +3002,7 @@ button.stats-row:hover {
   .arena-board { padding: var(--ar-s2); }
   .arena-score { gap: var(--ar-s1); padding: var(--ar-s2); }
   .arena-score > span { font-size: 12px; }
-  .arena-score > span:first-child::before, .arena-score > span:last-child::after { flex-basis: 4px; width: 4px; height: 22px; }
+  .arena-score .arena-crest { width: 22px; height: auto; }
   .arena-score strong { padding: 0 var(--ar-s2); font-size: 30px; }
   .arena-shell button, .arena-shell .btn, .arena-topbar .btn, .arena-live a[href^="/arena?partido="] { min-height: 44px; }
   .arena-source-tabs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -2995,10 +3022,7 @@ button.stats-row:hover {
 .arena-stats-clock { padding: 0 var(--ar-s2); border-radius: var(--ar-r-sm); background: var(--ar-bug-2); color: var(--ar-bug-ink); font: 700 13px/1.5 var(--font-display), sans-serif; }
 .arena-stats-teams { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ar-s2); margin: var(--ar-s3) 0 var(--ar-s1); font: 700 13px/1.3 var(--font-display), sans-serif; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
 .arena-stats-teams span { display: flex; align-items: center; gap: var(--ar-s2); min-width: 0; }
-.arena-stats-teams span::before { content: ""; flex: 0 0 6px; width: 6px; height: 16px; border-radius: 2px; }
-.arena-stats-teams [data-side="local"]::before { background: var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ring); }
-.arena-stats-teams [data-side="visita"] { flex-direction: row-reverse; text-align: right; }
-.arena-stats-teams [data-side="visita"]::before { background: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-stats-teams [data-side="visita"] { justify-content: flex-end; text-align: right; }
 .arena-stats-teams [data-favorite] { text-decoration: underline 2px var(--ar-score-bg); text-underline-offset: 4px; }
 .arena-stats .arena-empty { border-color: var(--ar-bug-2); background: var(--ar-bug-2); color: var(--ar-bug-ink); }
 .arena-stat-row { display: grid; grid-template-columns: minmax(4.5em, auto) minmax(0, 1fr) minmax(4.5em, auto); grid-template-areas: "local etiqueta visita" "barras barras barras"; align-items: center; column-gap: var(--ar-s2); padding: var(--ar-s2) 0; border-top: 1px solid var(--ar-bug-2); }
@@ -3011,7 +3035,8 @@ button.stats-row:hover {
 /* Líder: pastilla con el color de SU equipo (también en las filas donde gana el menor). */
 .arena-stat-value[data-lead] { border-radius: var(--ar-r-pill); font-weight: 800; }
 .arena-stat-value[data-lead][data-side="local"] { background: var(--ar-home-ui); color: var(--ar-bug); }
-.arena-stat-value[data-lead][data-side="visita"] { background: var(--ar-away-ui); color: var(--ar-away-ink); }
+/* Brief 055 (v1.1 § 1): las dos pastillas con --ar-bug (oscuro) sobre el --ar-*-ui-bug del equipo. */
+.arena-stat-value[data-lead][data-side="visita"] { background: var(--ar-away-ui); color: var(--ar-bug); }
 .arena-stat-bars { grid-area: barras; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ar-s1); margin-top: var(--ar-s1); }
 .arena-stat-track { display: flex; height: 6px; overflow: hidden; border-radius: 3px; background: var(--ar-bug-2); }
 .arena-stat-track[data-side="local"] { justify-content: flex-end; }
@@ -3055,11 +3080,9 @@ button.stats-row:hover {
 .arena-shell .arena-fav-toggle:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 1px; }
 .arena-fav-star { display: block; width: 16px; height: 16px; background: currentColor; opacity: .5; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
 .arena-fav-toggle[aria-pressed="true"] .arena-fav-star { opacity: 1; background: var(--ar-score-bg); }
-.arena-player-card .arena-fav-toggle[aria-pressed="true"] .arena-fav-star { background: var(--ar-live); }
+.arena-player-card .arena-fav-toggle[aria-pressed="true"] .arena-fav-star { background: var(--ar-score-bg); }
 .arena-score > span[data-favorite] { color: var(--ar-score-bg); }
-/* Ficha favorita en la cancha: anillo --ar-live del mismo grosor que la selección, sin transform. */
-.arena-player[data-favorite] > .arena-token > circle { stroke: var(--ar-live); stroke-width: 0.7; }
-.arena-player-selected[data-favorite] > .arena-token > circle { stroke: var(--ar-select); }
+/* Ficha favorita en la cancha: brief 055 (v1.1 § 3), anillo punteado propio (.arena-fav-ring, arriba). */
 @media (max-width: 520px) {
   .arena-stats { padding: var(--ar-s2) var(--ar-s3); }
   .arena-stat-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "etiqueta etiqueta" "local visita" "barras barras"; row-gap: 2px; }
@@ -3070,7 +3093,7 @@ button.stats-row:hover {
 /* Brief 050 · Celebración del gol (P1, estática): realce del marcador y rótulo sobre la cancha, solo
    con tokens existentes (--ar-score-bg y --ar-score-ink: 16,2; --ar-home y --ar-away con sus anillos). El texto de
    `strong` no cambia; nada de transform/transition/animation en fichas, balón ni árbitro (047). */
-.arena-score[data-gol="local"] > span:first-child::before, .arena-score[data-gol="visita"] > span:last-child::after { flex-basis: 10px; width: 10px; box-shadow: 0 0 0 2px var(--ar-score-bg); }
+.arena-score[data-gol="local"] > span:first-child .arena-crest, .arena-score[data-gol="visita"] > span:last-child .arena-crest { outline: 2px solid var(--ar-score-bg); outline-offset: 1px; border-radius: 4px; }
 .arena-score[data-gol] strong { box-shadow: 0 0 0 3px var(--ar-score-bg); }
 .arena-pitch-wrap { position: relative; }
 .arena-goal-banner { position: absolute; top: var(--ar-s3); left: 50%; z-index: 1; translate: -50% 0; box-sizing: border-box; width: max-content; max-width: calc(100% - 2 * var(--ar-s3)); margin: 0; padding: var(--ar-s1) var(--ar-s3); border-left: 6px solid var(--ar-home); border-radius: var(--ar-r-sm); background: var(--ar-score-bg); color: var(--ar-score-ink); box-shadow: 0 0 0 1px var(--ar-home-ui); font: 700 15px/1.25 var(--font-display), sans-serif; text-align: center; overflow-wrap: anywhere; pointer-events: none; }
@@ -3091,4 +3114,79 @@ button.stats-row:hover {
   .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card, .arena-stat-bar { transition: none; }
   /* Brief 050: rótulo, realce y anillo aparecen estáticos y desaparecen con el cursor. */
   .arena-goal-banner, .arena-score[data-gol] strong, .arena-player[data-gol] > .arena-token > circle.arena-goal-ring { animation: none; }
+}
+
+/* ==========================================================================
+   Brief 055 § 4.2 · Partido primero: cabecera compacta, sala de control dentro del acompañante y
+   tablero (marcador + cancha) como primera imagen. Solo CSS: el DOM se movió sin cambiar funciones.
+   ========================================================================== */
+.arena-intro-cta { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--ar-s4); border: 1px solid var(--ar-bug-2); border-radius: var(--ar-r); color: var(--ar-bug-ink); font: 700 14px/1.2 var(--font-display), sans-serif; text-decoration: none; white-space: nowrap; }
+.arena-intro-cta:hover { border-color: var(--ar-bug-muted); }
+.arena-intro-cta:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 2px; }
+@media (min-width: 1100px) {
+  .arena-intro { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; align-items: center; column-gap: var(--ar-s5); padding: var(--ar-s3) var(--ar-s5); }
+  .arena-intro .overline { grid-column: 1; grid-row: 1; justify-self: start; }
+  .arena-intro h1 { grid-column: 1; grid-row: 2; margin: var(--ar-s1) 0 0; font: 900 clamp(22px, 2.2vw, 30px)/1.1 var(--font-display), sans-serif; }
+  .arena-intro p:not(.overline) { grid-column: 2; grid-row: 1 / span 2; max-width: 52ch; font-size: 14px; }
+  .arena-intro-cta { grid-column: 3; grid-row: 1 / span 2; }
+  .arena-intro::after { top: -40px; right: -24px; width: 180px; height: 160px; }
+}
+@media (max-width: 1099px) {
+  .arena-intro h1 { font-size: clamp(26px, 6vw, 32px); }
+  .arena-intro-cta { display: flex; width: 100%; margin-top: var(--ar-s3); }
+}
+/* Sala de control: primer hijo del acompañante (sticky con scroll interno en escritorio). */
+#arena-control { scroll-margin-top: 96px; }
+#arena-control:focus { outline: none; }
+#arena-control:focus-visible { outline: 2px solid var(--ar-select); outline-offset: -2px; }
+.arena-companion > .arena-control-room { padding: var(--ar-s4); border-bottom: 1px solid var(--line); }
+.arena-control-room .arena-source-tabs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.arena-control-room .arena-source-tabs::before { grid-column: 1 / -1; }
+.arena-control-room .arena-source-tabs .btn { min-width: 0; white-space: normal; }
+.arena-control-room .arena-source-tabs a { grid-row: 2; grid-column: 1 / -1; justify-self: start; margin: var(--ar-s2) 0 0; text-align: left; }
+.arena-control-room .arena-setup { margin: var(--ar-s2) 0 0; }
+.arena-control-room .arena-settings label { flex: 1 1 100%; }
+.arena-control-room .arena-settings input, .arena-control-room .arena-settings select { width: 100%; min-width: 0; }
+.arena-control-room .arena-settings > button { width: 100%; }
+.arena-control-room .arena-tools { flex-direction: column; align-items: stretch; }
+.arena-control-room .arena-tools[hidden] { display: none; }
+.arena-control-room .arena-live { display: block; padding: var(--ar-s3); margin: var(--ar-s3) 0 0; }
+.arena-control-room .arena-live > :not(:first-child) { margin-top: var(--ar-s2); }
+.arena-control-room .arena-live .arena-live-controls { flex-direction: column; align-items: stretch; }
+.arena-control-room .arena-live .arena-live-controls label { display: grid; flex: 0 0 auto; white-space: normal; }
+.arena-control-room .arena-live-controls .btn-primary { width: 100%; }
+/* Aviso de vista previa: una sola línea de 36 px sobre el marcador (en móvil puede partirse). */
+.arena-board > .arena-empty:first-child { min-height: 36px; box-sizing: border-box; padding-block: var(--ar-s1); line-height: 1.3; }
+@media (min-width: 851px) { .arena-board > .arena-empty:first-child { height: 36px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
+/* Brief 055 · A ≤ 520 px el escudo (22 px) y la estrella (44 px) dejaban el nombre en ~40 px y lo partían
+   letra a letra. Rejilla de dos columnas: escudo y estrella apilados junto al nombre (que conserva su texto). */
+@media (max-width: 520px) {
+  .arena-score > span { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: var(--ar-s1); row-gap: 0; align-items: center; justify-items: start; }
+  .arena-score > span > .arena-crest { grid-column: 1; grid-row: 1; }
+  .arena-score > span > .arena-fav-toggle { grid-column: 1; grid-row: 2; justify-self: center; }
+  .arena-score > span:last-child { grid-template-columns: minmax(0, 1fr) auto; justify-items: end; }
+  .arena-score > span:last-child > .arena-crest, .arena-score > span:last-child > .arena-fav-toggle { grid-column: 2; }
+}
+
+/* ==========================================================================
+   Brief 055 § 6 (v1.1 § 7) · Iconos de eventos: celda fija de 18 px (vacía si el evento no lleva
+   icono), aria-hidden, sin animaciones. Las tarjetas fijan su fill como atributo: sobre el rótulo
+   de cifras una regla CSS lo sustituye por los tokens --ar-card-*-bug.
+   ========================================================================== */
+.arena-event-icon { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; color: var(--muted); flex: 0 0 auto; }
+.arena-event-icon[data-kind="gol"] { color: var(--accent); }
+.arena-event-icon[data-kind="roja"] { color: var(--danger); }
+.arena-live-feed .arena-event-icon { align-self: flex-start; margin-top: 1px; }
+.arena-stat-label .arena-event-icon { color: var(--ar-bug-muted); margin-inline-end: var(--ar-s1); vertical-align: -4px; }
+.arena-stat-label .arena-event-icon[data-kind="gol"] { color: var(--ar-score-bg); }
+.arena-stat-label [data-kind="amarilla"] rect { fill: var(--ar-card-yellow-bug); stroke: var(--ar-card-yellow-bug); }
+.arena-stat-label [data-kind="roja"] rect { fill: var(--ar-card-red-bug); stroke: var(--ar-card-red-bug); }
+/* Descripción completa: cuatro celdas con áreas explícitas (tiempo, icono, texto, id). */
+.arena-events li { grid-template-columns: auto 18px minmax(0, 1fr) auto; grid-template-areas: "tiempo icono texto id"; }
+.arena-events li > .arena-event-time { grid-area: tiempo; }
+.arena-events li > .arena-event-icon { grid-area: icono; align-self: center; }
+.arena-events li > .arena-event-text { grid-area: texto; }
+.arena-events li > .arena-event-id { grid-area: id; }
+@media (max-width: 520px) {
+  .arena-events li { grid-template-columns: auto 18px minmax(0, 1fr); grid-template-areas: "tiempo icono texto" "id id id"; }
 }

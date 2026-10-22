@@ -2,7 +2,7 @@
 import type { TipoEvento } from "../sim/tipos";
 
 type P = { size?: number };
-const base = (size: number) => ({
+export const base = (size: number) => ({
   width: size,
   height: size,
   viewBox: "0 0 24 24",

@@ -3,6 +3,7 @@ import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz, type 
 import { RELATO_INTERVALOS } from "./protocolo";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
 import type { Lado } from "../sim/tipos";
+import { prngDerivado } from "../sim/prng";
 import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 import type { IntervencionArena, VarianteIntercambio } from "./protocolo";
 import { varianteEfectiva } from "./turnos";
@@ -66,15 +67,93 @@ export function marcadorHablado(m: Marcador, idioma: "es" | "en"): string {
   return rellenar(CANTO_GOL.plantillas.marcador[idioma], { local: n(m.local), visita: n(m.visita) });
 }
 
+/** Brief 054 · Condiciones de los gritos condicionados (solo desde el registro). */
+export type CondicionGrito = "remate" | "golazo" | "tardio" | "empate" | "otro";
+/** Brief 054 · Entrada del catálogo `CANTO_GOL.gritos` (ES/EN paralelos). */
+export interface GritoCanto { clave: string; condicion?: CondicionGrito; prioridad?: number; es: { texto: string; rate: number }; en: { texto: string; rate: number } }
+/** El catálogo leído en tiempo de ejecución, con el tipo común de sus entradas. */
+export const catalogoGritos = (): readonly GritoCanto[] => CANTO_GOL.gritos;
+
+/** Índice del gol en `registro.eventos` (por identidad; si es una copia, por id). */
+function indiceEvento(registro: RegistroArena, evento: EventoArena): number {
+  const i = registro.eventos.indexOf(evento);
+  return i >= 0 ? i : registro.eventos.findIndex(e => e.id === evento.id);
+}
+
+/** Brief 054 v1.1 · «Remate y gol», por POSICIÓN en `registro.eventos`: el evento anterior más cercano
+ * del goleador es un `tiro` con tick ≤ el del gol y el mismo `desde`, y entre los índices del tiro y del
+ * gol no hay ningún evento de `CANTO_GOL.gritoRemate.tiposQueRompen`. Lo posterior al gol no cuenta. */
+export function golDeRemate(gol: EventoArena, registro: RegistroArena): boolean {
+  if (gol.tipo !== "gol") return false;
+  const rompen: readonly string[] = CANTO_GOL.gritoRemate.tiposQueRompen;
+  for (let k = indiceEvento(registro, gol) - 1; k >= 0; k--) {
+    const e = registro.eventos[k]!;
+    if (e.jugador === gol.jugador) return e.tipo === "tiro" && e.tick <= gol.tick && e.desde.x === gol.desde.x && e.desde.y === gol.desde.y;
+    if (rompen.includes(e.tipo)) return false;
+  }
+  return false;
+}
+
+/** Brief 054 · «Golazo» por definición: remate cuya distancia en profundidad del origen a la línea de
+ * meta (|hasta.x − desde.x|) es ≥ CANTO_GOL.golazoDesdeM. No mide belleza, ángulo ni dificultad. */
+export function golazo(gol: EventoArena, registro: RegistroArena): boolean {
+  return golDeRemate(gol, registro) && Math.abs(gol.hasta.x - gol.desde.x) >= CANTO_GOL.golazoDesdeM;
+}
+
+/** Brief 054 · Las cinco condiciones de un gol, con `a` = marcador tras el gol. */
+export function condicionesGrito(gol: EventoArena, registro: RegistroArena): Record<CondicionGrito, boolean> {
+  const a = marcadorTrasGol(registro, gol.tick), situacion = situacionGol(gol.lado, a);
+  return {
+    remate: golDeRemate(gol, registro),
+    golazo: golazo(gol, registro),
+    tardio: golTardio(gol.tick, registro.config.duracionS, a),
+    empate: situacion === "empate",
+    otro: situacion === "ampliacion" || situacion === "goleada",
+  };
+}
+
+/** Brief 054 · Orden del partido de los gritos sin prioridad: por `prngDerivado(seed, semillaGritos:clave)`. */
+export function ordenGritos(seed: number): string[] {
+  return catalogoGritos().map((g, i) => ({ g, i })).filter(x => x.g.prioridad === undefined)
+    .map(x => ({ ...x, r: prngDerivado(seed, `${CANTO_GOL.semillaGritos}:${x.g.clave}`).next() }))
+    .sort((a, b) => a.r - b.r || a.i - b.i).map(x => x.g.clave);
+}
+
+/** Brief 054 · Grito de cada gol no autogol del registro, en orden (tick, posición): sin repetir hasta
+ * agotar los elegibles; un condicionado con prioridad disponible gana (menor número); si no, el primero
+ * disponible en el orden del partido. Solo depende del registro: los tres modos, la transcripción y dos
+ * espectadores oyen la misma secuencia. Un gol posterior nunca cambia el grito de uno anterior. La
+ * selección no depende del idioma (las claves son comunes). */
+export function gritosPartido(registro: RegistroArena, _idioma: "es" | "en"): Map<string, string> {
+  const catalogo = catalogoGritos(), orden = ordenGritos(registro.config.partido.seed);
+  const goles = registro.eventos.map((e, i) => ({ e, i })).filter(x => x.e.tipo === "gol" && !x.e.autogol).sort((a, b) => a.e.tick - b.e.tick || a.i - b.i);
+  const usados = new Set<string>(), mapa = new Map<string, string>();
+  for (const { e } of goles) {
+    const condiciones = condicionesGrito(e, registro);
+    const elegibles = catalogo.filter(g => !g.condicion || condiciones[g.condicion]);
+    let disponibles = elegibles.filter(g => !usados.has(g.clave));
+    if (!disponibles.length) { usados.clear(); disponibles = elegibles; }
+    const prioritario = disponibles.filter(g => g.prioridad !== undefined).sort((a, b) => a.prioridad! - b.prioridad!)[0];
+    const elegido = prioritario ?? orden.map(c => disponibles.find(g => g.clave === c)).find(g => g !== undefined)!;
+    usados.add(elegido.clave); mapa.set(e.id, elegido.clave);
+  }
+  return mapa;
+}
+
 /** Brief 050 v1.1 · Canto de un gol: tramos grito + goleador (o autogol, sin grito) + hechos, con
  * `texto` = tramos unidos por un espacio. `goleador` sale de `evento.jugador`; `equipo`, de
  * `config.partido[evento.lado]` (en un autogol, el equipo beneficiado). Un desvío canta normal.
- * Devuelve null si el goleador no está en la plantilla (inicial ∪ banco). */
+ * Brief 054: el grito sale de `gritosPartido(registro, idioma)` (las cuatro variantes lo comparten) y
+ * el tramo lleva su clave. Devuelve null si el goleador no está en la plantilla (inicial ∪ banco) o si
+ * el gol no está en `registro.eventos` (sin grito asignado). */
 export function cantoGol(evento: EventoArena, registro: RegistroArena, idioma: "es" | "en", variante: number): { texto: string; tramos: TramoCanto[] } | null {
   if (evento.tipo !== "gol") return null;
   const p = CANTO_GOL.plantillas;
   const goleador = [...registro.inicial.jugadores, ...registro.inicial.banco ?? []].find(j => j.id === evento.jugador)?.nombre;
   if (!goleador) return null;
+  const clave = evento.autogol ? undefined : gritosPartido(registro, idioma).get(evento.id);
+  const grito = clave === undefined ? undefined : catalogoGritos().find(g => g.clave === clave);
+  if (!evento.autogol && !grito) return null;
   const equipo = registro.config.partido[evento.lado].nombre, a = marcadorTrasGol(registro, evento.tick);
   const tardio = golTardio(evento.tick, registro.config.duracionS, a);
   const plantillaSituacion: string = p.situacion[idioma][situacionGol(evento.lado, a)];
@@ -83,7 +162,7 @@ export function cantoGol(evento: EventoArena, registro: RegistroArena, idioma: "
   const hechos = rellenar(p.hechos[idioma], { situacion: (tardio ? p.tardio[idioma] : "") + situacion, marcador: marcadorHablado(a, idioma), segundos: Math.floor(evento.tick * ARENA.pasoS + 1e-9) });
   const tramos: TramoCanto[] = evento.autogol
     ? [{ texto: rellenar(p.autogol[idioma], { goleador }), tipo: "autogol" }, { texto: hechos, tipo: "hechos" }]
-    : [{ texto: p.grito[idioma], tipo: "grito" }, { texto: rellenar(p.goleador[idioma][variante % p.goleador[idioma].length]!, { goleador }), tipo: "goleador" }, { texto: hechos, tipo: "hechos" }];
+    : [{ texto: grito![idioma].texto, tipo: "grito", grito: grito!.clave }, { texto: rellenar(p.goleador[idioma][variante % p.goleador[idioma].length]!, { goleador }), tipo: "goleador" }, { texto: hechos, tipo: "hechos" }];
   return { texto: tramos.map(t => t.texto).join(" "), tramos };
 }
 

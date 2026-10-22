@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { estructura } from "../arena/catalogo";
 import { formaciones, type FormacionArena, type RegistroArena } from "../arena/tipos";
 import { estadoVisual, golEnCelebracion, narrarEventoArena } from "../arena/vista";
 import { etiquetasPerfil } from "../arena/personalidades";
-import { ARENA, CLIMAS_PARTIDO, TEMPERATURA_C } from "../sim/limites";
+import { ARENA, CLIMAS_PARTIDO, IDENTIDAD_ARENA, TEMPERATURA_C } from "../sim/limites";
+import { identidadPartido } from "../arena/identidad";
+import { Escudo } from "./Escudo";
+import { EmblemaCronista } from "./Emblema";
+import { IconoEventoArena } from "./IconosArena";
 import { entornoDeFormulario } from "../arena/entorno-formulario";
 import type { Condiciones } from "../sim/tipos";
 import { IndicadorCarga, useAvisoCarga } from "./Actividad";
@@ -190,6 +194,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const decisiones = ronda ? Object.values(ronda.decisiones) : [];
   const tieneLlm = decisiones.some(d => d.tipo === "llm");
   const nombres = registro.config.partido;
+  // Brief 055 (v1.1 § 12) · Identidad de los dos clubes, una vez por par de nombres; los hijos la reciben.
+  const identidad = useMemo(() => identidadPartido(nombres.local.nombre, nombres.visita.nombre), [nombres.local.nombre, nombres.visita.nombre]);
   const plantillaCompleta = [...estado.jugadores, ...estado.banco ?? [], ...estado.retirados ?? [], ...estado.expulsados ?? []];
   const jugadorActivo = plantillaCompleta.find(j => j.id === seleccionado) ?? estado.jugadores.find(j => j.lado === "local" && j.capitan) ?? estado.jugadores[0]!;
   const saltar = (s: number) => { if (enDirecto || bufferActivo) return; setReproduciendo(false); setTiempo(s); cursor.current = s; };
@@ -202,58 +208,23 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const estrellaClub = (lado: "local" | "visita") => <EstrellaFavorito activo={presentes.lado === lado} nombre={nombres[lado].nombre} tipo="club" idioma={idioma} testId="arena-favorite-club" lado={lado} alternar={() => cambiarFavoritos(alternarClub(favoritos.valor, nombres[lado].nombre))} />;
   return <>
     <header className="topbar arena-topbar">
-      <Link href="/" className="brand" prefetch={false}><span className="brand-mark">CRONISTA</span><span className="brand-tag">{t("Team agents lab", "Laboratorio de equipos")}</span></Link>
+      <Link href="/" className="brand" prefetch={false}><EmblemaCronista /><span className="brand-mark">CRONISTA</span><span className="brand-tag">{t("Team agents lab", "Laboratorio de equipos")}</span></Link>
       <nav className="topbar-links" aria-label={t("Sections", "Secciones")}><Link href="/" prefetch={false}>{t("Match reports", "Crónicas")}</Link><button className="btn" onClick={() => setIdioma(es ? "en" : "es")} aria-label={t("Switch to Spanish", "Cambiar a inglés")}>{es ? "EN" : "ES"}</button></nav>
     </header>
-    <main className="arena-shell" lang={idioma} data-testid="arena">
+    <main className="arena-shell" lang={idioma} data-testid="arena" style={identidad.variables as CSSProperties}>
       <div className="arena-intro"><p className="overline">{t("Experimental · simulated football", "Experimental · fútbol simulado")}</p>
         <h1>{t("Two teams. One shared pitch.", "Dos equipos. Una misma cancha.")}</h1>
         <p>{t("Each controller tries to win: create goals, defend its own goal and adapt to the opponent. One shared engine resolves movement, the ball and the outcome.", "Cada controlador intenta ganar: crear goles, defender su portería y adaptarse al rival. Un motor compartido resuelve movimientos, balón y resultados.")}</p>
+        <a className="arena-intro-cta" href="#arena-control">{t("Set up or choose a match", "Configurar o elegir un partido")}</a>
       </div>
-      <div className="arena-source-tabs" role="group" aria-label={t("Choose a match", "Elegir partido")}>
-        <button className="btn" aria-pressed={vista === "live"} disabled={bloqueado} onClick={() => { setVista("live"); setConfigurando(true); }}>{t("Live", "En vivo")}</button>
-        <button className="btn" aria-pressed={vista === "guardados"} disabled={bloqueado} onClick={() => { setVista("guardados"); setConfigurando(true); }}>{t("Saved matches", "Partidos guardados")}</button>
-        <a href="#arena-watch">{t("Go to the pitch and narration", "Ir a la cancha y narración")}</a>
-      </div>
-      <details className="arena-setup" open={configurando} onToggle={e => setConfigurando(e.currentTarget.open)}>
-        <summary>{vista === "live" ? t("Set up your live match", "Configura tu partido en vivo") : t("Choose a saved match or create a recording", "Elige un partido guardado o crea una grabación")}</summary>
-        <p className="arena-muted">{t("Choose the starting shape for each team. By default, each coach selects and adapts its formation during play. Every new match generates different teams and conditions.", "Elige la formación inicial de cada equipo. Por defecto, cada entrenador la elige y adapta durante el juego. Cada nuevo partido genera equipos y condiciones diferentes.")}</p>
-      <form className="arena-settings" onSubmit={simular} aria-busy={pendiente}>
-        <label>{t("Home formation", "Formación local")}<select className="field" value={local} disabled={bloqueado} onChange={e => setLocal(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
-        <label>{t("Away formation", "Formación visitante")}<select className="field" value={visita} disabled={bloqueado} onChange={e => setVisita(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
-        <label>{t("Simulated duration", "Duración simulada")}<select className="field" value={segundos} disabled={bloqueado} onChange={e => setSegundos(Number(e.target.value))}><option value="30">30 s</option><option value="60">60 s</option><option value="180">180 s</option></select></label>
-        {vista === "guardados" && <button className="btn" disabled={bloqueado}>{t("Create recording without AI", "Crear grabación sin IA")}</button>}
-        <details className="arena-settings-more"><summary>{t("Choose weather, pitch and crowd pressure", "Elegir clima, cancha y presión del público")}</summary><div className="arena-environment-settings">
-          <label>{t("Weather", "Clima")}<select className="field" value={clima} disabled={bloqueado} onChange={e => { const c = e.target.value as typeof clima; setClima(c); if (c === "calor" || c === "frio") setTemperatura(String(ARENA.temperaturaDefectoC[c])); }}><option value="auto">{t("Generated", "Generado")}</option>{CLIMAS_PARTIDO.map(c => <option key={c} value={c}>{({ despejado: t("Clear", "Despejado"), calor: t("Heat", "Calor"), lluvia: t("Rain", "Lluvia"), frio: t("Cold", "Frío"), niebla: t("Fog", "Niebla") })[c]}</option>)}</select></label>
-          {(clima === "calor" || clima === "frio") && <label>{t("Temperature °C", "Temperatura °C")}<input className="field" type="number" required min={TEMPERATURA_C[clima].min} max={TEMPERATURA_C[clima].max} value={temperatura} disabled={bloqueado} onChange={e => setTemperatura(e.target.value)} /></label>}
-          <label>{t("Surface", "Superficie")}<select className="field" value={superficie} disabled={bloqueado} onChange={e => setSuperficie(e.target.value as typeof superficie)}><option value="auto">{t("Home ground", "Cancha del local")}</option><option value="natural">{t("Natural", "Natural")}</option><option value="sintetica">{t("Artificial", "Sintética")}</option></select></label>
-          {superficie === "natural" && <label>{t("Grass", "Césped")}<select className="field" value={cesped} disabled={bloqueado} onChange={e => setCesped(e.target.value as typeof cesped)}><option value="corto">{t("Short", "Corto")}</option><option value="alto">{t("Long", "Alto")}</option></select></label>}
-          <label>{t("Crowd pressure: home / away", "Presión del público: local / visita")}<select className="field" value={presion} disabled={bloqueado} onChange={e => setPresion(e.target.value as typeof presion)}><option value="auto">{t("Generated", "Generada")}</option><option value="baja">{t("Low / medium", "Baja / media")}</option><option value="media">{t("Medium / high", "Media / alta")}</option></select></label>
-        </div></details>
-        <details className="arena-settings-more"><summary>{t("Reproduce a specific match (advanced)", "Repetir un partido específico (avanzado)")}</summary>
-          <label>{t("Match seed (optional)", "Semilla del partido (opcional)")}<input className="field" value={seed} onChange={e => setSeed(e.target.value)} inputMode="numeric" pattern="[0-9]*" disabled={bloqueado} placeholder={t("Random", "Aleatoria")} aria-describedby="arena-seed-help" /></label>
-          <p id="arena-seed-help" className="arena-muted">{t("A seed is a number used to generate teams, coaches and starting conditions. Leave it blank for a new draw. Reusing it with the same settings repeats the initial setup; AI decisions can vary. Example: 42.", "La semilla es un número que genera equipos, entrenadores y condiciones iniciales. Déjala vacía para un nuevo sorteo. Reutilizarla con los mismos ajustes repite la configuración inicial; las decisiones de IA pueden variar. Ejemplo: 42.")}</p>
-          {seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295) && <p role="alert">{t("Enter a whole number between 0 and 4294967295, or leave it blank.", "Escribe un entero entre 0 y 4294967295 o déjala vacía.")}</p>}
-        </details>
-      </form>
-      <div className="arena-tools" hidden={vista !== "guardados"}>
-        <button className="btn btn-primary" onClick={() => void ejecutar("duelo")} disabled={bloqueado}>{t("Load recorded model duel", "Cargar duelo de modelos grabado")}</button>
-        <button className="btn btn-primary" onClick={() => void ejecutar("ejemplo-v3")} disabled={bloqueado}>{t("Load AI coaches example", "Cargar ejemplo de entrenadores IA")}</button>
-        <button className="btn" onClick={() => void ejecutar("ejemplo")} disabled={bloqueado}>{t("Load recorded AI run", "Cargar ejemplo de IA grabado")}</button>
-        <label className="btn arena-file">{t("Open saved run", "Abrir registro guardado")}<input type="file" accept="application/json,.json" disabled={bloqueado} aria-label={t("Open saved run", "Abrir registro guardado")} onChange={e => { void cargar(e.target.files?.[0]); e.target.value = ""; }} /></label>
-        <button className="btn" onClick={descargar} disabled={bloqueado || (registro.final.tick * ARENA.pasoS < registro.config.duracionS && !registro.final.finalizado)}>{t("Download run", "Descargar registro")}</button>
-        <span className="arena-muted">{t("Programmed and recorded runs make no AI calls. Live model runs use the chosen controllers.", "Las ejecuciones programadas y grabadas no llaman a IA. Los partidos en vivo con modelos usan los controladores elegidos.")}</span>
-      </div>
-      </details>
-      <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} />
       {pendiente && <div className="arena-notice" role="status"><IndicadorCarga />{t("Resolving orders and validating the sequence…", "Resolviendo órdenes y validando la secuencia…")}<button className="btn" onClick={cancelar}>{t("Cancel", "Cancelar")}</button></div>}
       {error && <div className="arena-notice" role="alert">{error}{ultimaPeticion.current !== null && <button className="btn" onClick={() => void ejecutar(ultimaPeticion.current)} disabled={bloqueado}>{t("Retry", "Reintentar")}</button>}</div>}
       <div className="arena-grid" id="arena-watch">
         <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
           {registro === inicial && !sesionActual && !enDirecto && <p className="arena-muted arena-empty">{t("Saved preview. Start a live match above or choose a recording.", "Vista previa guardada. Inicia un partido en vivo arriba o elige una grabación.")}</p>}
-          <ArenaMarcador registro={registro} estado={estado} gol={gol} favorito={presentes.lado} estrella={estrellaClub} />
+          <ArenaMarcador registro={registro} estado={estado} gol={gol} favorito={presentes.lado} estrella={estrellaClub} identidad={identidad} />
           <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock">{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
-          <div className="arena-pitch-wrap"><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
+          <div className="arena-pitch-wrap"><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} identidad={identidad} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
             <rect className="arena-runoff" x="-5" y="-5" width="115" height="78" rx="1.5" aria-hidden="true" />
             <rect className="arena-grass" x="0" y="0" width="105" height="68" />
             <g className="arena-stripes" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map(i => <rect key={i} className="arena-stripe" y="0" width="8.75" height="68" x={i * 17.5 + 8.75} />)}</g>
@@ -262,7 +233,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
               <path d="M16.5 26.69 A9.15 9.15 0 0 1 16.5 41.31" /><path d="M88.5 26.69 A9.15 9.15 0 0 0 88.5 41.31" />
               <path d="M1 0 A1 1 0 0 1 0 1 M105 1 A1 1 0 0 1 104 0 M104 68 A1 1 0 0 1 105 67 M0 67 A1 1 0 0 1 1 68" /></g>
             {estado.jugadores.map(j => <g key={j.id} data-testid="arena-player" data-player={j.id} data-captain={j.capitan || undefined} data-favorite={presentes.jugador === j.id || undefined} data-gol={gol?.jugador === j.id || undefined} transform={`translate(${j.posicion.x} ${j.posicion.y})`} className={`arena-player arena-${j.lado}${jugadorActivo.id === j.id ? " arena-player-selected" : ""}`} role="button" tabIndex={0} aria-pressed={jugadorActivo.id === j.id} aria-label={`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? ` · ${t("Captain", "Capitán")}` : ""}${j.personalidad ? ` · ${etiquetasPerfil[j.personalidad.perfil][idioma]}` : ""}`} onClick={() => setSeleccionado(j.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSeleccionado(j.id); } }}>
-              <title>{`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? " · C" : ""}`}</title><g className="arena-token"><circle r="1.9" /><text textAnchor="middle" dominantBaseline="central">{j.dorsal}</text>
+              <title>{`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? " · C" : ""}`}</title><g className="arena-token"><circle className="arena-kit" r="1.9" /><text textAnchor="middle" dominantBaseline="central">{j.dorsal}</text>
+              {/* Brief 055 (v1.1 §§ 2–3): anillos propios tras el dorsal; sólido = selección, punteado = favorito. */}
+              {jugadorActivo.id === j.id && <circle className="arena-select-ring" r="2.6" aria-hidden="true" />}
+              {presentes.jugador === j.id && <circle className="arena-fav-ring" r="3.05" aria-hidden="true" />}
               {j.capitan && <g className="arena-captain-mark" aria-hidden="true"><rect x="1.4" y="-3.3" width="2.5" height="2.5" rx="0.4" /><text x="2.65" y="-2" textAnchor="middle" dominantBaseline="central">C</text></g>}
               {!!j.amarillas && <rect className="arena-yellow-card" x="-3.5" y="-3" width="1.3" height="2" aria-hidden="true" />}
               {/* Brief 050 (P2): anillo del goleador, último hijo de la ficha y solo durante la celebración. */}
@@ -274,9 +248,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             </g>}
             <circle className="arena-ball" cx={estado.balon.posicion.x} cy={estado.balon.posicion.y} r="0.95" data-testid="arena-ball" />
           </svg></div>
-          <div className="arena-direction"><span>● {t("Home →", "Local →")}</span><span>{t("← Away", "← Visitante")} ○</span></div>
+          <div className="arena-direction"><span>● {t("Home →", "Local →")}</span><span>{t("← Away", "← Visitante")} ○</span>{identidad.kits.visitaAlternativa && <span className="arena-kit-note">{t(`${nombres.visita.nombre} wears its change kit`, `${nombres.visita.nombre} viste su segunda equipación`)}</span>}</div>
           {enDirecto && <p className="arena-muted" data-testid="arena-pitch-live-status">{bufferActivo ? t("The match is generating ahead of the broadcast.", "El partido se genera por delante de la emisión.") : preparandoPartido ? t("Preparing the complete match…", "Preparando el partido completo…") : estadoDirecto === "esperando" ? t("Coaches are deciding · simulation clock paused", "Los entrenadores están decidiendo · reloj simulado detenido") : estadoDirecto === "jugando" ? t("Live play · confirmed engine state", "Juego en vivo · estado confirmado por el motor") : t("Play finished · completing commentary", "Juego terminado · completando comentario")}</p>}
-          {estado.saque && estado.pausa && estado.tick < estado.saque.hastaTick && <p role="status" data-testid="arena-restart">{({ centro: t("Kick-off", "Saque de centro"), banda: t("Throw-in", "Saque de banda"), esquina: t("Corner kick", "Saque de esquina"), meta: t("Goal kick", "Saque de meta") })[estado.saque.tipo]} · {registro.config.partido[estado.saque.lado].nombre}</p>}
+          {estado.saque && estado.pausa && estado.tick < estado.saque.hastaTick && <p role="status" data-testid="arena-restart">{({ centro: t("Kick-off", "Saque de centro"), banda: t("Throw-in", "Saque de banda"), esquina: t("Corner kick", "Saque de esquina"), meta: t("Goal kick", "Saque de meta") })[estado.saque.tipo]} · <Escudo identidad={identidad[estado.saque.lado]} size={IDENTIDAD_ARENA.escudoPx.reanudacion} />{registro.config.partido[estado.saque.lado].nombre}</p>}
           {estado.arbitro && <div className="arena-referee-info"><span className="arena-referee-swatch" aria-hidden="true" /><div><strong>{t("Referee", "Árbitro")}: {estado.arbitro.nombre}</strong><p>{estado.entrenadores ? t(`Contact criterion ${estado.arbitro.criterioContacto}/100. Calls synthetic contact fouls and cards; each restart appears in the description.`, `Criterio de contacto ${estado.arbitro.criterioContacto}/100. Sanciona contactos sintéticos con faltas y tarjetas; consulta cada reanudación en la descripción.`) : t("Follows play with its own movement. Visual official; fouls and cards are not simulated yet.", "Sigue la jugada con movimiento propio. Árbitro visual; todavía no se simulan faltas ni tarjetas.")}</p></div></div>}
           {!bufferActivo && <><div className="arena-playback"><button className="btn btn-primary" onClick={() => { if (tiempo >= finS) saltar(0); setReproduciendo(!reproduciendo); }} aria-pressed={reproduciendo} disabled={bloqueado || audioActivo}>{reproduciendo ? t("Pause", "Pausar") : t("Play", "Reproducir")}</button>
             <button className="btn" onClick={() => saltar(0)} disabled={enDirecto || audioActivo}>{t("Restart", "Volver al inicio")}</button>
@@ -286,9 +260,49 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <input className="arena-seek" type="range" min="0" max={finS} disabled={enDirecto || audioActivo} step="0.1" value={tiempo} onChange={e => saltar(Number(e.target.value))} aria-label={t("Match time", "Tiempo de juego")} />
           </>}
           <p className="arena-muted">{bufferActivo ? t("Live match at normal speed.", "Partido en vivo a velocidad normal.") : t("Continuous simulated movement; explicit ball cuts at simplified restarts. Playback starts paused.", "Movimiento continuo simulado; el balón se recoloca en reinicios simplificados. La reproducción empieza pausada.")}{reducido && t(" Reduced motion: discrete states.", " Movimiento reducido: estados discretos.")}</p>
-          <ArenaCifras registro={registro} tick={tickCifras} idioma={idioma} favorito={presentes.lado} />
+          <ArenaCifras registro={registro} tick={tickCifras} idioma={idioma} favorito={presentes.lado} identidad={identidad} />
         </section>
         <aside className="arena-companion" aria-label={t("Narration and commentary", "Narración y comentarios")} data-testid="arena-companion">
+          {/* Brief 055 § 4.1 · Sala de control: pestañas, configuración y panel en vivo, sin cambios internos,
+              como primer hijo del acompañante (el tablero queda primero bajo la cabecera). */}
+          <div className="arena-control-room" id="arena-control" tabIndex={-1}>
+          <div className="arena-source-tabs" role="group" aria-label={t("Choose a match", "Elegir partido")}>
+            <button className="btn" aria-pressed={vista === "live"} disabled={bloqueado} onClick={() => { setVista("live"); setConfigurando(true); }}>{t("Live", "En vivo")}</button>
+            <button className="btn" aria-pressed={vista === "guardados"} disabled={bloqueado} onClick={() => { setVista("guardados"); setConfigurando(true); }}>{t("Saved matches", "Partidos guardados")}</button>
+            <a href="#arena-watch">{t("Go to the pitch and narration", "Ir a la cancha y narración")}</a>
+          </div>
+          <details className="arena-setup" open={configurando} onToggle={e => setConfigurando(e.currentTarget.open)}>
+            <summary>{vista === "live" ? t("Set up your live match", "Configura tu partido en vivo") : t("Choose a saved match or create a recording", "Elige un partido guardado o crea una grabación")}</summary>
+            <p className="arena-muted">{t("Choose the starting shape for each team. By default, each coach selects and adapts its formation during play. Every new match generates different teams and conditions.", "Elige la formación inicial de cada equipo. Por defecto, cada entrenador la elige y adapta durante el juego. Cada nuevo partido genera equipos y condiciones diferentes.")}</p>
+          <form className="arena-settings" onSubmit={simular} aria-busy={pendiente}>
+            <label>{t("Home formation", "Formación local")}<select className="field" value={local} disabled={bloqueado} onChange={e => setLocal(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
+            <label>{t("Away formation", "Formación visitante")}<select className="field" value={visita} disabled={bloqueado} onChange={e => setVisita(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
+            <label>{t("Simulated duration", "Duración simulada")}<select className="field" value={segundos} disabled={bloqueado} onChange={e => setSegundos(Number(e.target.value))}><option value="30">30 s</option><option value="60">60 s</option><option value="180">180 s</option></select></label>
+            {vista === "guardados" && <button className="btn" disabled={bloqueado}>{t("Create recording without AI", "Crear grabación sin IA")}</button>}
+            <details className="arena-settings-more"><summary>{t("Choose weather, pitch and crowd pressure", "Elegir clima, cancha y presión del público")}</summary><div className="arena-environment-settings">
+              <label>{t("Weather", "Clima")}<select className="field" value={clima} disabled={bloqueado} onChange={e => { const c = e.target.value as typeof clima; setClima(c); if (c === "calor" || c === "frio") setTemperatura(String(ARENA.temperaturaDefectoC[c])); }}><option value="auto">{t("Generated", "Generado")}</option>{CLIMAS_PARTIDO.map(c => <option key={c} value={c}>{({ despejado: t("Clear", "Despejado"), calor: t("Heat", "Calor"), lluvia: t("Rain", "Lluvia"), frio: t("Cold", "Frío"), niebla: t("Fog", "Niebla") })[c]}</option>)}</select></label>
+              {(clima === "calor" || clima === "frio") && <label>{t("Temperature °C", "Temperatura °C")}<input className="field" type="number" required min={TEMPERATURA_C[clima].min} max={TEMPERATURA_C[clima].max} value={temperatura} disabled={bloqueado} onChange={e => setTemperatura(e.target.value)} /></label>}
+              <label>{t("Surface", "Superficie")}<select className="field" value={superficie} disabled={bloqueado} onChange={e => setSuperficie(e.target.value as typeof superficie)}><option value="auto">{t("Home ground", "Cancha del local")}</option><option value="natural">{t("Natural", "Natural")}</option><option value="sintetica">{t("Artificial", "Sintética")}</option></select></label>
+              {superficie === "natural" && <label>{t("Grass", "Césped")}<select className="field" value={cesped} disabled={bloqueado} onChange={e => setCesped(e.target.value as typeof cesped)}><option value="corto">{t("Short", "Corto")}</option><option value="alto">{t("Long", "Alto")}</option></select></label>}
+              <label>{t("Crowd pressure: home / away", "Presión del público: local / visita")}<select className="field" value={presion} disabled={bloqueado} onChange={e => setPresion(e.target.value as typeof presion)}><option value="auto">{t("Generated", "Generada")}</option><option value="baja">{t("Low / medium", "Baja / media")}</option><option value="media">{t("Medium / high", "Media / alta")}</option></select></label>
+            </div></details>
+            <details className="arena-settings-more"><summary>{t("Reproduce a specific match (advanced)", "Repetir un partido específico (avanzado)")}</summary>
+              <label>{t("Match seed (optional)", "Semilla del partido (opcional)")}<input className="field" value={seed} onChange={e => setSeed(e.target.value)} inputMode="numeric" pattern="[0-9]*" disabled={bloqueado} placeholder={t("Random", "Aleatoria")} aria-describedby="arena-seed-help" /></label>
+              <p id="arena-seed-help" className="arena-muted">{t("A seed is a number used to generate teams, coaches and starting conditions. Leave it blank for a new draw. Reusing it with the same settings repeats the initial setup; AI decisions can vary. Example: 42.", "La semilla es un número que genera equipos, entrenadores y condiciones iniciales. Déjala vacía para un nuevo sorteo. Reutilizarla con los mismos ajustes repite la configuración inicial; las decisiones de IA pueden variar. Ejemplo: 42.")}</p>
+              {seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295) && <p role="alert">{t("Enter a whole number between 0 and 4294967295, or leave it blank.", "Escribe un entero entre 0 y 4294967295 o déjala vacía.")}</p>}
+            </details>
+          </form>
+          <div className="arena-tools" hidden={vista !== "guardados"}>
+            <button className="btn btn-primary" onClick={() => void ejecutar("duelo")} disabled={bloqueado}>{t("Load recorded model duel", "Cargar duelo de modelos grabado")}</button>
+            <button className="btn btn-primary" onClick={() => void ejecutar("ejemplo-v3")} disabled={bloqueado}>{t("Load AI coaches example", "Cargar ejemplo de entrenadores IA")}</button>
+            <button className="btn" onClick={() => void ejecutar("ejemplo")} disabled={bloqueado}>{t("Load recorded AI run", "Cargar ejemplo de IA grabado")}</button>
+            <label className="btn arena-file">{t("Open saved run", "Abrir registro guardado")}<input type="file" accept="application/json,.json" disabled={bloqueado} aria-label={t("Open saved run", "Abrir registro guardado")} onChange={e => { void cargar(e.target.files?.[0]); e.target.value = ""; }} /></label>
+            <button className="btn" onClick={descargar} disabled={bloqueado || (registro.final.tick * ARENA.pasoS < registro.config.duracionS && !registro.final.finalizado)}>{t("Download run", "Descargar registro")}</button>
+            <span className="arena-muted">{t("Programmed and recorded runs make no AI calls. Live model runs use the chosen controllers.", "Las ejecuciones programadas y grabadas no llaman a IA. Los partidos en vivo con modelos usan los controladores elegidos.")}</span>
+          </div>
+          </details>
+          <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} />
+          </div>
           {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={intervenciones} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
           {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={intervenciones} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <ArenaMesa comentarios={comentarios} intervenciones={intervenciones} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
@@ -299,7 +313,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>
             <p className="arena-muted">{t("Confirmed actions, synchronized with the pitch. Text is available with audio off.", "Acciones confirmadas, sincronizadas con la cancha. Puedes leerlas con el audio apagado.")}</p>
             {presentes.jugador && <label className="arena-only-favourite"><input type="checkbox" checked={soloFavorito} onChange={e => setSoloFavorito(e.target.checked)} data-testid="arena-only-favourite" />{t("Only my player (and goals)", "Solo mi jugador (y los goles)")}</label>}
-            {!eventos.length ? <p className="arena-empty">{t("Waiting for kick-off. Start a live match or play a saved match.", "Esperando el inicio. Inicia un partido en vivo o reproduce uno guardado.")}</p> : <ol>{(soloFavorito && presentes.jugador ? eventos.filter(e => e.jugador === presentes.jugador || e.receptor === presentes.jugador || e.sale === presentes.jugador || e.tipo === "gol") : eventos).slice(-5).reverse().map(e => <li key={e.id} data-event-tick={e.tick}><time>{reloj(e.tick * ARENA.pasoS)}</time><span>{narrarEventoArena(e, registro, idioma)}</span></li>)}</ol>}
+            {!eventos.length ? <p className="arena-empty">{t("Waiting for kick-off. Start a live match or play a saved match.", "Esperando el inicio. Inicia un partido en vivo o reproduce uno guardado.")}</p> : <ol>{(soloFavorito && presentes.jugador ? eventos.filter(e => e.jugador === presentes.jugador || e.receptor === presentes.jugador || e.sale === presentes.jugador || e.tipo === "gol") : eventos).slice(-5).reverse().map(e => <li key={e.id} data-event-tick={e.tick}><time>{reloj(e.tick * ARENA.pasoS)}</time><IconoEventoArena evento={e} /><span>{narrarEventoArena(e, registro, idioma)}</span></li>)}</ol>}
           </section>
           <ArenaInteligencia key={`${cargaId}-${modoInicial}`} modoInicial={modoInicial} registro={registro} estado={estado} idioma={idioma} jugador={jugadorActivo.id} />
         </aside>
@@ -312,7 +326,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             const d = ronda.decisiones[lado];
             const propio = estado.jugadores.find(j => j.id === estado.balon.poseedor)?.lado ?? estado.balon.vuelo?.lado;
             const formacion = estado.entrenadores?.[lado].formacion ?? registro.config.formaciones[lado];
-            return <section className="arena-team-plan" key={lado}><h2>{nombres[lado].nombre}</h2>
+            return <section className="arena-team-plan" key={lado}><h2><Escudo identidad={identidad[lado]} size={IDENTIDAD_ARENA.escudoPx.plan} />{nombres[lado].nombre}</h2>
               <p className="arena-shape">{formacion} → {estructura(formacion, propio === lado, estado.jugadores.filter(j => j.lado === lado).map(j => j.puesto))}</p>
               <p className="arena-muted arena-controller">{d.tipo === "llm" ? "LLM" : t("Programmed", "Programado")} · {d.controlador}</p>
               <p>{!es && (d.tipo === "programado" || d.origen === "respaldo") ? d.ordenes.intencion.startsWith("Progresar") ? "Progress with staggered support and keep cover behind the ball." : "Send one player towards the ball, provide cover and keep the block connected." : d.ordenes.intencion}</p>
@@ -331,8 +345,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
         </aside>
       </details>
       <ArenaAsistente sesion={sesionActual} tick={estado.tick} jugador={jugadorActivo.id} idioma={idioma} comentarios={comentarios} />
-      <ArenaContexto registro={registro} estado={estado} idioma={idioma} seleccionar={setSeleccionado} saltar={saltar} />
-      <ArenaPlantilla estado={estado} registro={registro} seleccionado={seleccionado} seleccionar={setSeleccionado} idioma={idioma} tick={tickCifras}
+      <ArenaContexto registro={registro} estado={estado} idioma={idioma} seleccionar={setSeleccionado} saltar={saltar} identidad={identidad} />
+      <ArenaPlantilla estado={estado} registro={registro} seleccionado={seleccionado} seleccionar={setSeleccionado} idioma={idioma} tick={tickCifras} identidad={identidad}
         favorito={presentes.jugador !== null && presentes.jugador === jugadorActivo.id} alternarFavorito={j => cambiarFavoritos(alternarJugador(favoritos.valor, j))}
         avisos={favoritos.hidratado ? <AvisosFavoritos favoritos={favoritos.valor} presentes={presentes} error={favoritos.error} idioma={idioma} olvidar={que => cambiarFavoritos(que === "club" ? { ...favoritos.valor, club: null } : { ...favoritos.valor, jugador: null })} /> : null}
         transporte={!enDirecto && !bufferActivo && !audioActivo} saltar={saltar} />

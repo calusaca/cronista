@@ -5,8 +5,11 @@
 // sale del prefijo ≤ tick (en vivo siguiendo el cursor) y, al final, «Cifras finales».
 import { capacidades, cifrasEquipos, destacados, ETIQUETAS_CIFRAS, memoAgregado, noSimulada, pasesIntentados, type Cifra, type FilaPanel, type MemoAgregado } from "../arena/estadisticas";
 import type { RegistroArena } from "../arena/tipos";
-import { ARENA, ESTADISTICAS_ARENA } from "../sim/limites";
+import { ARENA, ESTADISTICAS_ARENA, IDENTIDAD_ARENA } from "../sim/limites";
 import type { Lado } from "../sim/tipos";
+import type { IdentidadPartido } from "../arena/identidad";
+import { Escudo } from "./Escudo";
+import { IconoClase, iconoDeCifra } from "./IconosArena";
 
 const reloj = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 const PORCENTAJE: ReadonlySet<string> = new Set(["posesion_pct", "precision_pase"]);
@@ -37,8 +40,8 @@ export function anchoBarra(fila: Pick<FilaPanel, "clave" | "local" | "visita">, 
   return Math.min(100, Math.max(ESTADISTICAS_ARENA.barraMinPct, Math.round(bruto * 10) / 10));
 }
 
-export function ArenaCifras({ registro, tick, idioma, favorito, memo = memoAgregado }: {
-  registro: RegistroArena; tick: number; idioma: "es" | "en"; favorito: Lado | null; memo?: MemoAgregado;
+export function ArenaCifras({ registro, tick, idioma, favorito, memo = memoAgregado, identidad }: {
+  registro: RegistroArena; tick: number; idioma: "es" | "en"; favorito: Lado | null; memo?: MemoAgregado; identidad?: IdentidadPartido;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const cifras = cifrasEquipos(registro, tick, memo), intentos = pasesIntentados(registro, tick, memo);
@@ -56,14 +59,14 @@ export function ArenaCifras({ registro, tick, idioma, favorito, memo = memoAgreg
       <span className="arena-stats-clock tnum">{reloj(tick * ARENA.pasoS)}</span>
     </div>
     <div className="arena-stats-teams">
-      {(["local", "visita"] as const).map(lado => <span key={lado} data-side={lado} data-favorite={favorito === lado || undefined}>{nombres[lado].nombre}</span>)}
+      {(["local", "visita"] as const).map(lado => <span key={lado} data-side={lado} data-favorite={favorito === lado || undefined}>{identidad && lado === "local" && <Escudo identidad={identidad.local} size={IDENTIDAD_ARENA.escudoPx.cifras} />}{nombres[lado].nombre}{identidad && lado === "visita" && <Escudo identidad={identidad.visita} size={IDENTIDAD_ARENA.escudoPx.cifras} />}</span>)}
     </div>
     {vacio ? <p className="arena-empty">{t("Waiting for kick-off", "Esperando el inicio")}</p> : <div className="arena-stats-rows">
       {cifras.filas.map(f => {
         const nota = noSimulada(registro, f.clave);
         return <div key={f.clave} className="arena-stat-row" data-stat={f.clave} data-leader={f.lider ?? "none"} data-class={f.clase}>
           {(["local", "visita"] as const).map(lado => <span key={lado} className="arena-stat-value tnum" data-side={lado} data-lead={f.lider === lado || undefined} data-favorite={favorito === lado || undefined}>{valor(f[lado], f.clave, lado)}</span>)}
-          <span className="arena-stat-label">{ETIQUETAS_CIFRAS[f.clave][idioma]}{nota && <small className="arena-stat-note">{t("not simulated in this recording", "no simulado en este registro")}</small>}</span>
+          <span className="arena-stat-label"><IconoClase clase={iconoDeCifra(f.clave)} />{ETIQUETAS_CIFRAS[f.clave][idioma]}{nota && <small className="arena-stat-note">{t("not simulated in this recording", "no simulado en este registro")}</small>}</span>
           <span className="arena-stat-bars" aria-hidden="true">
             {(["local", "visita"] as const).map(lado => <span key={lado} className="arena-stat-track" data-side={lado}><span className="arena-stat-bar" data-side={lado} style={{ width: `${anchoBarra(f, lado)}%` }} /></span>)}
           </span>

@@ -8,7 +8,7 @@ import { crearRng, type Rng } from "./prng";
 import type { Equipo, Estilo, Jugador, Posicion, SimConfig } from "./tipos";
 
 export const PREFIJOS = ["Atlético", "Deportivo", "Unión", "Sporting", "Racing", "Club", "Olímpico", "Juventud"] as const;
-const LUGARES = [
+export const LUGARES = [
   "Torreluna",
   "Pradoalto",
   "Marisal",

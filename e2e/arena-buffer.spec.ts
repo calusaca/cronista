@@ -295,6 +295,8 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
       }
     };
   });
+  // Brief 054 v1.1 (2): el grito se compara con el primer tramo del canto que devuelve /relato.
+  let grito: string | undefined;
   await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
     const p = r.request().postDataJSON();
     // Esta prueba necesita un comentario largo, sin la noticia de fuera de juego
@@ -304,6 +306,7 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
       : p.desdeTick === 250 && p.entradaTick === undefined ? { ...registro, eventos: [...registro.eventos.filter(e => e.tick <= reinicio.tick), reinicio, ...registro.eventos.filter(e => e.tick > reinicio.tick)] } : registro;
     const relato = construirRelato(fuente, p.desdeTick, p.hastaTick, "buffer", p.idioma, { entradaTick: p.entradaTick });
     const prioridad = "prioridad" in relato ? relato.prioridad : undefined;
+    if (prioridad === PRIORIDAD_EVENTO_ARENA.gol) grito = relato.fragmentos[0]?.canto?.tramos[0]?.texto;
     return r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: p.hastaTick === 150 && p.entradaTick === undefined ? larga : prioridad === PRIORIDAD_EVENTO_ARENA.gol ? audioGol : prioridad === PRIORIDAD_EVENTO_ARENA.reinicio ? audioReinicio : audioCorto, tipo: "audio/wav" } : null } });
   });
   await page.goto(`/arena?partido=${id}&vista=buffer`);
@@ -317,7 +320,8 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
   await expect(page.locator(".arena-score strong")).toHaveText("1–0");
   expect(await page.evaluate(() => (window as unknown as { fuentesPrueba: { duracion: number; detenida: boolean }[] }).fuentesPrueba.find(f => f.duracion === 15)?.detenida)).toBe(true);
   // Brief 050 · Canto: el transcript muestra su texto (grito y hechos, sin variantes); rótulo y data-gol en el marcador.
-  await expect(transcripcion).toContainText(CANTO_GOL.plantillas.grito.en);
+  expect(grito).toBeTruthy();
+  await expect(transcripcion).toContainText(grito!);
   await expect(transcripcion).toContainText(cantoGol(gol, registro, "en", 0)!.tramos.at(-1)!.texto);
   const rotulo = page.locator(".arena-pitch-wrap > p.arena-goal-banner");
   await expect(rotulo).toBeVisible();

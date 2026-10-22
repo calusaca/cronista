@@ -6,8 +6,11 @@ import type { EstadoArena, PersonalidadJugador, RegistroArena } from "../arena/t
 import { memoAgregado, type MemoAgregado } from "../arena/estadisticas";
 import { ArenaCifrasJugador } from "./ArenaCifrasJugador";
 import { EstrellaFavorito } from "./ArenaFavoritos";
+import type { IdentidadPartido } from "../arena/identidad";
+import { IDENTIDAD_ARENA } from "../sim/limites";
+import { Escudo } from "./Escudo";
 
-export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, idioma, tick, favorito, alternarFavorito, avisos, transporte = false, saltar, memo = memoAgregado }: {
+export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, idioma, tick, favorito, alternarFavorito, avisos, transporte = false, saltar, memo = memoAgregado, identidad }: {
   estado: EstadoArena; registro: RegistroArena; seleccionado: string | null;
   seleccionar: (id: string) => void; idioma: "es" | "en";
   /** Brief 049: tick entero del cursor (cifras del prefijo ≤ tick). */
@@ -15,6 +18,8 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
   /** Brief 049: el jugador seleccionado es el favorito; la estrella lo alterna. */
   favorito?: boolean; alternarFavorito?: (j: { club: string; dorsal: number; nombre: string }) => void;
   avisos?: ReactNode; transporte?: boolean; saltar?: (s: number) => void; memo?: MemoAgregado;
+  /** Brief 055: identidad del partido (escudos en los botones de equipo y en la ficha). */
+  identidad?: IdentidadPartido;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const plantilla = [...estado.jugadores, ...estado.banco ?? [], ...estado.retirados ?? [], ...estado.expulsados ?? []];
@@ -35,7 +40,7 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
   return <section className="arena-rosters" aria-label={t("Squads and personalities", "Plantillas y personalidades")}>
     <div className="arena-roster-heading"><h2>{t("Meet the players", "Conoce a los jugadores")}</h2><p className="arena-muted">{t("Select a player on the pitch or in the squad to explore their profile.", "Selecciona un jugador en la cancha o en la plantilla para conocer su perfil.")}</p></div>
     <div className="arena-team-switch" role="group" aria-label={t("Choose a squad", "Elegir plantilla")}>
-      {(["local", "visita"] as const).map(lado => <button key={lado} className="btn" type="button" aria-pressed={j.lado === lado} onClick={() => seleccionar((estado.jugadores.find(p => p.lado === lado && p.capitan) ?? estado.jugadores.find(p => p.lado === lado))!.id)}>{registro.config.partido[lado].nombre}</button>)}
+      {(["local", "visita"] as const).map(lado => <button key={lado} className="btn" type="button" aria-pressed={j.lado === lado} onClick={() => seleccionar((estado.jugadores.find(p => p.lado === lado && p.capitan) ?? estado.jugadores.find(p => p.lado === lado))!.id)}>{identidad && <Escudo identidad={identidad[lado]} size={IDENTIDAD_ARENA.escudoPx.plantilla} />}{registro.config.partido[lado].nombre}</button>)}
     </div>
     <div className="arena-roster-grid">
       <div><div className="arena-roster-list" role="group" aria-label={t("Players", "Jugadores")}>
@@ -47,7 +52,7 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
       {!![...estado.retirados ?? [], ...estado.expulsados ?? []].filter(p => p.lado === j.lado).length && <details className="arena-departed"><summary>{t("Substituted / sent off", "Sustituidos / expulsados")}</summary>{[...estado.retirados ?? [], ...estado.expulsados ?? []].filter(p => p.lado === j.lado).map(p => <button type="button" key={p.id} className="arena-bench-person" onClick={() => seleccionar(p.id)}>{p.dorsal} · {p.nombre}<span>{estado.expulsados?.some(e => e.id === p.id) ? t("Sent off", "Expulsado") : t("Substituted", "Sustituido")}</span></button>)}</details>}
       </div>
       <section className="arena-player-card" data-testid="arena-player-card" data-favorite={favorito || undefined} aria-label={t("Selected player", "Jugador seleccionado")}>
-        <p className="overline">{j.puesto} · {t("Shirt", "Dorsal")} {j.dorsal}</p>
+        <p className="overline">{identidad && <><Escudo identidad={identidad[j.lado]} size={IDENTIDAD_ARENA.escudoPx.ficha} />{registro.config.partido[j.lado].nombre} · </>}{j.puesto} · {t("Shirt", "Dorsal")} {j.dorsal}</p>
         <div className="arena-player-title"><h3>{j.nombre}{j.capitan && <span className="arena-captain-badge">{t("Captain", "Capitán")}</span>}</h3>
           {alternarFavorito && <EstrellaFavorito activo={!!favorito} nombre={j.nombre} tipo="jugador" idioma={idioma} testId="arena-favorite-player" alternar={() => alternarFavorito({ club: registro.config.partido[j.lado].nombre, dorsal: j.dorsal, nombre: j.nombre })} />}</div>
         {avisos}

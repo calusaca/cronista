@@ -926,6 +926,42 @@ export const IGR_ARENA = {
   umbralCercano: 0.3,
 } as const;
 
+/** Brief 055 · Identidad de club derivada del nombre: equipaciones, escudos e iconos. Los colores
+ * se midieron con la fórmula WCAG 2.x el 22 oct contra --ar-grass-a/-b (3:1 mínimo para el relleno
+ * y el anillo), contra el relleno (4,5:1 para el dorsal) y contra --surface/--ar-surface-2 (claro)
+ * y --surface/--ar-surface-2/--ar-bug/--ar-bug-2 (oscuro) para los colores de interfaz (4,5:1).
+ * Las pruebas vuelven a medir todo con los tokens leídos de globals.css; aquí no se repite ninguna cifra.
+ * Determinismo entre despliegues: cambiar la paleta o el orden de sus entradas cambia el escudo de
+ * todos los clubes; los colores nuevos van al final y actualizan la prueba de distribución. */
+export const IDENTIDAD_ARENA = {
+  /** Mínimos WCAG: relleno/anillo frente al césped y entre equipos (gráfico), dorsal e interfaz (texto). */
+  minGrafico: 3, minTexto: 4.5, minEntreEquipos: 3,
+  /** FNV-1a de 32 bits. */
+  fnvDesplazamiento: 0x811c9dc5, fnvPrimo: 0x01000193,
+  /** Iniciales: máximo y longitud mínima de palabra. */
+  maxIniciales: 3, minLetrasPalabra: 3,
+  formas: ["escudo", "redondo", "estandarte"],
+  patrones: ["liso", "rayas", "mitades", "banda", "aros"],
+  /** Índices 0–4 familia oscura, 5–9 familia clara. tinta = color del dorsal y del anillo.
+   * uiClaro/uiOscuro = color del equipo sobre superficies del tema claro/oscuro (barras, tabla, bordes). */
+  paleta: [
+    { id: "marino",   familia: "oscura", fondo: "#0c1640", tinta: "#ffffff", uiClaro: "#1b2f7a", uiOscuro: "#8fb0ff", nombre: { es: "marino",   en: "navy" } },
+    { id: "negro",    familia: "oscura", fondo: "#121418", tinta: "#ffffff", uiClaro: "#2b2f3a", uiOscuro: "#c9ced9", nombre: { es: "negro",    en: "black" } },
+    { id: "granate",  familia: "oscura", fondo: "#2e0612", tinta: "#ffffff", uiClaro: "#7a1430", uiOscuro: "#ff9fb4", nombre: { es: "granate",  en: "claret" } },
+    { id: "purpura",  familia: "oscura", fondo: "#200a3a", tinta: "#ffffff", uiClaro: "#5a2a9a", uiOscuro: "#cfaaff", nombre: { es: "púrpura",  en: "purple" } },
+    { id: "petroleo", familia: "oscura", fondo: "#041c24", tinta: "#ffffff", uiClaro: "#0b5566", uiOscuro: "#7fd6e8", nombre: { es: "petróleo", en: "teal" } },
+    { id: "blanco",   familia: "clara",  fondo: "#f5f7fb", tinta: "#0b1220", uiClaro: "#13203f", uiOscuro: "#f5f7fb", nombre: { es: "blanco",   en: "white" } },
+    { id: "amarillo", familia: "clara",  fondo: "#ffd23f", tinta: "#0b1220", uiClaro: "#7a5a00", uiOscuro: "#ffd23f", nombre: { es: "amarillo", en: "yellow" } },
+    { id: "celeste",  familia: "clara",  fondo: "#a6d6ff", tinta: "#0b1220", uiClaro: "#0b4f8a", uiOscuro: "#a6d6ff", nombre: { es: "celeste",  en: "sky blue" } },
+    { id: "rosa",     familia: "clara",  fondo: "#ffbccf", tinta: "#0b1220", uiClaro: "#8a2a4a", uiOscuro: "#ffbccf", nombre: { es: "rosa",     en: "pink" } },
+    { id: "naranja",  familia: "clara",  fondo: "#ffc46a", tinta: "#0b1220", uiClaro: "#8a4b00", uiOscuro: "#ffc46a", nombre: { es: "naranja",  en: "amber" } },
+  ],
+  /** Tamaños del escudo (px de ancho) por lugar; el alto es ×36/32. */
+  escudoPx: { marcador: 28, marcadorMovil: 22, rotuloGol: 16, cifras: 16, plantilla: 18, ficha: 18, entrenador: 20, plan: 22, reanudacion: 16 },
+  /** Tope de concentración admitido en la prueba de distribución sobre todos los nombres posibles. */
+  maxFraccionPorKit: 0.25,
+} as const;
+
 /** Brief 043 (nota del 22 oct) · Reservas de voz pregrabadas del consumidor en vivo (respaldo neutral). */
 export const RESERVAS_VOZ = {
   /** Tras la primera vuelta completa del catálogo, ninguna de las ⌈n · fracción⌉ reservas oídas más
@@ -965,11 +1001,13 @@ export const CANTO_GOL = {
   },
   /** Silencio final del canto (como el jubilo anterior). */
   pausaFinalMs: 380,
-  /** Caracteres máximos del texto (tramos unidos): 150 / MESA_ARENA.dialogo.caracteresPorSegundoVoz
-   * + 0,38 ≈ 16,2 s < VOZ_BUFFER.duracionMaxS. Solo acota plantillas; la cota es la duración medida
+  /** Caracteres máximos del texto (tramos unidos): 160 / MESA_ARENA.dialogo.caracteresPorSegundoVoz
+   * + 0,38 ≈ 17,2 s < VOZ_BUFFER.duracionMaxS. Solo acota plantillas; la cota es la duración medida
    * (13,87 / 14,23 s; con el grito más largo del 054, 13,87 / 14,56 s) y el rechazo por duración
-   * real del consumidor. */
-  maxCaracteres: 150,
+   * real del consumidor. Brief 054 § 3.5: la prueba del presupuesto con los diez gritos midió 152 c
+   * (ES: «¡Gol, gol, gol, gooool!» + «¡Gol, gol de …!» + «Sobre el final, … se pone por delante, cinco
+   * a cuatro, …»), por encima de 150; se sube a 160 como prescribe el brief, sin acortar ningún grito. */
+  maxCaracteres: 160,
   /** «Sobre el final»: desde esta fracción de la duración y con diferencia ≤ tardioDiferenciaMax tras
    * el gol. Misma regla que la intensidad 1 de expresionEvento (que lee de aquí). */
   tardioDesdeFraccion: 0.8, tardioDiferenciaMax: 1,

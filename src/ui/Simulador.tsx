@@ -8,6 +8,7 @@ import { type FormEvent, useState, useTransition } from "react";
 import type { Preset } from "../vista/servidor";
 import { IconoDado } from "./Iconos";
 import { useAvisoCarga } from "./Actividad";
+import { EmblemaCronista } from "./Emblema";
 
 /** Brief 011: rango del partido al azar (Math.random está bien aquí: es UI, no src/sim). */
 const AZAR_MAX = 99999;
@@ -49,6 +50,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
   return (
     <header className="topbar">
       <Link href="/" className="brand" prefetch={false}>
+        <EmblemaCronista />
         <span className="brand-mark">CRONISTA</span>
         <span className="brand-tag">Match reports where every sentence shows its evidence</span>
       </Link>

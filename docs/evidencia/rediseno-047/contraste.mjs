@@ -1,11 +1,17 @@
 // Brief 047 · Contraste WCAG de pares clave de /arena medido sobre estilos computados.
-// Uso (desde la raíz del repo): node docs/evidencia/rediseno-047/contraste.mjs [URL] [SEGUNDO]
+// Uso (desde la raíz del repo): node docs/evidencia/rediseno-047/contraste.mjs [URL] [SEGUNDO] [--cargar=ejemplo-v3|duelo] [--favorito]
 // (brief 050: SEGUNDO opcional del deslizador, 40 por defecto; con un gol en curso mide rótulo y anillo).
+// Brief 055: --cargar carga un ejemplo público con las pestañas («Saved matches» → botón) antes de medir;
+// --favorito marca como favorito al jugador activo (aparece su anillo punteado). Un par cuyo primer
+// plano es una lista [[selector, propiedad], …] usa la regla «max» (silueta: relleno o contorno).
 // Por defecto mide la arena pública con un partido terminado. Sale con código 1 si algún
 // par presente falla su mínimo o si falta un elemento marcado como obligatorio.
 import { chromium } from "@playwright/test";
 
-const URL_ARENA = process.argv[2] ?? "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena?partido=cd0e2ad0-a8b6-45fb-ba6d-1a9ca3f9a905";
+const ARGS = process.argv.slice(2).filter(a => !a.startsWith("--"));
+const CARGAR = process.argv.find(a => a.startsWith("--cargar="))?.split("=")[1] ?? null;
+const FAVORITO = process.argv.includes("--favorito");
+const URL_ARENA = ARGS[0] ?? "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena?partido=cd0e2ad0-a8b6-45fb-ba6d-1a9ca3f9a905";
 // [nombre, selector primer plano, propiedad, selectores de fondo (null = ancestro opaco), propiedad fondo, mínimo, obligatorio tras el 047]
 const PARES = [
   ["texto principal / fondo", "main h1", "color", null, null, 4.5, true],
@@ -15,11 +21,13 @@ const PARES = [
   ["reloj / fondo", "[data-testid=arena-clock]", "color", null, null, 4.5, true],
   ["botón primario", ".arena-playback .btn-primary", "color", [".arena-playback .btn-primary"], "background-color", 4.5, true],
   ["pestaña activa", ".arena-source-tabs [aria-pressed=true]", "color", [".arena-source-tabs [aria-pressed=true]"], "background-color", 4.5, true],
-  ["dorsal local / ficha", ".arena-local text", "fill", [".arena-local circle"], "fill", 4.5, true],
-  ["dorsal visita / ficha", ".arena-visita text", "fill", [".arena-visita circle"], "fill", 4.5, true],
-  ["ficha local / césped", ".arena-local circle", "fill", [".arena-grass", ".arena-stripe"], "fill", 3, true],
-  ["anillo local / césped", ".arena-local circle", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, true],
-  ["ficha visita / césped", ".arena-visita circle", "fill", [".arena-grass", ".arena-stripe"], "fill", 3, true],
+  // Brief 055: el círculo base de la ficha es .arena-kit (los anillos nuevos se miden aparte).
+  ["dorsal local / ficha", ".arena-local .arena-token > text", "fill", [".arena-local .arena-kit"], "fill", 4.5, true],
+  ["dorsal visita / ficha", ".arena-visita .arena-token > text", "fill", [".arena-visita .arena-kit"], "fill", 4.5, true],
+  ["ficha local / césped", ".arena-local .arena-kit", "fill", [".arena-grass", ".arena-stripe"], "fill", 3, true],
+  ["anillo local / césped", ".arena-local .arena-kit", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, true],
+  ["ficha visita / césped", ".arena-visita .arena-kit", "fill", [".arena-grass", ".arena-stripe"], "fill", 3, true],
+  ["anillo visita / césped", ".arena-visita .arena-kit", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, true],
   ["balón / césped", ".arena-ball", "fill", [".arena-grass", ".arena-stripe"], "fill", 3, true],
   ["líneas / césped", ".arena-lines", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, true],
   ["nombre mesa / tarjeta", ".arena-mesa-card h3", "color", null, null, 4.5, true],
@@ -40,7 +48,7 @@ const PARES = [
   ["estado del directo / píldora", ".arena-live [role=status]", "color", null, null, 4.5, true],
   ["enlace compartir / botón", ".arena-live a[href^='/arena?partido=']", "color", null, null, 4.5, false],
   ["dirección local / tablero", ".arena-direction span:first-child", "color", null, null, 4.5, true],
-  ["dirección visita / tablero", ".arena-direction span:last-child", "color", null, null, 4.5, true],
+  ["dirección visita / tablero", ".arena-direction span:nth-child(2)", "color", null, null, 4.5, true],
   ["botón fantasma / transporte", ".arena-playback .btn:not(.btn-primary)", "color", null, null, 4.5, true],
   ["árbitro / ficha informativa", ".arena-referee-info p", "color", null, null, 4.5, false],
   ["instante y modo / chip", ".arena-mesa-meta", "color", null, null, 4.5, true],
@@ -55,6 +63,25 @@ const PARES = [
   // durante la celebración, así que no son obligatorios.
   ["rótulo de gol / fondo", ".arena-goal-banner", "color", null, null, 4.5, false],
   ["anillo del goleador / césped", "circle.arena-goal-ring", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, false],
+  // Brief 055 (v1.1 §§ 1–4 y 9) · Identidad de club, anillos, emblema y pastillas líder.
+  ["iniciales escudo local / campo", ".arena-score > span:first-child .arena-crest-iniciales", "fill", [".arena-score > span:first-child .arena-crest-campo"], "fill", 4.5, true],
+  ["iniciales escudo visita / campo", ".arena-score > span:last-child .arena-crest-iniciales", "fill", [".arena-score > span:last-child .arena-crest-campo"], "fill", 4.5, true],
+  ["silueta escudo local / marcador", [[".arena-score > span:first-child .arena-crest-forma", "fill"], [".arena-score > span:first-child .arena-crest-contorno", "stroke"]], "max", [".arena-score"], "background-color", 3, true],
+  ["silueta escudo visita / marcador", [[".arena-score > span:last-child .arena-crest-forma", "fill"], [".arena-score > span:last-child .arena-crest-contorno", "stroke"]], "max", [".arena-score"], "background-color", 3, true],
+  ["anillo de selección / césped", ".arena-select-ring", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, false],
+  ["anillo favorito / césped", ".arena-fav-ring", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, false],
+  ["nota de equipación / tablero", ".arena-kit-note", "color", null, null, 4.5, false],
+  ["emblema / barra superior", ".arena-topbar .brand-emblem", "color", null, null, 3, true],
+  ["pastilla líder local", ".arena-stat-value[data-lead][data-side=local]", "color", [".arena-stat-value[data-lead][data-side=local]"], "background-color", 4.5, false],
+  ["pastilla líder visita", ".arena-stat-value[data-lead][data-side=visita]", "color", [".arena-stat-value[data-lead][data-side=visita]"], "background-color", 4.5, false],
+  ["CTA de la cabecera", ".arena-intro-cta", "color", null, null, 4.5, true],
+  // Bloque C · iconos de eventos (aria-hidden; gráficos, 3:1).
+  ["icono del feed / tarjeta", ".arena-live-feed .arena-event-icon[data-kind]", "color", null, null, 3, false],
+  ["icono de cifras / rótulo", ".arena-stat-label .arena-event-icon[data-kind]", "color", [".arena-stats"], "background-color", 3, true],
+  ["tarjeta amarilla de cifras / rótulo", ".arena-stat-label [data-kind=amarilla] rect", "fill", [".arena-stats"], "background-color", 3, true],
+  ["tarjeta roja de cifras / rótulo", ".arena-stat-label [data-kind=roja] rect", "fill", [".arena-stats"], "background-color", 3, true],
+  ["tarjeta amarilla del feed / tarjeta", ".arena-live-feed [data-kind=amarilla] rect", "fill", null, null, 3, false],
+  ["tarjeta roja del feed / tarjeta", ".arena-live-feed [data-kind=roja] rect", "fill", null, null, 3, false],
 ];
 
 const browser = await chromium.launch();
@@ -64,8 +91,14 @@ for (const tema of ["light", "dark"]) {
   const page = await ctx.newPage();
   await page.goto(URL_ARENA, { waitUntil: "networkidle", timeout: 90000 });
   await page.getByTestId("arena-pitch").waitFor();
+  if (CARGAR) {
+    await page.getByRole("button", { name: "Saved matches", exact: true }).click();
+    await page.getByRole("button", { name: CARGAR === "duelo" ? "Load recorded model duel" : "Load AI coaches example", exact: true }).click();
+    await page.locator(".arena-board > .arena-empty").waitFor({ state: "detached", timeout: 30000 });
+  }
+  if (FAVORITO) await page.getByTestId("arena-favorite-player").click();
   const slider = page.getByRole("slider", { name: "Match time" });
-  if (await slider.count()) { await slider.fill(process.argv[3] ?? "40"); await page.waitForTimeout(500); }
+  if (await slider.count()) { await slider.fill(ARGS[1] ?? "40"); await page.waitForTimeout(500); }
   const filas = await page.evaluate((PARES) => {
     const rgb = s => { const m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 }; };
     const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
@@ -73,12 +106,17 @@ for (const tema of ["light", "dark"]) {
     const opaco = el => { for (let e = el; e; e = e.parentElement) { const c = rgb(getComputedStyle(e).backgroundColor); if (c && c.a > 0.5) return c; } return rgb(getComputedStyle(document.body).backgroundColor); };
     const txt = c => `rgb(${c.r},${c.g},${c.b})`;
     return PARES.map(([nombre, sel, prop, selF, propF, min, obligatorio]) => {
-      const el = document.querySelector(sel);
-      if (!el) return { nombre, estado: "AUSENTE", obligatorio };
-      const fg = rgb(getComputedStyle(el).getPropertyValue(prop));
+      // Regla «max» (brief 055 v1.1 § 4): varias partes del primer plano; cuenta la que más contrasta.
+      const partes = Array.isArray(sel) ? sel : [[sel, prop]];
+      const els = partes.map(([s]) => document.querySelector(s));
+      if (els.some(e => !e)) return { nombre, estado: "AUSENTE", obligatorio };
+      const el = els[0];
+      const fgs = partes.map(([, p], i) => rgb(getComputedStyle(els[i]).getPropertyValue(p)));
       const fondos = selF ? selF.map(s => document.querySelector(s)).filter(Boolean).map(e => rgb(getComputedStyle(e).getPropertyValue(propF))) : [opaco(el.closest("svg")?.parentElement ?? el)];
-      if (!fg || !fondos.length || fondos.some(f => !f)) return { nombre, estado: "SIN COLOR", obligatorio };
-      const medidas = fondos.map(f => ({ bg: txt(f), r: ratio(fg, f) }));
+      if (fgs.some(f => !f) || !fondos.length || fondos.some(f => !f)) return { nombre, estado: "SIN COLOR", obligatorio };
+      const elegir = f => fgs.reduce((a, b) => (ratio(b, f) > ratio(a, f) ? b : a));
+      const fg = elegir(fondos[0]);
+      const medidas = fondos.map(f => ({ bg: txt(f), r: ratio(elegir(f), f) }));
       const peor = medidas.reduce((a, b) => (b.r < a.r ? b : a));
       return { nombre, fg: txt(fg), bg: medidas.map(m => m.bg).join(" y "), ratio: Math.round(peor.r * 100) / 100, min, estado: peor.r >= min ? "OK" : "FALLA", obligatorio };
     });

@@ -130,7 +130,7 @@ describe("050 (P2) · ficha del goleador", () => {
     expect(todas.length).toBeGreaterThan(20);
     expect(goleador.atributos).toContain('data-gol="true"');
     expect(todas.filter(f => f.atributos.includes("data-gol"))).toHaveLength(1);
-    expect(goleador.token).toMatch(/^<title>.*?<\/title><g class="arena-token"><circle r="1.9"><\/circle>/);
+    expect(goleador.token).toMatch(/^<title>.*?<\/title><g class="arena-token"><circle class="arena-kit" r="1.9"><\/circle>/); // Brief 055: círculo base .arena-kit
     expect(goleador.token).toMatch(/<circle class="arena-goal-ring" r="3.2" aria-hidden="true"><\/circle>$/);
     expect(html.match(/arena-goal-ring/g)).toHaveLength(1);
     expect(html).toMatch(/<div class="arena-pitch-wrap"><p class="arena-goal-banner"/);
