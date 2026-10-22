@@ -1,0 +1,86 @@
+{
+  "checkedUtc": "2026-10-22T18:17:31.836Z",
+  "sesion": "8a91b6ed-c0ed-4c0d-96e6-ca019ab31dd3",
+  "piezas": [
+    {
+      "id": "previa:1-local:0",
+      "idioma": "es",
+      "http": 200,
+      "texto": "Así sale Club Marisal, en cuatro-dos-dos-dos: Dante Zareena lleva el brazalete. Once de nivel medio 75; en el banquillo, Teo Quinena, adaptable.",
+      "fragmentos": [
+        "narrador: Así sale Club Marisal, en cuatro-dos-dos-dos: Dante Zareena lleva el brazalete.",
+        "estadista: Once de nivel medio 75; en el banquillo, Teo Quinena, adaptable."
+      ],
+      "bytes": 73152,
+      "duracionS": 12.2,
+      "sha256": "1d0254f8597e477eb3d63c750e269e7e5a2ed1cfee324572b952c962f91b91fa"
+    },
+    {
+      "id": "previa:1-local:0",
+      "idioma": "en",
+      "http": 200,
+      "texto": "Here is Club Marisal, in a four-two-two-two: Dante Zareena wears the armband. A starting eleven with an average ability of 75; Teo Quinena in the dugout, adaptable.",
+      "fragmentos": [
+        "narrador: Here is Club Marisal, in a four-two-two-two: Dante Zareena wears the armband.",
+        "estadista: A starting eleven with an average ability of 75; Teo Quinena in the dugout, adaptable."
+      ],
+      "bytes": 76464,
+      "duracionS": 12.7,
+      "sha256": "fa11f56475cc4502aad6474250b78b8455a92f10f309ddd2ed5bc31065571016"
+    },
+    {
+      "id": "previa:2-visita:0",
+      "idioma": "es",
+      "http": 200,
+      "texto": "Así sale Unión Arenablanca, en cuatro-tres-uno-dos: Gael Valelich lleva el brazalete. Once de nivel medio 72; en el banquillo, Teo Fenera, ataque vertical.",
+      "fragmentos": [
+        "narrador: Así sale Unión Arenablanca, en cuatro-tres-uno-dos: Gael Valelich lleva el brazalete.",
+        "estadista: Once de nivel medio 72; en el banquillo, Teo Fenera, ataque vertical."
+      ],
+      "bytes": 74736,
+      "duracionS": 12.5,
+      "sha256": "57495e2c29329b58231473b73afa7f1a20775de9d97e3d7ab4388285c422e64a"
+    },
+    {
+      "id": "previa:2-visita:0",
+      "idioma": "en",
+      "http": 200,
+      "texto": "Here is Unión Arenablanca, in a four-three-one-two: Gael Valelich wears the armband. A starting eleven with an average ability of 72; Teo Fenera in the dugout, direct attacking.",
+      "fragmentos": [
+        "narrador: Here is Unión Arenablanca, in a four-three-one-two: Gael Valelich wears the armband.",
+        "estadista: A starting eleven with an average ability of 72; Teo Fenera in the dugout, direct attacking."
+      ],
+      "bytes": 78768,
+      "duracionS": 13.1,
+      "sha256": "83d854fe5f759afac71234d7ac3233674c4676b0856595ccc6e602093c737e72"
+    },
+    {
+      "id": "previa:3-condiciones:0",
+      "idioma": "es",
+      "http": 200,
+      "texto": "Arbitra Alex Brelosa. Lluvia y césped natural alto. Perfiles de equipo: Club Marisal, ataque 83 y defensa 63; Unión Arenablanca, ataque 72 y defensa 65.",
+      "fragmentos": [
+        "narrador: Arbitra Alex Brelosa. Lluvia y césped natural alto.",
+        "estadista: Perfiles de equipo: Club Marisal, ataque 83 y defensa 63; Unión Arenablanca, ataque 72 y defensa 65."
+      ],
+      "bytes": 92448,
+      "duracionS": 15.4,
+      "sha256": "59ab504a830bbb3eaa90d3e543b4dab8a9a933470d8ccc5c25b86bba0e8fb5a5"
+    },
+    {
+      "id": "previa:3-condiciones:0",
+      "idioma": "en",
+      "http": 200,
+      "texto": "Alex Brelosa is the referee. Rain and long natural grass. Team profiles: Club Marisal, attack 83 and defence 63; Unión Arenablanca, attack 72 and defence 65.",
+      "fragmentos": [
+        "narrador: Alex Brelosa is the referee. Rain and long natural grass.",
+        "estadista: Team profiles: Club Marisal, attack 83 and defence 63; Unión Arenablanca, attack 72 and defence 65."
+      ],
+      "bytes": 90720,
+      "duracionS": 15.1,
+      "sha256": "ef42745dc9294e72d4c3961541951bfe823c521cd8a6efd4584421ef574ce07c"
+    }
+  ],
+  "desconocida": 404,
+  "status": "passed"
+}
