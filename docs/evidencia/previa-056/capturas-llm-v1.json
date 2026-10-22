@@ -1,0 +1,102 @@
+{
+  "base": "http://127.0.0.1:3418/arena",
+  "partido": "llm-v1",
+  "filas": [
+    {
+      "vista": "escritorio",
+      "tema": "light",
+      "partido": "llm-v1",
+      "tick0": {
+        "anchoDocumento": 1440,
+        "marcadorAbajo": 268,
+        "canchaAbajo": 830,
+        "alineacionesAbajo": 1820,
+        "tarjeta": true,
+        "jugadores": 22,
+        "reloj": "0:00 / 0:10"
+      },
+      "reproduciendo": {
+        "anchoDocumento": 1440,
+        "marcadorAbajo": 268,
+        "canchaAbajo": 830,
+        "alineacionesAbajo": null,
+        "tarjeta": false,
+        "jugadores": 0,
+        "reloj": "0:00 / 0:10"
+      },
+      "errores": []
+    },
+    {
+      "vista": "escritorio",
+      "tema": "dark",
+      "partido": "llm-v1",
+      "tick0": {
+        "anchoDocumento": 1440,
+        "marcadorAbajo": 268,
+        "canchaAbajo": 830,
+        "alineacionesAbajo": 1820,
+        "tarjeta": true,
+        "jugadores": 22,
+        "reloj": "0:00 / 0:10"
+      },
+      "reproduciendo": {
+        "anchoDocumento": 1440,
+        "marcadorAbajo": 268,
+        "canchaAbajo": 830,
+        "alineacionesAbajo": null,
+        "tarjeta": false,
+        "jugadores": 0,
+        "reloj": "0:00 / 0:10"
+      },
+      "errores": []
+    },
+    {
+      "vista": "movil",
+      "tema": "light",
+      "partido": "llm-v1",
+      "tick0": {
+        "anchoDocumento": 360,
+        "marcadorAbajo": 552,
+        "canchaAbajo": 805,
+        "alineacionesAbajo": 2948,
+        "tarjeta": true,
+        "jugadores": 22,
+        "reloj": "0:00 / 0:10"
+      },
+      "reproduciendo": {
+        "anchoDocumento": 360,
+        "marcadorAbajo": 552,
+        "canchaAbajo": 805,
+        "alineacionesAbajo": null,
+        "tarjeta": false,
+        "jugadores": 0,
+        "reloj": "0:00 / 0:10"
+      },
+      "errores": []
+    },
+    {
+      "vista": "movil",
+      "tema": "dark",
+      "partido": "llm-v1",
+      "tick0": {
+        "anchoDocumento": 360,
+        "marcadorAbajo": 552,
+        "canchaAbajo": 805,
+        "alineacionesAbajo": 2948,
+        "tarjeta": true,
+        "jugadores": 22,
+        "reloj": "0:00 / 0:10"
+      },
+      "reproduciendo": {
+        "anchoDocumento": 360,
+        "marcadorAbajo": 552,
+        "canchaAbajo": 805,
+        "alineacionesAbajo": null,
+        "tarjeta": false,
+        "jugadores": 0,
+        "reloj": "0:00 / 0:10"
+      },
+      "errores": []
+    }
+  ]
+}

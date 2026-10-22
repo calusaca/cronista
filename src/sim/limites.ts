@@ -962,6 +962,55 @@ export const IDENTIDAD_ARENA = {
   maxFraccionPorKit: 0.25,
 } as const;
 
+/** Brief 056 (v1.2) · Previa del partido: alineaciones tipo TV derivadas del registro (config + inicial).
+ * La cancha de la tarjeta usa ARENA.anchoM como ancho del viewBox (metros reales). El eje de profundidad
+ * se estira con escalaProfundidad (v1.2, decisión del coordinador): la línea de fondo propia queda en
+ * margenSuperior + ARENA.largoM · escalaProfundidad y el alto del viewBox añade margenInferior. */
+export const PREVIA_ARENA = {
+  /** Unidades del viewBox. escalaProfundidad (unidades por metro de largo): con 0,68 la pareja más
+   * cercana del catálogo (MP–DC del 4-2-3-1, 11,55 m en el mismo carril) queda a 7,85 unidades, por
+   * encima de 2 · radioFicha + separacionMinFichas (7,4); el mínimo exacto es 0,641. El dibujo solo
+   * lleva dorsales (los nombres están en la lista de texto). escalaCapitan amplía la marca «C». */
+  tarjeta: { margenSuperior: 8, margenInferior: 4, escalaProfundidad: 0.68, separacionMinFichas: 1, radioFicha: 3.2, fuenteDorsal: 3, escalaCapitan: 1.6, maxPerfilesMostrados: 2 },
+  /** Caducidad (s de partido) de las tres piezas habladas; mayor que la general (MESA_ARENA.caducidadInvitadoS)
+   * para cubrir el primer tramo tras el saque. */
+  caducidadS: 30,
+  /** Separación (s de audio) entre dos piezas de la previa; entre una previa y otro invitado rige la general. */
+  separacionS: 1.2,
+  /** Bolsa propia de Speech por encuentro (v1.1 § 9): 3 piezas × 2 variantes × 2 idiomas. Medido el 22 oct
+   * con prepararVoz: completa ≈ 573–665 c de SSML, breve ≈ 362–442; con nombres al máximo admitido ≈ 700 y
+   * ≈ 500 → cota 7.200; 9.000 deja un 25 % de margen. No se presta a ni toma de otras bolsas. */
+  bolsaSpeech: { solicitudes: 12, caracteres: 9000 },
+  /** Orden y claves de las piezas; el id es `previa:${n}-${clave}:0` (n desde 1). */
+  piezas: ["local", "visita", "condiciones"],
+  /** Plantillas habladas (ES/EN paralelas). Llaves: equipo, formacion, capitan, nivel, entrenador, perfil,
+   * arbitro, clima, temperatura, superficie, local, visita, a1, d1, a2, d2. {formacion} se pronuncia en
+   * palabras (CANTO_GOL.plantillas.numeros); `referencias` sustituyen al club en la escalera (v1.1 § 4). */
+  plantillas: {
+    es: {
+      alineacion: "Así sale {equipo}, en {formacion}: {capitan} lleva el brazalete.", alineacionSinCapitan: "Así sale {equipo}, en {formacion}.",
+      plantel: "Once de nivel medio {nivel}; en el banquillo, {entrenador}, {perfil}.", plantelSinPerfil: "Once de nivel medio {nivel}; en el banquillo, {entrenador}.", plantelSinEntrenador: "Once de nivel medio {nivel}.",
+      arbitro: "Arbitra {arbitro}.", condiciones: "{clima}{temperatura} y {superficie}.", temperatura: ", {n} grados",
+      perfiles: "Perfiles de equipo: {local}, ataque {a1} y defensa {d1}; {visita}, ataque {a2} y defensa {d2}.",
+      referencias: { local: "el local", visita: "la visita" },
+    },
+    en: {
+      alineacion: "Here is {equipo}, in a {formacion}: {capitan} wears the armband.", alineacionSinCapitan: "Here is {equipo}, in a {formacion}.",
+      plantel: "A starting eleven with an average ability of {nivel}; {entrenador} in the dugout, {perfil}.", plantelSinPerfil: "A starting eleven with an average ability of {nivel}; {entrenador} in the dugout.", plantelSinEntrenador: "A starting eleven with an average ability of {nivel}.",
+      arbitro: "{arbitro} is the referee.", condiciones: "{clima}{temperatura} and {superficie}.", temperatura: ", {n} degrees",
+      perfiles: "Team profiles: {local}, attack {a1} and defence {d1}; {visita}, attack {a2} and defence {d2}.",
+      referencias: { local: "the home side", visita: "the away side" },
+    },
+  },
+  /** Textos compartidos por la tarjeta y la voz. En la frase hablada van en minúscula salvo al inicio.
+   * Superficie: `natural` (sin longitud de césped en el registro), `natural_corto`, `natural_alto`, `sintetica`. */
+  textos: {
+    clima: { es: { despejado: "Cielo despejado", calor: "Calor", lluvia: "Lluvia", frio: "Frío", niebla: "Niebla" }, en: { despejado: "Clear skies", calor: "Heat", lluvia: "Rain", frio: "Cold", niebla: "Fog" } },
+    superficie: { es: { natural: "césped natural", natural_corto: "césped natural corto", natural_alto: "césped natural alto", sintetica: "superficie sintética" }, en: { natural: "natural grass", natural_corto: "short natural grass", natural_alto: "long natural grass", sintetica: "artificial surface" } },
+    estilo: { es: { posesion: "Posesión", contragolpe: "Contragolpe", presion: "Presión" }, en: { posesion: "Possession", contragolpe: "Counter-attack", presion: "Pressing" } },
+  },
+} as const;
+
 /** Brief 043 (nota del 22 oct) · Reservas de voz pregrabadas del consumidor en vivo (respaldo neutral). */
 export const RESERVAS_VOZ = {
   /** Tras la primera vuelta completa del catálogo, ninguna de las ⌈n · fracción⌉ reservas oídas más

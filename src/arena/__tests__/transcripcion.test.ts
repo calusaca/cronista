@@ -13,6 +13,7 @@ import { componerIntercambio, memoriaDialogoVacia } from "../dialogo";
 import { datosEstadista, intervencionEstadista } from "../estadista";
 import { hechosArena } from "../inteligencia";
 import { MesaSesion } from "../mesa";
+import { previaPartido } from "../previa";
 import { comentarArena, narrarArena, type ComentarioArena } from "../narrador";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../protocolo";
 import { catalogoGritos, construirRelato, gritosPartido } from "../relato";
@@ -472,5 +473,59 @@ describe("053 · bilingüe, Markdown y nombres", () => {
     expect(tr.resumen).toMatchObject({ comentarios: 0, intervenciones: 0, turnos: 0, relato: tr.lineas.length, lineas: tr.lineas.length });
     expect(tr.registro.sesion).toBeNull();
     expect(transcripcionMarkdown(tr).split("\n")[1]).toContain(`${ROTULOS_TRANSCRIPCION.es.sesion} —`);
+  });
+});
+
+// Brief 056 § 5.7 (v1.1 § 11) · La previa en la transcripción: antes de «Comienza el partido…», dato
+// determinista sin V ni D, forma «previa», funcion «dato», citas con las fuentes de la tabla y rótulos.
+describe("056 · previa en la transcripción", () => {
+  const FUENTE: Record<string, string> = { equipo: "config.partido", formacion: "config.formaciones", capitan: "inicial.jugadores", nivel: "inicial.jugadores", entrenador: "config.entrenadores", arbitro: "inicial.arbitro", condiciones: "config.partido.condiciones", perfiles: "config.partido" };
+  const previa = previaPartido(v3);
+  it("con hastaTick = 0 las líneas de la previa preceden a «Comienza el partido…», en orden de piezas y turnos", () => {
+    for (const idioma of ["es", "en"] as const) {
+      const tr = construirTranscripcion(entrada(v3, [], previa), 0, idioma);
+      const deLaPrevia = tr.lineas.filter(l => l.intervencion?.forma === "previa");
+      expect(deLaPrevia.length).toBe(previa.reduce((n, i) => n + i.turnos!.length, 0));
+      expect(tr.lineas.slice(0, deLaPrevia.length)).toEqual(deLaPrevia);
+      const relato0 = construirRelato({ ...v3, eventos: v3.eventos.filter(e => e.tick <= 0), fotogramas: v3.fotogramas.filter(f => f.tick <= 0) }, 0, 1, "completo", idioma).fragmentos[0]!.texto;
+      expect(tr.lineas[deLaPrevia.length]).toMatchObject({ origen: "relato", texto: relato0 });
+      expect(deLaPrevia.map(l => [l.intervencion!.id, l.intervencion!.turno])).toEqual(previa.flatMap(i => i.turnos!.map((_, k) => [i.id, k])));
+      for (const l of deLaPrevia) {
+        const i = previa.find(x => x.id === l.intervencion!.id)!, t = i.turnos![l.intervencion!.turno!]!;
+        expect(l).toMatchObject({ tick: 0, rol: t.rol, origen: "intervencion", modo: "determinista", texto_es: t.texto_es, texto_en: t.texto_en });
+        expect(l.verificacion).toEqual({ v: { estado: "no-aplica" }, d: { estado: "no-aplica" }, clase: "dato-determinista" });
+        expect(l.intervencion).toMatchObject({ id: i.id, tema: "previa", forma: "previa", funcion: "dato" });
+        const o = i.oraciones[t.oraciones[0]!]!;
+        expect(l.evidencia.hechos).toEqual([o.hecho, ...o.apoyo ?? []]);
+        expect(l.evidencia.fotogramas).toEqual([]);
+        expect(l.evidencia.eventos).toEqual([]);
+        expect(l.evidencia.intervalo).toEqual([0, 0]);
+        expect(l.evidencia.citas!.map(c => c.hecho)).toEqual(l.evidencia.hechos);
+        for (const c of l.evidencia.citas!) expect(c.fuente).toBe(FUENTE[c.hecho.split(":")[1]!]);
+      }
+      expect(tr.diario.intervenciones.filter(i => i.forma === "previa").map(i => i.id)).toEqual(previa.map(i => i.id));
+    }
+  });
+  it("con el diario completo la previa sigue primero y ningún turno del narrador de la previa es «marco-de-dialogo»", () => {
+    const tr = construirTranscripcion(entrada(v4, comentarios, [...previaPartido(v4), ...intervenciones]), v4.final.tick, "es");
+    const n = previaPartido(v4).reduce((s, i) => s + i.turnos!.length, 0);
+    expect(tr.lineas.slice(0, n).every(l => l.intervencion?.forma === "previa")).toBe(true);
+    expect(tr.lineas.filter(l => l.intervencion?.forma === "previa" && l.verificacion.clase !== "dato-determinista")).toEqual([]);
+    // Las cuentas sin previa no cambian: las demás líneas son las de siempre.
+    const sin = construirTranscripcion(entrada(v4, comentarios, intervenciones), v4.final.tick, "es");
+    expect(tr.lineas.slice(n).map(l => l.texto)).toEqual(sin.lineas.map(l => l.texto));
+    expect(tr.resumen.lineas).toBe(sin.resumen.lineas + n);
+  });
+  it("Markdown rotula «previa» / «pre-match», la nota nueva y el orden con la excepción de la previa", () => {
+    for (const idioma of ["es", "en"] as const) {
+      const md = transcripcionMarkdown(construirTranscripcion(entrada(v3, [], previa), 0, idioma)), R = ROTULOS_TRANSCRIPCION[idioma];
+      expect(md).toContain(`${R.conversacion} · ${R.formas.previa} · ${escaparMarkdown(previa[0]!.id)}`);
+      expect(R.formas.previa).toBe(idioma === "es" ? "previa" : "pre-match");
+      expect(md).toContain(idioma === "es" ? "La previa (alineaciones, técnicos y condiciones) se deriva del registro por plantilla determinista." : "The pre-match segment (line-ups, coaches and conditions) is derived from the match run by deterministic template.");
+      expect(md).toContain(R.clases["dato-determinista"]);
+      const excepcion = idioma === "es" ? "salvo la previa, que va antes del primer tramo." : "except the pre-match segment, which comes before the first passage.";
+      expect(R.orden).toContain(excepcion);
+      expect(R.omitido[4]).toContain(excepcion);
+    }
   });
 });

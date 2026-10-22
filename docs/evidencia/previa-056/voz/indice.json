@@ -1,0 +1,228 @@
+{
+  "generado": "2026-10-22T17:05:10.798Z",
+  "semilla": 4242,
+  "bolsa": {
+    "solicitudes": 12,
+    "caracteres": 9000
+  },
+  "solicitudes": 12,
+  "caracteresSsml": 5705,
+  "filas": [
+    {
+      "archivo": "es-previa_1-local_0-completa.mp3",
+      "idioma": "es",
+      "pieza": "previa:1-local:0",
+      "variante": "completa",
+      "texto": "Así sale Olímpico Quebralta, en cuatro-uno-cuatro-uno: Simón Rosauz lleva el brazalete. Once de nivel medio 78; en el banquillo, Vera Ulvueta, adaptable.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "es-MX-JorgeNeural",
+        "es-MX-GerardoNeural"
+      ],
+      "caracteresTexto": 153,
+      "caracteresSsml": 546,
+      "estimadaS": 18.4,
+      "realS": 12.55
+    },
+    {
+      "archivo": "es-previa_1-local_0-breve.mp3",
+      "idioma": "es",
+      "pieza": "previa:1-local:0",
+      "variante": "breve",
+      "texto": "Así sale Olímpico Quebralta, en cuatro-uno-cuatro-uno: Simón Rosauz lleva el brazalete.",
+      "roles": [
+        "narrador"
+      ],
+      "voces": [
+        "es-MX-JorgeNeural"
+      ],
+      "caracteresTexto": 87,
+      "caracteresSsml": 350,
+      "estimadaS": 9.16,
+      "realS": 6.57
+    },
+    {
+      "archivo": "es-previa_2-visita_0-completa.mp3",
+      "idioma": "es",
+      "pieza": "previa:2-visita:0",
+      "variante": "completa",
+      "texto": "Así sale Club Quebralta, en cuatro-uno-cuatro-uno: Darío Valera lleva el brazalete. Once de nivel medio 81; en el banquillo, Elio Zarueta, adaptable.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "es-MX-JorgeNeural",
+        "es-MX-GerardoNeural"
+      ],
+      "caracteresTexto": 149,
+      "caracteresSsml": 542,
+      "estimadaS": 17.98,
+      "realS": 12.09
+    },
+    {
+      "archivo": "es-previa_2-visita_0-breve.mp3",
+      "idioma": "es",
+      "pieza": "previa:2-visita:0",
+      "variante": "breve",
+      "texto": "Así sale Club Quebralta, en cuatro-uno-cuatro-uno: Darío Valera lleva el brazalete.",
+      "roles": [
+        "narrador"
+      ],
+      "voces": [
+        "es-MX-JorgeNeural"
+      ],
+      "caracteresTexto": 83,
+      "caracteresSsml": 346,
+      "estimadaS": 8.74,
+      "realS": 6.14
+    },
+    {
+      "archivo": "es-previa_3-condiciones_0-completa.mp3",
+      "idioma": "es",
+      "pieza": "previa:3-condiciones:0",
+      "variante": "completa",
+      "texto": "Arbitra Sam Quinel. Lluvia y superficie sintética. Perfiles de equipo: Olímpico Quebralta, ataque 67 y defensa 80; Club Quebralta, ataque 82 y defensa 76.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "es-MX-JorgeNeural",
+        "es-MX-GerardoNeural"
+      ],
+      "caracteresTexto": 154,
+      "caracteresSsml": 547,
+      "estimadaS": 17.03,
+      "realS": 14.92
+    },
+    {
+      "archivo": "es-previa_3-condiciones_0-breve.mp3",
+      "idioma": "es",
+      "pieza": "previa:3-condiciones:0",
+      "variante": "breve",
+      "texto": "Perfiles de equipo: Olímpico Quebralta, ataque 67 y defensa 80; Club Quebralta, ataque 82 y defensa 76.",
+      "roles": [
+        "estadista"
+      ],
+      "voces": [
+        "es-MX-GerardoNeural"
+      ],
+      "caracteresTexto": 103,
+      "caracteresSsml": 368,
+      "estimadaS": 10.84,
+      "realS": 10.17
+    },
+    {
+      "archivo": "en-previa_1-local_0-completa.mp3",
+      "idioma": "en",
+      "pieza": "previa:1-local:0",
+      "variante": "completa",
+      "texto": "Here is Olímpico Quebralta, in a four-one-four-one: Simón Rosauz wears the armband. A starting eleven with an average ability of 78; Vera Ulvueta in the dugout, adaptable.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "en-US-JennyNeural",
+        "en-US-GuyNeural"
+      ],
+      "caracteresTexto": 171,
+      "caracteresSsml": 633,
+      "estimadaS": 18.4,
+      "realS": 13.2
+    },
+    {
+      "archivo": "en-previa_1-local_0-breve.mp3",
+      "idioma": "en",
+      "pieza": "previa:1-local:0",
+      "variante": "breve",
+      "texto": "Here is Olímpico Quebralta, in a four-one-four-one: Simón Rosauz wears the armband.",
+      "roles": [
+        "narrador"
+      ],
+      "voces": [
+        "en-US-JennyNeural"
+      ],
+      "caracteresTexto": 83,
+      "caracteresSsml": 346,
+      "estimadaS": 9.16,
+      "realS": 6.07
+    },
+    {
+      "archivo": "en-previa_2-visita_0-completa.mp3",
+      "idioma": "en",
+      "pieza": "previa:2-visita:0",
+      "variante": "completa",
+      "texto": "Here is Club Quebralta, in a four-one-four-one: Darío Valera wears the armband. A starting eleven with an average ability of 81; Elio Zarueta in the dugout, adaptable.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "en-US-JennyNeural",
+        "en-US-GuyNeural"
+      ],
+      "caracteresTexto": 167,
+      "caracteresSsml": 629,
+      "estimadaS": 17.98,
+      "realS": 12.55
+    },
+    {
+      "archivo": "en-previa_2-visita_0-breve.mp3",
+      "idioma": "en",
+      "pieza": "previa:2-visita:0",
+      "variante": "breve",
+      "texto": "Here is Club Quebralta, in a four-one-four-one: Darío Valera wears the armband.",
+      "roles": [
+        "narrador"
+      ],
+      "voces": [
+        "en-US-JennyNeural"
+      ],
+      "caracteresTexto": 79,
+      "caracteresSsml": 342,
+      "estimadaS": 8.74,
+      "realS": 5.64
+    },
+    {
+      "archivo": "en-previa_3-condiciones_0-completa.mp3",
+      "idioma": "en",
+      "pieza": "previa:3-condiciones:0",
+      "variante": "completa",
+      "texto": "Sam Quinel is the referee. Rain and artificial surface. Team profiles: Olímpico Quebralta, attack 67 and defence 80; Club Quebralta, attack 82 and defence 76.",
+      "roles": [
+        "narrador",
+        "estadista"
+      ],
+      "voces": [
+        "en-US-JennyNeural",
+        "en-US-GuyNeural"
+      ],
+      "caracteresTexto": 158,
+      "caracteresSsml": 620,
+      "estimadaS": 17.03,
+      "realS": 14.8
+    },
+    {
+      "archivo": "en-previa_3-condiciones_0-breve.mp3",
+      "idioma": "en",
+      "pieza": "previa:3-condiciones:0",
+      "variante": "breve",
+      "texto": "Team profiles: Olímpico Quebralta, attack 67 and defence 80; Club Quebralta, attack 82 and defence 76.",
+      "roles": [
+        "estadista"
+      ],
+      "voces": [
+        "en-US-GuyNeural"
+      ],
+      "caracteresTexto": 102,
+      "caracteresSsml": 436,
+      "estimadaS": 10.84,
+      "realS": 9.79
+    }
+  ]
+}

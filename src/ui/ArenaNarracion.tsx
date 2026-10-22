@@ -7,6 +7,7 @@ import { nombreDescarga } from "../arena/transcripcion";
 import { descargarBlob } from "./ArenaDescargas";
 import { esperaReintentoInvitado, segmentoVozValido, type FalloInvitado } from "../arena/turnos";
 import { VOZ_BUFFER } from "../arena/buffer";
+import { esPrevia } from "../arena/previa";
 
 type Segmento = (ReturnType<typeof construirRelato> | ReturnType<typeof relatoIntervencion>) & { audio: { base64: string; tipo: string } | null };
 /** Brief 053 v1.1 § 9 · La pista guarda el `hastaTick` y el idioma con que se construyó: el WAV los usa. */
@@ -82,7 +83,7 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
           if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: "completa" } })) throw new Error("Intervención inconsistente");
           return s;
         } catch (error) {
-          const espera = vigente() ? esperaReintentoInvitado(fallo, reintentos, null) : null;
+          const espera = vigente() ? esperaReintentoInvitado(fallo, reintentos, null, i.tema) : null;
           if (espera === null) throw error;
           await dormir(espera);
         }
@@ -99,12 +100,14 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
             decodificador = new AudioContext({ sampleRate: 24000 });
             const segmentos: Segmento[] = [], tramos: TramoTemporal[] = [], muestras: Float32Array[] = [];
             let duracion = 0;
-            // Cada intervención va tras el primer tramo del narrador cuyo hastaTick ≥ tick.
-            const piezas: ({ desde: number; hasta: number } | IntervencionArena)[] = [];
+            // Cada intervención va tras el primer tramo del narrador cuyo hastaTick ≥ tick. Brief 056 § 5.6: las
+            // piezas de la previa van ANTES del primer tramo, como tramos de ancho cero [0, 0] (cursor en 0).
+            const previas = invitados.filter(i => esPrevia(i)), resto = invitados.filter(i => !esPrevia(i));
+            const piezas: ({ desde: number; hasta: number } | IntervencionArena)[] = [...previas];
             for (let inicio = 0, k = 0; inicio < hastaTick; inicio += intervalo) {
               const hasta = Math.min(inicio + intervalo, hastaTick);
               piezas.push({ desde: inicio, hasta });
-              while (k < invitados.length && invitados[k]!.tick <= hasta) piezas.push(invitados[k++]!);
+              while (k < resto.length && resto[k]!.tick <= hasta) piezas.push(resto[k++]!);
             }
             let total = piezas.length; setProgreso({ listos: 0, total });
             const decodificar = async (s: Segmento) => {

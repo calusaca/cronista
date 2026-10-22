@@ -28,7 +28,7 @@ test("activar y silenciar voz conserva su preparación y omite el gol ocurrido m
   let liberar!: () => void; const barrera = new Promise<void>(resolver => { liberar = resolver; });
   let entradas = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, async ruta => {
-    const p = ruta.request().postDataJSON(); peticiones.push(p);
+    const p = ruta.request().postDataJSON(); if (p.intervencion?.startsWith("previa:")) return ruta.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); peticiones.push(p);
     if (p.entradaTick !== undefined && ++entradas === 1) await barrera;
     const relato = construirRelato(r, p.desdeTick, p.hastaTick, "buffer", p.idioma, { entradaTick: p.entradaTick, cierre: p.cierre });
     await ruta.fulfill({ json: { ...relato, audio: { base64: voz, tipo: "audio/wav" } } }).catch(() => {});

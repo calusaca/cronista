@@ -450,7 +450,7 @@ test("arena: prepara una pista continua con los seis MP3 reales archivados, sin 
   await page.route("**/api/arena/grabaciones", r => r.fulfill({ json: { id } }));
   let solicitudes = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
-    const p = r.request().postDataJSON(); solicitudes++;
+    const p = r.request().postDataJSON(); if (p.intervencion?.startsWith("previa:")) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); solicitudes++;
     return r.fulfill({ json: { ...construirRelato(grabacion, p.desdeTick, p.hastaTick, p.modo, p.idioma), audio: { base64: bloques.get(p.desdeTick)!.toString("base64"), tipo: "audio/mpeg" } } });
   });
   await page.goto("/arena");

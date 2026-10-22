@@ -7,8 +7,9 @@ import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import { elegirReservaVoz, ordenPrimeraVuelta, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
 import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../arena/reservas-voz";
-import { caducidadInvitadoS, calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
+import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
+import { esPrevia } from "../arena/previa";
 import { ARENA, MESA_ARENA, RESERVAS_VOZ } from "../sim/limites";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
@@ -32,7 +33,7 @@ type Sonido = { silenciada: boolean; activacion: number; activadoTick: number; e
   reservasOidas: string[]; cargaReservas: AbortController; totalReservas: number;
   /** 048: por id de intervención, sus dos variantes; peticiones por `${id}|${variante}`; `pedidas` = ids terminados
    * (arrancados, descartados o caducados); `sonadas` = eventos cuya noticia ya sonó. */
-  invitados: Map<string, InvitadoLocal>; peticionesInvitado: Map<string, AbortController>; pedidas: Set<string>; sonadas: Set<string>; finUltimaNoticia: number | null; finUltimoInvitado: number | null; ultimoInvitado: { rol: Rol; tick: number } | null };
+  invitados: Map<string, InvitadoLocal>; peticionesInvitado: Map<string, AbortController>; pedidas: Set<string>; sonadas: Set<string>; finUltimaNoticia: number | null; finUltimoInvitado: number | null; ultimoInvitado: { rol: Rol; tick: number; tema?: string } | null };
 
 /** 048 · Una intervención termina en este consumidor (arrancó, se descartó o caducó): se abortan sus
  * peticiones, se sueltan sus dos variantes y no se vuelve a pedir. */
@@ -136,7 +137,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     s.silenciada = false; s.activacion++; s.activadoTick = tick; s.entradaPendiente = true; s.ultimoFin = s.contexto.currentTime;
     for (const [clave, a] of s.peticiones) if (clave.startsWith("entrada:")) { a.abort(); s.peticiones.delete(clave); }
     for (const [clave, c] of s.clips) if (c.segmento.fragmentos[0]!.tick < tick || clave.startsWith("entrada:")) s.clips.delete(clave);
-    for (const [id, inv] of s.invitados) if (inv.intervencion.tick < tick) terminarInvitado(s, id);
+    // Brief 056 v1.1 § 3: una pieza de la previa aún pendiente y vigente se conserva al reactivar.
+    for (const id of candidatasAlReactivar([...s.invitados.values()].map(inv => inv.intervencion), tick, s.pedidas)) terminarInvitado(s, id);
     reanudarAudio(true);
     setVoz(true); setVersion(v => v + 1);
   };
@@ -227,6 +229,14 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       if ((tickVisible - intervencion.tick) / 10 > caducidadInvitadoS(intervencion.tema)) { terminarInvitado(s, intervencion.id); continue; }
       let inv = s.invitados.get(intervencion.id);
       if (!inv) { inv = { intervencion, completa: { estado: "sin-pedir" }, breve: { estado: intervencion.turnosBreve?.length ? "sin-pedir" : "inexistente" } }; s.invitados.set(intervencion.id, inv); }
+      // Brief 056 § 5.2: con el reloj detenido (preparando/recuperando), una pieza de la previa pide
+      // directamente la completa (sin la breve antes); con el reloj en marcha, la regla del 048 v1.1 (9).
+      const previaDetenida = esPrevia(intervencion) && (reloj.current.estado === "preparando" || reloj.current.estado === "recuperando");
+      if (previaDetenida) {
+        if (inv.completa.estado !== "sin-pedir") continue;
+        if (pedible(inv.completa)) pedirVariante(inv, "completa");
+        break;
+      }
       // Una variante a la espera de su reintento conserva el orden: mientras tanto no se pide otra.
       if (inv.breve.estado === "sin-pedir") { if (pedible(inv.breve)) pedirVariante(inv, "breve"); break; }
       if (inv.completa.estado !== "sin-pedir") continue;
@@ -243,7 +253,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     }
     // La preparación depende de datos nuevos y del cursor, nunca del fin de un audio.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sesion, hastaTick, terminada, idioma, voz, version, bloque, intervenciones.length]);
+  }, [sesion, hastaTick, terminada, idioma, voz, version, bloque, intervenciones.length, vista.estado]);
 
   useEffect(() => {
     let frame = 0, anterior = performance.now();
@@ -269,6 +279,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               // 048 v1.1 (5): horizonte conservador; una noticia alcanzada y aún pendiente lo anula.
               ventanaS: horizonteS(datos.registro, segundo, datos.terminada, s.sonadas, s.activadoTick / 10),
               terminada: r.estado === "final", cerrando: s.cerrando,
+              // Brief 056 § 5.1 (4): reloj de presentación detenido (las previas no miran la ventana).
+              relojDetenido: r.estado === "preparando" || r.estado === "recuperando",
               // v3.1: la entrada precede a todo invitado: pendiente de pedir, en vuelo o sin consumir.
               aperturaPendiente: s.entradaPendiente || [...s.peticiones.keys()].some(k => k.startsWith("entrada:")) || [...s.clips.entries()].some(([k, c]) => k.startsWith("entrada:") && !c.consumido),
               candidatas: [...s.invitados.values()].filter(inv => !s.pedidas.has(inv.intervencion.id)).map(inv => ({ id: inv.intervencion.id, rol: inv.intervencion.rol, tick: inv.intervencion.tick, origen: inv.intervencion.turnos?.length ? "048" as const : "045" as const, tema: inv.intervencion.tema, completa: estadoCoordinador(inv.completa), breve: estadoCoordinador(inv.breve) })),
@@ -320,8 +332,9 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
                 const fuente = s.contexto.createBufferSource(); fuente.buffer = invitado.audio; fuente.connect(s.contexto.destination);
                 const activa: Activa = { fuente, fin: plan.fin, prioridad: MESA_ARENA.prioridadInvitado, recuerdo, rol, tick }; s.activa = activa;
                 // 048: al arrancar una variante se descarta la otra.
+                const tema = s.invitados.get(turno.id)?.intervencion.tema;
                 invitado.consumido = true; terminarInvitado(s, turno.id);
-                s.ultimoInvitado = { rol, tick }; s.finUltimoInvitado = plan.fin;
+                s.ultimoInvitado = { rol, tick, tema }; s.finUltimoInvitado = plan.fin;
                 fuente.onended = () => {
                   if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect();
                   if (sonido.current === s && s.activa === activa) { s.activa = undefined; s.ultimoFin = s.contexto.currentTime; s.finUltimoInvitado = Math.min(plan.fin, s.contexto.currentTime); setHablando(false); }

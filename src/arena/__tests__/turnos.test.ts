@@ -3,11 +3,11 @@
 // ventana conocida, calma por las manos del portero y validación de 1 a maxTurnos fragmentos.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
+import { ARENA, CANTO_GOL, MESA_ARENA, PREVIA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
 import { VOZ_BUFFER } from "../buffer";
 import { recordarVoz } from "../editorial";
 import type { EventoArena, RegistroArena } from "../tipos";
-import { caducidadInvitadoS, calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
+import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
 
 const ahora = 100, partidoS = 30, tickCursor = Math.round(partidoS / ARENA.pasoS);
 const valida = (d: number): EstadoVariante => ({ estado: "valida", duracionS: d });
@@ -315,5 +315,102 @@ describe("050 · caducidad de la Mesa tras un gol", () => {
     expect(segmentoVozValido(canto, { desde: 200, hasta: 250, idioma: "es" })).toBe(true);
     // Por esto el canto es UN fragmento con tramos y no tres fragmentos: el consumidor rechaza dos.
     expect(segmentoVozValido({ ...canto, fragmentos: [{ tick: 231 }, { tick: 231 }] }, { desde: 200, hasta: 250, idioma: "es" })).toBe(false);
+  });
+});
+
+// Brief 056 (v1.1 § 5.1 y §§ 3, 5) · La previa en el coordinador: caducidad propia, separación corta
+// solo entre previas, orden obligatorio por id, ventana infinita con el reloj detenido y 409 reintentable.
+describe("056 · previa en el coordinador de turnos", () => {
+  const P = PREVIA_ARENA;
+  const previaId = (n: number) => `previa:${n}-${P.piezas[n - 1]}:0`;
+  /** Pieza de la previa (tick 0) con dos variantes; el cursor en `partido` s. */
+  const previa = (n: number, extra: Partial<CandidataTurno> = {}): CandidataTurno => ({ id: previaId(n), rol: "estadista", tick: 0, origen: "048", tema: "previa", completa: valida(dur), breve: valida(dur / 2), ...extra });
+  const enCero = (extra: Partial<EntradaTurno> = {}) => base({ partidoS: 0, ...extra });
+
+  it("caducidadInvitadoS(\"previa\") = PREVIA_ARENA.caducidadS; mayor que la general y la separación menor que la general", () => {
+    expect(caducidadInvitadoS("previa")).toBe(P.caducidadS);
+    expect(P.caducidadS).toBeGreaterThan(MESA_ARENA.caducidadInvitadoS);
+    expect(P.separacionS).toBeLessThan(MESA_ARENA.separacionInvitadosS);
+    expect(P.bolsaSpeech.solicitudes).toBeGreaterThanOrEqual(P.piezas.length * 2 * 2);
+    // Una pieza arranca a caducidadS de partido y no un tick después.
+    const enS = (s: number) => base({ partidoS: s, candidatas: [previa(1)], ventanaS: dur * 2 });
+    expect(siguienteTurno(enS(P.caducidadS))?.id).toBe(previaId(1));
+    expect(siguienteTurno(enS(P.caducidadS + ARENA.pasoS))).toBeNull();
+    expect(descartesTurno(enS(P.caducidadS + ARENA.pasoS))).toEqual([previaId(1)]);
+  });
+
+  it("con el reloj detenido una previa completa de 19 s es elegible con ventanaS = 4; la misma candidata no previa elige la breve", () => {
+    const larga = previa(1, { completa: valida(19), breve: valida(3) });
+    expect(siguienteTurno(enCero({ relojDetenido: true, ventanaS: 4, candidatas: [larga] }))?.variante).toBe("completa");
+    const ordinaria: CandidataTurno = { ...larga, id: "estadista:posesion:0", tema: "posesion" };
+    expect(siguienteTurno(enCero({ relojDetenido: true, ventanaS: 4, candidatas: [ordinaria] }))?.variante).toBe("breve");
+    // Con el reloj en marcha, la previa sigue la regla general del 048.
+    expect(siguienteTurno(enCero({ relojDetenido: false, ventanaS: 4, candidatas: [larga] }))?.variante).toBe("breve");
+    // Detenido, con la completa aún pendiente (el consumidor no pide la breve), no arranca nada.
+    expect(siguienteTurno(enCero({ relojDetenido: true, ventanaS: 4, candidatas: [previa(1, { completa: { estado: "pendiente" }, breve: { estado: "pendiente" } })] }))).toBeNull();
+  });
+
+  it("separación PREVIA_ARENA.separacionS entre dos previas y la general entre una previa y un comentarista", () => {
+    const tras = { ultimoInvitado: { rol: "estadista" as const, tick: 0, tema: "previa" } };
+    expect(siguienteTurno(enCero({ ...tras, finUltimoInvitadoS: ahora - P.separacionS + 0.01, candidatas: [previa(2)] }))).toBeNull();
+    expect(siguienteTurno(enCero({ ...tras, finUltimoInvitadoS: ahora - P.separacionS, candidatas: [previa(2)] }))?.id).toBe(previaId(2));
+    // Tras una previa, un comentarista espera la separación general.
+    const com = cand("comentarista", 0);
+    expect(siguienteTurno(enCero({ ...tras, finUltimoInvitadoS: ahora - P.separacionS, candidatas: [com] }))).toBeNull();
+    expect(siguienteTurno(enCero({ ...tras, finUltimoInvitadoS: ahora - MESA_ARENA.separacionInvitadosS, candidatas: [com] }))?.id).toBe(com.id);
+    // Tras un invitado ordinario, una previa también espera la general.
+    const trasOrdinario = { ultimoInvitado: { rol: "comentarista" as const, tick: 0, tema: "tiempo" } };
+    expect(siguienteTurno(enCero({ ...trasOrdinario, finUltimoInvitadoS: ahora - P.separacionS, candidatas: [previa(1)] }))).toBeNull();
+    expect(siguienteTurno(enCero({ ...trasOrdinario, finUltimoInvitadoS: ahora - MESA_ARENA.separacionInvitadosS, candidatas: [previa(1)] }))?.id).toBe(previaId(1));
+  });
+
+  it("empate de tick entre previas resuelto por id ascendente, sea cual sea el orden de entrada", () => {
+    expect(siguienteTurno(enCero({ candidatas: [previa(3), previa(2), previa(1)] }))?.id).toBe(previaId(1));
+    expect(siguienteTurno(enCero({ candidatas: [previa(3), previa(2)] }))?.id).toBe(previaId(2));
+  });
+
+  it("orden obligatorio: la pieza 2 válida espera a la 1 pendiente; si la 1 falló o caducó, pasa la 2", () => {
+    const pendiente = previa(1, { completa: { estado: "pendiente" }, breve: { estado: "pendiente" } });
+    expect(siguienteTurno(enCero({ candidatas: [previa(2), pendiente] }))).toBeNull();
+    const fallida = previa(1, { completa: { estado: "fallida" }, breve: { estado: "fallida" } });
+    expect(siguienteTurno(enCero({ candidatas: [previa(2), fallida] }))?.id).toBe(previaId(2));
+    // Audio fuera de orden: la 2 llegó antes, la 1 decodificada después → suena la 1 primero.
+    expect(siguienteTurno(enCero({ candidatas: [previa(2), previa(1)] }))?.id).toBe(previaId(1));
+  });
+
+  it("regresiones (v1.1 § 5): candidatas ordinarias del mismo rol y tick conservan el orden estable de hoy", () => {
+    const a: CandidataTurno = { ...cand("estadista", tickCursor, `estadista:b:${tickCursor}`) }, b: CandidataTurno = { ...cand("estadista", tickCursor, `estadista:a:${tickCursor}`) };
+    // Resultado de hoy (sort estable por tick): la primera de la lista, aunque su id sea mayor.
+    expect(siguienteTurno(base({ candidatas: [a, b] }))?.id).toBe(a.id);
+    expect(siguienteTurno(base({ candidatas: [b, a] }))?.id).toBe(b.id);
+    const final: CandidataTurno = { ...cand("estadista", tickCursor, `estadista:final:${tickCursor}`) };
+    expect(siguienteTurno(base({ candidatas: [final, a] }))?.id).toBe(final.id);
+    expect(siguienteTurno(base({ candidatas: [a, final] }))?.id).toBe(a.id);
+    // Mezcla previa + ordinaria: la ordinaria más reciente (mismo rol) sigue ganando por tick.
+    const mezcla = base({ partidoS: 5, candidatas: [previa(1), cand("estadista", 50)] });
+    expect(siguienteTurno(mezcla)?.id).toBe(cand("estadista", 50).id);
+  });
+
+  it("409 reintentable solo con tema previa; los demás estados no cambian", () => {
+    const http = (estado: number) => ({ tipo: "http" as const, estado });
+    expect(esperaReintentoInvitado(http(409), 0, 0, "previa")).toBeGreaterThan(0);
+    expect(esperaReintentoInvitado(http(409), 0, 0, "tiempo")).toBeNull();
+    expect(esperaReintentoInvitado(http(409), 0, 0)).toBeNull();
+    expect(esperaReintentoInvitado(http(404), 0, 0, "previa")).toBeNull();
+    // Caducidad de la previa en el reintento.
+    expect(esperaReintentoInvitado(http(429), 0, P.caducidadS, "previa")).not.toBeNull();
+    expect(esperaReintentoInvitado(http(429), 0, P.caducidadS + ARENA.pasoS, "previa")).toBeNull();
+  });
+
+  it("v1.1 § 3 · candidatasAlReactivar: previa pendiente a 5 s se conserva; a 31 s se termina; arrancada no aparece; ordinaria se termina", () => {
+    const pieza = (n: number) => ({ id: previaId(n), tick: 0, forma: "previa" as const });
+    const ordinaria = { id: "comentarista:tiempo:20", tick: 20, forma: "pregunta" as const };
+    const enTick = (s: number) => Math.round(s / ARENA.pasoS);
+    expect(candidatasAlReactivar([pieza(2)], enTick(5))).toEqual([]);
+    expect(candidatasAlReactivar([pieza(2)], enTick(P.caducidadS + 1))).toEqual([pieza(2).id]);
+    expect(candidatasAlReactivar([pieza(1), pieza(2)], enTick(5), new Set([pieza(1).id]))).toEqual([]);
+    expect(candidatasAlReactivar([ordinaria, pieza(3)], enTick(5))).toEqual([ordinaria.id]);
+    // Una candidatura no anterior a la activación nunca se termina.
+    expect(candidatasAlReactivar([{ id: "estadista:x:60", tick: 60 }], enTick(5))).toEqual([]);
   });
 });

@@ -119,7 +119,7 @@ test("mesa: narrador, comentarista y estadista se ceden la palabra sin solaparse
   const pedidos: Pedido[] = [], respondidas: Record<string, number> = {};
   await preparar(page, id, registro, intervenciones, corte);
   await page.route(`**/api/arena/sesiones/${id}/relato`, async (r: Route) => {
-    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && !intervenciones.some(x => x.id === p.intervencion)) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); pedidos.push(p);
     if (p.intervencion) {
       await esperar(300);
       const i = intervenciones.find(x => x.id === p.intervencion)!;
@@ -220,7 +220,7 @@ test("mesa: con noticias continuas y audio del invitado demorado no arranca ning
   await preparar(page, id, registro, intervenciones, corte);
   let invitadas = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido;
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && !intervenciones.some(x => x.id === p.intervencion)) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     if (p.intervencion) {
       invitadas++; await esperar(3000);
       const i = intervenciones.find(x => x.id === p.intervencion)!;
@@ -288,7 +288,7 @@ test("mesa: «Escuchar desde el inicio» inserta las intervenciones del diario e
     await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: [{ tipo: "sesion", id, asignacion }, { tipo: "terminada", estado: "completa", metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } }].map((publicacion, i) => `id: ${i + 1}\nevent: arena\ndata: ${JSON.stringify({ id: i + 1, publicacion })}\n\n`).join("") }));
     await page.route(`**/api/arena/sesiones/${id}/reproduccion`, r => r.fulfill({ json: { registro, comentarios: [], intervenciones, asignacion, metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } } }));
     await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
-      const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+      const p = r.request().postDataJSON() as Pedido; if (p.intervencion && !intervenciones.some(x => x.id === p.intervencion)) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); pedidos.push(p);
       if (p.intervencion) {
         if (p.intervencion === falla) return r.fulfill({ status: 503, json: { error: "Speech no disponible en esta prueba" } });
         if (p.intervencion === limitado && rechazados < rechazos429) { rechazados++; return r.fulfill({ status: 429, json: { error: "Hay otras consultas en curso; espera a que terminen" } }); }
@@ -412,7 +412,7 @@ test("048 · diálogo: ronda completa, pregunta breve gracias a las manos, estad
   const pedidos: Pedido[] = [];
   await preparar(page, id, registro, intervenciones, corte);
   await page.route(`**/api/arena/sesiones/${id}/relato`, async (r: Route) => {
-    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && !intervenciones.some(x => x.id === p.intervencion)) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); pedidos.push(p);
     if (p.intervencion) {
       await esperar(300);
       const i = intervenciones.find(x => x.id === p.intervencion)!, v = varianteEfectiva(i, (p.variante ?? "completa") as "completa" | "breve");
@@ -520,7 +520,7 @@ test("048 · con la breve retrasada 3 s y la completa que no cabe, el invitado e
   await preparar(page, id, registro, [i], 200);
   const respuestas: Record<string, number> = {}, pedidos: Pedido[] = [];
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && p.intervencion !== i.id) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); pedidos.push(p);
     if (p.intervencion) {
       if (p.variante === "breve") await esperar(retrasoMs);
       respuestas[p.variante ?? "completa"] = Date.now();
@@ -580,7 +580,7 @@ test("048 · completa decodificada que ya no cabe cuando llega el turno: arranca
   await preparar(page, id, registro, [i], 200);
   const pedidos: Pedido[] = [];
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && p.intervencion !== i.id) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {}); pedidos.push(p);
     if (p.intervencion) { await esperar(300); return r.fulfill({ json: { ...relatoIntervencion(i, seed, p.idioma as "es" | "en", p.variante as "completa" | "breve"), audio: { base64: p.variante === "breve" ? clips.breve : clips.completa, tipo: "audio/wav" } } }).catch(() => {}); }
     if (p.entradaTick !== undefined) { await esperar(200); return r.fulfill({ json: segmento(p, p.entradaTick, "Apertura", 10, clips.apertura, { tipoRelato: "entrada" }) }).catch(() => {}); }
     await esperar(200);
@@ -623,7 +623,7 @@ test("048 v1.2 G03 · una noticia alcanzada pero pendiente de sonar anula la ven
   const clips = { completa: await audio(completaS), breve: await audio(breveS), apertura: await audio(aperturaS), noticia: await audio(noticiaS) };
   await preparar(page, id, registro, [i], 200);
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido;
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && p.intervencion !== i.id) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     if (p.intervencion) { await esperar(300); return r.fulfill({ json: { ...relatoIntervencion(i, seed, p.idioma as "es" | "en", p.variante as "completa" | "breve"), audio: { base64: p.variante === "breve" ? clips.breve : clips.completa, tipo: "audio/wav" } } }).catch(() => {}); }
     if (p.entradaTick !== undefined) { await esperar(200); return r.fulfill({ json: segmento(p, p.entradaTick, "Apertura", 10, clips.apertura, { tipoRelato: "entrada" }) }).catch(() => {}); }
     if (p.desdeTick === Math.floor((tGol - 1) / 50) * 50) {
@@ -668,7 +668,7 @@ async function mesaCon429(page: Page, id: string, rechazar: (intento: number) =>
   const intentos: Intento[] = [], narrador: { t: number; memoria: string[] }[] = [], cuenta: Record<string, number> = {};
   let enVuelo = 0, maxEnVuelo = 0;
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido;
+    const p = r.request().postDataJSON() as Pedido; if (p.intervencion && p.intervencion !== i.id) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     if (p.intervencion) {
       const clave = p.variante ?? "completa", intento = cuenta[clave] = (cuenta[clave] ?? 0) + 1;
       const reloj = relojS(await page.getByTestId("arena-clock").textContent().catch(() => "") ?? "");

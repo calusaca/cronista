@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { leerJsonAcotado } from "../../../../../../arena/peticiones";
 import { construirRelato, relatoIntervencion } from "../../../../../../arena/relato";
+import { esPrevia, previaPartido } from "../../../../../../arena/previa";
+import type { IntervencionArena } from "../../../../../../arena/protocolo";
 import { ErrorSesion, gestorSesiones, respuestaErrorSesion } from "../../../../../../arena/sesiones";
 import { asignarVoces, catalogoVoces, claveAudio, prepararVoz, sintetizarVoz, vocesDe } from "../../../../../../arena/voz";
 
@@ -15,7 +17,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const conIntervencion = typeof cuerpo === "object" && cuerpo !== null && "intervencion" in cuerpo;
     const memoria = conIntervencion ? z.unknown().transform(() => undefined)
       : z.array(z.strictObject({ tick: z.number().int().nonnegative().max(1800), texto: z.string().max(500), clave: z.string().max(120).optional(), tema: z.string().max(80).optional(), estado: z.enum(["iniciada", "completa", "interrumpida"]).optional(), rol: z.enum(["narrador", "comentarista", "estadista"]).optional() })).max(12).optional();
-    const p = z.strictObject({ desdeTick: z.number().int().nonnegative().max(1800), hastaTick: z.number().int().positive().max(1800), idioma: z.enum(["es", "en"]), modo: z.enum(["vivo", "completo", "buffer"]), cierre: z.boolean().optional(), entradaTick: z.number().int().nonnegative().max(1800).optional(),
+    const p = z.strictObject({ desdeTick: z.number().int().nonnegative().max(1800), hastaTick: z.number().int().nonnegative().max(1800), idioma: z.enum(["es", "en"]), modo: z.enum(["vivo", "completo", "buffer"]), cierre: z.boolean().optional(), entradaTick: z.number().int().nonnegative().max(1800).optional(),
       // Brief 045: identificador del diario; la intervención se lee, nunca se regenera.
       intervencion: z.string().min(1).max(120).optional(),
       // Brief 048: variante del intercambio (solo con `intervencion`); por defecto, la completa.
@@ -24,7 +26,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     const { id } = await ctx.params, gestor = gestorSesiones();
     if (p.variante !== undefined && p.intervencion === undefined) throw new ErrorSesion("La variante solo se admite con una intervención", 400);
     if (p.intervencion !== undefined) {
-      const intervencion = await gestor.intervencionPublicada(id, p.intervencion);
+      // Brief 056 § 5.3 · La previa no está en el diario: se re-deriva del prefijo publicado en el tick 0
+      // (config + inicial); un id previa:* desconocido es 404 como cualquier intervención no publicada.
+      const previa = esPrevia({ id: p.intervencion });
+      let intervencion: IntervencionArena;
+      if (previa) {
+        const vista = await gestor.vistaPublicada(id, 0);
+        let piezas: IntervencionArena[] = [];
+        try { piezas = previaPartido(vista); } catch { /* Alineación inconsistente: no hay previa que servir. */ }
+        const encontrada = piezas.find(i => i.id === p.intervencion);
+        if (!encontrada) throw new ErrorSesion("Intervención no publicada", 404);
+        intervencion = encontrada;
+      } else intervencion = await gestor.intervencionPublicada(id, p.intervencion);
       if (p.modo !== "buffer" || p.cierre || p.entradaTick !== undefined || p.desdeTick !== intervencion.tick || p.hastaTick !== intervencion.tick) throw new ErrorSesion("Ventana de intervención inválida", 400);
       const registro = await gestor.vistaPublicada(id, intervencion.tick);
       // v3.1: la memoria del espectador no influye en la intervención; si llega, se ignora.
@@ -33,9 +46,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       // Voz efectiva por rol, con la degradación del catálogo que publica /herramientas.
       const preparada = prepararVoz(relato.fragmentos, p.idioma, vocesDe(asignarVoces(p.idioma, await catalogoVoces())));
       // 048 v1.2 (2): la síntesis de un invitado respeta la cuota de invitados y la reserva del cierre (si no, 429).
-      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados, "invitado");
+      // Brief 056 § 5.4: la previa cobra solo de su bolsa propia (clase "previa").
+      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados, previa ? "previa" : "invitado");
       return Response.json({ ...relato, audio }, { headers: { "cache-control": "private, max-age=86400" } });
     }
+    // Brief 056 v1.1 § 1 · La rama del narrador exige una ventana no vacía (antes la rechazaba construirRelato).
+    if (!(p.hastaTick > p.desdeTick)) throw new ErrorSesion("Ventana de relato vacía", 400);
     const registro = await gestor.vistaPublicada(id, p.hastaTick);
     const relato = construirRelato(registro, p.desdeTick, p.hastaTick, p.modo, p.idioma, { cierre: p.cierre, entradaTick: p.entradaTick, memoria: p.memoria });
     if (!relato.texto) return Response.json({ ...relato, audio: null }, { headers: { "cache-control": "no-store" } });

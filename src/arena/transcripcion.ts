@@ -78,14 +78,14 @@ export const ROTULOS_TRANSCRIPCION = {
     contiene: "Qué contiene", transmision: "Transmisión",
     resumen: "{n} líneas: {a} del relato por plantillas, {b} de comentarios del narrador (IA), {c} de la mesa ({d} turnos).",
     noContiene: "No contiene:",
-    orden: "Orden canónico por tiempo; la pista de audio inserta a los invitados tras la ventana del narrador.",
-    nota: "Las líneas del relato por plantillas no pasan por el verificador V1–V8. Los comentarios de IA y sus respaldos por plantilla se publican solo verificados con V1–V8; los datos del estadista son deterministas; los diálogos de la mesa superaron D1–D5.",
+    orden: "Orden canónico por tiempo; la pista de audio inserta a los invitados tras la ventana del narrador, salvo la previa, que va antes del primer tramo.",
+    nota: "Las líneas del relato por plantillas no pasan por el verificador V1–V8. Los comentarios de IA y sus respaldos por plantilla se publican solo verificados con V1–V8; los datos del estadista son deterministas; los diálogos de la mesa superaron D1–D5. La previa (alineaciones, técnicos y condiciones) se deriva del registro por plantilla determinista.",
     noImportable: "Este archivo no es un registro del partido y no se puede importar; el registro se descarga en «Partidos guardados».",
     roles: { narrador: "Narrador", comentarista: "Comentarista", estadista: "Estadista" },
     relato: "relato", comentario: "comentario", conversacion: "Conversación", intervencion: "intervención",
     modos: { plantilla: "plantilla", llm: "IA", determinista: "determinista" },
     funciones: { pregunta: "pregunta", cesion: "cesión", respuesta: "respuesta", dato: "dato", cierre: "cierre" },
-    formas: { pregunta: "pregunta", dato: "dato", ronda: "ronda", estadista: "estadista", final: "final" },
+    formas: { pregunta: "pregunta", dato: "dato", ronda: "ronda", estadista: "estadista", final: "final", previa: "previa" },
     evidencia: "Evidencia", eventos: "eventos", hechos: "hechos", posiciones: "posiciones", intervalo: "intervalo", refiere: "refiere", oracion: "oración", plantilla: "plantilla",
     verificacion: "Verificación del texto", vAprobada: "V1–V8 aprobado", dAprobada: "D1–D5 aprobado",
     clases: {
@@ -103,7 +103,7 @@ export const ROTULOS_TRANSCRIPCION = {
       "El comentario editorial en vivo (depende de la memoria de cada espectador).",
       "La variante breve de los intercambios; se transcribe la completa.",
       "Las cesiones del narrador a las intervenciones sin turnos (se deciden al sintetizar).",
-      "Qué intervenciones caducaron o no sonaron. Orden canónico por tiempo; la pista de audio inserta a los invitados tras la ventana del narrador.",
+      "Qué intervenciones caducaron o no sonaron. Orden canónico por tiempo; la pista de audio inserta a los invitados tras la ventana del narrador, salvo la previa, que va antes del primer tramo.",
       "La descripción evento a evento (está en el registro del partido).",
     ],
   },
@@ -113,14 +113,14 @@ export const ROTULOS_TRANSCRIPCION = {
     contiene: "What it contains", transmision: "Broadcast",
     resumen: "{n} lines: {a} from the template play-by-play, {b} from narrator commentary (AI), {c} from the desk ({d} turns).",
     noContiene: "Not included:",
-    orden: "Canonical order by time; the audio track inserts guests after the narrator's window.",
-    nota: "Template play-by-play lines do not go through the V1–V8 verifier. AI commentary and its template fallbacks are only published after passing V1–V8; statistician data are deterministic; desk dialogues passed D1–D5.",
+    orden: "Canonical order by time; the audio track inserts guests after the narrator's window, except the pre-match segment, which comes before the first passage.",
+    nota: "Template play-by-play lines do not go through the V1–V8 verifier. AI commentary and its template fallbacks are only published after passing V1–V8; statistician data are deterministic; desk dialogues passed D1–D5. The pre-match segment (line-ups, coaches and conditions) is derived from the match run by deterministic template.",
     noImportable: "This file is not a match run and cannot be imported; the run is downloaded under “Saved matches”.",
     roles: { narrador: "Narrator", comentarista: "Commentator", estadista: "Statistician" },
     relato: "play-by-play", comentario: "commentary", conversacion: "Conversation", intervencion: "intervention",
     modos: { plantilla: "template", llm: "AI", determinista: "deterministic" },
     funciones: { pregunta: "question", cesion: "hand-over", respuesta: "answer", dato: "data", cierre: "close" },
-    formas: { pregunta: "question", dato: "data", ronda: "round", estadista: "statistician", final: "final" },
+    formas: { pregunta: "question", dato: "data", ronda: "round", estadista: "statistician", final: "final", previa: "pre-match" },
     evidencia: "Evidence", eventos: "events", hechos: "facts", posiciones: "positions", intervalo: "interval", refiere: "refers to", oracion: "sentence", plantilla: "template",
     verificacion: "Text checks", vAprobada: "V1–V8 passed", dAprobada: "D1–D5 passed",
     clases: {
@@ -138,7 +138,7 @@ export const ROTULOS_TRANSCRIPCION = {
       "Live editorial commentary (it depends on each viewer's memory).",
       "The short variant of exchanges; the full variant is transcribed.",
       "Narrator hand-overs to interventions without turns (decided at synthesis time).",
-      "Which interventions expired or were not heard. Canonical order by time; the audio track inserts guests after the narrator's window.",
+      "Which interventions expired or were not heard. Canonical order by time; the audio track inserts guests after the narrator's window, except the pre-match segment, which comes before the first passage.",
       "The event-by-event description (it is in the match run).",
     ],
   },
@@ -171,7 +171,8 @@ export function construirTranscripcion(entrada: EntradaTranscripcion, hastaTick:
   const posicion = new Map(registro.eventos.map((e, i) => [e.id, i]));
   const ordenar = (ids: Iterable<string>) => unicos(ids).sort((a, b) => (posicion.get(a) ?? Number.MAX_SAFE_INTEGER) - (posicion.get(b) ?? Number.MAX_SAFE_INTEGER));
   const borradores: Borrador[] = [];
-  const agregar = (linea: Borrador["linea"], pos: number, k: number) => borradores.push({ linea, clave: [linea.tick, ORIGEN[linea.origen], pos, k] });
+  // Brief 056 § 5.7 · La previa tiene clave de origen −1: precede al relato del tick 0.
+  const agregar = (linea: Borrador["linea"], pos: number, k: number) => borradores.push({ linea, clave: [linea.tick, linea.intervencion?.forma === "previa" ? -1 : ORIGEN[linea.origen], pos, k] });
 
   // Relato por plantillas: ventanas de RELATO_INTERVALOS.completo, ES y EN alineadas uno a uno.
   // Ronda 2 · Con corte 0 entran también las líneas de tick 0 («Comienza…» y eventos del tick 0):
@@ -248,6 +249,16 @@ export function construirTranscripcion(entrada: EntradaTranscripcion, hastaTick:
     // El historial del comentarista nunca se copia a líneas del estadista ni del narrador.
     const historialC = i.rol === "comentarista" ? historialDe(i.audit, false) : undefined;
     const claseInvitado = (rol: Exclude<RolMesa, "narrador">): ClaseVerificacion => rol === "estadista" ? "dato-determinista" : i.modo === "llm" ? "llm-aprobado" : "respaldo-verificado";
+    if (i.forma === "previa" && i.turnos?.length) {
+      // Brief 056 § 5.7 · Previa: una línea por turno, dato determinista (también el narrador, que lee un
+      // dato del registro), sin V1–V8 ni D1–D5 (su garantía es la reconstrucción exacta, comprobarPrevia).
+      i.turnos.forEach((t, k) => agregar({
+        tick: i.tick, rol: t.rol, origen: "intervencion", modo: "determinista", texto_es: t.texto_es, texto_en: t.texto_en, evidencia: evidenciaDe(i, t.oraciones, []),
+        verificacion: { v: { estado: "no-aplica" }, d: { estado: "no-aplica" }, clase: "dato-determinista" },
+        intervencion: { ...base, turno: k, funcion: "dato" },
+      }, pos, k));
+      return;
+    }
     if (i.turnos?.length) {
       // 048 · Una línea por turno de la variante completa; D1–D5 aprobados (si no, no habría turnos).
       i.turnos.forEach((t, k) => {

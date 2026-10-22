@@ -1,4 +1,4 @@
-import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL, MESA_ARENA, PREVIA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 import { VOZ_BUFFER } from "./buffer";
 import type { RecuerdoVoz } from "./editorial";
 import type { IntervencionArena, TurnoMesa, VarianteIntercambio } from "./protocolo";
@@ -19,10 +19,13 @@ export interface EntradaTurno {
   ahoraAudioS: number;              // reloj Web Audio
   fuenteActiva: { rol: Rol; prioridad: number; finS: number } | null; // reservas incluidas (prioridad −1)
   finUltimaNoticiaS: number | null; // fin (reloj de audio) del último clip del narrador con prioridad ≥ VOZ_BUFFER.prioridadInterrupcion; null si aún no hubo
-  finUltimoInvitadoS: number | null; ultimoInvitado: { rol: Rol; tick: number } | null;
+  /** Brief 056 § 5.1 (2): `tema` del invitado anterior; entre dos piezas de la previa rige PREVIA_ARENA.separacionS. */
+  finUltimoInvitadoS: number | null; ultimoInvitado: { rol: Rol; tick: number; tema?: string } | null;
   pausaVigente: boolean;            // 048: calmaEnFotograma(cursor) — pausa vigente o balón en manos del portero
   terminada: boolean; cerrando: boolean;
   aperturaPendiente: boolean;       // v3.1: la entrada del narrador aún no sonó (pedida, en vuelo o decodificada sin consumir)
+  /** Brief 056 § 5.1 (4): reloj de presentación en `preparando` o `recuperando` (cursor detenido). */
+  relojDetenido?: boolean;
   /** 048 · ventanaConocidaS en el cursor: horizonte conservador hasta la próxima noticia. */
   ventanaS: number | null;
   candidatas: CandidataTurno[];
@@ -40,8 +43,11 @@ const posible = (v: EstadoVariante) => v.estado === "valida" || v.estado === "pe
 /** Brief 050 v1.1 (3) · Caducidad (segundos de partido) de una candidatura según su tema: tras un gol,
  * CANTO_GOL.caducidadInvitadoTrasGolS (el canto y la calma ocupan casi la general); el resto, la del 045. */
 export function caducidadInvitadoS(tema: string): number {
-  return tema === "gol" ? CANTO_GOL.caducidadInvitadoTrasGolS : MESA_ARENA.caducidadInvitadoS;
+  // Brief 056 § 5.1 (1): las piezas de la previa duran hasta PREVIA_ARENA.caducidadS.
+  return tema === "gol" ? CANTO_GOL.caducidadInvitadoTrasGolS : tema === "previa" ? PREVIA_ARENA.caducidadS : MESA_ARENA.caducidadInvitadoS;
 }
+/** Brief 056 · Candidata de la previa (por id; el tema la acompaña). */
+const esPreviaCandidata = (c: Pick<CandidataTurno, "id">) => c.id.startsWith("previa:");
 const edadS = (c: CandidataTurno, e: EntradaTurno) => e.partidoS - c.tick * ARENA.pasoS;
 /** Caducidad propia del invitado (no el atraso del narrador): ni vieja ni futura. */
 const aTiempo = (c: CandidataTurno, e: EntradaTurno) => c.rol !== "narrador" && edadS(c, e) <= caducidadInvitadoS(c.tema) && c.tick * ARENA.pasoS <= e.partidoS + 1e-6;
@@ -79,19 +85,43 @@ export function siguienteTurno(e: EntradaTurno): { id: string; variante: Variant
   if (e.fuenteActiva !== null || e.terminada || e.cerrando || e.aperturaPendiente) return null;
   const calma = e.finUltimaNoticiaS === null || e.ahoraAudioS - e.finUltimaNoticiaS >= MESA_ARENA.calmaMinS || e.pausaVigente;
   if (!calma) return null;
-  if (e.finUltimoInvitadoS !== null && e.ahoraAudioS - e.finUltimoInvitadoS < MESA_ARENA.separacionInvitadosS) return null;
+  // Brief 056 § 5.1 (2): la separación se evalúa por candidata; entre dos piezas de la previa es
+  // PREVIA_ARENA.separacionS, en cualquier otro caso la general (mismo resultado que antes).
+  const separada = (c: CandidataTurno) => {
+    if (e.finUltimoInvitadoS === null) return true;
+    const minima = esPreviaCandidata(c) && e.ultimoInvitado?.tema === "previa" ? PREVIA_ARENA.separacionS : MESA_ARENA.separacionInvitadosS;
+    return e.ahoraAudioS - e.finUltimoInvitadoS >= minima;
+  };
   const vigentes = e.candidatas.filter(c => aTiempo(c, e) && conFuturo(c));
+  // Brief 056 v1.1 § 5: orden obligatorio entre previas; una pieza espera mientras otra de id menor siga vigente.
+  const esperaAnterior = (c: CandidataTurno) => esPreviaCandidata(c) && vigentes.some(o => esPreviaCandidata(o) && o.id < c.id);
   const orden: Rol[] = e.ultimoInvitado?.rol === "comentarista" ? ["estadista", "comentarista"] : ["comentarista", "estadista"];
   for (const rol of orden) {
     // Dentro del rol, la más reciente que puede arrancar ya (v1.2, B13: una candidata solo
     // pendiente no desplaza a una válida; las superadas ya salieron por descartesTurno).
-    for (const c of vigentes.filter(c => c.rol === rol).sort((a, b) => b.tick - a.tick)) {
-      const variante = varianteElegible(c, e.ventanaS);
+    // Brief 056 v1.1 § 5: a igual tick, desempate por id ascendente SOLO entre dos previas (orden estable para el resto).
+    for (const c of vigentes.filter(c => c.rol === rol).sort((a, b) => b.tick - a.tick || (esPreviaCandidata(a) && esPreviaCandidata(b) ? (a.id < b.id ? -1 : a.id > b.id ? 1 : 0) : 0))) {
+      if (!separada(c) || esperaAnterior(c)) continue;
+      // Brief 056 § 5.1 (4): con el reloj detenido, una previa elige sin mirar la ventana (completa si es válida).
+      const variante = varianteElegible(c, esPreviaCandidata(c) && e.relojDetenido ? Number.POSITIVE_INFINITY : e.ventanaS);
       // v3.1: `texto = id`, nunca el texto hablado; el consumidor lo añade tal cual, solo al arrancar.
       if (variante) return { id: c.id, variante, recuerdo: { tick: Math.floor(e.partidoS / ARENA.pasoS + 1e-9), texto: c.id, clave: c.id, tema: rol, estado: "iniciada", rol } };
     }
   }
   return null;
+}
+
+/** Brief 056 v1.1 § 3 · Al reactivar la voz en el tick `tick`, ids de las candidaturas conocidas a terminar:
+ * las anteriores a `tick` (regla del 045/048), salvo una pieza de la previa que aún no arrancó (no está en
+ * `pedidas`) mientras no haya caducado (PREVIA_ARENA.caducidadS). Las ya terminadas no se tocan. */
+export function candidatasAlReactivar(invitados: Iterable<Pick<IntervencionArena, "id" | "tick" | "forma">>, tick: number, pedidas: ReadonlySet<string> = new Set()): string[] {
+  const ids: string[] = [];
+  for (const i of invitados) {
+    if (pedidas.has(i.id) || !(i.tick < tick)) continue;
+    const previaVigente = (i.forma === "previa" || i.id.startsWith("previa:")) && (tick - i.tick) * ARENA.pasoS <= PREVIA_ARENA.caducidadS + 1e-9;
+    if (!previaVigente) ids.push(i.id);
+  }
+  return ids;
 }
 
 /** Brief 048 · Calma en el fotograma del cursor: pausa vigente (045) o balón en las manos del
@@ -175,7 +205,8 @@ export type FalloInvitado = { tipo: "http"; estado: number } | { tipo: "red" } |
  * cursor; `null` en la repetición guardada, que no tiene caducidad). Brief 050 v1.1 (3): la caducidad
  * es la del `tema` de la intervención (`caducidadInvitadoS(tema)`). */
 export function esperaReintentoInvitado(fallo: FalloInvitado, reintentosHechos: number, edadS: number | null, tema = ""): number | null {
-  const reintentable = fallo.tipo === "red" || fallo.tipo === "http" && fallo.estado === 429;
+  // Brief 056 § 5.1 (5): un 409 (la vista publicada aún no tiene `inicio`) solo se reintenta en la previa.
+  const reintentable = fallo.tipo === "red" || fallo.tipo === "http" && (fallo.estado === 429 || fallo.estado === 409 && tema === "previa");
   if (!reintentable || !Number.isInteger(reintentosHechos) || reintentosHechos < 0 || reintentosHechos >= MESA_ARENA.maxReintentosInvitado) return null;
   if (edadS !== null && !(edadS <= caducidadInvitadoS(tema))) return null;
   return MESA_ARENA.reintentoInvitadoMs * 2 ** reintentosHechos;

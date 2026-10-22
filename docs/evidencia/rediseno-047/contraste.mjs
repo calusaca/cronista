@@ -11,6 +11,9 @@ import { chromium } from "@playwright/test";
 const ARGS = process.argv.slice(2).filter(a => !a.startsWith("--"));
 const CARGAR = process.argv.find(a => a.startsWith("--cargar="))?.split("=")[1] ?? null;
 const FAVORITO = process.argv.includes("--favorito");
+// Brief 056: --previa mide en el tick 0 (SEGUNDO = 0): los pares de la tarjeta de alineaciones pasan a
+// obligatorios y los demás a opcionales (en el tick 0 aún no hay acciones, iconos ni datos de la Mesa).
+const PREVIA = process.argv.includes("--previa");
 const URL_ARENA = ARGS[0] ?? "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena?partido=cd0e2ad0-a8b6-45fb-ba6d-1a9ca3f9a905";
 // [nombre, selector primer plano, propiedad, selectores de fondo (null = ancestro opaco), propiedad fondo, mínimo, obligatorio tras el 047]
 const PARES = [
@@ -83,6 +86,20 @@ const PARES = [
   ["tarjeta amarilla del feed / tarjeta", ".arena-live-feed [data-kind=amarilla] rect", "fill", null, null, 3, false],
   ["tarjeta roja del feed / tarjeta", ".arena-live-feed [data-kind=roja] rect", "fill", null, null, 3, false],
 ];
+// Brief 056 · Tarjeta de alineaciones: solo existe en el tick 0 (medir con SEGUNDO = 0, --cargar y --previa).
+const PARES_PREVIA = [
+  ["líneas alineación / césped tarjeta", ".arena-lineup-pitch .arena-lines", "stroke", [".arena-lineup-pitch .arena-grass"], "fill", 3, false],
+  ["dorsal alineación local / ficha", ".arena-lineup.arena-local .arena-token > text", "fill", [".arena-lineup.arena-local .arena-kit"], "fill", 4.5, false],
+  ["dorsal alineación visita / ficha", ".arena-lineup.arena-visita .arena-token > text", "fill", [".arena-lineup.arena-visita .arena-kit"], "fill", 4.5, false],
+  ["jugador alineación / tarjeta", ".arena-lineup-player strong", "color", [".arena-lineups"], "background-color", 4.5, false],
+  ["puesto alineación / tarjeta", ".arena-lineup-player .arena-muted", "color", [".arena-lineups"], "background-color", 4.5, false],
+  ["rasgos alineación / tarjeta", ".arena-lineup-traits", "color", [".arena-lineups"], "background-color", 4.5, false],
+  ["chip de condiciones", ".arena-lineup-chip", "color", [".arena-lineup-chip"], "background-color", 4.5, false],
+  ["formación / chip", ".arena-lineup-shape", "color", [".arena-lineup-shape"], "background-color", 4.5, false],
+];
+
+for (const par of PARES) if (PREVIA) par[6] = false;
+for (const par of PARES_PREVIA) { par[6] = PREVIA; PARES.push(par); }
 
 const browser = await chromium.launch();
 let fallos = 0;

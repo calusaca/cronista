@@ -22,6 +22,8 @@ import { ArenaMesa } from "./ArenaMesa";
 import { ArenaAsistente } from "./ArenaAsistente";
 import { ArenaNarracion } from "./ArenaNarracion";
 import { ArenaDescargas } from "./ArenaDescargas";
+import { ArenaPrevia } from "./ArenaPrevia";
+import { previaPartido, previaVisual } from "../arena/previa";
 import type { ComentarioArena } from "../arena/narrador";
 import { aplicarPublicacion } from "../arena/protocolo";
 import { rondaVisible } from "../arena/buffer";
@@ -73,6 +75,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [cargaId, setCargaId] = useState(0);
   const [modoInicial, setModoInicial] = useState<"fan" | "player">("fan");
   const [soloFavorito, setSoloFavorito] = useState(false);
+  // Brief 056 (v1.1 § 12) · Tarjeta de alineaciones plegada: se reinicia con cada carga y al salir del tick 0.
+  const [plegada, setPlegada] = useState(false);
   const es = idioma === "es";
   const bloqueado = pendiente || enDirecto || bufferActivo;
   const finS = registro.final.tick * ARENA.pasoS;
@@ -203,6 +207,14 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   // compartida por el panel y la ficha (memoAgregado guarda la última).
   const tickCifras = Math.floor(tiempo / ARENA.pasoS + 1e-9);
   useMemo(() => memoAgregado(registro, tickCifras), [registro, tickCifras]);
+  // Brief 056 § 5.5 · Previa derivada del registro (config + inicial); un registro inconsistente no rompe la página.
+  const previaCarta = useMemo(() => { try { return previaVisual(registro); } catch { return null; } }, [registro.config, registro.inicial]);
+  const previaVisible = tickCifras === 0 && previaCarta !== null;
+  // Brief 056 § 5.5 · Las tres piezas habladas, derivadas del registro y fusionadas con el diario (una sola fusión).
+  const previa = useMemo(() => { try { return previaPartido(registro); } catch { return []; } }, [registro.config, registro.inicial]);
+  const mesa = useMemo(() => [...previa, ...intervenciones], [previa, intervenciones]);
+  useEffect(() => { setPlegada(false); }, [cargaId]);
+  useEffect(() => { if (tickCifras > 0) setPlegada(false); }, [tickCifras > 0]);
   const presentes = useMemo(() => favoritos.hidratado ? favoritosEn(registro, favoritos.valor) : { lado: null, jugador: null }, [registro, favoritos]);
   const cambiarFavoritos = (valor: FavoritosArena) => { if (!favoritos.hidratado) return; const ok = guardarFavoritos(almacenFavoritos(), valor); setFavoritos({ valor, error: !ok, hidratado: true }); };
   const estrellaClub = (lado: "local" | "visita") => <EstrellaFavorito activo={presentes.lado === lado} nombre={nombres[lado].nombre} tipo="club" idioma={idioma} testId="arena-favorite-club" lado={lado} alternar={() => cambiarFavoritos(alternarClub(favoritos.valor, nombres[lado].nombre))} />;
@@ -249,6 +261,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             <circle className="arena-ball" cx={estado.balon.posicion.x} cy={estado.balon.posicion.y} r="0.95" data-testid="arena-ball" />
           </svg></div>
           <div className="arena-direction"><span>● {t("Home →", "Local →")}</span><span>{t("← Away", "← Visitante")} ○</span>{identidad.kits.visitaAlternativa && <span className="arena-kit-note">{t(`${nombres.visita.nombre} wears its change kit`, `${nombres.visita.nombre} viste su segunda equipación`)}</span>}</div>
+          {previaVisible && <ArenaPrevia previa={previaCarta} identidad={identidad} idioma={idioma} plegada={plegada} alternar={() => setPlegada(p => !p)} seleccionado={seleccionado} seleccionar={setSeleccionado} />}
           {enDirecto && <p className="arena-muted" data-testid="arena-pitch-live-status">{bufferActivo ? t("The match is generating ahead of the broadcast.", "El partido se genera por delante de la emisión.") : preparandoPartido ? t("Preparing the complete match…", "Preparando el partido completo…") : estadoDirecto === "esperando" ? t("Coaches are deciding · simulation clock paused", "Los entrenadores están decidiendo · reloj simulado detenido") : estadoDirecto === "jugando" ? t("Live play · confirmed engine state", "Juego en vivo · estado confirmado por el motor") : t("Play finished · completing commentary", "Juego terminado · completando comentario")}</p>}
           {estado.saque && estado.pausa && estado.tick < estado.saque.hastaTick && <p role="status" data-testid="arena-restart">{({ centro: t("Kick-off", "Saque de centro"), banda: t("Throw-in", "Saque de banda"), esquina: t("Corner kick", "Saque de esquina"), meta: t("Goal kick", "Saque de meta") })[estado.saque.tipo]} · <Escudo identidad={identidad[estado.saque.lado]} size={IDENTIDAD_ARENA.escudoPx.reanudacion} />{registro.config.partido[estado.saque.lado].nombre}</p>}
           {estado.arbitro && <div className="arena-referee-info"><span className="arena-referee-swatch" aria-hidden="true" /><div><strong>{t("Referee", "Árbitro")}: {estado.arbitro.nombre}</strong><p>{estado.entrenadores ? t(`Contact criterion ${estado.arbitro.criterioContacto}/100. Calls synthetic contact fouls and cards; each restart appears in the description.`, `Criterio de contacto ${estado.arbitro.criterioContacto}/100. Sanciona contactos sintéticos con faltas y tarjetas; consulta cada reanudación en la descripción.`) : t("Follows play with its own movement. Visual official; fouls and cards are not simulated yet.", "Sigue la jugada con movimiento propio. Árbitro visual; todavía no se simulan faltas ni tarjetas.")}</p></div></div>}
@@ -303,11 +316,11 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           </details>
           <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} />
           </div>
-          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={intervenciones} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
-          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={intervenciones} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
-          <ArenaMesa comentarios={comentarios} intervenciones={intervenciones} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
+          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
+          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={mesa} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
+          <ArenaMesa comentarios={comentarios} intervenciones={mesa} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}
-          <ArenaDescargas registro={registro} comentarios={comentarios} intervenciones={intervenciones} sesion={sesionActual} hastaTick={tickCifras} enCurso={enDirecto || bufferActivo} idioma={idioma} sinPartido={registro === inicial && !sesionActual && !enDirecto} />
+          <ArenaDescargas registro={registro} comentarios={comentarios} intervenciones={mesa} sesion={sesionActual} hastaTick={tickCifras} enCurso={enDirecto || bufferActivo} idioma={idioma} sinPartido={registro === inicial && !sesionActual && !enDirecto} />
           <section className="arena-live-feed" aria-label={t("Live text narration", "Narración de texto en vivo")} data-testid="arena-live-text">
             <h2>{t("Latest actions", "Últimas acciones")}</h2>
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>

@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ARENA, MESA_ARENA } from "../sim/limites";
+import { ARENA, MESA_ARENA, PREVIA_ARENA } from "../sim/limites";
 import { ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -38,17 +38,23 @@ const duracionRetencionMs = 24 * 60 * 60 * 1000;
 export const PRESUPUESTO_AUDIO_ENCUENTRO = { solicitudes: 80, caracteres: 24_000 } as const;
 /** Brief 048: clase de la síntesis de voz. v1.3 (1): el narrador (tramos y cierre) consume solo de
  * PRESUPUESTO_AUDIO_ENCUENTRO, con la reserva del cierre (v1.2) dentro; los invitados, solo de su
- * bolsa propia `bolsaSpeechInvitados`. Ninguna de las dos se presta a la otra. */
-export type ClaseVoz = "narrador" | "cierre" | "invitado";
+ * bolsa propia `bolsaSpeechInvitados`. Ninguna de las dos se presta a la otra.
+ * Brief 056 (v1.1 § 9): la previa hablada consume SOLO de PREVIA_ARENA.bolsaSpeech, y ni el narrador
+ * ni los invitados la cuentan. */
+export type ClaseVoz = "narrador" | "cierre" | "invitado" | "previa";
 /** Rechazo de presupuesto de voz para una nueva síntesis (null si cabe). Pura. */
 export function rechazoCuotaVoz(reservas: readonly { tipo: string; caracteres?: number; clase?: ClaseVoz }[], caracteres: number, clase: ClaseVoz): string | null {
   const audio = reservas.filter(x => x.tipo === "audio"), suma = (xs: typeof audio) => xs.reduce((s, x) => s + (x.caracteres ?? 0), 0);
   const P = PRESUPUESTO_AUDIO_ENCUENTRO, D = MESA_ARENA.dialogo;
+  if (clase === "previa") {
+    const previa = audio.filter(x => x.clase === "previa"), B = PREVIA_ARENA.bolsaSpeech;
+    return previa.length + 1 > B.solicitudes || suma(previa) + caracteres > B.caracteres ? "Bolsa de voz de la previa agotada" : null;
+  }
   if (clase === "invitado") {
     const invitados = audio.filter(x => x.clase === "invitado"), B = D.bolsaSpeechInvitados;
     return invitados.length + 1 > B.solicitudes || suma(invitados) + caracteres > B.caracteres ? "Bolsa de voz de los invitados agotada" : null;
   }
-  const narrador = audio.filter(x => x.clase !== "invitado");
+  const narrador = audio.filter(x => x.clase !== "invitado" && x.clase !== "previa");
   if (narrador.length + 1 > P.solicitudes || suma(narrador) + caracteres > P.caracteres) return "Se alcanzó el límite de consultas de este encuentro";
   if (clase !== "cierre" && (narrador.length + 1 > P.solicitudes - D.reservaSpeechCierreSolicitudes || suma(narrador) + caracteres > P.caracteres - D.reservaSpeechCierreCaracteres)) return "Presupuesto de voz reservado para el cierre";
   return null;

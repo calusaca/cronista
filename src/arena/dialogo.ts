@@ -9,6 +9,7 @@ import { contextoNarradorArena } from "./narrador";
 import type { AuditDialogo, EvidenciaMesa, FormaDialogo, FuncionTurno, IntervencionArena, RolMesa, TurnoMesa } from "./protocolo";
 import type { EventoArena, RegistroArena } from "./tipos";
 import { estimarDuracionS } from "./turnos";
+import { comprobarPrevia } from "./previa";
 
 /** Brief 048 · Diálogo entre voces. Composición única en el servidor (función pura) y
  * comprobación D1–D5 de los turnos de plantilla. v1.1: formas pregunta, ronda, estadista y
@@ -263,6 +264,9 @@ export function confirmarMemoria(memoria: MemoriaDialogo, intercambio: Pick<Inte
 type Motivo = AuditDialogo["motivos"][number];
 /** Comprobación de turnos D1–D5 (pura). Sin `turnos` no hay nada que comprobar. */
 export function comprobarTurnos(i: IntervencionArena, registro: RegistroArena): Motivo[] {
+  // Brief 056 § 3.6 · La previa no usa plantillas de la mesa: se comprueba re-derivándola del registro
+  // (D1 = referencia sin procedencia: una previa que no se reconstruye no procede del registro).
+  if (i.forma === "previa") return comprobarPrevia(i, registro).map(m => ({ regla: "D1", detalle: `previa: ${m.detalle}` }));
   const motivos: Motivo[] = [];
   const m = (regla: Motivo["regla"], detalle: string) => { if (!motivos.some(x => x.regla === regla && x.detalle === detalle)) motivos.push({ regla, detalle }); };
   if (!i.turnos) return motivos;

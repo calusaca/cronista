@@ -3190,3 +3190,41 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 @media (max-width: 520px) {
   .arena-events li { grid-template-columns: auto 18px minmax(0, 1fr); grid-template-areas: "tiempo icono texto" "id id id"; }
 }
+
+/* ==========================================================================
+   Brief 056 (v1.1) · Previa: tarjeta de alineaciones en el tablero, solo en el tick 0. Tokens del
+   047/055; sin transition, animation ni transform CSS (la marca de capitán escala por atributo SVG).
+   La camiseta de cada ficha la tiñen las reglas existentes .arena-local/.arena-visita .arena-token.
+   ========================================================================== */
+.arena-lineups { margin-top: var(--ar-s4); padding: var(--ar-s4); background: var(--ar-surface-2); border: 1px solid var(--line); border-radius: var(--ar-r); }
+.arena-lineups-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s3); }
+.arena-lineups-head h2 { margin: 0; font: 700 20px/1.25 var(--font-display), sans-serif; }
+.arena-lineups-head .btn { margin-left: auto; min-height: 44px; }
+.arena-lineups-conditions { display: flex; flex-wrap: wrap; gap: var(--ar-s1) var(--ar-s2); margin: 0; }
+.arena-lineup-chip { padding: 2px var(--ar-s2); border-radius: var(--ar-r-pill); background: var(--chip); color: var(--ink); font-size: 13px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.arena-lineups-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ar-s4); margin-top: var(--ar-s3); }
+.arena-lineups-grid[hidden] { display: none; }
+@media (max-width: 719px) { .arena-lineups-grid { grid-template-columns: 1fr; } }
+.arena-lineup { min-width: 0; }
+.arena-lineup-head { display: flex; align-items: center; gap: var(--ar-s2); margin-bottom: var(--ar-s2); }
+.arena-lineup-head h3 { min-width: 0; margin: 0; font: 700 16px/1.25 var(--font-display), sans-serif; overflow-wrap: anywhere; }
+.arena-lineup-head .arena-crest { margin: 0; }
+.arena-lineup-shape { margin-left: auto; padding: 0 var(--ar-s2); border-radius: var(--ar-r-sm); background: var(--chip); color: var(--ink); font-weight: 700; white-space: nowrap; }
+.arena-lineup-pitch { display: block; width: 100%; height: auto; border-radius: 6px; --ar-token-escala: 1; }
+.arena-lineup-list { display: grid; grid-template-columns: 1fr 1fr; gap: var(--ar-s1) var(--ar-s3); margin: var(--ar-s3) 0 0; padding: 0; list-style: none; }
+.arena-lineup-list li, .arena-lineup-bench li { min-width: 0; }
+.arena-lineup-player { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--ar-s2); width: 100%; min-height: 44px; padding: var(--ar-s1) var(--ar-s2); border: 1px solid transparent; border-radius: var(--ar-r-sm); background: none; color: var(--ink); font: inherit; font-size: 14px; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.arena-lineup-player:hover { background: var(--hl); }
+.arena-lineup-player:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 1px; }
+.arena-lineup-player[aria-pressed="true"] { border-color: var(--hl-line); background: var(--hl); }
+.arena-lineup-player .arena-muted { font-size: 12px; }
+.arena-lineup-coach, .arena-lineup-traits { margin: var(--ar-s2) 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.arena-lineup-coach .overline, .arena-lineup-traits .overline { margin-inline-end: var(--ar-s1); font-size: 11px; }
+.arena-lineup-bench { margin-top: var(--ar-s2); }
+.arena-lineup-bench summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+.arena-lineup-bench ul { display: grid; gap: var(--ar-s1); margin: 0; padding: 0; list-style: none; }
+.arena-lineups-note { margin: var(--ar-s3) 0 0; font-size: 12px; }
+@media (max-width: 520px) {
+  .arena-lineups { padding: var(--ar-s3); }
+  .arena-lineup-list { grid-template-columns: 1fr; }
+}

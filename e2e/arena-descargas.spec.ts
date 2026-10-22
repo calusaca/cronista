@@ -13,6 +13,7 @@ import { comentarArena, narrarArena } from "../src/arena/narrador";
 import { wavMono } from "../src/arena/pista-audio";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../src/arena/protocolo";
 import { construirRelato, relatoIntervencion } from "../src/arena/relato";
+import { previaPartido } from "../src/arena/previa";
 import type { RegistroArena } from "../src/arena/tipos";
 import { construirTranscripcion, escaparMarkdown, transcripcionJson, type TranscripcionArena } from "../src/arena/transcripcion";
 import { ARENA } from "../src/sim/limites";
@@ -28,6 +29,8 @@ const metricas = { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [
 
 const registro = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
 const seed = registro.config.partido.seed;
+// Brief 056 v1.3 (1): la descarga incluye las tres piezas de la previa derivadas del registro, primero.
+const previa = previaPartido(registro).map(i => i.id);
 const gol = registro.eventos.find(e => e.tipo === "gol")!;
 const pGol = prefijo(registro, gol.tick);
 const com048 = componerIntercambio({ intervencion: (await comentarArena(pGol, gol.tick, fiel, { principal: `arena:${gol.id}`, tema: "gol" }))!, registro: pGol, seed, forma: "pregunta", memoria: memoriaDialogoVacia() }).intervencion;
@@ -82,7 +85,7 @@ async function guardado(page: Page, id: string) {
   await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: [{ tipo: "sesion", id, asignacion }, { tipo: "terminada", estado: "completa", metricas }].map((publicacion, i) => `id: ${i + 1}\nevent: arena\ndata: ${JSON.stringify({ id: i + 1, publicacion })}\n\n`).join("") }));
   await page.route(`**/api/arena/sesiones/${id}/reproduccion`, r => r.fulfill({ json: { registro, comentarios: [comentario], intervenciones, asignacion, metricas } }));
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as { desdeTick: number; hastaTick: number; modo: string; idioma: "es" | "en"; intervencion?: string; variante?: string };
+    const p = r.request().postDataJSON() as { desdeTick: number; hastaTick: number; modo: string; idioma: "es" | "en"; intervencion?: string; variante?: string }; if (p.intervencion && !intervenciones.some(x => x.id === p.intervencion)) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     pedidos.push(p);
     if (p.intervencion) {
       const i = intervenciones.find(x => x.id === p.intervencion)!;
@@ -156,7 +159,7 @@ test("053 · guardado: comentarios completos al final y parciales con el cursor 
   expect(p.lineas.length).toBeGreaterThan(0);
   expect(p.lineas.every(l => l.tick <= 250)).toBe(true);
   expect([...p.diario.comentarios, ...p.diario.intervenciones].every(x => x.tick <= 250)).toBe(true);
-  expect(p.diario.intervenciones.map(i => i.id)).toEqual([com048.id]);
+  expect(p.diario.intervenciones.map(i => i.id)).toEqual([...previa, com048.id]);
   expect(p.lineas.map(l => l.texto)).not.toContain(est045.oraciones[0]!.texto_es);
   expect(p.partido.marcador).toEqual({ local: gol.lado === "local" ? 1 : 0, visita: gol.lado === "visita" ? 1 : 0 });
   // Descargar no pide relato ni síntesis.
@@ -210,7 +213,7 @@ test("053 · en vivo (búfer): parcial hasta el reloj visible, sin nada por dela
   // El cliente ya tenía fotogramas, el comentario y las intervenciones (también la tardía) por delante del cursor.
   expect(t.alcance.hastaTick).toBeLessThan(registro.final.tick);
   expect(t.diario.comentarios).toEqual(comentario.tick <= t.alcance.hastaTick ? [comentario] : []);
-  expect(t.diario.intervenciones.map(i => i.id)).toEqual([...intervenciones, tardia].filter(i => i.tick <= t.alcance.hastaTick).map(i => i.id));
+  expect(t.diario.intervenciones.map(i => i.id)).toEqual([...previa, ...[...intervenciones, tardia].filter(i => i.tick <= t.alcance.hastaTick).map(i => i.id)]);
   expect(t.alcance.hastaTick).toBeLessThan(tardia.tick);
   expect(t.registro.eventos).toBe(registro.eventos.filter(e => e.tick <= t.alcance.hastaTick).length);
   expect(relatos).toBe(0);

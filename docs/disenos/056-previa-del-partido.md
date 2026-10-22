@@ -1029,3 +1029,15 @@ guardada (§ 5.6). Lo que se recorte deja su constante y su prueba fuera, no a m
    diámetro (4-2-3-1 y 4-2-2-2). El dibujo muestra solo el dorsal (los nombres están en la lista de texto de la tarjeta)
    y el eje de profundidad se estira con una constante de `PREVIA_ARENA.tarjeta` para que la distancia entre centros de
    cualquier par de fichas sea ≥ diámetro + 1 unidad, probado en las 12 formaciones del catálogo.
+
+## Versión 1.3 (22 de octubre, coordinador): cambios autorizados en e2e para el Bloque B
+
+Con el Bloque B aplicado, cinco e2e existentes fallaban por supuestos que el brief no previó. Se autorizan, sin
+relajar ninguna otra aserción:
+
+1. `e2e/arena-descargas.spec.ts` (aserciones de `diario.intervenciones`, líneas ~159 y ~213): pasan a esperar las
+   intervenciones del diario más las tres piezas de la previa derivadas del registro, porque §5.7 manda incluirlas en
+   la descarga. La comparación sigue siendo exacta (lista completa, en orden).
+2. `e2e/arena-buffer.spec.ts` (~271), `e2e/arena-sincronia.spec.ts` (~7) y `e2e/arena.spec.ts` (~441): la misma guarda
+   404 para ids `previa:*` que ya tienen los nueve mocks autorizados en la v1.1 §6.
+3. El escenario (3) simula `/api/arena/grabaciones` como `arena.spec.ts` (el servidor de e2e no tiene `ARENA_VOZ=1`).

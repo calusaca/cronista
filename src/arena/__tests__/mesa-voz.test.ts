@@ -11,7 +11,9 @@ import { POST as relatoHttp } from "../../app/api/arena/sesiones/[id]/relato/rou
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { verificarUpdate, type HechoVerificable } from "../../cadena/verificador";
 import type { Llm } from "../../lib/llm";
-import { MESA_ARENA } from "../../sim/limites";
+import { MESA_ARENA, PREVIA_ARENA } from "../../sim/limites";
+import { previaPartido } from "../previa";
+import { crearConfigArena, crearEstadoArena } from "../motor";
 import { datosEstadista, intervencionEstadista } from "../estadista";
 import { varianteVoz } from "../expresion";
 import { comentarArena, contextoNarradorArena } from "../narrador";
@@ -413,4 +415,167 @@ describe("048 · ruta de relato con variantes (lectura del diario, nunca composi
     expect(sin.cierre).toBeNull();
     expect(rechazoCuotaVoz(Array.from({ length: B.solicitudes }, () => ({ tipo: "audio", caracteres: 1, clase: "invitado" as const })), 1, "invitado")).toBe("Bolsa de voz de los invitados agotada");
   });
+});
+
+// Brief 056 (§§ 5.3–5.4 y v1.1 §§ 1, 9, 11) · Previa hablada: ruta /relato con ventana [0, 0] y lectura
+// re-derivada (nunca del diario), bolsa de Speech propia, suficiencia con SSML real y aislamiento.
+describe("056 · previa en la ruta /relato y en el presupuesto de voz", () => {
+  const rutas: string[] = [];
+  const compartido = globalThis as typeof globalThis & { __cronistaSesiones?: GestorSesiones };
+  let previo: GestorSesiones | undefined;
+  afterEach(async () => { compartido.__cronistaSesiones = previo; await Promise.all(rutas.splice(0).map(p => rm(p, { recursive: true, force: true }))); });
+  const llmDe = (completar: Llm["completar"]): Llm => ({ id: "modelo-prueba", completar });
+  const fielLlm = () => llmDe(async (_s, m) => { const c = JSON.parse(m[0]!.contenido) as { hechos: HechoVerificable[]; principal: string }, h = c.hechos.find(h => h.id === c.principal)!; return JSON.stringify({ oraciones: [{ texto_es: h.texto_es, texto_en: h.texto_en, hecho: h.id, apoyo: [] }] }); });
+  const entorno = async () => {
+    previo = compartido.__cronistaSesiones;
+    vi.stubEnv("ARENA_BLOB_ENDPOINT", ""); vi.stubEnv("ARENA_VOZ", "1");
+    vi.stubEnv("AZURE_SPEECH_ENDPOINT", "https://ejemplo.cognitiveservices.azure.com"); vi.stubEnv("AZURE_SPEECH_KEY", "prueba");
+    const directorio = await mkdtemp(join(tmpdir(), "cronista-previa-056-")); rutas.push(directorio);
+    return directorio;
+  };
+  const speechSimulado = () => vi.stubGlobal("fetch", vi.fn<typeof fetch>(async url => String(url).includes("/voices/list") ? new Response("x", { status: 500 }) : new Response(new Uint8Array([1, 2, 3]))));
+  const grabacion = async () => {
+    const directorio = await entorno();
+    const g = new GestorSesiones({ directorio }); compartido.__cronistaSesiones = g;
+    const { id } = await g.registrarGrabacion(registro, "previa-056");
+    speechSimulado();
+    return { g, id, directorio };
+  };
+  const pedir = (id: string, cuerpo: object) => relatoHttp(new Request("http://localhost/relato", { method: "POST", body: JSON.stringify(cuerpo) }), { params: Promise.resolve({ id }) });
+  const pieza = (intervencion: string, idioma: "es" | "en" = "es", variante?: "completa" | "breve") => ({ desdeTick: 0, hastaTick: 0, modo: "buffer", idioma, intervencion, ...variante ? { variante } : {} });
+  const reservas = (directorio: string, id: string) => Object.values(JSON.parse(readFileSync(join(directorio, `${id}.extras.json`), "utf8")) as Record<string, { tipo: string; clase?: string }>);
+
+  it("sesión de registrarGrabacion (sin diario de intervenciones): la pieza 1 se sirve con 200, tipoRelato invitado y reserva de clase previa; un previa:x desconocido es 404", async () => {
+    const { g, id, directorio } = await grabacion();
+    expect((await g.reproduccion(id)).intervenciones).toEqual([]);
+    const respuesta = await pedir(id, pieza("previa:1-local:0"));
+    expect(respuesta.status).toBe(200);
+    const datos = await respuesta.json();
+    expect(datos).toMatchObject({ tipoRelato: "invitado", intervencion: "previa:1-local:0", desdeTick: 0, hastaTick: 0, variante: "completa" });
+    expect(reservas(directorio, id).filter(r => r.tipo === "audio").map(r => r.clase)).toEqual(["previa"]);
+    for (const desconocido of ["previa:x", "previa:4-otra:0"]) {
+      const r = await pedir(id, pieza(desconocido));
+      expect([desconocido, r.status, (await r.json()).error]).toEqual([desconocido, 404, "Intervención no publicada"]);
+    }
+    // Nunca en el diario: la grabación sigue sin intervenciones tras servir la previa.
+    expect((await g.reproduccion(id)).intervenciones).toEqual([]);
+    expect((await g.emision(id)).intervenciones).toEqual([]);
+  });
+
+  it("cliente frente a ruta: las tres piezas y las dos variantes coinciden con relatoIntervencion(previaPartido(registro)[k])", async () => {
+    const { id } = await grabacion();
+    const piezas = previaPartido(registro);
+    for (const variante of ["completa", "breve"] as const) for (const idioma of ["es", "en"] as const) for (const i of piezas) {
+      const respuesta = await pedir(id, pieza(i.id, idioma, variante));
+      expect([i.id, variante, idioma, respuesta.status]).toEqual([i.id, variante, idioma, 200]);
+      const datos = await respuesta.json(), esperado = relatoIntervencion(i, seed, idioma, variante);
+      expect(datos.fragmentos).toEqual(esperado.fragmentos);
+      expect([datos.texto, datos.variante, datos.turnos, datos.tipoRelato]).toEqual([esperado.texto, esperado.variante, esperado.turnos, "invitado"]);
+      expect(segmentoVozValido(datos, { desde: 0, hasta: 0, idioma, intervencion: { id: i.id, tick: 0, variante: varianteEfectiva(i, variante) } })).toBe(true);
+    }
+  });
+
+  it("v1.1 § 1 · ventanas: previa [0,0] → 200; narrador [0,0] y [50,50] → 400 «Ventana de relato vacía»; intervención ordinaria con [tick, tick+1] → 400; hastaTick −1 → 400", async () => {
+    const directorio = await entorno();
+    const catalogo: ModeloConfigurado[] = [{ publico: { id: "p", nombre: "P", controlador: "p" }, crear: () => llmDe(async (_s, m) => JSON.stringify(planProgramado(JSON.parse(m[0]!.contenido)))) }];
+    const g = new GestorSesiones({ directorio, ritmoMsPorSegundo: 0, catalogo: () => catalogo, narrador: () => fielLlm() }); compartido.__cronistaSesiones = g;
+    const { id } = await g.crear({ seed: 42, segundos: 60, local: "auto", visita: "auto", seleccion: { modo: "manual", local: "p", visita: "p" }, presentacion: "buffer" });
+    await g.esperarFinal(id); speechSimulado();
+    expect((await pedir(id, pieza("previa:3-condiciones:0"))).status).toBe(200);
+    for (const [desde, hasta] of [[0, 0], [50, 50]]) {
+      const r = await pedir(id, { desdeTick: desde, hastaTick: hasta, modo: "buffer", idioma: "es" });
+      expect([desde, hasta, r.status, (await r.json()).error]).toEqual([desde, hasta, 400, "Ventana de relato vacía"]);
+    }
+    const ordinaria = (await g.reproduccion(id)).intervenciones[0]!;
+    const r = await pedir(id, { desdeTick: ordinaria.tick, hastaTick: ordinaria.tick + 1, modo: "buffer", idioma: "es", intervencion: ordinaria.id });
+    expect([r.status, (await r.json()).error]).toEqual([400, "Ventana de intervención inválida"]);
+    expect((await pedir(id, { desdeTick: 0, hastaTick: -1, modo: "buffer", idioma: "es" })).status).toBe(400);
+    // v1.1 § 11 · Nunca en el diario: ningún mensaje publicado lleva una pieza de la previa.
+    const diario = readFileSync(join(directorio, `${id}.ndjson`), "utf8").split("\n").filter(Boolean).map(l => JSON.parse(l) as { publicacion: { tipo: string; intervencion?: IntervencionArena } });
+    expect(diario.some(m => m.publicacion.tipo === "intervencion")).toBe(true);
+    expect(diario.filter(m => m.publicacion.tipo === "intervencion" && (m.publicacion.intervencion!.id.startsWith("previa:") || m.publicacion.intervencion!.forma === "previa"))).toEqual([]);
+  }, 60_000);
+
+  it("rechazoCuotaVoz con clase previa: se agota en bolsaSpeech y no altera al narrador, el cierre ni los invitados", () => {
+    const B = PREVIA_ARENA.bolsaSpeech, P = PRESUPUESTO_AUDIO_ENCUENTRO, I = MESA_ARENA.dialogo.bolsaSpeechInvitados;
+    type Reserva = { tipo: string; caracteres: number; clase: "narrador" | "invitado" | "previa" | "cierre" };
+    const llenar = (r: Reserva[], clase: Reserva["clase"], n: number, c: number) => { for (let k = 0; k < n; k++) if (!rechazoCuotaVoz(r, c, clase)) r.push({ tipo: "audio", caracteres: c, clase }); return r; };
+    const conPrevia = llenar([], "previa", B.solicitudes, Math.floor(B.caracteres / B.solicitudes));
+    expect(conPrevia).toHaveLength(B.solicitudes);
+    expect(rechazoCuotaVoz(conPrevia, 1, "previa")).toBe("Bolsa de voz de la previa agotada");
+    expect(rechazoCuotaVoz([], B.caracteres + 1, "previa")).toBe("Bolsa de voz de la previa agotada");
+    // Con la previa llena, narrador, cierre e invitados admiten exactamente lo mismo que sin ella.
+    const admitidos = (base: Reserva[]) => {
+      const r = [...base];
+      const narrador = llenar(r, "narrador", P.solicitudes, 250).filter(x => x.clase === "narrador").length;
+      const invitados = llenar(r, "invitado", I.solicitudes + 2, Math.floor(I.caracteres / I.solicitudes)).filter(x => x.clase === "invitado").length;
+      return { narrador, invitados, cierre: rechazoCuotaVoz(r, 335, "cierre") };
+    };
+    expect(admitidos(conPrevia)).toEqual(admitidos([]));
+    // Y al revés: narrador e invitados llenos no quitan nada a la previa.
+    const lleno = llenar(llenar([], "narrador", P.solicitudes, 250), "invitado", I.solicitudes, Math.floor(I.caracteres / I.solicitudes));
+    expect(llenar(lleno, "previa", B.solicitudes + 1, Math.floor(B.caracteres / B.solicitudes)).filter(x => x.clase === "previa")).toHaveLength(B.solicitudes);
+  });
+
+  it("v1.1 § 9 · suficiencia: fixtures, 60 semillas y nombres máximos, ES y EN, catálogo completo y degradado: las 12 síntesis caben en bolsaSpeech", () => {
+    const B = PREVIA_ARENA.bolsaSpeech;
+    const leerPublico = (n: string) => JSON.parse(readFileSync(`public/experimentos/${n}`, "utf8")) as RegistroArena;
+    const largo = structuredClone(registro);
+    const persona = (p: string) => { const b = `${p} & <Lía> "Q" 'O' `; return b + "Z".repeat(80 - b.length); };
+    largo.config.partido.local.nombre = ("Club Atlético " + "Ñ".repeat(100)).slice(0, 100); largo.config.partido.visita.nombre = ("Unión Deportiva " + "Á".repeat(100)).slice(0, 100);
+    for (const lado of ["local", "visita"] as const) { largo.inicial.jugadores.find(j => j.lado === lado && j.capitan)!.nombre = persona("Capitana"); largo.config.entrenadores![lado].nombre = persona("Técnica"); }
+    largo.inicial.arbitro!.nombre = persona("Árbitra");
+    const semillas = Array.from({ length: 60 }, (_, i) => { const config = crearConfigArena({ seed: 1000 + i * 7919, duracionS: 60 }), inicial = crearEstadoArena(config); return { version: config.version!, config, inicial, rondas: [], eventos: [], fotogramas: [inicial], final: inicial } as RegistroArena; });
+    const registros = [registro, leerPublico("arena-llm-v1.json"), leerPublico("arena-llm-v3.json"), leerPublico("arena-duelo-v3.json"), largo, ...semillas];
+    let maximo = 0;
+    for (const r of registros) for (const degradacion of ["completo", "sin-estadista", "solo-narrador"] as const) {
+      let caracteres = 0, solicitudes = 0;
+      for (const idioma of ["es", "en"] as const) {
+        const a = asignarVoces(idioma);
+        const catalogo = degradacion === "completo" ? null : new Set(degradacion === "sin-estadista" ? [a.narrador.voz, a.comentarista.voz] : [a.narrador.voz]);
+        const voces = vocesDe(asignarVoces(idioma, catalogo));
+        for (const i of previaPartido(r)) for (const variante of ["completa", "breve"] as const) {
+          caracteres += prepararVoz(relatoIntervencion(i, r.config.partido.seed, idioma, variante).fragmentos, idioma, voces).caracteresPresupuestados; solicitudes++;
+        }
+      }
+      maximo = Math.max(maximo, caracteres);
+      expect(solicitudes).toBeLessThanOrEqual(B.solicitudes);
+      expect(caracteres, `${r.config.partido.seed} ${degradacion}`).toBeLessThanOrEqual(B.caracteres);
+    }
+    expect(maximo).toBeGreaterThan(0);
+  });
+
+  /** Recorrido del consumidor (como el del 048) con o sin las 12 síntesis de la previa al principio. */
+  const recorrido = async (segundos: number, idiomas: readonly ("es" | "en")[], conPrevia: boolean) => {
+    const directorio = await entorno();
+    const catalogo: ModeloConfigurado[] = [{ publico: { id: "p", nombre: "P", controlador: "p" }, crear: () => llmDe(async (_s, m) => JSON.stringify(planProgramado(JSON.parse(m[0]!.contenido)))) }];
+    const g = new GestorSesiones({ directorio, ritmoMsPorSegundo: 0, catalogo: () => catalogo, narrador: () => fielLlm() }); compartido.__cronistaSesiones = g;
+    const { id } = await g.crear({ seed: 42, segundos, local: "auto", visita: "auto", seleccion: { modo: "manual", local: "p", visita: "p" }, presentacion: "buffer" });
+    await g.esperarFinal(id); speechSimulado();
+    const r = await g.reproduccion(id), fin = r.registro.final.tick;
+    type Paso = { tick: number; orden: number; clave: string; tipo: "narrador" | "invitado" | "cierre" | "previa"; cuerpo: object };
+    const plan: Paso[] = [];
+    for (const idioma of idiomas) {
+      plan.push({ tick: 0, orden: 0, clave: `${idioma}:entrada`, tipo: "narrador", cuerpo: { desdeTick: 0, hastaTick: Math.min(50, fin), modo: "buffer", idioma, entradaTick: 0 } });
+      if (conPrevia) for (const i of previaPartido(r.registro)) for (const variante of ["completa", "breve"] as const) plan.push({ tick: 0, orden: 0.5, clave: `${idioma}:${i.id}:${variante}`, tipo: "previa", cuerpo: pieza(i.id, idioma, variante) });
+      for (let desde = 0; desde < fin; desde += 50) plan.push({ tick: desde, orden: 1, clave: `${idioma}:${desde}`, tipo: "narrador", cuerpo: { desdeTick: desde, hastaTick: Math.min(desde + 50, fin), modo: "buffer", idioma } });
+      for (const i of r.intervenciones) for (const variante of ["breve", "completa"] as const) if (variante === "completa" || i.turnosBreve)
+        plan.push({ tick: i.tick, orden: 2, clave: `${idioma}:${i.id}:${variante}`, tipo: "invitado", cuerpo: { desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante } });
+      plan.push({ tick: fin + 1, orden: 3, clave: `${idioma}:cierre`, tipo: "cierre", cuerpo: { desdeTick: Math.floor((fin - 1) / 50) * 50, hastaTick: fin, modo: "buffer", idioma, cierre: true } });
+    }
+    plan.sort((a, b) => a.tick - b.tick || a.orden - b.orden);
+    const estado = new Map<string, number>();
+    for (const p of plan) estado.set(p.clave, (await pedir(id, p.cuerpo)).status);
+    const de = (tipo: Paso["tipo"]) => plan.filter(p => p.tipo === tipo).map(p => [p.clave, estado.get(p.clave)] as const);
+    return { narrador: de("narrador"), invitados: de("invitado"), cierres: de("cierre"), previa: de("previa") };
+  };
+  const recorridos = [[60, ["es"]], [60, ["es", "en"]], [120, ["es"]], [120, ["es", "en"]], [180, ["es"]], [180, ["es", "en"]]] as const;
+  for (const [segundos, idiomas] of recorridos) it(`v1.1 § 9 · aislamiento ${segundos} s ${idiomas.join("+")}: narrador, cierres e invitados idénticos con y sin previa; la previa entera cabe en su bolsa`, async () => {
+    const sin = await recorrido(segundos, idiomas, false), con = await recorrido(segundos, idiomas, true);
+    expect(con.narrador).toEqual(sin.narrador);
+    expect(con.cierres).toEqual(sin.cierres);
+    expect(con.invitados).toEqual(sin.invitados);
+    expect(con.previa).toHaveLength(PREVIA_ARENA.piezas.length * 2 * idiomas.length);
+    expect(con.previa.filter(([, s]) => s !== 200)).toEqual([]);
+  }, 120_000);
 });

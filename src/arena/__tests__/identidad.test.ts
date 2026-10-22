@@ -186,7 +186,7 @@ describe("055 · variables de equipación", () => {
 });
 
 describe("055 · sin hex literales en los TSX", () => {
-  it.each(["src/ui/Escudo.tsx", "src/ui/Emblema.tsx", "src/ui/IconosArena.tsx", "src/ui/Arena.tsx"])("%s", ruta => {
+  it.each(["src/ui/Escudo.tsx", "src/ui/Emblema.tsx", "src/ui/IconosArena.tsx", "src/ui/Arena.tsx", "src/ui/ArenaPrevia.tsx"])("%s", ruta => {
     const fuente = readFileSync(ruta, "utf8");
     const sinComentarios = fuente.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
     expect(sinComentarios.match(/#[0-9a-fA-F]{3,8}/g)).toBeNull();

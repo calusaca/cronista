@@ -14,7 +14,9 @@ export interface MetricasSesion { duracionMs: number; decisiones: number; respal
 /** Brief 045: roles de la mesa de transmisión. */
 export type RolMesa = "narrador" | "comentarista" | "estadista";
 /** Evidencia de un dato o una oración: eventos de la fórmula o, si el valor no procede
- * de eventos, el intervalo inspeccionado y su fuente (`inicial` o `fotograma:<tick>`). */
+ * de eventos, el intervalo inspeccionado y su fuente (`inicial` o `fotograma:<tick>`).
+ * Brief 056: la previa cita campos del registro (`config.partido`, `config.formaciones`,
+ * `config.entrenadores`, `config.partido.condiciones`, `inicial.jugadores`, `inicial.arbitro`). */
 export interface EvidenciaMesa {
   eventos: string[]; intervalo?: [number, number]; fuente?: string;
   /** v3.1 · Una entrada por hecho citado por la oración (principal y apoyos) que sea un dato
@@ -24,7 +26,7 @@ export interface EvidenciaMesa {
 export interface CitaMesa { hecho: string; eventos: string[]; intervalo?: [number, number]; fuente?: string }
 /** Brief 048 · Formas del intercambio. v1.1: la forma `dato` queda fuera de esta entrega (el tipo
  * la conserva por contrato, pero `componerIntercambio` nunca la produce y D2 la rechaza). */
-export type FormaDialogo = "pregunta" | "dato" | "ronda" | "estadista" | "final";
+export type FormaDialogo = "pregunta" | "dato" | "ronda" | "estadista" | "final" | "previa";
 export type FuncionTurno = "pregunta" | "cesion" | "respuesta" | "dato" | "cierre";
 export type VarianteIntercambio = "completa" | "breve";
 export interface TurnoMesa {

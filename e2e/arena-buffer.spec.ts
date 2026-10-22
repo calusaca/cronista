@@ -298,7 +298,7 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
   // Brief 054 v1.1 (2): el grito se compara con el primer tramo del canto que devuelve /relato.
   let grito: string | undefined;
   await page.route(`**/api/arena/sesiones/${id}/relato`, r => {
-    const p = r.request().postDataJSON();
+    const p = r.request().postDataJSON(); if (p.intervencion?.startsWith("previa:")) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     // Esta prueba necesita un comentario largo, sin la noticia de fuera de juego
     // que ahora prima sobre el antiguo balance periódico del segundo quince.
     // Brief 050: un reinicio sintético en el tramo siguiente al gol (tick 252) llega mientras suena el canto.
