@@ -22,6 +22,8 @@ const arg = (n, d) => process.argv.find(a => a.startsWith(`--${n}=`))?.split("="
 const fases = arg("fases", "arena,recap,tarjetas,voz,montar,verificar").split(",");
 const controladores = arg("controladores", "azar");
 const toma = arg("toma", "arena");
+const duracionPartido = +arg("duracion", "180");
+const [modeloLocal, modeloVisita] = arg("modelos", "luna6,equilibrado").split(",");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 mkdirSync(TRABAJO, { recursive: true });
 
@@ -168,22 +170,30 @@ async function grabarArena() {
     await page.goto(ARENA, { waitUntil: "networkidle", timeout: 180_000 });
     await page.getByTestId("arena-pitch").waitFor();
     await sleep(800);
+    // Duración del partido (fuera de cuadro): 180 s da margen para goles y conversaciones.
+    { const dur = page.locator("select").filter({ has: page.locator(`option:text-is("${duracionPartido} s")`) }).first(); await dur.selectOption({ label: `${duracionPartido} s` }); }
     // Escena 1: marcador 0–0, cancha con 22 fichas y árbitro; el cursor recorre la mesa.
     await g.desplazar(page.getByTestId("arena-pitch"), 318, 1500);
     await g.marca("s1");
     for (const rol of ["narrador", "comentarista", "estadista"]) await g.mover(page.getByTestId(`arena-mesa-${rol}`), 1900);
-    // Escena 2: elección aleatoria de modelos y arranque del partido en vivo.
+    // Escena 2: elección manual de modelos (GPT-6 Luna frente a GPT-5.6 Luna) y arranque.
     await g.desplazar(page.getByTestId("arena-live"), 84, 1400);
-    const select = page.getByTestId("arena-live").locator("select").first();
+    const vivoPanel = page.getByTestId("arena-live");
+    const select = vivoPanel.locator("select").first();
+    await g.mover(select, 700);
+    await g.marca("s2-modelos");
     if (controladores === "programado") await select.selectOption("programado");
-    else await select.selectOption("azar");
-    await g.mover(select, 1300);
+    else {
+      await select.selectOption("manual"); await sleep(700);
+      const [local, visita] = [vivoPanel.locator("select").nth(1), vivoPanel.locator("select").nth(2)];
+      await g.mover(local, 500); await local.selectOption(modeloLocal); await sleep(900);
+      await g.mover(visita, 500); await visita.selectOption(modeloVisita); await sleep(900);
+    }
     const boton = page.getByRole("button", { name: "Start live match" });
     await g.mover(boton, 600);
     await g.marca("s2-clic");
     const b = await boton.boundingBox(); await page.mouse.click(b.x + 40, b.y + b.height / 2);
     await sleep(500); await page.mouse.move(520, 215, { steps: 14 });
-    // Reintento si otro partido con modelos está en curso (429 del servidor): un solo partido por intento.
     let arrancado = await g.esperar(async () => (await g.texto("[data-testid=arena-live-assignment]")) || null, 15_000, "asignación");
     for (let intento = 0; !arrancado && intento < 3; intento++) {
       console.log("  ! no arrancó; se reintenta en 45 s: " + (await g.texto("[data-testid=arena-live] [role=alert]")));
@@ -195,7 +205,6 @@ async function grabarArena() {
     if (!arrancado) throw new Error("El partido no arrancó: " + await g.texto("[data-testid=arena-live]"));
     await g.desplazar(page.getByTestId("arena-live"), 84, 900);
     await g.marca("s2-asignacion", { texto: arrancado });
-    // «Coaches are deciding» y «Live · N s ready» pueden llegar en cualquier orden o a la vez.
     let tDec = null, tVivo = null; const ini2 = Date.now();
     while (Date.now() - ini2 < 150_000) {
       const st = await g.texto("[data-testid=arena-live-status]"), bs = await g.texto("[data-testid=arena-buffer-status]");
@@ -206,108 +215,87 @@ async function grabarArena() {
     }
     if (!tVivo) throw new Error("La emisión no quedó lista");
     while (Date.now() < Math.max(tVivo, tDec ?? 0) + 1500) await sleep(100);
-    // Escena 4 (inicio): la narración se activa en cuanto la emisión está lista, para que los
-    // intercambios de la mesa se pidan de uno en uno y no en la ráfaga inicial.
+    // Narración activada en cuanto la emisión está lista.
     const activar = page.getByRole("button", { name: "Enable narration" });
     await g.esperar(async () => activar.isVisible(), 30_000, "botón de narración");
     await g.mover(activar, 500);
-    await g.marca("s4");
+    await g.marca("narracion");
     { const bb = await activar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
-    await sleep(2500);
-    // Escena 3: planes validados y órdenes por jugador.
-    const planes = page.locator("details.arena-plans");
-    await g.desplazar(planes, 330, 1300);
-    await g.pulsar(planes.locator(":scope > summary"), 400);
-    await g.marca("s3");
-    await sleep(2500);
-    const ordenes = planes.locator("details > summary").first();
-    if (await ordenes.count()) { await g.desplazar(ordenes, 330, 1000); await g.pulsar(ordenes, 400); await g.marca("s3-ordenes"); }
     await sleep(1500);
-    await g.desplazarPor(240, 1400);
-    await sleep(4500);
-    // Escena 4: narración y mesa; esperar un intercambio del comentarista que suene completo.
+    // Escenas 3–4: toda la emisión en la vista cancha + mesa (goles, rótulo, marcador e intercambios).
     await g.desplazar(page.getByTestId("arena-pitch"), 250, 1300);
     await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 10 });
-    await g.marca("s4-mesa");
-    let elegido = null;
-    const inicio4 = Date.now();
-    while (Date.now() - inicio4 < 120_000) {
-      const eventos = await page.evaluate(() => window.__audio).catch(() => []);
-      for (const e of eventos) {
-        const r = e.tag && estado.relatos.get(e.tag);
-        const turnos = r?.fragmentos?.map(f => f.rol) ?? [];
-        if (r?.intervencion && turnos.includes("comentarista") && (r.modoIntervencion === "llm" || controladores === "programado") && e.offset === 0) { elegido = { ...e, relato: r.archivo }; break; }
-      }
-      if (elegido) break;
-      await sleep(400);
+    await g.marca("mesa");
+    const finEmision = Date.now() + (duracionPartido + 120) * 1000;
+    let finVisto = null;
+    while (Date.now() < finEmision) {
+      const bs = await g.texto("[data-testid=arena-buffer]");
+      if (/End of narration/.test(bs)) break;
+      if (/End of broadcast/.test(bs)) { finVisto ??= Date.now(); if (Date.now() - finVisto > 25_000) break; }
+      await sleep(500);
     }
-    if (!elegido) {
-      console.log("  ! sin intercambio LLM del comentarista audible; se acepta cualquier intercambio");
-      const eventos = await page.evaluate(() => window.__audio);
-      const e = eventos.find(e => estado.relatos.get(e.tag)?.intervencion);
-      if (e) elegido = { ...e, relato: estado.relatos.get(e.tag).archivo };
-    }
-    if (elegido) {
-      const fin = elegido.t + (elegido.dur - elegido.offset) * 1000 + 1500;
-      while (Date.now() < fin) await sleep(200);
-      await g.marca("s4-intercambio", { inicio: (elegido.t - t0) / 1000, dur: elegido.dur, relato: elegido.relato });
-    }
+    await g.marca("fin-emision", { texto: await g.texto("[data-testid=arena-buffer-status]") });
+    await sleep(2500);
     // Escena 5: hechos y verificaciones en la tarjeta del comentarista.
     const tarjeta = page.getByTestId("arena-mesa-comentarista");
     await g.desplazar(tarjeta, 120, 1200);
     await g.pulsar(tarjeta.locator("details > summary").first(), 400);
     await g.marca("s5");
     await sleep(4500);
-    const intentos = tarjeta.locator("details").first();
-    await g.desplazar(intentos, 60, 1500);
+    await g.desplazar(tarjeta.locator("details").first(), 60, 1500);
     await sleep(5500);
-    // Escena 6: agente de Foundry, estilo Analyst, herramientas y evidencia.
+    // Escena 6: cifras del partido (final) y ficha del goleador con sus cifras.
+    const cifras = page.getByTestId("arena-stats");
+    await g.desplazar(cifras, 84, 1300);
+    await g.marca("s6-cifras");
+    await sleep(3000);
+    await g.desplazarPor(260, 1600);
+    await sleep(1500);
+    const sesionId = estado.sesion;
+    const goleador = sesionId ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); if (!r.ok) return null; const j = await r.json(); return j.registro?.eventos?.filter(e => e.tipo === "gol" && !e.autogol).at(-1)?.jugador ?? null; }, sesionId).catch(() => null) : null;
+    await g.desplazar(page.getByTestId("arena-pitch"), 250, 1100);
+    const ficha = goleador ? page.locator(`[data-testid=arena-player][data-player="${goleador}"]`) : page.getByTestId("arena-player").nth(9);
+    await g.pulsar((await ficha.count()) ? ficha.first() : page.getByTestId("arena-player").nth(9), 500);
+    await g.marca("s6-seleccion", { jugador: goleador });
+    const tarjetaJugador = page.getByTestId("arena-player-card");
+    await g.desplazar(tarjetaJugador, 84, 1400);
+    await g.marca("s6-jugador", { texto: (await g.texto("[data-testid=arena-player-card]")).slice(0, 600) });
+    await sleep(5000);
+    // Escena 7: descargar comentarios (Markdown).
+    const descargas = page.getByTestId("arena-downloads");
+    await g.desplazar(descargas, 220, 1300);
+    const md = descargas.getByRole("button", { name: "Download commentary (Markdown)" });
+    await g.mover(md, 700);
+    await g.marca("s7");
+    const espera = page.waitForEvent("download", { timeout: 20_000 });
+    { const bb = await md.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
+    const descarga = await espera;
+    const nombreMd = descarga.suggestedFilename();
+    await descarga.saveAs(join(dir, "descarga.md"));
+    await g.marca("s7-descargado", { archivo: nombreMd });
+    await sleep(3000);
+    // Escena 8: agente de Foundry, estilo Analyst, herramientas y evidencia.
     const asistente = page.getByTestId("arena-assistant");
     await g.desplazar(asistente, 90, 1200);
     const [pregunta, estilo] = [asistente.locator("select").nth(0), asistente.locator("select").nth(1)];
     await g.mover(pregunta, 500); await pregunta.selectOption("momento");
     await g.mover(estilo, 500); await estilo.selectOption("analyst");
-    await g.marca("s6");
+    await g.marca("s8");
     const preguntar = asistente.getByRole("button", { name: "Ask analyst" });
     await g.mover(preguntar, 500);
     { const bb = await preguntar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
-    await g.marca("s6-pregunta");
+    await g.marca("s8-pregunta");
     const respuesta = await g.esperar(async () => (await asistente.getByTestId("arena-assistant-answer").count()) > 0 || (await asistente.getByRole("alert").count()) > 0, 90_000, "respuesta del analista");
     await sleep(400);
-    await g.marca("s6-respuesta", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
+    await g.marca("s8-respuesta", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
     if (respuesta && await asistente.getByTestId("arena-assistant-answer").count()) {
       await sleep(2200);
-      const herramientas = asistente.getByTestId("arena-assistant-answer").locator("summary");
-      await g.pulsar(herramientas, 300);
-      await g.marca("s6-herramientas", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
+      await g.pulsar(asistente.getByTestId("arena-assistant-answer").locator("summary"), 300);
+      await g.marca("s8-herramientas", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
       await g.desplazar(asistente.getByTestId("arena-assistant-answer"), 120, 1200);
       await sleep(4500);
     }
-    // Escena 7: ES, selección de un dorsal y vista «seguir al jugador».
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" })); await sleep(1100);
-    const es = page.getByRole("button", { name: "Switch to Spanish" });
-    await g.mover(es, 400);
-    await g.marca("s7");
-    { const bb = await es.boundingBox(); await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); }
-    await sleep(1200);
-    await g.desplazar(page.getByTestId("arena-pitch"), 318, 1300);
-    await sleep(1200);
-    const ficha = page.getByTestId("arena-player").nth(6);
-    await g.pulsar(ficha, 500);
-    await g.marca("s7-jugador");
-    const inteligencia = page.getByTestId("arena-intelligence");
-    await g.desplazar(inteligencia, 110, 1200);
-    const vista = inteligencia.locator("select").first();
-    await g.mover(vista, 500);
-    const opciones = await vista.locator("option").evaluateAll(os => os.map(o => ({ v: o.value, t: o.textContent })));
-    const seguir = opciones.find(o => /jugador|player/i.test(o.t)) ?? opciones.at(-1);
-    await vista.selectOption(seguir.v);
-    await g.marca("s7-seguir", { opcion: seguir.t });
-    await sleep(4500);
-    // Fotograma final: de vuelta en EN, la cancha.
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" })); await sleep(900);
-    { const en = page.getByRole("button", { name: "Cambiar a inglés" }); const bb = await en.boundingBox(); await page.mouse.move(bb.x + 10, bb.y + 10, { steps: 8 }); await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); }
-    await sleep(800);
+    // Fotograma final: la cancha.
     await g.desplazar(page.getByTestId("arena-pitch"), 318, 1300);
     await page.mouse.move(ANCHO - 20, ALTO - 20, { steps: 6 });
     await g.marca("fin");
@@ -316,7 +304,7 @@ async function grabarArena() {
     const eventos = await page.evaluate(() => window.__audio);
     const sesion = estado.sesion ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); return r.ok ? r.json() : { http: r.status }; }, estado.sesion).catch(() => null) : null;
     writeFileSync(join(dir, "datos.json"), JSON.stringify({ t0, url: ARENA, controladores, sesion: estado.sesion, asignacion: estado.asignacion, marcas: g.marcas, eventosAudio: eventos.map(e => ({ ...e, t: (e.t - t0) / 1000, parada: e.parada === null ? null : (e.parada - t0) / 1000, relato: estado.relatos.get(e.tag)?.archivo ?? null })), analisis: estado.analisis, errores: estado.errores, peticionesRelato: estado.peticionesRelato }, null, 1));
-    if (sesion) writeFileSync(join(dir, "emision.json"), JSON.stringify({ estado: sesion.estado, metricas: sesion.metricas, asignacion: sesion.asignacion, intervenciones: sesion.intervenciones ?? sesion.registro?.intervenciones ?? null }, null, 1));
+    if (sesion) writeFileSync(join(dir, "emision.json"), JSON.stringify({ estado: sesion.estado, metricas: sesion.metricas, asignacion: sesion.asignacion, reglas: sesion.registro?.config?.reglas ?? null, marcador: sesion.registro?.final?.marcador ?? null, goles: (sesion.registro?.eventos ?? []).filter(e => e.tipo === "gol"), intervenciones: sesion.intervenciones ?? sesion.registro?.intervenciones ?? null }, null, 1));
   } finally {
     await context.close();
     await browser.close();
@@ -394,7 +382,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
  <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure</div>
  <h1>Separate roles, one shared journal,<br>a verifier before every spoken analysis.</h1>
  <div class="grid" style="grid-template-columns:1.05fr 40px 1.1fr 40px 1.1fr">
-  <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>LLM · second deployment · same observation</span></div></div>
+  <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI deployment · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>GPT-6 Luna · GPT-5.6 Luna · GPT-5.4 mini</span></div></div>
   <div class="arr">→</div>
   <div class="box" style="display:flex;flex-direction:column;justify-content:center"><b>Shared deterministic engine</b><span>Validates plans, resolves play.<br>Clock paused while coaches decide.</span></div>
   <div class="arr">→</div>
@@ -427,13 +415,13 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
 </main>
 <main id="calidad">
  <div class="brand">CRONISTA</div><div class="over">Quality · evidence in the repository</div>
- <h1>Nearly two thousand automated checks</h1>
+ <h1>More than two thousand automated checks</h1>
  <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-  <div class="box" style="padding:30px"><div class="num">1,788</div><div class="lbl">unit, invariant, oracle and lie-battery tests in 80 files</div></div>
-  <div class="box" style="padding:30px"><div class="num">129</div><div class="lbl">Playwright journeys in 29 files</div></div>
-  <div class="box" style="padding:30px"><div class="num">58</div><div class="lbl">statistical checks over 1,000 simulated matches</div></div>
+  <div class="box" style="padding:30px"><div class="num">2,037</div><div class="lbl">unit, invariant, oracle and lie-battery tests</div></div>
+  <div class="box" style="padding:30px"><div class="num">148</div><div class="lbl">Playwright journeys</div></div>
+  <div class="box" style="padding:30px"><div class="num">61</div><div class="lbl">statistical checks over simulated matches</div></div>
  </div>
- <p style="margin-top:34px"><span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">run 39699195295 · three jobs · commit 9704dce · 22 Oct 2026</span></p>
+ <p style="margin-top:34px"><span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">run 39743502851 · three jobs · commit 0d16663 · 22 Oct 2026</span></p>
  <p style="margin-top:26px"><span class="tag">All data synthetic</span><span class="tag">Open source</span><span class="tag">Claims link to evidence</span></p>
  <div class="foot">Live arena: cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena<br>Fictional clubs, players and broadcasters. The arena is a short 2D prototype, not a regulation match.</div>
 </main>
@@ -446,22 +434,39 @@ async function tarjetas() {
   await page.goto("file://" + join(dir, "tarjetas.html"), { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   for (const id of ["arquitectura", "azure", "calidad"]) await page.locator(`#${id}`).screenshot({ path: join(dir, `${id}.png`) });
+  // Vista previa del archivo descargado en la toma (nombre real y primeras líneas reales).
+  const datosToma = join(TRABAJO, toma, "datos.json"), md = join(TRABAJO, toma, "descarga.md");
+  if (existsSync(datosToma) && existsSync(md)) {
+    const nombre = JSON.parse(readFileSync(datosToma, "utf8")).marcas.find(m => m.nombre === "s7-descargado")?.archivo ?? "commentary.md";
+    const todas = readFileSync(md, "utf8").split("\n").filter(l => l.trim());
+    const emision = todas.findIndex(l => /^## Broadcast/.test(l));
+    const lineas = [...todas.slice(0, 2), "…", ...todas.slice(emision, emision + 10)];
+    const esc = t => t.replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[c]);
+    const html = TARJETAS_HTML.replace(/<main id="arquitectura">[\s\S]*<\/html>/, `<main id="descarga"><div class="brand">CRONISTA</div><div class="over">Downloaded from the public arena in this recording</div>
+<h1 style="font-size:40px;margin-bottom:18px">${esc(nombre)}</h1>
+<pre style="background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:0;font:17px/1.5 'DejaVu Sans Mono',monospace;color:var(--ink);white-space:pre-wrap;overflow:hidden;max-height:470px">${lineas.map(esc).join("\n")}</pre>
+<div class="foot">Unedited excerpt: the first two lines and the start of the broadcast section (“…” marks the skipped summary).</div></main></html>`);
+    writeFileSync(join(dir, "descarga.html"), html);
+    await page.goto("file://" + join(dir, "descarga.html"), { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator("#descarga").screenshot({ path: join(dir, "descarga.png") });
+  }
   await browser.close();
 }
 
 // --------------------------------------------------------------------------------------------
 // Fase voz: voz en off en inglés con Azure Speech (misma llamada REST que src/arena/voz.ts).
 const VOZ = {
-  s1: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable.",
-  s2: "Two LLM coaches on separate Azure OpenAI deployments receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both.",
-  s3: "Plans are validated against the engine. An invalid or late answer gets one correction with feedback, then a recorded programmed fallback. The match never stalls.",
-  s5: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template.",
-  s6: "A versioned Microsoft Foundry agent answers viewer questions with read-only tools over the confirmed play only. Its sentences pass the same verifier.",
-  s7: "Spanish or English, fan, analyst or one player: the same intelligence, rendered for each viewer.",
-  s8: "The same verifier guards the automated recap: click any sentence to see its events and open the process view with every draft and verdict. We claim traceability, not better prose.",
-  s9: "It runs on Azure Container Apps with Blob, Key Vault, Application Insights, Speech and Foundry. Nearly two thousand automated tests run in CI. Everything is synthetic. CRONISTA: narrate the match, prove every sentence.",
+  gancho: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable.",
+  modelos: "Two LLM coaches, GPT-6 Luna and GPT-5.6 Luna, receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both.",
+  verificacion: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template.",
+  cifras: "Match stats and each player's numbers are computed only from confirmed events, live as the broadcast plays.",
+  descarga: "Every line of the commentary can be downloaded, with its time, voice, evidence and checks.",
+  analista: "A versioned Microsoft Foundry agent answers viewer questions with read-only tools over the confirmed play only. Its sentences pass the same verifier.",
+  cronica: "The same verifier guards the automated recap: click any sentence to see its events and open the process view with every draft and verdict. We claim traceability, not better prose.",
+  cierre: "It runs on Azure Container Apps with Blob, Key Vault, Application Insights, Speech and Foundry. More than two thousand automated tests run in CI. Everything is synthetic. CRONISTA: narrate the match, prove every sentence.",
 };
-const RITMO = { s1: "+9%", s2: "+6%", s5: "+10%", s8: "+12%", s9: "+15%" };
+const RITMO = { gancho: "+9%", modelos: "+12%", verificacion: "+10%", cronica: "+12%", cierre: "+15%" };
 async function voz() {
   const dir = join(TRABAJO, "voz"); mkdirSync(dir, { recursive: true });
   for (const f of [".env", ".cache/azure-servicios.env"]) if (existsSync(f)) process.loadEnvFile(f);
@@ -492,15 +497,15 @@ async function voz() {
 // --------------------------------------------------------------------------------------------
 // Fase montar: escenas, subtítulos (rótulo superior + transcripción inferior), mezcla y MP4.
 const ROTULO = {
-  s1: "CRONISTA — multi-agent match broadcast · every sentence traceable",
-  s3: "Validated plan · 1 correction with feedback · fallback recorded, never silent",
-  s5: "V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims",
-  s7: "ES / EN · Fan · Analyst · Follow a player — same facts, different experience",
-  s8: "Automated recap · GPT-6.1 Sol · 0/163 baseline, 0/167 pipeline flagged · no reduction demonstrated",
-  s9a: "Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions",
-  s9b: "All data synthetic · open source · claims link to evidence",
+  gancho: "CRONISTA — multi-agent match broadcast · every sentence traceable",
+  gol: "Goal call · real narrator audio as played in the public broadcast · GOAL banner and scoreboard highlight",
+  verificacion: "V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims",
+  cifras: "Match stats and the selected player's stats · counted from confirmed engine events · estimates labelled",
+  descarga: "Download commentary · Markdown or JSON · each line with time, voice, evidence and checks",
+  cronica: "Automated recap · GPT-6.1 Sol · 0/163 baseline, 0/167 pipeline flagged · no reduction demonstrated",
+  cierreA: "Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions",
+  cierreB: "All data synthetic · open source · claims link to evidence",
 };
-const NOMBRE_ROL = { narrador: "Narrator", comentarista: "Commentator", estadista: "Statistician" };
 function montar() {
   const dir = join(TRABAJO, "montaje"); mkdirSync(dir, { recursive: true });
   const arena = JSON.parse(readFileSync(join(TRABAJO, toma, "datos.json"), "utf8"));
@@ -510,174 +515,147 @@ function montar() {
   const A = join(TRABAJO, toma, "arena.webm"), R = join(TRABAJO, "recap", "recap.webm"), T = join(TRABAJO, "tarjetas");
   const durVoz = e => vozOff[e].duracionS;
   const largo = (e, ranura) => Math.max(ranura, +(durVoz(e) + 0.7).toFixed(2));
+  const sin = arg("sin", "").split(",").filter(Boolean);
 
-  // Escena 4: el intercambio de la mesa que sonó en la sesión (audio propio de la página).
-  const s4 = m(arena, "s4-intercambio");
-  const relato4 = JSON.parse(readFileSync(join(TRABAJO, toma, "relatos", s4.relato.replace(".mp3", ".json")), "utf8"));
-  // Ventana sin cortar ninguna locución: empieza en un silencio antes del intercambio y acaba
-  // tras él o justo antes de la siguiente locución.
-  const finEv = e => e.parada ?? e.t + (e.dur - e.offset);
-  const mesa4 = m(arena, "s4-mesa").t + 0.2;
-  const sonidos = arena.eventosAudio.filter(e => e.t < s4.inicio + s4.dur + 6 && finEv(e) > mesa4);
-  let inicio4 = Math.max(mesa4, s4.inicio - 1.0);
-  for (const e of sonidos) if (e.t < inicio4 && finEv(e) > inicio4) inicio4 = s4.inicio - finEv(e) >= 0.6 ? finEv(e) + 0.05 : Math.max(mesa4, e.t - 0.4);
-  // Si la locución anterior (p. ej. el cantado del gol) acaba justo antes del intercambio, se incluye.
-  const previa = sonidos.filter(e => finEv(e) <= s4.inicio + 0.05 && s4.inicio - finEv(e) < 2 && e.t - 0.6 >= mesa4).at(-1);
-  if (previa) inicio4 = Math.max(previa.t - 0.6, ...sonidos.filter(e => e.t < previa.t).map(e => finEv(e) + 0.03));
-  const finInt = s4.inicio + s4.dur;
-  let fin4 = Math.min(finInt + 1.2, inicio4 + 19.3);
-  for (const e of sonidos) if (e.t > finInt - 0.05 && e.t < fin4) fin4 = Math.max(finInt + 0.05, e.t - 0.02);
-  const dur4 = +(fin4 - inicio4).toFixed(2);
+  // Audio real de la sesión: cada clip que la página arrancó, identificado por huella.
+  const dirRelatos = join(TRABAJO, toma, "relatos"), porHuella = new Map(), porArchivo = new Map();
+  for (const f of readdirSync(dirRelatos).filter(f => f.endsWith(".json"))) { const j = JSON.parse(readFileSync(join(dirRelatos, f), "utf8")); porHuella.set(j.tag, j.archivo); porArchivo.set(j.archivo, j); }
+  const eventos = arena.eventosAudio.map(e => ({ ...e, relato: e.relato ?? porHuella.get(e.tag) ?? null, fin: e.parada ?? e.t + (e.dur - e.offset) }));
+  const rel = e => porArchivo.get(e.relato);
+  const completo = e => e.offset === 0 && (e.parada === null || e.parada >= e.t + e.dur - 0.15);
+  const esCanto = r => (r?.fragmentos ?? []).some(f => /Goooal!/.test(f.texto));
+  const esIntercambio = r => !!r?.intervencion && (r.fragmentos ?? []).some(f => f.rol === "comentarista") && r.modoIntervencion === "llm";
+  const desdeMesa = m(arena, "mesa").t + 0.3, hastaMesa = m(arena, "fin-emision").t;
+  const enMesa = eventos.filter(e => e.relato && e.t >= desdeMesa && e.fin <= hastaMesa && completo(e));
+  const cantos = enMesa.filter(e => esCanto(rel(e))), intercambios = enMesa.filter(e => esIntercambio(rel(e)));
+  if (!cantos.length) throw new Error("No sonó ningún canto de gol completo en la vista de la cancha");
+  const ajustar = (ini, fin) => {
+    for (const e of eventos) if (e.t < ini && e.fin > ini) ini = e.fin + 0.03;
+    for (const e of eventos) if (e.t > ini && e.t < fin && e.fin > fin + 0.05) fin = e.t - 0.02;
+    return [Math.max(ini, desdeMesa), Math.min(fin, hastaMesa)];
+  };
+  // Preferencia: un canto seguido del intercambio del comentarista sobre ese gol (una sola toma continua).
+  let canto = cantos[0], tras = null;
+  for (const c of cantos) { const x = intercambios.find(i => i.t > c.fin && i.t - c.fin < 12); if (x) { canto = c; tras = x; break; } }
+  const ventanas = [];
+  if (tras && tras.fin + 1 - (canto.t - 1.5) <= 27) ventanas.push({ id: "gol", ini: canto.t - 1.5, fin: tras.fin + 1.0, cambio: tras.t - 0.3, intercambio: tras });
+  else {
+    ventanas.push({ id: "gol", ini: canto.t - 1.5, fin: canto.fin + 1.2 });
+    const x = intercambios.find(i => i.t > canto.fin + 2) ?? intercambios.find(i => i.fin < canto.t - 2);
+    if (x) ventanas.push({ id: "mesa", ini: x.t - 1.0, fin: x.fin + 1.0, intercambio: x });
+  }
+  for (const v of ventanas) { [v.ini, v.fin] = ajustar(v.ini, v.fin); v.dur = +(v.fin - v.ini).toFixed(2); }
 
-  // Lista de escenas: piezas de vídeo y ventanas de audio de la sesión.
-  const a2 = m(arena, "s2-clic").t, dec = arena.marcas.find(k => k.nombre === "s2-decidiendo")?.t ?? m(arena, "s2-vivo").t;
-  const vivo = m(arena, "s2-vivo").t;
-  // Escena 2: el clic y, tras un corte, la espera hasta «Live · N s ready» (justo antes de activar la narración).
-  const clic4 = m(arena, "s4").t, pieza4a = 2.2;
-  const piezas2 = [{ src: null, desde: a2 - 2.5, dur: 4.5 }];
-  { const restoS2 = largo("s2", 14) - 4.5, fin = clic4 - 0.7; piezas2.push({ src: null, desde: Math.max(m(arena, "s2-asignacion").t + 0.8, fin - restoS2), dur: 0 }); }
-  const L = { s1: largo("s1", 8), s2: largo("s2", 14), s3: largo("s3", 10), s4: +(pieza4a + dur4).toFixed(2), s5: largo("s5", 12), s6: largo("s6", 11), s7: largo("s7", 11), s8: largo("s8", 12), s9: largo("s9", 12) };
-  const s6p = m(arena, "s6-pregunta").t, s6r = m(arena, "s6-respuesta").t;
-  const piezaA6 = +(s6p + 1.6 - (m(arena, "s6").t - 1.8)).toFixed(2);
+  const vivo = m(arena, "narracion").t, mod = m(arena, "s2-modelos").t, clic = m(arena, "s2-clic").t;
+  const L = { gancho: largo("gancho", 8), modelos: largo("modelos", 13), verificacion: largo("verificacion", 12), cifras: largo("cifras", 10.5), descarga: largo("descarga", 8.5), analista: largo("analista", 10), cronica: largo("cronica", 11), cierre: largo("cierre", 12) };
+  const piezaA2 = +(clic + 2.6 - (mod - 0.6)).toFixed(2);
+  const s8 = m(arena, "s8").t, s8p = m(arena, "s8-pregunta").t, s8r = m(arena, "s8-respuesta").t, piezaA8 = +(s8p + 1.6 - (s8 - 1.8)).toFixed(2);
   const escenas = [
-    { id: "s1", piezas: [{ src: A, desde: m(arena, "s1").t - 0.3, dur: L.s1 }] },
-    { id: "s2", piezas: piezas2.map((p, i, todas) => ({ ...p, src: A, dur: i < todas.length - 1 ? p.dur : +(L.s2 - todas.slice(0, -1).reduce((s, q) => s + q.dur, 0)).toFixed(2) })) },
-    { id: "s3", piezas: [{ src: A, desde: m(arena, "s3").t - 0.8, dur: L.s3 }] },
-    { id: "s4", piezas: [{ src: A, desde: clic4 - 0.6, dur: pieza4a }, { src: A, desde: inicio4, dur: dur4 }] },
-    { id: "s5", piezas: [{ src: A, desde: m(arena, "s5").t - 0.8, dur: L.s5 }] },
-    { id: "s6", piezas: [{ src: A, desde: m(arena, "s6").t - 1.8, dur: piezaA6 }, { src: A, desde: s6r - 0.6, dur: +(L.s6 - piezaA6).toFixed(2) }] },
-    { id: "s7", piezas: [{ src: A, desde: m(arena, "s7").t - 0.6, dur: L.s7 }] },
-    { id: "s8", piezas: [{ src: R, desde: m(recap, "r-clic").t - 2.6, dur: L.s8 }] },
-  ];
-  const fin9 = 1.6, cartas = L.s9 - fin9;
-  escenas.push({ id: "s9", piezas: [
-    { img: join(T, "arquitectura.png"), dur: +(cartas * 0.38).toFixed(2) },
-    { img: join(T, "azure.png"), dur: +(cartas * 0.32).toFixed(2) },
-    { img: join(T, "calidad.png"), dur: +(cartas - +(cartas * 0.38).toFixed(2) - +(cartas * 0.32).toFixed(2)).toFixed(2) },
-    { src: A, desde: m(arena, "fin").t + 0.6, dur: fin9 },
-  ] });
+    { id: "gancho", voz: "gancho", piezas: [{ src: A, desde: m(arena, "s1").t - 0.3, dur: L.gancho }] },
+    { id: "modelos", voz: "modelos", piezas: [{ src: A, desde: mod - 0.6, dur: piezaA2 }, { src: A, desde: vivo - 0.6 - (L.modelos - piezaA2), dur: +(L.modelos - piezaA2).toFixed(2) }] },
+    ...ventanas.map(v => ({ id: v.id, piezas: [{ src: A, desde: v.ini, dur: v.dur }], ventana: v })),
+    { id: "verificacion", voz: "verificacion", piezas: [{ src: A, desde: m(arena, "s5").t - 0.8, dur: L.verificacion }] },
+    { id: "cifras", voz: "cifras", piezas: [{ src: A, desde: m(arena, "s6-cifras").t - 0.4, dur: 5.6 }, { src: A, desde: m(arena, "s6-jugador").t - 0.3, dur: +(L.cifras - 5.6).toFixed(2) }] },
+    { id: "descarga", voz: "descarga", piezas: [{ src: A, desde: m(arena, "s7").t - 1.6, dur: 3.6 }, { img: join(T, "descarga.png"), dur: +(L.descarga - 3.6).toFixed(2) }] },
+    { id: "analista", voz: "analista", piezas: [{ src: A, desde: s8 - 1.8, dur: piezaA8 }, { src: A, desde: (arena.marcas.some(k => k.nombre === "s8-herramientas") ? m(arena, "s8-herramientas").t - 1.0 : s8r - 0.6), dur: +(L.analista - piezaA8).toFixed(2) }] },
+    { id: "cronica", voz: "cronica", piezas: [{ src: R, desde: m(recap, "r-clic").t - 2.6, dur: L.cronica }] },
+  ].filter(e => !sin.includes(e.id));
+  const fin9 = 1.6, cartas = L.cierre - fin9, c1 = +(cartas * 0.38).toFixed(2), c2 = +(cartas * 0.32).toFixed(2);
+  escenas.push({ id: "cierre", voz: "cierre", piezas: [{ img: join(T, "arquitectura.png"), dur: c1 }, { img: join(T, "azure.png"), dur: c2 }, { img: join(T, "calidad.png"), dur: +(cartas - c1 - c2).toFixed(2) }, { src: A, desde: m(arena, "fin").t + 0.6, dur: fin9 }] });
+  const total = escenas.reduce((s, e) => s + e.piezas.reduce((t, p) => t + p.dur, 0), 0);
+  console.log(`  · duración prevista ${total.toFixed(2)} s`);
+  if (total > 114.9) throw new Error(`Supera 1:55 (${total.toFixed(2)} s): usa --sin=<escena>`);
 
-  // 1) Segmentos de vídeo (intermedio de alta calidad, 25 fps, 1440×900).
-  const segmentos = []; let n = 0; let reloj = 0; const inicio = {};
+  // 1) Segmentos de vídeo.
+  const segmentos = []; let n = 0, reloj = 0; const inicio = {};
   for (const e of escenas) {
-    inicio[e.id] = reloj;
+    inicio[e.id] = reloj; e.dur = e.piezas.reduce((t, p) => t + p.dur, 0);
     for (const p of e.piezas) {
-      const out = join(dir, `seg-${String(n++).padStart(2, "0")}.mp4`);
-      const vf = `scale=${ANCHO}:${ALTO}:flags=lanczos,fps=${FPS},format=yuv420p`;
+      const out = join(dir, `seg-${String(n++).padStart(2, "0")}.mp4`), vf = `scale=${ANCHO}:${ALTO}:flags=lanczos,fps=${FPS},format=yuv420p`;
       if (p.img) ff(["-loop", "1", "-t", String(p.dur), "-i", p.img, "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "14", "-an", out]);
       else ff(["-ss", p.desde.toFixed(3), "-i", p.src, "-t", String(p.dur), "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "14", "-an", out]);
       segmentos.push(out); p.inicioFinal = reloj; reloj += p.dur;
     }
   }
-  const total = reloj;
   writeFileSync(join(dir, "lista.txt"), segmentos.map(s => `file '${s}'`).join("\n") + "\n");
   ff(["-f", "concat", "-safe", "0", "-i", join(dir, "lista.txt"), "-c", "copy", join(dir, "mudo.mp4")]);
 
-  // 2) Audio: voz en off por escena, audio real de la sesión en la escena 4, clip C bajo la escena 7.
-  const entradas = [], filtros = [];
+  // 2) Audio: voz en off y audio real de la sesión en las ventanas del gol y de la mesa.
+  const entradas = [], filtros = [], subt = [], audioSesion = [];
   const agregar = (archivo, alInicio, { volumen = 1, desde = 0, dur = null } = {}) => {
     const k = entradas.length / 2; entradas.push("-i", archivo);
-    const recorte = `atrim=start=${desde.toFixed(3)}${dur ? `:duration=${dur.toFixed(3)}` : ""},asetpts=PTS-STARTPTS`;
-    filtros.push(`[${k}:a]aresample=48000,aformat=channel_layouts=mono,${recorte},afade=t=in:d=0.03,volume=${volumen},adelay=${Math.round(alInicio * 1000)}:all=1[a${k}]`);
+    filtros.push(`[${k}:a]aresample=48000,aformat=channel_layouts=mono,atrim=start=${desde.toFixed(3)}${dur ? `:duration=${dur.toFixed(3)}` : ""},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,volume=${volumen},adelay=${Math.round(alInicio * 1000)}:all=1[a${k}]`);
   };
-  const desfaseVoz = { s1: 0.25, s2: 0.3, s3: 0.3, s5: 0.3, s6: 0.3, s7: 0.9, s8: 0.3, s9: 0.25 };
-  for (const e of Object.keys(VOZ)) agregar(join(TRABAJO, "voz", `${e}.wav`), inicio[e] + desfaseVoz[e]);
-  const audioSesion = [];
-  const dirRelatos = join(TRABAJO, toma, "relatos"), porHuella = new Map();
-  for (const f of readdirSync(dirRelatos).filter(f => f.endsWith(".json"))) { const j = JSON.parse(readFileSync(join(dirRelatos, f), "utf8")); porHuella.set(j.tag, j.archivo); }
-  const reserva = clipsReserva();
-  for (const idioma of ["en", "es"]) reserva[idioma].forEach((clip, i) => {
-    const bytes = clip.bytes, tag = huella(bytes), archivo = `reserva-${idioma}-${i}.mp3`;
-    if (porHuella.has(tag)) return;
-    writeFileSync(join(dirRelatos, archivo), bytes);
-    writeFileSync(join(dirRelatos, archivo.replace(".mp3", ".json")), JSON.stringify({ tag, archivo, reserva: true, idioma, texto: clip.texto, fragmentos: [{ rol: "narrador", texto: clip.texto }] }, null, 1));
-    porHuella.set(tag, archivo);
-  });
-  for (const ev0 of arena.eventosAudio) {
-    const ev = { ...ev0, relato: ev0.relato ?? porHuella.get(ev0.tag) ?? null };
-    if (!ev.relato) { if (ev.t < inicio4 + dur4 && (ev.parada ?? ev.t + ev.dur) > inicio4) console.log(`  ! audio sin identificar en la escena 4: ${ev.tag}`); continue; }
-    const fin = ev.parada ?? ev.t + (ev.dur - ev.offset);
-    if (fin <= inicio4 || ev.t >= inicio4 + dur4) continue;
-    const desde = Math.max(0, inicio4 - ev.t), alInicio = inicio.s4 + pieza4a + Math.max(0, ev.t - inicio4);
-    const dur = Math.min(fin, inicio4 + dur4) - Math.max(ev.t, inicio4);
-    if (dur < 0.6) continue;
-    agregar(join(TRABAJO, toma, "relatos", ev.relato), alInicio, { desde: ev.offset + desde, dur });
-    audioSesion.push({ ...ev, alInicio, desde: ev.offset + desde, durUsada: dur });
+  const desfase = e => e === "gancho" || e === "cierre" ? 0.25 : 0.3;
+  const repartir = (texto, desde, dur) => {
+    const frases = texto.split(/(?<=[.?!;:]["»]?)\s+/).map(s => s.trim()).filter(Boolean), trozos = [];
+    for (const f of frases) { if (trozos.length && (trozos.at(-1) + " " + f).length <= 84 && !/[.?!]$/.test(trozos.at(-1))) trozos[trozos.length - 1] += " " + f; else trozos.push(f); }
+    const tot = trozos.reduce((s, t) => s + t.length, 0); let t = desde;
+    for (const tr of trozos) { const d = dur * tr.length / tot; subt.push({ ini: t, fin: t + d - 0.04, texto: tr }); t += d; }
+  };
+  for (const e of escenas.filter(e => e.voz)) { agregar(join(TRABAJO, "voz", `${e.voz}.wav`), inicio[e.id] + desfase(e.id)); repartir(VOZ[e.voz], inicio[e.id] + desfase(e.id) + 0.05, durVoz(e.voz) - 0.25); }
+  const rolDe = (r, f) => f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)"
+    : /Goooal!/.test(f.texto) ? "Narrator (goal call)" : r.reserva ? "Narrator (backup clip)" : r.intervencion ? "Narrator (template)" : "Narrator (play-by-play)";
+  for (const e of escenas.filter(e => e.ventana)) {
+    const v = e.ventana;
+    for (const ev of eventos.filter(x => x.relato && x.t >= v.ini - 0.05 && x.fin <= v.fin + 0.05 && x.fin - x.t >= 0.6)) {
+      const alInicio = inicio[e.id] + (ev.t - v.ini), dur = ev.fin - ev.t;
+      agregar(join(dirRelatos, ev.relato), alInicio, { desde: ev.offset, dur });
+      audioSesion.push({ escena: e.id, relato: ev.relato, alInicio: +alInicio.toFixed(2), dur: +dur.toFixed(2) });
+      const r = rel(ev);
+      let frags = r.fragmentos?.length ? r.fragmentos : [{ rol: "narrador", texto: r.texto }];
+      // Locución cortada por la propia emisión (una noticia posterior): el subtítulo se corta igual.
+      if (ev.parada !== null && ev.parada < ev.t + ev.dur - 0.15) { const total = frags.reduce((s, f) => s + f.texto.length, 0), corte = total * dur / ev.dur; let acum = 0; frags = frags.flatMap(f => { if (acum >= corte) return []; const resto = corte - acum; acum += f.texto.length; if (f.texto.length <= resto) return [f]; const pal = f.texto.slice(0, Math.max(1, Math.floor(resto))).replace(/\s+\S*$/, ""); return [{ ...f, texto: `${pal}…` }]; }); }
+      const chars = frags.reduce((s, f) => s + f.texto.length, 0); let t = alInicio + 0.1;
+      for (const f of frags) { const d = (dur - 0.4) * f.texto.length / chars; subt.push({ ini: t, fin: t + d - 0.04, texto: `${rolDe(r, f)}: ${f.texto}` }); t += d; }
+    }
   }
-  if (!audioSesion.length) throw new Error("La escena 4 no tiene audio de la sesión");
-  agregar(join(EVIDENCIA, "publico-ronda-457-es.mp3"), inicio.s7 + 0.1, { volumen: 0.22, dur: Math.min(16.66, L.s7 - 0.3) });
   const k = entradas.length / 2;
   filtros.push(`${Array.from({ length: k }, (_, i) => `[a${i}]`).join("")}amix=inputs=${k}:normalize=0:dropout_transition=0,apad,atrim=duration=${total.toFixed(3)},loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[mez]`);
   writeFileSync(join(dir, "filtros-audio.txt"), filtros.join(";\n"));
   ff([...entradas, "-filter_complex_script", join(dir, "filtros-audio.txt"), "-map", "[mez]", "-ac", "2", "-c:a", "pcm_s16le", join(dir, "mezcla.wav")]);
 
-  // 3) Subtítulos: transcripción (SRT entregable) y rótulos (solo en el vídeo, como ASS).
-  const subt = [];
-  const repartir = (texto, desde, dur, prefijo = "") => {
-    const frases = texto.match(/[^.?!;:]+[.?!;:]+["»]?|[^.?!;:]+$/g).map(s => s.trim()).filter(Boolean);
-    const trozos = [];
-    for (const f of frases) { if (trozos.length && (trozos.at(-1) + " " + f).length <= 84 && !/[.?!]$/.test(trozos.at(-1))) trozos[trozos.length - 1] += " " + f; else trozos.push(f); }
-    const total = trozos.reduce((s, t) => s + t.length, 0); let t = desde;
-    trozos.forEach((tr, i) => { const d = dur * tr.length / total; subt.push({ ini: t, fin: t + d - 0.04, texto: (i === 0 ? prefijo : "") + tr }); t += d; });
-  };
-  for (const e of Object.keys(VOZ)) repartir(VOZ[e], inicio[e] + desfaseVoz[e] + 0.05, durVoz(e) - 0.25);
-  // Escena 4: lo que se oye, con el rol de cada voz (de la respuesta /relato servida a la página).
-  const modoInt = relato4.modoIntervencion;
-  for (const ev of audioSesion) {
-    const r = JSON.parse(readFileSync(join(TRABAJO, toma, "relatos", ev.relato.replace(".mp3", ".json")), "utf8"));
-    const frags = r.fragmentos ?? [{ rol: "narrador", texto: r.texto }];
-    const chars = frags.reduce((s, f) => s + f.texto.length, 0); let t = ev.alInicio + 0.1;
-    const util = ev.dur - 0.4;
-    for (const f of frags) {
-      const d = util * f.texto.length / chars;
-      const rol = f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)" : r.reserva ? "Narrator (bundled backup clip)" : r.intervencion ? "Narrator (template)" : "Narrator (play-by-play)";
-      const ini = Math.max(t, inicio.s4 + pieza4a), finS = Math.min(t + d, inicio.s4 + L.s4);
-      if (finS - ini > 0.5) subt.push({ ini, fin: finS - 0.04, texto: `${rol}: ${f.texto}` });
-      t += d;
-    }
-  }
-  // Escena 7: el clip C (otro partido, 21 oct) suena bajo la voz en off; se rotula al quedar solo.
-  { const ini = inicio.s7 + desfaseVoz.s7 + durVoz("s7") + 0.15, fin = inicio.s7 + L.s7 - 0.1;
-    if (fin - ini > 0.8) subt.push({ ini, fin, texto: "[Spanish desk audio: a four-voice round recorded in the public arena on 21 Oct]" }); }
+  // 3) Subtítulos: transcripción (SRT) y rótulos (ASS).
   subt.sort((a, b) => a.ini - b.ini);
   for (let i = 0; i + 1 < subt.length; i++) if (subt[i].fin > subt[i + 1].ini - 0.02) subt[i].fin = subt[i + 1].ini - 0.02;
   const srtT = s => { const ms = Math.round(s * 1000); const h = Math.floor(ms / 3600000), mi = Math.floor(ms / 60000) % 60, se = Math.floor(ms / 1000) % 60; return `${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")}:${String(se).padStart(2, "0")},${String(ms % 1000).padStart(3, "0")}`; };
   const partir = (t, max = 62) => { if (t.length <= max) return [t]; const pal = t.split(" "); let a = ""; const out = []; for (const p of pal) { if ((a + " " + p).trim().length > Math.ceil(t.length / Math.ceil(t.length / max)) + 6 && a) { out.push(a); a = p; } else a = (a + " " + p).trim(); } out.push(a); return out; };
   writeFileSync(SALIDA_SRT, subt.map((s, i) => `${i + 1}\n${srtT(s.ini)} --> ${srtT(s.fin)}\n${partir(s.texto).join("\n")}\n`).join("\n"));
-
   const asignacion = arena.asignacion;
+  const rotuloMesa = x => { const r = rel(x); return `Real audio from this match · desk exchange${r.variante === "breve" ? " (short variant)" : ""}: ${(r.fragmentos ?? []).map(f => f.rol === "comentarista" ? "Commentator (LLM, verified)" : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`; };
   const rotulos = { ...ROTULO,
-    s2: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · same observation, strict JSON, 60 s deadline, programmed fallback`,
-    s4: `Real audio from this match · desk exchange${relato4.variante === "breve" ? " (short variant)" : ""}: ${(relato4.fragmentos ?? []).map(f => f.rol === "comentarista" ? `Commentator (${modoInt === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`,
-    s6: arena.analisis?.cuerpo?.comentario?.modo === "llm" ? "Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks" : "Microsoft Foundry Agent Service · this answer: verified template fallback · tools reject future ticks",
+    modelos: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · chosen manually · same observation, strict JSON, 60 s deadline`,
+    analista: arena.analisis?.cuerpo?.comentario?.modo === "llm" ? "Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks" : "Microsoft Foundry Agent Service · this answer: verified template fallback · tools reject future ticks",
   };
   const assT = s => { const cs = Math.round(s * 100); return `${Math.floor(cs / 360000)}:${String(Math.floor(cs / 6000) % 60).padStart(2, "0")}:${String(Math.floor(cs / 100) % 60).padStart(2, "0")}.${String(cs % 100).padStart(2, "0")}`; };
-  const ev = [];
-  const rot = (texto, ini, fin) => ev.push(`Dialogue: 1,${assT(ini)},${assT(fin)},Rotulo,,0,0,0,,${texto}`);
-  for (const e of ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"]) rot(rotulos[e], inicio[e] + 0.15, inicio[e] + L[e] - 0.1);
-  const s9b = escenas.at(-1).piezas[2].inicioFinal;
-  rot(rotulos.s9a, inicio.s9 + 0.15, s9b); rot(rotulos.s9b, s9b, total - 0.05);
+  const ev = [], rot = (texto, ini, fin) => ev.push(`Dialogue: 1,${assT(ini)},${assT(fin)},Rotulo,,0,0,0,,${texto}`);
+  for (const e of escenas) {
+    const a = inicio[e.id] + 0.15, b = inicio[e.id] + e.dur - 0.1;
+    if (e.id === "cierre") { const c3 = e.piezas[2].inicioFinal; rot(rotulos.cierreA, a, c3); rot(rotulos.cierreB, c3, b + 0.05); }
+    else if (e.ventana?.cambio) { const c = inicio[e.id] + (e.ventana.cambio - e.ventana.ini); rot(rotulos.gol, a, c); rot(rotuloMesa(e.ventana.intercambio), c, b); }
+    else if (e.id === "mesa") rot(rotuloMesa(e.ventana.intercambio), a, b);
+    else rot(rotulos[e.id], a, b);
+  }
   for (const s of subt) ev.push(`Dialogue: 0,${assT(s.ini)},${assT(s.fin)},Sub,,0,0,0,,${partir(s.texto).join("\\N")}`);
   const ass = `[Script Info]\nScriptType: v4.00+\nPlayResX: ${ANCHO}\nPlayResY: ${ALTO}\nWrapStyle: 0\nScaledBorderAndShadow: yes\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Sub,Liberation Sans,31,&H00FFFFFF,&H00FFFFFF,&H30201208,&H30201208,1,0,0,0,100,100,0,0,3,8,0,2,140,140,30,1\nStyle: Rotulo,Liberation Sans,24,&H003AFFD4,&H003AFFD4,&H18201208,&H18201208,1,0,0,0,100,100,0,0,3,9,0,8,300,300,14,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n${ev.join("\n")}\n`;
   writeFileSync(join(dir, "subtitulos.ass"), ass);
 
-  // 4) Vídeo final: subtítulos quemados, H.264 + AAC.
+  // 4) Vídeo final.
   ff(["-i", join(dir, "mudo.mp4"), "-i", join(dir, "mezcla.wav"), "-vf", `ass=${join(dir, "subtitulos.ass")}:fontsdir=/usr/share/fonts/truetype/liberation`, "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-maxrate", "3000k", "-bufsize", "6000k", "-pix_fmt", "yuv420p", "-r", String(FPS), "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-shortest", SALIDA]);
-  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.piezas.reduce((s, p) => s + p.dur, 0).toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos, audioEscena4: audioSesion.map(a => ({ relato: a.relato, alInicio: +a.alInicio.toFixed(2), dur: +a.durUsada.toFixed(2) })), vozOff: VOZ_OFF, asignacion, sesion: arena.sesion };
+  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.dur.toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos, audioSesion, vozOff: VOZ_OFF, asignacion, sesion: arena.sesion, omitidas: sin };
   writeFileSync(join(dir, "informe.json"), JSON.stringify(informe, null, 1));
-  console.log(JSON.stringify(informe, null, 1));
+  console.log(JSON.stringify({ duracionS: informe.duracionS, escenas: informe.escenas.map(e => `${e.id} ${e.inicioS}+${e.durS}`), audioSesion }, null, 1));
 }
 
-// Fase verificar: duración, flujos y fotogramas por escena para revisarlos a ojo.
+// Fase verificar: duración, flujos y un fotograma por escena para revisarlos a ojo.
 function verificar() {
   const informe = JSON.parse(readFileSync(join(TRABAJO, "montaje", "informe.json"), "utf8"));
   let salida = ""; try { execFileSync(FF, ["-hide_banner", "-i", SALIDA], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); } catch (e) { salida = String(e.stderr); }
   const flujos = salida.split("\n").filter(l => /Stream #/.test(l)).map(l => l.trim());
   const dir = resolve("docs/entrega/capturas"); mkdirSync(dir, { recursive: true });
-  const e = id => informe.escenas.find(x => x.id === id);
-  const puntos = [["1-arena", e("s1").inicioS + 4], ["2-inicio", e("s2").inicioS + e("s2").durS - 2], ["3-planes", e("s3").inicioS + 7], ["4-mesa", e("s4").inicioS + e("s4").durS * 0.55],
-    ["5-verificacion", e("s5").inicioS + 9], ["6-analista", e("s6").inicioS + e("s6").durS - 2], ["7-espanol", e("s7").inicioS + e("s7").durS - 2], ["8-cronica", e("s8").inicioS + 9], ["9-tarjeta", e("s9").inicioS + 2]];
-  for (const [n, t] of puntos) ff(["-ss", t.toFixed(2), "-i", SALIDA, "-frames:v", "1", join(dir, `video-final-${n}.png`)]);
+  for (const f of readdirSync(dir).filter(f => f.startsWith("video-final-"))) execFileSync("rm", ["-f", join(dir, f)]);
+  const puntos = informe.escenas.map((e, i) => [`${i + 1}-${e.id}`, e.inicioS + e.durS * (e.id === "cierre" ? 0.15 : 0.6)]);
+  for (const [nombre, t] of puntos) ff(["-ss", t.toFixed(2), "-i", SALIDA, "-frames:v", "1", join(dir, `video-final-${nombre}.png`)]);
   const r = { duracionS: duracion(SALIDA), bytes: readFileSync(SALIDA).length, flujos, capturas: puntos.map(([n, t]) => ({ archivo: `docs/entrega/capturas/video-final-${n}.png`, t: +t.toFixed(2) })) };
   writeFileSync(join(TRABAJO, "montaje", "verificacion.json"), JSON.stringify(r, null, 1));
   console.log(JSON.stringify(r, null, 1));
