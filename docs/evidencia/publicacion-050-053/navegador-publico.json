@@ -1,0 +1,54 @@
+{
+  "checkedUtc": "2026-10-22T08:16:45.989Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "partido": "8f2374b3-3074-4529-875f-20f3d88d36e2",
+  "gol": {
+    "tick": 231,
+    "jugador": "visita-14"
+  },
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "banner": "GOAL Olímpico Quebralta · Germán Mendarardi",
+      "marcadorDataGol": "visita",
+      "panel": "FINAL STATS 1:00 JUVENTUD ORMIDIA OLÍMPICO QUEBRALTA 64% 36% Possession 0 0.08 Geometric shot index (sum) · estimated 0 2 Shots 0 2 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 0 0 Offsides 3 / 3 2 / 2 Passes completed 100% 100% Pass accuracy 1 3 B",
+      "descargas": [
+        {
+          "etiqueta": "Download commentary (Markdown)",
+          "archivo": "cronista-arena-50053-comentarios-en.md",
+          "bytes": 15093,
+          "inicio": "# Juventud Ormidia 0–2 Olímpico Quebralta · Broadcast transcript\nSimulated match · seed 50053 · 60 s · arena-v3 · language EN · session 8f2374b3-3074-4529-875f-"
+        },
+        {
+          "etiqueta": "Download commentary (JSON)",
+          "archivo": "cronista-arena-50053-comentarios-en.json",
+          "bytes": 96616,
+          "inicio": "{\n \"version\": \"transcripcion-arena-v1\",\n \"generado\": \"2026-10-22T08:16:53.177Z\",\n \"idioma\": \"en\",\n \"importable\": false,\n \"partido\": {\n  \"seed\": 50053,\n  \"versio"
+        }
+      ],
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "banner": "GOAL Olímpico Quebralta · Germán Mendarardi",
+      "marcadorDataGol": "visita",
+      "panel": "FINAL STATS 1:00 JUVENTUD ORMIDIA OLÍMPICO QUEBRALTA 64% 36% Possession 0 0.08 Geometric shot index (sum) · estimated 0 2 Shots 0 2 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 0 0 Offsides 3 / 3 2 / 2 Passes completed 100% 100% Pass accuracy 1 3 B",
+      "descargas": [
+        {
+          "etiqueta": "Download commentary (Markdown)",
+          "archivo": "cronista-arena-50053-comentarios-en.md",
+          "bytes": 15093,
+          "inicio": "# Juventud Ormidia 0–2 Olímpico Quebralta · Broadcast transcript\nSimulated match · seed 50053 · 60 s · arena-v3 · language EN · session 8f2374b3-3074-4529-875f-"
+        },
+        {
+          "etiqueta": "Download commentary (JSON)",
+          "archivo": "cronista-arena-50053-comentarios-en.json",
+          "bytes": 96616,
+          "inicio": "{\n \"version\": \"transcripcion-arena-v1\",\n \"generado\": \"2026-10-22T08:16:57.778Z\",\n \"idioma\": \"en\",\n \"importable\": false,\n \"partido\": {\n  \"seed\": 50053,\n  \"versio"
+        }
+      ],
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}

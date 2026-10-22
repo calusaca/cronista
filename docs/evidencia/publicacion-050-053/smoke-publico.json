@@ -1,0 +1,721 @@
+{
+  "checkedUtc": "2026-10-22T08:14:38.332Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": null,
+  "scope": "public_container_app_real_azure_services_briefs_050_053",
+  "health": {
+    "status": "ok",
+    "service": "cronista"
+  },
+  "capabilities": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+      "es": {
+        "narrador": {
+          "voz": "es-MX-JorgeNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "es-MX-DaliaNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "es-MX-GerardoNeural",
+          "motivo": "predeterminada"
+        }
+      },
+      "en": {
+        "narrador": {
+          "voz": "en-US-JennyNeural",
+          "motivo": "entorno"
+        },
+        "comentarista": {
+          "voz": "en-US-DavisNeural",
+          "motivo": "predeterminada"
+        },
+        "estadista": {
+          "voz": "en-US-GuyNeural",
+          "motivo": "predeterminada"
+        }
+      }
+    },
+    "catalogo": "consultado"
+  },
+  "match": {
+    "id": "8f2374b3-3074-4529-875f-20f3d88d36e2",
+    "asignacion": {
+      "modo": "manual",
+      "local": {
+        "id": "luna6",
+        "nombre": "GPT-6 Luna",
+        "controlador": "azure-openai:cronista-luna6:reasoning-low"
+      },
+      "visita": {
+        "id": "equilibrado",
+        "nombre": "GPT-5.6 Luna",
+        "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+      }
+    },
+    "createdUtc": "2026-10-22T08:14:44.861Z"
+  },
+  "stream": {
+    "messages": 144,
+    "advances": 124,
+    "comments": [
+      {
+        "modo": "llm",
+        "tick": 20,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 170,
+        "accepted": true
+      },
+      {
+        "modo": "llm",
+        "tick": 320,
+        "accepted": true
+      }
+    ],
+    "interventions": [
+      {
+        "id": "estadista:marcador+remates:200",
+        "rol": "estadista",
+        "tick": 200,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Ormidia 0, Olímpico Quebralta 0.",
+            "en": "Score: Juventud Ormidia 0, Olímpico Quebralta 0.",
+            "hecho": "estadista:marcador:200"
+          },
+          {
+            "es": "Sin remates en los primeros 20 segundos.",
+            "en": "No shots in the first 20 seconds.",
+            "hecho": "estadista:remates:200"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [],
+            "intervalo": [
+              0,
+              200
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: Tomás Ibarra, ¿cómo está el marcador?",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 0. Sin remates en los primeros 20 segundos.",
+          "narrador: Gracias, Tomás."
+        ],
+        "turnosBreve": [
+          "narrador: Adelante, Tomás Ibarra.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 0."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:231",
+        "rol": "comentarista",
+        "tick": 231,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Germán Mendarardi (16) marcó un gol para Olímpico Quebralta.",
+            "en": "Germán Mendarardi (16) scored a goal for Olímpico Quebralta.",
+            "hecho": "arena:a10"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a10"
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Sobre el gol de Germán Mendarardi, Ana Cedeño, ¿qué tenemos?",
+          "comentarista: Germán Mendarardi (16) marcó un gol para Olímpico Quebralta."
+        ],
+        "turnosBreve": [
+          "narrador: Ana Cedeño, ¿qué ves?",
+          "comentarista: Germán Mendarardi (16) marcó un gol para Olímpico Quebralta."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:marcador+remates:400",
+        "rol": "estadista",
+        "tick": 400,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Ormidia 0, Olímpico Quebralta 1.",
+            "en": "Score: Juventud Ormidia 0, Olímpico Quebralta 1.",
+            "hecho": "estadista:marcador:400"
+          },
+          {
+            "es": "Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 1 (1 a puerta).",
+            "en": "Shots: Juventud Ormidia 0 (0 on target), Olímpico Quebralta 1 (1 on target).",
+            "hecho": "estadista:remates:400"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a10"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a9",
+              "a10"
+            ],
+            "intervalo": [
+              0,
+              400
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: El marcador, Tomás.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 1. Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 1 (1 a puerta).",
+          "narrador: Muy bien, Tomás. Seguimos."
+        ],
+        "turnosBreve": [
+          "narrador: Tomás, con el dato.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 1."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:tiempo:485",
+        "rol": "comentarista",
+        "tick": 485,
+        "tema": "tiempo",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Thiago Oroido (10) toma el control del balón.",
+            "en": "Thiago Oroido (10) takes control of the ball.",
+            "hecho": "arena:a20"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a20"
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Ana, ¿qué ves?",
+          "comentarista: Thiago Oroido (10) toma el control del balón.",
+          "narrador: Anotado, Ana."
+        ],
+        "turnosBreve": [
+          "narrador: Te escucho, Ana.",
+          "comentarista: Thiago Oroido (10) toma el control del balón."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:marcador+remates:600",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Ormidia 0, Olímpico Quebralta 2.",
+            "en": "Score: Juventud Ormidia 0, Olímpico Quebralta 2.",
+            "hecho": "estadista:marcador:600"
+          },
+          {
+            "es": "Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 2 (2 a puerta).",
+            "en": "Shots: Juventud Ormidia 0 (0 on target), Olímpico Quebralta 2 (2 on target).",
+            "hecho": "estadista:remates:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a10",
+              "a22"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a9",
+              "a10",
+              "a21",
+              "a22"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "estadista",
+        "turnos": [
+          "narrador: Tomás, ¿cómo está el marcador?",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 2. Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 2 (2 a puerta).",
+          "narrador: Gracias, Tomás."
+        ],
+        "turnosBreve": [
+          "narrador: Tomás, con el dato.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 2."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "comentarista:gol:571",
+        "rol": "comentarista",
+        "tick": 571,
+        "tema": "gol",
+        "modo": "llm",
+        "modelo": "azure-openai:cronista-rapido:reasoning-low",
+        "oraciones": [
+          {
+            "es": "Thiago Oroido (10) marcó para Olímpico Quebralta.",
+            "en": "Thiago Oroido (10) scored for Olímpico Quebralta.",
+            "hecho": "arena:a22"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a22"
+            ]
+          }
+        ],
+        "auditFinalRejections": [],
+        "forma": "pregunta",
+        "turnos": [
+          "narrador: Ana, vamos con el gol de Thiago Oroido.",
+          "comentarista: Thiago Oroido (10) marcó para Olímpico Quebralta.",
+          "narrador: Muy bien, Ana. Seguimos."
+        ],
+        "turnosBreve": [
+          "narrador: Te escucho, Ana.",
+          "comentarista: Thiago Oroido (10) marcó para Olímpico Quebralta."
+        ],
+        "motivosD": []
+      },
+      {
+        "id": "estadista:marcador+remates:600:final",
+        "rol": "estadista",
+        "tick": 600,
+        "tema": "marcador+remates",
+        "modo": "determinista",
+        "modelo": null,
+        "oraciones": [
+          {
+            "es": "Marcador: Juventud Ormidia 0, Olímpico Quebralta 2.",
+            "en": "Score: Juventud Ormidia 0, Olímpico Quebralta 2.",
+            "hecho": "estadista:marcador:600"
+          },
+          {
+            "es": "Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 2 (2 a puerta).",
+            "en": "Shots: Juventud Ormidia 0 (0 on target), Olímpico Quebralta 2 (2 on target).",
+            "hecho": "estadista:remates:600"
+          }
+        ],
+        "evidencia": [
+          {
+            "eventos": [
+              "a10",
+              "a22"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          },
+          {
+            "eventos": [
+              "a9",
+              "a10",
+              "a21",
+              "a22"
+            ],
+            "intervalo": [
+              0,
+              600
+            ],
+            "fuente": "inicial"
+          }
+        ],
+        "auditFinalRejections": null,
+        "forma": "final",
+        "turnos": [
+          "narrador: Tomás, cerramos con los datos.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 2. Remates: Juventud Ormidia 0 (0 a puerta), Olímpico Quebralta 2 (2 a puerta).",
+          "narrador: Gracias, Tomás, por los números del partido."
+        ],
+        "turnosBreve": [
+          "narrador: Tomás, con el dato.",
+          "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 2."
+        ],
+        "motivosD": []
+      }
+    ],
+    "lastId": 144,
+    "terminated": {
+      "tipo": "terminada",
+      "estado": "completa",
+      "metricas": {
+        "duracionMs": 75249,
+        "decisiones": 4,
+        "respaldos": 0,
+        "esperaModeloMs": [
+          5558.332302000141,
+          3814.7576389999595,
+          5579.111803999869,
+          3545.31679299986
+        ],
+        "solicitudesEquipo": 4,
+        "uso": {
+          "local": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17457,
+            "salida": 1168,
+            "cache": 0
+          },
+          "visita": {
+            "llamadas": 2,
+            "respuestasConUso": 2,
+            "entrada": 17425,
+            "salida": 1073,
+            "cache": 0
+          },
+          "narrador": {
+            "llamadas": 9,
+            "respuestasConUso": 9,
+            "entrada": 17672,
+            "salida": 1649,
+            "cache": 3584
+          }
+        }
+      }
+    },
+    "elapsedMs": 75199
+  },
+  "consistency": {
+    "stream": 7,
+    "reproduccion": [
+      "estadista:marcador+remates:200",
+      "comentarista:gol:231",
+      "estadista:marcador+remates:400",
+      "comentarista:tiempo:485",
+      "estadista:marcador+remates:600",
+      "comentarista:gol:571",
+      "estadista:marcador+remates:600:final"
+    ],
+    "emision": [
+      "estadista:marcador+remates:200",
+      "comentarista:gol:231",
+      "estadista:marcador+remates:400",
+      "comentarista:tiempo:485",
+      "estadista:marcador+remates:600",
+      "comentarista:gol:571",
+      "estadista:marcador+remates:600:final"
+    ]
+  },
+  "voice": {
+    "comentarista_es": {
+      "id": "comentarista:gol:231",
+      "tick": 231,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 231,
+          "texto": "Sobre el gol de Germán Mendarardi, Ana Cedeño, ¿qué tenemos?"
+        },
+        {
+          "rol": "comentarista",
+          "tick": 231,
+          "texto": "Germán Mendarardi (16) marcó un gol para Olímpico Quebralta."
+        }
+      ],
+      "text": "Sobre el gol de Germán Mendarardi, Ana Cedeño, ¿qué tenemos? Germán Mendarardi (16) marcó un gol para Olímpico Quebralta.",
+      "bytes": 60768,
+      "type": "audio/mpeg",
+      "characters": 121,
+      "voz": "es-MX-DaliaNeural",
+      "audioSha256": "b0f87e8c351f83d250af18bdc3878bcbd135832cb0b64ca071c50e7035f0708a"
+    },
+    "comentarista_en": {
+      "id": "comentarista:gol:231",
+      "tick": 231,
+      "tipoRelato": "invitado",
+      "rol": "comentarista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 231,
+          "texto": "Priya Chandra, what do we have on Germán Mendarardi's goal?"
+        },
+        {
+          "rol": "comentarista",
+          "tick": 231,
+          "texto": "Germán Mendarardi (16) scored a goal for Olímpico Quebralta."
+        }
+      ],
+      "text": "Priya Chandra, what do we have on Germán Mendarardi's goal? Germán Mendarardi (16) scored a goal for Olímpico Quebralta.",
+      "bytes": 55008,
+      "type": "audio/mpeg",
+      "characters": 120,
+      "voz": "en-US-DavisNeural",
+      "audioSha256": "6e090650ae7e7b3798f2d02c8e519caac26b73cbe669ae42f36bd1b704a5f124"
+    },
+    "estadista_es": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Tomás Ibarra, ¿cómo está el marcador?"
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Marcador: Juventud Ormidia 0, Olímpico Quebralta 0. Sin remates en los primeros 20 segundos."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Gracias, Tomás."
+        }
+      ],
+      "text": "Tomás Ibarra, ¿cómo está el marcador? Marcador: Juventud Ormidia 0, Olímpico Quebralta 0. Sin remates en los primeros 20 segundos. Gracias, Tomás.",
+      "bytes": 85680,
+      "type": "audio/mpeg",
+      "characters": 146,
+      "voz": "es-MX-GerardoNeural",
+      "audioSha256": "d6e13fe14e9247980f30114b7b3fc589c7f445762ecb7784fbba5eda6aa629d1"
+    },
+    "estadista_en": {
+      "id": "estadista:marcador+remates:200",
+      "tick": 200,
+      "tipoRelato": "invitado",
+      "rol": "estadista",
+      "fragmentos": [
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Owen Platt, where does the score stand?"
+        },
+        {
+          "rol": "estadista",
+          "tick": 200,
+          "texto": "Score: Juventud Ormidia 0, Olímpico Quebralta 0. No shots in the first 20 seconds."
+        },
+        {
+          "rol": "narrador",
+          "tick": 200,
+          "texto": "Thanks, Owen."
+        }
+      ],
+      "text": "Owen Platt, where does the score stand? Score: Juventud Ormidia 0, Olímpico Quebralta 0. No shots in the first 20 seconds. Thanks, Owen.",
+      "bytes": 83088,
+      "type": "audio/mpeg",
+      "characters": 136,
+      "voz": "en-US-GuyNeural",
+      "audioSha256": "26b29e7c84dc93bcac40f3d34724ec50c909f5cce0ac8fe49f3fa1339501a2a6"
+    },
+    "dialogo_completa_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: Tomás Ibarra, ¿cómo está el marcador?",
+        "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 0. Sin remates en los primeros 20 segundos.",
+        "narrador: Gracias, Tomás."
+      ],
+      "bytes": 85680,
+      "characters": 146,
+      "sha256": "d6e13fe14e9247980f30114b7b3fc589c7f445762ecb7784fbba5eda6aa629d1"
+    },
+    "dialogo_completa_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "completa",
+      "fragmentos": [
+        "narrador: Owen Platt, where does the score stand?",
+        "estadista: Score: Juventud Ormidia 0, Olímpico Quebralta 0. No shots in the first 20 seconds.",
+        "narrador: Thanks, Owen."
+      ],
+      "bytes": 83088,
+      "characters": 136,
+      "sha256": "26b29e7c84dc93bcac40f3d34724ec50c909f5cce0ac8fe49f3fa1339501a2a6"
+    },
+    "dialogo_breve_es": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Adelante, Tomás Ibarra.",
+        "estadista: Marcador: Juventud Ormidia 0, Olímpico Quebralta 0."
+      ],
+      "bytes": 46800,
+      "characters": 75,
+      "sha256": "9f72d8a339b65054f6eabe154911c115690dd6f09fd71b1bac67dbcea7c6b5e5"
+    },
+    "dialogo_breve_en": {
+      "id": "estadista:marcador+remates:200",
+      "variante": "breve",
+      "fragmentos": [
+        "narrador: Go ahead, Owen Platt.",
+        "estadista: Score: Juventud Ormidia 0, Olímpico Quebralta 0."
+      ],
+      "bytes": 47952,
+      "characters": 70,
+      "sha256": "355788d42a7613dd086110110260bdde3af8339028d3f5be767ca02579715e6d"
+    },
+    "canto_es": {
+      "tick": 231,
+      "texto": "¡Gooool! ¡Gol, gol de Germán Mendarardi! Olímpico Quebralta se adelanta, cero a uno, a los 23 segundos.",
+      "canto": {
+        "tramos": [
+          {
+            "texto": "¡Gooool!",
+            "tipo": "grito"
+          },
+          {
+            "texto": "¡Gol, gol de Germán Mendarardi!",
+            "tipo": "goleador"
+          },
+          {
+            "texto": "Olímpico Quebralta se adelanta, cero a uno, a los 23 segundos.",
+            "tipo": "hechos"
+          }
+        ]
+      },
+      "bytes": 62064,
+      "duracionS": 10.3,
+      "sha256": "3253c504904748ffe11ee649de40bb4c7dc751308f4bc35de21e129d8603cfff"
+    },
+    "canto_en": {
+      "tick": 231,
+      "texto": "Goooal! Goal, goal by Germán Mendarardi! Olímpico Quebralta take the lead, nil–one, after 23 seconds.",
+      "canto": {
+        "tramos": [
+          {
+            "texto": "Goooal!",
+            "tipo": "grito"
+          },
+          {
+            "texto": "Goal, goal by Germán Mendarardi!",
+            "tipo": "goleador"
+          },
+          {
+            "texto": "Olímpico Quebralta take the lead, nil–one, after 23 seconds.",
+            "tipo": "hechos"
+          }
+        ]
+      },
+      "bytes": 63648,
+      "duracionS": 10.6,
+      "sha256": "5e47940a9e8fec9fe3edfbfb54a771dd793cde7d89b519b62380185bd05790dc"
+    },
+    "narrador_es": {
+      "bytes": 123696,
+      "characters": 235,
+      "text": "Comienza el partido entre Juventud Ormidia y Olímpico Quebralta. Saque de centro para Juventud Ormidia; ejecuta Simón Valoánez (6). Simón Valoánez (6) intenta un pase de 32 m hacia Adrián Quinelón. Adrián Quinelón (15) recibe el balón."
+    }
+  },
+  "dialogue": {
+    "forms": [
+      "estadista",
+      "pregunta",
+      "estadista",
+      "pregunta",
+      "estadista",
+      "pregunta",
+      "final"
+    ],
+    "withDialogue": 7,
+    "total": 7,
+    "motivosD": []
+  },
+  "goal": {
+    "reglas": "reinicios-v5",
+    "goles": 2
+  },
+  "unknownIntervention": 404,
+  "motor": {
+    "reglas": "reinicios-v5",
+    "marcador": {
+      "local": 0,
+      "visita": 2
+    },
+    "eventos": 25,
+    "centros": 0,
+    "saquesManos": 0,
+    "atajadas": 0,
+    "goles": 2,
+    "decisiones": [
+      "valida",
+      "valida",
+      "valida",
+      "valida"
+    ],
+    "accionesLlm": [
+      "cubrir",
+      "profundidad",
+      "mover",
+      "apoyar",
+      "conducir",
+      "presionar"
+    ]
+  },
+  "status": "passed",
+  "finishedUtc": "2026-10-22T08:16:23.871Z"
+}
