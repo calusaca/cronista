@@ -826,3 +826,32 @@ export const MESA_ARENA = {
     },
   },
 } as const;
+
+/** Brief 049 · Cifras del partido y favoritos. */
+export const ESTADISTICAS_ARENA = {
+  /** Filas del panel, en orden; solo las implementadas (v1.1 § 13: entrega mínima, nivel 2 y, del
+   * nivel 3, `igr` y `remates_cercanos`, ambas «estimadas»). */
+  filasPanel: ["posesion_pct", "igr", "remates", "remates_directos", "remates_indirectos", "remates_cercanos", "esquinas", "fueras_juego", "pases_completados", "precision_pase", "recuperaciones", "perdidas", "faltas", "amarillas", "rojas", "atajadas"],
+  /** Claves donde lidera el menor valor. */
+  mejorMenor: ["fueras_juego", "perdidas", "faltas", "amarillas", "rojas"],
+  /** Ancho mínimo (%) de una barra con valor > 0, para que siga visible. */
+  barraMinPct: 4,
+  /** Líneas de «Destacados» en la vista final. */
+  destacados: 3,
+  /** m/s → km/h. */
+  kmhPorMps: 3.6,
+  /** Evidencias listadas por cifra en la ficha (la cifra cuenta todas). */
+  evidenciasVisibles: 12,
+  /** Clave de localStorage de los favoritos; el sufijo versiona el formato. */
+  claveFavoritos: "cronista:arena:favoritos:v1",
+} as const;
+
+/** Brief 049 (v1.1 § 9, nivel 3) · Índice geométrico de remate (IGR) de la arena: SOLO ordena
+ * remates por distancia y ángulo al arco rival. Adimensional, en [0, max]; NO es una probabilidad
+ * ni un xG, no está calibrado contra nada y no es comparable con el xG del simulador histórico.
+ * Siempre rotulado «estimado». Desde la línea de fondo rival o detrás (θ = 0) vale 0. */
+export const IGR_ARENA = {
+  base: 0.35, puntoPenalM: 11, distanciaLibreM: 6, escalaM: 12, min: 0.02, max: 0.6,
+  /** Umbral de «remate cercano y centrado»; coincide en magnitud con XG_ALTO.xgMin, pero es independiente. */
+  umbralCercano: 0.3,
+} as const;

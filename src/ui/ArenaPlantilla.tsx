@@ -1,11 +1,20 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { etiquetaTemperamento, etiquetasPerfil } from "../arena/personalidades";
 import type { EstadoArena, PersonalidadJugador, RegistroArena } from "../arena/tipos";
+import { memoAgregado, type MemoAgregado } from "../arena/estadisticas";
+import { ArenaCifrasJugador } from "./ArenaCifrasJugador";
+import { EstrellaFavorito } from "./ArenaFavoritos";
 
-export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, idioma }: {
+export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, idioma, tick, favorito, alternarFavorito, avisos, transporte = false, saltar, memo = memoAgregado }: {
   estado: EstadoArena; registro: RegistroArena; seleccionado: string | null;
   seleccionar: (id: string) => void; idioma: "es" | "en";
+  /** Brief 049: tick entero del cursor (cifras del prefijo ≤ tick). */
+  tick?: number;
+  /** Brief 049: el jugador seleccionado es el favorito; la estrella lo alterna. */
+  favorito?: boolean; alternarFavorito?: (j: { club: string; dorsal: number; nombre: string }) => void;
+  avisos?: ReactNode; transporte?: boolean; saltar?: (s: number) => void; memo?: MemoAgregado;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const plantilla = [...estado.jugadores, ...estado.banco ?? [], ...estado.retirados ?? [], ...estado.expulsados ?? []];
@@ -37,12 +46,15 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
       </div>{estado.banco && <div className="arena-bench"><h3>{t("Bench", "Suplentes")}</h3>{estado.banco.filter(p => p.lado === j.lado).map(p => <button type="button" key={p.id} className="arena-bench-person" aria-pressed={p.id === j.id} onClick={() => seleccionar(p.id)} data-testid="arena-bench-person">{p.dorsal} · {p.nombre}<span>{p.posicionNatural}</span></button>)}</div>}
       {!![...estado.retirados ?? [], ...estado.expulsados ?? []].filter(p => p.lado === j.lado).length && <details className="arena-departed"><summary>{t("Substituted / sent off", "Sustituidos / expulsados")}</summary>{[...estado.retirados ?? [], ...estado.expulsados ?? []].filter(p => p.lado === j.lado).map(p => <button type="button" key={p.id} className="arena-bench-person" onClick={() => seleccionar(p.id)}>{p.dorsal} · {p.nombre}<span>{estado.expulsados?.some(e => e.id === p.id) ? t("Sent off", "Expulsado") : t("Substituted", "Sustituido")}</span></button>)}</details>}
       </div>
-      <section className="arena-player-card" data-testid="arena-player-card" aria-label={t("Selected player", "Jugador seleccionado")}>
+      <section className="arena-player-card" data-testid="arena-player-card" data-favorite={favorito || undefined} aria-label={t("Selected player", "Jugador seleccionado")}>
         <p className="overline">{j.puesto} · {t("Shirt", "Dorsal")} {j.dorsal}</p>
-        <h3>{j.nombre}{j.capitan && <span className="arena-captain-badge">{t("Captain", "Capitán")}</span>}</h3>
+        <div className="arena-player-title"><h3>{j.nombre}{j.capitan && <span className="arena-captain-badge">{t("Captain", "Capitán")}</span>}</h3>
+          {alternarFavorito && <EstrellaFavorito activo={!!favorito} nombre={j.nombre} tipo="jugador" idioma={idioma} testId="arena-favorite-player" alternar={() => alternarFavorito({ club: registro.config.partido[j.lado].nombre, dorsal: j.dorsal, nombre: j.nombre })} />}</div>
+        {avisos}
         {estado.banco && <p className="arena-muted">{estado.banco.some(p => p.id === j.id) ? t("Available substitute", "Suplente disponible") : estado.retirados?.some(p => p.id === j.id) ? t("Substituted — cannot return", "Sustituido — sin reingreso") : estado.expulsados?.some(p => p.id === j.id) ? t("Sent off — cannot be replaced", "Expulsado — no puede ser reemplazado") : t("On the pitch", "En cancha")}{j.posicionNatural ? ` · ${t("Natural role", "Puesto natural")}: ${j.posicionNatural}` : ""}{j.amarillas ? ` · ${j.amarillas} ${t("yellow card(s)", "amarilla(s)")}` : ""}</p>}
         {p && <p className="arena-profile-tags" data-testid="arena-profile-tags"><span>{etiquetasPerfil[p.perfil][idioma]}</span><span>{etiquetaTemperamento(p, idioma)}</span></p>}
         <dl className="arena-player-metrics"><div><dt>{t("Ability", "Nivel")}</dt><dd>{j.nivel}<small>/100</small></dd></div><div><dt>{t("Current energy", "Energía actual")}</dt><dd>{Math.round(j.energia * 100)}<small>%</small></dd></div></dl>
+        {tick !== undefined && <ArenaCifrasJugador registro={registro} tick={tick} jugador={j} idioma={idioma} transporte={transporte} saltar={saltar} memo={memo} />}
         {p ? <>
           <p className="arena-muted">{t("Independent traits: a passer can be aggressive and captain. These synthetic preferences guide programmed decisions and local choices; model controllers receive them as context. Ability determines execution.", "Rasgos independientes: un pasador puede ser agresivo y capitán. Estas preferencias sintéticas orientan decisiones programadas y elecciones locales; los modelos las reciben como contexto. El nivel determina la capacidad de ejecución.")}</p>
           <div className="arena-traits">{rasgos.map(r => <div className="arena-trait" key={r.clave}>

@@ -5,8 +5,8 @@ import { inteligenciaArena } from "../arena/inteligencia";
 import { ARENA } from "../sim/limites";
 import type { EstadoArena, RegistroArena } from "../arena/tipos";
 
-export function ArenaInteligencia({ registro, estado, idioma, jugador }: { registro: RegistroArena; estado: EstadoArena; idioma: "es" | "en"; jugador: string }) {
-  const [modo, setModo] = useState<"fan" | "analyst" | "player">("fan");
+export function ArenaInteligencia({ registro, estado, idioma, jugador, modoInicial = "fan" }: { registro: RegistroArena; estado: EstadoArena; idioma: "es" | "en"; jugador: string; modoInicial?: "fan" | "player" }) {
+  const [modo, setModo] = useState<"fan" | "analyst" | "player">(modoInicial);
   const [evidencia, setEvidencia] = useState<string | null>(null);
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const analisis = inteligenciaArena(registro, estado);

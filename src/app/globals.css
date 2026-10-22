@@ -2670,6 +2670,11 @@ button.stats-row:hover {
   --ar-bug-muted: #a9b8d0;
   --ar-score-bg: #d4ff3a;
   --ar-score-ink: #0b1220;
+  /* Brief 049 · Colores de equipo sobre el rótulo de TV (--ar-bug, constante en los dos temas): los
+     valores oscuros de --ar-home-ui / --ar-away-ui, para que barras y pastillas del líder se lean
+     igual en claro y en oscuro. El panel de cifras redefine esos tokens con estos. */
+  --ar-home-ui-bug: #8fb0ff;
+  --ar-away-ui-bug: #f5f7fb;
   /* Equipaciones en la cancha: constantes. */
   --ar-home: #0c1640;
   --ar-home-ink: #ffffff;
@@ -2979,7 +2984,87 @@ button.stats-row:hover {
   .arena-seek { padding: 0 var(--ar-s2) var(--ar-s2); height: calc(28px + var(--ar-s2)); }
 }
 
+/* ---------- Brief 049 · cifras del partido, ficha del jugador y favoritos (tokens 047) ---------- */
+.arena-board > .arena-muted:has(+ .arena-stats) { margin: var(--ar-s3) 0 0; font-size: 13px; }
+.arena-stats { --ar-home-ui: var(--ar-home-ui-bug); --ar-away-ui: var(--ar-away-ui-bug); min-width: 0; margin-top: var(--ar-s4); padding: var(--ar-s3) var(--ar-s4); border-radius: var(--ar-r); background: var(--ar-bug); color: var(--ar-bug-ink); box-shadow: var(--shadow); }
+.arena-stats-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ar-s2); }
+.arena-stats .overline { margin: 0; color: var(--ar-bug-muted); font-size: 11px; letter-spacing: .08em; }
+.arena-stats-clock { padding: 0 var(--ar-s2); border-radius: var(--ar-r-sm); background: var(--ar-bug-2); color: var(--ar-bug-ink); font: 700 13px/1.5 var(--font-display), sans-serif; }
+.arena-stats-teams { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ar-s2); margin: var(--ar-s3) 0 var(--ar-s1); font: 700 13px/1.3 var(--font-display), sans-serif; letter-spacing: .04em; text-transform: uppercase; overflow-wrap: anywhere; }
+.arena-stats-teams span { display: flex; align-items: center; gap: var(--ar-s2); min-width: 0; }
+.arena-stats-teams span::before { content: ""; flex: 0 0 6px; width: 6px; height: 16px; border-radius: 2px; }
+.arena-stats-teams [data-side="local"]::before { background: var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ring); }
+.arena-stats-teams [data-side="visita"] { flex-direction: row-reverse; text-align: right; }
+.arena-stats-teams [data-side="visita"]::before { background: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-stats-teams [data-favorite] { text-decoration: underline 2px var(--ar-score-bg); text-underline-offset: 4px; }
+.arena-stats .arena-empty { border-color: var(--ar-bug-2); background: var(--ar-bug-2); color: var(--ar-bug-ink); }
+.arena-stat-row { display: grid; grid-template-columns: minmax(4.5em, auto) minmax(0, 1fr) minmax(4.5em, auto); grid-template-areas: "local etiqueta visita" "barras barras barras"; align-items: center; column-gap: var(--ar-s2); padding: var(--ar-s2) 0; border-top: 1px solid var(--ar-bug-2); }
+.arena-stat-label { grid-area: etiqueta; min-width: 0; color: var(--ar-bug-ink); font-size: 13px; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.arena-stat-note { display: block; color: var(--ar-bug-muted); font-size: 11px; }
+.arena-stat-value { justify-self: start; padding: 1px var(--ar-s2); border-radius: var(--ar-r-sm); color: var(--ar-bug-muted); font: 600 16px/1.3 var(--font-display), sans-serif; white-space: nowrap; }
+.arena-stat-value[data-side="local"] { grid-area: local; }
+.arena-stat-value[data-side="visita"] { grid-area: visita; justify-self: end; }
+.arena-stat-value small { font-size: 12px; font-weight: 400; }
+/* Líder: pastilla con el color de SU equipo (también en las filas donde gana el menor). */
+.arena-stat-value[data-lead] { border-radius: var(--ar-r-pill); font-weight: 800; }
+.arena-stat-value[data-lead][data-side="local"] { background: var(--ar-home-ui); color: var(--ar-bug); }
+.arena-stat-value[data-lead][data-side="visita"] { background: var(--ar-away-ui); color: var(--ar-away-ink); }
+.arena-stat-bars { grid-area: barras; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--ar-s1); margin-top: var(--ar-s1); }
+.arena-stat-track { display: flex; height: 6px; overflow: hidden; border-radius: 3px; background: var(--ar-bug-2); }
+.arena-stat-track[data-side="local"] { justify-content: flex-end; }
+.arena-stat-bar { display: block; height: 100%; border-radius: 3px; transition: width 160ms; }
+.arena-stat-bar[data-side="local"] { background: var(--ar-home-ui); }
+.arena-stat-bar[data-side="visita"] { background: var(--ar-away-ui); }
+.arena-stats-foot { margin-top: var(--ar-s2); padding-top: var(--ar-s2); border-top: 1px solid var(--ar-bug-2); }
+.arena-stats-foot .arena-muted { margin: 0 0 var(--ar-s1); color: var(--ar-bug-muted); font-size: 12px; }
+.arena-stats-foot summary { cursor: pointer; color: var(--ar-score-bg); font-size: 13px; font-weight: 600; }
+.arena-stats-evidence { margin: var(--ar-s2) 0 0; font-size: 12px; }
+.arena-stats-evidence > div { padding: var(--ar-s1) 0; border-top: 1px solid var(--ar-bug-2); }
+.arena-stats-evidence dt { color: var(--ar-bug-ink); font-weight: 600; }
+.arena-stats-evidence dd { display: grid; gap: 2px; margin: 0; color: var(--ar-bug-muted); overflow-wrap: anywhere; }
+.arena-stats-legend [data-class] { font-weight: 700; color: var(--ar-bug-ink); }
+.arena-stats-highlights { margin-top: var(--ar-s3); padding-top: var(--ar-s2); border-top: 1px solid var(--ar-bug-2); }
+.arena-stats-highlights ul { display: grid; gap: var(--ar-s1); margin: var(--ar-s1) 0 0; padding: 0; list-style: none; }
+.arena-stats-highlights li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--ar-s2); font-size: 13px; }
+.arena-stats-highlights li > span:first-child { grid-column: 1 / -1; color: var(--ar-bug-muted); font-size: 12px; }
+.arena-stats-highlights strong { min-width: 0; color: var(--ar-bug-ink); overflow-wrap: anywhere; }
+.arena-stats-highlights .tnum { color: var(--ar-score-bg); font-weight: 700; }
+.arena-only-favourite { display: flex; align-items: center; gap: var(--ar-s2); margin: var(--ar-s1) 0; font-size: 13px; }
+/* Ficha del jugador */
+.arena-player-title { display: flex; align-items: center; gap: var(--ar-s2); }
+.arena-player-title h3 { flex: 1 1 auto; min-width: 0; }
+.arena-player-card[data-favorite] { border-color: var(--ar-live); box-shadow: inset 0 0 0 1px var(--ar-live); }
+.arena-player-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ar-s2); margin: 0 0 var(--ar-s3); }
+.arena-player-stats > div { min-width: 0; padding: var(--ar-s2) var(--ar-s3); border-radius: var(--ar-r-sm); background: var(--ar-surface-2); }
+.arena-player-stats dt { color: var(--muted); font-size: 12px; line-height: 1.35; }
+.arena-player-stats dd { margin: 2px 0 0; color: var(--ink); font: 700 18px/1.25 var(--font-display), sans-serif; overflow-wrap: anywhere; }
+.arena-player-stats dd small { display: block; color: var(--muted); font: 400 12px/1.35 var(--font-sans), sans-serif; }
+.arena-player-evidence { margin: 0 0 var(--ar-s2); font-size: 13px; }
+.arena-player-evidence summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.arena-player-evidence p { margin: var(--ar-s2) 0 0; }
+.arena-player-evidence .arena-evidence-link:disabled { cursor: not-allowed; opacity: .7; }
+.arena-player-stats-note { font-size: 12px; }
+.arena-fav-notes p { margin: 0 0 var(--ar-s2); }
+.arena-fav-notes .btn { margin-left: var(--ar-s1); padding: 2px var(--ar-s2); font-size: 13px; }
+/* Estrella: forma CSS en un span aria-hidden; sin texto ni contenido en pseudoelementos. */
+.arena-shell .arena-fav-toggle { display: inline-grid; flex: 0 0 auto; place-items: center; width: 32px; height: 32px; min-height: 0; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; }
+.arena-shell .arena-fav-toggle:hover { border-color: currentColor; }
+.arena-shell .arena-fav-toggle:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 1px; }
+.arena-fav-star { display: block; width: 16px; height: 16px; background: currentColor; opacity: .5; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.arena-fav-toggle[aria-pressed="true"] .arena-fav-star { opacity: 1; background: var(--ar-score-bg); }
+.arena-player-card .arena-fav-toggle[aria-pressed="true"] .arena-fav-star { background: var(--ar-live); }
+.arena-score > span[data-favorite] { color: var(--ar-score-bg); }
+/* Ficha favorita en la cancha: anillo --ar-live del mismo grosor que la selección, sin transform. */
+.arena-player[data-favorite] > .arena-token > circle { stroke: var(--ar-live); stroke-width: 0.7; }
+.arena-player-selected[data-favorite] > .arena-token > circle { stroke: var(--ar-select); }
+@media (max-width: 520px) {
+  .arena-stats { padding: var(--ar-s2) var(--ar-s3); }
+  .arena-stat-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "etiqueta etiqueta" "local visita" "barras barras"; row-gap: 2px; }
+  .arena-player-stats { grid-template-columns: minmax(0, 1fr); }
+  .arena-shell .arena-fav-toggle { width: 44px; height: 44px; min-height: 44px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .arena-match-clock[data-en-vivo]::before { animation: none; }
-  .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card { transition: none; }
+  .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card, .arena-stat-bar { transition: none; }
 }

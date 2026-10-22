@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { estructura } from "../arena/catalogo";
 import { formaciones, type FormacionArena, type RegistroArena } from "../arena/tipos";
 import { estadoVisual, narrarEventoArena } from "../arena/vista";
@@ -22,6 +22,10 @@ import { aplicarPublicacion } from "../arena/protocolo";
 import { rondaVisible } from "../arena/buffer";
 import { ArenaDescripcion } from "./ArenaDescripcion";
 import { ArenaEmisionBuffer } from "./ArenaEmisionBuffer";
+import { ArenaCifras } from "./ArenaCifras";
+import { AvisosFavoritos, EstrellaFavorito } from "./ArenaFavoritos";
+import { memoAgregado } from "../arena/estadisticas";
+import { almacenFavoritos, alternarClub, alternarJugador, FAVORITOS_VACIOS, favoritosEn, guardarFavoritos, leerFavoritos, preseleccionFavorita, type FavoritosArena } from "../arena/favoritos";
 import type { IntervencionArena, PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
 
 const reloj = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
@@ -56,6 +60,13 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [archivoActual, setArchivoActual] = useState<"duelo" | "ejemplo-v3" | "ejemplo" | null>(null);
   const solicitud = useRef<AbortController | null>(null), cursor = useRef(0);
   const ultimaPeticion = useRef<unknown>(null);
+  // Brief 049 (v1.1 § 10) · Favoritos: vacíos y sin hidratar en el primer render (SSR y cliente);
+  // se leen una vez al montar y solo se escriben desde las estrellas y «Olvidar favorito».
+  const [favoritos, setFavoritos] = useState<{ valor: FavoritosArena; error: boolean; hidratado: boolean }>({ valor: FAVORITOS_VACIOS, error: false, hidratado: false });
+  /** Cada carga correcta (ejecutar, recibirPreparado, publicación inicio) la incrementa. */
+  const [cargaId, setCargaId] = useState(0);
+  const [modoInicial, setModoInicial] = useState<"fan" | "player">("fan");
+  const [soloFavorito, setSoloFavorito] = useState(false);
   const es = idioma === "es";
   const bloqueado = pendiente || enDirecto || bufferActivo;
   const finS = registro.final.tick * ARENA.pasoS;
@@ -68,6 +79,14 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     return () => media.removeEventListener("change", cambiar);
   }, []);
   useEffect(() => () => solicitud.current?.abort(), []);
+  useEffect(() => { const { favoritos: valor, error } = leerFavoritos(almacenFavoritos()); setFavoritos({ valor, error, hidratado: true }); }, []);
+  // Preselección una vez por carga (y tras hidratar): el jugador favorito o el capitán del club
+  // favorito, solo si nadie está seleccionado; las publicaciones «avance» no tocan cargaId.
+  useEffect(() => {
+    if (!favoritos.hidratado) return;
+    if (seleccionado === null) { const id = preseleccionFavorita(registro, favoritos.valor); if (id) setSeleccionado(id); }
+    setModoInicial(favoritosEn(registro, favoritos.valor).jugador ? "player" : "fan");
+  }, [cargaId, favoritos.hidratado]);
   useEffect(() => { cursor.current = tiempo; }, [tiempo]);
   useEffect(() => {
     if (!reproduciendo) return;
@@ -94,7 +113,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (p.tipo === "terminada" && presentacionActual.current === "buffer") { setBufferTerminada(true); if (p.estado !== "completa") setBufferActivo(false); }
     if (p.tipo === "sesion" && p.id) setSesionActual(p.id);
     if (p.tipo === "esperando" || p.tipo === "avance" || p.tipo === "fin") setEstadoDirecto(p.tipo === "avance" ? "jugando" : p.tipo === "fin" ? "finalizando" : "esperando");
-    if (p.tipo === "inicio") { setArchivoActual(null); setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null); setImportado(false); setComentarios([]); setIntervenciones([]); }
+    if (p.tipo === "inicio") { setCargaId(c => c + 1); setArchivoActual(null); setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null); setImportado(false); setComentarios([]); setIntervenciones([]); }
     if (p.tipo === "comentario") setComentarios(anteriores => [...anteriores, p.comentario]);
     if (p.tipo === "intervencion") setIntervenciones(anteriores => anteriores.some(i => i.id === p.intervencion.id) ? anteriores : [...anteriores, p.intervencion]);
     if (p.tipo === "avance" && presentacionActual.current !== "buffer") { const s = p.estado.tick * ARENA.pasoS; setTiempo(s); cursor.current = s; }
@@ -107,7 +126,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (activa) { bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
   const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
-    setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id);
+    setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id); setCargaId(c => c + 1);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
     // Una instantánea que ya llega cancelada, interrumpida o con error no abre la emisión:
@@ -137,7 +156,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       setRegistro(siguiente); setTiempo(0); cursor.current = 0;
       setArchivoActual(payload === "duelo" || payload === "ejemplo-v3" || payload === "ejemplo" ? payload : null);
       setComentarios([]); setIntervenciones([]);
-      setSeleccionado(null);
+      setSeleccionado(null); setCargaId(c => c + 1);
       setImportado((cuerpo as { accion: string }).accion === "reproducir");
     } catch {
       if (!controlador.signal.aborted && solicitud.current === controlador) setError(t("Could not validate or run this experiment. Your previous run is still available.", "No se pudo validar o ejecutar el experimento. El anterior sigue disponible."));
@@ -170,6 +189,13 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const plantillaCompleta = [...estado.jugadores, ...estado.banco ?? [], ...estado.retirados ?? [], ...estado.expulsados ?? []];
   const jugadorActivo = plantillaCompleta.find(j => j.id === seleccionado) ?? estado.jugadores.find(j => j.lado === "local" && j.capitan) ?? estado.jugadores[0]!;
   const saltar = (s: number) => { if (enDirecto || bufferActivo) return; setReproduciendo(false); setTiempo(s); cursor.current = s; };
+  // Brief 049 · Cifras del prefijo ≤ tick entero del cursor: una agregación por (registro, tick),
+  // compartida por el panel y la ficha (memoAgregado guarda la última).
+  const tickCifras = Math.floor(tiempo / ARENA.pasoS + 1e-9);
+  useMemo(() => memoAgregado(registro, tickCifras), [registro, tickCifras]);
+  const presentes = useMemo(() => favoritos.hidratado ? favoritosEn(registro, favoritos.valor) : { lado: null, jugador: null }, [registro, favoritos]);
+  const cambiarFavoritos = (valor: FavoritosArena) => { if (!favoritos.hidratado) return; const ok = guardarFavoritos(almacenFavoritos(), valor); setFavoritos({ valor, error: !ok, hidratado: true }); };
+  const estrellaClub = (lado: "local" | "visita") => <EstrellaFavorito activo={presentes.lado === lado} nombre={nombres[lado].nombre} tipo="club" idioma={idioma} testId="arena-favorite-club" lado={lado} alternar={() => cambiarFavoritos(alternarClub(favoritos.valor, nombres[lado].nombre))} />;
   return <>
     <header className="topbar arena-topbar">
       <Link href="/" className="brand" prefetch={false}><span className="brand-mark">CRONISTA</span><span className="brand-tag">{t("Team agents lab", "Laboratorio de equipos")}</span></Link>
@@ -221,7 +247,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       <div className="arena-grid" id="arena-watch">
         <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
           {registro === inicial && !sesionActual && !enDirecto && <p className="arena-muted arena-empty">{t("Saved preview. Start a live match above or choose a recording.", "Vista previa guardada. Inicia un partido en vivo arriba o elige una grabación.")}</p>}
-          <div className="arena-score"><span>{nombres.local.nombre}</span><strong className="tnum">{estado.marcador.local}–{estado.marcador.visita}</strong><span>{nombres.visita.nombre}</span></div>
+          <div className="arena-score"><span data-favorite={presentes.lado === "local" || undefined}>{nombres.local.nombre}{estrellaClub("local")}</span><strong className="tnum">{estado.marcador.local}–{estado.marcador.visita}</strong><span data-favorite={presentes.lado === "visita" || undefined}>{nombres.visita.nombre}{estrellaClub("visita")}</span></div>
           <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock">{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
           <div className="arena-pitch-wrap"><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
             <rect className="arena-runoff" x="-5" y="-5" width="115" height="78" rx="1.5" aria-hidden="true" />
@@ -231,7 +257,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
               <circle cx="52.5" cy="34" r="0.35" className="arena-spot" /><circle cx="11" cy="34" r="0.35" className="arena-spot" /><circle cx="94" cy="34" r="0.35" className="arena-spot" />
               <path d="M16.5 26.69 A9.15 9.15 0 0 1 16.5 41.31" /><path d="M88.5 26.69 A9.15 9.15 0 0 0 88.5 41.31" />
               <path d="M1 0 A1 1 0 0 1 0 1 M105 1 A1 1 0 0 1 104 0 M104 68 A1 1 0 0 1 105 67 M0 67 A1 1 0 0 1 1 68" /></g>
-            {estado.jugadores.map(j => <g key={j.id} data-testid="arena-player" data-player={j.id} data-captain={j.capitan || undefined} transform={`translate(${j.posicion.x} ${j.posicion.y})`} className={`arena-player arena-${j.lado}${jugadorActivo.id === j.id ? " arena-player-selected" : ""}`} role="button" tabIndex={0} aria-pressed={jugadorActivo.id === j.id} aria-label={`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? ` · ${t("Captain", "Capitán")}` : ""}${j.personalidad ? ` · ${etiquetasPerfil[j.personalidad.perfil][idioma]}` : ""}`} onClick={() => setSeleccionado(j.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSeleccionado(j.id); } }}>
+            {estado.jugadores.map(j => <g key={j.id} data-testid="arena-player" data-player={j.id} data-captain={j.capitan || undefined} data-favorite={presentes.jugador === j.id || undefined} transform={`translate(${j.posicion.x} ${j.posicion.y})`} className={`arena-player arena-${j.lado}${jugadorActivo.id === j.id ? " arena-player-selected" : ""}`} role="button" tabIndex={0} aria-pressed={jugadorActivo.id === j.id} aria-label={`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? ` · ${t("Captain", "Capitán")}` : ""}${j.personalidad ? ` · ${etiquetasPerfil[j.personalidad.perfil][idioma]}` : ""}`} onClick={() => setSeleccionado(j.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSeleccionado(j.id); } }}>
               <title>{`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? " · C" : ""}`}</title><g className="arena-token"><circle r="1.9" /><text textAnchor="middle" dominantBaseline="central">{j.dorsal}</text>
               {j.capitan && <g className="arena-captain-mark" aria-hidden="true"><rect x="1.4" y="-3.3" width="2.5" height="2.5" rx="0.4" /><text x="2.65" y="-2" textAnchor="middle" dominantBaseline="central">C</text></g>}
               {!!j.amarillas && <rect className="arena-yellow-card" x="-3.5" y="-3" width="1.3" height="2" aria-hidden="true" />}</g>
@@ -254,6 +280,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <input className="arena-seek" type="range" min="0" max={finS} disabled={enDirecto || audioActivo} step="0.1" value={tiempo} onChange={e => saltar(Number(e.target.value))} aria-label={t("Match time", "Tiempo de juego")} />
           </>}
           <p className="arena-muted">{bufferActivo ? t("Live match at normal speed.", "Partido en vivo a velocidad normal.") : t("Continuous simulated movement; explicit ball cuts at simplified restarts. Playback starts paused.", "Movimiento continuo simulado; el balón se recoloca en reinicios simplificados. La reproducción empieza pausada.")}{reducido && t(" Reduced motion: discrete states.", " Movimiento reducido: estados discretos.")}</p>
+          <ArenaCifras registro={registro} tick={tickCifras} idioma={idioma} favorito={presentes.lado} />
         </section>
         <aside className="arena-companion" aria-label={t("Narration and commentary", "Narración y comentarios")} data-testid="arena-companion">
           {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={intervenciones} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
@@ -263,9 +290,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             <h2>{t("Latest actions", "Últimas acciones")}</h2>
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>
             <p className="arena-muted">{t("Confirmed actions, synchronized with the pitch. Text is available with audio off.", "Acciones confirmadas, sincronizadas con la cancha. Puedes leerlas con el audio apagado.")}</p>
-            {!eventos.length ? <p className="arena-empty">{t("Waiting for kick-off. Start a live match or play a saved match.", "Esperando el inicio. Inicia un partido en vivo o reproduce uno guardado.")}</p> : <ol>{eventos.slice(-5).reverse().map(e => <li key={e.id} data-event-tick={e.tick}><time>{reloj(e.tick * ARENA.pasoS)}</time><span>{narrarEventoArena(e, registro, idioma)}</span></li>)}</ol>}
+            {presentes.jugador && <label className="arena-only-favourite"><input type="checkbox" checked={soloFavorito} onChange={e => setSoloFavorito(e.target.checked)} data-testid="arena-only-favourite" />{t("Only my player (and goals)", "Solo mi jugador (y los goles)")}</label>}
+            {!eventos.length ? <p className="arena-empty">{t("Waiting for kick-off. Start a live match or play a saved match.", "Esperando el inicio. Inicia un partido en vivo o reproduce uno guardado.")}</p> : <ol>{(soloFavorito && presentes.jugador ? eventos.filter(e => e.jugador === presentes.jugador || e.receptor === presentes.jugador || e.sale === presentes.jugador || e.tipo === "gol") : eventos).slice(-5).reverse().map(e => <li key={e.id} data-event-tick={e.tick}><time>{reloj(e.tick * ARENA.pasoS)}</time><span>{narrarEventoArena(e, registro, idioma)}</span></li>)}</ol>}
           </section>
-          <ArenaInteligencia registro={registro} estado={estado} idioma={idioma} jugador={jugadorActivo.id} />
+          <ArenaInteligencia key={`${cargaId}-${modoInicial}`} modoInicial={modoInicial} registro={registro} estado={estado} idioma={idioma} jugador={jugadorActivo.id} />
         </aside>
       </div>
       <details className="arena-plans"><summary>{t("Team plans and player orders", "Planes de equipo y órdenes individuales")}</summary>
@@ -296,7 +324,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       </details>
       <ArenaAsistente sesion={sesionActual} tick={estado.tick} jugador={jugadorActivo.id} idioma={idioma} comentarios={comentarios} />
       <ArenaContexto registro={registro} estado={estado} idioma={idioma} seleccionar={setSeleccionado} saltar={saltar} />
-      <ArenaPlantilla estado={estado} registro={registro} seleccionado={seleccionado} seleccionar={setSeleccionado} idioma={idioma} />
+      <ArenaPlantilla estado={estado} registro={registro} seleccionado={seleccionado} seleccionar={setSeleccionado} idioma={idioma} tick={tickCifras}
+        favorito={presentes.jugador !== null && presentes.jugador === jugadorActivo.id} alternarFavorito={j => cambiarFavoritos(alternarJugador(favoritos.valor, j))}
+        avisos={favoritos.hidratado ? <AvisosFavoritos favoritos={favoritos.valor} presentes={presentes} error={favoritos.error} idioma={idioma} olvidar={que => cambiarFavoritos(que === "club" ? { ...favoritos.valor, club: null } : { ...favoritos.valor, jugador: null })} /> : null}
+        transporte={!enDirecto && !bufferActivo && !audioActivo} saltar={saltar} />
       <ArenaDescripcion eventos={eventos} registro={registro} idioma={idioma} saltar={saltar} />
       <details className="arena-limits"><summary>{t("Prototype scope and limitations", "Alcance y límites del prototipo")}</summary><p>{estado.entrenadores ? t("Short synthetic 2D encounters with coaches, substitutions at stoppages and simplified contact fouls/cards. New matches include simplified kick-offs, throw-ins, corner kicks and goal kicks; archives retain their original rules. No regulation penalties, injuries or change of ends. Crosses have a simplified aerial phase, with no heights or headers, contested only near the landing point; the goalkeeper cannot be challenged while holding the ball. Movement, personalities and environmental effects require calibration. This is not a full regulation match or evidence of professional tactical quality.", "Encuentros sintéticos cortos en 2D con entrenadores, sustituciones en interrupciones y faltas/tarjetas por contacto simplificadas. Los partidos nuevos incluyen saques de centro, banda, esquina y meta simplificados; los archivos conservan sus reglas originales. Sin penales reglamentarios, lesiones ni cambio de campo. Los centros tienen una fase aérea simplificada, sin alturas ni cabezazos, que solo se disputa cerca del punto de caída; el portero no puede ser disputado con el balón en las manos. Movimiento, personalidades y efectos ambientales requieren calibración. No es un partido reglamentario completo ni evidencia de calidad táctica profesional.") : t("Archived short 2D open-play scenario. Simplified restarts; no fouls, cards, injuries, substitutions or change of ends.", "Escenario archivado corto de juego abierto 2D. Reinicios simplificados; sin faltas, tarjetas, lesiones, sustituciones ni cambio de campo.")}</p></details>
     </main>
