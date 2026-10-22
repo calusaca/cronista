@@ -945,11 +945,12 @@ export const RESERVAS_VOZ = {
  * frontera de <s> u oración añade ≈ 1 s de silencio. La escucha humana puede ajustar cifras, no la
  * estructura. */
 export const CANTO_GOL = {
-  /** Porcentajes SSML y styledegree por tramo. El grito usa el máximo documentado (2) y rate −30 %
-   * (vocal sostenida en ES); el goleador baja un escalón; los hechos bajan para que el marcador se
-   * entienda; el autogol no grita (sustituye a grito + goleador). */
+  /** Porcentajes SSML y styledegree por tramo. El grito usa el máximo documentado (2); el goleador
+   * baja un escalón; los hechos bajan para que el marcador se entienda; el autogol no grita
+   * (sustituye a grito + goleador).
+   * Brief 054 · Prosodia común del grito; el rate lo aporta cada grito del catálogo. */
   tramos: {
-    grito: { rate: -30, pitch: 16, volume: 30, grado: 2 },
+    grito: { pitch: 16, volume: 30, grado: 2 },
     goleador: { rate: 10, pitch: 12, volume: 22, grado: 1.8 },
     hechos: { rate: 6, pitch: 6, volume: 10, grado: 1.3 },
     autogol: { rate: 0, pitch: 3, volume: 6, grado: 1 },
@@ -966,7 +967,8 @@ export const CANTO_GOL = {
   pausaFinalMs: 380,
   /** Caracteres máximos del texto (tramos unidos): 150 / MESA_ARENA.dialogo.caracteresPorSegundoVoz
    * + 0,38 ≈ 16,2 s < VOZ_BUFFER.duracionMaxS. Solo acota plantillas; la cota es la duración medida
-   * (13,87 / 14,23 s) y el rechazo por duración real del consumidor. */
+   * (13,87 / 14,23 s; con el grito más largo del 054, 13,87 / 14,56 s) y el rechazo por duración
+   * real del consumidor. */
   maxCaracteres: 150,
   /** «Sobre el final»: desde esta fracción de la duración y con diferencia ≤ tardioDiferenciaMax tras
    * el gol. Misma regla que la intensidad 1 de expresionEvento (que lee de aquí). */
@@ -980,9 +982,35 @@ export const CANTO_GOL = {
   caducidadInvitadoTrasGolS: 20,
   /** Números del marcador en palabras hasta aquí; desde el siguiente, cifras. */
   numerosEnPalabrasHasta: 9,
+  /** Brief 054 · Catálogo de gritos medido el 22 oct (docs/evidencia/canto-gol-054/indice.json): habla
+   * 0,5–2,5 s por grito, media de los dos primeros segundos −22,3…−19,1 dB (ES) y −17,3…−13,1 (EN).
+   * Grafías rechazadas por duración: «Yyyy» (deletreo, +1,84 s), «lll» final (corta la vocal),
+   * mayúsculas (sin efecto). rate entre −10 y −30: −45 alarga el silencio final sin sostener más.
+   * Sin `condicion` = general; con `prioridad` = condicionado que se antepone a la rotación. */
+  gritos: [
+    { clave: "gooool", es: { texto: "¡Gooool!", rate: -30 }, en: { texto: "Goooal!", rate: -30 } },
+    { clave: "gooool_largo", es: { texto: "¡Goooooooool!", rate: -30 }, en: { texto: "Goooooooal!", rate: -30 } },
+    { clave: "gol_x4", es: { texto: "¡Gol, gol, gol, gol!", rate: -10 }, en: { texto: "Goal, goal, goal, goal!", rate: -10 } },
+    { clave: "gol_gol_gooool", es: { texto: "¡Gol, gol, gol, gooool!", rate: -20 }, en: { texto: "Go, go, go, goooal!", rate: -20 } },
+    { clave: "y_gooool", es: { texto: "¡Y gooool!", rate: -30 }, en: { texto: "Aaaand goooal!", rate: -30 } },
+    { clave: "remate", condicion: "remate", es: { texto: "¡Remate y gooool!", rate: -25 }, en: { texto: "Shot, and goooal!", rate: -25 } },
+    { clave: "golazo", condicion: "golazo", prioridad: 1, es: { texto: "¡Qué golaaaazo!", rate: -25 }, en: { texto: "What a goal!", rate: -25 } },
+    { clave: "tardio", condicion: "tardio", prioridad: 2, es: { texto: "¡Gooool sobre el final!", rate: -30 }, en: { texto: "A late, late goooal!", rate: -25 } },
+    { clave: "empate", condicion: "empate", prioridad: 3, es: { texto: "¡Gooool del empate!", rate: -30 }, en: { texto: "Goooal, they're level!", rate: -25 } },
+    { clave: "otro", condicion: "otro", prioridad: 4, es: { texto: "¡Y otro gooool!", rate: -30 }, en: { texto: "Another goooal!", rate: -30 } },
+  ],
+  /** «Golazo» es valorativo: solo lo habilita un remate cuyo origen dista de la línea de meta, en
+   * profundidad (|hasta.x − desde.x|), al menos el largo del área: «desde fuera del área». 2 de 9
+   * goles de los fixtures (16,6 y 18,3 m). No mide ángulo ni dificultad. */
+  golazoDesdeM: ARENA.areaLargoM,
+  /** «Remate y gol» (054 v1.1, por posición en registro.eventos): el evento anterior más cercano del
+   * goleador es un `tiro` con el mismo origen y, entre los índices del tiro y del gol, no hay ningún
+   * evento de estos tipos; lo posterior al gol (su reinicio del mismo tick) no cuenta. 9 de 9 goles de
+   * los fixtures lo cumplen; un centro o pase que cruza la línea, no. */
+  gritoRemate: { tiposQueRompen: ["pase", "recepcion", "intercepcion", "recuperacion", "atajada", "tiro", "tiro_fuera", "fuera_juego", "reinicio"] },
+  /** Semilla derivada del orden de rotación de los gritos sin prioridad (por partido). */
+  semillaGritos: "canto-gol-054:grito",
   plantillas: {
-    /** Tramo grito, sin variantes. */
-    grito: { es: "¡Gooool!", en: "Goooal!" },
     /** Tramo goleador, cuatro variantes (elegirVarianteVoz sobre los cantos completos). */
     goleador: {
       es: ["¡Gol de {goleador}!", "¡Lo marca {goleador}!", "¡{goleador}, gol!", "¡Gol, gol de {goleador}!"],

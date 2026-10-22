@@ -14,7 +14,8 @@ export interface FragmentoVoz {
   canto?: { tramos: TramoCanto[] };
 }
 export type TipoTramoCanto = "grito" | "goleador" | "hechos" | "autogol";
-export interface TramoCanto { texto: string; tipo: TipoTramoCanto }
+/** Brief 054 · `grito` (clave de CANTO_GOL.gritos) es obligatorio cuando `tipo === "grito"`. */
+export interface TramoCanto { texto: string; tipo: TipoTramoCanto; grito?: string }
 export const limitarIntensidad = (n: number) => Math.max(0, Math.min(1, n));
 export function varianteVoz(seed: number, id: string) { return prngDerivado(seed, `voz-expresiva-v1:${id}`).int(0, 3); }
 

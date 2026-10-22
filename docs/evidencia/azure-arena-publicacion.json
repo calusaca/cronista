@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-22T07:54:56.101Z",
+  "checkedUtc": "2026-10-22T15:26:52.220Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022075209",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261022152338",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -681,8 +681,8 @@
     },
     {
       "path": "src/arena/smoke-modelos-cli.ts",
-      "bytes": 17176,
-      "sha256": "cc7955d0c3680082ba3194b61b854d3b2d2330cfa86405e6a05cc5c8be72bc8a"
+      "bytes": 18614,
+      "sha256": "936f8525e9d59eb649b3214c7f2bc4abb50e8b1a8a43b6ed5711a12d4221d13e"
     },
     {
       "path": "src/arena/smoke-modelos.ts",

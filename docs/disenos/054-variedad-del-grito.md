@@ -358,3 +358,22 @@ y duración medida en `docs/evidencia/canto-gol-054/`; bitácora con las mutacio
   secuencia que dependa de lo que se oyó.
 - **Coste:** +0 a +15 caracteres de SSML por gol e idioma; sin solicitudes nuevas. La deuda de
   presupuesto a 180 s en ES+EN (048) no cambia.
+
+## Versión 1.1 (22 de octubre, coordinador): aclaraciones antes de implementar
+
+El implementador detectó que la regla de `remate` de §3.2, formulada por intervalo de ticks
+`(t.tick, gol.tick]`, contradice las pruebas de §5: el motor registra el `reinicio` del saque de centro en el
+mismo tick que el gol, detrás de él en `registro.eventos`, y con la regla literal solo 3 de 9 goles de los
+fixtures serían `remate` (y ningún `golazo`). Decisiones, que prevalecen sobre §3.2 y §3.7:
+
+1. **Regla por posición (como en §1).** Un gol es `remate` si el `tiro` del goleador con el mismo `desde` es el
+   evento anterior más cercano de ese jugador y, **entre el índice del `tiro` y el índice del gol en
+   `registro.eventos`**, no hay ningún evento de `tiposQueRompen`. Los eventos posteriores al gol en el registro
+   (su `reinicio`, cambios del mismo tick) nunca cuentan. Con esta regla los 9 goles de los fixtures son
+   `remate` y `a23` (v1) y `a14` (duelo) son `golazo`, como exigen las pruebas. La mutación M15 inserta un
+   `pase` entre ambos índices.
+2. **E2e.** `e2e/arena-canto-gol.spec.ts` y `e2e/arena-buffer.spec.ts` dejan de leer
+   `CANTO_GOL.plantillas.grito` y comparan con el texto que devuelve `/relato` (el primer tramo del canto).
+3. **Script de evidencia.** `docs/evidencia/canto-gol-054/experimento.mts` fija su velocidad de control en −30
+   como literal del experimento (es evidencia histórica, no normativa) para seguir siendo reproducible.
+4. **Firma.** Se mantiene `gritosPartido(registro, idioma)` como en el brief; la selección no depende del idioma.
