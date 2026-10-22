@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { construirRelato, relatoIntervencion } from "../arena/relato";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../arena/protocolo";
 import { instanteNarrado, wavMono, type TramoTemporal } from "../arena/pista-audio";
-import { segmentoVozValido } from "../arena/turnos";
+import { esperaReintentoInvitado, segmentoVozValido, type FalloInvitado } from "../arena/turnos";
 import { VOZ_BUFFER } from "../arena/buffer";
 
 type Segmento = (ReturnType<typeof construirRelato> | ReturnType<typeof relatoIntervencion>) & { audio: { base64: string; tipo: string } | null };
@@ -59,12 +59,29 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     };
     // La intervención se lee del diario por su id (modo buffer, sin memoria): nunca se regenera.
     // Brief 048: la repetición guardada pide siempre la variante completa.
-    const solicitarInvitado = async (i: IntervencionArena) => {
-      const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante: "completa" }) });
-      if (!r.ok) throw new Error("Intervención");
-      const s = await r.json() as Segmento;
-      if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: "completa" } })) throw new Error("Intervención inconsistente");
-      return s;
+    // Corrección 045/048: un 429 (p. ej. otras síntesis en curso en el servidor) o un fallo de red se
+    // reintenta con espera (esperaReintentoInvitado, sin caducidad: la pista se prepara antes de sonar);
+    // un 4xx/5xx distinto o un segmento inválido es final y la intervención se omite como antes.
+    const dormir = (ms: number) => new Promise<void>((resolver, rechazar) => {
+      const t = setTimeout(resolver, ms);
+      a.signal.addEventListener("abort", () => { clearTimeout(t); rechazar(new Error("Cancelada")); }, { once: true });
+    });
+    const solicitarInvitado = async (i: IntervencionArena): Promise<Segmento> => {
+      for (let reintentos = 0; ; reintentos++) {
+        let fallo: FalloInvitado = { tipo: "invalida" };
+        try {
+          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante: "completa" }) })
+            .catch((e: unknown) => { fallo = { tipo: "red" }; throw e; });
+          if (!r.ok) { fallo = { tipo: "http", estado: r.status }; throw new Error("Intervención"); }
+          const s = await r.json() as Segmento;
+          if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: "completa" } })) throw new Error("Intervención inconsistente");
+          return s;
+        } catch (error) {
+          const espera = vigente() ? esperaReintentoInvitado(fallo, reintentos, null) : null;
+          if (espera === null) throw error;
+          await dormir(espera);
+        }
+      }
     };
     void (async () => {
       let decodificador: AudioContext | undefined;

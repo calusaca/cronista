@@ -885,3 +885,10 @@ que la ronda retenida falle y se deshaga, así que publica `cambios` y `marcador
 temporizador en 367: no se pierde ningún dato y no hay escrituras fuera de la cola. Ese es el resultado normativo
 para `MesaSesion`; la secuencia literal de Codex se comprueba sobre `DisparadorEstadista`, donde la revisión por
 tema produce el resultado descrito en el punto 3.
+
+**Nota del 22 de octubre (corrección posterior).** Al grabar el video se observó que, si la narración se activa con la
+emisión empezada, las peticiones de invitados chocan con el límite de dos síntesis simultáneas del servidor (429) y no
+se reintentaban. Ahora el consumidor y «Escuchar desde el inicio» reintentan un 429 o un fallo de red con espera
+creciente (`MESA_ARENA.reintentoInvitadoMs`, `maxReintentosInvitado`) mientras la intervención no caduque; la variante
+sigue `pendiente` durante los reintentos y pasa a `fallida` al agotarlos. Esto incluye el 429 de la bolsa de Speech del
+punto 9 de la v1.1: el servidor rechaza antes de reservar, así que reintentar no cuesta nada y el estado final es el mismo.

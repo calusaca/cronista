@@ -269,14 +269,19 @@ test("mesa: «Escuchar desde el inicio» inserta las intervenciones del diario e
   const tramoS = 1, invitadoS = 0.5, largoS = VOZ_BUFFER.duracionMaxS + 1;
   const tramo = await audio(tramoS), voz = await audio(invitadoS), larga = await audio(largoS);
   const tramos = Math.ceil(registro.final.tick / 100);
-  // Escenarios: todo bien; el comentarista falla con 503; el estadista trae un clip más largo que duracionMaxS.
+  // Escenarios: todo bien; el comentarista falla con 503 (final); el estadista trae un clip más largo que
+  // duracionMaxS; corrección 045/048: el comentarista recibe 429 en sus dos primeros intentos y entra igual.
+  const rechazos429 = 2;
+  expect(MESA_ARENA.maxReintentosInvitado).toBeGreaterThanOrEqual(rechazos429);
   const escenarios = [
-    { id: "00000000-0000-4000-8000-000000000047", falla: null, largo: null },
-    { id: "00000000-0000-4000-8000-000000000048", falla: com.id, largo: null },
-    { id: "00000000-0000-4000-8000-000000000049", falla: null, largo: est.id },
+    { id: "00000000-0000-4000-8000-000000000047", falla: null, largo: null, limitado: null },
+    { id: "00000000-0000-4000-8000-000000000048", falla: com.id, largo: null, limitado: null },
+    { id: "00000000-0000-4000-8000-000000000049", falla: null, largo: est.id, limitado: null },
+    { id: "00000000-0000-4000-8000-000000000452", falla: null, largo: null, limitado: com.id },
   ];
-  for (const { id, falla, largo } of escenarios) {
+  for (const { id, falla, largo, limitado } of escenarios) {
     const pedidos: Pedido[] = [];
+    let rechazados = 0;
     await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
     await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: [{ tipo: "sesion", id, asignacion }, { tipo: "terminada", estado: "completa", metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } }].map((publicacion, i) => `id: ${i + 1}\nevent: arena\ndata: ${JSON.stringify({ id: i + 1, publicacion })}\n\n`).join("") }));
     await page.route(`**/api/arena/sesiones/${id}/reproduccion`, r => r.fulfill({ json: { registro, comentarios: [], intervenciones, asignacion, metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } } }));
@@ -284,6 +289,7 @@ test("mesa: «Escuchar desde el inicio» inserta las intervenciones del diario e
       const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
       if (p.intervencion) {
         if (p.intervencion === falla) return r.fulfill({ status: 503, json: { error: "Speech no disponible en esta prueba" } });
+        if (p.intervencion === limitado && rechazados < rechazos429) { rechazados++; return r.fulfill({ status: 429, json: { error: "Hay otras consultas en curso; espera a que terminen" } }); }
         const i = intervenciones.find(x => x.id === p.intervencion)!;
         return r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma as "es" | "en", p.variante as "completa" | "breve"), audio: { base64: i.id === largo ? larga : voz, tipo: "audio/wav" } } });
       }
@@ -300,12 +306,12 @@ test("mesa: «Escuchar desde el inicio» inserta las intervenciones del diario e
     await expect(estado).toHaveAttribute("data-progress-total", String(tramos + incluidas.length));
     await expect(estado).toHaveAttribute("data-progress-ready", String(tramos + incluidas.length));
     if (!falla && !largo) expect(incluidas).toHaveLength(intervenciones.length);
-    // Cada id se pide exactamente una vez, por su id del diario y sin memoria.
+    // Cada id se pide exactamente una vez (más un reintento por cada 429; el 503 no se reintenta), por su
+    // id del diario y sin memoria.
     for (const i of intervenciones) {
       const suyos = pedidos.filter(p => p.intervencion === i.id);
-      expect(suyos).toHaveLength(1);
-      expect(suyos[0]).toMatchObject({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", variante: "completa" });
-      expect(suyos[0]).not.toHaveProperty("memoria");
+      expect(suyos).toHaveLength(i.id === limitado ? rechazos429 + 1 : 1);
+      for (const p of suyos) { expect(p).toMatchObject({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", variante: "completa" }); expect(p).not.toHaveProperty("memoria"); }
     }
     await expect.poll(() => narracion.locator("audio").evaluate((a: HTMLAudioElement) => Number.isFinite(a.duration) ? a.duration : 0)).toBeGreaterThan(0);
     const duracion = await narracion.locator("audio").evaluate((a: HTMLAudioElement) => { a.pause(); return a.duration; });
@@ -642,4 +648,110 @@ test("048 v1.2 G03 · una noticia alcanzada pero pendiente de sonar anula la ven
   expect(invitados).toHaveLength(1);
   expect(invitados[0]!.detenida).toBe(false);
   expect(invitados[0]!.inicio - gol.fin).toBeGreaterThanOrEqual(MESA_ARENA.calmaMinS * 1000 - 50);
+});
+
+// ——— Corrección 045/048 · 429 del invitado al activar la voz con la emisión ya empezada ———
+// El servidor limita las síntesis «extra» simultáneas; al activar la narración, la apertura y los tramos
+// del narrador las ocupan y la petición del invitado ya vencido recibía 429 y nunca sonaba.
+async function mesaCon429(page: Page, id: string, rechazar: (intento: number) => boolean) {
+  const base = JSON.parse(await readFile("public/experimentos/arena-duelo-v3.json", "utf8")) as RegistroArena;
+  const tickInvitado = Math.round(3 / ARENA.pasoS);
+  const registro = lineaControlada(base, []);
+  const seed = registro.config.partido.seed;
+  const i = componerIntercambio({ intervencion: (await comentarArena(prefijo(registro, tickInvitado), tickInvitado, fielE2e))!, registro: prefijo(registro, tickInvitado), seed, forma: "pregunta", memoria: { recientes: {}, presentados: [] } }).intervencion;
+  expect(comprobarTurnos(i, registro)).toEqual([]);
+  const clips = { completa: await audio(4), breve: await audio(2.5), apertura: await audio(1.5) };
+  await preparar(page, id, registro, [i], 200);
+  type Intento = { variante: string; intento: number; estado: number; t: number; relojS: number };
+  const intentos: Intento[] = [], narrador: { t: number; memoria: string[] }[] = [], cuenta: Record<string, number> = {};
+  let enVuelo = 0, maxEnVuelo = 0;
+  await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
+    const p = r.request().postDataJSON() as Pedido;
+    if (p.intervencion) {
+      const clave = p.variante ?? "completa", intento = cuenta[clave] = (cuenta[clave] ?? 0) + 1;
+      const reloj = relojS(await page.getByTestId("arena-clock").textContent().catch(() => "") ?? "");
+      enVuelo++; maxEnVuelo = Math.max(maxEnVuelo, enVuelo);
+      await esperar(200); enVuelo--;
+      const estado = rechazar(intento) ? 429 : 200;
+      intentos.push({ variante: clave, intento, estado, t: Date.now(), relojS: reloj });
+      if (estado === 429) return r.fulfill({ status: 429, json: { error: "Hay otras consultas en curso; espera a que terminen" } }).catch(() => {});
+      return r.fulfill({ json: { ...relatoIntervencion(i, seed, p.idioma as "es" | "en", p.variante as "completa" | "breve"), audio: { base64: p.variante === "breve" ? clips.breve : clips.completa, tipo: "audio/wav" } } }).catch(() => {});
+    }
+    narrador.push({ t: Date.now(), memoria: (p.memoria ?? []).map(m => m.texto) });
+    if (p.entradaTick !== undefined) { await esperar(200); return r.fulfill({ json: segmento(p, p.entradaTick, "Apertura", 10, clips.apertura, { tipoRelato: "entrada" }) }).catch(() => {}); }
+    await esperar(200);
+    return r.fulfill({ json: segmento(p, p.hastaTick, "", 10, null) }).catch(() => {});
+  });
+  await instrumentar(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  const desfase = await page.evaluate(() => Date.now() - performance.now());
+  // La emisión ya empezó y el invitado ya venció cuando el espectador activa la narración.
+  await expect.poll(async () => relojS(await page.getByTestId("arena-clock").textContent() ?? ""), { timeout: 20000 }).toBeGreaterThan(i.tick * ARENA.pasoS);
+  await page.getByRole("button", { name: "Enable narration", exact: true }).click();
+  return { i, intentos, narrador, desfase, maxEnVuelo: () => maxEnVuelo };
+}
+const sinSolapes = (fuentes: Fuente[]) => {
+  const ordenadas = [...fuentes].sort((a, b) => a.inicio - b.inicio);
+  ordenadas.forEach((f, k) => { if (k) expect(f.inicio, JSON.stringify([ordenadas[k - 1], f])).toBeGreaterThanOrEqual(ordenadas[k - 1]!.fin - 60); });
+};
+
+test("045/048 · el invitado que recibe 429 al activar la voz se reintenta con espera y suena sin solaparse", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  const rechazos = 2;
+  expect(MESA_ARENA.maxReintentosInvitado).toBeGreaterThanOrEqual(rechazos);
+  const { i, intentos, narrador, desfase, maxEnVuelo } = await mesaCon429(page, "00000000-0000-4000-8000-000000000453", n => n <= rechazos);
+  const transcripcion = page.getByTestId("arena-voice-transcript");
+  await expect(transcripcion).toHaveAttribute("data-narration-kind", "invitado", { timeout: 20000 });
+  await expect(transcripcion).toHaveAttribute("data-narration-role", i.rol);
+  await expect(transcripcion).toHaveAttribute("data-narration-tick", String(i.tick));
+  // Se observa hasta que el invitado habría caducado, para ver todo lo que pudo sonar después.
+  await expect.poll(async () => relojS(await page.getByTestId("arena-clock").textContent() ?? ""), { timeout: 30000 }).toBeGreaterThanOrEqual(i.tick * ARENA.pasoS + MESA_ARENA.caducidadInvitadoS + 1);
+  const fuentes = await page.evaluate(() => (window as unknown as { mesa: Fuente[] }).mesa);
+  await testInfo.attach("invitado-429-reintentado.json", { body: JSON.stringify({ fuentes, intentos, narrador, desfase }, null, 2), contentType: "application/json" });
+  const invitados = fuentes.filter(f => f.etiqueta?.kind === "invitado");
+  expect(invitados).toHaveLength(1);
+  const variante = invitados[0]!.etiqueta!.variante!;
+  expect(invitados[0]!.etiqueta).toMatchObject({ role: i.rol, roles: (variante === "breve" ? i.turnosBreve! : i.turnos!).map(t => t.rol) });
+  // La variante que sonó recibió 429 en sus primeros intentos y se reintentó con espera exponencial.
+  const suyos = intentos.filter(x => x.variante === variante);
+  expect(suyos.map(x => x.estado)).toEqual([...Array(rechazos).fill(429), 200]);
+  for (let k = 1; k < suyos.length; k++) expect(suyos[k]!.t - suyos[k - 1]!.t).toBeGreaterThanOrEqual(MESA_ARENA.reintentoInvitadoMs * 2 ** (k - 1));
+  // Una sola petición de invitado en vuelo; todas antes de la caducidad.
+  expect(maxEnVuelo()).toBe(1);
+  for (const x of intentos) expect(x.relojS).toBeLessThanOrEqual(i.tick * ARENA.pasoS + MESA_ARENA.caducidadInvitadoS + 1);
+  cursorEnVentana(fuentes, [i]);
+  // Ninguna otra fuente se solapa (apertura, reservas y el invitado).
+  sinSolapes(fuentes);
+  // Los reintentos no marcan la memoria: ninguna petición del narrador anterior al arranque lleva el id.
+  const arranque = invitados[0]!.inicio + desfase;
+  expect(narrador.filter(n => n.t < arranque).some(n => n.memoria.includes(i.id))).toBe(false);
+  expect(narrador.filter(n => n.t > arranque).some(n => n.memoria.includes(i.id))).toBe(true);
+});
+
+test("045/048 · con 429 persistente el invitado caduca sin sonar, sin pedirse tras caducar, y la emisión sigue", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  const { i, intentos, maxEnVuelo } = await mesaCon429(page, "00000000-0000-4000-8000-000000000454", () => true);
+  const caducaS = i.tick * ARENA.pasoS + MESA_ARENA.caducidadInvitadoS;
+  const reloj = page.getByTestId("arena-clock");
+  await expect.poll(async () => relojS(await reloj.textContent() ?? ""), { timeout: 40000 }).toBeGreaterThanOrEqual(caducaS + 1);
+  const tras = intentos.length;
+  // Más que la espera de reintento más larga tras la caducidad: ya no se pide nada.
+  await expect.poll(async () => relojS(await reloj.textContent() ?? ""), { timeout: 30000 }).toBeGreaterThanOrEqual(caducaS + MESA_ARENA.reintentoInvitadoMs * 2 ** (MESA_ARENA.maxReintentosInvitado - 1) / 1000 + 1);
+  // La emisión sigue: alguna fuente del narrador arranca después de la caducidad.
+  await expect.poll(() => page.evaluate(c => (window as unknown as { mesa: Fuente[] }).mesa.some(f => f.relojS > c), caducaS), { timeout: 20000 }).toBe(true);
+  const fuentes = await page.evaluate(() => (window as unknown as { mesa: Fuente[] }).mesa);
+  await testInfo.attach("invitado-429-persistente.json", { body: JSON.stringify({ fuentes, intentos }, null, 2), contentType: "application/json" });
+  expect(intentos.length).toBe(tras);
+  // Se reintentó (más de un intento), dentro del tope por variante y nunca después de caducar.
+  const variantes = new Set(intentos.map(x => x.variante));
+  expect(intentos.length).toBeGreaterThan(1);
+  for (const v of variantes) expect(intentos.filter(x => x.variante === v).length).toBeLessThanOrEqual(MESA_ARENA.maxReintentosInvitado + 1);
+  for (const x of intentos) expect(x.relojS).toBeLessThanOrEqual(caducaS + 1);
+  expect(maxEnVuelo()).toBe(1);
+  // Nunca sonó; el narrador siguió (reservas tras la caducidad), sin solapes ni alerta de fallo.
+  expect(fuentes.filter(f => f.etiqueta?.kind === "invitado" || f.etiqueta?.role === i.rol)).toEqual([]);
+  expect(fuentes.some(f => f.relojS > caducaS)).toBe(true);
+  sinSolapes(fuentes);
+  await expect(page.getByTestId("arena-buffer").getByRole("alert")).toHaveCount(0);
+  await expect(page.getByTestId("arena-voice-status")).toBeVisible();
 });

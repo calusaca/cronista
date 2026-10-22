@@ -688,6 +688,12 @@ export const MESA_ARENA = {
   separacionInvitadosS: 6,
   /** Segundos de partido; una candidatura más vieja no arranca. */
   caducidadInvitadoS: 12,
+  /** Corrección (045/048, 22 oct) · Petición de una variante de invitado que recibe 429 (p. ej. el tope
+   * de síntesis «extra» simultáneas del servidor, ocupado por el narrador al activar la voz) o un fallo
+   * de red o de plazo: se reintenta tras reintentoInvitadoMs · 2^k ms (k = reintentos ya hechos), hasta
+   * maxReintentosInvitado veces y nunca pasada caducidadInvitadoS. 1 + 2 + 4 = 7 s de espera < 12 s.
+   * Un 400/404, un 5xx o un segmento inválido siguen siendo finales. */
+  reintentoInvitadoMs: 1000, maxReintentosInvitado: 3,
   /** Cadencia de candidaturas del estadista (segundos de partido). */
   estadistaCadaS: 20,
   /** Ventana (s) de la proporción de acciones y de la distancia media de pase; mínimo de acciones. */

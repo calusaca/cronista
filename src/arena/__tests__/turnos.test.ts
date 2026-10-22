@@ -7,7 +7,7 @@ import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
 import { VOZ_BUFFER } from "../buffer";
 import { recordarVoz } from "../editorial";
 import type { EventoArena, RegistroArena } from "../tipos";
-import { calmaEnFotograma, descartesTurno, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
+import { calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
 
 const ahora = 100, partidoS = 30, tickCursor = Math.round(partidoS / ARENA.pasoS);
 const valida = (d: number): EstadoVariante => ({ estado: "valida", duracionS: d });
@@ -234,5 +234,40 @@ describe("045/048 · validación del consumidor", () => {
     expect(segmentoVozValido({ ...invitado(2), tipoRelato: "jugada" }, { desde: 200, hasta: 200, idioma: "es" })).toBe(false);
     expect(segmentoVozValido({ ...invitado(2), tipoRelato: "invitado" }, { desde: 200, hasta: 200, idioma: "es" })).toBe(false);
     expect(segmentoVozValido({ ...invitado(1), tipoRelato: "jugada", intervencion: undefined, desdeTick: 150, fragmentos: [{ tick: 180 }] }, { desde: 150, hasta: 200, idioma: "es" })).toBe(true);
+  });
+});
+
+describe("045/048 · reintento de una variante de invitado (corrección del consumidor)", () => {
+  const { reintentoInvitadoMs: base, maxReintentosInvitado: max, caducidadInvitadoS: caduca } = MESA_ARENA;
+  const http = (estado: number) => ({ tipo: "http" as const, estado });
+
+  it("un 429 o un fallo de red se reintentan con espera exponencial desde la base", () => {
+    for (const fallo of [http(429), { tipo: "red" as const }]) {
+      for (let k = 0; k < max; k++) expect(esperaReintentoInvitado(fallo, k, 0)).toBe(base * 2 ** k);
+      expect(esperaReintentoInvitado(fallo, 0, null)).toBe(base);
+    }
+  });
+
+  it("agotados los reintentos, el fallo es final", () => {
+    expect(esperaReintentoInvitado(http(429), max, 0)).toBeNull();
+    expect(esperaReintentoInvitado({ tipo: "red" }, max + 1, null)).toBeNull();
+    expect(esperaReintentoInvitado(http(429), -1, 0)).toBeNull();
+    expect(esperaReintentoInvitado(http(429), 0.5, 0)).toBeNull();
+  });
+
+  it("400, 404, 409, 5xx o un segmento inválido son finales desde el primer intento", () => {
+    for (const estado of [400, 404, 409, 500, 503]) expect(esperaReintentoInvitado(http(estado), 0, 0), String(estado)).toBeNull();
+    expect(esperaReintentoInvitado({ tipo: "invalida" }, 0, 0)).toBeNull();
+  });
+
+  it("caducada la intervención contra el cursor no se reintenta; en el límite exacto, sí", () => {
+    expect(esperaReintentoInvitado(http(429), 0, caduca)).toBe(base);
+    expect(esperaReintentoInvitado(http(429), 0, caduca + ARENA.pasoS)).toBeNull();
+    expect(esperaReintentoInvitado({ tipo: "red" }, 0, Number.NaN)).toBeNull();
+  });
+
+  it("la espera total de los reintentos cabe dentro de la caducidad del invitado", () => {
+    let total = 0; for (let k = 0; k < max; k++) total += esperaReintentoInvitado(http(429), k, 0)!;
+    expect(total / 1000).toBeLessThan(caduca);
   });
 });

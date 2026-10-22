@@ -157,3 +157,19 @@ export function segmentoVozValido(s: SegmentoRecibido, esperado: { desde: number
   }
   return !(s.entradaTick !== esperado.entradaTick || s.fragmentos.length > 1 || s.fragmentos.some(f => f.tick < esperado.desde || f.tick > esperado.hasta) || s.texto && !s.audio || s.audio && s.fragmentos.length !== 1);
 }
+
+/** Fallo de la petición de una variante de invitado: respuesta HTTP no correcta, red caída o plazo
+ * agotado, o respuesta recibida pero inválida (segmento, audio o decodificación). */
+export type FalloInvitado = { tipo: "http"; estado: number } | { tipo: "red" } | { tipo: "invalida" };
+/** Corrección 045/048 · Espera (ms) antes de reintentar una variante de invitado, o `null` si el fallo
+ * es final. Solo un 429 (el servidor rechaza antes de reservar: tope de síntesis simultáneas o bolsa
+ * de los invitados) o un fallo de red/plazo se reintentan, con espera exponencial desde
+ * `MESA_ARENA.reintentoInvitadoMs`, hasta `MESA_ARENA.maxReintentosInvitado` reintentos y solo
+ * mientras la intervención no haya caducado (`edadS`, segundos de partido desde su tick hasta el
+ * cursor; `null` en la repetición guardada, que no tiene caducidad). */
+export function esperaReintentoInvitado(fallo: FalloInvitado, reintentosHechos: number, edadS: number | null): number | null {
+  const reintentable = fallo.tipo === "red" || fallo.tipo === "http" && fallo.estado === 429;
+  if (!reintentable || !Number.isInteger(reintentosHechos) || reintentosHechos < 0 || reintentosHechos >= MESA_ARENA.maxReintentosInvitado) return null;
+  if (edadS !== null && !(edadS <= MESA_ARENA.caducidadInvitadoS)) return null;
+  return MESA_ARENA.reintentoInvitadoMs * 2 ** reintentosHechos;
+}

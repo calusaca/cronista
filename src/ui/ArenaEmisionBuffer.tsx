@@ -7,14 +7,19 @@ import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import catalogoReserva from "../arena/voz-reserva.json";
 import { elegirReservaVoz, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
-import { calmaEnFotograma, descartesTurno, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type Rol } from "../arena/turnos";
+import { calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { ARENA, MESA_ARENA } from "../sim/limites";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
-/** Brief 048 v1.1 · Estado explícito de cada variante de un intercambio en este consumidor. */
-type VarianteLocal = { estado: "inexistente" | "sin-pedir" | "pidiendo" | "valida" | "invalida" | "fallida"; clip?: Clip };
+/** Brief 048 v1.1 · Estado explícito de cada variante de un intercambio en este consumidor.
+ * Corrección 045/048: una variante a la espera de reintento vuelve a `sin-pedir` (pendiente para el
+ * coordinador) con sus `reintentos` hechos y `noAntesDe` (performance.now(), ms), primer instante en
+ * que puede volver a pedirse. */
+type VarianteLocal = { estado: "inexistente" | "sin-pedir" | "pidiendo" | "valida" | "invalida" | "fallida"; clip?: Clip; reintentos?: number; noAntesDe?: number };
+/** La variante puede pedirse ya: sin pedir y sin una espera de reintento vigente. */
+const pedible = (v: VarianteLocal) => v.estado === "sin-pedir" && (v.noAntesDe === undefined || v.noAntesDe <= performance.now());
 type InvitadoLocal = { intervencion: IntervencionArena; completa: VarianteLocal; breve: VarianteLocal };
 const estadoCoordinador = (v: VarianteLocal): EstadoVariante => v.estado === "valida" ? { estado: "valida", duracionS: v.clip!.audio.duration } : v.estado === "sin-pedir" || v.estado === "pidiendo" ? { estado: "pendiente" } : { estado: v.estado };
 type Activa = { fuente: AudioBufferSourceNode; fin: number; prioridad: number; recuerdo: RecuerdoVoz; rol: Rol };
@@ -153,14 +158,16 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     // que caduque; preparar o descartar no la marca como escuchada. 048 v1.1 (9): primero la breve
     // (si existe) y la completa solo si la ventana conocida admite su duración estimada.
     const pedirVariante = (inv: InvitadoLocal, variante: VarianteIntercambio) => {
-      const { id, tick } = inv.intervencion, clave = `${id}|${variante}`, a = new AbortController();
-      s.peticionesInvitado.set(clave, a); inv[variante] = { estado: "pidiendo" };
+      const { id, tick } = inv.intervencion, clave = `${id}|${variante}`, a = new AbortController(), reintentos = inv[variante].reintentos ?? 0;
+      s.peticionesInvitado.set(clave, a); inv[variante] = { estado: "pidiendo", reintentos };
       const signal = AbortSignal.any([a.signal, AbortSignal.timeout(15_000)]);
       void (async () => {
+        let fallo: FalloInvitado = { tipo: "invalida" };
         try {
           // v3.1: sin memoria; la intervención es la misma para todos los espectadores.
-          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: tick, hastaTick: tick, modo: "buffer", idioma, intervencion: id, variante }) });
-          if (!r.ok) throw new Error("Intervención no disponible");
+          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: tick, hastaTick: tick, modo: "buffer", idioma, intervencion: id, variante }) })
+            .catch((e: unknown) => { fallo = { tipo: "red" }; throw e; });
+          if (!r.ok) { fallo = { tipo: "http", estado: r.status }; throw new Error("Intervención no disponible"); }
           const segmento = await r.json() as Segmento;
           if (!segmentoVozValido(segmento, { desde: tick, hasta: tick, idioma, intervencion: { id, tick, variante: varianteEfectiva(inv.intervencion, variante) } })) throw new Error("Intervención inconsistente");
           const audio = await s.contexto.decodeAudioData(Uint8Array.from(atob(segmento.audio!.base64), c => c.charCodeAt(0)).buffer);
@@ -168,8 +175,19 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
           // Un clip demasiado largo queda inválido sin arrancar: no se recorta audio.
           inv[variante] = audio.numberOfChannels === 1 && estadoPorDuracion(audio.duration).estado === "valida" ? { estado: "valida", clip: { segmento, audio, consumido: false } } : { estado: "invalida" };
         } catch {
-          // El narrador sigue; un invitado ausente (429 incluido) no es un fallo de la emisión.
-          if (!a.signal.aborted) inv[variante] = { estado: "fallida" };
+          // El narrador sigue; un invitado ausente no es un fallo de la emisión. Corrección 045/048: un 429
+          // (el servidor rechaza antes de reservar) o un fallo de red/plazo se reintenta con espera mientras
+          // la intervención no caduque y la generación siga; entretanto la variante sigue pendiente. El
+          // reintento vuelve a pasar por la ruta (cuotas y bolsas de Speech incluidas) y no toca la memoria.
+          if (!a.signal.aborted && g === generacion.current) {
+            if (signal.aborted) fallo = { tipo: "red" }; // plazo agotado, también durante el cuerpo
+            const espera = esperaReintentoInvitado(fallo, reintentos, reloj.current.segundo - tick * ARENA.pasoS);
+            if (espera === null) inv[variante] = { estado: "fallida" };
+            else {
+              inv[variante] = { estado: "sin-pedir", reintentos: reintentos + 1, noAntesDe: performance.now() + espera };
+              setTimeout(() => { if (g === generacion.current) setVersion(v => v + 1); }, espera);
+            }
+          }
         } finally { s.peticionesInvitado.delete(clave); if (g === generacion.current) setVersion(v => v + 1); }
       })();
     };
@@ -179,8 +197,10 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       if ((tickVisible - intervencion.tick) / 10 > MESA_ARENA.caducidadInvitadoS) { terminarInvitado(s, intervencion.id); continue; }
       let inv = s.invitados.get(intervencion.id);
       if (!inv) { inv = { intervencion, completa: { estado: "sin-pedir" }, breve: { estado: intervencion.turnosBreve?.length ? "sin-pedir" : "inexistente" } }; s.invitados.set(intervencion.id, inv); }
-      if (inv.breve.estado === "sin-pedir") { pedirVariante(inv, "breve"); break; }
+      // Una variante a la espera de su reintento conserva el orden: mientras tanto no se pide otra.
+      if (inv.breve.estado === "sin-pedir") { if (pedible(inv.breve)) pedirVariante(inv, "breve"); break; }
       if (inv.completa.estado !== "sin-pedir") continue;
+      if (!pedible(inv.completa)) break;
       // v1.2 (6–7): un diario del 045 pide su única variante; un intercambio del 048, solo si el mismo
       // horizonte de la selección (noticias pendientes incluidas) admite la duración estimada.
       const ventana = horizonteS(actual.current.registro, Math.max(tickVisible / 10, intervencion.tick * ARENA.pasoS), terminada, s.sonadas, s.activadoTick / 10, tickVisible / 10);
