@@ -1,6 +1,6 @@
 // La costura LLM (brief 003): TODO acceso a un modelo de lenguaje pasa por aquí.
 // La cadena solo conoce la interfaz `Llm`; la implementación se elige por env
-// CRONISTA_LLM=stub|foundry|azure-openai|ensayo (stub por defecto: $0, offline, determinista).
+// CRONISTA_LLM=stub|foundry|azure-openai|foundry-modelos|ensayo (stub por defecto: $0, offline, determinista).
 //
 // Agregar una implementación nueva (p. ej. Azure OpenAI para el bake-off con
 // GPT-6.1 Sol) es: un archivo `llm-<nombre>.ts` que devuelva un `Llm`, y un `case`
@@ -9,6 +9,7 @@
 import { crearLlmAzureOpenAI, ESFUERZOS_AZURE_OPENAI, type EsfuerzoAzureOpenAI } from "./llm-azure-openai";
 import { crearLlmEnsayo } from "./llm-ensayo";
 import { crearLlmFoundry } from "./llm-foundry";
+import { crearLlmFoundryModelos, ESFUERZOS_FOUNDRY_MODELOS, FORMATOS_JSON_FOUNDRY_MODELOS, type EsfuerzoFoundryModelos, type FormatoJsonFoundryModelos } from "./llm-foundry-modelos";
 import { crearLlmStub } from "./llm-stub";
 
 export interface Mensaje {
@@ -19,7 +20,8 @@ export interface Mensaje {
 export interface Llm {
   /**
    * Identidad estable del modelo para la caché `(seed, deployment, modo)`:
-   * "stub", "foundry:<deployment>" o "azure-openai:<deployment>". Cambiar de backend o de
+   * "stub", "foundry:<deployment>", "azure-openai:<deployment>" o
+   * "foundry-modelos:<deployment>". Cambiar de backend o de
    * deployment invalida la caché sola.
    */
   readonly id: string;
@@ -30,9 +32,17 @@ export interface Llm {
 export interface OpcionesLlm { signal?: AbortSignal; esquema?: { nombre: string; json: Record<string, unknown> }; maxTokens?: number }
 export interface UsoLlm { llamadas: number; respuestasConUso: number; entrada: number; salida: number; cache: number }
 
-export type TipoLlm = "stub" | "foundry" | "azure-openai" | "ensayo";
+export type TipoLlm = "stub" | "foundry" | "azure-openai" | "foundry-modelos" | "ensayo";
 /** "ensayo" es un fixture de pruebas (e2e de la UI): jamás alimenta la demo. */
-export const TIPOS_LLM: readonly TipoLlm[] = ["stub", "foundry", "azure-openai", "ensayo"];
+export const TIPOS_LLM: readonly TipoLlm[] = ["stub", "foundry", "azure-openai", "foundry-modelos", "ensayo"];
+
+/** Brief 052: variables que un catálogo (`ARENA_<ID>_…`) o un lado de la arena
+ * (`ARENA_<LADO>_…`) puede sobreescribir por prefijo. Única lista para ambos usos. */
+export const CLAVES_LLM_POR_PREFIJO = [
+  "FOUNDRY_API_KEY", "FOUNDRY_BASE_URL", "FOUNDRY_DEPLOYMENT",
+  "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION", "AZURE_OPENAI_REASONING_EFFORT",
+  "FOUNDRY_MODELOS_ENDPOINT", "FOUNDRY_MODELOS_API_KEY", "FOUNDRY_MODELOS_DEPLOYMENT", "FOUNDRY_MODELOS_FORMATO_JSON", "FOUNDRY_MODELOS_API_VERSION", "FOUNDRY_MODELOS_ESFUERZO_RAZONAMIENTO",
+] as const;
 
 type Env = Record<string, string | undefined>;
 
@@ -76,6 +86,25 @@ export function crearLlmDesdeEnv(env: Env = process.env, opciones: { maxRetries?
         ...(reasoningEffort ? { reasoningEffort: reasoningEffort as EsfuerzoAzureOpenAI } : {}),
       });
     }
+    case "foundry-modelos": {
+      const formatoJson = opcional(env, "FOUNDRY_MODELOS_FORMATO_JSON");
+      if (formatoJson && !(FORMATOS_JSON_FOUNDRY_MODELOS as readonly string[]).includes(formatoJson)) {
+        throw new Error(`FOUNDRY_MODELOS_FORMATO_JSON debe ser ${FORMATOS_JSON_FOUNDRY_MODELOS.join(" | ")}`);
+      }
+      const apiVersion = opcional(env, "FOUNDRY_MODELOS_API_VERSION");
+      const esfuerzo = opcional(env, "FOUNDRY_MODELOS_ESFUERZO_RAZONAMIENTO");
+      if (esfuerzo && !(ESFUERZOS_FOUNDRY_MODELOS as readonly string[]).includes(esfuerzo)) {
+        throw new Error(`FOUNDRY_MODELOS_ESFUERZO_RAZONAMIENTO debe ser ${ESFUERZOS_FOUNDRY_MODELOS.join(" | ")}`);
+      }
+      return crearLlmFoundryModelos({
+        apiKey: requerida(env, "FOUNDRY_MODELOS_API_KEY", "foundry-modelos"),
+        endpoint: requerida(env, "FOUNDRY_MODELOS_ENDPOINT", "foundry-modelos"),
+        deployment: requerida(env, "FOUNDRY_MODELOS_DEPLOYMENT", "foundry-modelos"),
+        ...(formatoJson ? { formatoJson: formatoJson as FormatoJsonFoundryModelos } : {}),
+        ...(apiVersion ? { apiVersion } : {}),
+        ...(esfuerzo ? { esfuerzoRazonamiento: esfuerzo as EsfuerzoFoundryModelos } : {}),
+      });
+    }
     default:
       throw new Error(`CRONISTA_LLM="${tipo}" no existe; valores válidos: ${TIPOS_LLM.join(", ")}`);
   }
@@ -87,12 +116,12 @@ export function crearLlmDesdeEnv(env: Env = process.env, opciones: { maxRetries?
 export function crearLlmEquipoDesdeEnv(lado: "local" | "visita", env: Env = process.env): Llm {
   const prefijo = `ARENA_${lado.toUpperCase()}_`;
   const configuracion = { ...env };
-  for (const key of ["FOUNDRY_API_KEY", "FOUNDRY_BASE_URL", "FOUNDRY_DEPLOYMENT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION", "AZURE_OPENAI_REASONING_EFFORT"]) {
+  for (const key of CLAVES_LLM_POR_PREFIJO) {
     if (env[prefijo + key] !== undefined) configuracion[key] = env[prefijo + key];
   }
   configuracion.CRONISTA_LLM = (env[prefijo + "LLM"] ?? env.CRONISTA_LLM ?? "stub").trim();
-  if (configuracion.CRONISTA_LLM !== "foundry" && configuracion.CRONISTA_LLM !== "azure-openai") {
-    throw new Error("Arena LLM necesita azure-openai o foundry; el modo programado se elige por separado");
+  if (!["foundry", "azure-openai", "foundry-modelos"].includes(configuracion.CRONISTA_LLM)) {
+    throw new Error("Arena LLM necesita azure-openai, foundry o foundry-modelos; el modo programado se elige por separado");
   }
   return crearLlmDesdeEnv(configuracion, { maxRetries: 0 });
 }

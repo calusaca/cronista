@@ -33,6 +33,15 @@ export function stageSource(root, destination, secrets = []) {
   return files;
 }
 
+/** Toda variable `*_API_KEY` / `*_KEY` (incluidas las prefijadas ARENA_<ID>_…) más la cadena
+ * de Application Insights: valores no vacíos, sin repetir. */
+export function secretosDeEntorno(env = process.env) {
+  const valores = Object.entries(env)
+    .filter(([nombre, valor]) => (/_KEY$/.test(nombre) || nombre === "APPLICATIONINSIGHTS_CONNECTION_STRING") && typeof valor === "string" && valor.trim() !== "")
+    .map(([, valor]) => valor);
+  return [...new Set(valores)];
+}
+
 async function main() {
   const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
   if (existsSync(join(root, ".env"))) process.loadEnvFile(join(root, ".env"));
@@ -55,7 +64,8 @@ async function main() {
   const location = option("--location", "eastus2");
   const appName = option("--app", "cronista");
   if (!/^[a-z][a-z0-9-]{0,30}[a-z0-9]$/.test(appName) || appName.includes("--")) throw new Error("Nombre de app inválido (2–32 caracteres, minúsculas/números/guiones).");
-  const secrets = [process.env.AZURE_OPENAI_API_KEY, process.env.FOUNDRY_API_KEY].filter(Boolean);
+  // Brief 052 v1.1 §7: toda variable *_API_KEY / *_KEY y la cadena de Insights.
+  const secrets = secretosDeEntorno(process.env);
   const redact = value => secrets.reduce((text, secret) => text.split(secret).join("[REDACTED]"), value);
   async function az(params, { json = false } = {}) {
     return await new Promise((res, rej) => {

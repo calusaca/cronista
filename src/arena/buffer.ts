@@ -1,5 +1,5 @@
 import type { EstadoArena, RegistroArena } from "./tipos";
-import { ARENA } from "../sim/limites";
+import { ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 
 export const VOZ_BUFFER = { duracionMaxS: 24, atrasoNormalS: 3, atrasoImportanteS: 3, concurrencia: 2, silencioMaxS: 5, reservaTrasS: 2, prioridadInterrupcion: 35 } as const;
 export const BUFFER_ARENA = { segundos: 20, tramoTicks: 50, recuperacionS: 10, adelantoAudioS: 25 } as const;
@@ -58,12 +58,21 @@ export function rondaVisible(registro: RegistroArena, tick: number) {
 
 /** La voz consume el cursor visible. Espera su instante, conserva velocidad natural
  * y deja pasar el partido cuando todavía no puede hablar. */
-export function planVozBuffer(eventoS: number, duracionS: number, partidoS: number, ahoraAudioS: number, finAnteriorS: number, prioridad: number, prioridadAnterior = 0, cierre = false) {
+/** Brief 050 v1.1 (1) · `eventoAnteriorS` es el instante de partido del evento de la fuente activa:
+ * un gol solo interrumpe a otro gol si es posterior (sin él, nunca: un canto no se corta por igualdad). */
+export function planVozBuffer(eventoS: number, duracionS: number, partidoS: number, ahoraAudioS: number, finAnteriorS: number, prioridad: number, prioridadAnterior = 0, cierre = false, eventoAnteriorS = Number.POSITIVE_INFINITY) {
   if (![eventoS, duracionS, partidoS, ahoraAudioS, finAnteriorS, prioridad, prioridadAnterior].every(Number.isFinite) || duracionS <= 0 || duracionS > VOZ_BUFFER.duracionMaxS || eventoS > partidoS + 1e-6) return null;
   const importante = prioridad >= VOZ_BUFFER.prioridadInterrupcion;
   if (!cierre && partidoS - eventoS > (importante ? VOZ_BUFFER.atrasoImportanteS : VOZ_BUFFER.atrasoNormalS)) return null;
   const ocupada = finAnteriorS > ahoraAudioS;
-  if (ocupada && !(prioridadAnterior < 0 || importante && prioridad > prioridadAnterior)) return null;
+  const golPosterior = prioridad === PRIORIDAD_EVENTO_ARENA.gol && prioridadAnterior === PRIORIDAD_EVENTO_ARENA.gol && eventoS > eventoAnteriorS;
+  if (ocupada && !(prioridadAnterior < 0 || importante && prioridad > prioridadAnterior || golPosterior)) return null;
   const cuando = ahoraAudioS + .03;
   return { cuando, velocidad: 1, fin: cuando + duracionS, interrumpirAnterior: ocupada };
+}
+
+/** Brief 050 v1.1 (1) · Mientras suena un canto de gol, todo clip de gol con tick ≤ el de la fuente
+ * activa queda superado (llegó tarde o es anterior) y el consumidor lo descarta sin arrancarlo. */
+export function golSuperado(prioridad: number, tick: number, activa: { prioridad: number; tick: number } | null | undefined): boolean {
+  return !!activa && activa.prioridad === PRIORIDAD_EVENTO_ARENA.gol && prioridad === PRIORIDAD_EVENTO_ARENA.gol && tick <= activa.tick;
 }

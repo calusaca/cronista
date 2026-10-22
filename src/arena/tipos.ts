@@ -7,8 +7,9 @@ export const formaciones = ["4-3-3", "4-2-3-1", "4-4-2", "4-1-4-1", "4-1-2-1-2",
 export type FormacionArena = (typeof formaciones)[number];
 export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalidades | typeof ARENA.versionLegado;
 /** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
-/** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`). */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", ARENA.reglas] as const;
+/** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`).
+ * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -79,6 +80,11 @@ export interface Vuelo {
   centro?: true;
   /** Brief 046 v1.2: saque largo del portero desde las manos; misma fase aérea que el centro. */
   aereo?: true;
+  /** Brief 051 (reinicios-v5), solo en remates: potencia ∈ [0, 1] (velocidad del vuelo y desvío). */
+  potencia?: number;
+  /** Brief 051 (reinicios-v5): remate por encima del travesaño (probabilidad modelada, sin altura
+   * simulada). Nadie lo toca y al cruzar la línea de fondo es `tiro_fuera` con `motivo: "alto"`. */
+  alto?: true;
 }
 export interface EstadoArena {
   tick: number;
@@ -110,6 +116,7 @@ export type TipoEventoArena = "pase" | "recepcion" | "intercepcion" | "recuperac
 export interface EventoArena {
   id: string; tick: number; tipo: TipoEventoArena; lado: Lado; jugador: string;
   receptor: string | null; desde: Punto; hasta: Punto; distanciaM: number;
+  /** `motivo`: p. ej. "desvio" (atajada), "centro"/"saque_manos" (pase), "alto" (tiro_fuera, brief 051). */
   sale?: string; entrenador?: string; motivo?: string; fuentes?: string[];
   formacion?: FormacionArena;
   gravedad?: "imprudente" | "temeraria" | "fuerza_excesiva";

@@ -1,0 +1,553 @@
+{
+ "brief": "051 (v1.1) · auditoría de mutaciones de la implementación",
+ "generado": "2026-10-22",
+ "commitBase": "e5e78180f2dde50810793a796a87df03e47b2f8b",
+ "arbolConCambios": true,
+ "metodo": "Copia aislada del árbol de trabajo (src, package.json, tsconfig, configs de vitest; node_modules enlazado) con git propio. Cada mutación reemplaza un fragmento exacto (una sola aparición), corre `npx vitest run --config vitest.config.ts <pruebas>`, restaura el archivo y verifica que su md5 coincide con el anterior. La copia se borró al terminar.",
+ "pruebasMd5": {
+  "src/arena/__tests__/motor051.test.ts": "609f32726419fefd8828530a429364f9",
+  "src/arena/__tests__/motor046.test.ts": "7e2472dee621728406b46ce6464b4c11"
+ },
+ "lineaBase": "motor051.test.ts 25/25 y motor046.test.ts 37/37 en verde en la copia antes de mutar",
+ "resumen": {
+  "mutaciones": 30,
+  "enRojo": 30,
+  "restauradasConMd5": 30
+ },
+ "mutaciones": [
+  {
+   "mutacion": "1 ignorar al portero",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  3 failed | 22 passed (25)",
+   "pruebasEnRojo": [
+    "1 · objetivoRemate: lado contrario al portero en ambos lados del campo; centrado → palo lejano; margen monótono y acot",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 524ms",
+    "v1.1 #5 · distancia perpendicular a la RECTA: antes, dentro y después del segmento dan el mismo lado; casos degenerado"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "49576a9bdf4640a35c0c370f026c803e",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "1b ignorar indiferenciaM",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 863ms",
+    "v1.1 #5 · distancia perpendicular a la RECTA: antes, dentro y después del segmento dan el mismo lado; casos degenerado"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "73ba270ec89c2095190189e422831a52",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "1c umbral de indiferencia estricto",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "v1.1 #5 · distancia perpendicular a la RECTA: antes, dentro y después del segmento dan el mismo lado; casos degenerado"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "9332496d6c1ad9c8eaa9155bedeffee2",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "2 quitar la cota del margen",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "1 · objetivoRemate: lado contrario al portero en ambos lados del campo; centrado → palo lejano; margen monótono y acot"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "2aaea2886dc06c50c6fb4ab81e1a3dcb",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "3 una sola extracción (uniforme)",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  3 failed | 22 passed (25)",
+   "pruebasEnRojo": [
+    "2 · error triangular: hasta.y = objetivo + (r₁ + r₂ − 1)·semiancho con el PRNG arena:golpe; nivel 100 a 8 m sin entorn",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 501ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "9ff79b3386f09999e7deb732dcfd75d6",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "4 quitar el factor de distancia",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "2 (pura) · errorRemate: nulo a nivel 100; escala con la distancia dentro de las cotas y con la potencia (mutación: qui",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 527ms"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "e5d8b6d59b3e1742d665d5d65ea4de15",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "5/20f velocidad fija (motor ignora la potencia)",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  4 failed | 21 passed (25)",
+   "pruebasEnRojo": [
+    "3 · el vuelo con potencia 0 tarda más ticks que con potencia 1 a la misma distancia (mutación: velocidad fija) 32ms",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 536ms",
+    "v1.1 #7 (f) · la velocidad del remate depende de la potencia: más ticks de vuelo hasta el portero con potencia 0 (muta"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "44ae4801f85308732f1f6e4efbc7e61c",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "5b velocidadRemate constante",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  5 failed | 20 passed (25)",
+   "pruebasEnRojo": [
+    "3 (pura) · potencia 0 hasta colocadoHastaM y 1 desde potenteDesdeM; velocidad creciente con la potencia 4ms",
+    "3 · el vuelo con potencia 0 tarda más ticks que con potencia 1 a la misma distancia (mutación: velocidad fija) 29ms",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 511ms",
+    "v1.1 #7 (f) · la velocidad del remate depende de la potencia: más ticks de vuelo hasta el portero con potencia 0 (muta"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "17e4de922396c8af84a8b00b70854914",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "6 permitir contacto al vuelo alto",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "4 · remate alto: nadie lo toca, entre los palos es tiro_fuera con motivo alto, sin gol, y sigue saque de meta; por la ",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 631ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "0c32e4e45da8eea2f332af6996517edd",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "7 quitar la condición alto de resolverSalida",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  4 failed | 21 passed (25)",
+   "pruebasEnRojo": [
+    "12 · cumple las bandas rápidas, con el experimento controlado de porteros 5332ms",
+    "4 · remate alto: nadie lo toca, entre los palos es tiro_fuera con motivo alto, sin gol, y sigue saque de meta; por la ",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 621ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "9175b0e4e7afbd8ae69078a4ff0bf043",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "8 alcance sin nivel",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  5 failed | 20 passed (25)",
+   "pruebasEnRojo": [
+    "12 · cumple las bandas rápidas, con el experimento controlado de porteros 15549ms",
+    "5 (pura) · alcancePortero: alcanceMinM a nivel 0, alcanceMaxM a 100, × min(1, t/reaccionS), nunca < cuerpoM (mutación:",
+    "5 · con variantes.niveles, el remate que pasa a 2,1 m del portero lo ataja con nivel 100 y entra con nivel 30 (mutació",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 579ms"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "b55d61a1a254040b9355e215492693ae",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "9 radio = controlPorteroM bajo v5",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  5 failed | 20 passed (25)",
+   "pruebasEnRojo": [
+    "12 · cumple las bandas rápidas, con el experimento controlado de porteros 15484ms",
+    "5 · con variantes.niveles, el remate que pasa a 2,1 m del portero lo ataja con nivel 100 y entra con nivel 30 (mutació",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 555ms",
+    "v1.1 #3 · una sola velocidad efectiva: con sintética y césped alto el alcance cambia en el factor del entorno a 4 m de"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "e431bf77b5b80e60e1c07c14087d2278",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "10 desvío con probabilidad constante",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  4 failed | 21 passed (25)",
+   "pruebasEnRojo": [
+    "6 · un contacto que es atrapada con nivel 90 es desvío con nivel 10 con la misma semilla (mutación: constante desvioPr",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 573ms",
+    "v1.1 #7 (a)–(c) · cada término del desvío cambia el desenlace al quitarlo (mutaciones 15–17: sin potencia, sin nivel, "
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "3655d44f01c075557696231af1fbb282",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "11 quitar la rama de posicionamiento",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  4 failed | 21 passed (25)",
+   "pruebasEnRojo": [
+    "7 · posicionamiento: sin mano a mano el portero va hacia C + u·posicionamientoM y queda en su área; lejos vuelve al an",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 532ms",
+    "v1.1 #7 (e) · un pase rival en vuelo a ≤ manoAManoRadioM mueve al portero aunque no haya poseedor (mutación 19) 14ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "10a7a59a97ff08f0586c5eaede281e0e",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "12 posicionamiento también en mano a mano",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  3 failed | 22 passed (25)",
+   "pruebasEnRojo": [
+    "12 · cumple las bandas rápidas, con el experimento controlado de porteros 5228ms",
+    "7 · posicionamiento: sin mano a mano el portero va hacia C + u·posicionamientoM y queda en su área; lejos vuelve al an",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 740ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "291ec29592bf088431a6f7d78be19271",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "13 ruta distinta para la orden tirar",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  3 failed | 22 passed (25)",
+   "pruebasEnRojo": [
+    "2 · error triangular: hasta.y = objetivo + (r₁ + r₂ − 1)·semiancho con el PRNG arena:golpe; nivel 100 a 8 m sin entorn",
+    "8 · la orden tirar sigue la misma ruta que la decisión local: mismo objetivo, potencia y alto; el esquema no cambia (m",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "926670274435dfb3a2d0ffe4ba9ad0b8",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "14 activar las reglas nuevas con v4",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts",
+    "src/arena/__tests__/motor046.test.ts"
+   ],
+   "resultado": "Tests  6 failed | 56 passed (62)",
+   "pruebasEnRojo": [
+    "17 · v1–v3 se reproducen exactos; el fixture v4 cumple sus condiciones y se reproduce; validación y valor por defecto ",
+    "7 · mano a mano a 20 m con órdenes fijas (portero con cubrir): sale sobre la línea arco–balón y queda en el área; con ",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 414ms",
+    "v1.1 #7 (e) · un pase rival en vuelo a ≤ manoAManoRadioM mueve al portero aunque no haya poseedor (mutación 19) 20ms",
+    "v1.1 · 6: centro con caída fuera del campo → reinicio normal (banda o meta); un contacto válido antes del cruce preval"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "c44aabe39b91dc92e00fd2032471a601",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "14b activar las reglas nuevas con conReinicios",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts",
+    "src/arena/__tests__/motor046.test.ts"
+   ],
+   "resultado": "Tests  6 failed | 56 passed (62)",
+   "pruebasEnRojo": [
+    "17 · v1–v3 se reproducen exactos; el fixture v4 cumple sus condiciones y se reproduce; validación y valor por defecto ",
+    "7 · mano a mano a 20 m con órdenes fijas (portero con cubrir): sale sobre la línea arco–balón y queda en el área; con ",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 48ms",
+    "v1.1 #7 (e) · un pase rival en vuelo a ≤ manoAManoRadioM mueve al portero aunque no haya poseedor (mutación 19) 19ms",
+    "v1.1 · 6: centro con caída fuera del campo → reinicio normal (banda o meta); un contacto válido antes del cruce preval"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "bbc6bb375ca0ba4cdefa21f1f29782c8",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "15 rama del 046 con === ARENA.reglas",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts",
+    "src/arena/__tests__/motor046.test.ts"
+   ],
+   "resultado": "Tests  28 failed | 34 passed (62)",
+   "pruebasEnRojo": [
+    "1 · histéresis: los rivales respetan distanciaManosM + margenManosM y, con la tolerancia de llegada, nunca bloquean el",
+    "1 · tras una atajada, un rival pegado (nivel máximo frente a mínimo) no recupera ni comete falta hasta que suelta 64ms",
+    "10 · sin opción de centro, el poseedor en la zona de centro va hacia el punto de giro 9ms",
+    "11 · centro al palo lejano: pase con motivo centro, vuelo.centro, ese receptor y destino = objetivo ± error lateral; e",
+    "12 · fase aérea: un defensor en la trayectoria lejos de la caída no intercepta; uno a menos de caidaM sí; v1.1: justo ",
+    "13 · llegada al área: apoyar/profundidad reciben palo cercano, lejano y penal; cubrir no; la línea de fuera de juego l",
+    "14 · lateral A: un pasar fuera de alcance no bloquea al poseedor en v4 (actúa en local dentro de accionCadaS); en v3 n",
+    "15 · lateral B: conducir con destino a menos de renovarConduccionM mantiene velocidad tras 1 s 5ms",
+    "16 · validarOrdenes, esquema, motor y prompt de centrar 19ms",
+    "17 · v1–v3 se reproducen exactos; el fixture v4 cumple sus condiciones y se reproduce; validación y valor por defecto ",
+    "2 · balon.manos se crea al recibir dentro del área (atajada y reiniciar) con hastaTick de manosMaxS; fuera del área no",
+    "2 · un saque largo (> saqueAereoMinM) va por arriba: un rival plantado en mitad de la trayectoria no lo toca 26ms",
+    "3 · no suelta antes de accionCadaS / ritmo; con un rival cerca espera; al vencer el plazo, saque forzado hacia el comp",
+    "3 · un saque corto exige línea limpia (el voluntario espera) y el forzado elige entre saques admisibles el de mayor ma",
+    "3b · v1.1: sin compañeros a saqueManosMaxM el saque forzado no tiene límite de distancia; sin compañeros de campo, des",
+    "4 · con el balón en las manos en x = controlM + 0,1, órdenes conducir/tirar hacia atrás y un rival empujando, durante ",
+    "5 · los destinos rivales se proyectan a distanciaManosM + margenManosM (v1.2) (función pura y motor) 27ms",
+    "7 · mano a mano a 20 m con órdenes fijas (portero con cubrir): sale sobre la línea arco–balón y queda en el área; con ",
+    "8 · radio de reacción: controlPorteroM desde reaccionM, cuerpoM a bocajarro, monótono; un remate a 2 m entre ambos rad",
+    "9 · un extremo que conduce hacia la línea de fondo durante 4 s no provoca saque de meta ni de banda 21ms",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 391ms",
+    "M33 · un pasar del portero a más de saqueManosMaxM no se obedece: usa la opción ordinaria 22ms",
+    "M39 · el portero con el balón en las manos no obedece conducir 9ms",
+    "cumple todas las bandas rápidas 5319ms",
+    "v1.1 · 10: matriz de versiones — cada comportamiento nuevo cambia solo con v4 9ms",
+    "v1.1 · 3: durante una pausa con inercia hacia la línea, el portero con manos no sale del área (ambas porterías) 12ms",
+    "v1.1 · 4: falta sobre el portero con el balón en los pies dentro del área → reanudación en manos con plazo tras la pau",
+    "v1.1 · 7: fuera de juego en el centro con la referencia del golpe (adelantado que vuelve, habilitado que rebasa, recep"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "ee267c9b7dc0aa0b7397158a0d9779cb",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "16 texto genérico sin motivo alto",
+   "archivo": "src/arena/vista.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "10 · textos ES/EN del remate alto (vista y modo breve), narrador de plantilla V1–V8 y conteo 049 como fuera o bloquead"
+   ],
+   "md5Antes": "879fa1614d2a84890a77e40b7b8962f7",
+   "md5Mutado": "7502e48112c833a4c38ca70275ff3b3f",
+   "md5Despues": "879fa1614d2a84890a77e40b7b8962f7",
+   "restaurado": true
+  },
+  {
+   "mutacion": "16b variante breve ES alterada",
+   "archivo": "src/arena/relato.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "10 · textos ES/EN del remate alto (vista y modo breve), narrador de plantilla V1–V8 y conteo 049 como fuera o bloquead"
+   ],
+   "md5Antes": "745efdc34191065de1382f3724e41b0d",
+   "md5Mutado": "679e175e06277d039224d3a2b5bef1b3",
+   "md5Despues": "745efdc34191065de1382f3724e41b0d",
+   "restaurado": true
+  },
+  {
+   "mutacion": "16c variante breve EN alterada",
+   "archivo": "src/arena/relato.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "10 · textos ES/EN del remate alto (vista y modo breve), narrador de plantilla V1–V8 y conteo 049 como fuera o bloquead"
+   ],
+   "md5Antes": "745efdc34191065de1382f3724e41b0d",
+   "md5Mutado": "9fd586f9f1e7a4101bf451049a21e61c",
+   "md5Despues": "745efdc34191065de1382f3724e41b0d",
+   "restaurado": true
+  },
+  {
+   "mutacion": "17 contar el alto como a puerta",
+   "archivo": "src/arena/estadista.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "10 · textos ES/EN del remate alto (vista y modo breve), narrador de plantilla V1–V8 y conteo 049 como fuera o bloquead",
+    "v1.1 #1 · listas sintéticas: desenlace físico frente a rematesPorLado y discrepancias 2ms"
+   ],
+   "md5Antes": "1b6aa6f1c8ef7026ac1a7104c89b8afc",
+   "md5Mutado": "7b7fd7de381ab38a908a2e0be8bbc23b",
+   "md5Despues": "1b6aa6f1c8ef7026ac1a7104c89b8afc",
+   "restaurado": true
+  },
+  {
+   "mutacion": "18 intercepción cercana sin radio",
+   "archivo": "src/arena/metricas-lote.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "12 · cumple las bandas rápidas, con el experimento controlado de porteros 6937ms",
+    "14 · intercepciones inmediatas: temporal (046) y cercana (≤ inmediataRadioM) con límites inclusivos (mutación: ignorar"
+   ],
+   "md5Antes": "cac61a575a60ae933f4bf101910b2dac",
+   "md5Mutado": "b201ba52bb60c482dfac2e8875fe4a3e",
+   "md5Despues": "cac61a575a60ae933f4bf101910b2dac",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19a desvío sin término de potencia",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "6 (pura) · probabilidadDesvio crece con potencia y estirada, decrece con el nivel, acotada y finita; v1.1 #2: estirada",
+    "v1.1 #7 (a)–(c) · cada término del desvío cambia el desenlace al quitarlo (mutaciones 15–17: sin potencia, sin nivel, "
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "5b8221fef1360ca82c18169a6258a693",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19b desvío sin término de nivel",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  4 failed | 21 passed (25)",
+   "pruebasEnRojo": [
+    "6 (pura) · probabilidadDesvio crece con potencia y estirada, decrece con el nivel, acotada y finita; v1.1 #2: estirada",
+    "6 · un contacto que es atrapada con nivel 90 es desvío con nivel 10 con la misma semilla (mutación: constante desvioPr",
+    "9 · matriz: cada comportamiento nuevo cambia el resultado solo con v5 (mutación: activar una regla con v4 o conReinici",
+    "v1.1 #7 (a)–(c) · cada término del desvío cambia el desenlace al quitarlo (mutaciones 15–17: sin potencia, sin nivel, "
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "65493d4a96a398dde654212e1e054883",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19c desvío sin término de estirada",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  3 failed | 22 passed (25)",
+   "pruebasEnRojo": [
+    "6 (pura) · probabilidadDesvio crece con potencia y estirada, decrece con el nivel, acotada y finita; v1.1 #2: estirada",
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 579ms",
+    "v1.1 #7 (a)–(c) · cada término del desvío cambia el desenlace al quitarlo (mutaciones 15–17: sin potencia, sin nivel, "
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "449219df64b7b0b84b13988b012d66fa",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19d reacción sin el entorno",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "v1.1 #3 · una sola velocidad efectiva: con sintética y césped alto el alcance cambia en el factor del entorno a 4 m de"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "6ba698b18387f1e4efb1ba19821a2d5e",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19e posicionamiento solo con poseedor (no en vuelo)",
+   "archivo": "src/arena/motor.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  2 failed | 23 passed (25)",
+   "pruebasEnRojo": [
+    "9 · v1–v4 exactos; el fixture v5 cumple sus condiciones y se reproduce; validación y valor por defecto 529ms",
+    "v1.1 #7 (e) · un pase rival en vuelo a ≤ manoAManoRadioM mueve al portero aunque no haya poseedor (mutación 19) 11ms"
+   ],
+   "md5Antes": "16195e4c0811da7d6364a480fb04cec4",
+   "md5Mutado": "5200603ebe2dbbbe1d62fbdf1d768265",
+   "md5Despues": "16195e4c0811da7d6364a480fb04cec4",
+   "restaurado": true
+  },
+  {
+   "mutacion": "19g estirada sin salvaguarda (division por cero)",
+   "archivo": "src/arena/remate.ts",
+   "pruebas": [
+    "src/arena/__tests__/motor051.test.ts"
+   ],
+   "resultado": "Tests  1 failed | 24 passed (25)",
+   "pruebasEnRojo": [
+    "6 (pura) · probabilidadDesvio crece con potencia y estirada, decrece con el nivel, acotada y finita; v1.1 #2: estirada"
+   ],
+   "md5Antes": "9c628ee640b495585421ae951baa8c59",
+   "md5Mutado": "6e85bfd16ef2690250b96b07702e7c2a",
+   "md5Despues": "9c628ee640b495585421ae951baa8c59",
+   "restaurado": true
+  }
+ ]
+}

@@ -1,0 +1,768 @@
+{
+  "version": "052-v1.1",
+  "generadoUtc": "2026-10-22T06:15:00.246Z",
+  "seed": 52,
+  "candidato": {
+    "id": "grok",
+    "nombrePublico": "Grok 4.7 (Foundry)",
+    "llm": "foundry-modelos",
+    "deployment": "cronista-grok",
+    "modelo": "grok-4.7",
+    "version": "1",
+    "capacidad": 10,
+    "esfuerzoRazonamiento": "low",
+    "formatoJson": "json_schema",
+    "controlador": "foundry-modelos:cronista-grok:reasoning-low"
+  },
+  "rival": {
+    "controlador": "azure-openai:cronista-rapido:reasoning-low",
+    "deployment": "cronista-rapido"
+  },
+  "cotas": {
+    "decisionMaxMs": 30000,
+    "solicitudesMax": 2,
+    "tokensOrdenes": 2048,
+    "esperaMs": 60000
+  },
+  "sonda": {
+    "elegido": "json_schema",
+    "intentos": [
+      {
+        "formato": "json_schema",
+        "observacion": "inicio",
+        "resultado": "ok",
+        "respetaEsquema": true,
+        "peticion": {
+          "status": 200,
+          "ms": 32187,
+          "finish": "stop",
+          "modelo": "grok-4.7",
+          "entrada": 8118,
+          "salida": 417,
+          "razonamiento": 873,
+          "cache": 0,
+          "total": 9408,
+          "teniaThink": false,
+          "reasoningContentChars": 0
+        }
+      },
+      {
+        "formato": "json_schema",
+        "observacion": "mitad",
+        "resultado": "ok",
+        "respetaEsquema": true,
+        "peticion": {
+          "status": 200,
+          "ms": 40129,
+          "finish": "stop",
+          "modelo": "grok-4.7",
+          "entrada": 9741,
+          "salida": 475,
+          "razonamiento": 1149,
+          "cache": 1206,
+          "total": 11365,
+          "teniaThink": false,
+          "reasoningContentChars": 0
+        }
+      }
+    ]
+  },
+  "partidos": [
+    {
+      "nombre": "espejo",
+      "duracionS": 60,
+      "intervaloS": 15,
+      "esperaMs": 60000,
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "esperadas": 8,
+      "observadas": 8,
+      "lados": [
+        {
+          "lado": "local",
+          "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+          "esCandidato": true,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 3,
+            "entrada": 28324,
+            "salida": 5691,
+            "cache": 3618
+          },
+          "razonamientoInformado": 4375,
+          "razonamientoFueraDeCompletion": true,
+          "peticiones": 4,
+          "promptMax": 10130,
+          "salidaFacturableMax": 2202,
+          "estados": {
+            "200": 3,
+            "429": 1
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "grok-4.7"
+          ]
+        },
+        {
+          "lado": "visita",
+          "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+          "esCandidato": true,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 2,
+            "entrada": 18366,
+            "salida": 2502,
+            "cache": 1206
+          },
+          "razonamientoInformado": 1649,
+          "razonamientoFueraDeCompletion": true,
+          "peticiones": 4,
+          "promptMax": 10231,
+          "salidaFacturableMax": 1319,
+          "estados": {
+            "200": 2,
+            "429": 2
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "grok-4.7"
+          ]
+        }
+      ]
+    },
+    {
+      "nombre": "cruzadoA",
+      "duracionS": 60,
+      "intervaloS": 15,
+      "esperaMs": 60000,
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "esperadas": 4,
+      "observadas": 4,
+      "lados": [
+        {
+          "lado": "local",
+          "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+          "esCandidato": true,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 4,
+            "entrada": 38434,
+            "salida": 5911,
+            "cache": 11608
+          },
+          "razonamientoInformado": 4205,
+          "razonamientoFueraDeCompletion": true,
+          "peticiones": 4,
+          "promptMax": 10209,
+          "salidaFacturableMax": 1873,
+          "estados": {
+            "200": 4
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "grok-4.7"
+          ]
+        },
+        {
+          "lado": "visita",
+          "controlador": "azure-openai:cronista-rapido:reasoning-low",
+          "esCandidato": false,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 4,
+            "entrada": 36714,
+            "salida": 2450,
+            "cache": 7424
+          },
+          "razonamientoInformado": 727,
+          "razonamientoFueraDeCompletion": false,
+          "peticiones": 4,
+          "promptMax": 9754,
+          "salidaFacturableMax": 722,
+          "estados": {
+            "200": 4
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      ]
+    },
+    {
+      "nombre": "cruzadoB",
+      "duracionS": 60,
+      "intervaloS": 15,
+      "esperaMs": 60000,
+      "marcador": {
+        "local": 1,
+        "visita": 1
+      },
+      "esperadas": 4,
+      "observadas": 4,
+      "lados": [
+        {
+          "lado": "local",
+          "controlador": "azure-openai:cronista-rapido:reasoning-low",
+          "esCandidato": false,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 4,
+            "entrada": 36329,
+            "salida": 2537,
+            "cache": 7424
+          },
+          "razonamientoInformado": 804,
+          "razonamientoFueraDeCompletion": false,
+          "peticiones": 4,
+          "promptMax": 9789,
+          "salidaFacturableMax": 914,
+          "estados": {
+            "200": 4
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        },
+        {
+          "lado": "visita",
+          "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+          "esCandidato": true,
+          "uso": {
+            "llamadas": 4,
+            "respuestasConUso": 3,
+            "entrada": 28325,
+            "salida": 3907,
+            "cache": 2412
+          },
+          "razonamientoInformado": 2661,
+          "razonamientoFueraDeCompletion": true,
+          "peticiones": 4,
+          "promptMax": 10136,
+          "salidaFacturableMax": 1487,
+          "estados": {
+            "0": 1,
+            "200": 3
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "grok-4.7"
+          ]
+        }
+      ]
+    },
+    {
+      "nombre": "web",
+      "duracionS": 180,
+      "intervaloS": 30,
+      "esperaMs": 60000,
+      "marcador": {
+        "local": 0,
+        "visita": 0
+      },
+      "esperadas": 6,
+      "observadas": 6,
+      "lados": [
+        {
+          "lado": "local",
+          "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+          "esCandidato": true,
+          "uso": {
+            "llamadas": 6,
+            "respuestasConUso": 5,
+            "entrada": 48816,
+            "salida": 8186,
+            "cache": 6030
+          },
+          "razonamientoInformado": 5868,
+          "razonamientoFueraDeCompletion": true,
+          "peticiones": 6,
+          "promptMax": 10280,
+          "salidaFacturableMax": 2234,
+          "estados": {
+            "0": 1,
+            "200": 5
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "grok-4.7"
+          ]
+        },
+        {
+          "lado": "visita",
+          "controlador": "azure-openai:cronista-rapido:reasoning-low",
+          "esCandidato": false,
+          "uso": {
+            "llamadas": 6,
+            "respuestasConUso": 6,
+            "entrada": 56722,
+            "salida": 4650,
+            "cache": 7424
+          },
+          "razonamientoInformado": 1929,
+          "razonamientoFueraDeCompletion": false,
+          "peticiones": 6,
+          "promptMax": 9920,
+          "salidaFacturableMax": 1033,
+          "estados": {
+            "200": 6
+          },
+          "teniaThink": 0,
+          "reasoningContentChars": 0,
+          "modelos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      ]
+    }
+  ],
+  "decisionesCandidato": [
+    {
+      "partido": "espejo",
+      "ronda": 1,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 50045,
+      "llamadas": 1,
+      "promptMax": 8110
+    },
+    {
+      "partido": "espejo",
+      "ronda": 1,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 31865,
+      "llamadas": 1,
+      "promptMax": 8135
+    },
+    {
+      "partido": "espejo",
+      "ronda": 2,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 38753,
+      "llamadas": 1,
+      "promptMax": 10130
+    },
+    {
+      "partido": "espejo",
+      "ronda": 2,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "respaldo",
+      "motivo": "error_controlador",
+      "tiempoMs": 979,
+      "llamadas": 1,
+      "promptMax": null
+    },
+    {
+      "partido": "espejo",
+      "ronda": 3,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 47472,
+      "llamadas": 1,
+      "promptMax": 10084
+    },
+    {
+      "partido": "espejo",
+      "ronda": 3,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "respaldo",
+      "motivo": "error_controlador",
+      "tiempoMs": 660,
+      "llamadas": 1,
+      "promptMax": null
+    },
+    {
+      "partido": "espejo",
+      "ronda": 4,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "respaldo",
+      "motivo": "error_controlador",
+      "tiempoMs": 708,
+      "llamadas": 1,
+      "promptMax": null
+    },
+    {
+      "partido": "espejo",
+      "ronda": 4,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 28610,
+      "llamadas": 1,
+      "promptMax": 10231
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 1,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 23000,
+      "llamadas": 1,
+      "promptMax": 8110
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 2,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 32590,
+      "llamadas": 1,
+      "promptMax": 10020
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 3,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 45424,
+      "llamadas": 1,
+      "promptMax": 10095
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 4,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 24001,
+      "llamadas": 1,
+      "promptMax": 10209
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 1,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 30324,
+      "llamadas": 1,
+      "promptMax": 8135
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 2,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 29541,
+      "llamadas": 1,
+      "promptMax": 10136
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 3,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "respaldo",
+      "motivo": "plazo_agotado",
+      "tiempoMs": 60002,
+      "llamadas": 1,
+      "promptMax": null
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 4,
+      "lado": "visita",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 24976,
+      "llamadas": 1,
+      "promptMax": 10054
+    },
+    {
+      "partido": "web",
+      "ronda": 1,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 20742,
+      "llamadas": 1,
+      "promptMax": 8118
+    },
+    {
+      "partido": "web",
+      "ronda": 2,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 32173,
+      "llamadas": 1,
+      "promptMax": 10022
+    },
+    {
+      "partido": "web",
+      "ronda": 3,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 50053,
+      "llamadas": 1,
+      "promptMax": 10280
+    },
+    {
+      "partido": "web",
+      "ronda": 4,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 55390,
+      "llamadas": 1,
+      "promptMax": 10265
+    },
+    {
+      "partido": "web",
+      "ronda": 5,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 54555,
+      "llamadas": 1,
+      "promptMax": 10131
+    },
+    {
+      "partido": "web",
+      "ronda": 6,
+      "lado": "local",
+      "controlador": "foundry-modelos:cronista-grok:reasoning-low",
+      "origen": "respaldo",
+      "motivo": "plazo_agotado",
+      "tiempoMs": 60001,
+      "llamadas": 1,
+      "promptMax": null
+    }
+  ],
+  "decisionesRival": [
+    {
+      "partido": "cruzadoA",
+      "ronda": 1,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 3729,
+      "llamadas": 1,
+      "promptMax": 7784
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 2,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4875,
+      "llamadas": 1,
+      "promptMax": 9514
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 3,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4371,
+      "llamadas": 1,
+      "promptMax": 9754
+    },
+    {
+      "partido": "cruzadoA",
+      "ronda": 4,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4013,
+      "llamadas": 1,
+      "promptMax": 9662
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 1,
+      "lado": "local",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 3430,
+      "llamadas": 1,
+      "promptMax": 7736
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 2,
+      "lado": "local",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4510,
+      "llamadas": 1,
+      "promptMax": 9413
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 3,
+      "lado": "local",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 6722,
+      "llamadas": 1,
+      "promptMax": 9391
+    },
+    {
+      "partido": "cruzadoB",
+      "ronda": 4,
+      "lado": "local",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4267,
+      "llamadas": 1,
+      "promptMax": 9789
+    },
+    {
+      "partido": "web",
+      "ronda": 1,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4099,
+      "llamadas": 1,
+      "promptMax": 7796
+    },
+    {
+      "partido": "web",
+      "ronda": 2,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 7436,
+      "llamadas": 1,
+      "promptMax": 9513
+    },
+    {
+      "partido": "web",
+      "ronda": 3,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 5282,
+      "llamadas": 1,
+      "promptMax": 9815
+    },
+    {
+      "partido": "web",
+      "ronda": 4,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 5806,
+      "llamadas": 1,
+      "promptMax": 9920
+    },
+    {
+      "partido": "web",
+      "ronda": 5,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 6213,
+      "llamadas": 1,
+      "promptMax": 9809
+    },
+    {
+      "partido": "web",
+      "ronda": 6,
+      "lado": "visita",
+      "controlador": "azure-openai:cronista-rapido:reasoning-low",
+      "origen": "controlador",
+      "motivo": "valida",
+      "tiempoMs": 4664,
+      "llamadas": 1,
+      "promptMax": 9869
+    }
+  ],
+  "resumen": {
+    "esperadas": 22,
+    "observadas": 22,
+    "controlador": 17,
+    "respaldos": 5,
+    "tiempoMaxMs": 60002,
+    "llamadasMax": 1,
+    "promptMaxWeb": 10280,
+    "tokensCandidato": {
+      "entrada": 162265,
+      "salida": 26197,
+      "cache": 24874,
+      "razonamientoInformado": 18758,
+      "llamadas": 22,
+      "respuestasConUso": 17
+    },
+    "razonamientoFueraDeCompletion": true
+  },
+  "costo": {
+    "precio": {
+      "entrada": 2,
+      "salida": 6,
+      "cache": 0.5
+    },
+    "smokeUsd": 0.4444,
+    "ladoWebUsd": 0.4692,
+    "nota": "ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2234 × salida) / 1e6 (§5). El proveedor informa reasoning_tokens fuera de completion_tokens (total_tokens = prompt + completion + reasoning): se facturan como salida y max_tokens no los acota; la cota de salida por solicitud es la mayor observada."
+  },
+  "admision": {
+    "admitido": false,
+    "causas": [
+      "5 de 22 decisiones cayeron a respaldo (error_controlador, plazo_agotado)",
+      "13 decisiones > 30000 ms (máx. 60002 ms)",
+      "respuestasConUso (17) ≠ llamadas (22)"
+    ]
+  }
+}

@@ -579,3 +579,19 @@ La prueba 9 de la v1.0 se sustituye y la lista se completa:
    `precios.json`; corte 23 oct 16:00; README de evidencia con admitidos, «probado,
    no admitido» y «no probado». No anunciar DeepSeek ni Llama Maverick: hoy no
    tienen cuota ni deployment.
+
+## Versión 1.2 (22 de octubre, coordinador): decisiones durante la admisión
+
+Durante la Entrega B aparecieron tres hechos que el v1.1 no contemplaba; el coordinador (Opus, con la aprobación de
+Carlos para crear despliegues) decide:
+
+1. **Capacidad.** GPT-6 Luna quedó en 20/22 decisiones por dos HTTP 429 de capacidad en el partido espejo (capacidad 30,
+   prompts de ~9,5 K tokens cada 15 s). En GlobalStandard la capacidad es un límite de TPM, sin coste en reposo, así que se
+   sube a 100 y se repite el smoke. Por el mismo riesgo en público (mismo modelo en ambos lados más el narrador), también
+   suben a 100 `cronista-equilibrado` y `cronista-rapido`. Cada cambio queda registrado en la evidencia.
+2. **Crédito.** Sin acceso al saldo actual, la condición de presupuesto de §5 se evalúa con una hipótesis declarada de
+   50 USD (último dato verificado: 150 USD el 10 de octubre), pendiente de confirmar por Carlos.
+3. **Esfuerzo de razonamiento.** Grok 4.7 razona por defecto y tarda 85–125 s por decisión; con `reasoning_effort: low`
+   baja a ~28 s. Se permite una opción por modelo, `FOUNDRY_MODELOS_ESFUERZO_RAZONAMIENTO` (`low` | `minimal`, ausente
+   por defecto), que el adaptador envía solo si está configurada. Grok se admite con ella solo si cumple el criterio de
+   inclusión completo (ninguna decisión por encima de 30 s y ninguna con respaldo).

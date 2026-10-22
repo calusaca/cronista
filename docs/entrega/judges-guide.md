@@ -16,7 +16,11 @@ quotas listed at the end. The latest public walkthrough of exactly this path is 
 1. **Open the arena.** It lands on the **Live** tab with a saved preview on the pitch. The
    top-right **ES / EN** button switches the whole page, including the voices.
 2. **Pick the coaches.** Under *Choose who manages each team*, leave **Random** (two different
-   Azure OpenAI deployments when available) or choose them manually; **Programmed** runs the same
+   deployments drawn from GPT-5.6 Luna, GPT-5.4 mini and GPT-6 Luna, all on Azure OpenAI; the
+   controller label under each team names the deployment that played) or choose them manually.
+   Grok 4.7 and gpt-oss-120b were also tried through Foundry Models, but they were too slow or
+   ran out of output tokens and were not admitted
+   ([evidence](../evidencia/modelos-052/README.md)). **Programmed** runs the same
    path with no model calls. Keep **Coach decides** for formations and the default 60-second
    duration; weather, pitch and crowd are optional. Press **Start live match**.
 3. **Watch the handover between agents.** The scoreboard shows *Coaches are deciding · simulation

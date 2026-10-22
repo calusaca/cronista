@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import { LOTE_ARENA_046 as L } from "../../sim/limites";
 import { incumplimientos, incumplimientosSaques, medirLote } from "../metricas-lote";
 
-const lote = { desde: L.completo.semillaDesde, semillas: L.completo.semillas };
+// Brief 051: el lote del 046 fija reinicios-v4 (la predeterminada es v5; sus bandas las exige motor051).
+const lote = { desde: L.completo.semillaDesde, semillas: L.completo.semillas, reglas: "reinicios-v4" as const };
 
 describe("046 · lote completo de la arena", () => {
   it("reinicios-v4 cumple todas las bandas completas", { timeout: 300_000 }, async () => {
@@ -17,7 +18,7 @@ describe("046 · lote completo de la arena", () => {
   });
 
   it("v1.2: el segundo lote (segundoLoteDesde) cumple las bandas de saques desde las manos", { timeout: 300_000 }, async () => {
-    const m = await medirLote({ desde: L.segundoLoteDesde, semillas: L.completo.semillas });
+    const m = await medirLote({ desde: L.segundoLoteDesde, semillas: L.completo.semillas, reglas: lote.reglas });
     console.log("[046 v4 segundo lote]", JSON.stringify(m));
     expect(m.saquesManos).toBeGreaterThan(0);
     expect(incumplimientosSaques(m, L.completo)).toEqual([]);

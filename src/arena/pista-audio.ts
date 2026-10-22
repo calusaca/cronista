@@ -1,7 +1,9 @@
+/** Tope de bytes PCM de una pista (más 44 de cabecera). Brief 053: compartido con ArenaNarracion. */
+export const PISTA_MAX_PCM_BYTES = 60_000_000;
 /** WAV PCM mono: une audio ya decodificado sin cabeceras MP3 intermedias. */
 export function wavMono(fragmentos: readonly Float32Array[], sampleRate: number): Blob {
   const muestras = fragmentos.reduce((n, f) => n + f.length, 0);
-  if (!Number.isInteger(sampleRate) || sampleRate < 8000 || sampleRate > 48000 || !muestras || muestras * 2 > 60_000_000) throw new Error("Pista fuera de presupuesto");
+  if (!Number.isInteger(sampleRate) || sampleRate < 8000 || sampleRate > 48000 || !muestras || muestras * 2 > PISTA_MAX_PCM_BYTES) throw new Error("Pista fuera de presupuesto");
   const bytes = new ArrayBuffer(44 + muestras * 2), vista = new DataView(bytes);
   const texto = (pos: number, valor: string) => { for (let i = 0; i < valor.length; i++) vista.setUint8(pos + i, valor.charCodeAt(i)); };
   texto(0, "RIFF"); vista.setUint32(4, 36 + muestras * 2, true); texto(8, "WAVE"); texto(12, "fmt ");

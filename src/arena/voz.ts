@@ -2,9 +2,9 @@ import type { ComentarioArena } from "./narrador";
 import { credencialAzure, endpointAzure } from "../lib/azure";
 import { trazar } from "../lib/telemetria";
 import { createHash } from "node:crypto";
-import type { FragmentoVoz } from "./expresion";
+import type { FragmentoVoz, TipoTramoCanto } from "./expresion";
 import type { RegistroArena } from "./tipos";
-import { MESA_ARENA } from "../sim/limites";
+import { CANTO_GOL, MESA_ARENA } from "../sim/limites";
 
 export const VERSION_VOZ = "voz-expresiva-v1";
 const formato = "audio-24khz-48kbitrate-mono-mp3";
@@ -13,7 +13,8 @@ const formato = "audio-24khz-48kbitrate-mono-mp3";
 // Brief 045: voces del comentarista y del estadista consultadas el 20 de octubre.
 const estilosAdmitidos: Record<string, readonly string[]> = {
   "es-MX-JorgeNeural": ["chat", "cheerful"], "es-MX-DaliaNeural": [], "es-MX-GerardoNeural": [],
-  "en-US-JennyNeural": ["excited", "sad"], "en-US-GuyNeural": ["excited", "sad", "newscast"], "en-US-DavisNeural": ["chat"],
+  // Brief 050 v1.1 (5): `shouting` de Jenny y de Guy, catálogo real del 22 oct (canto-gol-050/catalogo-estilos.json).
+  "en-US-JennyNeural": ["excited", "sad", "shouting"], "en-US-GuyNeural": ["excited", "sad", "newscast", "shouting"], "en-US-DavisNeural": ["chat"],
 };
 type Idioma = "es" | "en";
 export type RolVoz = "narrador" | "comentarista" | "estadista";
@@ -53,6 +54,24 @@ export function asignarVoces(idioma: Idioma, catalogo?: ReadonlySet<string> | nu
 }
 export const vocesDe = (asignacion: Record<RolVoz, AsignacionVoz>): Record<RolVoz, string> => ({ narrador: asignacion.narrador.voz, comentarista: asignacion.comentarista.voz, estadista: asignacion.estadista.voz });
 
+const tiposCanto: readonly TipoTramoCanto[] = ["grito", "goleador", "hechos", "autogol"];
+/** Brief 050 v1.1 · Canto de gol: un único `<s>` con un `express-as`/`prosody` por tramo, sin `<s>`
+ * ni `<break>` entre tramos (cada frontera cuesta ≈ 1 s) y el silencio final de CANTO_GOL. Prosodia
+ * y styledegree de CANTO_GOL.tramos; estilo de CANTO_GOL.estilos filtrado por la voz efectiva. Solo
+ * el narrador con `jubilo` y con `texto` igual a los tramos unidos. */
+function parteCanto(f: FragmentoVoz, rol: RolVoz, voz: string, idioma: Idioma): string {
+  const tramos = f.canto!.tramos;
+  if (rol !== "narrador" || f.emocion !== "jubilo" || !Array.isArray(tramos) || !tramos.length || tramos.some(t => !t.texto || !tiposCanto.includes(t.tipo)) || f.texto !== tramos.map(t => t.texto).join(" ")) throw new Error("Interpretación de voz inválida");
+  const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
+  const frases = tramos.map(t => {
+    const p = CANTO_GOL.tramos[t.tipo], deseado: string = CANTO_GOL.estilos[idioma][t.tipo];
+    const estilo = estilosAdmitidos[voz]!.includes(deseado) ? deseado : undefined;
+    const prosodia = `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">${escapar(t.texto)}</prosody>`;
+    return estilo ? `<mstts:express-as style="${estilo}" styledegree="${p.grado.toFixed(2)}">${prosodia}</mstts:express-as>` : prosodia;
+  });
+  return `<s>${frases.join("")}<break time="${CANTO_GOL.pausaFinalMs}ms"/></s>`;
+}
+
 /** Un documento por tramo: varias interpretaciones sin multiplicar solicitudes. Los fragmentos
  * contiguos del mismo rol comparten un `<voice>`; una intervención puede llevar dos hermanos. */
 export function prepararVoz(fragmentos: readonly FragmentoVoz[], idioma: Idioma, voces?: Partial<Record<RolVoz, string>>) {
@@ -68,6 +87,11 @@ export function prepararVoz(fragmentos: readonly FragmentoVoz[], idioma: Idioma,
     const rol = f.rol ?? "narrador";
     if (!roles.includes(rol) || !f.texto || !Number.isFinite(f.intensidad) || f.intensidad < 0 || f.intensidad > 1 || !Number.isInteger(f.variante) || f.variante < 0 || f.variante > 3) throw new Error("Interpretación de voz inválida");
     const voz = vozDe(rol);
+    if (f.canto) {
+      const ultimo = grupos.at(-1), parte = parteCanto(f, rol, voz, idioma);
+      if (ultimo && ultimo.rol === rol) ultimo.partes.push(parte); else grupos.push({ rol, voz, partes: [parte] });
+      continue;
+    }
     const variacion = [-1, 0, 1, 2][f.variante]!;
     const activa = ["tension", "emocion", "sorpresa", "jubilo"].includes(f.emocion);
     const ritmo = (activa ? 4 + f.intensidad * 9 : f.emocion === "decepcion" ? -6 : 0) + variacion;

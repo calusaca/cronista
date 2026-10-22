@@ -143,6 +143,11 @@ function esFinal(registro: RegistroArena, tick: number, eventos: readonly Evento
   return tick * ARENA.pasoS >= registro.config.duracionS - 1e-9 || eventos.some(e => e.tipo === "final_anticipado") || fotogramasFinalizados;
 }
 
+/** Brief 053 · La misma regla del § 1 (v1.1) sobre el prefijo ≤ tick, sin leer `registro.final`. */
+export function finalDelPrefijo(registro: RegistroArena, tick: number): boolean {
+  return esFinal(registro, tick, registro.eventos.filter(e => e.tick <= tick), registro.fotogramas.some(f => f.tick <= tick && !!f.finalizado));
+}
+
 export function agregarPrefijo(registro: RegistroArena, tick: number): AgregadoPrefijo {
   const eventos = registro.eventos.filter(e => e.tick <= tick);
   const fotogramas = registro.fotogramas.filter(f => f.tick <= tick);

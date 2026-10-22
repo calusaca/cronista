@@ -31,9 +31,16 @@ export function manoAMano(estado: EstadoArena, ladoPortero: Lado, radioM: number
   return estado.jugadores.filter(j => j.lado === ladoPortero && j.puesto !== "POR").every(d => transformar(d.posicion, p.lado).x <= o.x) ? p : null;
 }
 
+/** Brief 051: dirección (coordenadas orientadas del portero) de la línea centro del arco propio–balón
+ * y distancia del balón a ese centro. La comparten la salida (046) y el posicionamiento (051). */
+export function lineaArcoBalon(balon: Punto, lado: Lado): { dx: number; dy: number; d: number } {
+  const b = transformar(balon, lado), dx = b.x, dy = b.y - MEDIO_Y;
+  return { dx, dy, d: Math.hypot(dx, dy) };
+}
+
 /** Destino de la salida: C + u·s, con C el centro del arco propio y u la dirección al balón. */
 export function destinoSalida(balon: Punto, lado: Lado): Punto {
-  const b = transformar(balon, lado), dx = b.x, dy = b.y - MEDIO_Y, d = Math.hypot(dx, dy);
+  const { dx, dy, d } = lineaArcoBalon(balon, lado);
   if (!d) return transformar({ x: ARENA.controlM, y: MEDIO_Y }, lado);
   const s = Math.min(PO.salidaMaxM, Math.max(ARENA.controlM, d - Math.max(PO.salidaHolguraM, PO.salidaFraccion * d)));
   return transformar({ x: dx / d * s, y: MEDIO_Y + dy / d * s }, lado);

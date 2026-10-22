@@ -1,4 +1,4 @@
-import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 import { VOZ_BUFFER } from "./buffer";
 import type { RecuerdoVoz } from "./editorial";
 import type { IntervencionArena, TurnoMesa, VarianteIntercambio } from "./protocolo";
@@ -12,7 +12,8 @@ export type EstadoVariante =
   | { estado: "inexistente" | "pendiente" | "invalida" | "fallida" }
   | { estado: "valida"; duracionS: number };
 /** v1.2 (6) · `origen` distingue los diarios del 045 (sin turnos) de los intercambios del 048. */
-export interface CandidataTurno { id: string; rol: Rol; tick: number; origen: "045" | "048"; completa: EstadoVariante; breve: EstadoVariante }
+/** Brief 050 v1.1 (3) · `tema` es el de la intervención (`intervencion.tema`): decide su caducidad. */
+export interface CandidataTurno { id: string; rol: Rol; tick: number; origen: "045" | "048"; tema: string; completa: EstadoVariante; breve: EstadoVariante }
 export interface EntradaTurno {
   partidoS: number;                 // cursor visible
   ahoraAudioS: number;              // reloj Web Audio
@@ -36,9 +37,14 @@ const valida = (v: EstadoVariante): v is { estado: "valida"; duracionS: number }
 /** Puede llegar a sonar: válida o aún pendiente. */
 const posible = (v: EstadoVariante) => v.estado === "valida" || v.estado === "pendiente";
 
+/** Brief 050 v1.1 (3) · Caducidad (segundos de partido) de una candidatura según su tema: tras un gol,
+ * CANTO_GOL.caducidadInvitadoTrasGolS (el canto y la calma ocupan casi la general); el resto, la del 045. */
+export function caducidadInvitadoS(tema: string): number {
+  return tema === "gol" ? CANTO_GOL.caducidadInvitadoTrasGolS : MESA_ARENA.caducidadInvitadoS;
+}
 const edadS = (c: CandidataTurno, e: EntradaTurno) => e.partidoS - c.tick * ARENA.pasoS;
 /** Caducidad propia del invitado (no el atraso del narrador): ni vieja ni futura. */
-const aTiempo = (c: CandidataTurno, e: EntradaTurno) => c.rol !== "narrador" && edadS(c, e) <= MESA_ARENA.caducidadInvitadoS && c.tick * ARENA.pasoS <= e.partidoS + 1e-6;
+const aTiempo = (c: CandidataTurno, e: EntradaTurno) => c.rol !== "narrador" && edadS(c, e) <= caducidadInvitadoS(c.tema) && c.tick * ARENA.pasoS <= e.partidoS + 1e-6;
 const conFuturo = (c: CandidataTurno) => posible(c.completa) || posible(c.breve);
 const conValida = (c: CandidataTurno) => valida(c.completa) || valida(c.breve);
 
@@ -61,7 +67,7 @@ export function varianteElegible(c: CandidataTurno, ventanaS: number | null): Va
 /** Candidaturas que ya no pueden sonar: caducadas, sin ninguna variante válida ni pendiente, o
  * superadas por una más reciente del mismo rol con alguna variante válida que ya alcanzó el cursor. */
 export function descartesTurno(e: EntradaTurno): string[] {
-  const fuera = e.candidatas.filter(c => c.rol === "narrador" || edadS(c, e) > MESA_ARENA.caducidadInvitadoS || !conFuturo(c)).map(c => c.id);
+  const fuera = e.candidatas.filter(c => c.rol === "narrador" || edadS(c, e) > caducidadInvitadoS(c.tema) || !conFuturo(c)).map(c => c.id);
   const superadas = e.candidatas.filter(c => aTiempo(c, e) && e.candidatas.some(o => o.rol === c.rol && o.tick > c.tick && aTiempo(o, e) && conValida(o))).map(c => c.id);
   return [...new Set([...fuera, ...superadas])];
 }
@@ -166,10 +172,11 @@ export type FalloInvitado = { tipo: "http"; estado: number } | { tipo: "red" } |
  * de los invitados) o un fallo de red/plazo se reintentan, con espera exponencial desde
  * `MESA_ARENA.reintentoInvitadoMs`, hasta `MESA_ARENA.maxReintentosInvitado` reintentos y solo
  * mientras la intervención no haya caducado (`edadS`, segundos de partido desde su tick hasta el
- * cursor; `null` en la repetición guardada, que no tiene caducidad). */
-export function esperaReintentoInvitado(fallo: FalloInvitado, reintentosHechos: number, edadS: number | null): number | null {
+ * cursor; `null` en la repetición guardada, que no tiene caducidad). Brief 050 v1.1 (3): la caducidad
+ * es la del `tema` de la intervención (`caducidadInvitadoS(tema)`). */
+export function esperaReintentoInvitado(fallo: FalloInvitado, reintentosHechos: number, edadS: number | null, tema = ""): number | null {
   const reintentable = fallo.tipo === "red" || fallo.tipo === "http" && fallo.estado === 429;
   if (!reintentable || !Number.isInteger(reintentosHechos) || reintentosHechos < 0 || reintentosHechos >= MESA_ARENA.maxReintentosInvitado) return null;
-  if (edadS !== null && !(edadS <= MESA_ARENA.caducidadInvitadoS)) return null;
+  if (edadS !== null && !(edadS <= caducidadInvitadoS(tema))) return null;
   return MESA_ARENA.reintentoInvitadoMs * 2 ** reintentosHechos;
 }

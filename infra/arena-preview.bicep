@@ -14,6 +14,26 @@ param speechEndpoint string
 param agentVersion string
 @secure()
 param insightsConnectionString string
+@description('Brief 052: host de Foundry Models (https://<recurso>.services.ai.azure.com, sin /anthropic). Lo pasa deploy-azure-arena.mjs desde FOUNDRY_BASE_URL.')
+param foundryEndpoint string
+@description('Brief 052: catálogo publicado, derivado por deploy-azure-arena.mjs de infra/modelos-arena.json (solo entradas con publicar: true). Cada elemento: { id, nombre, prefijo, llm, deployment, formatoJson, esfuerzoRazonamiento }.')
+param modelos array
+
+// Brief 052: variables por modelo. La clave de Foundry Models es el mismo secreto
+// `inferencia` (clave del recurso); nada nuevo en Key Vault.
+var envModelos = flatten(map(modelos, m => m.llm == 'foundry-modelos' ? concat([
+  { name: '${m.prefijo}LLM', value: 'foundry-modelos' }
+  { name: '${m.prefijo}FOUNDRY_MODELOS_ENDPOINT', value: foundryEndpoint }
+  { name: '${m.prefijo}FOUNDRY_MODELOS_API_KEY', secretRef: 'inferencia' }
+  { name: '${m.prefijo}FOUNDRY_MODELOS_DEPLOYMENT', value: m.deployment }
+  { name: '${m.prefijo}FOUNDRY_MODELOS_FORMATO_JSON', value: m.formatoJson }
+], empty(m.esfuerzoRazonamiento) ? [] : [
+  // v1.2 (coordinador): esfuerzo de razonamiento solo para los modelos que lo declaran.
+  { name: '${m.prefijo}FOUNDRY_MODELOS_ESFUERZO_RAZONAMIENTO', value: m.esfuerzoRazonamiento }
+]) : [
+  { name: '${m.prefijo}LLM', value: 'azure-openai' }
+  { name: '${m.prefijo}AZURE_OPENAI_DEPLOYMENT', value: m.deployment }
+]))
 
 resource environment 'Microsoft.App/managedEnvironments@2025-01-01' existing = { name: 'cronista-env' }
 resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = { name: registryName }
@@ -36,7 +56,7 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
       ]
     }
     template: {
-      containers: [{ name: 'cronista', image: '${registry.properties.loginServer}/cronista:${imageTag}', resources: { cpu: json('0.5'), memory: '1Gi' }, env: [
+      containers: [{ name: 'cronista', image: '${registry.properties.loginServer}/cronista:${imageTag}', resources: { cpu: json('0.5'), memory: '1Gi' }, env: concat([
         // La portada histórica permanece offline; esta publicación sirve la arena.
         { name: 'CRONISTA_LLM', value: 'stub' }
         { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
@@ -44,11 +64,7 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
         { name: 'AZURE_OPENAI_API_KEY', secretRef: 'inferencia' }
         { name: 'AZURE_OPENAI_REASONING_EFFORT', value: 'low' }
         { name: 'ARENA_WEB_LLM', value: '1' }
-        { name: 'ARENA_MODELOS', value: '[{"id":"equilibrado","nombre":"GPT-5.6 Luna","prefijo":"ARENA_EQUILIBRADO_"},{"id":"rapido","nombre":"GPT-5.4 mini","prefijo":"ARENA_RAPIDO_"}]' }
-        { name: 'ARENA_EQUILIBRADO_LLM', value: 'azure-openai' }
-        { name: 'ARENA_EQUILIBRADO_AZURE_OPENAI_DEPLOYMENT', value: 'cronista-equilibrado' }
-        { name: 'ARENA_RAPIDO_LLM', value: 'azure-openai' }
-        { name: 'ARENA_RAPIDO_AZURE_OPENAI_DEPLOYMENT', value: 'cronista-rapido' }
+        { name: 'ARENA_MODELOS', value: string(map(modelos, m => { id: m.id, nombre: m.nombre, prefijo: m.prefijo })) }
         { name: 'ARENA_NARRADOR_LLM', value: '1' }
         { name: 'ARENA_NARRADOR_MODELO', value: 'rapido' }
         { name: 'ARENA_BLOB_ENDPOINT', value: blobEndpoint }
@@ -64,7 +80,7 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
         { name: 'CRONISTA_TELEMETRIA', value: '1' }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', secretRef: 'insights' }
         { name: 'OTEL_SERVICE_NAME', value: 'cronista-arena' }
-      ], probes: [
+      ], envModelos), probes: [
         { type: 'Startup', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 2, failureThreshold: 90 }
         { type: 'Readiness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 10, failureThreshold: 3 }
         { type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 20, failureThreshold: 3 }

@@ -1,5 +1,6 @@
 // Brief 047 · Contraste WCAG de pares clave de /arena medido sobre estilos computados.
-// Uso (desde la raíz del repo): node docs/evidencia/rediseno-047/contraste.mjs [URL]
+// Uso (desde la raíz del repo): node docs/evidencia/rediseno-047/contraste.mjs [URL] [SEGUNDO]
+// (brief 050: SEGUNDO opcional del deslizador, 40 por defecto; con un gol en curso mide rótulo y anillo).
 // Por defecto mide la arena pública con un partido terminado. Sale con código 1 si algún
 // par presente falla su mínimo o si falta un elemento marcado como obligatorio.
 import { chromium } from "@playwright/test";
@@ -50,6 +51,10 @@ const PARES = [
   ["rótulo panel / chip", ".arena-intelligence .overline", "color", null, null, 4.5, true],
   ["enlace evidencia / chip", ".arena-evidence-link", "color", null, null, 4.5, false],
   ["resumen desplegable / panel", ".arena-setup > summary", "color", null, null, 4.5, true],
+  // Brief 050: rótulo del gol (mismos tokens que el marcador) y anillo del goleador; solo existen
+  // durante la celebración, así que no son obligatorios.
+  ["rótulo de gol / fondo", ".arena-goal-banner", "color", null, null, 4.5, false],
+  ["anillo del goleador / césped", "circle.arena-goal-ring", "stroke", [".arena-grass", ".arena-stripe"], "fill", 3, false],
 ];
 
 const browser = await chromium.launch();
@@ -60,7 +65,7 @@ for (const tema of ["light", "dark"]) {
   await page.goto(URL_ARENA, { waitUntil: "networkidle", timeout: 90000 });
   await page.getByTestId("arena-pitch").waitFor();
   const slider = page.getByRole("slider", { name: "Match time" });
-  if (await slider.count()) { await slider.fill("40"); await page.waitForTimeout(500); }
+  if (await slider.count()) { await slider.fill(process.argv[3] ?? "40"); await page.waitForTimeout(500); }
   const filas = await page.evaluate((PARES) => {
     const rgb = s => { const m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 }; };
     const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };

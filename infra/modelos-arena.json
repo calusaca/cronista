@@ -1,0 +1,60 @@
+[
+  {
+    "nombre": "cronista-equilibrado",
+    "modelo": "gpt-5.6-luna",
+    "version": "2026-07-09",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "equilibrado",
+    "nombrePublico": "GPT-5.6 Luna",
+    "llm": "azure-openai",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-rapido",
+    "modelo": "gpt-5.4-mini",
+    "version": "2026-03-17",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "rapido",
+    "nombrePublico": "GPT-5.4 mini",
+    "llm": "azure-openai",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-luna6",
+    "modelo": "gpt-6-luna",
+    "version": "2026-09-22",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "luna6",
+    "nombrePublico": "GPT-6 Luna",
+    "llm": "azure-openai",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-grok",
+    "modelo": "grok-4.7",
+    "version": "1",
+    "formato": "xAI",
+    "capacidad": 10,
+    "id": "grok",
+    "nombrePublico": "Grok 4.7 (Foundry)",
+    "llm": "foundry-modelos",
+    "formatoJson": "json_schema",
+    "publicar": false,
+    "esfuerzoRazonamiento": "low"
+  },
+  {
+    "nombre": "cronista-oss",
+    "modelo": "gpt-oss-120b",
+    "version": "1",
+    "formato": "OpenAI-OSS",
+    "capacidad": 50,
+    "id": "oss",
+    "nombrePublico": "gpt-oss-120b (open weights, Foundry)",
+    "llm": "foundry-modelos",
+    "formatoJson": "json_object",
+    "publicar": false
+  }
+]

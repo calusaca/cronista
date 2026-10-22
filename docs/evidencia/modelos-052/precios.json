@@ -1,0 +1,260 @@
+{
+  "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+  "consultadoUtc": "2026-10-22T05:39:56.892Z",
+  "consultadoPor": "Opus (implementación brief 052), por decisión del coordinador: sin acceso al portal",
+  "moneda": "USD",
+  "unidad": "USD por millón de tokens",
+  "region": "northcentralus",
+  "sku": "Global Standard, contexto corto",
+  "modelos": [
+    {
+      "deployment": "cronista-equilibrado",
+      "modelo": "gpt-5.6-luna",
+      "entrada": 0.2,
+      "salida": 1.2,
+      "cache": 0.02,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "5.6 luna ShortCo Inp Std Gl 1M Tokens",
+          "meterId": "e8cf8e0e-6c2f-579a-bebd-6b04d35d29a1",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.6 luna ShortCo Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.2,
+          "usdPorMillon": 0.2,
+          "effectiveStartDate": "2026-08-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "5.6 luna ShortCo Opt Std Gl 1M Tokens",
+          "meterId": "4491b9b1-9d42-5690-98d9-d679443dd8d5",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.6 luna ShortCo Opt Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 1.2,
+          "usdPorMillon": 1.2,
+          "effectiveStartDate": "2026-08-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "5.6 luna ShortCo Cd Inp Std Gl 1M Tokens",
+          "meterId": "252ebb7b-16b2-583b-860f-1cbb699ad800",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.6 luna ShortCo Cd Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.02,
+          "usdPorMillon": 0.02,
+          "effectiveStartDate": "2026-08-01T00:00:00Z"
+        }
+      }
+    },
+    {
+      "deployment": "cronista-rapido",
+      "modelo": "gpt-5.4-mini",
+      "entrada": 0.75,
+      "salida": 4.5,
+      "cache": 0.075,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "5.4 mini Inp Gl 1M Tokens",
+          "meterId": "0c8fe48b-3087-57fa-acf0-c55ae76566cf",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.4 mini Inp Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.75,
+          "usdPorMillon": 0.75,
+          "effectiveStartDate": "2026-03-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "5.4 mini Opt Gl 1M Tokens",
+          "meterId": "9f18d9d0-8385-5037-a302-77bc7231201c",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.4 mini Opt Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 4.5,
+          "usdPorMillon": 4.5,
+          "effectiveStartDate": "2026-03-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "5.4 mini cd Inp Gl 1M Tokens",
+          "meterId": "c7fd7588-0f39-5661-9f9a-b7022b4139b4",
+          "productName": "Azure OpenAI GPT5",
+          "skuName": "5.4 mini cd Inp Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.075,
+          "usdPorMillon": 0.075,
+          "effectiveStartDate": "2026-03-01T00:00:00Z"
+        }
+      }
+    },
+    {
+      "deployment": "cronista-luna6",
+      "modelo": "gpt-6-luna",
+      "entrada": 0.1,
+      "salida": 0.5,
+      "cache": 0.01,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "6-luna ShortCo Inp Std Gl 1M Tokens",
+          "meterId": "a52f140b-b418-5028-9f89-2575a6dbcabd",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-luna ShortCo Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.1,
+          "usdPorMillon": 0.1,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "6-luna ShortCo Opt Std Gl 1M Tokens",
+          "meterId": "6330fe4f-3788-5241-a3b8-95bab64bb4b7",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-luna ShortCo Opt Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.5,
+          "usdPorMillon": 0.5,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "6-luna ShortCo Cd Inp Std Gl 1M Tokens",
+          "meterId": "f8e0b27f-d426-5123-af8d-73da781b8821",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-luna ShortCo Cd Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.01,
+          "usdPorMillon": 0.01,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        }
+      }
+    },
+    {
+      "deployment": "cronista-grok",
+      "modelo": "grok-4.7",
+      "entrada": 2,
+      "salida": 6,
+      "cache": 0.5,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "4.7 Inp glbl 1M Tokens",
+          "meterId": "5949a768-1287-5e1a-a637-267f057bfe3e",
+          "productName": "Azure Grok Models",
+          "skuName": "4.7 Inp glbl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 2,
+          "usdPorMillon": 2,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "4.7 Outp glbl 1M Tokens",
+          "meterId": "6665770a-f8c9-578b-aa0d-66163e95b836",
+          "productName": "Azure Grok Models",
+          "skuName": "4.7 Outp glbl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 6,
+          "usdPorMillon": 6,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "4.7 Cached glbl 1M Tokens",
+          "meterId": "30cda1e4-5916-567a-b3a6-13d61e8acfab",
+          "productName": "Azure Grok Models",
+          "skuName": "4.7 Cached glbl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.5,
+          "usdPorMillon": 0.5,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        }
+      },
+      "nota": "Existen medidores «L» (contexto largo: 4 / 12 / 1 USD); el umbral de contexto largo no figura en la API. Los prompts de la arena (~8 K tokens) se asumen de contexto corto. reasoning_tokens se informan fuera de completion_tokens y se facturan como salida."
+    },
+    {
+      "deployment": "cronista-oss",
+      "modelo": "gpt-oss-120b",
+      "entrada": 0.15,
+      "salida": 0.6,
+      "cache": null,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "gpt-oss-120B Inp glbl Tokens",
+          "meterId": "9afa9a77-a75e-5b68-b124-3e389a06d712",
+          "productName": "Azure OpenAI OSS Models",
+          "skuName": "gpt-oss-120B Inp glbl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1K",
+          "retailPrice": 0.00015,
+          "usdPorMillon": 0.15,
+          "effectiveStartDate": "2026-03-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "gpt-oss-120B Outp glbl Tokens",
+          "meterId": "777c3301-e0ff-5df6-a8c5-4206aaa58866",
+          "productName": "Azure OpenAI OSS Models",
+          "skuName": "gpt-oss-120B Outp glbl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1K",
+          "retailPrice": 0.0006,
+          "usdPorMillon": 0.6,
+          "effectiveStartDate": "2026-03-01T00:00:00Z"
+        }
+      },
+      "nota": "Medidor por 1K tokens (0,00015 / 0,0006 USD) convertido a 1M. Sin medidor de caché: se aplica el precio de entrada."
+    }
+  ],
+  "presupuesto": {
+    "creditoInicialUsd": 150,
+    "creditoRestanteUsd": null,
+    "hipotesisCreditoRestanteUsd": 50,
+    "hipotesisNota": "hipótesis pendiente de confirmar por Carlos; el último dato verificado fue 150 USD el 10 oct (decisión del coordinador, 22 oct)",
+    "fechaFin": "2026-11-10",
+    "partidosModeloPorDia": 10,
+    "margenUsd": 30,
+    "formula": "(costoMaxPartidoLLM × partidosModeloPorDia + speechUsdDia) × díasHastaFechaFin ≤ crédito − margen; costoMaxPartidoLLM = 2 × max(costo por lado) + narrador/comentarista (12 llamadas en cronista-rapido, 1.200 tokens de salida, entrada acotada por el prompt máximo observado)"
+  },
+  "speech": {
+    "servicio": "Foundry Tools / Azure Speech",
+    "meterName": "S1 Neural Text To Speech Characters",
+    "meterId": "0f98e708-a16c-407b-8089-a0ed9e14ab49",
+    "region": "northcentralus",
+    "usdPorMillonCaracteres": 15,
+    "caracteresPorDiaMax": 120000,
+    "tipo": "precio de lista (Retail Prices API)"
+  },
+  "capacidades": [
+    {
+      "deployment": "cronista-luna6",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:37Z",
+      "motivo": "429 en el espejo del smoke con capacidad 30 (decisión del coordinador)"
+    },
+    {
+      "deployment": "cronista-equilibrado",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:40Z",
+      "motivo": "riesgo de 429 público con el mismo modelo en ambos lados (decisión del coordinador)"
+    },
+    {
+      "deployment": "cronista-rapido",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:42Z",
+      "motivo": "riesgo de 429 público: entrenador + narrador/comentarista (decisión del coordinador)"
+    }
+  ],
+  "capacidadNota": "GlobalStandard factura por token; la capacidad solo fija el límite de TPM y no cuesta en reposo."
+}

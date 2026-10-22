@@ -1,4 +1,4 @@
-import { ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL } from "../sim/limites";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
 
 /** Interpolación visual de estados del motor. Los reinicios declarados cortan el
@@ -24,6 +24,20 @@ export function estadoVisual(registro: RegistroArena, segundos: number, discreto
     x: interpolar(j.posicion.x, b.jugadores.find(p => p.id === j.id)?.posicion.x ?? j.posicion.x), y: interpolar(j.posicion.y, b.jugadores.find(p => p.id === j.id)?.posicion.y ?? j.posicion.y),
   } })), balon: { ...a.balon, posicion: corte ? a.balon.posicion : { x: interpolar(a.balon.posicion.x, b.balon.posicion.x), y: interpolar(a.balon.posicion.y, b.balon.posicion.y) } } };
 }
+/** Brief 050 v1.1 (4) · Gol en celebración en el cursor visible `tick` (puede ser fraccionario): el de
+ * mayor tick con 0 ≤ tick − gol.tick < CANTO_GOL.celebracionS / ARENA.pasoS, buscado en todos los
+ * eventos (retroceder el cursor funciona). Sin temporizadores ni estado: un gol futuro nunca cuenta. */
+export function golEnCelebracion(registro: RegistroArena, tick: number): EventoArena | null {
+  const ventana = CANTO_GOL.celebracionS / ARENA.pasoS;
+  let elegido: EventoArena | null = null;
+  for (const e of registro.eventos) {
+    const edad = tick - e.tick;
+    // Misma tolerancia que el marcador de estadoVisual: en el tick exacto del gol ya celebra.
+    if (e.tipo === "gol" && edad >= -1e-9 && edad < ventana && (!elegido || e.tick > elegido.tick)) elegido = e;
+  }
+  return elegido;
+}
+
 export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, idioma: "es" | "en"): string {
   const plantilla = [...registro.inicial.jugadores, ...registro.inicial.banco ?? []];
   const j = plantilla.find(j => j.id === evento.jugador)!;
@@ -43,6 +57,8 @@ export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, 
   if (evento.tipo === "pase" && evento.motivo === "saque_manos") return idioma === "es"
     ? `${nombre} pone el balón en juego desde sus manos hacia ${receptor?.nombre ?? "el centro del campo"} (${metros} m).` : `${nombre} puts the ball back in play from the hands towards ${receptor?.nombre ?? "midfield"} (${metros} m).`;
   if (evento.tipo === "atajada" && evento.motivo === "desvio") return idioma === "es" ? `${nombre} desvía el remate; el balón sigue en juego.` : `${nombre} deflects the shot; the ball stays in play.`;
+  // Brief 051: remate por encima del travesaño (reinicios-v5); sin motivo, el texto genérico de abajo.
+  if (evento.tipo === "tiro_fuera" && evento.motivo === "alto") return idioma === "es" ? `El remate de ${nombre} se va por encima del travesaño.` : `${nombre}'s shot goes over the bar.`;
   const textos = idioma === "es" ? {
     pase: `${nombre} intenta un pase de ${metros} m hacia ${receptor?.nombre ?? "un compañero"}.`,
     recepcion: `${nombre} recibe el balón.`, intercepcion: `${nombre} intercepta la trayectoria del balón.`,

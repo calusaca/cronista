@@ -1,0 +1,115 @@
+{
+  "consultadoUtc": "2026-10-22T05:40:00Z",
+  "fuente": "az cognitiveservices account deployment create / list (Azure CLI), recurso <recurso> (AIServices, northcentralus), grupo rg-carlos.sandi-6716",
+  "nota": "Comandos exactos del brief 052 (sección «Deployments») más cronista-oss por decisión del coordinador (gpt-oss-120b, última reserva del brief). La CLI crea los deployments con versionUpgradeOption = OnceNewDefaultVersionAvailable (también los dos de 2026-10-19); infra/modelos-arena.bicep declara NoAutoUpgrade: la plantilla es reproducción, no el estado vivo.",
+  "intentos": [
+    {
+      "deployment": "cronista-luna6",
+      "modelo": "gpt-6-luna",
+      "version": "2026-09-22",
+      "formato": "OpenAI",
+      "capacidadPedida": 30,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 30
+    },
+    {
+      "deployment": "cronista-deepseek",
+      "modelo": "DeepSeek-V4-Flash",
+      "version": "2026-04-23",
+      "formato": "DeepSeek",
+      "capacidadPedida": 50,
+      "resultado": "fallido",
+      "error": "(InsufficientQuota) This operation require 50 new capacity in quota Requests Per Minute - DeepSeek-V4-Flash, which is bigger than the current available capacity 0. The current quota usage is 0 and the quota limit is 0 for quota Requests Per Minute - DeepSeek-V4-Flash."
+    },
+    {
+      "deployment": "cronista-llama",
+      "modelo": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+      "version": "1",
+      "formato": "Meta",
+      "capacidadPedida": 10,
+      "resultado": "fallido",
+      "error": "(InsufficientQuota) This operation require 10 new capacity in quota Tokens Per Minute (thousands) - Llama-4-Maverick-17B-128E-Instruct-FP8, which is bigger than the current available capacity 0. The current quota usage is 0 and the quota limit is 0 for quota Tokens Per Minute (thousands) - Llama-4-Maverick-17B-128E-Instruct-FP8."
+    },
+    {
+      "deployment": "cronista-llama",
+      "modelo": "Llama-4-Scout-17B-16E-Instruct",
+      "version": "1",
+      "formato": "Meta",
+      "capacidadPedida": 10,
+      "resultado": "fallido",
+      "error": "(UserError) Error occurred when subscribing to Marketplace: Marketplace Subscription purchase eligibility check failed, error message [Publisher 'metagenai' does not offer product 'llama-4-scout-17b-16e-instruct-offer', plan 'llama-4-scout-17b-16e-instruct-plan', in your subscription/Azure account's region 'CR'.]"
+    },
+    {
+      "deployment": "cronista-grok",
+      "modelo": "grok-4.7",
+      "version": "1",
+      "formato": "xAI",
+      "capacidadPedida": 10,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 10
+    },
+    {
+      "deployment": "cronista-mistral",
+      "modelo": "mistral-medium-2505",
+      "version": "1",
+      "formato": "Mistral AI",
+      "capacidadPedida": 10,
+      "resultado": "fallido",
+      "error": "(UserError) Error occurred when subscribing to Marketplace: Marketplace Subscription purchase eligibility check failed, error message [Publisher '000-000' does not offer product 'mistral-medium-2505', plan 'mistral-medium-2505-paid-tier', in your subscription/Azure account's region 'CR'.]"
+    },
+    {
+      "deployment": "cronista-oss",
+      "modelo": "gpt-oss-120b",
+      "version": "1",
+      "formato": "OpenAI-OSS",
+      "capacidadPedida": 50,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 50
+    }
+  ],
+  "noProbados": [
+    {
+      "id": "deepseek",
+      "nombre": "DeepSeek-V4-Flash",
+      "causa": "no probado: cuota GlobalStandard 0 en la suscripción (InsufficientQuota); sin deployment"
+    },
+    {
+      "id": "llama",
+      "nombre": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+      "causa": "no probado: cuota GlobalStandard 0 en la suscripción (InsufficientQuota); sin deployment"
+    },
+    {
+      "id": "llama-scout",
+      "nombre": "Llama-4-Scout-17B-16E-Instruct",
+      "causa": "no probado: Marketplace no ofrece el producto a la región de facturación de la cuenta (CR); sin deployment"
+    },
+    {
+      "id": "mistral",
+      "nombre": "mistral-medium-2505",
+      "causa": "no probado: Marketplace no ofrece el producto a la región de facturación de la cuenta (CR); sin deployment"
+    }
+  ],
+  "cambiosDeCapacidad": [
+    {
+      "deployment": "cronista-luna6",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:37Z",
+      "motivo": "429 en el espejo del smoke con capacidad 30 (decisión del coordinador)"
+    },
+    {
+      "deployment": "cronista-equilibrado",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:40Z",
+      "motivo": "riesgo de 429 público con el mismo modelo en ambos lados (decisión del coordinador)"
+    },
+    {
+      "deployment": "cronista-rapido",
+      "antes": 30,
+      "despues": 100,
+      "cambioUtc": "2026-10-22T05:54:42Z",
+      "motivo": "riesgo de 429 público: entrenador + narrador/comentarista (decisión del coordinador)"
+    }
+  ]
+}

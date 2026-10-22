@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BUFFER_ARENA, firmaEstadoVoz, planVozBuffer, RelojBuffer, VOZ_BUFFER } from "../arena/buffer";
+import { BUFFER_ARENA, firmaEstadoVoz, golSuperado, planVozBuffer, RelojBuffer, VOZ_BUFFER } from "../arena/buffer";
 import { estadoVisual } from "../arena/vista";
 import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import { elegirReservaVoz, ordenPrimeraVuelta, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
 import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../arena/reservas-voz";
-import { calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
+import { caducidadInvitadoS, calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { ARENA, MESA_ARENA, RESERVAS_VOZ } from "../sim/limites";
 
@@ -22,7 +22,8 @@ type VarianteLocal = { estado: "inexistente" | "sin-pedir" | "pidiendo" | "valid
 const pedible = (v: VarianteLocal) => v.estado === "sin-pedir" && (v.noAntesDe === undefined || v.noAntesDe <= performance.now());
 type InvitadoLocal = { intervencion: IntervencionArena; completa: VarianteLocal; breve: VarianteLocal };
 const estadoCoordinador = (v: VarianteLocal): EstadoVariante => v.estado === "valida" ? { estado: "valida", duracionS: v.clip!.audio.duration } : v.estado === "sin-pedir" || v.estado === "pidiendo" ? { estado: "pendiente" } : { estado: v.estado };
-type Activa = { fuente: AudioBufferSourceNode; fin: number; prioridad: number; recuerdo: RecuerdoVoz; rol: Rol };
+/** Brief 050 v1.1 (1): `tick` del clip activo (evento del narrador, intervención o cursor de la reserva). */
+type Activa = { fuente: AudioBufferSourceNode; fin: number; prioridad: number; recuerdo: RecuerdoVoz; rol: Rol; tick: number };
 type Reserva = { texto: string; audio: AudioBuffer; cierre: boolean; orden: number };
 /** Brief 045: los invitados tienen su propia preparación (una a la vez) y sus propios clips;
  * nunca ocupan la concurrencia del narrador. */
@@ -210,7 +211,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
           // reintento vuelve a pasar por la ruta (cuotas y bolsas de Speech incluidas) y no toca la memoria.
           if (!a.signal.aborted && g === generacion.current) {
             if (signal.aborted) fallo = { tipo: "red" }; // plazo agotado, también durante el cuerpo
-            const espera = esperaReintentoInvitado(fallo, reintentos, reloj.current.segundo - tick * ARENA.pasoS);
+            const espera = esperaReintentoInvitado(fallo, reintentos, reloj.current.segundo - tick * ARENA.pasoS, inv.intervencion.tema);
             if (espera === null) inv[variante] = { estado: "fallida" };
             else {
               inv[variante] = { estado: "sin-pedir", reintentos: reintentos + 1, noAntesDe: performance.now() + espera };
@@ -223,7 +224,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     for (const intervencion of [...actual.current.intervenciones].sort((a, b) => a.tick - b.tick)) {
       if (s.peticionesInvitado.size >= 1) break;
       if (s.pedidas.has(intervencion.id) || intervencion.tick > hastaTick || intervencion.tick > tickVisible + BUFFER_ARENA.adelantoAudioS * 10) continue;
-      if ((tickVisible - intervencion.tick) / 10 > MESA_ARENA.caducidadInvitadoS) { terminarInvitado(s, intervencion.id); continue; }
+      if ((tickVisible - intervencion.tick) / 10 > caducidadInvitadoS(intervencion.tema)) { terminarInvitado(s, intervencion.id); continue; }
       let inv = s.invitados.get(intervencion.id);
       if (!inv) { inv = { intervencion, completa: { estado: "sin-pedir" }, breve: { estado: intervencion.turnosBreve?.length ? "sin-pedir" : "inexistente" } }; s.invitados.set(intervencion.id, inv); }
       // Una variante a la espera de su reintento conserva el orden: mientras tanto no se pide otra.
@@ -270,7 +271,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               terminada: r.estado === "final", cerrando: s.cerrando,
               // v3.1: la entrada precede a todo invitado: pendiente de pedir, en vuelo o sin consumir.
               aperturaPendiente: s.entradaPendiente || [...s.peticiones.keys()].some(k => k.startsWith("entrada:")) || [...s.clips.entries()].some(([k, c]) => k.startsWith("entrada:") && !c.consumido),
-              candidatas: [...s.invitados.values()].filter(inv => !s.pedidas.has(inv.intervencion.id)).map(inv => ({ id: inv.intervencion.id, rol: inv.intervencion.rol, tick: inv.intervencion.tick, origen: inv.intervencion.turnos?.length ? "048" as const : "045" as const, completa: estadoCoordinador(inv.completa), breve: estadoCoordinador(inv.breve) })),
+              candidatas: [...s.invitados.values()].filter(inv => !s.pedidas.has(inv.intervencion.id)).map(inv => ({ id: inv.intervencion.id, rol: inv.intervencion.rol, tick: inv.intervencion.tick, origen: inv.intervencion.turnos?.length ? "048" as const : "045" as const, tema: inv.intervencion.tema, completa: estadoCoordinador(inv.completa), breve: estadoCoordinador(inv.breve) })),
             };
             for (const id of descartesTurno(entrada)) terminarInvitado(s, id);
             entrada.candidatas = entrada.candidatas.filter(c => s.invitados.has(c.id));
@@ -281,6 +282,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               const tick = clip.segmento.fragmentos[0]!.tick, prioridad = clip.segmento.prioridad ?? (clip.segmento.fragmentos[0]?.emocion === "jubilo" ? 100 : 10);
               if (!clip.segmento.cierre && (tick < s.activadoTick || segundo - tick / 10 > (prioridad >= 80 ? VOZ_BUFFER.atrasoImportanteS : VOZ_BUFFER.atrasoNormalS))) { s.clips.delete(clave); continue; }
               if (clip.consumido) continue;
+              // Brief 050 v1.1 (1): con un canto sonando, un gol anterior (o el mismo, llegado tarde) queda superado.
+              if (golSuperado(prioridad, tick, s.activa)) { s.clips.delete(clave); continue; }
               // La preferencia del invitado sobre el editorial no alcanza a la entrada ni al cierre.
               if (turno && prioridad < MESA_ARENA.prioridadInvitado && !clip.segmento.cierre && clip.segmento.tipoRelato !== "entrada") continue;
               const recuerdo: RecuerdoVoz = { tick: Math.floor(segundo * 10), texto: clip.segmento.texto, clave: clip.segmento.claveVoz, tema: clip.segmento.temaVoz, estado: "iniciada" };
@@ -288,14 +291,14 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               // Revalidar aquí evita reproducir la misma idea desde otra ventana.
               if (tick <= segundo * 10 && !clip.segmento.cierre && clip.segmento.tipoRelato !== "entrada" && (prioridad < 35 ? repetidaVoz(s.memoria, recuerdo) : recuerdo.clave && s.memoria.some(m => m.clave === recuerdo.clave))) { s.clips.delete(clave); continue; }
               if (clip.segmento.firmaEstado && tick <= segundo * 10 && clip.segmento.firmaEstado !== firmaEstadoVoz(estadoVisual(datos.registro, segundo))) { s.clips.delete(clave); continue; }
-              const plan = planVozBuffer(tick / 10, clip.audio.duration, segundo, s.contexto.currentTime, s.activa?.fin ?? 0, prioridad, s.activa?.prioridad ?? 0, clip.segmento.cierre);
+              const plan = planVozBuffer(tick / 10, clip.audio.duration, segundo, s.contexto.currentTime, s.activa?.fin ?? 0, prioridad, s.activa?.prioridad ?? 0, clip.segmento.cierre, s.activa ? s.activa.tick / 10 : undefined);
               if (!plan) continue;
               if (plan.interrumpirAnterior) {
                 if (s.activa) { s.activa.recuerdo.estado = "interrumpida"; if (s.activa.rol !== "narrador") s.finUltimoInvitado = s.contexto.currentTime; }
                 try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
               }
               const fuente = s.contexto.createBufferSource(); fuente.buffer = clip.audio; fuente.connect(s.contexto.destination);
-              const activa: Activa = { fuente, fin: plan.fin, prioridad, recuerdo, rol: "narrador" }; s.activa = activa; clip.consumido = true;
+              const activa: Activa = { fuente, fin: plan.fin, prioridad, recuerdo, rol: "narrador", tick }; s.activa = activa; clip.consumido = true;
               const noticia = prioridad >= VOZ_BUFFER.prioridadInterrupcion;
               if (noticia) { s.finUltimaNoticia = plan.fin; for (const e of clip.segmento.fuentes) s.sonadas.add(e); }
               if (clip.segmento.cierre) s.cerrando = true;
@@ -315,7 +318,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
                 // v3.1: el recuerdo devuelto por siguienteTurno, tal cual (`texto = id`).
                 const recuerdo: RecuerdoVoz = turno.recuerdo;
                 const fuente = s.contexto.createBufferSource(); fuente.buffer = invitado.audio; fuente.connect(s.contexto.destination);
-                const activa: Activa = { fuente, fin: plan.fin, prioridad: MESA_ARENA.prioridadInvitado, recuerdo, rol }; s.activa = activa;
+                const activa: Activa = { fuente, fin: plan.fin, prioridad: MESA_ARENA.prioridadInvitado, recuerdo, rol, tick }; s.activa = activa;
                 // 048: al arrancar una variante se descarta la otra.
                 invitado.consumido = true; terminarInvitado(s, turno.id);
                 s.ultimoInvitado = { rol, tick }; s.finUltimoInvitado = plan.fin;
@@ -335,7 +338,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
               const cierre = cierreReserva;
               const recuerdo: RecuerdoVoz = { tick: Math.floor(segundo * 10), texto: reserva.texto, tema: "reserva", estado: "iniciada" };
               const fuente = s.contexto.createBufferSource(); fuente.buffer = reserva.audio; fuente.connect(s.contexto.destination);
-              const activa: Activa = { fuente, fin: s.contexto.currentTime + reserva.audio.duration, prioridad: -1, recuerdo, rol: "narrador" }; s.activa = activa;
+              const activa: Activa = { fuente, fin: s.contexto.currentTime + reserva.audio.duration, prioridad: -1, recuerdo, rol: "narrador", tick: Math.floor(segundo * 10) }; s.activa = activa;
               if (cierre) s.cerrando = true;
               fuente.onended = () => { if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect(); if (sonido.current === s && s.activa === activa) { s.activa = undefined; s.ultimoFin = s.contexto.currentTime; setHablando(false); } };
               fuente.start(); s.memoria = recordarVoz(s.memoria, recuerdo); if (!reserva.cierre) s.reservasOidas.push(reserva.texto);

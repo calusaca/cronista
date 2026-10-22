@@ -3,15 +3,21 @@
 // empezar cada paso, y mide la continuidad de los episodios por diferencia de ticks. Un
 // denominador cero es `null` («sin muestra»): nunca cuenta como cumplimiento.
 // Geometría y ticks salen de ARENA / LOTE_ARENA_046; no hay cifras propias.
-import { ARENA, LOTE_ARENA_046 as L } from "../sim/limites";
-import type { Lado } from "../sim/tipos";
+// Brief 051: en la misma pasada, las métricas de remate (desenlace físico, «a puerta» por
+// `rematesPorLado`, colocación) con las bandas de LOTE_ARENA_051, el experimento controlado de
+// niveles (`partidoConNiveles`) y los dos contadores de intercepción inmediata (v1.1 #4).
+import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51 } from "../sim/limites";
+import { configDeSemilla } from "../sim/plantillas";
+import type { Lado, SimConfig } from "../sim/tipos";
 import { enAreaRival } from "./ataque";
 import { transformar } from "./catalogo";
 import { crearControladorProgramado } from "./controladores";
 import { ejecutarArena } from "./coordinador";
+import { rematesPorLado } from "./estadista";
+import { distancia } from "./geometria";
 import { crearConfigArena, MotorArena } from "./motor";
 import { enAreaPropia, manoAMano } from "./portero";
-import { rival, type EstadoArena, type EventoArena, type OrdenesEquipo, type Punto, type ReglasArena } from "./tipos";
+import { lados, rival, type EstadoArena, type EventoArena, type OrdenesEquipo, type Punto, type ReglasArena } from "./tipos";
 
 interface JugadorMuestra { id: string; lado: Lado; puesto: string; x: number; y: number }
 /** Estado al empezar el paso `tick` (o el final del partido). */
@@ -33,6 +39,18 @@ export interface MetricasPartido {
   /** v1.2 · saques desde las manos, perdidos (primer toque rival), interceptados en ≤ saqueInmediataS
    * y goles rivales sin toque defensor en ≤ golTrasSaqueS. */
   saquesManos: number; saquesPerdidos: number; intercepcionesInmediatas: number; golesTrasSaque: number;
+  /** Brief 051 v1.1 #4: las inmediatas cuyo toque rival (`hasta`) queda a ≤ inmediataRadioM del `desde` del saque. */
+  intercepcionesInmediatasCercanas: number;
+  /** Brief 051 · desenlace físico de cada remate (evento `tiro`). */
+  remates: Record<DesenlaceRemate, number>;
+  /** Brief 051 · lectura 045 (`rematesPorLado`): a puerta, y de ellos los cerrados por atajada. */
+  aPuerta045: number; atajadas045: number;
+  /** Remates en los que la lectura 045 (a puerta o no) y la física (gol, atrapada o desvío) difieren. */
+  discrepancias045: number;
+  /** Goles cuyo evento previo no neutro no es un `tiro` ni un desvío del portero. */
+  golesSinRemate: number;
+  /** Colocación: remates con |hasta.y − centro| ≤ arcoM/2, de ellos > arcoM/4, y suma de |hasta.y − centro| (m). */
+  rematesDentro: number; rematesLados: number; sumaDesvioDestinoM: number;
   metas: number; metasConduccion: number;
   tiroFueraTrasDesvio: number; recepcionPorteroRechace: number;
   ticksConducir: number; ticksConducirFrenado: number; fuerasDeJuego: number;
@@ -45,6 +63,39 @@ const toque = new Set<EventoArena["tipo"]>(["recepcion", "intercepcion", "recupe
 const finSaque = new Set<EventoArena["tipo"]>([...toque, "fuera_juego", "reinicio", "gol"]);
 const ganancia = new Set<EventoArena["tipo"]>(["recepcion", "atajada", "intercepcion", "recuperacion", "reinicio"]);
 const toqueDefensor = new Set<EventoArena["tipo"]>([...toque, "pase", "tiro"]);
+
+/** Brief 051 · desenlace físico de un remate. */
+export const DESENLACES_REMATE = ["gol", "atrapada", "desvio", "ancho", "alto", "bloqueado", "otro"] as const;
+export type DesenlaceRemate = (typeof DESENLACES_REMATE)[number];
+const cierreRemate = new Set<EventoArena["tipo"]>(["recepcion", "reinicio", "recuperacion", "tiro", "gol", "fuera_juego"]);
+/** Desenlace físico del remate `eventos[i]`: el primer evento posterior no neutro que lo cierra. Gol
+ * del mismo lado y jugador; atajada con `receptor` = rematador (atrapada o desvío según `motivo`);
+ * `tiro_fuera` del rematador (ancho, o alto con `motivo: "alto"`); intercepción con `receptor` =
+ * rematador (bloqueado); cualquier otro cierre (recepción, reinicio, recuperación, otro tiro, otro
+ * gol, fuera de juego) = otro. Faltas, tarjetas y eventos de otro vuelo no cierran. */
+export function desenlaceFisico(eventos: readonly EventoArena[], i: number): DesenlaceRemate {
+  const e = eventos[i]!;
+  for (const d of eventos.slice(i + 1)) {
+    if (neutro.has(d.tipo)) continue;
+    if (d.tipo === "gol" && d.lado === e.lado && d.jugador === e.jugador) return "gol";
+    if (d.tipo === "atajada" && d.receptor === e.jugador) return d.motivo === "desvio" ? "desvio" : "atrapada";
+    if (d.tipo === "tiro_fuera" && d.jugador === e.jugador) return d.motivo === "alto" ? "alto" : "ancho";
+    if (d.tipo === "intercepcion" && d.receptor === e.jugador) return "bloqueado";
+    if (cierreRemate.has(d.tipo)) return "otro";
+  }
+  return "otro";
+}
+
+/** Brief 051 · ids de los remates «a puerta» según `rematesPorLado` (045) y, para cada uno, el tipo
+ * del evento que lo cierra (gol o atajada). */
+function aPuertaSegun045(eventos: readonly EventoArena[]): Map<string, EventoArena["tipo"]> {
+  const r = rematesPorLado(eventos, Infinity), tipos = new Map(eventos.map(e => [e.id, e.tipo])), resultado = new Map<string, EventoArena["tipo"]>();
+  for (const lado of lados) r[lado].eventos.forEach((id, k, ids) => {
+    const siguiente = ids[k + 1];
+    if (tipos.get(id) === "tiro" && siguiente !== undefined && tipos.get(siguiente) !== "tiro") resultado.set(id, tipos.get(siguiente)!);
+  });
+  return resultado;
+}
 
 /** v1.2 · ¿el evento i es un saque desde las manos? En v4, `motivo: "saque_manos"`. Para comparar
  * con reglas sin ese estado (v3), también el primer pase de juego de un portero cuya última
@@ -74,8 +125,21 @@ function muestrear(estado: EstadoArena, eventos: number, planes?: Record<Lado, O
     jugadores: estado.jugadores.map(j => ({ id: j.id, lado: j.lado, puesto: j.puesto, x: j.posicion.x, y: j.posicion.y })) };
 }
 
+/** Brief 051 · experimento controlado: la configuración de la semilla con `variantes.niveles` y el
+ * nivel forzado de los porteros y/o de los jugadores de campo; los no forzados reciben el nivel de
+ * su equipo ((ataque + defensa) / 2, redondeado: la variante exige niveles enteros). */
+export function partidoConNiveles(seed: number, nivelPortero: number | null, nivelCampo: number | null): SimConfig {
+  const base = configDeSemilla(seed);
+  const equipo = (lado: Lado) => {
+    const nivelEquipo = Math.round((base[lado].ataque + base[lado].defensa) / 2);
+    return { ...base[lado], jugadores: base[lado].jugadores.map(j => ({ ...j, nivel: j.posicion === "POR" ? nivelPortero ?? nivelEquipo : nivelCampo ?? nivelEquipo })) };
+  };
+  return { ...base, variantes: { ...base.variantes, niveles: true }, local: equipo("local"), visita: equipo("visita") };
+}
+export interface NivelesForzados { portero: number | null; campo: number | null }
+
 /** Ejecuta un partido programado y devuelve las muestras de todos los ticks y los eventos. */
-export async function muestrasPartido(seed: number, duracionS: number, reglas?: ReglasArena): Promise<{ muestras: MuestraTick[]; eventos: EventoArena[] }> {
+export async function muestrasPartido(seed: number, duracionS: number, reglas?: ReglasArena, niveles?: NivelesForzados): Promise<{ muestras: MuestraTick[]; eventos: EventoArena[] }> {
   const proto = MotorArena.prototype as unknown as { planesActivos: (this: MotorArena, planes: Record<Lado, OrdenesEquipo>) => Record<Lado, OrdenesEquipo> };
   const original = proto.planesActivos, muestras: MuestraTick[] = [];
   proto.planesActivos = function (planes) {
@@ -84,7 +148,7 @@ export async function muestrasPartido(seed: number, duracionS: number, reglas?: 
     return activos;
   };
   try {
-    const registro = await ejecutarArena(crearConfigArena({ seed, duracionS, ...(reglas ? { reglas } : {}) }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+    const registro = await ejecutarArena(crearConfigArena({ seed, duracionS, ...(reglas ? { reglas } : {}), ...(niveles ? { partido: partidoConNiveles(seed, niveles.portero, niveles.campo) } : {}) }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
     muestras.push(muestrear(registro.final, registro.eventos.length));
     return { muestras, eventos: registro.eventos };
   } finally { proto.planesActivos = original; }
@@ -93,12 +157,28 @@ export async function muestrasPartido(seed: number, duracionS: number, reglas?: 
 /** Métricas de un partido a partir de muestras consecutivas y eventos (puro). */
 export function analizarPartido(seed: number, muestras: readonly MuestraTick[], eventos: readonly EventoArena[]): MetricasPartido {
   const m: MetricasPartido = { seed, goles: 0, tiros: 0, robosEnManos: 0, atajadasConPosesion: 0, perdidasTrasAtajada: 0, perdidasArea: 0, episodios: [],
-    pasesBanda: 0, pasesBandaAlArea: 0, centros: 0, saquesManos: 0, saquesPerdidos: 0, intercepcionesInmediatas: 0, golesTrasSaque: 0, metas: 0, metasConduccion: 0, tiroFueraTrasDesvio: 0, recepcionPorteroRechace: 0,
+    pasesBanda: 0, pasesBandaAlArea: 0, centros: 0, saquesManos: 0, saquesPerdidos: 0, intercepcionesInmediatas: 0, intercepcionesInmediatasCercanas: 0, golesTrasSaque: 0,
+    remates: Object.fromEntries(DESENLACES_REMATE.map(d => [d, 0])) as Record<DesenlaceRemate, number>, aPuerta045: 0, atajadas045: 0, discrepancias045: 0, golesSinRemate: 0,
+    rematesDentro: 0, rematesLados: 0, sumaDesvioDestinoM: 0, metas: 0, metasConduccion: 0, tiroFueraTrasDesvio: 0, recepcionPorteroRechace: 0,
     ticksConducir: 0, ticksConducirFrenado: 0, fuerasDeJuego: 0 };
   const porteros = new Set(muestras.flatMap(s => s.jugadores.filter(j => j.puesto === "POR").map(j => j.id)));
   const ladoDe = (id: string) => muestras.find(s => s.jugadores.some(j => j.id === id))?.jugadores.find(j => j.id === id)?.lado;
   const porTick = new Map(muestras.map(s => [s.tick, s]));
+  const aPuerta = aPuertaSegun045(eventos);
   eventos.forEach((e, i) => {
+    if (e.tipo === "tiro") {
+      const fisico = desenlaceFisico(eventos, i), cierre = aPuerta.get(e.id);
+      m.remates[fisico]++;
+      if (cierre) { m.aPuerta045++; if (cierre === "atajada") m.atajadas045++; }
+      if ((cierre !== undefined) !== (fisico === "gol" || fisico === "atrapada" || fisico === "desvio")) m.discrepancias045++;
+      const lateral = Math.abs(e.hasta.y - ARENA.anchoM / 2);
+      m.sumaDesvioDestinoM += lateral;
+      if (lateral <= ARENA.arcoM / 2) { m.rematesDentro++; if (lateral > ARENA.arcoM / 4) m.rematesLados++; }
+    }
+    if (e.tipo === "gol") {
+      const previo = eventos.slice(0, i).reverse().find(x => !neutro.has(x.tipo));
+      if (!(previo?.tipo === "tiro" || previo?.tipo === "atajada" && previo.motivo === "desvio")) m.golesSinRemate++;
+    }
     const siguiente = eventos.slice(i + 1).find(x => !neutro.has(x.tipo));
     if (e.tipo === "gol") m.goles++;
     if (e.tipo === "tiro") m.tiros++;
@@ -115,7 +195,10 @@ export function analizarPartido(seed: number, muestras: readonly MuestraTick[], 
       const primero = eventos.slice(i + 1).find(x => finSaque.has(x.tipo));
       if (primero && toque.has(primero.tipo) && primero.lado !== e.lado) {
         m.saquesPerdidos++;
-        if ((primero.tick - e.tick) * ARENA.pasoS <= L.saqueInmediataS) m.intercepcionesInmediatas++;
+        if ((primero.tick - e.tick) * ARENA.pasoS <= L.saqueInmediataS) {
+          m.intercepcionesInmediatas++;
+          if (distancia(primero.hasta, e.desde) <= L.inmediataRadioM) m.intercepcionesInmediatasCercanas++;
+        }
       }
       const limite = e.tick + Math.round(L.golTrasSaqueS / ARENA.pasoS);
       for (const x of eventos.slice(i + 1)) {
@@ -197,6 +280,17 @@ export interface MetricasLote {
   manoAMano: { episodios: number; goles: number; conversion: number | null; fraccionDeGoles: number | null; desplazamientoMedianaM: number | null; desplazamientoP75M: number | null; fraccionDesplazado: number | null };
   centros: { pasesBanda: number; alArea: number; proporcion: number | null; motivoCentro: number; porPartido: number };
   saquesManos: number; saquesPerdidos: number; saquesPerdidosPorPartido: number; intercepcionesInmediatas: number; golesTrasSaque: number; golesTrasSaquePorPartido: number;
+  /** Brief 051 v1.1 #4. */
+  intercepcionesInmediatasPorPartido: number; intercepcionesInmediatasCercanas: number;
+  /** Brief 051 · métricas de remate. «A puerta» y atajadas / a puerta: lectura 045 (`rematesPorLado`);
+   * conversión, fuera, altos, bloqueados y desvíos / atajadas: desenlace físico. */
+  remate: {
+    remates: number; porPartido: number; desenlaces: Record<DesenlaceRemate, number>;
+    aPuerta: number | null; conversion: number | null; atajadasSobreAPuerta: number | null; desviosSobreAtajadas: number | null;
+    fuera: number | null; altos: number; altosSobreFuera: number | null; bloqueados: number | null;
+    golesSinRemate: number; golesSinRematePorPartido: number;
+    colocacionLados: number | null; desvioMedioM: number | null; discrepancias045: number;
+  };
   metas: number; metasConduccion: number; metasConduccionPorPartido: number;
   tiroFueraTrasDesvio: number; recepcionPorteroRechace: number;
   conducir: { ticks: number; frenados: number; fraccion: number | null }; fuerasDeJuego: number;
@@ -216,7 +310,8 @@ export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: re
       desplazamientoMedianaM: cuantil(desplazamientos, 0.5), desplazamientoP75M: cuantil(desplazamientos, 0.75), fraccionDesplazado: cociente(desplazamientos.filter(d => d > L.desplazamientoM).length, episodios.length) },
     centros: { pasesBanda: suma(p => p.pasesBanda), alArea: suma(p => p.pasesBandaAlArea), proporcion: cociente(suma(p => p.pasesBandaAlArea), suma(p => p.pasesBanda)), motivoCentro: suma(p => p.centros), porPartido: suma(p => p.centros) / n },
     saquesManos: suma(p => p.saquesManos), saquesPerdidos: suma(p => p.saquesPerdidos), saquesPerdidosPorPartido: suma(p => p.saquesPerdidos) / n,
-    intercepcionesInmediatas: suma(p => p.intercepcionesInmediatas), golesTrasSaque: suma(p => p.golesTrasSaque), golesTrasSaquePorPartido: suma(p => p.golesTrasSaque) / n,
+    intercepcionesInmediatas: suma(p => p.intercepcionesInmediatas), intercepcionesInmediatasPorPartido: suma(p => p.intercepcionesInmediatas) / n, intercepcionesInmediatasCercanas: suma(p => p.intercepcionesInmediatasCercanas),
+    remate: agregarRemates(partidos), golesTrasSaque: suma(p => p.golesTrasSaque), golesTrasSaquePorPartido: suma(p => p.golesTrasSaque) / n,
     metas: suma(p => p.metas), metasConduccion: suma(p => p.metasConduccion), metasConduccionPorPartido: suma(p => p.metasConduccion) / n,
     tiroFueraTrasDesvio: suma(p => p.tiroFueraTrasDesvio), recepcionPorteroRechace: suma(p => p.recepcionPorteroRechace),
     conducir: { ticks: suma(p => p.ticksConducir), frenados: suma(p => p.ticksConducirFrenado), fraccion: cociente(suma(p => p.ticksConducirFrenado), suma(p => p.ticksConducir)) },
@@ -224,19 +319,36 @@ export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: re
   };
 }
 
+function agregarRemates(partidos: readonly MetricasPartido[]): MetricasLote["remate"] {
+  const n = partidos.length, suma = (f: (p: MetricasPartido) => number) => partidos.reduce((s, p) => s + f(p), 0);
+  const desenlaces = Object.fromEntries(DESENLACES_REMATE.map(d => [d, suma(p => p.remates[d])])) as Record<DesenlaceRemate, number>;
+  const remates = DESENLACES_REMATE.reduce((s, d) => s + desenlaces[d], 0), aPuerta = suma(p => p.aPuerta045);
+  const atajadas = desenlaces.atrapada + desenlaces.desvio, fuera = desenlaces.ancho + desenlaces.alto;
+  return {
+    remates, porPartido: remates / n, desenlaces,
+    aPuerta: cociente(aPuerta, remates), conversion: cociente(desenlaces.gol, remates), atajadasSobreAPuerta: cociente(suma(p => p.atajadas045), aPuerta),
+    desviosSobreAtajadas: cociente(desenlaces.desvio, atajadas), fuera: cociente(fuera, remates), altos: desenlaces.alto, altosSobreFuera: cociente(desenlaces.alto, fuera),
+    bloqueados: cociente(desenlaces.bloqueado, remates), golesSinRemate: suma(p => p.golesSinRemate), golesSinRematePorPartido: suma(p => p.golesSinRemate) / n,
+    colocacionLados: cociente(suma(p => p.rematesLados), suma(p => p.rematesDentro)), desvioMedioM: cociente(suma(p => p.sumaDesvioDestinoM), remates),
+    discrepancias045: suma(p => p.discrepancias045),
+  };
+}
+
 /** Lote de `semillas` partidos programados desde `desde` (siempre LOTE_ARENA_046.duracionS salvo prueba). */
-export async function medirLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number }): Promise<MetricasLote> {
+export async function medirLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number; niveles?: NivelesForzados }): Promise<MetricasLote> {
   const duracionS = opciones.duracionS ?? L.duracionS, reglas = opciones.reglas ?? ARENA.reglas, partidos: MetricasPartido[] = [];
   for (let seed = opciones.desde; seed < opciones.desde + opciones.semillas; seed++) {
-    const { muestras, eventos } = await muestrasPartido(seed, duracionS, reglas);
+    const { muestras, eventos } = await muestrasPartido(seed, duracionS, reglas, opciones.niveles);
     partidos.push(analizarPartido(seed, muestras, eventos));
   }
   return agregarLote(reglas, duracionS, partidos);
 }
 
 type Banda = (typeof L)["rapido"] | (typeof L)["completo"];
-/** Bandas incumplidas (nombre y valor). Un valor `null` es «sin muestra» y siempre incumple. */
-export function incumplimientos(m: MetricasLote, banda: Banda): string[] {
+type Banda051 = (typeof L51)["rapido"] | (typeof L51)["completo"];
+/** Bandas incumplidas (nombre y valor). Un valor `null` es «sin muestra» y siempre incumple. Con
+ * `banda051` (brief 051), también las de remate (sin el experimento controlado, que son otros lotes). */
+export function incumplimientos(m: MetricasLote, banda: Banda, banda051?: Banda051): string[] {
   const fallos: string[] = [];
   const max = (nombre: string, v: number | null, limite: number) => { if (v === null || v > limite) fallos.push(`${nombre}=${v ?? "sin muestra"} > ${limite}`); };
   const min = (nombre: string, v: number | null, limite: number) => { if (v === null || v < limite) fallos.push(`${nombre}=${v ?? "sin muestra"} < ${limite}`); };
@@ -254,6 +366,48 @@ export function incumplimientos(m: MetricasLote, banda: Banda): string[] {
   max("tiroFueraTrasDesvio", m.tiroFueraTrasDesvio, banda.tiroFueraTrasDesvioMax);
   max("recepcionPorteroRechace", m.recepcionPorteroRechace, banda.recepcionPorteroRechaceMax);
   max("conducirFrenado", m.conducir.fraccion, banda.conducirFrenadoMax);
+  if (banda051) fallos.push(...incumplimientosRemate(m, banda051));
+  return fallos;
+}
+
+const comprobar = (fallos: string[]) => ({
+  max: (nombre: string, v: number | null, limite: number) => { if (v === null || v > limite) fallos.push(`${nombre}=${v ?? "sin muestra"} > ${limite}`); },
+  min: (nombre: string, v: number | null, limite: number) => { if (v === null || v < limite) fallos.push(`${nombre}=${v ?? "sin muestra"} < ${limite}`); },
+  entre: (nombre: string, v: number | null, r: { min: number; max: number }) => { if (v === null || v < r.min || v > r.max) fallos.push(`${nombre}=${v ?? "sin muestra"} ∉ [${r.min}; ${r.max}]`); },
+});
+
+/** Brief 051 · bandas de remate de LOTE_ARENA_051 (salvo el experimento controlado). */
+export function incumplimientosRemate(m: MetricasLote, banda: Banda051): string[] {
+  const fallos: string[] = [], { max, min, entre } = comprobar(fallos), r = m.remate;
+  entre("aPuerta", r.aPuerta, banda.aPuerta);
+  if ("conversion" in banda) entre("conversionRemate", r.conversion, banda.conversion);
+  entre("atajadasSobreAPuerta", r.atajadasSobreAPuerta, banda.atajadasSobreAPuerta);
+  entre("fuera", r.fuera, banda.fuera);
+  if ("altosMin" in banda) min("altos", r.remates ? r.altos : null, banda.altosMin);
+  if ("altosSobreFuera" in banda) entre("altosSobreFuera", r.altosSobreFuera, banda.altosSobreFuera);
+  max("bloqueados", r.bloqueados, banda.bloqueadosMax);
+  max("golesSinRematePorPartido", m.partidos ? r.golesSinRematePorPartido : null, banda.golesSinRematePorPartidoMax);
+  min("colocacionLados", r.colocacionLados, banda.colocacionLadosMin);
+  return fallos;
+}
+
+/** Brief 051 · experimento controlado: el mismo lote con el nivel forzado a nivelesControlado.bajo y
+ * a .alto, para los porteros (diferencia de atajadas / a puerta) o para los de campo (diferencia de
+ * conversión). Sin muestra en cualquiera de los dos, la diferencia es null. */
+export async function medirControlado(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number; quien: "portero" | "campo" }): Promise<{ bajo: MetricasLote; alto: MetricasLote; diferencia: number | null }> {
+  const niveles = (nivel: number): NivelesForzados => opciones.quien === "portero" ? { portero: nivel, campo: null } : { portero: null, campo: nivel };
+  const bajo = await medirLote({ ...opciones, niveles: niveles(L51.nivelesControlado.bajo) });
+  const alto = await medirLote({ ...opciones, niveles: niveles(L51.nivelesControlado.alto) });
+  const valor = (x: MetricasLote) => opciones.quien === "portero" ? x.remate.atajadasSobreAPuerta : x.remate.conversion;
+  const a = valor(alto), b = valor(bajo);
+  return { bajo, alto, diferencia: a === null || b === null ? null : a - b };
+}
+
+/** Brief 051 · bandas del experimento controlado (diferencias alto − bajo). `campo` solo en `completo`. */
+export function incumplimientosControlado(diferencias: { porteros: number | null; campo?: number | null }, banda: Banda051): string[] {
+  const fallos: string[] = [], { min } = comprobar(fallos);
+  min("controladoPorteros", diferencias.porteros, banda.controladoPorterosMin);
+  if ("controladoCampoMin" in banda) min("controladoCampo", diferencias.campo ?? null, banda.controladoCampoMin);
   return fallos;
 }
 
@@ -262,7 +416,11 @@ export function incumplimientos(m: MetricasLote, banda: Banda): string[] {
 export function incumplimientosSaques(m: MetricasLote, banda: Banda): string[] {
   if (!m.saquesManos) return ["saquesManos=sin muestra"];
   const fallos: string[] = [];
-  if (m.intercepcionesInmediatas > banda.intercepcionesInmediatasMax) fallos.push(`intercepcionesInmediatas=${m.intercepcionesInmediatas} > ${banda.intercepcionesInmediatasMax}`);
+  // Brief 051 v1.1 #4: el temporal del 046 (≤ 1 en el lote rápido, ≤ 0,01 por partido en el completo)
+  // y el cercano (toque a ≤ inmediataRadioM del saque), con su propia banda.
+  if ("intercepcionesInmediatasPorPartidoMax" in banda) { if (m.intercepcionesInmediatasPorPartido > banda.intercepcionesInmediatasPorPartidoMax) fallos.push(`intercepcionesInmediatasPorPartido=${m.intercepcionesInmediatasPorPartido} > ${banda.intercepcionesInmediatasPorPartidoMax}`); }
+  else if (m.intercepcionesInmediatas > banda.intercepcionesInmediatasMax) fallos.push(`intercepcionesInmediatas=${m.intercepcionesInmediatas} > ${banda.intercepcionesInmediatasMax}`);
+  if (m.intercepcionesInmediatasCercanas > banda.intercepcionesCercanasMax) fallos.push(`intercepcionesInmediatasCercanas=${m.intercepcionesInmediatasCercanas} > ${banda.intercepcionesCercanasMax}`);
   if (m.golesTrasSaquePorPartido > banda.golesTrasSaquePorPartidoMax) fallos.push(`golesTrasSaquePorPartido=${m.golesTrasSaquePorPartido} > ${banda.golesTrasSaquePorPartidoMax}`);
   if (m.saquesPerdidosPorPartido > banda.saquesPerdidosPorPartidoMax) fallos.push(`saquesPerdidosPorPartido=${m.saquesPerdidosPorPartido} > ${banda.saquesPerdidosPorPartidoMax}`);
   return fallos;

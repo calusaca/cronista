@@ -1,4 +1,4 @@
-import { ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import type { Lado } from "../sim/tipos";
 import type { EstadoArena, EventoArena } from "./tipos";
@@ -9,7 +9,12 @@ export interface FragmentoVoz {
   fuentes: string[]; fotogramas: number[];
   /** Brief 045: voz que pronuncia el fragmento; ausente equivale a "narrador". */
   rol?: "narrador" | "comentarista" | "estadista";
+  /** Brief 050 v1.1 · Canto de gol del narrador: tramos de prosodia dentro de un solo `<s>`.
+   * Invariante: `texto === canto.tramos.map(t => t.texto).join(" ")`. */
+  canto?: { tramos: TramoCanto[] };
 }
+export type TipoTramoCanto = "grito" | "goleador" | "hechos" | "autogol";
+export interface TramoCanto { texto: string; tipo: TipoTramoCanto }
 export const limitarIntensidad = (n: number) => Math.max(0, Math.min(1, n));
 export function varianteVoz(seed: number, id: string) { return prngDerivado(seed, `voz-expresiva-v1:${id}`).int(0, 3); }
 
@@ -31,7 +36,8 @@ export function expresionEvento(e: EventoArena, estado: EstadoArena, anterior: {
   const amenaza = amenazaConBalon(estado, e.lado);
   const memoria = anterior?.lado === e.lado ? Math.max(0, anterior.intensidad - (e.tick - anterior.tick) * ARENA.pasoS * 0.12) : 0;
   const tension = Math.max(amenaza, memoria);
-  if (e.tipo === "gol") return { emocion: "jubilo", intensidad: e.tick * ARENA.pasoS >= duracionS * 0.8 && Math.abs(estado.marcador.local - estado.marcador.visita) <= 1 ? 1 : 0.92 };
+  // Brief 050: misma regla que «sobre el final» del canto, con las cifras de CANTO_GOL.
+  if (e.tipo === "gol") return { emocion: "jubilo", intensidad: e.tick * ARENA.pasoS >= duracionS * CANTO_GOL.tardioDesdeFraccion && Math.abs(estado.marcador.local - estado.marcador.visita) <= CANTO_GOL.tardioDiferenciaMax ? 1 : 0.92 };
   if (e.tipo === "tiro") return { emocion: "emocion", intensidad: 0.85 };
   if (e.tipo === "atajada") return { emocion: "sorpresa", intensidad: 0.88 };
   if (e.tipo === "tiro_fuera") return { emocion: "decepcion", intensidad: 0.65 };

@@ -177,6 +177,53 @@ citas y reglas. Se permite una corrección de formato o semántica, con feedback
 dentro del mismo plazo de 60 segundos: máximo dos solicitudes y 2.048 tokens de
 salida por solicitud de equipo. Los errores de transporte no se reintentan.
 
+#### Modelos de otras familias: Foundry Models (brief 052)
+
+Un modelo del catálogo puede servirse por la Azure AI Model Inference API
+(`/models/chat/completions`, `api-version=2024-05-01-preview`) con el adaptador
+[`src/lib/llm-foundry-modelos.ts`](../src/lib/llm-foundry-modelos.ts), detrás de la
+misma costura `src/lib/llm.ts`. La clave es la del recurso, la misma que
+`AZURE_OPENAI_API_KEY`; el endpoint es el host `services.ai.azure.com`:
+
+```dotenv
+ARENA_GROK_LLM=foundry-modelos
+ARENA_GROK_FOUNDRY_MODELOS_ENDPOINT=https://<recurso>.services.ai.azure.com
+ARENA_GROK_FOUNDRY_MODELOS_API_KEY=<clave del recurso>
+ARENA_GROK_FOUNDRY_MODELOS_DEPLOYMENT=cronista-grok
+ARENA_GROK_FOUNDRY_MODELOS_FORMATO_JSON=json_schema   # json_schema | json_object | texto
+```
+
+Se envían `model` = deployment, `max_tokens` (2.048 en la arena) y el
+`response_format` del formato configurado; nunca `temperature` ni parámetros de
+razonamiento. El razonamiento no vuelve al historial: se descarta
+`reasoning_content` y se recorta la envoltura inicial `<think>…</think>` con una
+gramática cerrada. Un marcador fuera de esa envoltura o un `<think>` sin cierre se
+rechazan. En modo `texto` se toma la primera valla ```json o, si no hay, el último
+objeto balanceado. Si no hay objeto, se devuelve el texto y el validador pide la
+corrección, igual que con Azure OpenAI. Si el proveedor informa `reasoning_tokens`
+fuera de `completion_tokens` (lo hace grok-4.7: `total_tokens` = entrada + salida +
+razonamiento), esos tokens se cuentan como salida.
+
+En la publicación, `infra/modelos-arena.json` es la única lista de deployments.
+De ella salen los deployments que reproduce [`infra/modelos-arena.bicep`](../infra/modelos-arena.bicep)
+y, a partir de las entradas con `publicar: true`, el `ARENA_MODELOS` y las variables
+por prefijo que `scripts/deploy-azure-arena.mjs` pasa a
+[`infra/arena-preview.bicep`](../infra/arena-preview.bicep). Un modelo entra solo si
+pasa el smoke real (`npm run arena:smoke-modelos -- --id <id>`). Ese smoke es una
+sonda de formato con el esquema real más cuatro partidos (espejo, cruzado, cruzado
+invertido y uno web de 180 s / 30 s). Exige 22 de 22 decisiones del candidato sin
+respaldo, ninguna por encima de 30 s, como máximo dos solicitudes y precio anotado.
+Resultados, causas de rechazo y despliegues intentados:
+[evidencia del 052](evidencia/modelos-052/README.md).
+
+Admitido el 22 de octubre: **GPT-6 Luna** (`cronista-luna6`, familia OpenAI, adaptador
+`azure-openai`): 22 de 22 decisiones válidas, latencia máxima 8,5 s. Probados y no
+admitidos: Grok 4.7 por Foundry Models (con `reasoning_effort` `low`: 13 decisiones
+> 30 s y 2 plazos agotados) y gpt-oss-120b (truncado a 2.048 tokens, órdenes inválidas).
+No probados: DeepSeek-V4-Flash y Llama 4 Maverick (cuota 0), Llama 4 Scout y Mistral
+Medium (Marketplace no disponible para la cuenta). El catálogo público sigue siendo
+solo de la familia OpenAI.
+
 Por réplica: dos sesiones concurrentes, una de modelos, diez sesiones de modelos
 por día UTC, duración máxima de 180 segundos y decisiones cada 30 segundos en
 web. Son como máximo 12 decisiones de equipo y 24 solicitudes; el narrador añade

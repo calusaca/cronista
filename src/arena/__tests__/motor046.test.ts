@@ -788,14 +788,15 @@ describe("046 · versiones", () => {
     expect(reproducirArena(r)).toEqual(r);
     expect(r.rondas.flatMap(x => Object.values(x.decisiones)).every(d => d.tiempoMs === 0)).toBe(true);
 
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", V4]);
-    expect(crearConfigArena().reglas).toBe(V4);
-    expect(ARENA.reglas).toBe(V4);
+    // Brief 051: reinicios-v4 pasa a ser literal y la predeterminada es reinicios-v5.
+    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", V4, "reinicios-v5"]);
+    expect(crearConfigArena().reglas).toBe("reinicios-v5");
+    expect(ARENA.reglas).toBe("reinicios-v5");
     expect(crearConfigArena({ reglas: "reinicios-v3" }).reglas).toBe("reinicios-v3");
     expect(() => crearConfigArena({ version: ARENA.versionPersonalidades, reglas: "reinicios-v3" })).toThrow();
     const base = crearConfigArena();
     for (const reglas of reglasArena) expect(() => validarConfigArena({ ...base, reglas })).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v5" as never })).toThrow("Reglas");
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v6" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) {
       expect(reglasDesde({ ...base, reglas }, "reinicios-v3")).toBe(i >= 2);
       expect(reglasDesde({ ...base, reglas }, V4)).toBe(i >= 3);
@@ -999,7 +1000,8 @@ describe("046 · v1.2: el saque del portero no regala el gol", () => {
 
 describe("046 · lote de 30 semillas (bandas rápidas de LOTE_ARENA_046)", () => {
   it("cumple todas las bandas rápidas", { timeout: 180_000 }, async () => {
-    const m = await medirLote({ desde: L.rapido.semillaDesde, semillas: L.rapido.semillas });
+    // Brief 051: el lote del 046 fija reinicios-v4 (las bandas sobre v5 las exige motor051).
+    const m = await medirLote({ desde: L.rapido.semillaDesde, semillas: L.rapido.semillas, reglas: V4 });
     expect(m.partidos).toBe(L.rapido.semillas);
     expect(incumplimientos(m, L.rapido)).toEqual([]);
   });

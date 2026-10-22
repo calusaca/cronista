@@ -3,17 +3,17 @@
 // ventana conocida, calma por las manos del portero y validación de 1 a maxTurnos fragmentos.
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
+import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
 import { VOZ_BUFFER } from "../buffer";
 import { recordarVoz } from "../editorial";
 import type { EventoArena, RegistroArena } from "../tipos";
-import { calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
+import { caducidadInvitadoS, calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, horizonteS, noticiaPendiente, segmentoVozValido, siguienteTurno, varianteElegible, varianteEfectiva, ventanaConocidaS, type CandidataTurno, type EntradaTurno, type EstadoVariante } from "../turnos";
 
 const ahora = 100, partidoS = 30, tickCursor = Math.round(partidoS / ARENA.pasoS);
 const valida = (d: number): EstadoVariante => ({ estado: "valida", duracionS: d });
 const dur = VOZ_BUFFER.duracionMaxS / 4;
 /** Candidata del 045: una sola variante (la breve no existe). */
-const cand = (rol: CandidataTurno["rol"], tick = tickCursor, id = `${rol}:x:${tick}`): CandidataTurno => ({ id, rol, tick, origen: "045", completa: valida(dur), breve: { estado: "inexistente" } });
+const cand = (rol: CandidataTurno["rol"], tick = tickCursor, id = `${rol}:x:${tick}`): CandidataTurno => ({ id, rol, tick, origen: "045", tema: "tiempo", completa: valida(dur), breve: { estado: "inexistente" } });
 const base = (extra: Partial<EntradaTurno> = {}): EntradaTurno => ({
   partidoS, ahoraAudioS: ahora, fuenteActiva: null, finUltimaNoticiaS: null, finUltimoInvitadoS: null, ultimoInvitado: null,
   pausaVigente: false, terminada: false, cerrando: false, aperturaPendiente: false, ventanaS: null, candidatas: [cand("comentarista")], ...extra,
@@ -54,7 +54,7 @@ describe("045 · siguienteTurno", () => {
 
   it("v1.1 (10) · una variante caducada nunca arranca, aunque su duración quepa en la ventana", () => {
     const limite = tickCursor - Math.round(MESA_ARENA.caducidadInvitadoS / ARENA.pasoS);
-    const dos = (tick: number): CandidataTurno => ({ id: `comentarista:y:${tick}`, rol: "comentarista", tick, origen: "048", completa: valida(dur), breve: valida(dur / 2) });
+    const dos = (tick: number): CandidataTurno => ({ id: `comentarista:y:${tick}`, rol: "comentarista", tick, origen: "048", tema: "tiempo", completa: valida(dur), breve: valida(dur / 2) });
     expect(siguienteTurno(base({ ventanaS: dur * 2, candidatas: [dos(limite)] }))?.variante).toBe("completa");
     expect(siguienteTurno(base({ ventanaS: dur * 2, candidatas: [dos(limite - 1)] }))).toBeNull();
     expect(siguienteTurno(base({ ventanaS: dur / 2, candidatas: [dos(limite - 1)] }))).toBeNull();
@@ -99,7 +99,7 @@ describe("045 · siguienteTurno", () => {
 
 describe("048 · elección de variante (v1.1, 1)", () => {
   const completa = dur * 2, breve = dur;
-  const c = (completaE: EstadoVariante, breveE: EstadoVariante, origen: CandidataTurno["origen"] = "048"): CandidataTurno => ({ id: "comentarista:gol:300", rol: "comentarista", tick: tickCursor, origen, completa: completaE, breve: breveE });
+  const c = (completaE: EstadoVariante, breveE: EstadoVariante, origen: CandidataTurno["origen"] = "048"): CandidataTurno => ({ id: "comentarista:gol:300", rol: "comentarista", tick: tickCursor, origen, tema: "tiempo", completa: completaE, breve: breveE });
   const elegir = (cc: CandidataTurno, ventanaS: number | null) => siguienteTurno(base({ ventanaS, candidatas: [cc] }));
 
   it("completa si cabe; breve si la completa no cabe; ninguna si ninguna cabe", () => {
@@ -269,5 +269,51 @@ describe("045/048 · reintento de una variante de invitado (corrección del cons
   it("la espera total de los reintentos cabe dentro de la caducidad del invitado", () => {
     let total = 0; for (let k = 0; k < max; k++) total += esperaReintentoInvitado(http(429), k, 0)!;
     expect(total / 1000).toBeLessThan(caduca);
+  });
+});
+
+// Brief 050 v1.1 (3) · Caducidad por tema: tras un gol, CANTO_GOL.caducidadInvitadoTrasGolS en la
+// selección, el descarte y el reintento; el resto de temas conserva MESA_ARENA.caducidadInvitadoS.
+describe("050 · caducidad de la Mesa tras un gol", () => {
+  const { caducidadInvitadoS: general } = MESA_ARENA, { caducidadInvitadoTrasGolS: trasGol } = CANTO_GOL;
+  const conTema = (tema: string, edadS: number): CandidataTurno => ({ ...cand("comentarista", tickCursor - Math.round(edadS / ARENA.pasoS)), tema });
+
+  it("caducidadInvitadoS(tema): gol → trasGol; cualquier otro tema → la general", () => {
+    expect(caducidadInvitadoS("gol")).toBe(trasGol);
+    for (const tema of ["atajada", "tiempo", "tiro_fuera", "roja", ""]) expect(caducidadInvitadoS(tema)).toBe(general);
+    expect(trasGol).toBeGreaterThan(general);
+  });
+
+  it("M8 · una candidata `gol` arranca a general + 1 s y no a trasGol + 1 s; una `atajada` caduca a la general", () => {
+    expect(siguienteTurno(base({ candidatas: [conTema("gol", general + 1)] }))).not.toBeNull();
+    expect(siguienteTurno(base({ candidatas: [conTema("gol", trasGol + 1)] }))).toBeNull();
+    expect(siguienteTurno(base({ candidatas: [conTema("atajada", general + 1)] }))).toBeNull();
+    expect(siguienteTurno(base({ candidatas: [conTema("atajada", general)] }))).not.toBeNull();
+  });
+
+  it("descartesTurno conserva la candidatura `gol` entre ambas caducidades y descarta la `atajada`", () => {
+    const medio = (general + trasGol) / 2, gol = conTema("gol", medio), atajada = { ...conTema("atajada", medio), id: "estadista:atajada", rol: "estadista" as const };
+    expect(descartesTurno(base({ candidatas: [gol, atajada] }))).toEqual([atajada.id]);
+    expect(descartesTurno(base({ candidatas: [conTema("gol", trasGol + 1)] }))).toHaveLength(1);
+  });
+
+  it("un 429 entre general y trasGol se reintenta para `gol` y no para `atajada`; límite exacto de trasGol", () => {
+    const http429 = { tipo: "http" as const, estado: 429 }, medio = (general + trasGol) / 2;
+    expect(esperaReintentoInvitado(http429, 0, medio, "gol")).toBe(MESA_ARENA.reintentoInvitadoMs);
+    expect(esperaReintentoInvitado(http429, 0, medio, "atajada")).toBeNull();
+    expect(esperaReintentoInvitado(http429, 0, medio)).toBeNull(); // sin tema: la general
+    expect(esperaReintentoInvitado(http429, 0, trasGol, "gol")).toBe(MESA_ARENA.reintentoInvitadoMs);
+    expect(esperaReintentoInvitado(http429, 0, trasGol + ARENA.pasoS, "gol")).toBeNull();
+    // Mismo límite en la selección (edad medida desde el tick de la candidatura hasta el cursor).
+    expect(siguienteTurno(base({ candidatas: [conTema("gol", trasGol)] }))).not.toBeNull();
+    expect(siguienteTurno(base({ candidatas: [conTema("gol", trasGol + ARENA.pasoS)] }))).toBeNull();
+  });
+
+  it("segmentoVozValido acepta el canto (un fragmento con `canto`) y rechaza dos fragmentos del narrador", () => {
+    const canto = { desdeTick: 200, hastaTick: 250, idioma: "es", modo: "buffer", texto: "¡Gooool! ¡Gol de X! …", tipoRelato: "jugada", audio: { base64: "x" },
+      fragmentos: [{ tick: 231, canto: { tramos: [{ texto: "¡Gooool!", tipo: "grito" }] } }] };
+    expect(segmentoVozValido(canto, { desde: 200, hasta: 250, idioma: "es" })).toBe(true);
+    // Por esto el canto es UN fragmento con tramos y no tres fragmentos: el consumidor rechaza dos.
+    expect(segmentoVozValido({ ...canto, fragmentos: [{ tick: 231 }, { tick: 231 }] }, { desde: 200, hasta: 250, idioma: "es" })).toBe(false);
   });
 });

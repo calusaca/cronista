@@ -2,8 +2,8 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { MESA_ARENA } from "../../sim/limites";
-import { BUFFER_ARENA, firmaEstadoVoz, planVozBuffer, RelojBuffer, RitmoProduccionBuffer, rondaVisible, VOZ_BUFFER } from "../buffer";
+import { MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../../sim/limites";
+import { BUFFER_ARENA, firmaEstadoVoz, golSuperado, planVozBuffer, RelojBuffer, RitmoProduccionBuffer, rondaVisible, VOZ_BUFFER } from "../buffer";
 import { GestorSesiones } from "../sesiones";
 import { construirRelato } from "../relato";
 import { reproducirArena } from "../coordinador";
@@ -199,5 +199,59 @@ describe("045 · planVozBuffer con la prioridad del invitado", () => {
     // más de atrasoNormalS sigue siendo planificable; la caducidad la decide siguienteTurno.
     expect(planVozBuffer(20, 3, 20 + VOZ_BUFFER.atrasoNormalS + 1, 100, 0, MESA_ARENA.prioridadInvitado, 0)).toBeNull();
     expect(planVozBuffer(20, 3, 20 + VOZ_BUFFER.atrasoNormalS + 1, 100, 0, MESA_ARENA.prioridadInvitado, 0, true)).not.toBeNull();
+  });
+});
+
+// Brief 050 v1.1 (1) · Prioridad del canto: nada lo corta salvo un gol posterior; los goles anteriores
+// (o el mismo, llegado tarde) se descartan como superados; el cierre espera al canto.
+describe("050 · canto de gol en planVozBuffer", () => {
+  const GOL = PRIORIDAD_EVENTO_ARENA.gol!, ahora = 50, golS = 23.1, duracion = 9, finCanto = ahora + duracion;
+  /** Plan de un clip en el segundo `eventoS` con el canto del gol de `golS` sonando. */
+  const sobreCanto = (prioridad: number, eventoS = golS + 0.5, cierre = false) => planVozBuffer(eventoS, 1.5, eventoS, ahora, finCanto, prioridad, GOL, cierre, golS);
+
+  it("reinicio, tiro, atajada, roja e invitado no cortan un canto en curso", () => {
+    for (const p of [PRIORIDAD_EVENTO_ARENA.reinicio!, PRIORIDAD_EVENTO_ARENA.tiro!, PRIORIDAD_EVENTO_ARENA.atajada!, PRIORIDAD_EVENTO_ARENA.roja!, MESA_ARENA.prioridadInvitado]) expect(sobreCanto(p), String(p)).toBeNull();
+  });
+
+  it("un gol posterior corta el canto (c); un gol con el mismo instante o anterior no", () => {
+    expect(sobreCanto(GOL, golS + 4)).toMatchObject({ interrumpirAnterior: true, velocidad: 1 });
+    expect(sobreCanto(GOL, golS)).toBeNull();
+    expect(planVozBuffer(golS - 4, duracion, golS, ahora, finCanto, GOL, GOL, false, golS)).toBeNull();
+    // Sin el instante de la fuente activa, la igualdad nunca interrumpe.
+    expect(planVozBuffer(golS + 4, duracion, golS + 4, ahora, finCanto, GOL, GOL)).toBeNull();
+    expect(golSuperado(GOL, Math.round((golS + 4) * 10), { prioridad: GOL, tick: Math.round(golS * 10) })).toBe(false);
+  });
+
+  it("M7 (a) · dos cantos vigentes: arranca el más reciente y el anterior, aún dentro del atraso, no lo corta", () => {
+    const clips = [{ clave: "viejo", tick: 245, prioridad: GOL }, { clave: "nuevo", tick: 251, prioridad: GOL }];
+    // Orden del consumidor: prioridad descendente y, en empate, tick descendente.
+    const orden = [...clips].sort((a, b) => b.prioridad - a.prioridad || b.tick - a.tick);
+    expect(orden[0]!.clave).toBe("nuevo");
+    // Cursor en el que los dos son vigentes: ambos alcanzados y el viejo dentro de atrasoImportanteS.
+    const partidoS = orden[0]!.tick / 10 + .5;
+    for (const c of clips) expect(partidoS - c.tick / 10).toBeLessThanOrEqual(VOZ_BUFFER.atrasoImportanteS);
+    // Sin fuente activa, el viejo sí podría sonar: lo que lo frena es solo el canto más reciente.
+    expect(planVozBuffer(orden[1]!.tick / 10, duracion, partidoS, ahora, 0, GOL, 0)).not.toBeNull();
+    const primero = planVozBuffer(orden[0]!.tick / 10, duracion, partidoS, ahora, 0, GOL, 0)!;
+    expect(primero.interrumpirAnterior).toBe(false);
+    const activa = { prioridad: GOL, tick: orden[0]!.tick };
+    // Fotograma siguiente: el canto viejo, vigente, no corta al nuevo (igualdad de prioridad con tick anterior).
+    expect(planVozBuffer(orden[1]!.tick / 10, duracion, partidoS, ahora + .02, primero.fin, GOL, GOL, false, activa.tick / 10)).toBeNull();
+    expect(golSuperado(GOL, orden[1]!.tick, activa)).toBe(true);
+  });
+
+  it("(b) respuesta fuera de orden: el clip del gol viejo que llega tras arrancar el nuevo queda superado", () => {
+    const activa = { prioridad: GOL, tick: 290 };
+    expect(golSuperado(GOL, 231, activa)).toBe(true);
+    expect(golSuperado(GOL, 290, activa)).toBe(true);
+    // Solo entre goles: otras prioridades y otras fuentes activas no se tocan.
+    expect(golSuperado(PRIORIDAD_EVENTO_ARENA.tiro!, 231, activa)).toBe(false);
+    expect(golSuperado(GOL, 231, { prioridad: PRIORIDAD_EVENTO_ARENA.tiro!, tick: 290 })).toBe(false);
+    expect(golSuperado(GOL, 231, undefined)).toBe(false);
+  });
+
+  it("el cierre (prioridad 0) espera mientras suena el canto y arranca al liberarse, exento de atraso", () => {
+    expect(planVozBuffer(60, 3, 60, ahora, finCanto, 0, GOL, true, golS)).toBeNull();
+    expect(planVozBuffer(60, 3, 70, finCanto + .01, finCanto, 0, GOL, true, golS)).toMatchObject({ interrumpirAnterior: false });
   });
 });

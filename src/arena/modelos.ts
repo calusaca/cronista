@@ -1,4 +1,4 @@
-import { crearLlmDesdeEnv, crearLlmEquipoDesdeEnv, type Llm, type UsoLlm } from "../lib/llm";
+import { CLAVES_LLM_POR_PREFIJO, crearLlmDesdeEnv, crearLlmEquipoDesdeEnv, type Llm, type UsoLlm } from "../lib/llm";
 import { prngDerivado } from "../sim/prng";
 import { z } from "zod";
 import { crearControladorLlm, crearControladorProgramado } from "./controladores";
@@ -7,7 +7,6 @@ import type { ControladorEquipo } from "./tipos";
 
 type Env = Record<string, string | undefined>;
 export interface ModeloConfigurado { publico: ModeloPublico; crear: () => Llm }
-const claves = ["FOUNDRY_API_KEY", "FOUNDRY_BASE_URL", "FOUNDRY_DEPLOYMENT", "AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT", "AZURE_OPENAI_API_VERSION", "AZURE_OPENAI_REASONING_EFFORT"];
 const esquemaCatalogo = z.array(z.strictObject({ id: z.string().regex(/^[a-z0-9-]{1,40}$/), nombre: z.string().min(1).max(80), prefijo: z.string().regex(/^ARENA_[A-Z0-9_]+_$/) })).min(1).max(12);
 
 /** Solo configuración del servidor. Construir el catálogo no realiza inferencias. */
@@ -18,8 +17,8 @@ export function catalogoModelos(env: Env = process.env): ModeloConfigurado[] {
     for (const entrada of esquemaCatalogo.parse(JSON.parse(env.ARENA_MODELOS))) {
       if (catalogo.some(m => m.publico.id === entrada.id)) throw new Error("Identificadores de modelos repetidos");
       const configuracion: Env = { ...env, CRONISTA_LLM: env[entrada.prefijo + "LLM"] ?? env.CRONISTA_LLM };
-      for (const clave of claves) if (env[entrada.prefijo + clave] !== undefined) configuracion[clave] = env[entrada.prefijo + clave];
-      if (!["azure-openai", "foundry"].includes(configuracion.CRONISTA_LLM ?? "")) throw new Error("El catálogo necesita modelos reales");
+      for (const clave of CLAVES_LLM_POR_PREFIJO) if (env[entrada.prefijo + clave] !== undefined) configuracion[clave] = env[entrada.prefijo + clave];
+      if (!["azure-openai", "foundry", "foundry-modelos"].includes(configuracion.CRONISTA_LLM ?? "")) throw new Error("El catálogo necesita modelos reales");
       const crear = () => crearLlmDesdeEnv(configuracion, { maxRetries: 0 });
       catalogo.push({ publico: { id: entrada.id, nombre: entrada.nombre, controlador: crear().id }, crear });
     }

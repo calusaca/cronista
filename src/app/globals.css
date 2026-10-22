@@ -2585,6 +2585,9 @@ button.stats-row:hover {
 .arena-live-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
 .arena-live-controls label { display: grid; gap: 7px; flex: 1 1 180px; min-width: 0; font-size: 13px; font-weight: 600; }
 .arena-live-controls .field { width: 100%; min-width: 0; }
+/* Brief 053 · Descargas de la transmisión: tokens del 047, sin animaciones; a 360 px los botones se apilan. */
+.arena-downloads-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+.arena-downloads-actions .btn, .arena-live-controls [data-testid="arena-narration-download"] { max-width: 100%; white-space: normal; }
 .arena-live [role="status"] { padding: 10px 12px; background: var(--hl); border-radius: 6px; margin-bottom: 0; }
 .arena-intelligence-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
 .arena-intelligence-controls label { display: grid; gap: 6px; min-width: 0; font-size: 13px; }
@@ -3064,7 +3067,28 @@ button.stats-row:hover {
   .arena-shell .arena-fav-toggle { width: 44px; height: 44px; min-height: 44px; }
 }
 
+/* Brief 050 · Celebración del gol (P1, estática): realce del marcador y rótulo sobre la cancha, solo
+   con tokens existentes (--ar-score-bg y --ar-score-ink: 16,2; --ar-home y --ar-away con sus anillos). El texto de
+   `strong` no cambia; nada de transform/transition/animation en fichas, balón ni árbitro (047). */
+.arena-score[data-gol="local"] > span:first-child::before, .arena-score[data-gol="visita"] > span:last-child::after { flex-basis: 10px; width: 10px; box-shadow: 0 0 0 2px var(--ar-score-bg); }
+.arena-score[data-gol] strong { box-shadow: 0 0 0 3px var(--ar-score-bg); }
+.arena-pitch-wrap { position: relative; }
+.arena-goal-banner { position: absolute; top: var(--ar-s3); left: 50%; z-index: 1; translate: -50% 0; box-sizing: border-box; width: max-content; max-width: calc(100% - 2 * var(--ar-s3)); margin: 0; padding: var(--ar-s1) var(--ar-s3); border-left: 6px solid var(--ar-home); border-radius: var(--ar-r-sm); background: var(--ar-score-bg); color: var(--ar-score-ink); box-shadow: 0 0 0 1px var(--ar-home-ui); font: 700 15px/1.25 var(--font-display), sans-serif; text-align: center; overflow-wrap: anywhere; pointer-events: none; }
+.arena-goal-banner[data-lado="visita"] { border-left-color: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-goal-word { font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+/* P2 · Anillo del goleador: elemento propio (último hijo de .arena-token) con especificidad 0,4,1 para
+   ganar a local/visita, selección, foco y favorito; solo existe con data-gol. Animaciones del rótulo,
+   del marcador y del anillo; con movimiento reducido quedan en none (bloque de abajo). */
+.arena-player[data-gol] > .arena-token > circle.arena-goal-ring { fill: none; stroke: var(--ar-select); stroke-width: .5; stroke-dasharray: none; animation: arena-gol-anillo 1.2s ease-in-out infinite; }
+.arena-goal-banner { animation: arena-gol-rotulo 240ms ease-out 1; }
+.arena-score[data-gol] strong { animation: arena-gol-marcador 600ms ease-out 2; }
+@keyframes arena-gol-anillo { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes arena-gol-rotulo { from { opacity: 0; translate: -50% -6px; } to { opacity: 1; translate: -50% 0; } }
+@keyframes arena-gol-marcador { 0%, 100% { box-shadow: 0 0 0 3px var(--ar-score-bg); } 50% { box-shadow: 0 0 0 8px transparent; } }
+
 @media (prefers-reduced-motion: reduce) {
   .arena-match-clock[data-en-vivo]::before { animation: none; }
   .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card, .arena-stat-bar { transition: none; }
+  /* Brief 050: rótulo, realce y anillo aparecen estáticos y desaparecen con el cursor. */
+  .arena-goal-banner, .arena-score[data-gol] strong, .arena-player[data-gol] > .arena-token > circle.arena-goal-ring { animation: none; }
 }

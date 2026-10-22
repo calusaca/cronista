@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { crearSesion } from "./sesiones";
-import { construirRelato } from "../src/arena/relato";
+import { cantoGol, construirRelato } from "../src/arena/relato";
+import { CANTO_GOL, PRIORIDAD_EVENTO_ARENA } from "../src/sim/limites";
 import { wavMono } from "../src/arena/pista-audio";
 import type { RegistroArena } from "../src/arena/tipos";
 
@@ -30,7 +31,11 @@ test("reinicios: banda, esquina, meta y centro se ven junto al campo y en la des
     const respuesta = await request.post("/api/arena", { data: { accion: "simular", seed, segundos: 60, local: "auto", visita: "auto" } });
     expect(respuesta.ok()).toBe(true);
     const registro = await respuesta.json() as RegistroArena;
+    // «Imported recording» ya está visible desde la importación anterior: se espera la respuesta real
+    // de esta importación para que el partido no se reemplace después de las comprobaciones.
+    const importada = page.waitForResponse(r => r.url().endsWith("/api/arena") && r.request().method() === "POST" && (r.request().postData() ?? "").includes(`"seed":${seed},`));
     await page.getByLabel("Open saved run", { exact: true }).setInputFiles({ name: `saques-${seed}.json`, mimeType: "application/json", buffer: Buffer.from(JSON.stringify(registro)) });
+    expect((await importada).ok()).toBe(true);
     await expect(page.getByText("Imported recording:", { exact: false })).toBeAttached();
     await expect(page.locator(".arena-score")).toContainText(registro.config.partido.local.nombre);
     for (const tipo of tipos) {
@@ -271,7 +276,11 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
   await page.route(`**/api/arena/sesiones/${id}/eventos*`, r => r.fulfill({ headers: { "content-type": "text/event-stream" }, body: ": keepalive\n\n" }));
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
   const larga = Buffer.from(await wavMono([new Float32Array(360000)], 24000).arrayBuffer()).toString("base64");
-  const audioGol = Buffer.from(await wavMono([new Float32Array(57600)], 24000).arrayBuffer()).toString("base64");
+  // Brief 050: el canto dura ≈ 9 s (medido con Speech); el reinicio sintético del tramo siguiente, 1,5 s.
+  const audioGol = Buffer.from(await wavMono([new Float32Array(9 * 24000)], 24000).arrayBuffer()).toString("base64");
+  const audioReinicio = Buffer.from(await wavMono([new Float32Array(1.5 * 24000)], 24000).arrayBuffer()).toString("base64");
+  const gol = registro.eventos.find(e => e.tipo === "gol" && e.tick === 231)!, reinicioBase = registro.eventos.find(e => e.tipo === "reinicio" && e.tick === gol.tick)!;
+  const reinicio = { ...reinicioBase, id: "reinicio-sintetico-252", tick: 252 };
   await page.addInitScript(() => {
     const Base = window.AudioContext;
     const fuentes: { duracion: number; velocidad: number; detenida: boolean }[] = [];
@@ -290,9 +299,12 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
     const p = r.request().postDataJSON();
     // Esta prueba necesita un comentario largo, sin la noticia de fuera de juego
     // que ahora prima sobre el antiguo balance periódico del segundo quince.
-    const fuente = p.hastaTick === 150 && p.entradaTick === undefined ? { ...registro, eventos: registro.eventos.filter(e => e.tick <= 100 || e.tick > 150 || ["pase", "recepcion"].includes(e.tipo)) } : registro;
+    // Brief 050: un reinicio sintético en el tramo siguiente al gol (tick 252) llega mientras suena el canto.
+    const fuente = p.hastaTick === 150 && p.entradaTick === undefined ? { ...registro, eventos: registro.eventos.filter(e => e.tick <= 100 || e.tick > 150 || ["pase", "recepcion"].includes(e.tipo)) }
+      : p.desdeTick === 250 && p.entradaTick === undefined ? { ...registro, eventos: [...registro.eventos.filter(e => e.tick <= reinicio.tick), reinicio, ...registro.eventos.filter(e => e.tick > reinicio.tick)] } : registro;
     const relato = construirRelato(fuente, p.desdeTick, p.hastaTick, "buffer", p.idioma, { entradaTick: p.entradaTick });
-    return r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: p.hastaTick === 150 && p.entradaTick === undefined ? larga : "prioridad" in relato && relato.prioridad === 100 ? audioGol : audioCorto, tipo: "audio/wav" } : null } });
+    const prioridad = "prioridad" in relato ? relato.prioridad : undefined;
+    return r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: p.hastaTick === 150 && p.entradaTick === undefined ? larga : prioridad === PRIORIDAD_EVENTO_ARENA.gol ? audioGol : prioridad === PRIORIDAD_EVENTO_ARENA.reinicio ? audioReinicio : audioCorto, tipo: "audio/wav" } : null } });
   });
   await page.goto(`/arena?partido=${id}&vista=buffer`);
   await page.getByRole("button", { name: "Enable narration" }).click();
@@ -304,6 +316,23 @@ test("voz independiente: un pasaje largo conserva su ritmo y un gol lo interrump
   await expect(transcripcion).toHaveAttribute("data-narration-tick", "231", { timeout: 12000 });
   await expect(page.locator(".arena-score strong")).toHaveText("1–0");
   expect(await page.evaluate(() => (window as unknown as { fuentesPrueba: { duracion: number; detenida: boolean }[] }).fuentesPrueba.find(f => f.duracion === 15)?.detenida)).toBe(true);
+  // Brief 050 · Canto: el transcript muestra su texto (grito y hechos, sin variantes); rótulo y data-gol en el marcador.
+  await expect(transcripcion).toContainText(CANTO_GOL.plantillas.grito.en);
+  await expect(transcripcion).toContainText(cantoGol(gol, registro, "en", 0)!.tramos.at(-1)!.texto);
+  const rotulo = page.locator(".arena-pitch-wrap > p.arena-goal-banner");
+  await expect(rotulo).toBeVisible();
+  await expect(rotulo).toContainText(registro.config.partido.local.nombre);
+  await expect(rotulo).toContainText(registro.inicial.jugadores.find(j => j.id === gol.jugador)!.nombre);
+  await expect(rotulo.locator(".arena-goal-word")).toHaveText("Goal");
+  expect(await rotulo.getAttribute("role")).toBeNull();
+  await expect(page.locator(".arena-board").getByRole("status", { name: /Gol|Goal/ })).toHaveCount(0);
+  await expect(page.locator('.arena-score[data-gol="local"]')).toHaveCount(1);
+  await expect(page.locator(".arena-score > span")).toHaveCount(2);
+  // El reinicio del tramo siguiente caduca durante el canto: no arranca ni lo detiene.
+  await expect(page.getByTestId("arena-clock")).toHaveText(/0:(29|30) \/ 1:00/, { timeout: 15000 });
+  const fuentes = await page.evaluate(() => (window as unknown as { fuentesPrueba: { duracion: number; detenida: boolean }[] }).fuentesPrueba);
+  expect(fuentes.find(f => f.duracion === 9)?.detenida).toBe(false);
+  expect(fuentes.some(f => f.duracion === 1.5)).toBe(false);
 });
 
 test("voz independiente: termina el partido mientras continúa el relato y después suena el cierre", async ({ page, request }) => {

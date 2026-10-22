@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { estructura } from "../arena/catalogo";
 import { formaciones, type FormacionArena, type RegistroArena } from "../arena/tipos";
-import { estadoVisual, narrarEventoArena } from "../arena/vista";
+import { estadoVisual, golEnCelebracion, narrarEventoArena } from "../arena/vista";
 import { etiquetasPerfil } from "../arena/personalidades";
 import { ARENA, CLIMAS_PARTIDO, TEMPERATURA_C } from "../sim/limites";
 import { entornoDeFormulario } from "../arena/entorno-formulario";
@@ -17,12 +17,14 @@ import { ArenaInteligencia } from "./ArenaInteligencia";
 import { ArenaMesa } from "./ArenaMesa";
 import { ArenaAsistente } from "./ArenaAsistente";
 import { ArenaNarracion } from "./ArenaNarracion";
+import { ArenaDescargas } from "./ArenaDescargas";
 import type { ComentarioArena } from "../arena/narrador";
 import { aplicarPublicacion } from "../arena/protocolo";
 import { rondaVisible } from "../arena/buffer";
 import { ArenaDescripcion } from "./ArenaDescripcion";
 import { ArenaEmisionBuffer } from "./ArenaEmisionBuffer";
 import { ArenaCifras } from "./ArenaCifras";
+import { ArenaMarcador, ArenaRotuloGol } from "./ArenaCelebracion";
 import { AvisosFavoritos, EstrellaFavorito } from "./ArenaFavoritos";
 import { memoAgregado } from "../arena/estadisticas";
 import { almacenFavoritos, alternarClub, alternarJugador, FAVORITOS_VACIOS, favoritosEn, guardarFavoritos, leerFavoritos, preseleccionFavorita, type FavoritosArena } from "../arena/favoritos";
@@ -181,6 +183,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     enlace.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const estado = estadoVisual(registro, tiempo, reducido);
+  // Brief 050: la celebración se deriva del cursor visible, igual que el marcador.
+  const gol = golEnCelebracion(registro, tiempo / ARENA.pasoS);
   const ronda = rondaVisible(registro, tiempo / ARENA.pasoS);
   const eventos = registro.eventos.filter(e => reducido ? e.tick <= estado.tick : e.tick * ARENA.pasoS <= tiempo + Number.EPSILON * ARENA.duracionMaxS);
   const decisiones = ronda ? Object.values(ronda.decisiones) : [];
@@ -247,9 +251,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       <div className="arena-grid" id="arena-watch">
         <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
           {registro === inicial && !sesionActual && !enDirecto && <p className="arena-muted arena-empty">{t("Saved preview. Start a live match above or choose a recording.", "Vista previa guardada. Inicia un partido en vivo arriba o elige una grabación.")}</p>}
-          <div className="arena-score"><span data-favorite={presentes.lado === "local" || undefined}>{nombres.local.nombre}{estrellaClub("local")}</span><strong className="tnum">{estado.marcador.local}–{estado.marcador.visita}</strong><span data-favorite={presentes.lado === "visita" || undefined}>{nombres.visita.nombre}{estrellaClub("visita")}</span></div>
+          <ArenaMarcador registro={registro} estado={estado} gol={gol} favorito={presentes.lado} estrella={estrellaClub} />
           <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock">{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
-          <div className="arena-pitch-wrap"><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
+          <div className="arena-pitch-wrap"><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
             <rect className="arena-runoff" x="-5" y="-5" width="115" height="78" rx="1.5" aria-hidden="true" />
             <rect className="arena-grass" x="0" y="0" width="105" height="68" />
             <g className="arena-stripes" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map(i => <rect key={i} className="arena-stripe" y="0" width="8.75" height="68" x={i * 17.5 + 8.75} />)}</g>
@@ -257,10 +261,12 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
               <circle cx="52.5" cy="34" r="0.35" className="arena-spot" /><circle cx="11" cy="34" r="0.35" className="arena-spot" /><circle cx="94" cy="34" r="0.35" className="arena-spot" />
               <path d="M16.5 26.69 A9.15 9.15 0 0 1 16.5 41.31" /><path d="M88.5 26.69 A9.15 9.15 0 0 0 88.5 41.31" />
               <path d="M1 0 A1 1 0 0 1 0 1 M105 1 A1 1 0 0 1 104 0 M104 68 A1 1 0 0 1 105 67 M0 67 A1 1 0 0 1 1 68" /></g>
-            {estado.jugadores.map(j => <g key={j.id} data-testid="arena-player" data-player={j.id} data-captain={j.capitan || undefined} data-favorite={presentes.jugador === j.id || undefined} transform={`translate(${j.posicion.x} ${j.posicion.y})`} className={`arena-player arena-${j.lado}${jugadorActivo.id === j.id ? " arena-player-selected" : ""}`} role="button" tabIndex={0} aria-pressed={jugadorActivo.id === j.id} aria-label={`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? ` · ${t("Captain", "Capitán")}` : ""}${j.personalidad ? ` · ${etiquetasPerfil[j.personalidad.perfil][idioma]}` : ""}`} onClick={() => setSeleccionado(j.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSeleccionado(j.id); } }}>
+            {estado.jugadores.map(j => <g key={j.id} data-testid="arena-player" data-player={j.id} data-captain={j.capitan || undefined} data-favorite={presentes.jugador === j.id || undefined} data-gol={gol?.jugador === j.id || undefined} transform={`translate(${j.posicion.x} ${j.posicion.y})`} className={`arena-player arena-${j.lado}${jugadorActivo.id === j.id ? " arena-player-selected" : ""}`} role="button" tabIndex={0} aria-pressed={jugadorActivo.id === j.id} aria-label={`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? ` · ${t("Captain", "Capitán")}` : ""}${j.personalidad ? ` · ${etiquetasPerfil[j.personalidad.perfil][idioma]}` : ""}`} onClick={() => setSeleccionado(j.id)} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSeleccionado(j.id); } }}>
               <title>{`${j.nombre} · ${j.dorsal} · ${j.puesto}${j.capitan ? " · C" : ""}`}</title><g className="arena-token"><circle r="1.9" /><text textAnchor="middle" dominantBaseline="central">{j.dorsal}</text>
               {j.capitan && <g className="arena-captain-mark" aria-hidden="true"><rect x="1.4" y="-3.3" width="2.5" height="2.5" rx="0.4" /><text x="2.65" y="-2" textAnchor="middle" dominantBaseline="central">C</text></g>}
-              {!!j.amarillas && <rect className="arena-yellow-card" x="-3.5" y="-3" width="1.3" height="2" aria-hidden="true" />}</g>
+              {!!j.amarillas && <rect className="arena-yellow-card" x="-3.5" y="-3" width="1.3" height="2" aria-hidden="true" />}
+              {/* Brief 050 (P2): anillo del goleador, último hijo de la ficha y solo durante la celebración. */}
+              {gol?.jugador === j.id && <circle className="arena-goal-ring" r="3.2" aria-hidden="true" />}</g>
             </g>)}
             {estado.arbitro && <g className="arena-referee" data-testid="arena-referee" transform={`translate(${estado.arbitro.posicion.x} ${estado.arbitro.posicion.y})`} role="img" aria-label={`${t("Referee", "Árbitro")}: ${estado.arbitro.nombre}`}>
               <title>{`${t("Referee", "Árbitro")}: ${estado.arbitro.nombre}`}</title><rect x="-2.2" y="-2.2" width="4.4" height="4.4" rx="0.5" /><text textAnchor="middle" dominantBaseline="central">{es ? "A" : "R"}</text>
@@ -284,8 +290,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
         </section>
         <aside className="arena-companion" aria-label={t("Narration and commentary", "Narración y comentarios")} data-testid="arena-companion">
           {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={intervenciones} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
-          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={intervenciones} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
+          {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={intervenciones} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <ArenaMesa comentarios={comentarios} intervenciones={intervenciones} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
+          {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}
+          <ArenaDescargas registro={registro} comentarios={comentarios} intervenciones={intervenciones} sesion={sesionActual} hastaTick={tickCifras} enCurso={enDirecto || bufferActivo} idioma={idioma} sinPartido={registro === inicial && !sesionActual && !enDirecto} />
           <section className="arena-live-feed" aria-label={t("Live text narration", "Narración de texto en vivo")} data-testid="arena-live-text">
             <h2>{t("Latest actions", "Últimas acciones")}</h2>
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>
@@ -329,7 +337,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
         avisos={favoritos.hidratado ? <AvisosFavoritos favoritos={favoritos.valor} presentes={presentes} error={favoritos.error} idioma={idioma} olvidar={que => cambiarFavoritos(que === "club" ? { ...favoritos.valor, club: null } : { ...favoritos.valor, jugador: null })} /> : null}
         transporte={!enDirecto && !bufferActivo && !audioActivo} saltar={saltar} />
       <ArenaDescripcion eventos={eventos} registro={registro} idioma={idioma} saltar={saltar} />
-      <details className="arena-limits"><summary>{t("Prototype scope and limitations", "Alcance y límites del prototipo")}</summary><p>{estado.entrenadores ? t("Short synthetic 2D encounters with coaches, substitutions at stoppages and simplified contact fouls/cards. New matches include simplified kick-offs, throw-ins, corner kicks and goal kicks; archives retain their original rules. No regulation penalties, injuries or change of ends. Crosses have a simplified aerial phase, with no heights or headers, contested only near the landing point; the goalkeeper cannot be challenged while holding the ball. Movement, personalities and environmental effects require calibration. This is not a full regulation match or evidence of professional tactical quality.", "Encuentros sintéticos cortos en 2D con entrenadores, sustituciones en interrupciones y faltas/tarjetas por contacto simplificadas. Los partidos nuevos incluyen saques de centro, banda, esquina y meta simplificados; los archivos conservan sus reglas originales. Sin penales reglamentarios, lesiones ni cambio de campo. Los centros tienen una fase aérea simplificada, sin alturas ni cabezazos, que solo se disputa cerca del punto de caída; el portero no puede ser disputado con el balón en las manos. Movimiento, personalidades y efectos ambientales requieren calibración. No es un partido reglamentario completo ni evidencia de calidad táctica profesional.") : t("Archived short 2D open-play scenario. Simplified restarts; no fouls, cards, injuries, substitutions or change of ends.", "Escenario archivado corto de juego abierto 2D. Reinicios simplificados; sin faltas, tarjetas, lesiones, sustituciones ni cambio de campo.")}</p></details>
+      <details className="arena-limits"><summary>{t("Prototype scope and limitations", "Alcance y límites del prototipo")}</summary><p>{estado.entrenadores ? t("Short synthetic 2D encounters with coaches, substitutions at stoppages and simplified contact fouls/cards. New matches include simplified kick-offs, throw-ins, corner kicks and goal kicks; archives retain their original rules. No regulation penalties, injuries or change of ends. Crosses have a simplified aerial phase, with no heights or headers, contested only near the landing point; the goalkeeper cannot be challenged while holding the ball. Shots are placed inside the goal and can go over the bar with a modelled probability, with no simulated height; there are no posts or rebounds. Movement, personalities and environmental effects require calibration. This is not a full regulation match or evidence of professional tactical quality.", "Encuentros sintéticos cortos en 2D con entrenadores, sustituciones en interrupciones y faltas/tarjetas por contacto simplificadas. Los partidos nuevos incluyen saques de centro, banda, esquina y meta simplificados; los archivos conservan sus reglas originales. Sin penales reglamentarios, lesiones ni cambio de campo. Los centros tienen una fase aérea simplificada, sin alturas ni cabezazos, que solo se disputa cerca del punto de caída; el portero no puede ser disputado con el balón en las manos. El remate se coloca dentro del arco y puede irse por encima del travesaño por una probabilidad modelada, sin altura simulada; no hay palos ni rebotes. Movimiento, personalidades y efectos ambientales requieren calibración. No es un partido reglamentario completo ni evidencia de calidad táctica profesional.") : t("Archived short 2D open-play scenario. Simplified restarts; no fouls, cards, injuries, substitutions or change of ends.", "Escenario archivado corto de juego abierto 2D. Reinicios simplificados; sin faltas, tarjetas, lesiones, sustituciones ni cambio de campo.")}</p></details>
     </main>
   </>;
 }

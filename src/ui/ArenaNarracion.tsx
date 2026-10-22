@@ -2,23 +2,28 @@
 import { useEffect, useRef, useState } from "react";
 import type { construirRelato, relatoIntervencion } from "../arena/relato";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../arena/protocolo";
-import { instanteNarrado, wavMono, type TramoTemporal } from "../arena/pista-audio";
+import { instanteNarrado, PISTA_MAX_PCM_BYTES, wavMono, type TramoTemporal } from "../arena/pista-audio";
+import { nombreDescarga } from "../arena/transcripcion";
+import { descargarBlob } from "./ArenaDescargas";
 import { esperaReintentoInvitado, segmentoVozValido, type FalloInvitado } from "../arena/turnos";
 import { VOZ_BUFFER } from "../arena/buffer";
 
 type Segmento = (ReturnType<typeof construirRelato> | ReturnType<typeof relatoIntervencion>) & { audio: { base64: string; tipo: string } | null };
-type Pista = { clave: string; blob: Blob; segmentos: Segmento[]; tramos: TramoTemporal[] };
+/** Brief 053 v1.1 § 9 · La pista guarda el `hastaTick` y el idioma con que se construyó: el WAV los usa. */
+type Pista = { clave: string; blob: Blob; segmentos: Segmento[]; tramos: TramoTemporal[]; hastaTick: number; idioma: "es" | "en" };
 const rolDe = (s: Segmento) => "rol" in s ? s.rol : "narrador";
 /** Brief 045 v3.1: en `completo`, las intervenciones del diario se insertan en la pista, cada una
  * tras el primer tramo del narrador cuyo `hastaTick ≥ tick`, como un tramo de ancho cero en
  * ticks (el cursor se detiene mientras habla el invitado). Nunca se generan nuevas. */
-export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDirecto, idioma, seleccionarTiempo, alActividadAudio, intervenciones = [] }: { sesion: string | null; archivo: "duelo" | "ejemplo-v3" | "ejemplo" | null; alRegistrar: (id: string) => void; hastaTick: number; enDirecto: boolean; idioma: "es" | "en"; seleccionarTiempo: (tick: number) => void; alActividadAudio: (activa: boolean) => void; intervenciones?: readonly IntervencionArena[] }) {
+export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDirecto, idioma, seleccionarTiempo, alActividadAudio, intervenciones = [], seed }: { seed: number; sesion: string | null; archivo: "duelo" | "ejemplo-v3" | "ejemplo" | null; alRegistrar: (id: string) => void; hastaTick: number; enDirecto: boolean; idioma: "es" | "en"; seleccionarTiempo: (tick: number) => void; alActividadAudio: (activa: boolean) => void; intervenciones?: readonly IntervencionArena[] }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const [disponible, setDisponible] = useState(false), [modo, setModo] = useState<"apagado" | "vivo" | "completo">("apagado");
   const [segmento, setSegmento] = useState<Segmento | null>(null), [url, setUrl] = useState<string | null>(null), [version, setVersion] = useState(0), [estado, setEstado] = useState("listo");
   const [progreso, setProgreso] = useState({ listos: 0, total: 0 });
   const audio = useRef<HTMLAudioElement | null>(null), desde = useRef(0), ocupado = useRef(false), generacion = useRef(0), peticion = useRef<AbortController | null>(null);
   const pista = useRef<Pista | null>(null);
+  // Brief 053: el botón de WAV sigue a `pista.current` (se deriva tras cada asignación).
+  const [pistaLista, setPistaLista] = useState(false);
   const seleccionar = useRef(seleccionarTiempo); seleccionar.current = seleccionarTiempo;
   const diario = useRef(intervenciones); diario.current = intervenciones;
   const activarArchivo = async () => {
@@ -29,7 +34,7 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     catch { if (!a.signal.aborted) setEstado("error"); } finally { if (g === generacion.current) ocupado.current = false; }
   };
   useEffect(() => { const a = new AbortController(); void fetch("/api/arena/herramientas", { signal: a.signal }).then(r => r.json()).then(r => setDisponible(r.voz)).catch(() => {}); return () => a.abort(); }, []);
-  useEffect(() => { pista.current = null; setModo("apagado"); setSegmento(null); setEstado("listo"); }, [sesion, archivo, idioma]);
+  useEffect(() => { pista.current = null; setPistaLista(pista.current !== null); setModo("apagado"); setSegmento(null); setEstado("listo"); }, [sesion, archivo, idioma]);
   useEffect(() => { alActividadAudio(modo === "completo"); return () => alActividadAudio(false); }, [modo, alActividadAudio]);
   useEffect(() => {
     generacion.current++; peticion.current?.abort(); ocupado.current = false; audio.current?.pause(); setUrl(null); if (modo !== "apagado") setSegmento(null);
@@ -127,12 +132,12 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
               muestras.push(buffer.getChannelData(0).slice());
               segmentos.push(s); tramos.push({ inicioS: duracion, finS: duracion + buffer.duration, desdeTick: s.desdeTick, hastaTick: s.hastaTick });
               duracion += buffer.duration;
-              if (duracion * decodificador.sampleRate * 2 > 60_000_000) throw new Error("Pista demasiado larga");
+              if (duracion * decodificador.sampleRate * 2 > PISTA_MAX_PCM_BYTES) throw new Error("Pista demasiado larga");
               setProgreso({ listos: segmentos.length, total });
             }
-            lista = { clave, segmentos, tramos, blob: wavMono(muestras, decodificador.sampleRate) };
+            lista = { clave, segmentos, tramos, blob: wavMono(muestras, decodificador.sampleRate), hastaTick, idioma };
             if (!vigente()) return;
-            pista.current = lista;
+            pista.current = lista; setPistaLista(pista.current !== null);
           }
           setSegmento(lista.segmentos[0]!); seleccionar.current(0);
           setUrl(URL.createObjectURL(lista.blob)); setEstado("reproduciendo");
@@ -180,7 +185,10 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
       {enDirecto && <button className="btn" disabled={!sesion || !disponible} aria-pressed={modo === "vivo"} onClick={() => setModo(modo === "vivo" ? "apagado" : "vivo")}>{t("Live narration", "Narración en vivo")}</button>}
       <button className="btn" disabled={!sesion || !disponible || enDirecto || modo === "completo"} aria-pressed={modo === "completo"} onClick={() => setModo("completo")}>{t("Listen from the start", "Escuchar desde el inicio")}</button>
       {modo !== "apagado" && <button className="btn" onClick={() => setModo("apagado")}>{t("Stop narration", "Detener narración")}</button>}
+      {/* Brief 053 · El WAV es el mismo Blob de la pista: ninguna petición ni síntesis nueva. */}
+      <button className="btn" data-testid="arena-narration-download" disabled={!pistaLista} onClick={() => { const p = pista.current; if (p) descargarBlob(nombreDescarga({ partido: { seed }, idioma: p.idioma, alcance: { hastaTick: p.hastaTick, parcial: false } }, "wav"), p.blob); }}>{t("Download audio (WAV)", "Descargar audio (WAV)")}</button>
     </div>
+    {!pistaLista && sesion && disponible && <p className="arena-muted" data-testid="arena-narration-download-help">{t("Press “Listen from the start” to prepare the track; downloading does not generate new audio.", "Pulsa “Escuchar desde el inicio” para preparar la pista; la descarga no genera audio nuevo.")}</p>}
     {!sesion && !archivo && <p className="arena-muted">{t("Generate a match to enable its narration.", "Genera un encuentro para activar su narración.")}</p>}
     {sesion && !disponible && <p className="arena-muted">{t("Audio is currently unavailable.", "El audio no está disponible en este momento.")}</p>}
     <p role="status" data-progress-ready={progreso.listos} data-progress-total={progreso.total}>{textos[estado]}</p>

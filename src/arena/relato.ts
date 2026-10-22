@@ -1,8 +1,9 @@
 import { hechosArena, type HechoArena } from "./inteligencia";
-import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz } from "./expresion";
+import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz, type TramoCanto } from "./expresion";
 import { RELATO_INTERVALOS } from "./protocolo";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
-import { ARENA, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import type { Lado } from "../sim/tipos";
+import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 import type { IntervencionArena, VarianteIntercambio } from "./protocolo";
 import { varianteEfectiva } from "./turnos";
 import { comentarioEditorial, elegirVarianteVoz, type RecuerdoVoz } from "./editorial";
@@ -15,10 +16,12 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   const j = jugadores.find(j => j.id === e.jugador)?.nombre, receptor = jugadores.find(j => j.id === e.receptor)?.nombre;
   if (!j) return idioma === "es" ? h.texto_es : h.texto_en;
   const es = idioma === "es";
+  // Brief 050: el gol se canta con `cantoGol`; aquí solo llega si el goleador no está en la plantilla.
   if (e.autogol || e.motivo === "desvio") return es ? h.texto_es : h.texto_en;
-  if (e.tipo === "gol") return (es ? [`¡Gol de ${j}!`, `¡Gol! ¡Lo anota ${j}!`, `¡${j} marca el gol!`, `¡Gol, gol de ${j}!`] : [`Goal by ${j}!`, `Goal! ${j} scores!`, `${j} scores the goal!`, `It's a goal by ${j}!`])[variante]!;
   if (e.tipo === "atajada") return (es ? [`¡Ataja ${j}!`, `¡${j} detiene el remate!`, `¡El remate lo ataja ${j}!`, `¡Atajada de ${j}!`] : [`${j} makes the save!`, `${j} stops the shot!`, `The shot is saved by ${j}!`, `A save by ${j}!`])[variante]!;
   if (breve && e.tipo === "tiro") return (es ? [`¡Remata ${j}!`, `¡Disparo de ${j}!`, `¡${j} prueba el remate!`, `¡Le pega ${j}!`] : [`${j} shoots!`, `An attempt from ${j}!`, `${j} takes the shot!`, `${j} goes for goal!`])[variante]!;
+  // Brief 051: el remate por encima del travesaño (reinicios-v5) tiene sus propias variantes breves.
+  if (breve && e.tipo === "tiro_fuera" && e.motivo === "alto") return (es ? [`¡Alto el remate de ${j}!`, `¡Se va por encima el disparo de ${j}!`, `¡${j} la manda por encima del travesaño!`, `¡Por encima! Remate de ${j}.`] : [`${j} blazes it over!`, `${j}'s shot sails over the bar!`, `Over the bar from ${j}!`, `${j} lifts it over!`])[variante]!;
   if (breve && e.tipo === "fuera_juego") return (es ? [`Fuera de juego de ${j}.`, `Señalan posición adelantada de ${j}.`, `${j} estaba en fuera de juego.`, `La acción se detiene: fuera de juego de ${j}.`] : [`${j} is offside.`, `Offside against ${j}.`, `${j} was caught offside.`, `Play stops for offside against ${j}.`])[variante]!;
   // Brief 046: el centro tiene frase breve propia; el saque desde las manos usa el texto de `vista`.
   if (breve && e.tipo === "pase" && e.motivo === "centro") return es ? `¡Centro de ${j}!` : `${j} sends in a cross!`;
@@ -26,6 +29,62 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   if (breve && e.tipo === "pase" && receptor) return es ? `${j} busca a ${receptor}.` : `${j} looks for ${receptor}.`;
   if (breve && e.tipo === "recepcion") return es ? `Recibe ${j}.` : `${j} receives it.`;
   return es ? h.texto_es : h.texto_en;
+}
+
+/** Brief 050 · Situación del marcador tras un gol, en el orden de resolución del brief. */
+export type SituacionGol = keyof typeof CANTO_GOL.plantillas.situacion.es;
+type Marcador = { local: number; visita: number };
+const rellenar = (plantilla: string, valores: Record<string, string | number>) => plantilla.replace(/\{(\w+)\}/g, (_, k: string) => String(valores[k]));
+
+/** Marcador registrado tras el gol del `tick`: inicial + goles con tick ≤ `tick` (misma fórmula
+ * que el cierre y el estadista). Nada posterior al tick entra. */
+export function marcadorTrasGol(registro: RegistroArena, tick: number): Marcador {
+  const marcador = { ...registro.inicial.marcador };
+  for (const e of registro.eventos) if (e.tipo === "gol" && e.tick <= tick) marcador[e.lado]++;
+  return marcador;
+}
+
+/** Solo desde el marcador: `a` después del gol de `lado`, `b` antes (a con a[lado] − 1). */
+export function situacionGol(lado: Lado, a: Marcador): SituacionGol {
+  const o: Lado = lado === "local" ? "visita" : "local", b = { ...a, [lado]: a[lado] - 1 } as Marcador;
+  if (a[lado] === a[o]) return "empate";
+  if (a[lado] < a[o]) return "recorte";
+  if (a[lado] - a[o] >= CANTO_GOL.goleadaDesde) return "goleada";
+  if (b[lado] > b[o]) return "ampliacion";
+  if (b[lado] + b[o] === 0) return "apertura";
+  return "ventaja";
+}
+
+/** «Sobre el final»: misma regla que la intensidad 1 de `expresionEvento`. */
+export function golTardio(tick: number, duracionS: number, a: Marcador): boolean {
+  return tick * ARENA.pasoS >= CANTO_GOL.tardioDesdeFraccion * duracionS && Math.abs(a.local - a.visita) <= CANTO_GOL.tardioDiferenciaMax;
+}
+
+/** Marcador hablado en el orden del visual (local, visita): palabras hasta numerosEnPalabrasHasta. */
+export function marcadorHablado(m: Marcador, idioma: "es" | "en"): string {
+  const n = (x: number) => x >= 0 && x <= CANTO_GOL.numerosEnPalabrasHasta ? CANTO_GOL.plantillas.numeros[idioma][x]! : String(x);
+  return rellenar(CANTO_GOL.plantillas.marcador[idioma], { local: n(m.local), visita: n(m.visita) });
+}
+
+/** Brief 050 v1.1 · Canto de un gol: tramos grito + goleador (o autogol, sin grito) + hechos, con
+ * `texto` = tramos unidos por un espacio. `goleador` sale de `evento.jugador`; `equipo`, de
+ * `config.partido[evento.lado]` (en un autogol, el equipo beneficiado). Un desvío canta normal.
+ * Devuelve null si el goleador no está en la plantilla (inicial ∪ banco). */
+export function cantoGol(evento: EventoArena, registro: RegistroArena, idioma: "es" | "en", variante: number): { texto: string; tramos: TramoCanto[] } | null {
+  if (evento.tipo !== "gol") return null;
+  const p = CANTO_GOL.plantillas;
+  const goleador = [...registro.inicial.jugadores, ...registro.inicial.banco ?? []].find(j => j.id === evento.jugador)?.nombre;
+  if (!goleador) return null;
+  const equipo = registro.config.partido[evento.lado].nombre, a = marcadorTrasGol(registro, evento.tick);
+  const tardio = golTardio(evento.tick, registro.config.duracionS, a);
+  const plantillaSituacion: string = p.situacion[idioma][situacionGol(evento.lado, a)];
+  // Tras el prefijo, la plantilla que empieza por palabra (no por el equipo) va en minúscula.
+  const situacion = rellenar(tardio && !plantillaSituacion.startsWith("{") ? plantillaSituacion[0]!.toLowerCase() + plantillaSituacion.slice(1) : plantillaSituacion, { equipo });
+  const hechos = rellenar(p.hechos[idioma], { situacion: (tardio ? p.tardio[idioma] : "") + situacion, marcador: marcadorHablado(a, idioma), segundos: Math.floor(evento.tick * ARENA.pasoS + 1e-9) });
+  const tramos: TramoCanto[] = evento.autogol
+    ? [{ texto: rellenar(p.autogol[idioma], { goleador }), tipo: "autogol" }, { texto: hechos, tipo: "hechos" }]
+    : [{ texto: p.grito[idioma], tipo: "grito" }, { texto: rellenar(p.goleador[idioma][variante % p.goleador[idioma].length]!, { goleador }), tipo: "goleador" }, { texto: hechos, tipo: "hechos" }];
+  return { texto: tramos.map(t => t.texto).join(" "), tramos };
 }
 
 /** Posesión continua y avance comprobados en estados ya publicados. */
@@ -79,7 +138,9 @@ export function construirRelato(registro: RegistroArena, desdeTick: number, hast
     anterior = { tick: e.tick, intensidad: expresion.intensidad, lado: e.lado };
     if (!ids.has(h.id)) continue;
     const variante = varianteVoz(registro.config.partido.seed, e.id);
-    fragmentos.push({ tick: e.tick, texto: textoEvento(h, e, registro, idioma, variante, modo === "vivo"), ...expresion, variante, fuentes: h.eventos, fotogramas: [] });
+    // Brief 050: los tres modos producen el mismo canto (aquí, la variante por semilla).
+    const canto = cantoGol(e, registro, idioma, variante);
+    fragmentos.push({ tick: e.tick, texto: canto?.texto ?? textoEvento(h, e, registro, idioma, variante, modo === "vivo"), ...expresion, variante, fuentes: h.eventos, fotogramas: [], ...canto ? { canto: { tramos: canto.tramos } } : {} });
   }
   const carreras = conducciones(registro, hastaTick, idioma).filter(f => pertenece(f.tick));
   fragmentos.push(...carreras); fragmentos.sort((a, b) => a.tick - b.tick);
@@ -116,10 +177,13 @@ function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: num
     tipoRelato = "jugada";
     const estado = [...registro.fotogramas].reverse().find(f => f.tick <= evento.tick) ?? registro.inicial;
     const variante = varianteVoz(registro.config.partido.seed, evento.id);
-    const textos = Array.from({ length: 4 }, (_, i) => textoEvento(hecho, evento, registro, idioma, i, true));
+    // Brief 050: un gol ofrece sus cuatro cantos completos; la elección es la de siempre.
+    const cantos = Array.from({ length: 4 }, (_, i) => cantoGol(evento, registro, idioma, i));
+    const textos = cantos.map((c, i) => c?.texto ?? textoEvento(hecho, evento, registro, idioma, i, true));
     const texto = elegirVarianteVoz(textos, memoria, evento.tick, variante);
+    const canto = cantos[textos.indexOf(texto)];
     claveVoz = `evento:${evento.id}`; temaVoz = evento.tipo;
-    fragmentos.push({ tick: evento.tick, texto, ...expresionEvento(evento, estado, null, registro.config.duracionS), variante: varianteVoz(registro.config.partido.seed, evento.id), fuentes: [evento.id], fotogramas: [] });
+    fragmentos.push({ tick: evento.tick, texto, ...expresionEvento(evento, estado, null, registro.config.duracionS), variante: varianteVoz(registro.config.partido.seed, evento.id), fuentes: [evento.id], fotogramas: [], ...canto ? { canto: { tramos: canto.tramos } } : {} });
     prioridad = prioridadEvento[evento.tipo]!; eventosNarrados = 1;
   } else if (desdeTick === 0) {
     fragmentos.push({ tick: 0, texto: es ? `Comienza el partido entre ${registro.config.partido.local.nombre} y ${registro.config.partido.visita.nombre}.` : `The match between ${registro.config.partido.local.nombre} and ${registro.config.partido.visita.nombre} begins.`, emocion: "serena", intensidad: .25, variante: 0, fuentes: [], fotogramas: [0] });

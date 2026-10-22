@@ -2,9 +2,10 @@ import { readFileSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { amenazaConBalon, expresionEvento, varianteVoz, type FragmentoVoz } from "../expresion";
-import { construirRelato } from "../relato";
+import { cantoGol, construirRelato } from "../relato";
+import { CANTO_GOL } from "../../sim/limites";
 import { claveAudio, prepararVoz, sintetizarVoz } from "../voz";
 import { GestorSesiones } from "../sesiones";
 import { POST as relatoHttp } from "../../app/api/arena/sesiones/[id]/relato/route";
@@ -147,4 +148,128 @@ it("HTTP reserva texto y marcas antes de Speech y reutiliza el audio sin otra ll
     expect(datos.audio.caracteresPresupuestados).toBeGreaterThan(datos.audio.caracteres);
     expect((await pedir()).status).toBe(200); expect(transporte).toHaveBeenCalledTimes(1);
   } finally { compartido.__cronistaSesiones = previo; await rm(directorio, { recursive: true, force: true }); }
+});
+
+// Brief 050 v1.1 · Canto de gol: un solo <s>, tres tramos, cifras y estilos de CANTO_GOL.
+describe("050 · prepararVoz con canto", () => {
+  const gol = duelo.eventos.find(e => e.tipo === "gol")!;
+  const fragmentoCanto = (idioma: "es" | "en", variante = 0, registro = duelo, evento = gol): FragmentoVoz => {
+    const c = cantoGol(evento, registro, idioma, variante)!;
+    return { tick: evento.tick, texto: c.texto, emocion: "jubilo", intensidad: 0.92, variante, fuentes: [evento.id], fotogramas: [], canto: { tramos: c.tramos } };
+  };
+  const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
+  const prosodia = (tipo: keyof typeof CANTO_GOL.tramos) => { const p = CANTO_GOL.tramos[tipo]; return `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">`; };
+  const expresiones = (ssml: string) => [...ssml.matchAll(/<mstts:express-as style="([^"]+)" styledegree="([^"]+)">/g)].map(m => ({ estilo: m[1]!, grado: m[2]! }));
+
+  it("M5/M6 · ES (Jorge): un <s>, tres express-as cheerful con la prosodia y el styledegree de CANTO_GOL y un solo break final", () => {
+    const f = fragmentoCanto("es"), { ssml, texto } = prepararVoz([f], "es");
+    expect(texto).toBe(f.texto);
+    expect(ssml.match(/<s>/g)).toHaveLength(1); expect(ssml.match(/<\/s>/g)).toHaveLength(1);
+    expect(ssml.match(/<break /g)).toHaveLength(1);
+    expect(ssml).toContain(`<break time="${CANTO_GOL.pausaFinalMs}ms"/></s>`);
+    const tipos = f.canto!.tramos.map(t => t.tipo);
+    expect(expresiones(ssml)).toEqual(tipos.map(t => ({ estilo: CANTO_GOL.estilos.es[t], grado: CANTO_GOL.tramos[t].grado.toFixed(2) })));
+    expect(expresiones(ssml).every(x => x.estilo === "cheerful")).toBe(true);
+    for (const t of f.canto!.tramos) expect(ssml).toContain(`${prosodia(t.tipo)}${t.texto.replace(/'/g, "&apos;")}</prosody>`);
+    // Sin <s> ni <break> entre tramos: el cierre de un express-as va directo al siguiente.
+    expect(ssml).toMatch(/<\/prosody><\/mstts:express-as><mstts:express-as/);
+  });
+
+  it("EN (Jenny): shouting en el grito y excited en goleador y hechos", () => {
+    const { ssml, voz } = prepararVoz([fragmentoCanto("en", 1)], "en");
+    expect(voz).toBe("en-US-JennyNeural");
+    expect(expresiones(ssml).map(x => x.estilo)).toEqual(["shouting", "excited", "excited"]);
+    expect(expresiones(ssml).map(x => x.estilo)).toEqual((["grito", "goleador", "hechos"] as const).map(t => CANTO_GOL.estilos.en[t]));
+    expect(ssml.match(/<s>/g)).toHaveLength(1);
+  });
+
+  it("voz efectiva: Guy (catálogo real: shouting y excited) canta como Jenny; Jorge, cheerful en todo; una voz sin estilos solo lleva <prosody>", () => {
+    // v1.1 (5): catalogo-estilos.json lista shouting y excited para en-US-GuyNeural.
+    vi.stubEnv("ARENA_VOZ_EN", "en-US-GuyNeural");
+    const guy = prepararVoz([fragmentoCanto("en")], "en");
+    expect(guy.voz).toBe("en-US-GuyNeural");
+    expect(expresiones(guy.ssml).map(x => x.estilo)).toEqual(["shouting", "excited", "excited"]);
+    expect(guy.ssml).toContain(`<s><mstts:express-as style="shouting" styledegree="${CANTO_GOL.tramos.grito.grado.toFixed(2)}">${prosodia("grito")}`);
+    expect(expresiones(prepararVoz([fragmentoCanto("es")], "es").ssml).map(x => x.estilo)).toEqual(["cheerful", "cheerful", "cheerful"]);
+    vi.stubEnv("ARENA_VOZ_ES", "es-MX-DaliaNeural");
+    const dalia = prepararVoz([fragmentoCanto("es")], "es");
+    expect(dalia.ssml).not.toContain("<mstts:express-as");
+    expect(dalia.ssml.match(/<prosody /g)).toHaveLength(3); expect(dalia.ssml.match(/<s>/g)).toHaveLength(1);
+  });
+
+  it("autogol: dos tramos (autogol y hechos) con su prosodia", () => {
+    const r = structuredClone(duelo), e = r.eventos.find(e => e.tipo === "gol")!;
+    e.autogol = true; e.jugador = r.inicial.jugadores.find(j => j.lado !== e.lado && j.puesto !== "POR")!.id;
+    const { ssml } = prepararVoz([fragmentoCanto("es", 0, r, e)], "es");
+    expect(expresiones(ssml)).toEqual((["autogol", "hechos"] as const).map(t => ({ estilo: CANTO_GOL.estilos.es[t], grado: CANTO_GOL.tramos[t].grado.toFixed(2) })));
+    expect(ssml).toContain(prosodia("autogol")); expect(ssml).not.toContain(prosodia("grito"));
+  });
+
+  it("lanza con rol de invitado, con emoción distinta de jubilo o con texto distinto de la unión", () => {
+    const f = fragmentoCanto("es");
+    expect(() => prepararVoz([{ ...f, rol: "comentarista" }], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([{ ...f, emocion: "emocion" }], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([{ ...f, texto: f.texto + " Extra." }], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([{ ...f, canto: { tramos: [] } }], "es")).toThrow("Interpretación de voz inválida");
+    expect(() => prepararVoz([{ ...f, rol: "narrador" }], "es")).not.toThrow();
+  });
+
+  it("claveAudio estable por canto, idioma y voz; otra variante cambia la clave", () => {
+    const a = prepararVoz([fragmentoCanto("es", 0)], "es");
+    expect(claveAudio(a, gol.tick)).toBe(claveAudio(prepararVoz([fragmentoCanto("es", 0)], "es"), gol.tick));
+    expect(claveAudio(a, gol.tick)).not.toBe(claveAudio(prepararVoz([fragmentoCanto("es", 1)], "es"), gol.tick));
+    expect(claveAudio(a, gol.tick)).not.toBe(claveAudio(prepararVoz([fragmentoCanto("en", 0)], "en"), gol.tick));
+  });
+
+  it("la ruta de emisión sintetiza el canto del gol del duelo con canto en el fragmento", () => {
+    const desde = Math.floor((gol.tick - 1) / 50) * 50;
+    for (const idioma of ["es", "en"] as const) {
+      const relato = construirRelato(duelo, desde, desde + 50, "buffer", idioma), { ssml } = prepararVoz(relato.fragmentos, idioma);
+      expect(relato.fragmentos[0]!.canto).toBeDefined();
+      expect(ssml.match(/<s>/g)).toHaveLength(1);
+      expect(expresiones(ssml)).toHaveLength(3);
+    }
+  });
+});
+
+// Brief 050 v1.1 (10b) · Coste de Speech del canto frente al control anterior (la etiqueta «¡Gol de X!» /
+// «Goal by X!» del 049, variante 0, con la interpretación `jubilo` sin canto), por gol de v3/v4 en ES y EN.
+// La banda no se escribe a mano: el delta de cada gol se deriva de las constantes (marcas de tres tramos
+// de CANTO_GOL frente a las marcas del control medidas en su propio SSML) más la diferencia de texto.
+describe("050 · coste de SSML del canto (integración)", () => {
+  const leerF = (v: string) => JSON.parse(readFileSync(`src/arena/__fixtures__/arena-reinicios-${v}.json`, "utf8")) as RegistroArena;
+  const esc = (t: string) => t.replace(/[<>&"']/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[c]!);
+  const porciento = (n: number) => `${n >= 0 ? "+" : ""}${n}%`;
+  /** Marcas del canto según CANTO_GOL para la voz efectiva (todas las voces del narrador por defecto admiten sus estilos). */
+  const marcasCanto = (idioma: "es" | "en", tipos: (keyof typeof CANTO_GOL.tramos)[]) => "<s>".length + tipos.reduce((n, t) => {
+    const p = CANTO_GOL.tramos[t];
+    return n + `<mstts:express-as style="${CANTO_GOL.estilos[idioma][t]}" styledegree="${p.grado.toFixed(2)}">`.length + `<prosody rate="${porciento(p.rate)}" pitch="${porciento(p.pitch)}" volume="${porciento(p.volume)}">`.length + "</prosody></mstts:express-as>".length;
+  }, 0) + `<break time="${CANTO_GOL.pausaFinalMs}ms"/></s>`.length;
+
+  it("delta = marcas(CANTO_GOL) − marcas(control) + Δtexto para cada gol de v3/v4 en ES y EN; siempre positivo y sin solicitudes nuevas", () => {
+    const deltas: number[] = [];
+    for (const r of [leerF("v3"), leerF("v4")]) for (const e of r.eventos.filter(e => e.tipo === "gol")) for (const idioma of ["es", "en"] as const) {
+      const desde = Math.floor((e.tick - 1) / 50) * 50, relato = construirRelato(r, desde, Math.min(desde + 50, r.final.tick), "buffer", idioma);
+      const base = relato.fragmentos[0]!, nombre = [...r.inicial.jugadores, ...r.inicial.banco ?? []].find(j => j.id === e.jugador)!.nombre;
+      expect(base.canto).toBeDefined();
+      for (let v = 0; v < 4; v++) {
+      const c = cantoGol(e, r, idioma, v)!, f: FragmentoVoz = { ...base, texto: c.texto, canto: { tramos: c.tramos } };
+      const canto = prepararVoz([f], idioma);
+      const textoControl = idioma === "es" ? `¡Gol de ${nombre}!` : `Goal by ${nombre}!`;
+      const control = prepararVoz([{ ...f, texto: textoControl, canto: undefined }], idioma);
+      expect(canto.caracteresPresupuestados).toBe(canto.ssml.length);
+      // Marcas del control medidas en su SSML: el contenido de <voice> menos su texto.
+      const interiorControl = control.ssml.match(/<voice name="[^"]+">(.*)<\/voice>/)![1]!;
+      const marcasControl = interiorControl.length - esc(textoControl).length;
+      const esperado = marcasCanto(idioma, f.canto!.tramos.map(t => t.tipo)) - marcasControl + f.canto!.tramos.reduce((n, t) => n + esc(t.texto).length, 0) - esc(textoControl).length; // los tramos van juntos, sin el espacio de `texto`
+      const delta = canto.caracteresPresupuestados - control.caracteresPresupuestados;
+      expect(delta, `${e.id} ${idioma}`).toBe(esperado);
+      expect(delta).toBeGreaterThan(0);
+      deltas.push(delta);
+      }
+    }
+    expect(deltas).toHaveLength([leerF("v3"), leerF("v4")].flatMap(r => r.eventos.filter(e => e.tipo === "gol")).length * 2 * 4);
+    // Un solo fragmento y un solo documento por gol: el canto no añade solicitudes.
+    console.log(`050 · delta de SSML por gol (v3/v4, ES y EN): +${Math.min(...deltas)}…+${Math.max(...deltas)} caracteres`);
+  });
 });

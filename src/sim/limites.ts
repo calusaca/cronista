@@ -481,8 +481,9 @@ export const ARENA = {
   dueloMin: 0.1, dueloMax: 0.75, ignorarAutorS: 0.4,
   areaLargoM: 16.5, areaAnchoM: 40.32,
   /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`).
-   * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros). */
-  reglas: "reinicios-v4",
+   * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros).
+   * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel). */
+  reglas: "reinicios-v5",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -598,12 +599,19 @@ export const LOTE_ARENA_046 = {
   /** v1.2 · saques desde las manos: una pérdida en ≤ saqueInmediataS es «intercepción inmediata»; un
    * gol rival sin toque defensor en ≤ golTrasSaqueS tras el saque es «gol tras saque». */
   saqueInmediataS: 1, golTrasSaqueS: 10,
+  /** Brief 051 v1.1 #4 · «intercepción inmediata cercana»: además de ≤ saqueInmediataS, el punto del
+   * toque rival (`hasta`) queda a ≤ inmediataRadioM (m) del origen (`desde`) del saque. Es la
+   * prohibición del saque regalado al rival plantado junto al portero (046 v1.2 #4); la disputa
+   * legal de la caída de un saque aéreo lejano solo cuenta en el contador temporal. */
+  inmediataRadioM: 15,
   /** v1.2 · las bandas de saques se exigen también en este segundo lote de `completo.semillas`. */
   segundoLoteDesde: 101,
   rapido: {
     semillaDesde: 1, semillas: 30,
     robosEnManosMax: 0, perdidasTrasAtajadaMax: 0,
-    intercepcionesInmediatasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
+    /** Brief 051 v1.1 #4: el contador temporal admite como máximo 1 en el lote rápido (antes 0); el
+     * cercano sigue en 0. */
+    intercepcionesInmediatasMax: 1, intercepcionesCercanasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
     desplazamientoMedianaMinM: 1, fraccionDesplazadoMin: 0.45,
     proporcionCentrosMin: 0.25, centrosPorPartidoMin: 0.3,
     metasConduccionPorPartidoMax: 0.05, golesPorPartido: { min: 1.5, max: 3 },
@@ -612,11 +620,73 @@ export const LOTE_ARENA_046 = {
   completo: {
     semillaDesde: 1, semillas: 100,
     robosEnManosMax: 0, perdidasTrasAtajadaMax: 0,
-    intercepcionesInmediatasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
+    /** Brief 051 v1.1 #4: el contador temporal pasa de 0 a ≤ 0,01 por partido en cada lote completo
+     * (único límite del 046 que cambia: un saque aéreo de ≥ saqueAereoMinM entra en la caída en
+     * 1,05–1,2 s y la convención `tick + 1` lo mide 0,1 s antes); el cercano sigue en 0. */
+    intercepcionesInmediatasPorPartidoMax: 0.01, intercepcionesCercanasMax: 0, golesTrasSaquePorPartidoMax: 0.05, saquesPerdidosPorPartidoMax: 0.35,
     desplazamientoMedianaMinM: 1, fraccionDesplazadoMin: 0.45, conversion: { min: 0.25, max: 0.42 },
     proporcionCentrosMin: 0.3, centrosPorPartidoMin: 0.4,
     metasConduccionPorPartidoMax: 0.05, golesPorPartido: { min: 1.8, max: 2.8 },
     tiroFueraTrasDesvioMax: 0, recepcionPorteroRechaceMax: 0, conducirFrenadoMax: 0.25,
+  },
+} as const;
+
+/** Brief 051 · Remate (reinicios-v5). Cifras sintéticas calibradas con el prototipo del 22 oct
+ * (docs/evidencia/motor-051). Solo las usa el motor bajo reinicios-v5, vía `src/arena/remate.ts`. */
+export const REMATE_ARENA = {
+  /** Objetivo dentro del arco: margen mínimo desde el palo, más margen por falta de nivel y por
+   * personalidad (tendencia `remate` baja = más conservador). Acotado a [margenPaloM, arcoM/2]. */
+  margenPaloM: 0.5, margenNivelM: 1.5, margenPersonalidadM: 0.6,
+  /** Desvío lateral del portero (m) respecto de la línea rematador–arco por debajo del cual se considera
+   * centrado y el rematador elige el palo lejano. */
+  indiferenciaM: 0.5,
+  /** Error lateral (semiancho triangular, m) a nivel 0 y distancia referenciaM; escala con la distancia
+   * acotada a [factorDistanciaMin, factorDistanciaMax] y crece con la potencia. Sustituye a
+   * ARENA.errorTiroM solo para el remate bajo v5. */
+  errorBaseM: 5.5, referenciaM: 16, factorDistanciaMin: 0.5, factorDistanciaMax: 1.2, errorPotencia: 0.3,
+  /** Potencia 0 hasta colocadoHastaM, 1 desde potenteDesdeM (distancia al centro del arco). */
+  colocadoHastaM: 8, potenteDesdeM: 20,
+  /** Velocidad del remate = ARENA.velocidadTiroMps × (1 + potenciaVelocidad × (potencia − 0,5)). */
+  potenciaVelocidad: 0.4,
+  /** Probabilidad de que el balón salga por encima del travesaño (dimensión vertical modelada). */
+  altoBase: 0.02, altoPotencia: 0.06, altoNivel: 0.04,
+  /** Alcance del portero (m) a nivel 0 y 100, con el tiempo de reacción de PORTERO_ARENA (reaccionM /
+   * velocidadTiroMps) y el mínimo cuerpoM. A nivel 50 ≈ ARENA.controlPorteroM. */
+  alcanceMinM: 0.9, alcanceMaxM: 2.4,
+  /** Desvío en vez de atrapada: base, más potencia, menos nivel, más estirada; acotado. */
+  desvioBase: 0.35, desvioPotencia: 0.2, desvioNivel: 0.15, desvioEstirada: 0.3, desvioMin: 0.1, desvioMax: 0.8,
+  /** Fuera del mano a mano, el portero se coloca a estos metros del centro del arco sobre la línea
+   * balón–centro del arco (no la bisectriz del ángulo entre los postes; v1.1 #6). */
+  posicionamientoM: 3,
+} as const;
+
+/**
+ * Brief 051 · Bandas de las métricas de remate (`src/arena/metricas-lote.ts`, en la misma pasada que
+ * las del 046: programados, LOTE_ARENA_046.duracionS, todos los ticks; denominador cero = «sin
+ * muestra», incumple). «A puerta» es exactamente `rematesPorLado` (045/049, v1.1 #1); fuera, altos y
+ * bloqueados salen del desenlace físico de cada remate. `rapido` corre en `npm test` (semillas de
+ * LOTE_ARENA_046.rapido) y `completo` en `npm run test:stats` (LOTE_ARENA_046.completo y el segundo
+ * lote desde segundoLoteDesde). Los goles por partido siguen siendo las bandas de LOTE_ARENA_046.
+ */
+export const LOTE_ARENA_051 = {
+  /** Experimento controlado: el mismo lote con `variantes.niveles` y el nivel forzado a `bajo` y a
+   * `alto` (porteros o jugadores de campo; los demás reciben el nivel de su equipo). */
+  nivelesControlado: { bajo: 40, alto: 90 },
+  rapido: {
+    aPuerta: { min: 0.55, max: 0.88 }, atajadasSobreAPuerta: { min: 0.25, max: 0.6 }, fuera: { min: 0.08, max: 0.4 },
+    /** Remates altos mínimos en el lote (cuenta, no fracción: el lote rápido tiene pocos fuera). */
+    altosMin: 2,
+    bloqueadosMax: 0.1, golesSinRematePorPartidoMax: 0.05, colocacionLadosMin: 0.6,
+    /** Diferencia de atajadas / a puerta entre porteros a `alto` y a `bajo`. */
+    controladoPorterosMin: 0.1,
+  },
+  completo: {
+    aPuerta: { min: 0.6, max: 0.85 }, conversion: { min: 0.3, max: 0.5 }, atajadasSobreAPuerta: { min: 0.3, max: 0.55 }, fuera: { min: 0.12, max: 0.35 },
+    altosSobreFuera: { min: 0.1, max: 0.45 },
+    bloqueadosMax: 0.1, golesSinRematePorPartidoMax: 0.05, colocacionLadosMin: 0.6,
+    controladoPorterosMin: 0.1,
+    /** Diferencia de conversión entre jugadores de campo a `alto` y a `bajo`. */
+    controladoCampoMin: 0.1,
   },
 } as const;
 
@@ -867,4 +937,83 @@ export const RESERVAS_VOZ = {
   minimoPorIdioma: 30,
   /** Descargas simultáneas de clips de reserva al activar la voz. */
   descargasSimultaneas: 4,
+} as const;
+
+/** Brief 050 v1.1 · Canto de gol del narrador. Prosodia y estructura medidas el 22 oct con Speech real
+ * (docs/evidencia/canto-gol-050/indice.json): tres tramos (grito, goleador, hechos) dentro de un solo
+ * <s> duran ≈ 9,9 s (ES) y la cota con los nombres más largos 13,87 s (ES) y 14,23 s (EN); cada
+ * frontera de <s> u oración añade ≈ 1 s de silencio. La escucha humana puede ajustar cifras, no la
+ * estructura. */
+export const CANTO_GOL = {
+  /** Porcentajes SSML y styledegree por tramo. El grito usa el máximo documentado (2) y rate −30 %
+   * (vocal sostenida en ES); el goleador baja un escalón; los hechos bajan para que el marcador se
+   * entienda; el autogol no grita (sustituye a grito + goleador). */
+  tramos: {
+    grito: { rate: -30, pitch: 16, volume: 30, grado: 2 },
+    goleador: { rate: 10, pitch: 12, volume: 22, grado: 1.8 },
+    hechos: { rate: 6, pitch: 6, volume: 10, grado: 1.3 },
+    autogol: { rate: 0, pitch: 3, volume: 6, grado: 1 },
+  },
+  /** Estilo por idioma y tramo según el catálogo real del 22 oct (catalogo-estilos.json): Jorge solo
+   * cheerful/chat (ninguna voz es-* del recurso tiene shouting); Jenny admite shouting (ronda 5:
+   * shouting en el grito, excited en el resto). Si la voz efectiva no admite el estilo, se omite
+   * express-as y queda la prosodia (comportamiento vigente de prepararVoz). */
+  estilos: {
+    es: { grito: "cheerful", goleador: "cheerful", hechos: "cheerful", autogol: "cheerful" },
+    en: { grito: "shouting", goleador: "excited", hechos: "excited", autogol: "excited" },
+  },
+  /** Silencio final del canto (como el jubilo anterior). */
+  pausaFinalMs: 380,
+  /** Caracteres máximos del texto (tramos unidos): 150 / MESA_ARENA.dialogo.caracteresPorSegundoVoz
+   * + 0,38 ≈ 16,2 s < VOZ_BUFFER.duracionMaxS. Solo acota plantillas; la cota es la duración medida
+   * (13,87 / 14,23 s) y el rechazo por duración real del consumidor. */
+  maxCaracteres: 150,
+  /** «Sobre el final»: desde esta fracción de la duración y con diferencia ≤ tardioDiferenciaMax tras
+   * el gol. Misma regla que la intensidad 1 de expresionEvento (que lee de aquí). */
+  tardioDesdeFraccion: 0.8, tardioDiferenciaMax: 1,
+  /** Diferencia a favor, después del gol, desde la que el tramo de hechos dice «goleada». */
+  goleadaDesde: 3,
+  /** Segundos de partido (cursor visible) que duran el rótulo y el realce del marcador. */
+  celebracionS: 8,
+  /** Caducidad de la candidatura de la Mesa con tema `gol`: el canto (≈ 9–10 s) y calmaMinS ocupan
+   * casi los 12 s de MESA_ARENA.caducidadInvitadoS. Los demás temas conservan la del 045. */
+  caducidadInvitadoTrasGolS: 20,
+  /** Números del marcador en palabras hasta aquí; desde el siguiente, cifras. */
+  numerosEnPalabrasHasta: 9,
+  plantillas: {
+    /** Tramo grito, sin variantes. */
+    grito: { es: "¡Gooool!", en: "Goooal!" },
+    /** Tramo goleador, cuatro variantes (elegirVarianteVoz sobre los cantos completos). */
+    goleador: {
+      es: ["¡Gol de {goleador}!", "¡Lo marca {goleador}!", "¡{goleador}, gol!", "¡Gol, gol de {goleador}!"],
+      en: ["Goal by {goleador}!", "{goleador} scores!", "{goleador}, goal!", "Goal, goal by {goleador}!"],
+    },
+    /** Autogol: sin grito; este tramo sustituye a grito + goleador. */
+    autogol: { es: "Gol en propia puerta de {goleador}.", en: "An own goal by {goleador}." },
+    situacion: {
+      es: { empate: "{equipo} empata", recorte: "{equipo} recorta distancias", goleada: "Goleada de {equipo}", ampliacion: "{equipo} amplía la ventaja", apertura: "{equipo} se adelanta", ventaja: "{equipo} se pone por delante" },
+      en: { empate: "{equipo} level it", recorte: "{equipo} pull one back", goleada: "It's a rout for {equipo}", ampliacion: "{equipo} extend their lead", apertura: "{equipo} take the lead", ventaja: "{equipo} go in front" },
+    },
+    hechos: { es: "{situacion}, {marcador}, a los {segundos} segundos.", en: "{situacion}, {marcador}, after {segundos} seconds." },
+    tardio: { es: "Sobre el final, ", en: "Late on, " },
+    numeros: { es: ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"], en: ["nil", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"] },
+    marcador: { es: "{local} a {visita}", en: "{local}–{visita}" },
+    /** Palabra del rótulo para un autogol (el gol normal usa «Gol»/«Goal»). */
+    rotulo: { autogol: { es: "Autogol", en: "Own goal" } },
+  },
+} as const;
+
+/** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
+ * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
+ * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por
+ * decisión son los de ARENA (tokensOrdenes, intentosOrdenes), los mismos que usa la web. */
+export const SMOKE_MODELOS_ARENA = {
+  /** Ninguna decisión del candidato puede superar este tiempo (mitad del plazo web de 60 s). */
+  decisionMaxMs: 30_000,
+  /** Partidos cortos (espejo, cruzado A, cruzado B): duración e intervalo en segundos. */
+  cortoS: 60, cortoIntervaloS: 15,
+  /** Partido «web»: la duración e intervalo que usa la arena publicada. */
+  webS: 180, webIntervaloS: 30,
+  /** Margen sobre el prompt_tokens máximo observado para estimar la entrada con reintento (§5). */
+  factorEntradaReintento: 1.25,
 } as const;
