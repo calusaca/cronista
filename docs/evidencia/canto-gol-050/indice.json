@@ -1,0 +1,706 @@
+{
+  "generadoUtc": "2026-10-22T04:48:16.020Z",
+  "formato": "audio-24khz-48kbitrate-mono-mp3",
+  "solicitudes": 29,
+  "caracteresSsml": 19236,
+  "metodo": "ffmpeg: duración por decodificación completa (último time= de la salida), pico y media (volumedetect) del MP3 completo, de su primer segundo (grito) y del resto",
+  "escuchaHumana": "pendiente",
+  "candidatos": [
+    {
+      "id": "1-control-actual",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Etiqueta actual «¡Gol de X!» con la prosodia vigente de prepararVoz (jubilo 0,92)",
+      "texto": "¡Gol de Mateo Ferrán!",
+      "caracteresTexto": 21,
+      "caracteresSsml": 359,
+      "bytes": 14256,
+      "archivo": "es-1-control-actual.mp3",
+      "duracionS": 2.37,
+      "picoDb": -6.2,
+      "mediaDb": -24.3,
+      "primerSegundo": {
+        "picoDb": -6.2,
+        "mediaDb": -20.9
+      },
+      "resto": {
+        "picoDb": -6.2,
+        "mediaDb": -24.3
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"1.72\"><prosody rate=\"+11.3%\" pitch=\"+6.0%\" volume=\"+13.2%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.9
+    },
+    {
+      "id": "2-texto-largo-prosodia-unica",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Estructura completa en un solo fragmento con la prosodia vigente",
+      "texto": "¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 90,
+      "caracteresSsml": 428,
+      "bytes": 54720,
+      "archivo": "es-2-texto-largo-prosodia-unica.mp3",
+      "duracionS": 9.12,
+      "picoDb": -3,
+      "mediaDb": -21.6,
+      "primerSegundo": {
+        "picoDb": -8.7,
+        "mediaDb": -20.2
+      },
+      "resto": {
+        "picoDb": -3,
+        "mediaDb": -21.6
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"1.72\"><prosody rate=\"+11.3%\" pitch=\"+6.0%\" volume=\"+13.2%\">¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 9.9
+    },
+    {
+      "id": "3-rampa-segmentos",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Tres segmentos con rampa descendente de tono/volumen y styledegree 2 → 1,2",
+      "texto": "¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 90,
+      "caracteresSsml": 736,
+      "bytes": 62928,
+      "archivo": "es-3-rampa-segmentos.mp3",
+      "duracionS": 10.48,
+      "picoDb": -2.5,
+      "mediaDb": -21.7,
+      "primerSegundo": {
+        "picoDb": -7.3,
+        "mediaDb": -18.4
+      },
+      "resto": {
+        "picoDb": -2.5,
+        "mediaDb": -21.7
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+18%\" volume=\"+30%\">¡Gooool!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.6
+    },
+    {
+      "id": "4-triple-gol-crescendo",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "«¡Gol, gol, gol!» con crescendo por segmento y la misma cola",
+      "texto": "¡Gol! ¡Gol! ¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 102,
+      "caracteresSsml": 1058,
+      "bytes": 78336,
+      "archivo": "es-4-triple-gol-crescendo.mp3",
+      "duracionS": 13.05,
+      "picoDb": -2.6,
+      "mediaDb": -22,
+      "primerSegundo": {
+        "picoDb": -5.3,
+        "mediaDb": -22.4
+      },
+      "resto": {
+        "picoDb": -2.6,
+        "mediaDb": -22
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"1.40\"><prosody rate=\"+5%\" pitch=\"+6%\" volume=\"+10%\">¡Gol!</prosody></mstts:express-as><break time=\"60ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.70\"><prosody rate=\"0%\" pitch=\"+12%\" volume=\"+18%\">¡Gol!</prosody></mstts:express-as><break time=\"60ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+20%\" volume=\"+30%\">¡Gooool!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.8
+    },
+    {
+      "id": "5-vocal-estirada-texto",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Grito con vocal repetida en el texto, ritmo normal",
+      "texto": "¡Goooooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 93,
+      "caracteresSsml": 737,
+      "bytes": 61920,
+      "archivo": "es-5-vocal-estirada-texto.mp3",
+      "duracionS": 10.32,
+      "picoDb": -2.6,
+      "mediaDb": -22.1,
+      "primerSegundo": {
+        "picoDb": -8.5,
+        "mediaDb": -21
+      },
+      "resto": {
+        "picoDb": -2.6,
+        "mediaDb": -22.1
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"0%\" pitch=\"+18%\" volume=\"+30%\">¡Goooooool!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 9
+    },
+    {
+      "id": "6-vocal-estirada-prosodia",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Grito «¡Gol!» estirado solo con rate −45 %",
+      "texto": "¡Gol! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 87,
+      "caracteresSsml": 733,
+      "bytes": 64368,
+      "archivo": "es-6-vocal-estirada-prosodia.mp3",
+      "duracionS": 10.72,
+      "picoDb": -2.3,
+      "mediaDb": -22.3,
+      "primerSegundo": {
+        "picoDb": -4.6,
+        "mediaDb": -19.6
+      },
+      "resto": {
+        "picoDb": -2.3,
+        "mediaDb": -22.3
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-45%\" pitch=\"+18%\" volume=\"+30%\">¡Gol!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.1
+    },
+    {
+      "id": "7-nombre-repetido",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Grito, nombre del goleador dos veces y datos",
+      "texto": "¡Gooool! ¡Mateo Ferrán! ¡Mateo Ferrán! Gol para Sporting Montefrío Bajo. Minuto 23: uno a cero.",
+      "caracteresTexto": 95,
+      "caracteresSsml": 740,
+      "bytes": 69408,
+      "archivo": "es-7-nombre-repetido.mp3",
+      "duracionS": 11.56,
+      "picoDb": -3.6,
+      "mediaDb": -22.2,
+      "primerSegundo": {
+        "picoDb": -7.3,
+        "mediaDb": -18.4
+      },
+      "resto": {
+        "picoDb": -3.6,
+        "mediaDb": -22.2
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+18%\" volume=\"+30%\">¡Gooool!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+8%\" pitch=\"+12%\" volume=\"+22%\">¡Mateo Ferrán! ¡Mateo Ferrán!</prosody></mstts:express-as><break time=\"200ms\"/></s><s><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Gol para Sporting Montefrío Bajo. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.2
+    },
+    {
+      "id": "1-control-actual",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Etiqueta actual «¡Gol de X!» con la prosodia vigente de prepararVoz (jubilo 0,92)",
+      "texto": "Goal by Mateo Ferrán!",
+      "caracteresTexto": 21,
+      "caracteresSsml": 358,
+      "bytes": 17136,
+      "archivo": "en-1-control-actual.mp3",
+      "duracionS": 2.85,
+      "picoDb": -4.1,
+      "mediaDb": -22.7,
+      "primerSegundo": {
+        "picoDb": -4.1,
+        "mediaDb": -20.6
+      },
+      "resto": {
+        "picoDb": -4.1,
+        "mediaDb": -22.7
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"1.72\"><prosody rate=\"+11.3%\" pitch=\"+6.0%\" volume=\"+13.2%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.4
+    },
+    {
+      "id": "2-texto-largo-prosodia-unica",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Estructura completa en un solo fragmento con la prosodia vigente",
+      "texto": "Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 88,
+      "caracteresSsml": 425,
+      "bytes": 59904,
+      "archivo": "en-2-texto-largo-prosodia-unica.mp3",
+      "duracionS": 9.98,
+      "picoDb": -2.4,
+      "mediaDb": -22,
+      "primerSegundo": {
+        "picoDb": -5,
+        "mediaDb": -18.9
+      },
+      "resto": {
+        "picoDb": -2.4,
+        "mediaDb": -22
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"1.72\"><prosody rate=\"+11.3%\" pitch=\"+6.0%\" volume=\"+13.2%\">Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.8
+    },
+    {
+      "id": "3-rampa-segmentos",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Tres segmentos con rampa descendente de tono/volumen y styledegree 2 → 1,2",
+      "texto": "Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 88,
+      "caracteresSsml": 731,
+      "bytes": 66960,
+      "archivo": "en-3-rampa-segmentos.mp3",
+      "duracionS": 11.16,
+      "picoDb": -3.2,
+      "mediaDb": -21.7,
+      "primerSegundo": {
+        "picoDb": -4.3,
+        "mediaDb": -17.5
+      },
+      "resto": {
+        "picoDb": -3.2,
+        "mediaDb": -21.7
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+18%\" volume=\"+30%\">Goooal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.9
+    },
+    {
+      "id": "4-triple-gol-crescendo",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "«¡Gol, gol, gol!» con crescendo por segmento y la misma cola",
+      "texto": "Goal! Goal! Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 100,
+      "caracteresSsml": 1051,
+      "bytes": 85248,
+      "archivo": "en-4-triple-gol-crescendo.mp3",
+      "duracionS": 14.2,
+      "picoDb": -3.5,
+      "mediaDb": -20.8,
+      "primerSegundo": {
+        "picoDb": -4.3,
+        "mediaDb": -17.4
+      },
+      "resto": {
+        "picoDb": -3.5,
+        "mediaDb": -20.8
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"1.40\"><prosody rate=\"+5%\" pitch=\"+6%\" volume=\"+10%\">Goal!</prosody></mstts:express-as><break time=\"60ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.70\"><prosody rate=\"0%\" pitch=\"+12%\" volume=\"+18%\">Goal!</prosody></mstts:express-as><break time=\"60ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+20%\" volume=\"+30%\">Goooal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7
+    },
+    {
+      "id": "5-vocal-estirada-texto",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Grito con vocal repetida en el texto, ritmo normal",
+      "texto": "Goooooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 90,
+      "caracteresSsml": 731,
+      "bytes": 66240,
+      "archivo": "en-5-vocal-estirada-texto.mp3",
+      "duracionS": 11.04,
+      "picoDb": -3.4,
+      "mediaDb": -22.2,
+      "primerSegundo": {
+        "picoDb": -6.3,
+        "mediaDb": -19.9
+      },
+      "resto": {
+        "picoDb": -3.4,
+        "mediaDb": -22.2
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"0%\" pitch=\"+18%\" volume=\"+30%\">Goooooal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 8.2
+    },
+    {
+      "id": "6-vocal-estirada-prosodia",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Grito «¡Gol!» estirado solo con rate −45 %",
+      "texto": "Goal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 86,
+      "caracteresSsml": 729,
+      "bytes": 73008,
+      "archivo": "en-6-vocal-estirada-prosodia.mp3",
+      "duracionS": 12.16,
+      "picoDb": -3.6,
+      "mediaDb": -20.9,
+      "primerSegundo": {
+        "picoDb": -3.7,
+        "mediaDb": -14.1
+      },
+      "resto": {
+        "picoDb": -3.6,
+        "mediaDb": -20.9
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"-45%\" pitch=\"+18%\" volume=\"+30%\">Goal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"220ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.1
+    },
+    {
+      "id": "7-nombre-repetido",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Grito, nombre del goleador dos veces y datos",
+      "texto": "Goooal! Mateo Ferrán! Mateo Ferrán! Goal for Sporting Montefrío Bajo. Minute 23: one–nil.",
+      "caracteresTexto": 89,
+      "caracteresSsml": 731,
+      "bytes": 75600,
+      "archivo": "en-7-nombre-repetido.mp3",
+      "duracionS": 12.6,
+      "picoDb": -3.2,
+      "mediaDb": -22,
+      "primerSegundo": {
+        "picoDb": -4.3,
+        "mediaDb": -17.5
+      },
+      "resto": {
+        "picoDb": -3.2,
+        "mediaDb": -22
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"-15%\" pitch=\"+18%\" volume=\"+30%\">Goooal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+8%\" pitch=\"+12%\" volume=\"+22%\">Mateo Ferrán! Mateo Ferrán!</prosody></mstts:express-as><break time=\"200ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Goal for Sporting Montefrío Bajo. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.1
+    },
+    {
+      "id": "8-davis-shouting-informativo",
+      "idioma": "en",
+      "voz": "en-US-DavisNeural",
+      "descripcion": "Alternativa informativa con estilo shouting (no es la voz del narrador)",
+      "texto": "Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 88,
+      "caracteresSsml": 730,
+      "bytes": 69840,
+      "archivo": "en-8-davis-shouting-informativo.mp3",
+      "duracionS": 11.64,
+      "picoDb": -4.9,
+      "mediaDb": -24.5,
+      "primerSegundo": {
+        "picoDb": -7.1,
+        "mediaDb": -25.2
+      },
+      "resto": {
+        "picoDb": -4.9,
+        "mediaDb": -24.5
+      },
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-DavisNeural\"><s><mstts:express-as style=\"shouting\" styledegree=\"2.00\"><prosody rate=\"-10%\" pitch=\"+10%\" volume=\"+20%\">Goooal!</prosody></mstts:express-as><break time=\"150ms\"/></s><s><mstts:express-as style=\"shouting\" styledegree=\"1.50\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+15%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"200ms\"/></s><s><mstts:express-as style=\"excited\" styledegree=\"1.00\"><prosody rate=\"+2%\" pitch=\"0%\" volume=\"+5%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "caracteresPorSegundo": 7.6
+    },
+    {
+      "id": "9-compacto",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Tres segmentos sin <s>, pausas 120/250/380 ms, grito «Gooool» a rate −30 %",
+      "texto": "¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 90,
+      "caracteresSsml": 715,
+      "bytes": 65808,
+      "archivo": "es-9-compacto.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+18%\" volume=\"+30%\">¡Gooool!</prosody></mstts:express-as><break time=\"120ms\"/><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"250ms\"/><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></voice></speak>",
+      "duracionS": 10.96,
+      "picoDb": -2.6,
+      "mediaDb": -21.7,
+      "primerSegundo": {
+        "picoDb": -7.5,
+        "mediaDb": -18.9
+      },
+      "resto": {
+        "picoDb": -2.6,
+        "mediaDb": -21.7
+      },
+      "caracteresPorSegundo": 8.2
+    },
+    {
+      "id": "10-compacto-grito-largo",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Compacto con grito de vocal repetida y rate −40 %",
+      "texto": "¡Goooooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.",
+      "caracteresTexto": 93,
+      "caracteresSsml": 718,
+      "bytes": 70128,
+      "archivo": "es-10-compacto-grito-largo.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-40%\" pitch=\"+18%\" volume=\"+30%\">¡Goooooool!</prosody></mstts:express-as><break time=\"120ms\"/><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><break time=\"250ms\"/><mstts:express-as style=\"cheerful\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo se adelanta. Minuto 23: uno a cero.</prosody></mstts:express-as><break time=\"380ms\"/></voice></speak>",
+      "duracionS": 11.68,
+      "picoDb": -2.5,
+      "mediaDb": -22.2,
+      "primerSegundo": {
+        "picoDb": -8.3,
+        "mediaDb": -21.1
+      },
+      "resto": {
+        "picoDb": -2.5,
+        "mediaDb": -22.2
+      },
+      "caracteresPorSegundo": 8
+    },
+    {
+      "id": "9-compacto",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Tres segmentos sin <s>, pausas 120/250/380 ms, grito «Gooool» a rate −30 %",
+      "texto": "Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 88,
+      "caracteresSsml": 710,
+      "bytes": 69264,
+      "archivo": "en-9-compacto.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><mstts:express-as style=\"excited\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+18%\" volume=\"+30%\">Goooal!</prosody></mstts:express-as><break time=\"120ms\"/><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"250ms\"/><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></voice></speak>",
+      "duracionS": 11.54,
+      "picoDb": -3.5,
+      "mediaDb": -21.7,
+      "primerSegundo": {
+        "picoDb": -4.7,
+        "mediaDb": -16.7
+      },
+      "resto": {
+        "picoDb": -3.5,
+        "mediaDb": -21.7
+      },
+      "caracteresPorSegundo": 7.6
+    },
+    {
+      "id": "10-compacto-grito-shouting",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Compacto con estilo shouting solo en el grito (Jenny lo admite en el catálogo), excited después",
+      "texto": "Goooal! Goal by Mateo Ferrán! Sporting Montefrío Bajo take the lead. Minute 23: one–nil.",
+      "caracteresTexto": 88,
+      "caracteresSsml": 711,
+      "bytes": 68832,
+      "archivo": "en-10-compacto-grito-shouting.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><mstts:express-as style=\"shouting\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+18%\" volume=\"+30%\">Goooal!</prosody></mstts:express-as><break time=\"120ms\"/><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal by Mateo Ferrán!</prosody></mstts:express-as><break time=\"250ms\"/><mstts:express-as style=\"excited\" styledegree=\"1.20\"><prosody rate=\"+4%\" pitch=\"+4%\" volume=\"+8%\">Sporting Montefrío Bajo take the lead. Minute 23: one–nil.</prosody></mstts:express-as><break time=\"380ms\"/></voice></speak>",
+      "duracionS": 11.47,
+      "picoDb": -3.5,
+      "mediaDb": -20.8,
+      "primerSegundo": {
+        "picoDb": -3.7,
+        "mediaDb": -14.2
+      },
+      "resto": {
+        "picoDb": -3.5,
+        "mediaDb": -20.8
+      },
+      "caracteresPorSegundo": 7.7
+    },
+    {
+      "id": "11-forma-elegida",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Forma elegida: grito con el goleador (cheerful 2, rate −20 %, pitch +16 %, vol +30 %) y hechos (cheerful 1,3, rate +6 %, pitch +6 %, vol +10 %) en un solo <s>, pausa final 380 ms",
+      "texto": "¡Gooool de Mateo Ferrán! Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.",
+      "caracteresTexto": 92,
+      "caracteresSsml": 553,
+      "bytes": 52128,
+      "archivo": "es-11-forma-elegida.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+16%\" volume=\"+30%\">¡Gooool de Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 8.68,
+      "picoDb": -1.8,
+      "mediaDb": -21.8,
+      "primerSegundo": {
+        "picoDb": -7.7,
+        "mediaDb": -22.6
+      },
+      "resto": {
+        "picoDb": -1.8,
+        "mediaDb": -21.8
+      },
+      "caracteresPorSegundo": 10.6
+    },
+    {
+      "id": "11-forma-elegida",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Forma elegida: grito con el goleador (shouting 2, rate −20 %, pitch +16 %, vol +30 %) y hechos (excited 1,3, rate +6 %, pitch +6 %, vol +10 %) en un solo <s>, pausa final 380 ms",
+      "texto": "Goooal by Mateo Ferrán! Sporting Montefrío Bajo take the lead, one–nil, after 23 seconds.",
+      "caracteresTexto": 89,
+      "caracteresSsml": 549,
+      "bytes": 54432,
+      "archivo": "en-11-forma-elegida.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"shouting\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+16%\" volume=\"+30%\">Goooal by Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"excited\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo take the lead, one–nil, after 23 seconds.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 9.07,
+      "picoDb": -2.3,
+      "mediaDb": -20.1,
+      "primerSegundo": {
+        "picoDb": -2.3,
+        "mediaDb": -15.9
+      },
+      "resto": {
+        "picoDb": -2.3,
+        "mediaDb": -20.1
+      },
+      "caracteresPorSegundo": 9.8
+    },
+    {
+      "id": "12-cota-larga",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Cota de duración: variante 1 del grito, «sobre el final», goleada, marcador en cifras, nombres de 26/27 caracteres",
+      "texto": "¡Gol, gol, gooool de Maximiliano Torrealba Ríos! Sobre el final, goleada de Atlético Montefrío Bajo Sur, 10 a 7, a los 179 segundos.",
+      "caracteresTexto": 132,
+      "caracteresSsml": 593,
+      "bytes": 74736,
+      "archivo": "es-12-cota-larga.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+16%\" volume=\"+30%\">¡Gol, gol, gooool de Maximiliano Torrealba Ríos!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sobre el final, goleada de Atlético Montefrío Bajo Sur, 10 a 7, a los 179 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 12.45,
+      "picoDb": -2.9,
+      "mediaDb": -21.2,
+      "primerSegundo": {
+        "picoDb": -2.9,
+        "mediaDb": -18.6
+      },
+      "resto": {
+        "picoDb": -2.9,
+        "mediaDb": -21.2
+      },
+      "caracteresPorSegundo": 10.6
+    },
+    {
+      "id": "12-cota-larga",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "Duration bound: cry variant 1, late on, rout, numeric score, 26/27-character names",
+      "texto": "Goal, goal, goooal by Maximiliano Torrealba Ríos! Late on, it's a rout for Atlético Montefrío Bajo Sur, 10–7, after 179 seconds.",
+      "caracteresTexto": 128,
+      "caracteresSsml": 593,
+      "bytes": 77616,
+      "archivo": "en-12-cota-larga.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"shouting\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+16%\" volume=\"+30%\">Goal, goal, goooal by Maximiliano Torrealba Ríos!</prosody></mstts:express-as><mstts:express-as style=\"excited\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Late on, it&apos;s a rout for Atlético Montefrío Bajo Sur, 10–7, after 179 seconds.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 12.93,
+      "picoDb": -2.3,
+      "mediaDb": -18.5,
+      "primerSegundo": {
+        "picoDb": -2.3,
+        "mediaDb": -12.1
+      },
+      "resto": {
+        "picoDb": -2.3,
+        "mediaDb": -18.5
+      },
+      "caracteresPorSegundo": 9.9
+    },
+    {
+      "id": "13-forma-elegida-rate-10",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Forma elegida con el grito a rate −10 %",
+      "texto": "¡Gooool de Mateo Ferrán! Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.",
+      "caracteresTexto": 92,
+      "caracteresSsml": 553,
+      "bytes": 49824,
+      "archivo": "es-13-forma-elegida-rate-10.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-10%\" pitch=\"+16%\" volume=\"+30%\">¡Gooool de Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 8.3,
+      "picoDb": -2.3,
+      "mediaDb": -21.7,
+      "primerSegundo": {
+        "picoDb": -6.4,
+        "mediaDb": -21.1
+      },
+      "resto": {
+        "picoDb": -2.3,
+        "mediaDb": -21.7
+      },
+      "caracteresPorSegundo": 11.1
+    },
+    {
+      "id": "14-forma-elegida-xloud",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Forma elegida con volume=x-loud en el grito",
+      "texto": "¡Gooool de Mateo Ferrán! Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.",
+      "caracteresTexto": 92,
+      "caracteresSsml": 555,
+      "bytes": 52128,
+      "archivo": "es-14-forma-elegida-xloud.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+16%\" volume=\"x-loud\">¡Gooool de Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 8.68,
+      "picoDb": -1.8,
+      "mediaDb": -22.3,
+      "primerSegundo": {
+        "picoDb": -10.1,
+        "mediaDb": -24.9
+      },
+      "resto": {
+        "picoDb": -1.8,
+        "mediaDb": -22.3
+      },
+      "caracteresPorSegundo": 10.6
+    },
+    {
+      "id": "15-forma-elegida-pitch-8",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Forma elegida con pitch +8 % en el grito",
+      "texto": "¡Gooool de Mateo Ferrán! Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.",
+      "caracteresTexto": 92,
+      "caracteresSsml": 552,
+      "bytes": 52128,
+      "archivo": "es-15-forma-elegida-pitch-8.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-20%\" pitch=\"+8%\" volume=\"+30%\">¡Gooool de Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 8.68,
+      "picoDb": -1.9,
+      "mediaDb": -21.8,
+      "primerSegundo": {
+        "picoDb": -8.1,
+        "mediaDb": -22.7
+      },
+      "resto": {
+        "picoDb": -1.9,
+        "mediaDb": -21.8
+      },
+      "caracteresPorSegundo": 10.6
+    },
+    {
+      "id": "16-grito-separado-un-s",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "Tres tramos en un solo <s>: «¡Gooool!» (rate −30 %), «¡Gol de Mateo Ferrán!» y los hechos",
+      "texto": "¡Gooool! ¡Gol de Mateo Ferrán! Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.",
+      "caracteresTexto": 98,
+      "caracteresSsml": 689,
+      "bytes": 59616,
+      "archivo": "es-16-grito-separado-un-s.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+16%\" volume=\"+30%\">¡Gooool!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol de Mateo Ferrán!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sporting Montefrío Bajo se adelanta, uno a cero, a los 23 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 9.93,
+      "picoDb": -1.1,
+      "mediaDb": -21.2,
+      "primerSegundo": {
+        "picoDb": -7.3,
+        "mediaDb": -18.9
+      },
+      "resto": {
+        "picoDb": -1.1,
+        "mediaDb": -21.2
+      },
+      "caracteresPorSegundo": 9.9
+    },
+    {
+      "id": "17-cota-larga-tres-tramos",
+      "idioma": "es",
+      "voz": "es-MX-JorgeNeural",
+      "descripcion": "v1.1 · cota de duración con tres tramos en un <s>: grito, goleador (variante larga) y hechos (sobre el final, goleada, cifras, nombres de 26/27 c)",
+      "texto": "¡Gol, gol, gooool! ¡Gol, gol de Maximiliano Torrealba Ríos! Sobre el final, goleada de Atlético Montefrío Bajo Sur, 10 a 7, a los 179 segundos.",
+      "caracteresTexto": 143,
+      "caracteresSsml": 734,
+      "bytes": 83232,
+      "archivo": "es-17-cota-larga-tres-tramos.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"es-MX\"><voice name=\"es-MX-JorgeNeural\"><s><mstts:express-as style=\"cheerful\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+16%\" volume=\"+30%\">¡Gol, gol, gooool!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">¡Gol, gol de Maximiliano Torrealba Ríos!</prosody></mstts:express-as><mstts:express-as style=\"cheerful\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Sobre el final, goleada de Atlético Montefrío Bajo Sur, 10 a 7, a los 179 segundos.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 13.87,
+      "picoDb": -3.5,
+      "mediaDb": -21.3,
+      "primerSegundo": {
+        "picoDb": -4.3,
+        "mediaDb": -20.3
+      },
+      "resto": {
+        "picoDb": -3.5,
+        "mediaDb": -21.3
+      },
+      "caracteresPorSegundo": 10.3
+    },
+    {
+      "id": "17-cota-larga-tres-tramos",
+      "idioma": "en",
+      "voz": "en-US-JennyNeural",
+      "descripcion": "v1.1 · duration bound with three spans in one <s>: cry (shouting), scorer (long variant) and facts",
+      "texto": "Goal, goal, goooal! Goal, goal by Maximiliano Torrealba Ríos! Late on, it's a rout for Atlético Montefrío Bajo Sur, 10–7, after 179 seconds.",
+      "caracteresTexto": 140,
+      "caracteresSsml": 734,
+      "bytes": 85392,
+      "archivo": "en-17-cota-larga-tres-tramos.mp3",
+      "ssml": "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"en-US\"><voice name=\"en-US-JennyNeural\"><s><mstts:express-as style=\"shouting\" styledegree=\"2.00\"><prosody rate=\"-30%\" pitch=\"+16%\" volume=\"+30%\">Goal, goal, goooal!</prosody></mstts:express-as><mstts:express-as style=\"excited\" styledegree=\"1.80\"><prosody rate=\"+10%\" pitch=\"+12%\" volume=\"+22%\">Goal, goal by Maximiliano Torrealba Ríos!</prosody></mstts:express-as><mstts:express-as style=\"excited\" styledegree=\"1.30\"><prosody rate=\"+6%\" pitch=\"+6%\" volume=\"+10%\">Late on, it&apos;s a rout for Atlético Montefrío Bajo Sur, 10–7, after 179 seconds.</prosody></mstts:express-as><break time=\"380ms\"/></s></voice></speak>",
+      "duracionS": 14.23,
+      "picoDb": -2.5,
+      "mediaDb": -18.5,
+      "primerSegundo": {
+        "picoDb": -2.5,
+        "mediaDb": -13.8
+      },
+      "resto": {
+        "picoDb": -2.5,
+        "mediaDb": -18.5
+      },
+      "caracteresPorSegundo": 9.8
+    }
+  ]
+}

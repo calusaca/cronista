@@ -1,0 +1,253 @@
+{
+  "consultadoUtc": "2026-10-22T04:48:03.889Z",
+  "region": "la del recurso (no se escribe)",
+  "vocesConEstilos": [
+    {
+      "voz": "en-US-AndrewMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "empathetic",
+        "relieved"
+      ]
+    },
+    {
+      "voz": "en-US-PhoebeMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "empathetic",
+        "sad",
+        "serious"
+      ]
+    },
+    {
+      "voz": "en-US-AvaNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "fearful",
+        "sad"
+      ]
+    },
+    {
+      "voz": "en-US-JennyNeural",
+      "locale": "en-US",
+      "estilos": [
+        "assistant",
+        "chat",
+        "customerservice",
+        "newscast",
+        "angry",
+        "cheerful",
+        "sad",
+        "excited",
+        "friendly",
+        "terrified",
+        "shouting",
+        "unfriendly",
+        "whispering",
+        "hopeful"
+      ]
+    },
+    {
+      "voz": "en-US-GuyNeural",
+      "locale": "en-US",
+      "estilos": [
+        "newscast",
+        "angry",
+        "cheerful",
+        "sad",
+        "excited",
+        "friendly",
+        "terrified",
+        "shouting",
+        "unfriendly",
+        "whispering",
+        "hopeful"
+      ]
+    },
+    {
+      "voz": "en-US-AriaNeural",
+      "locale": "en-US",
+      "estilos": [
+        "chat",
+        "customerservice",
+        "narration-professional",
+        "newscast-casual",
+        "newscast-formal",
+        "cheerful",
+        "empathetic",
+        "angry",
+        "sad",
+        "excited",
+        "friendly",
+        "terrified",
+        "shouting",
+        "unfriendly",
+        "whispering",
+        "hopeful"
+      ]
+    },
+    {
+      "voz": "en-US-DavisNeural",
+      "locale": "en-US",
+      "estilos": [
+        "chat",
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-JaneNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-JasonNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-KaiNeural",
+      "locale": "en-US",
+      "estilos": [
+        "conversation"
+      ]
+    },
+    {
+      "voz": "en-US-LunaNeural",
+      "locale": "en-US",
+      "estilos": [
+        "conversation"
+      ]
+    },
+    {
+      "voz": "en-US-SaraNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-TonyNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-NancyNeural",
+      "locale": "en-US",
+      "estilos": [
+        "angry",
+        "cheerful",
+        "excited",
+        "friendly",
+        "hopeful",
+        "sad",
+        "shouting",
+        "terrified",
+        "unfriendly",
+        "whispering"
+      ]
+    },
+    {
+      "voz": "en-US-DavisMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "empathetic",
+        "funny",
+        "relieved"
+      ]
+    },
+    {
+      "voz": "en-US-DerekMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "empathetic",
+        "excited",
+        "relieved",
+        "shy"
+      ]
+    },
+    {
+      "voz": "en-US-NancyMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "excited",
+        "friendly",
+        "funny",
+        "relieved",
+        "shy"
+      ]
+    },
+    {
+      "voz": "en-US-SerenaMultilingualNeural",
+      "locale": "en-US",
+      "estilos": [
+        "empathetic",
+        "excited",
+        "friendly",
+        "shy",
+        "serious",
+        "relieved",
+        "sad"
+      ]
+    },
+    {
+      "voz": "es-MX-JorgeNeural",
+      "locale": "es-MX",
+      "estilos": [
+        "cheerful",
+        "chat"
+      ]
+    }
+  ]
+}

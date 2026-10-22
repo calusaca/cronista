@@ -5,11 +5,11 @@ import { BUFFER_ARENA, firmaEstadoVoz, planVozBuffer, RelojBuffer, VOZ_BUFFER } 
 import { estadoVisual } from "../arena/vista";
 import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
-import catalogoReserva from "../arena/voz-reserva.json";
-import { elegirReservaVoz, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
+import { elegirReservaVoz, ordenPrimeraVuelta, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
+import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../arena/reservas-voz";
 import { calmaEnFotograma, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
-import { ARENA, MESA_ARENA } from "../sim/limites";
+import { ARENA, MESA_ARENA, RESERVAS_VOZ } from "../sim/limites";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
@@ -23,10 +23,12 @@ const pedible = (v: VarianteLocal) => v.estado === "sin-pedir" && (v.noAntesDe =
 type InvitadoLocal = { intervencion: IntervencionArena; completa: VarianteLocal; breve: VarianteLocal };
 const estadoCoordinador = (v: VarianteLocal): EstadoVariante => v.estado === "valida" ? { estado: "valida", duracionS: v.clip!.audio.duration } : v.estado === "sin-pedir" || v.estado === "pidiendo" ? { estado: "pendiente" } : { estado: v.estado };
 type Activa = { fuente: AudioBufferSourceNode; fin: number; prioridad: number; recuerdo: RecuerdoVoz; rol: Rol };
-type Reserva = { texto: string; audio: AudioBuffer; cierre: boolean };
+type Reserva = { texto: string; audio: AudioBuffer; cierre: boolean; orden: number };
 /** Brief 045: los invitados tienen su propia preparación (una a la vez) y sus propios clips;
  * nunca ocupan la concurrencia del narrador. */
 type Sonido = { silenciada: boolean; activacion: number; activadoTick: number; entradaPendiente: boolean; idioma: "es" | "en"; contexto: AudioContext; clips: Map<string, Clip>; peticiones: Map<string, AbortController>; desde: number; cierrePedido: boolean; cierreFallido: boolean; cerrando: boolean; ultimoFin: number; reservas: Reserva[]; memoria: RecuerdoVoz[]; activa?: Activa;
+  /** Nota del 22 oct (043): reservas cuyo audio empezó en esta emisión, en orden; aparte de la memoria de escucha. */
+  reservasOidas: string[]; cargaReservas: AbortController; totalReservas: number;
   /** 048: por id de intervención, sus dos variantes; peticiones por `${id}|${variante}`; `pedidas` = ids terminados
    * (arrancados, descartados o caducados); `sonadas` = eventos cuya noticia ya sonó. */
   invitados: Map<string, InvitadoLocal>; peticionesInvitado: Map<string, AbortController>; pedidas: Set<string>; sonadas: Set<string>; finUltimaNoticia: number | null; finUltimoInvitado: number | null; ultimoInvitado: { rol: Rol; tick: number } | null };
@@ -36,6 +38,34 @@ type Sonido = { silenciada: boolean; activacion: number; activadoTick: number; e
 function terminarInvitado(s: Sonido, id: string) {
   for (const variante of ["completa", "breve"] as const) { const clave = `${id}|${variante}`; s.peticionesInvitado.get(clave)?.abort(); s.peticionesInvitado.delete(clave); }
   s.invitados.delete(id); s.pedidas.add(id);
+}
+
+/** Nota del 22 oct (043) · Descarga el catálogo de reservas del idioma: primero las de la primera vuelta
+ * (en su orden desfasado por semilla) y el cierre tras la primera, con pocas descargas a la vez. Cada clip
+ * entra en `s.reservas` en cuanto se decodifica; si uno falla, siguen los demás. Devuelve cuántos cargó. */
+async function cargarReservas(s: Sonido, semilla: number): Promise<number> {
+  const signal = s.cargaReservas.signal;
+  let cargadas = 0;
+  try {
+    const r = await fetch(`${RUTA_RESERVAS}/${ARCHIVO_INDICE_RESERVAS}`, { signal });
+    if (!r.ok) throw new Error("Índice de reservas no disponible");
+    const { reservas, cierre } = leerIndiceReservas(await r.json(), s.idioma);
+    s.totalReservas = reservas.length;
+    const cola = ordenPrimeraVuelta(reservas.length, semilla).map(i => reservas[i]!);
+    cola.splice(1, 0, cierre);
+    await Promise.all(Array.from({ length: RESERVAS_VOZ.descargasSimultaneas }, async () => {
+      for (let entrada = cola.shift(); entrada && !signal.aborted; entrada = cola.shift()) {
+        try {
+          const respuesta = await fetch(`${RUTA_RESERVAS}/${entrada.archivo}`, { signal });
+          if (!respuesta.ok) throw new Error("Reserva no disponible");
+          const audio = await s.contexto.decodeAudioData(await respuesta.arrayBuffer());
+          if (signal.aborted || !Number.isFinite(audio.duration) || audio.duration <= 0 || audio.duration > VOZ_BUFFER.duracionMaxS) continue;
+          s.reservas.push({ texto: entrada.texto, cierre: entrada.cierre, orden: entrada.orden, audio }); cargadas++;
+        } catch { /* Una reserva que no carga no detiene las demás. */ }
+      }
+    }));
+  } catch { /* Sin índice no hay reservas; el aviso de error lo muestra el consumidor. */ }
+  return cargadas;
 }
 
 /** El partido tiene un reloj propio. La voz lee ese cursor, prepara contenido
@@ -57,6 +87,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     if (s) {
       for (const a of s.peticiones.values()) a.abort();
       for (const a of s.peticionesInvitado.values()) a.abort();
+      s.cargaReservas.abort();
       try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
       void s.contexto.close().catch(() => {});
     }
@@ -94,14 +125,12 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     if (!s) {
       const contexto = new AudioContext({ sampleRate: 24000 });
       const desde = Math.floor(tick / BUFFER_ARENA.tramoTicks) * BUFFER_ARENA.tramoTicks;
-      s = { silenciada: false, activacion: 0, activadoTick: tick, entradaPendiente: true, idioma, contexto, clips: new Map(), peticiones: new Map(), desde, cierrePedido: false, cierreFallido: false, cerrando: false, ultimoFin: contexto.currentTime, reservas: [], memoria: [],
+      s = { silenciada: false, activacion: 0, activadoTick: tick, entradaPendiente: true, idioma, contexto, clips: new Map(), peticiones: new Map(), desde, cierrePedido: false, cierreFallido: false, cerrando: false, ultimoFin: contexto.currentTime, reservas: [], memoria: [], reservasOidas: [], cargaReservas: new AbortController(), totalReservas: 0,
         invitados: new Map(), peticionesInvitado: new Map(), pedidas: new Set(), sonadas: new Set(), finUltimaNoticia: null, finUltimoInvitado: null, ultimoInvitado: null };
       sonido.current = s;
       const nuevo = s;
-      // Reserva incluida en la aplicación, sin dependencia de red o voces locales.
-      void Promise.all(catalogoReserva[idioma].map(async (clip, i, todos) => ({ texto: clip.texto, cierre: i === todos.length - 1, audio: await contexto.decodeAudioData(Uint8Array.from(atob(clip.base64), c => c.charCodeAt(0)).buffer) })))
-        .then(clips => { if (sonido.current === nuevo) nuevo.reservas = clips; })
-        .catch(() => { if (sonido.current === nuevo) setError(true); });
+      // Nota del 22 oct (043): reservas como archivos estáticos, descargadas al activar la voz.
+      void cargarReservas(nuevo, actual.current.registro.config.partido.seed).then(cargadas => { if (sonido.current === nuevo && !cargadas) setError(true); });
     }
     s.silenciada = false; s.activacion++; s.activadoTick = tick; s.entradaPendiente = true; s.ultimoFin = s.contexto.currentTime;
     for (const [clave, a] of s.peticiones) if (clave.startsWith("entrada:")) { a.abort(); s.peticiones.delete(clave); }
@@ -298,15 +327,18 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
                 fuente.start(plan.cuando); s.memoria = recordarVoz(s.memoria, recuerdo); setPasaje(invitado.segmento); setHablando(true);
               }
             }
-            if (!s.activa && !s.cerrando && s.reservas.length && s.contexto.currentTime - s.ultimoFin >= VOZ_BUFFER.reservaTrasS) {
-              const cierre = r.estado === "final" && s.cierreFallido;
-              const reserva = elegirReservaVoz(s.reservas, s.memoria, cierre)!;
+            const cierreReserva = r.estado === "final" && s.cierreFallido;
+            // Nota del 22 oct (043): rotación por emisión, no por la memoria de escucha.
+            const reserva = !s.activa && !s.cerrando && s.reservas.length && s.contexto.currentTime - s.ultimoFin >= VOZ_BUFFER.reservaTrasS
+              ? elegirReservaVoz(s.reservas, s.reservasOidas, { semilla: datos.registro.config.partido.seed, cierre: cierreReserva, total: s.totalReservas }) : undefined;
+            if (reserva) {
+              const cierre = cierreReserva;
               const recuerdo: RecuerdoVoz = { tick: Math.floor(segundo * 10), texto: reserva.texto, tema: "reserva", estado: "iniciada" };
               const fuente = s.contexto.createBufferSource(); fuente.buffer = reserva.audio; fuente.connect(s.contexto.destination);
               const activa: Activa = { fuente, fin: s.contexto.currentTime + reserva.audio.duration, prioridad: -1, recuerdo, rol: "narrador" }; s.activa = activa;
               if (cierre) s.cerrando = true;
               fuente.onended = () => { if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect(); if (sonido.current === s && s.activa === activa) { s.activa = undefined; s.ultimoFin = s.contexto.currentTime; setHablando(false); } };
-              fuente.start(); s.memoria = recordarVoz(s.memoria, recuerdo);
+              fuente.start(); s.memoria = recordarVoz(s.memoria, recuerdo); if (!reserva.cierre) s.reservasOidas.push(reserva.texto);
               setPasaje({ desdeTick: Math.floor(segundo * 10), hastaTick: Math.floor(segundo * 10), modo: "buffer", idioma: s.idioma, texto: reserva.texto, fragmentos: [{ tick: Math.floor(segundo * 10), texto: reserva.texto, emocion: "serena", intensidad: .18, variante: 0, fuentes: [], fotogramas: [] }], fuentes: [], fotogramas: [], eventosDisponibles: 0, eventosNarrados: 0, conduccionesNarradas: 0, audio: null, prioridad: -1, cierre, tipoRelato: "comentario", firmaEstado: undefined, claveVoz: undefined, temaVoz: "reserva" });
               setHablando(true);
             }

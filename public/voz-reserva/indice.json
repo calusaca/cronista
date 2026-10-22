@@ -1,0 +1,388 @@
+{
+ "version": 1,
+ "formato": "audio/mpeg",
+ "voces": {
+  "es": "es-MX-JorgeNeural",
+  "en": "en-US-JennyNeural"
+ },
+ "es": {
+  "reservas": [
+   {
+    "archivo": "es/01.mp3",
+    "texto": "Además de quien lleva la pelota, conviene seguir los movimientos de sus compañeros.",
+    "bytes": 34848,
+    "sha256": "ed761f793bc0b4503d67bf84dae7179a2751bff42f061467a0a811d696181004"
+   },
+   {
+    "archivo": "es/02.mp3",
+    "texto": "Un pase hacia atrás también puede servir para encontrar una nueva salida.",
+    "bytes": 30096,
+    "sha256": "41cfe32fdc1bb0c22de4cfa74d002bddcfb7f1e77663b65347453ef5f9983f56"
+   },
+   {
+    "archivo": "es/03.mp3",
+    "texto": "En una recepción, el primer control puede facilitar la siguiente jugada.",
+    "bytes": 32688,
+    "sha256": "cd2ffa04a1ba71d9d7a13e4365b58b131d3ccfc917a695575668a8c429c64627"
+   },
+   {
+    "archivo": "es/04.mp3",
+    "texto": "Cambiar el juego de una banda a otra puede abrir un camino diferente hacia el área.",
+    "bytes": 32256,
+    "sha256": "757165641602284c56b24ac1e5f9c37acbf8cdbc8c6ee48a8991914f6ea5533b"
+   },
+   {
+    "archivo": "es/05.mp3",
+    "texto": "La distancia entre los compañeros importa: acercarse ofrece una opción de pase corto.",
+    "bytes": 36720,
+    "sha256": "b8c268760c480c2ddae3e4ec2fb56e51417dfa63e1dd42ade483269e789c96ad"
+   },
+   {
+    "archivo": "es/06.mp3",
+    "texto": "Para defender también cuenta lo que ocurre lejos de la pelota, especialmente a la espalda.",
+    "bytes": 36288,
+    "sha256": "a0599efcba00e40a4ad3646716a2e5f08844a5536527a35f6c3594dae842a0b7"
+   },
+   {
+    "archivo": "es/07.mp3",
+    "texto": "Cuando un equipo pierde la posesión, regresar a tiempo ayuda a cerrar espacios.",
+    "bytes": 33552,
+    "sha256": "3bd06c663a653f8af9a35e9118d0c789a5b2add3e8f18584bcf6d249e2f777c6"
+   },
+   {
+    "archivo": "es/08.mp3",
+    "texto": "Un remate no empieza solo al golpear: el pase anterior también forma parte de la jugada.",
+    "bytes": 37152,
+    "sha256": "83f7d80b5a05f3b4284fbab187331651ff14b3daccb4fe91147939a89b177dac"
+   },
+   {
+    "archivo": "es/09.mp3",
+    "texto": "Jugar por fuera puede dar amplitud; por dentro, las líneas de pase suelen ser más estrechas.",
+    "bytes": 40752,
+    "sha256": "a7375f465fb71ea0af60068dbc45ea23dc3f7514d066f4fc342fe2c1dbe43f89"
+   },
+   {
+    "archivo": "es/10.mp3",
+    "texto": "En un saque, la colocación de los compañeros ayuda a ofrecer distintas opciones.",
+    "bytes": 35280,
+    "sha256": "060c64d8c9032c2f6c57af26ac87fca555787c1d53e42df733a53af62500a585"
+   },
+   {
+    "archivo": "es/11.mp3",
+    "texto": "La precisión y la elección del momento cuentan tanto como la fuerza de un pase.",
+    "bytes": 31824,
+    "sha256": "8fcc51dd1221a8aff279f9514f0afe7236383dc5c4b4f407a66c9e34b96776d3"
+   },
+   {
+    "archivo": "es/12.mp3",
+    "texto": "El portero también puede ser un apoyo para volver a empezar la circulación.",
+    "bytes": 30672,
+    "sha256": "a32a0a8183a178e17eaf7ba5aeb32c3721f2e341852d5c485af37c7c3a2967f2"
+   },
+   {
+    "archivo": "es/13.mp3",
+    "texto": "Una pausa con la pelota puede dar tiempo para que los compañeros se acomoden.",
+    "bytes": 30384,
+    "sha256": "3b7bfc83ec00c67e711255f62ad524f4e4b796bbad7a5cd842fb4a4d9361c81a"
+   },
+   {
+    "archivo": "es/14.mp3",
+    "texto": "Conservar la posesión también sirve para descansar mientras circula la pelota.",
+    "bytes": 32256,
+    "sha256": "fab97342fe60adff98fa501a894830e84b2d56a1dfbcbad19220281788bc9f7d"
+   },
+   {
+    "archivo": "es/15.mp3",
+    "texto": "Atraer rivales hacia un lado puede dejar más espacio en el sector contrario.",
+    "bytes": 32256,
+    "sha256": "1ab1d2face5f15d352d96c239897cd2d40bf23542423d1b5cf9a030e24eb29b5"
+   },
+   {
+    "archivo": "es/16.mp3",
+    "texto": "Un apoyo cercano permite tocar, moverse y ofrecerse para recibir de nuevo.",
+    "bytes": 33984,
+    "sha256": "a4fb1d1c522babb7c7d1d1c280f1e2f4280399477840affa6f6359117ddeed3b"
+   },
+   {
+    "archivo": "es/17.mp3",
+    "texto": "La primera línea de presión intenta orientar la salida rival hacia un costado.",
+    "bytes": 31680,
+    "sha256": "64702ebd746af2851c303e08ad186a255873473e1d4fa09802549823c0d52afd"
+   },
+   {
+    "archivo": "es/18.mp3",
+    "texto": "Un control orientado ahorra un toque y acelera la acción siguiente.",
+    "bytes": 29232,
+    "sha256": "53227bf31e65c46a4146c6772806f4f4bebd66e9e3b785accbb9cc0679203ef2"
+   },
+   {
+    "archivo": "es/19.mp3",
+    "texto": "Mirar alrededor antes de recibir ayuda a decidir más rápido qué hacer.",
+    "bytes": 30240,
+    "sha256": "0d94db4f6506abaf30dccca5e4d77396191ffbb1ac30eb6fcafe973186c60e8f"
+   },
+   {
+    "archivo": "es/20.mp3",
+    "texto": "Ocupar todo el ancho del campo obliga a la defensa a cubrir más terreno.",
+    "bytes": 30384,
+    "sha256": "7cabc198541065387b0b67ba4fae6ce77b059b9dfe8be446912cb8bf44a1a982"
+   },
+   {
+    "archivo": "es/21.mp3",
+    "texto": "Las diagonales sin balón pueden arrastrar marcas y abrir un pasillo para otro compañero.",
+    "bytes": 35856,
+    "sha256": "c3b3cc022b4ac6fecdc6016062e92caedf9de42caa94727f534a7beabb7ad674"
+   },
+   {
+    "archivo": "es/22.mp3",
+    "texto": "Un pase firme al pie facilita el control; uno al espacio invita a correr.",
+    "bytes": 31248,
+    "sha256": "36819f834d309f6699a955dd4d2bf7035cecf4490a29d8b9bbcff1a6df05f7d9"
+   },
+   {
+    "archivo": "es/23.mp3",
+    "texto": "Justo después de recuperar, suelen aparecer huecos antes de que el rival se reorganice.",
+    "bytes": 36144,
+    "sha256": "da6fb7cb7cc29b92e549475c8016f8c90bcf0bf649e7657aa37cb0e03de3c755"
+   },
+   {
+    "archivo": "es/24.mp3",
+    "texto": "Defender con las líneas juntas reduce los huecos por donde puede filtrarse un pase.",
+    "bytes": 33408,
+    "sha256": "86435a133c30242be0de9c13d19c5dfc4b931b7eddd1ff643229361e1d6bbc89"
+   },
+   {
+    "archivo": "es/25.mp3",
+    "texto": "Hablar entre compañeros ayuda a repartir las marcas y a corregir posiciones.",
+    "bytes": 32688,
+    "sha256": "185673bbaa020049bc6006564be58318348f6637f26d793fbeed0f7411806c2b"
+   },
+   {
+    "archivo": "es/26.mp3",
+    "texto": "Un centro necesita compañeros que lleguen al área con el tiempo justo.",
+    "bytes": 30096,
+    "sha256": "95956505915048363ae5a4631e02798347247a7cc8ebbe864c0528dc8f593304"
+   },
+   {
+    "archivo": "es/27.mp3",
+    "texto": "Tener paciencia con el balón es otra manera de buscar el desequilibrio.",
+    "bytes": 28944,
+    "sha256": "acaf9e2b712ed14b72d03e36f8bf42b8fafe191b870f4f7e65d618897b62411a"
+   },
+   {
+    "archivo": "es/28.mp3",
+    "texto": "Un pase entre líneas puede dejar atrás a varios rivales con un solo toque.",
+    "bytes": 31392,
+    "sha256": "4103e0e68040de6d3bee4a4e380bd4d1dc7234924d0aa3ec9adf0786ffd5ae81"
+   },
+   {
+    "archivo": "es/29.mp3",
+    "texto": "Cubrir el balón con el cuerpo da tiempo para que lleguen los apoyos.",
+    "bytes": 27792,
+    "sha256": "d36dfe02b3388561ee055df02c463e5eddb505df6b7c2f21f552ee23cb957cce"
+   },
+   {
+    "archivo": "es/30.mp3",
+    "texto": "Una buena cobertura ocupa el espacio que deja el compañero que sale a presionar.",
+    "bytes": 31536,
+    "sha256": "eacddece6a924401b8b3bcd36ad59b15df6d432abdbddb825d8a04793f3dda8e"
+   }
+  ],
+  "cierre": {
+   "archivo": "es/cierre.mp3",
+   "texto": "Ha terminado el encuentro. Gracias por acompañarnos en esta transmisión.",
+   "bytes": 35712,
+   "sha256": "120e90d497860ee6d735e42d8489b98b60588d7fea6aed2f04f295a69c6c4f52"
+  }
+ },
+ "en": {
+  "reservas": [
+   {
+    "archivo": "en/01.mp3",
+    "texto": "There is more to follow than the ball carrier: the movement around them matters too.",
+    "bytes": 30672,
+    "sha256": "a1121c59335a57169f33a6c2b0302f8c03b244c7f04e77c53730a4cb2ff87a0c"
+   },
+   {
+    "archivo": "en/02.mp3",
+    "texto": "Going backwards can sometimes offer a different route forwards.",
+    "bytes": 26640,
+    "sha256": "90697ecb3d37c38c4d7828e68e95709e16f1385779ca4c285082949f1c72341f"
+   },
+   {
+    "archivo": "en/03.mp3",
+    "texto": "A good first touch can make the next part of a move much easier.",
+    "bytes": 26208,
+    "sha256": "dcfc04f7cfc41aa9974cd03b218c3d9e34729f70c6d293f89d3f4aac5e49ab43"
+   },
+   {
+    "archivo": "en/04.mp3",
+    "texto": "Switching play from one flank to the other can open a different route towards the box.",
+    "bytes": 32256,
+    "sha256": "d9e8421d0a7a6908a07720a9f72fcedcc7275a9bb98dee6403dd0323139fbc94"
+   },
+   {
+    "archivo": "en/05.mp3",
+    "texto": "The distance between teammates matters: coming closer offers a shorter passing option.",
+    "bytes": 36000,
+    "sha256": "d98ee27d52ba67bbacb06d4c4c9e91f5d3fea22447c4462692e6a7352d7a8f6d"
+   },
+   {
+    "archivo": "en/06.mp3",
+    "texto": "Defending also means watching what happens away from the ball, especially in behind.",
+    "bytes": 33264,
+    "sha256": "7c4903c3905b86e8685fe1a0773e3dd61a0606079b761581b53d53f40ea5aeea"
+   },
+   {
+    "archivo": "en/07.mp3",
+    "texto": "After losing possession, getting back quickly can help close the spaces.",
+    "bytes": 30960,
+    "sha256": "47ad13b5cef2b13b55d6e9af2fcc6426c700ff12c232c4ecf49f005396589d2b"
+   },
+   {
+    "archivo": "en/08.mp3",
+    "texto": "A shot is only part of a move; the pass that sets it up matters as well.",
+    "bytes": 30672,
+    "sha256": "a689a5ad069c64020ae1d66cbde0d58cc55aa1d37732f357ca4536f3e6258f49"
+   },
+   {
+    "archivo": "en/09.mp3",
+    "texto": "Width can stretch the play, while passing lanes through the middle tend to be tighter.",
+    "bytes": 31248,
+    "sha256": "b0e4439bc6158ee44d34f6445b0268f7ad48c11c7b804a177895a9bca096490a"
+   },
+   {
+    "archivo": "en/10.mp3",
+    "texto": "At a restart, teammates can offer different options through their positioning.",
+    "bytes": 29088,
+    "sha256": "468fbede703a634dac8de12cea4f5e2b20d830cadb532d34520d1ff92d352947"
+   },
+   {
+    "archivo": "en/11.mp3",
+    "texto": "Timing and accuracy can matter just as much as the power behind a pass.",
+    "bytes": 30240,
+    "sha256": "b2ca50f762e16394c22de1db03093ea9eb9c2d94a9ae22343080458a095df4a9"
+   },
+   {
+    "archivo": "en/12.mp3",
+    "texto": "The goalkeeper can also offer a way to recycle possession and start again.",
+    "bytes": 29952,
+    "sha256": "7a7b9655cf936748d3d7b1dc3d3fa208961ddd563910f94d2963d1c8a0e633f7"
+   },
+   {
+    "archivo": "en/13.mp3",
+    "texto": "Pausing on the ball can give teammates time to settle into position.",
+    "bytes": 27072,
+    "sha256": "b2c044c7765db88f43934e3f6af3b2027ef4d55c9a592fb36d5539e8626b8f78"
+   },
+   {
+    "archivo": "en/14.mp3",
+    "texto": "Keeping possession can also be a way of resting while the ball keeps moving.",
+    "bytes": 29088,
+    "sha256": "ec3c828d375de40039d80c79e9fb2ee8e2fe805bb4c15a183336f552202d92ba"
+   },
+   {
+    "archivo": "en/15.mp3",
+    "texto": "Drawing opponents towards one side can leave more room on the opposite side.",
+    "bytes": 30816,
+    "sha256": "c034fdfcaa77bafd3c57ba15b6531880fd6e5dcb997eb70b75b396024099f922"
+   },
+   {
+    "archivo": "en/16.mp3",
+    "texto": "A nearby teammate allows a quick exchange and a fresh run to receive again.",
+    "bytes": 30096,
+    "sha256": "6e0f342694b5aeaf4672cd709536a2c00d86c8b7e7038235f2588e9bf54f392a"
+   },
+   {
+    "archivo": "en/17.mp3",
+    "texto": "The first line of pressure often tries to steer the build-up towards a flank.",
+    "bytes": 29520,
+    "sha256": "5c9798f41d774b5a5061ae836a0a436e244b4ca915c03666dd2469079d53f769"
+   },
+   {
+    "archivo": "en/18.mp3",
+    "texto": "Receiving with an open body shape saves a touch and speeds up the next action.",
+    "bytes": 31824,
+    "sha256": "796057b4016e8b21bacd1955e2141150966ee0124fe18d4093c0f5e625963a8d"
+   },
+   {
+    "archivo": "en/19.mp3",
+    "texto": "Scanning before receiving helps a player decide faster what to do next.",
+    "bytes": 30096,
+    "sha256": "6154a0aab54e72320c55c5debb0349d7c45179f6f9d8a898a9c94687edf05d77"
+   },
+   {
+    "archivo": "en/20.mp3",
+    "texto": "Spreading across the whole width forces a defence to cover more ground.",
+    "bytes": 28368,
+    "sha256": "4bcc0221c8401081daca2ec63f6aacc57baf2760dcac672236d7bbf9e8bf605e"
+   },
+   {
+    "archivo": "en/21.mp3",
+    "texto": "Diagonal runs without the ball can drag markers away and open a lane for someone else.",
+    "bytes": 35568,
+    "sha256": "33be05a1b7305678daf3cb45bd4754525203c0767cdd16bb933ce3b089920de8"
+   },
+   {
+    "archivo": "en/22.mp3",
+    "texto": "A firm pass into feet helps control, while a pass into space invites a run.",
+    "bytes": 32688,
+    "sha256": "e7dbf0814dfc212fcfb24a490a977c9f11040a519210d49bbab82aa1079fd398"
+   },
+   {
+    "archivo": "en/23.mp3",
+    "texto": "Straight after winning possession, gaps often appear before the other side reorganises.",
+    "bytes": 34992,
+    "sha256": "e7e044c7bf6863d7ae70322595f9d30422ed6207691bfe4fd1937dee38871c75"
+   },
+   {
+    "archivo": "en/24.mp3",
+    "texto": "Keeping the lines compact reduces the gaps a pass can slip through.",
+    "bytes": 28224,
+    "sha256": "cbc6c40c37c361d0699bd34b3225ece200e9e86f46ba7c38f821ca8c93fedc0a"
+   },
+   {
+    "archivo": "en/25.mp3",
+    "texto": "Talking to teammates helps share out the marking and correct positions.",
+    "bytes": 27792,
+    "sha256": "a80092a4c0511bee84194b49ad26b4b629162276a45f216ce6dc706bdba8d983"
+   },
+   {
+    "archivo": "en/26.mp3",
+    "texto": "A cross needs teammates arriving in the area with good timing.",
+    "bytes": 25632,
+    "sha256": "0b1b7b98dd563fcddaee87819fa848168fedb06632318442d33abd954cb9eb1e"
+   },
+   {
+    "archivo": "en/27.mp3",
+    "texto": "Patience on the ball can be another way of trying to unbalance a defence.",
+    "bytes": 28656,
+    "sha256": "437e21795af6a908c789946e7f8b6e7dda723d0dd9bf003b25033ff377d8c2c1"
+   },
+   {
+    "archivo": "en/28.mp3",
+    "texto": "A pass between the lines can take several opponents out of the move with one touch.",
+    "bytes": 31968,
+    "sha256": "e003deb26cf69568a07bb39b3648d83c2f7c6970e9f9d07277a029c0f4a06b67"
+   },
+   {
+    "archivo": "en/29.mp3",
+    "texto": "Shielding the ball with the body buys time for support to arrive.",
+    "bytes": 25488,
+    "sha256": "d2ff1cc1c8489538bfaa237db2c1aac1a63cce88302e2e5b2ad53f5bacf51723"
+   },
+   {
+    "archivo": "en/30.mp3",
+    "texto": "Good cover means filling the space left by a teammate who steps out to press.",
+    "bytes": 31104,
+    "sha256": "f25d13d74836ccc5c071b33b6275b9e2e25910dca414812542de69cb7ead17c1"
+   }
+  ],
+  "cierre": {
+   "archivo": "en/cierre.mp3",
+   "texto": "The match has finished. Thank you for joining us for this broadcast.",
+   "bytes": 32832,
+   "sha256": "d504f21eda59a5dfe3693fdecb29377cfc31f8a23f514d81f99de10d0be5e4a1"
+  }
+ }
+}

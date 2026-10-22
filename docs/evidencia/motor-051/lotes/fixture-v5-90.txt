@@ -1,0 +1,11 @@
+semilla 68 cumple todo salvo ancho
+semilla 81: 67 eventos, 189 fotogramas; tiros 6
+semilla 177 cumple todo salvo ancho
+semillas que cumplen: [ 81 ] cuenta por condición: {
+  alto: 46,
+  ancho: 97,
+  desvio: 80,
+  atrapada: 86,
+  golLado: 156,
+  sinAncho: 3
+} semillas probadas: 81

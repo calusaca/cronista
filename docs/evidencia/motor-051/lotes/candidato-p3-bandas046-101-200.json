@@ -1,0 +1,92 @@
+{
+ "generado": "2026-10-22T05:26:34.148Z",
+ "commit": "2f5d98a7566c910cccb14498e6642e0ebeabcf65",
+ "motor": "experimental-v5 (prototipo; POS=1, TRI=1)",
+ "constantes": {
+  "margenPaloM": 0.5,
+  "margenNivelM": 1.5,
+  "margenPersonalidadM": 0.6,
+  "indiferenciaM": 0.5,
+  "errorBaseM": 5.5,
+  "referenciaTiroM": 16,
+  "factorDistanciaMin": 0.5,
+  "factorDistanciaMax": 1.2,
+  "errorPotencia": 0.3,
+  "colocadoHastaM": 8,
+  "potenteDesdeM": 20,
+  "potenciaVelocidad": 0.4,
+  "altoBase": 0.02,
+  "altoPotencia": 0.06,
+  "altoNivel": 0.04,
+  "alcanceMinM": 0.9,
+  "alcanceMaxM": 2.4,
+  "desvioBase": 0.35,
+  "desvioPotencia": 0.2,
+  "desvioNivel": 0.15,
+  "desvioEstirada": 0.3,
+  "desvioMin": 0.1,
+  "desvioMax": 0.8,
+  "posicionamientoM": 3,
+  "rechaceCampoProb": 0,
+  "rechaceCampoM": 8,
+  "triangular": true
+ },
+ "banda": "completo",
+ "incumplimientos": [],
+ "incumplimientosSaques": [],
+ "intercepcionesInmediatas": {
+  "temporal": 0,
+  "temporalConRadio": 0,
+  "radioM": 15
+ },
+ "metricas": {
+  "reglas": "prototipo-v5",
+  "semillas": {
+   "desde": 101,
+   "hasta": 200
+  },
+  "duracionS": 120,
+  "partidos": 100,
+  "golesPorPartido": 2.21,
+  "desviacionGoles": 1.4233411397131746,
+  "tirosPorPartido": 5.06,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 73,
+  "perdidasTrasAtajada": 0,
+  "perdidasArea": 0,
+  "perdidasAreaPorPartido": 0,
+  "manoAMano": {
+   "episodios": 413,
+   "goles": 151,
+   "conversion": 0.36561743341404357,
+   "fraccionDeGoles": 0.6832579185520362,
+   "desplazamientoMedianaM": 1.24204675116262,
+   "desplazamientoP75M": 2.926209411605552,
+   "fraccionDesplazado": 0.5569007263922519
+  },
+  "centros": {
+   "pasesBanda": 185,
+   "alArea": 80,
+   "proporcion": 0.43243243243243246,
+   "motivoCentro": 68,
+   "porPartido": 0.68
+  },
+  "saquesManos": 368,
+  "saquesPerdidos": 7,
+  "saquesPerdidosPorPartido": 0.07,
+  "intercepcionesInmediatas": 0,
+  "golesTrasSaque": 1,
+  "golesTrasSaquePorPartido": 0.01,
+  "metas": 119,
+  "metasConduccion": 0,
+  "metasConduccionPorPartido": 0,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 8745,
+   "frenados": 1275,
+   "fraccion": 0.1457975986277873
+  },
+  "fuerasDeJuego": 279
+ }
+}

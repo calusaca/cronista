@@ -1,0 +1,70 @@
+{
+ "generado": "2026-10-22T05:27:43.439Z",
+ "commit": "2f5d98a7566c910cccb14498e6642e0ebeabcf65",
+ "motor": "repositorio",
+ "duracionS": 120,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "reglas": "reinicios-v4",
+ "semillas": {
+  "desde": 1,
+  "hasta": 100
+ },
+ "partidos": 100,
+ "golesPorPartido": 2.59,
+ "golesRematePorPartido": 2.57,
+ "golesSinRematePorPartido": 0.02,
+ "autogoles": 0,
+ "golesTrasRechace": 0,
+ "tiros": 503,
+ "tirosPorPartido": 5.03,
+ "porDesenlace": {
+  "gol": 257,
+  "atrapada": 136,
+  "desvio": 69,
+  "fuera": 9,
+  "alto": 0,
+  "bloqueado": 22,
+  "companero": 5,
+  "otro_tiro": 0,
+  "otro": 2,
+  "pendiente": 3
+ },
+ "aPuertaFraccion": 0.918,
+ "aPuerta045Fraccion": 0.918,
+ "discrepancia045": 0,
+ "conversion": 0.511,
+ "atajadasSobreAPuerta": 0.444,
+ "atajadasSobreAPuerta045": 0.444,
+ "desvioSobreAtajadas": 0.337,
+ "fueraFraccion": 0.018,
+ "altoSobreFuera": 0,
+ "bloqueadoFraccion": 0.044,
+ "distanciaMediaM": 18.212,
+ "distanciaMedianaM": 19.785,
+ "porteroLineaMediaM": 6.872,
+ "porteroLateralMedianaM": 1.818,
+ "nivelPortero": {
+  "medianaCorte": 73,
+  "aPuertaAlto": 226,
+  "aPuertaBajo": 236,
+  "atajaAlto": 0.434,
+  "atajaBajo": 0.453,
+  "diferencia": -0.02
+ },
+ "nivelRematador": {
+  "medianaCorte": 73,
+  "tirosAlto": 226,
+  "tirosBajo": 277,
+  "aPuertaAlto": 0.92,
+  "aPuertaBajo": 0.917,
+  "golAlto": 0.522,
+  "golBajo": 0.502,
+  "diferenciaPuerta": 0.003
+ },
+ "colocacion": {
+  "dentro": 499,
+  "aLosLadosFraccion": 0.255,
+  "desvioMedioM": 1.296,
+  "izquierdaFraccion": 0.523
+ }
+}

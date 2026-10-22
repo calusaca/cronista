@@ -110,6 +110,13 @@ function grabador(page, t0, dir) {
   return { marcas, marca, mover, pulsar, desplazar, desplazarPor, texto, esperar };
 }
 
+/** Nota del 22 oct (043): clips de reserva estáticos (public/voz-reserva), cierre al final de cada idioma. */
+function clipsReserva() {
+  const indice = JSON.parse(readFileSync(resolve("public/voz-reserva/indice.json"), "utf8"));
+  const leer = c => ({ texto: c.texto, bytes: readFileSync(resolve("public/voz-reserva", c.archivo)) });
+  return Object.fromEntries(["en", "es"].map(idioma => [idioma, [...indice[idioma].reservas, indice[idioma].cierre].map(leer)]));
+}
+
 // --------------------------------------------------------------------------------------------
 // Fase arena: partido en vivo real (escenas 1–7 y fotograma final).
 async function grabarArena() {
@@ -123,9 +130,9 @@ async function grabarArena() {
   const estado = { sesion: null, asignacion: null, relatos: new Map(), analisis: null, errores: [], peticionesRelato: [] };
   page.on("pageerror", e => estado.errores.push(e.message));
   // Clips de respaldo empaquetados con la app (suenan si Speech tarda): también se identifican.
-  const reserva = JSON.parse(readFileSync(resolve("src/arena/voz-reserva.json"), "utf8"));
+  const reserva = clipsReserva();
   for (const idioma of ["en", "es"]) reserva[idioma].forEach((clip, i) => {
-    const bytes = Buffer.from(clip.base64, "base64"), tag = huella(bytes), archivo = `reserva-${idioma}-${i}.mp3`;
+    const bytes = clip.bytes, tag = huella(bytes), archivo = `reserva-${idioma}-${i}.mp3`;
     writeFileSync(join(dir, "relatos", archivo), bytes);
     const meta = { tag, archivo, reserva: true, idioma, texto: clip.texto, fragmentos: [{ rol: "narrador", texto: clip.texto }] };
     writeFileSync(join(dir, "relatos", archivo.replace(".mp3", ".json")), JSON.stringify(meta, null, 1));
@@ -578,9 +585,9 @@ function montar() {
   const audioSesion = [];
   const dirRelatos = join(TRABAJO, toma, "relatos"), porHuella = new Map();
   for (const f of readdirSync(dirRelatos).filter(f => f.endsWith(".json"))) { const j = JSON.parse(readFileSync(join(dirRelatos, f), "utf8")); porHuella.set(j.tag, j.archivo); }
-  const reserva = JSON.parse(readFileSync(resolve("src/arena/voz-reserva.json"), "utf8"));
+  const reserva = clipsReserva();
   for (const idioma of ["en", "es"]) reserva[idioma].forEach((clip, i) => {
-    const bytes = Buffer.from(clip.base64, "base64"), tag = huella(bytes), archivo = `reserva-${idioma}-${i}.mp3`;
+    const bytes = clip.bytes, tag = huella(bytes), archivo = `reserva-${idioma}-${i}.mp3`;
     if (porHuella.has(tag)) return;
     writeFileSync(join(dirRelatos, archivo), bytes);
     writeFileSync(join(dirRelatos, archivo.replace(".mp3", ".json")), JSON.stringify({ tag, archivo, reserva: true, idioma, texto: clip.texto, fragmentos: [{ rol: "narrador", texto: clip.texto }] }, null, 1));

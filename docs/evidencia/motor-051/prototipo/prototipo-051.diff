@@ -1,0 +1,143 @@
+--- motor.orig.ts	2026-10-22 04:50:21.752731795 +0000
++++ motor.ts	2026-10-22 05:25:11.932912223 +0000
+@@ -151,6 +151,42 @@
+ export const reglasDesde = (config: ConfigArena, desde: ReglasArena): boolean =>
+   config.reglas !== undefined && reglasArena.indexOf(config.reglas) >= reglasArena.indexOf(desde);
+ 
++const V5 = process.env.V5 === "1", POS = process.env.POS === "1";
++const n = (k: string, d: number) => Number(process.env[k] ?? d);
++export const C5 = {
++  margenPaloM: n("MARGEN_PALO", 0.5), margenNivelM: n("MARGEN_NIVEL", 1.5), margenPersonalidadM: n("MARGEN_PERS", 0.6), indiferenciaM: n("INDIF", 0.5),
++  errorBaseM: n("ERR_BASE", 9), referenciaTiroM: n("REF_DIST", 16), factorDistanciaMin: n("FDMIN", 0.5), factorDistanciaMax: n("FDMAX", 1.5), errorPotencia: n("ERR_POT", 0.3),
++  colocadoHastaM: n("COLOC_HASTA", 8), potenteDesdeM: n("POT_DESDE", 20), potenciaVelocidad: n("POT_VEL", 0.4),
++  altoBase: n("ALTO_BASE", 0.04), altoPotencia: n("ALTO_POT", 0.16), altoNivel: n("ALTO_NIVEL", 0.1),
++  alcanceMinM: n("ALC_MIN", 1.2), alcanceMaxM: n("ALC_MAX", 2.2),
++  desvioBase: n("DESV_BASE", 0.35), desvioPotencia: n("DESV_POT", 0.2), desvioNivel: n("DESV_NIVEL", 0.15), desvioEstirada: n("DESV_EST", 0.3), desvioMin: n("DESV_MIN", 0.1), desvioMax: n("DESV_MAX", 0.8),
++  posicionamientoM: n("POSIC", 3), rechaceCampoProb: n("RECH_PROB", 0), rechaceCampoM: n("RECH_M", 8), triangular: process.env.TRI === "1",
++};
++const MEDIO_Y = ARENA.anchoM / 2;
++/** Objetivo del remate (y orientada): lado contrario al portero respecto de la línea tirador–arco; con el
++ * portero centrado, el palo lejano. Margen desde el palo según nivel y personalidad. */
++export function objetivoRemate(origen: Punto, portero: Punto | null, nivel: number, remate: number, lado: Lado): { y: number; s: number; margen: number } {
++  const o = transformar(origen, lado), arco = { x: ARENA.largoM, y: MEDIO_Y };
++  let s = o.y <= MEDIO_Y ? 1 : -1; // palo lejano; rematador exactamente centrado → +y
++  const largo = Math.hypot(arco.x - o.x, arco.y - o.y);
++  if (portero && largo > 0) {
++    const k = transformar(portero, lado);
++    const cruz = (k.x - o.x) * (arco.y - o.y) - (k.y - o.y) * (arco.x - o.x); // > 0: portero hacia −y (en el marco orientado)
++    const lateral = Math.abs(cruz) / largo; // v1.1 #5: distancia perpendicular a la RECTA, no al segmento
++    if (lateral > C5.indiferenciaM) s = cruz > 0 ? 1 : -1;
++  }
++  const margen = limitar(C5.margenPaloM + C5.margenNivelM * (1 - nivel / 100) + C5.margenPersonalidadM * (0.5 - remate / 100), C5.margenPaloM, ARENA.arcoM / 2);
++  return { y: MEDIO_Y + s * (ARENA.arcoM / 2 - margen), s, margen };
++}
++export const potenciaRemate = (d: number) => limitar((d - C5.colocadoHastaM) / (C5.potenteDesdeM - C5.colocadoHastaM), 0, 1);
++export const velocidadRemate = (potencia: number) => ARENA.velocidadTiroMps * (1 + C5.potenciaVelocidad * (potencia - 0.5));
++export function alcancePortero(nivel: number, tiempoS: number): number {
++  const reaccionS = PO.reaccionM / ARENA.velocidadTiroMps;
++  return Math.max(PO.cuerpoM, (C5.alcanceMinM + (C5.alcanceMaxM - C5.alcanceMinM) * nivel / 100) * Math.min(1, tiempoS / reaccionS));
++}
++export function probabilidadDesvio(nivel: number, potencia: number, estirada: number): number {
++  return limitar(C5.desvioBase + C5.desvioPotencia * (potencia - 0.5) - C5.desvioNivel * (nivel - 50) / 50 + C5.desvioEstirada * estirada, C5.desvioMin, C5.desvioMax);
++}
+ export class MotorArena {
+   readonly estado: EstadoArena;
+   readonly eventos: EventoArena[] = [];
+@@ -277,12 +313,24 @@
+     const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado, distancia(desde, destino)) : null;
+     const lluvia = this.config.partido.condiciones?.clima === "lluvia" ? ARENA.errorLluviaM : 0;
+     const nivel = entorno ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel;
+-    const error = (1 - nivel / 100) * (tipo === "tiro" ? ARENA.errorTiroM : ARENA.errorPaseM)
++    let error = (1 - nivel / 100) * (tipo === "tiro" ? ARENA.errorTiroM : ARENA.errorPaseM)
+       + (entorno ? entorno.errorLluviaM + entorno.errorPresionM + (tipo === "pase" ? entorno.errorNieblaM + entorno.errorCespedM : 0) : lluvia);
+-    const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + (rng.next() * 2 - 1) * error };
++    let v5: { potencia: number; alto?: true; objetivoY: number } | null = null;
++    if (V5 && tipo === "tiro") {
++      const k = this.estado.jugadores.find(p => p.lado !== j.lado && p.puesto === "POR");
++      const d = distancia(desde, destino), potencia = potenciaRemate(d);
++      const ob = objetivoRemate(desde, k?.posicion ?? null, nivel, j.personalidad?.remate ?? 50, j.lado);
++      destino = transformar({ x: ARENA.largoM, y: ob.y }, j.lado);
++      error = ((1 - nivel / 100) * C5.errorBaseM) * limitar(d / C5.referenciaTiroM, C5.factorDistanciaMin, C5.factorDistanciaMax) * (1 + C5.errorPotencia * potencia)
++        + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
++      const rng5 = prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`);
++      const alto = rng5.chance(C5.altoBase + C5.altoPotencia * potencia + C5.altoNivel * (1 - nivel / 100));
++      v5 = { potencia, objetivoY: ob.y, ...(alto ? { alto: true as const } : {}) };
++    }
++    const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + (v5 && C5.triangular ? (rng.next() + rng.next() - 1) : (rng.next() * 2 - 1)) * error };
+     const objetivo = this.conReinicios ? bruto : enCancha(bruto);
+     const fuera = adelantados(this.estado, j.lado);
+-    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}) } };
++    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}), ...(v5 ? { v5 } : {}) } as any };
+     this.evento(tipo, j, desde, objetivo, receptor, extra.motivo ? { motivo: extra.motivo } : {});
+     this.ultimaAccion = this.estado.tick;
+   }
+@@ -407,6 +455,10 @@
+       }
+       // Salida a achicar: objetiva, ninguna orden la activa ni la impide.
+       if (salida?.[j.lado] && j.puesto === "POR" && j.id !== balon.poseedor) destino = destinoSalida(balon.posicion, j.lado);
++      else if (POS && V5 && j.puesto === "POR" && j.id !== balon.poseedor && ladoBalon !== undefined && ladoBalon !== j.lado && !this.estado.saque) {
++        const b = transformar(balon.posicion, j.lado), dd = Math.hypot(b.x, b.y - MEDIO_Y);
++        if (dd <= PO.manoAManoRadioM && dd > 0) destino = transformar({ x: b.x / dd * C5.posicionamientoM, y: MEDIO_Y + (b.y - MEDIO_Y) / dd * C5.posicionamientoM }, j.lado);
++      }
+       // Ningún rival se dirige a menos de distanciaManosM del portero con el balón en las manos.
+       if (porteroManos && j.lado !== porteroManos.lado) destino = respetarManos(destino, j.posicion, porteroManos.posicion);
+       const porteroEnArea = v4 && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado);
+@@ -501,13 +553,14 @@
+     this.estado.balon.posicion = cruce.punto;
+     if (cruce.borde === "lateral") { this.prepararSaque("banda", rival(ultimo.lado), cruce.punto, ultimo.jugador); return true; }
+     const defiende = defensorDePorteria(cruce.punto.x), ataca = rival(defiende);
+-    if (Math.abs(cruce.punto.y - ARENA.anchoM / 2) <= ARENA.arcoM / 2 && vuelo?.reinicio !== "banda" && !(vuelo?.reinicio && ultimo.lado === defiende)) {
++    const alto = !!(vuelo as any)?.v5?.alto && vuelo?.tipo === "tiro";
++    if (!alto && Math.abs(cruce.punto.y - ARENA.anchoM / 2) <= ARENA.arcoM / 2 && vuelo?.reinicio !== "banda" && !(vuelo?.reinicio && ultimo.lado === defiende)) {
+       const autor = this.estado.jugadores.find(j => j.id === (vuelo?.autor ?? ultimo.jugador))!;
+       this.evento("gol", autor, vuelo?.origen ?? desde, cruce.punto, null, { lado: ataca, ...(autor.lado !== ataca ? { autogol: true } : {}) });
+       this.estado.marcador[ataca]++;
+       this.prepararSaque("centro", defiende, { x: ARENA.largoM / 2, y: ARENA.anchoM / 2 }, ultimo.jugador);
+     } else {
+-      if (vuelo?.tipo === "tiro") { const autor = this.estado.jugadores.find(j => j.id === vuelo.autor)!; this.evento("tiro_fuera", autor, vuelo.origen, cruce.punto); }
++      if (vuelo?.tipo === "tiro") { const autor = this.estado.jugadores.find(j => j.id === vuelo.autor)!; this.evento("tiro_fuera", autor, vuelo.origen, cruce.punto, null, alto ? { motivo: "alto" } : {}); }
+       const esquina = ultimo.lado === defiende;
+       this.prepararSaque(esquina ? "esquina" : "meta", esquina ? ataca : defiende, esquina ? { x: cruce.punto.x === 0 ? ARENA.esquinaM : ARENA.largoM - ARENA.esquinaM, y: cruce.punto.y < ARENA.anchoM / 2 ? ARENA.esquinaM : ARENA.anchoM - ARENA.esquinaM } : transformar({ x: ARENA.saqueMetaM, y: ARENA.anchoM / 2 }, defiende), ultimo.jugador);
+     }
+@@ -603,7 +656,8 @@
+     const vuelo = balon.vuelo;
+     const desde = { ...balon.posicion };
+     if (vuelo) {
+-      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo !== "pase" ? ARENA.velocidadTiroMps : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
++      const v5 = (vuelo as any).v5 as { potencia: number; alto?: true } | undefined;
++      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo !== "pase" ? (v5 && vuelo.tipo === "tiro" ? velocidadRemate(v5.potencia) : ARENA.velocidadTiroMps) : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
+       const factor = d ? Math.min(1, velocidad * ARENA.pasoS / d) : 1;
+       balon.posicion = factor === 1 ? { ...vuelo.destino } : { x: desde.x + (vuelo.destino.x - desde.x) * factor, y: desde.y + (vuelo.destino.y - desde.y) * factor };
+     }
+@@ -614,19 +668,27 @@
+       const propia = transformar(j.posicion, j.lado);
+       const area = propia.x <= ARENA.areaLargoM && Math.abs(propia.y - ARENA.anchoM / 2) <= ARENA.areaAnchoM / 2;
+       // Brief 046 (v4): ante un remate el radio del portero depende de la distancia de origen.
+-      const radio = j.puesto === "POR" && area ? (this.v4 && vuelo?.tipo === "tiro" ? radioAtajada(distancia(vuelo.origen, j.posicion)) : ARENA.controlPorteroM) : ARENA.controlM;
++      const v5c = (vuelo as any)?.v5 as { potencia: number; alto?: true } | undefined;
++      const nivelK = this.estado.entrenadores ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel;
++      const vEfectiva = v5c ? velocidadRemate(v5c.potencia) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo!.lado).velocidadBalon : 1) : 0; // v1.1 #3: la misma velocidad que mueve el balón
++      const radio = j.puesto === "POR" && area ? (v5c && vuelo?.tipo === "tiro" ? alcancePortero(nivelK, distancia(vuelo.origen, j.posicion) / vEfectiva) : this.v4 && vuelo?.tipo === "tiro" ? radioAtajada(distancia(vuelo.origen, j.posicion)) : ARENA.controlPorteroM) : ARENA.controlM;
++      if (v5c?.alto) return { j, ...punto, contacto: false, radio };
+       const ignorar = vuelo && ((j.id === vuelo.autor && (vuelo.reinicio || (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS)) || this.conReinicios && j.id === balon.ultimoToque?.jugador && (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS);
+       // Fase aérea del centro (v1.1) y del saque largo del portero (v1.2): solo cuentan los contactos cuyo punto proyectado sobre la
+       // trayectoria queda a ≤ caidaM del destino (perturbado) del vuelo.
+       const aereo = this.v4 && (vuelo?.centro || vuelo?.aereo) && distancia({ x: desde.x + (extremo.x - desde.x) * punto.t, y: desde.y + (extremo.y - desde.y) * punto.t }, vuelo.destino) > A.caidaM;
+-      return { j, ...punto, contacto: !ignorar && !aereo && punto.distancia <= radio };
++      return { j, ...punto, contacto: !ignorar && !aereo && punto.distancia <= radio, radio };
+     }).filter(c => c.contacto).sort((a, b) => a.t - b.t || a.distancia - b.distancia || a.j.id.localeCompare(b.j.id));
+     if (contactos[0]) {
+       const j = contactos[0].j;
+-      if (this.conReinicios && vuelo?.tipo === "tiro" && j.lado !== vuelo.lado && j.puesto === "POR" && prngDerivado(this.config.partido.seed, `desvio:${this.estado.tick}:${j.id}`).chance(ARENA.desvioProbabilidad)) {
++      const rngD = prngDerivado(this.config.partido.seed, `desvio:${this.estado.tick}:${j.id}`);
++      const v5d = (vuelo as any)?.v5 as { potencia: number } | undefined;
++      const pDesvio = v5d && vuelo?.tipo === "tiro" ? probabilidadDesvio(this.estado.entrenadores ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel, v5d.potencia, contactos[0].radio > PO.cuerpoM ? limitar((contactos[0].distancia - PO.cuerpoM) / (contactos[0].radio - PO.cuerpoM), 0, 1) : 0) : ARENA.desvioProbabilidad;
++      if (this.conReinicios && vuelo?.tipo === "tiro" && j.lado !== vuelo.lado && j.puesto === "POR" && rngD.chance(pDesvio)) {
+         const punto = { ...j.posicion }, x = j.lado === "local" ? -ARENA.desvioFondoM : ARENA.largoM + ARENA.desvioFondoM;
+         this.evento("atajada", j, vuelo.origen, punto, vuelo.autor, { motivo: "desvio" });
+-        const destino = { x, y: ARENA.anchoM / 2 + (punto.y < ARENA.anchoM / 2 ? -ARENA.desvioLateralM : ARENA.desvioLateralM) };
++        let destino = { x, y: ARENA.anchoM / 2 + (punto.y < ARENA.anchoM / 2 ? -ARENA.desvioLateralM : ARENA.desvioLateralM) };
++        if (v5d && rngD.chance(C5.rechaceCampoProb)) { const ko = transformar(punto, j.lado); destino = enCancha(transformar({ x: ko.x + C5.rechaceCampoM, y: ko.y + (punto.y < ARENA.anchoM / 2 ? -ARENA.desvioLateralM : ARENA.desvioLateralM) }, j.lado)); }
+         // reinicios-v1/v2 conservaban el vuelo como "tiro" del rematador (y contaban un
+         // segundo tiro_fuera si salía); desde v3 el desvío es un rechace del portero: un
+         // balón suelto que conserva el lado del remate (movimiento y anclas como en v2).

@@ -855,3 +855,16 @@ export const IGR_ARENA = {
   /** Umbral de «remate cercano y centrado»; coincide en magnitud con XG_ALTO.xgMin, pero es independiente. */
   umbralCercano: 0.3,
 } as const;
+
+/** Brief 043 (nota del 22 oct) · Reservas de voz pregrabadas del consumidor en vivo (respaldo neutral). */
+export const RESERVAS_VOZ = {
+  /** Tras la primera vuelta completa del catálogo, ninguna de las ⌈n · fracción⌉ reservas oídas más
+   * recientes vuelve a sonar (n = reservas generales disponibles, sin el cierre). */
+  fraccionNoRepeticion: 0.5,
+  /** Reservas generales por idioma en el catálogo estático (public/voz-reserva). Medición del 22 oct en
+   * 180 s con el catálogo de 12: con Speech normal sonaron 16 (es) y 20 (en); con Speech fallido, 23 y 25.
+   * Con 30 ninguna se repite en un partido de 180 s, ni siquiera con Speech fallido. */
+  minimoPorIdioma: 30,
+  /** Descargas simultáneas de clips de reserva al activar la voz. */
+  descargasSimultaneas: 4,
+} as const;

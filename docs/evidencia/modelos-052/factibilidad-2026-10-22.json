@@ -1,0 +1,440 @@
+{
+  "checkedUtc": "2026-10-22T05:02:39.219Z",
+  "phase": "feasibility_probe_by_designer_no_new_deployments",
+  "resource": {
+    "account": "carlossandi-9096-resource",
+    "resourceGroup": "rg-carlos.sandi-6716",
+    "kind": "AIServices",
+    "location": "northcentralus",
+    "disableLocalAuth": false,
+    "endpoints": {
+      "AzureOpenAI": "https://<recurso>.openai.azure.com/",
+      "ModelInference": "https://<recurso>.services.ai.azure.com/"
+    }
+  },
+  "existingDeployments": [
+    {
+      "name": "gpt-6.1-sol",
+      "model": "gpt-6.1-sol",
+      "capacity": 100
+    },
+    {
+      "name": "cronista-rapido",
+      "model": "gpt-5.4-mini",
+      "capacity": 30
+    },
+    {
+      "name": "cronista-equilibrado",
+      "model": "gpt-5.6-luna",
+      "capacity": 30
+    }
+  ],
+  "appAuthToday": {
+    "AZURE_OPENAI_API_KEY": "secretRef inferencia (Key Vault cronista-inferencia, clave del recurso)",
+    "managedIdentityRolesOnAccount": [
+      "Foundry User (solo en el proyecto carlossandi-9096)"
+    ],
+    "note": "Sin rol Cognitive Services OpenAI User/Contributor en la cuenta: la autenticación por identidad administrada para inferencia no está habilitada hoy; el adaptador reutiliza la misma clave."
+  },
+  "realCalls": [
+    {
+      "caso": "inference json_object 2024-05-01-preview",
+      "url": "https://<recurso>.services.ai.azure.com/models/chat/completions?api-version=2024-05-01-preview",
+      "status": 200,
+      "ms": 1819,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "model": "gpt-5.4-mini-2026-03-17",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 53,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "latency_checkpoint": {
+          "engine_tbt_ms": 4,
+          "engine_ttft_ms": 51,
+          "engine_ttlt_ms": 290,
+          "pre_inference_ms": 94,
+          "service_tbt_ms": 4,
+          "service_ttft_ms": 409,
+          "service_ttlt_ms": 643,
+          "user_visible_ttft_ms": 315
+        },
+        "prompt_tokens": 77,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 130
+      },
+      "contentHead": "{\"equipo\":\"Lobos\",\"bloque\":\"medio\",\"ordenes\":[{\"jugador\":\"L1\",\"accion\":\"mover\",\""
+    },
+    {
+      "caso": "inference json_schema strict 2024-05-01-preview",
+      "url": "https://<recurso>.services.ai.azure.com/models/chat/completions?api-version=2024-05-01-preview",
+      "status": 200,
+      "ms": 1751,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "model": "gpt-5.4-mini-2026-03-17",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 54,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "latency_checkpoint": {
+          "engine_tbt_ms": 6,
+          "engine_ttft_ms": 46,
+          "engine_ttlt_ms": 359,
+          "pre_inference_ms": 134,
+          "service_tbt_ms": 6,
+          "service_ttft_ms": 442,
+          "service_ttlt_ms": 751,
+          "user_visible_ttft_ms": 309
+        },
+        "prompt_tokens": 174,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 228
+      },
+      "contentHead": "{\"equipo\":\"Lobos\",\"bloque\":\"medio\",\"ordenes\":[{\"jugador\":\"L1\",\"accion\":\"mover\",\""
+    },
+    {
+      "caso": "openai v1 route services host json_object api-key",
+      "url": "https://<recurso>.services.ai.azure.com/openai/v1/chat/completions",
+      "status": 200,
+      "ms": 1319,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "model": "gpt-5.4-mini-2026-03-17",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 53,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "latency_checkpoint": {
+          "engine_tbt_ms": 7,
+          "engine_ttft_ms": 54,
+          "engine_ttlt_ms": 416,
+          "pre_inference_ms": 87,
+          "service_tbt_ms": 7,
+          "service_ttft_ms": 392,
+          "service_ttlt_ms": 751,
+          "user_visible_ttft_ms": 305
+        },
+        "prompt_tokens": 77,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 130
+      },
+      "contentHead": "{\"equipo\":\"Lobos\",\"bloque\":\"medio\",\"ordenes\":[{\"jugador\":\"L1\",\"accion\":\"mover\",\""
+    },
+    {
+      "caso": "openai v1 route services host json_schema strict",
+      "url": "https://<recurso>.services.ai.azure.com/openai/v1/chat/completions",
+      "status": 200,
+      "ms": 1171,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "model": "gpt-5.4-mini-2026-03-17",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 54,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "latency_checkpoint": {
+          "engine_tbt_ms": 5,
+          "engine_ttft_ms": 57,
+          "engine_ttlt_ms": 355,
+          "pre_inference_ms": 114,
+          "service_tbt_ms": 5,
+          "service_ttft_ms": 425,
+          "service_ttlt_ms": 717,
+          "user_visible_ttft_ms": 311
+        },
+        "prompt_tokens": 174,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 228
+      },
+      "contentHead": "{\"equipo\":\"Lobos\",\"bloque\":\"medio\",\"ordenes\":[{\"jugador\":\"L1\",\"accion\":\"mover\",\""
+    },
+    {
+      "caso": "openai v1 route openai host bearer(api key as bearer)",
+      "url": "https://<recurso>.openai.azure.com/openai/v1/chat/completions",
+      "status": 200,
+      "ms": 1978,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "model": "gpt-5.4-mini-2026-03-17",
+      "finish": "stop",
+      "usage": {
+        "completion_tokens": 53,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "latency_checkpoint": {
+          "engine_tbt_ms": 5,
+          "engine_ttft_ms": 54,
+          "engine_ttlt_ms": 337,
+          "pre_inference_ms": 64,
+          "service_tbt_ms": 5,
+          "service_ttft_ms": 374,
+          "service_ttlt_ms": 652,
+          "user_visible_ttft_ms": 310
+        },
+        "prompt_tokens": 77,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "total_tokens": 130
+      },
+      "contentHead": "{\"equipo\":\"Lobos\",\"bloque\":\"medio\",\"ordenes\":[{\"jugador\":\"L1\",\"accion\":\"mover\",\""
+    },
+    {
+      "caso": "openai v1 modelo no desplegado DeepSeek-V4-Flash",
+      "url": "https://<recurso>.services.ai.azure.com/openai/v1/chat/completions",
+      "status": 404,
+      "ms": 247,
+      "region": "North Central US",
+      "deploymentHdr": null,
+      "error": "{\n  \"error\": {\n    \"type\": \"invalid_request_error\",\n    \"code\": \"DeploymentNotFound\",\n    \"message\": \"The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.\"\n  }\n}",
+      "contentHead": ""
+    }
+  ],
+  "catalog": {
+    "gpt-6-luna": {
+      "version": "2026-09-22",
+      "format": "OpenAI",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "agentsV2": "true",
+        "area": "US",
+        "assistants": "true",
+        "chatCompletion": "true",
+        "flexTierSkus": "GlobalStandard",
+        "responses": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 10,
+        "maximum": 10000000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2028-03-11T00:00:00Z"
+    },
+    "Llama-4-Maverick-17B-128E-Instruct-FP8": {
+      "version": "1",
+      "format": "Meta",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "agentsV2": "true",
+        "chatCompletion": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 10,
+        "maximum": 10000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2099-12-31T00:00:00Z"
+    },
+    "Llama-4-Scout-17B-16E-Instruct": {
+      "version": "1",
+      "format": "Meta",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "chatCompletion": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 1000,
+        "maximum": 10000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2099-12-31T00:00:00Z"
+    },
+    "mistral-medium-2505": {
+      "version": "1",
+      "format": "Mistral AI",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "chatCompletion": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 1000,
+        "maximum": 10000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2099-12-31T00:00:00Z"
+    },
+    "gpt-oss-120b": {
+      "version": "1",
+      "format": "OpenAI-OSS",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "FineTuneTokensMaxValue": "3000000000",
+        "agentsV2": "true",
+        "chatCompletion": "true",
+        "globalFineTune": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 500,
+        "maximum": 1000000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2099-12-31T00:00:00Z"
+    },
+    "DeepSeek-V4-Flash": {
+      "version": "2026-04-23",
+      "format": "DeepSeek",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "agentsV2": "true",
+        "area": "US",
+        "chatCompletion": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 5000,
+        "maximum": 1000000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2028-02-20T00:00:00Z"
+    },
+    "grok-4.7": {
+      "version": "1",
+      "format": "xAI",
+      "lifecycle": "GenerallyAvailable",
+      "capabilities": {
+        "agentsV2": "true",
+        "chatCompletion": "true"
+      },
+      "globalStandardCapacity": {
+        "allowedValues": null,
+        "default": 10,
+        "maximum": 1000000,
+        "minimum": null,
+        "step": null
+      },
+      "deprecationInference": "2027-10-05T00:00:00Z"
+    }
+  },
+  "quotaNorthCentralUs": {
+    "DeepSeek-V4-Flash": {
+      "limit": 0,
+      "current": 0
+    },
+    "Llama-4-Maverick-17B-128E-Instruct-FP8": {
+      "limit": 0,
+      "current": 0
+    },
+    "gpt-6-luna": {
+      "limit": 250,
+      "current": 0
+    },
+    "gpt-5.6-luna": {
+      "limit": 250,
+      "current": 30
+    },
+    "gpt-5.4-mini": {
+      "limit": 1000,
+      "current": 30
+    },
+    "Llama-4-Scout-17B-16E-Instruct": {
+      "limit": 20,
+      "current": 0
+    },
+    "grok-4.7": {
+      "limit": 80,
+      "current": 0
+    },
+    "mistral-medium-2505": {
+      "limit": 20,
+      "current": 0
+    },
+    "gpt-oss-120b": {
+      "limit": 5000,
+      "current": 0
+    },
+    "Llama-3.3-70B-Instruct": {
+      "limit": 20,
+      "current": 0
+    },
+    "zeroLimitAIServicesFamilies": 43
+  },
+  "retailPricesUsdPer1M": {
+    "source": "https://prices.azure.com/api/retail/prices (Consumption, global)",
+    "DeepSeek-V4-Flash": {
+      "input": [
+        0.19,
+        0.23
+      ],
+      "output": [
+        0.51,
+        0.61
+      ]
+    },
+    "Llama-4-Maverick-17B": {
+      "input": 0.25,
+      "output": 1.0
+    },
+    "gpt-5.4-mini": {
+      "input": 0.75,
+      "output": 4.5
+    },
+    "gpt-5.6-luna": "no encontrado por la API",
+    "gpt-6-luna": "no encontrado por la API"
+  },
+  "docs": {
+    "reasoning": "https://learn.microsoft.com/azure/ai-foundry/foundry-models/how-to/use-chat-reasoning",
+    "v1": "https://learn.microsoft.com/azure/ai-foundry/openai/api-version-lifecycle",
+    "soldByAzure": "https://learn.microsoft.com/azure/ai-foundry/foundry-models/concepts/models-sold-directly-by-azure",
+    "quotes": {
+      "DeepSeek-V4-Flash": "chat-completion (with reasoning content) · Response formats: Text, JSON · Tool calling: Yes",
+      "Llama-4-Maverick-17B-128E-Instruct-FP8": "chat-completion · Response formats: Text · Tool calling: No",
+      "reasoning_content": "Some non-OpenAI reasoning models return a reasoning_content field alongside the final content"
+    }
+  },
+  "usagePerDecisionObserved": {
+    "source": "docs/evidencia/arena-duelo-competitivo.json",
+    "model": "azure-openai:cronista-equilibrado:reasoning-low",
+    "calls": 2,
+    "inputTokens": 16497,
+    "outputTokens": 1027
+  }
+}

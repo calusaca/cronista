@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
-import { comentarioEditorial, elegirReservaVoz, normalizarVoz, recordarVoz, repetidaVoz, zonaRelato, type RecuerdoVoz } from "../editorial";
+import { comentarioEditorial, normalizarVoz, recordarVoz, repetidaVoz, zonaRelato, type RecuerdoVoz } from "../editorial";
 import { construirRelato } from "../relato";
 import { firmaEstadoVoz } from "../buffer";
 import type { EventoArena, RegistroArena } from "../tipos";
@@ -91,20 +91,7 @@ it("el consumidor detecta una misma idea preparada en ventanas distintas", () =>
   expect(repetidaVoz(memoria, { tick: 701, texto: memoria[0]!.texto, clave: "secuencia:a1" })).toBe(false);
 });
 
-it("el respaldo recorre su repertorio antes de repetir y nunca usa el cierre durante el juego", () => {
-  const reservas = Array.from({ length: 12 }, (_, i) => ({ texto: `Comentario ${i}`, cierre: false }));
-  reservas.push({ texto: "Final", cierre: true });
-  let memoria: RecuerdoVoz[] = [];
-  for (let i = 0; i < 12; i++) {
-    const r = elegirReservaVoz(reservas, memoria)!; expect(r.texto).toBe(`Comentario ${i}`);
-    memoria = recordarVoz(memoria, { tick: i * 40, texto: r.texto });
-  }
-  expect(elegirReservaVoz(reservas, memoria)!.texto).toBe("Comentario 0");
-  expect(elegirReservaVoz(reservas, memoria, true)!.texto).toBe("Final");
-  memoria = reservas.filter(r => !r.cierre).map(r => ({ tick: 500, texto: r.texto }));
-  const siguiente = elegirReservaVoz(reservas, memoria)!;
-  expect(siguiente.texto).toBe("Comentario 0");
-  memoria = recordarVoz(memoria, { tick: 500, texto: siguiente.texto });
-  expect(elegirReservaVoz(reservas, memoria)!.texto).toBe("Comentario 1");
+it("normaliza mayúsculas, signos y tildes al comparar lo oído", () => {
+  // La rotación de las reservas (nota del 22 oct, 043) tiene sus pruebas en reservas-voz.test.ts.
   expect(normalizarVoz("¡Balón!" )).toBe("balon");
 });

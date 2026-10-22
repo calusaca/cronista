@@ -23,7 +23,9 @@ const prefijo = (r: RegistroArena, t: number): RegistroArena => ({ ...r, eventos
 const conPlaza = (r: RegistroArena, t: number) => datosEstadista(prefijo(r, t), t).filter(d => d.ocupaPlaza);
 const esperar = (ms: number) => new Promise(r => setTimeout(r, ms));
 const relojS = (texto: string) => { const m = /^(\d+):(\d{2})/.exec(texto.trim()); return m ? Number(m[1]) * 60 + Number(m[2]) : NaN; };
-const catalogoReserva = JSON.parse(await readFile("src/arena/voz-reserva.json", "utf8")) as Record<"es" | "en", { texto: string }[]>;
+// Nota del 22 oct (043): las reservas se sirven como archivos estáticos con un índice de textos.
+const indiceReserva = JSON.parse(await readFile("public/voz-reserva/indice.json", "utf8")) as Record<"es" | "en", { reservas: { texto: string }[]; cierre: { texto: string } }>;
+const catalogoReserva = { es: [...indiceReserva.es.reservas, indiceReserva.es.cierre], en: [...indiceReserva.en.reservas, indiceReserva.en.cierre] };
 const PRIORIDAD_REINICIO = PRIORIDAD_EVENTO_ARENA.reinicio!, PRIORIDAD_TIRO = PRIORIDAD_EVENTO_ARENA.tiro!;
 
 /** C11a: cada invitado arranca con el cursor visible en [tick·pasoS, tick·pasoS + caducidadInvitadoS]

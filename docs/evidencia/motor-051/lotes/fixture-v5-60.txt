@@ -1,0 +1,8 @@
+semillas que cumplen: [] cuenta por condición: {
+  alto: 32,
+  ancho: 77,
+  desvio: 54,
+  atrapada: 66,
+  golLado: 129,
+  sinAncho: 0
+} semillas probadas: 200

@@ -178,3 +178,23 @@ voluntario. Se comprobó un solo contexto de audio, ausencia de anticipaciones,
 escritorio y móvil de 360 px sin errores JavaScript ni desborde. Algunas solicitudes
 de síntesis devolvieron 429; el respaldo cubrió esas intervenciones no disponibles.
 La prueba pública no demuestra que se sintetice o se lea cada noticia seleccionada.
+
+## Nota del 22 de octubre: las reservas se repetían en partidos largos
+
+Carlos oyó dos veces en un partido de 180 s la reserva «Un pase hacia atrás también puede servir para encontrar una
+nueva salida». Causa: `elegirReservaVoz` elige la reserva menos reciente según la memoria de escucha, que solo guarda
+las 12 últimas intervenciones de los últimos 60 s (`recordarVoz`); al salir de esa memoria, una reserva vuelve a
+parecer nueva. El catálogo (`src/arena/voz-reserva.json`) tiene 12 reservas más el cierre por idioma.
+
+Decisiones:
+1. **Rotación por emisión.** El consumidor guarda, aparte de la memoria de escucha, el orden de las reservas oídas en
+   esa emisión (y en «Escuchar desde el inicio»). Ninguna reserva se repite hasta haber sonado todas; en las vueltas
+   siguientes no se repite ninguna de las ⌈n/2⌉ más recientes. El orden de la primera vuelta parte de un desfase
+   determinista por semilla para que dos partidos no empiecen igual.
+2. **Medición y ampliación.** Se mide cuántas reservas suenan en partidos de 180 s (Speech normal y Speech fallido). Si
+   en el caso normal pueden sonar más que las del catálogo, se amplía a `RESERVAS_VOZ.minimoPorIdioma` (constante nueva)
+   con frases propias, generales y verificablemente neutras (sin hechos del partido), revisadas contra las huellas de
+   los transcripts. El audio de las reservas se sirve como archivos estáticos cargados bajo demanda, no incrustado en el
+   paquete del navegador; un script versionado las sintetiza con la voz del narrador.
+3. **Pruebas.** Rotación completa antes de repetir y ventana de no repetición, con la memoria de escucha vacía o
+   llena; e2e de 180 s con Speech fallido que no repite una reserva antes de agotar el catálogo.

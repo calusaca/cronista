@@ -1,5 +1,6 @@
 import type { EstadoArena, RegistroArena } from "./tipos";
 import { firmaEstadoVoz } from "./buffer";
+import { RESERVAS_VOZ } from "../sim/limites";
 
 /** Memoria del consumidor: solo intervenciones cuyo audio llegó a empezar. */
 export interface RecuerdoVoz { tick: number; texto: string; clave?: string; tema?: string; estado?: "iniciada" | "completa" | "interrumpida"; rol?: "narrador" | "comentarista" | "estadista" }
@@ -16,12 +17,43 @@ export function elegirVarianteVoz(textos: readonly string[], memoria: readonly R
   const orden = textos.map((_, i) => textos[(i + inicio) % textos.length]!);
   return orden.find(texto => !repetidaVoz(memoria, { tick, texto })) ?? orden[0]!;
 }
-export function elegirReservaVoz<T extends { texto: string; cierre?: boolean }>(reservas: readonly T[], memoria: readonly RecuerdoVoz[], cierre = false): T | undefined {
+/** Mezcla entera determinista (sin Math.random) para el desfase y las vueltas siguientes. */
+function mezclaReserva(semilla: number, k: number): number {
+  let h = (Math.trunc(semilla) ^ Math.imul(k + 1, 0x9e3779b1)) >>> 0;
+  h = Math.imul(h ^ h >>> 16, 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ h >>> 13, 0xc2b2ae35) >>> 0;
+  return (h ^ h >>> 16) >>> 0;
+}
+/** Una reserva del catálogo; `orden` es su posición en el catálogo (por defecto, en la lista recibida). */
+export type ReservaRotable = { texto: string; cierre?: boolean; orden?: number };
+/** Nota del 22 oct (043) · Posiciones del catálogo (0..total-1) en el orden de la primera vuelta:
+ * consecutivas a partir de un desfase determinista por semilla, para que dos partidos no empiecen igual. */
+export function ordenPrimeraVuelta(total: number, semilla: number): number[] {
+  const desfase = total > 0 ? mezclaReserva(semilla, 0) % total : 0;
+  return Array.from({ length: total }, (_, i) => (i + desfase) % total);
+}
+/** Nota del 22 oct (043) · Rotación de las reservas por emisión. `oidas` son los textos de las reservas
+ * cuyo audio empezó en esta emisión, en orden; no es la memoria de escucha (acotada a 12 recuerdos de
+ * 60 s), así que una reserva no vuelve a parecer nueva al salir de ella. Ninguna se repite hasta haber
+ * sonado todas las disponibles; después no vuelve ninguna de las ⌈n · fracción⌉ oídas más recientes.
+ * El cierre solo se elige con `cierre`. `total` es el tamaño del catálogo cuando solo una parte llegó a
+ * cargarse (el desfase se calcula sobre el catálogo). Sin reservas disponibles devuelve undefined. */
+export function elegirReservaVoz<T extends ReservaRotable>(reservas: readonly T[], oidas: readonly string[], { semilla, cierre = false, total: catalogo = 0 }: { semilla: number; cierre?: boolean; total?: number }): T | undefined {
   if (cierre) return reservas.find(r => r.cierre);
-  // Orden de escucha, no tick: durante una recuperación el reloj puede quedarse quieto.
-  const escuchado = memoria.map(m => normalizarVoz(m.texto));
-  const ultima = (r: T) => escuchado.lastIndexOf(normalizarVoz(r.texto));
-  return reservas.filter(r => !r.cierre).sort((a, b) => ultima(a) - ultima(b))[0];
+  const pos = (r: T) => r.orden ?? reservas.indexOf(r);
+  const generales = reservas.filter(r => !r.cierre).sort((a, b) => pos(a) - pos(b));
+  if (!generales.length) return undefined;
+  const total = Math.max(catalogo, generales.length, ...generales.map(r => pos(r) + 1));
+  const rango = new Map(ordenPrimeraVuelta(total, semilla).map((p, k) => [p, k]));
+  const claves = oidas.map(normalizarVoz), sonadas = new Set(claves);
+  // Primera vuelta (o una reserva que se cargó tarde): la siguiente sin oír en el orden desfasado.
+  const nuevas = generales.filter(r => !sonadas.has(normalizarVoz(r.texto)));
+  if (nuevas.length) return nuevas.sort((a, b) => rango.get(pos(a))! - rango.get(pos(b))!)[0];
+  const ventana = Math.ceil(generales.length * RESERVAS_VOZ.fraccionNoRepeticion), recientes = new Set<string>();
+  for (let i = claves.length - 1; i >= 0 && recientes.size < ventana; i--) recientes.add(claves[i]!);
+  const elegibles = generales.filter(r => !recientes.has(normalizarVoz(r.texto)));
+  // Con una sola reserva no hay alternativa: repetir antes que superar el silencio máximo.
+  return elegibles.length ? elegibles[mezclaReserva(semilla, oidas.length) % elegibles.length] : generales[0];
 }
 
 /** Campo propio/rival depende del equipo, las bandas del eje transversal. */
