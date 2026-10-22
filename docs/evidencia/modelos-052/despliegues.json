@@ -65,6 +65,30 @@
       "capacidadPedida": 50,
       "resultado": "Succeeded",
       "capacidadAceptada": 50
+    },
+    {
+      "deployment": "cronista-sol6",
+      "modelo": "gpt-6-sol",
+      "version": "2026-09-22",
+      "formato": "OpenAI",
+      "capacidadPedida": 100,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 100,
+      "versionUpgradeOption": "NoAutoUpgrade",
+      "creadoUtc": "2026-10-22T15:05Z",
+      "nota": "Aprobación de Carlos del 22 oct («si puedes agregar más modelos de GPT los agregas, ejemplo sol, astra»). Creado con `az rest` PUT a ARM (api-version 2024-10-01) para fijar versionUpgradeOption = NoAutoUpgrade, que `az cognitiveservices account deployment create` no expone. Versión = la única GA del catálogo del recurso (isDefaultVersion). Cuota GlobalStandard de la suscripción en northcentralus: 250 (uso previo 0)."
+    },
+    {
+      "deployment": "cronista-astra6",
+      "modelo": "gpt-6-astra",
+      "version": "2026-09-03",
+      "formato": "OpenAI",
+      "capacidadPedida": 100,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 100,
+      "versionUpgradeOption": "NoAutoUpgrade",
+      "creadoUtc": "2026-10-22T15:05Z",
+      "nota": "Aprobación de Carlos del 22 oct («si puedes agregar más modelos de GPT los agregas, ejemplo sol, astra»). Creado con `az rest` PUT a ARM (api-version 2024-10-01) para fijar versionUpgradeOption = NoAutoUpgrade, que `az cognitiveservices account deployment create` no expone. Versión = la única GA del catálogo del recurso (isDefaultVersion). Cuota GlobalStandard de la suscripción en northcentralus: 250 (uso previo 0)."
     }
   ],
   "noProbados": [

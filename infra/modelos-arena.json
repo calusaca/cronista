@@ -33,6 +33,28 @@
     "publicar": true
   },
   {
+    "nombre": "cronista-sol6",
+    "modelo": "gpt-6-sol",
+    "version": "2026-09-22",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "sol6",
+    "nombrePublico": "GPT-6 Sol",
+    "llm": "azure-openai",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-astra6",
+    "modelo": "gpt-6-astra",
+    "version": "2026-09-03",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "astra6",
+    "nombrePublico": "GPT-6 Astra",
+    "llm": "azure-openai",
+    "publicar": false
+  },
+  {
     "nombre": "cronista-grok",
     "modelo": "grok-4.7",
     "version": "1",

@@ -16,7 +16,7 @@ Built for the **Inside the Game** hackathon (Microsoft × Premier League). Targe
 
 | Piece | What happens | Evidence |
 |---|---|---|
-| **Live arena** (`/arena`) | Two LLM team controllers drawn from three Azure OpenAI deployments (GPT-5.6 Luna, GPT-5.4 mini, GPT-6 Luna) receive the same committed observation, return a JSON plan per player, and a deterministic 2D engine resolves movement, passes, crosses, keeper behaviour, fouls, cards and substitutions. The simulation clock pauses while both coaches decide. | [Public smoke, 21 Oct](docs/evidencia/publicacion-048/smoke-publico.json): 4/4 valid decisions, 3 goals, zero programmed fallbacks |
+| **Live arena** (`/arena`) | Two LLM team controllers drawn from four Azure OpenAI deployments (GPT-5.6 Luna, GPT-5.4 mini, GPT-6 Luna, GPT-6 Sol) receive the same committed observation, return a JSON plan per player, and a deterministic 2D engine resolves movement, passes, crosses, keeper behaviour, fouls, cards and substitutions. The simulation clock pauses while both coaches decide. | [Public smoke, 21 Oct](docs/evidencia/publicacion-048/smoke-publico.json): 4/4 valid decisions, 3 goals, zero programmed fallbacks |
 | **Broadcast desk** | A narrator (templates), a commentator (LLM, verified by rules V1–V8, template fallback) and a statistician (deterministic) hand the floor to each other in 1–4 turn exchanges, in Spanish or English, with one Azure Speech voice per role. | Same smoke: 7 of 7 exchanges composed, 0 structural failures; [real MP3s](docs/evidencia/publicacion-048/) |
 | **Inspect facts and checks** | Every desk card and every narrator comment opens its cited facts, event IDs, verifier verdicts and rejected attempts. | [Commentator rejected once, accepted on retry](docs/evidencia/tres-voces/comentarista-azure-real.json) |
 | **Ask the match analyst** | A versioned Microsoft Foundry agent with two read-only tools answers "What just happened?", "What has the selected player done?" or "What chances were there?" over the confirmed prefix only. | [Agent `cronista-analista:1`](docs/evidencia/azure-agente.json), [public answer with tool call](docs/evidencia/azure-arena-publica-smoke.json) |
@@ -43,7 +43,7 @@ Orchestration is custom TypeScript hosted on Azure, which the category text admi
 ```mermaid
 flowchart LR
     subgraph Coaches["Two competing coaches (Azure OpenAI)"]
-        H[Home coach<br/>GPT-5.6 Luna · GPT-5.4 mini · GPT-6 Luna] 
+        H[Home coach<br/>GPT-5.6 Luna · GPT-5.4 mini · GPT-6 Luna · GPT-6 Sol] 
         A[Away coach<br/>a different deployment]
     end
     OBS[Committed observation<br/>same instant for both] --> H
@@ -68,7 +68,7 @@ flowchart LR
 
 | Agent | Implementation | Inputs → outputs |
 |---|---|---|
-| Home / Away coach | LLM, one deployment each from a server-side catalogue (the public app draws from `cronista-equilibrado` = GPT-5.6 Luna, `cronista-rapido` = GPT-5.4 mini and `cronista-luna6` = GPT-6 Luna; a Foundry Models adapter, [`src/lib/llm-foundry-modelos.ts`](src/lib/llm-foundry-modelos.ts), can serve other families, but Grok 4.7 and gpt-oss-120b did not pass the admission smoke: [evidence](docs/evidencia/modelos-052/README.md)), strict JSON schema, 60 s deadline, one correction with feedback | Positions, ball, score, time left, traits, energy, bench, conditions, crowd, public opponent actions, own last valid plan → per-player orders (`pasar`, `conducir`, `centrar`, `presionar`, …), mentality, width, block, substitution requests. [`src/arena/controladores.ts`](src/arena/controladores.ts), [`src/arena/competencia.ts`](src/arena/competencia.ts) |
+| Home / Away coach | LLM, one deployment each from a server-side catalogue (the public app draws from `cronista-equilibrado` = GPT-5.6 Luna, `cronista-rapido` = GPT-5.4 mini and `cronista-sol6` = GPT-6 Sol, `cronista-luna6` = GPT-6 Luna; a Foundry Models adapter, [`src/lib/llm-foundry-modelos.ts`](src/lib/llm-foundry-modelos.ts), can serve other families, but Grok 4.7 and gpt-oss-120b did not pass the admission smoke: [evidence](docs/evidencia/modelos-052/README.md)), strict JSON schema, 60 s deadline, one correction with feedback | Positions, ball, score, time left, traits, energy, bench, conditions, crowd, public opponent actions, own last valid plan → per-player orders (`pasar`, `conducir`, `centrar`, `presionar`, …), mentality, width, block, substitution requests. [`src/arena/controladores.ts`](src/arena/controladores.ts), [`src/arena/competencia.ts`](src/arena/competencia.ts) |
 | Engine + local player control | Deterministic, versioned rules (`reinicios-v4`) | Plans → movement, contacts, trajectories, keeper decisions, fouls, cards, restarts; events with IDs. [`src/arena/motor.ts`](src/arena/motor.ts), [`src/arena/portero.ts`](src/arena/portero.ts), [`src/arena/ataque.ts`](src/arena/ataque.ts) |
 | Narrator | Deterministic templates; Azure Speech voice per language; optional LLM comments verified by V1–V8 | Confirmed events → play-by-play text and SSML; handovers, questions and closings for the desk. [`src/arena/relato.ts`](src/arena/relato.ts), [`src/arena/narrador.ts`](src/arena/narrador.ts) |
 | Commentator | LLM through `src/lib/llm.ts`, ≤ 2 sentences, each citing a fact; V1–V8 with one retry, template fallback | Last 8 allowed facts + the "desk datum" → verified analysis. [`src/arena/mesa.ts`](src/arena/mesa.ts) |
@@ -89,7 +89,7 @@ flowchart LR
 
 | Technology | Used for | Where |
 |---|---|---|
-| Azure OpenAI (GPT-6.1 Sol for recaps; GPT-5.6 Luna, GPT-5.4 mini and GPT-6 Luna as coaches; GPT-5.4 mini for narrator comments and commentator) | All published LLM inference, strict JSON schema, reasoning effort `low` | [`src/lib/llm-azure-openai.ts`](src/lib/llm-azure-openai.ts), [`infra/modelos-arena.json`](infra/modelos-arena.json), [`infra/modelos-arena.bicep`](infra/modelos-arena.bicep) |
+| Azure OpenAI (GPT-6.1 Sol for recaps; GPT-5.6 Luna, GPT-5.4 mini, GPT-6 Luna and GPT-6 Sol as coaches; GPT-5.4 mini for narrator comments and commentator) | All published LLM inference, strict JSON schema, reasoning effort `low` | [`src/lib/llm-azure-openai.ts`](src/lib/llm-azure-openai.ts), [`infra/modelos-arena.json`](infra/modelos-arena.json), [`infra/modelos-arena.bicep`](infra/modelos-arena.bicep) |
 | Foundry Models (Model Inference API) | Adapter for coaches from other model families behind the same seam; admission only after a real smoke (22/22 valid decisions, none over 30 s). Tried: Grok 4.7 (too slow) and gpt-oss-120b (truncated at 2,048 tokens), not admitted; DeepSeek and Llama had no quota or Marketplace offer | [`src/lib/llm-foundry-modelos.ts`](src/lib/llm-foundry-modelos.ts), [evidence](docs/evidencia/modelos-052/README.md) |
 | Microsoft Foundry Agent Service (`@azure/ai-projects`) | Versioned analyst agent with function tools; identity-based access (Foundry User role) | [`src/arena/agente.ts`](src/arena/agente.ts), [`src/arena/agente-cli.ts`](src/arena/agente-cli.ts), [identity fix](docs/evidencia/azure-foundry-identidad-publica.json) |
 | Microsoft Foundry Evaluation | Paired groundedness evaluation of draft vs pipeline | [`src/arena/foundry-eval.ts`](src/arena/foundry-eval.ts) |

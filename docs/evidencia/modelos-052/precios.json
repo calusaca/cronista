@@ -137,6 +137,94 @@
       }
     },
     {
+      "deployment": "cronista-sol6",
+      "modelo": "gpt-6-sol",
+      "entrada": 2.0,
+      "salida": 10.0,
+      "cache": 0.2,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "6-sol ShortCo Inp Std Gl 1M Tokens",
+          "meterId": "11aebc3e-6fca-5547-82ea-c385cdd76c93",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-sol ShortCo Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 2.0,
+          "usdPorMillon": 2.0,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "6-sol ShortCo Opt Std Gl 1M Tokens",
+          "meterId": "6d957285-0c75-567e-8558-c077663f4508",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-sol ShortCo Opt Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 10.0,
+          "usdPorMillon": 10.0,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "6-sol ShortCo Cd Inp Std Gl 1M Tokens",
+          "meterId": "80d92207-ed2e-50f3-8735-ff05dfee71cb",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-sol ShortCo Cd Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.2,
+          "usdPorMillon": 0.2,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        }
+      },
+      "nota": "Consultado el 2026-10-22 (UTC) por la Retail Prices API (productName «Azure OpenAI GPT6»), medidores ShortCo Std Gl; existen medidores LongCo (el doble) cuyo umbral de contexto largo no figura en la API. Los prompts de la arena (~10 K tokens) se asumen de contexto corto, como en Luna."
+    },
+    {
+      "deployment": "cronista-astra6",
+      "modelo": "gpt-6-astra",
+      "entrada": 10.0,
+      "salida": 50.0,
+      "cache": 1.0,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "6-astra ShortCo Inp Std Gl 1M Tokens",
+          "meterId": "3698e05b-71a2-557f-b085-fad538a5e6ce",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-astra ShortCo Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 10.0,
+          "usdPorMillon": 10.0,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "6-astra ShortCo Opt Std Gl 1M Tokens",
+          "meterId": "d1eebc30-8600-52f2-860d-842988da5f0c",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-astra ShortCo Opt Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 50.0,
+          "usdPorMillon": 50.0,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "6-astra ShortCo Cd Inp Std Gl 1M Tokens",
+          "meterId": "be01a765-4684-5856-9e08-ec64ea676ec5",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6-astra ShortCo Cd Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 1.0,
+          "usdPorMillon": 1.0,
+          "effectiveStartDate": "2026-09-01T00:00:00Z"
+        }
+      },
+      "nota": "Consultado el 2026-10-22 (UTC) por la Retail Prices API (productName «Azure OpenAI GPT6»), medidores ShortCo Std Gl; existen medidores LongCo (el doble) cuyo umbral de contexto largo no figura en la API. Los prompts de la arena (~10 K tokens) se asumen de contexto corto, como en Luna."
+    },
+    {
       "deployment": "cronista-grok",
       "modelo": "grok-4.7",
       "entrada": 2,
@@ -222,7 +310,18 @@
     "fechaFin": "2026-11-10",
     "partidosModeloPorDia": 10,
     "margenUsd": 30,
-    "formula": "(costoMaxPartidoLLM × partidosModeloPorDia + speechUsdDia) × díasHastaFechaFin ≤ crédito − margen; costoMaxPartidoLLM = 2 × max(costo por lado) + narrador/comentarista (12 llamadas en cronista-rapido, 1.200 tokens de salida, entrada acotada por el prompt máximo observado)"
+    "formula": "(costoMaxPartidoLLM × partidosModeloPorDia + speechUsdDia) × díasHastaFechaFin ≤ crédito − margen; costoMaxPartidoLLM = 2 × max(costo por lado) + narrador/comentarista (12 llamadas en cronista-rapido, 1.200 tokens de salida, entrada acotada por el prompt máximo observado)",
+    "retiradosPorCosto": [
+      {
+        "deployment": "cronista-astra6",
+        "motivo": "§5: pasó el smoke (22/22), pero es el más caro del catálogo (10 / 50 USD por 1M, ≈ 2,71 USD por lado y ≈ 5,58 USD por partido Astra contra Astra en la cota de §5); con él la proyección hasta el 10 nov pasa de ≈ 160 a ≈ 1.150 USD. Retirado primero (decisión de Opus el 22 oct al aplicar §5; Carlos puede revertirla)."
+      },
+      {
+        "deployment": "cronista-sol6",
+        "motivo": "§5: pasó el smoke (22/22), pero con 2 / 10 USD por 1M (≈ 0,55 USD por lado y ≈ 1,27 USD por partido Sol contra Sol en la cota de §5) casi duplica la proyección previa, que ya no cumple. Retirado después de Astra (decisión de Opus el 22 oct al aplicar §5; Carlos puede revertirla)."
+      }
+    ],
+    "decisionCoordinador": "22 oct: Carlos pidió añadir GPT-6 Sol y Astra. Se publica Sol (≈0,27 USD por partido real). Astra (≈1,3 USD por partido de 180 s Astra contra Astra) queda desplegado y no publicado hasta que Carlos confirme el crédito disponible."
   },
   "speech": {
     "servicio": "Foundry Tools / Azure Speech",
@@ -256,5 +355,6 @@
       "motivo": "riesgo de 429 público: entrenador + narrador/comentarista (decisión del coordinador)"
     }
   ],
-  "capacidadNota": "GlobalStandard factura por token; la capacidad solo fija el límite de TPM y no cuesta en reposo."
+  "capacidadNota": "GlobalStandard factura por token; la capacidad solo fija el límite de TPM y no cuesta en reposo.",
+  "consultadoSol6Astra6Utc": "2026-10-22T15:07:34Z"
 }

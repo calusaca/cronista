@@ -221,8 +221,13 @@ Admitido el 22 de octubre: **GPT-6 Luna** (`cronista-luna6`, familia OpenAI, ada
 admitidos: Grok 4.7 por Foundry Models (con `reasoning_effort` `low`: 13 decisiones
 > 30 s y 2 plazos agotados) y gpt-oss-120b (truncado a 2.048 tokens, órdenes inválidas).
 No probados: DeepSeek-V4-Flash y Llama 4 Maverick (cuota 0), Llama 4 Scout y Mistral
-Medium (Marketplace no disponible para la cuenta). El catálogo público sigue siendo
-solo de la familia OpenAI.
+Medium (Marketplace no disponible para la cuenta). GPT-6 Sol (`cronista-sol6`) y GPT-6 Astra
+(`cronista-astra6`) pasaron el smoke el 22 de octubre (22 de 22, máximos de 10,9 s y
+10,6 s). Sol se publica por decisión del coordinador a pedido de Carlos (≈ 0,27 USD por
+partido real). Astra queda desplegado sin publicar: con sus precios de lista (10/50 USD por
+millón de tokens) un partido de 180 s Astra contra Astra cuesta ≈ 1,3 USD y la proyección
+del peor caso supera con creces el crédito sin confirmar.
+El catálogo público sigue siendo solo de la familia OpenAI.
 
 Por réplica: dos sesiones concurrentes, una de modelos, diez sesiones de modelos
 por día UTC, duración máxima de 180 segundos y decisiones cada 30 segundos en

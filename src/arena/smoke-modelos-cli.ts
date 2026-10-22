@@ -24,7 +24,15 @@ const fmt = (n: number | null | undefined, d = 0) => n === null || n === undefin
 /** Tokens de salida por llamada del narrador/comentarista (src/arena/narrador.ts). */
 const TOKENS_NARRADOR = 1200;
 
-interface Precios { modelos: { deployment: string; modelo: string; entrada: number; salida: number }[]; speech?: { usdPorMillonCaracteres: number; caracteresPorDiaMax: number }; presupuesto?: { creditoInicialUsd: number; creditoRestanteUsd: number | null; hipotesisCreditoRestanteUsd?: number; fechaFin: string; partidosModeloPorDia: number; margenUsd: number } }
+interface RetiradoPorCosto { deployment: string; motivo: string }
+interface Precios { modelos: { deployment: string; modelo: string; entrada: number; salida: number }[]; speech?: { usdPorMillonCaracteres: number; caracteresPorDiaMax: number }; presupuesto?: { creditoInicialUsd: number; creditoRestanteUsd: number | null; hipotesisCreditoRestanteUsd?: number; fechaFin: string; partidosModeloPorDia: number; margenUsd: number; retiradosPorCosto?: RetiradoPorCosto[] } }
+
+/** §5: modelos que pasaron el smoke pero se retiran del catálogo por la condición de presupuesto
+ * (se retira el más caro hasta cumplirla). Se anotan en precios.json → presupuesto.retiradosPorCosto. */
+function retiradosPorCosto(): RetiradoPorCosto[] {
+  if (!existsSync(`${DIR}/precios.json`)) return [];
+  return (JSON.parse(readFileSync(`${DIR}/precios.json`, "utf8")) as Precios).presupuesto?.retiradosPorCosto ?? [];
+}
 
 /** Condición §5 (v1.1): por catálogo, la combinación más cara (el modelo más caro dos veces) más
  * narrador/comentarista en cronista-rapido, más Speech diario, durante los días restantes. */
@@ -49,10 +57,11 @@ export function seccionPresupuesto(evidencias: EvidenciaSmoke[], hoy = new Date(
   const speechDia = sp.caracteresPorDiaMax * sp.usdPorMillonCaracteres / 1e6;
   const dias = Math.max(0, Math.ceil((Date.parse(`${pr.fechaFin}T23:59:59Z`) - hoy.getTime()) / 86_400_000));
   const publicados = (JSON.parse(readFileSync("infra/modelos-arena.json", "utf8")) as { nombre: string; publicar: boolean }[]);
-  const admitidos = evidencias.filter(e => e.admision.admitido).map(e => e.candidato.deployment);
+  const retirados = (pr.retiradosPorCosto ?? []).map(r => r.deployment);
+  const admitidos = evidencias.filter(e => e.admision.admitido && !retirados.includes(e.candidato.deployment)).map(e => e.candidato.deployment);
   // «Previo»: lo publicado que no salió de este smoke (los dos entrenadores del 19 oct).
   const actuales = publicados.filter(m => m.publicar && !admitidos.includes(m.nombre)).map(m => m.nombre);
-  const catalogos: [string, string[]][] = [["previo al 052", actuales], ["publicado + admitidos", [...new Set([...actuales, ...admitidos])]], ...evidencias.filter(e => !e.admision.admitido).map(e => [`publicado + ${e.candidato.deployment} (no admitido, referencia)`, [...new Set([...actuales, e.candidato.deployment])]] as [string, string[]])];
+  const catalogos: [string, string[]][] = [["previo al 052", actuales], ["publicado + admitidos", [...new Set([...actuales, ...admitidos])]], ...evidencias.filter(e => !admitidos.includes(e.candidato.deployment)).map(e => [`publicado + ${e.candidato.deployment} (${e.admision.admitido ? "apto en smoke, retirado por §5" : "no admitido"}, referencia)`, [...new Set([...actuales, ...admitidos, e.candidato.deployment])]] as [string, string[]])];
   const creditos: [string, number][] = [...(pr.creditoRestanteUsd !== null ? [["crédito restante anotado", pr.creditoRestanteUsd] as [string, number]] : []), ...(pr.hipotesisCreditoRestanteUsd !== undefined ? [["hipótesis (pendiente de Carlos)", pr.hipotesisCreditoRestanteUsd] as [string, number]] : []), ["último dato verificado (10 oct)", pr.creditoInicialUsd]];
   const l = ["", "## Condición de presupuesto (§5)", "",
     `Entrada por solicitud: prompt máximo web observado ${fmt(promptWeb)} × ${S.factorEntradaReintento}; ${solicitudes} solicitudes por lado; salida ${ARENA.tokensOrdenes} tokens (o la mayor observada si el razonamiento va fuera de \`completion_tokens\`). Narrador/comentarista: ${MESA_ARENA.presupuestoLlamadasModelo} llamadas en \`cronista-rapido\` × (${fmt(promptWeb)} de entrada como cota + ${TOKENS_NARRADOR} de salida) = ${fmt(narrador, 3)} USD. Speech: ${fmt(sp.caracteresPorDiaMax)} caracteres/día × ${sp.usdPorMillonCaracteres} USD/1M = ${fmt(speechDia, 2)} USD/día. Días hasta el ${pr.fechaFin}: ${dias}. Condición: (costoMaxPartido × ${pr.partidosModeloPorDia} + Speech/día) × días ≤ crédito − ${pr.margenUsd}.`,
@@ -81,6 +90,8 @@ export function generarReadme(): string {
     "Generado por `npm run arena:smoke-modelos` (no editar a mano; se regenera en cada corrida).",
     `Criterio (v1.1 §3): las ${PARTIDOS_SMOKE.length} partidas (espejo, cruzado A, cruzado B invertido y web ${S.webS} s / ${S.webIntervaloS} s) suman las decisiones esperadas del candidato; todas con \`origen: "controlador"\`, \`tiempoMs ≤ ${fmt(S.decisionMaxMs)}\`, ≤ 2 solicitudes, \`respuestasConUso === llamadas\`, precio anotado en [precios.json](precios.json). Solo cuentan las decisiones cuyo \`controlador\` es el candidato; las del rival (\`cronista-rapido\`) se reportan aparte.`,
     "",
+    "Condición de publicación (§5): si la proyección de gasto no cabe en el crédito, se retira del catálogo el modelo más caro hasta cumplirla. «Apto en smoke; no publicado (§5)» = pasó los cuatro partidos pero queda con `publicar: false` en `infra/modelos-arena.json` y fuera de `ARENA_MODELOS` (motivo en `precios.json` → `presupuesto.retiradosPorCosto`).",
+    "",
     "Sin muestras crudas: se guardan indicadores (`teniaThink`, `reasoningContentChars`, `finish`, tokens) y nunca texto del modelo, claves ni endpoints. Ningún resultado demuestra que un modelo sea mejor entrenador.",
     "",
     "## Resultado por modelo",
@@ -88,11 +99,13 @@ export function generarReadme(): string {
     "| Modelo (deployment) | Estado | Formato | Decisiones válidas | Latencia máx. / mediana | Solicitudes máx. | Tokens entrada / salida | Costo smoke | Causa |",
     "|---|---|---|---|---|---|---|---|---|",
   ];
+  const retiradosCosto = retiradosPorCosto();
+  const retirado = (e: EvidenciaSmoke) => e.admision.admitido ? retiradosCosto.find(r => r.deployment === e.candidato.deployment) : undefined;
   for (const e of evidencias) {
     const tiempos = e.decisionesCandidato.map(d => d.tiempoMs).sort((a, b) => a - b);
     const mediana = tiempos.length ? tiempos[Math.floor(tiempos.length / 2)]! : null;
     const t = e.resumen.tokensCandidato;
-    l.push(`| ${e.candidato.nombrePublico} (\`${e.candidato.deployment}\`, ${e.candidato.modelo}) | ${e.admision.admitido ? "**admitido**" : "probado, no admitido"} | ${e.candidato.llm === "azure-openai" ? "json_schema (azure-openai)" : (e.sonda.elegido ?? `ninguno ok (partidos con ${e.candidato.formatoJson})`)} | ${e.resumen.controlador} / ${e.resumen.esperadas} | ${fmt(e.resumen.tiempoMaxMs)} / ${fmt(mediana)} ms | ${e.resumen.llamadasMax ?? "—"} | ${fmt(t.entrada)} / ${fmt(t.salida)}${e.resumen.razonamientoFueraDeCompletion ? " (incl. razonamiento informado fuera de completion)" : ""} | ${e.costo.smokeUsd === null ? "—" : `${fmt(e.costo.smokeUsd, 4)} USD`} | ${e.admision.causas.join("; ") || "—"} |`);
+    l.push(`| ${e.candidato.nombrePublico} (\`${e.candidato.deployment}\`, ${e.candidato.modelo}) | ${!e.admision.admitido ? "probado, no admitido" : retirado(e) ? "apto en smoke; **no publicado** (§5)" : "**admitido**"} | ${e.candidato.llm === "azure-openai" ? "json_schema (azure-openai)" : (e.sonda.elegido ?? `ninguno ok (partidos con ${e.candidato.formatoJson})`)} | ${e.resumen.controlador} / ${e.resumen.esperadas} | ${fmt(e.resumen.tiempoMaxMs)} / ${fmt(mediana)} ms | ${e.resumen.llamadasMax ?? "—"} | ${fmt(t.entrada)} / ${fmt(t.salida)}${e.resumen.razonamientoFueraDeCompletion ? " (incl. razonamiento informado fuera de completion)" : ""} | ${e.costo.smokeUsd === null ? "—" : `${fmt(e.costo.smokeUsd, 4)} USD`} | ${[...e.admision.causas, ...(retirado(e) ? [retirado(e)!.motivo] : [])].join("; ") || "—"} |`);
   }
   for (const n of despliegues.noProbados) l.push(`| ${n.nombre} | no probado | — | — | — | — | — | — | ${n.causa} |`);
   l.push("", "## Sonda de formato (esquema real, 2048 tokens)", "", "| Deployment | Formato | Observación | Resultado | HTTP | ms | finish | entrada / salida / razonamiento | marcador think | reasoning_content (caracteres) | Respeta esquema |", "|---|---|---|---|---|---|---|---|---|---|---|");
