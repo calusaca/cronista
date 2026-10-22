@@ -1,0 +1,21 @@
+{
+  "checkedUtc": "2026-10-22T04:13:05.644Z",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena",
+  "jsErrors": [],
+  "http5xx": [],
+  "pages": {
+    "desktop": {
+      "panel": "FINAL STATS 1:00 SPORTING MONTEFRÍO BAJO OLÍMPICO BREZAL 58% 42% Possession 0.02 0.13 Geometric shot index (sum) · estimated 1 2 Shots 1 2 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 0 0 Offsides 6 / 7 6 / 6 Passes completed 100% 100% Pass accuracy 0 1 Balls recovered 1 0 Balls lost 0 0 Fouls 0 0 Yellow cards 0 0 Red cards 2 0 Saves HIGHLIGHTS Most shots on target Owen Barinera · 7 · Olímpico Brezal 2 Most balls recovered Vicente Oreales · 4 · Olímpico Brezal 1 Most distance covered Darío Brelelueta · 17 · Sporting Montefrío Bajo 242 m Recor",
+      "jugador": "Goals 0 Shots 0 0 on target · 0 off target or blocked Passes completed / attempted 2 / 2 Accuracy 100% · average 28 m Balls recovered 0 Balls lost 0 Fouls committed / suffered 0 / 0 Saves 2 Distance covered 30 m Top speed 20.6 km/h Time on the ball 5.5 s Ball actions 4 Geometric shot index (sum) · estimated —",
+      "inicio": "MATCH STATS · LIVE 0:00 SPORTING MONTEFRÍO BAJO OLÍMPICO BREZAL — — Possession 0 0 Geometric shot index (sum) · estimated 0 0 Shots 0 0 Shots on target 0 0 Shots off target or blocked 0 0 Close, centr",
+      "horizontalOverflow": false
+    },
+    "mobile360": {
+      "panel": "FINAL STATS 1:00 SPORTING MONTEFRÍO BAJO OLÍMPICO BREZAL 58% 42% Possession 0.02 0.13 Geometric shot index (sum) · estimated 1 2 Shots 1 2 Shots on target 0 0 Shots off target or blocked 0 0 Close, central shots · estimated 0 0 Corners 0 0 Offsides 6 / 7 6 / 6 Passes completed 100% 100% Pass accuracy 0 1 Balls recovered 1 0 Balls lost 0 0 Fouls 0 0 Yellow cards 0 0 Red cards 2 0 Saves HIGHLIGHTS Most shots on target Owen Barinera · 7 · Olímpico Brezal 2 Most balls recovered Vicente Oreales · 4 · Olímpico Brezal 1 Most distance covered Darío Brelelueta · 17 · Sporting Montefrío Bajo 242 m Recor",
+      "jugador": "Goals 0 Shots 0 0 on target · 0 off target or blocked Passes completed / attempted 2 / 2 Accuracy 100% · average 28 m Balls recovered 0 Balls lost 0 Fouls committed / suffered 0 / 0 Saves 2 Distance covered 30 m Top speed 20.6 km/h Time on the ball 5.5 s Ball actions 4 Geometric shot index (sum) · estimated —",
+      "inicio": "MATCH STATS · LIVE 0:00 SPORTING MONTEFRÍO BAJO OLÍMPICO BREZAL — — Possession 0 0 Geometric shot index (sum) · estimated 0 0 Shots 0 0 Shots on target 0 0 Shots off target or blocked 0 0 Close, centr",
+      "horizontalOverflow": false
+    }
+  },
+  "status": "passed"
+}
