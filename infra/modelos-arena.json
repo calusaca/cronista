@@ -55,6 +55,17 @@
     "publicar": true
   },
   {
+    "nombre": "cronista-sol61",
+    "modelo": "gpt-6.1-sol",
+    "version": "2026-09-29",
+    "formato": "OpenAI",
+    "capacidad": 100,
+    "id": "sol61",
+    "nombrePublico": "GPT-6.1 Sol",
+    "llm": "azure-openai",
+    "publicar": true
+  },
+  {
     "nombre": "cronista-grok",
     "modelo": "grok-4.7",
     "version": "1",

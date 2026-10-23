@@ -15,7 +15,8 @@ Sin muestras crudas: se guardan indicadores (`teniaThink`, `reasoningContentChar
 | Grok 4.7 (Foundry) (`cronista-grok`, grok-4.7) | probado, no admitido | json_schema | 17 / 22 | 60.002 / 32.173 ms | 1 | 162.265 / 26.197 (incl. razonamiento informado fuera de completion) | 0,4444 USD | 5 de 22 decisiones cayeron a respaldo (error_controlador, plazo_agotado); 13 decisiones > 30000 ms (máx. 60002 ms); respuestasConUso (17) ≠ llamadas (22) |
 | GPT-6 Luna (`cronista-luna6`, gpt-6-luna) | **admitido** | json_schema (azure-openai) | 22 / 22 | 8488 / 6084 ms | 1 | 204.784 / 13.070 | 0,0249 USD | — |
 | gpt-oss-120b (open weights, Foundry) (`cronista-oss`, gpt-oss-120b) | probado, no admitido | ninguno ok (partidos con json_object) | 2 / 22 | 24.314 / 13.220 ms | 2 | 262.371 / 53.800 | 0,0716 USD | sonda sin formato ok (json_schema/inicio: ok, json_schema/mitad: truncado, json_object/inicio: ok, json_object/mitad: semantico, texto/inicio: semantico); 20 de 22 decisiones cayeron a respaldo (error_controlador, orden_invalida) |
-| GPT-6 Sol (`cronista-sol6`, gpt-6-sol) | **admitido y publicado** (decisión del coordinador, 22 oct: Carlos pidió añadirlo; ≈0,27 USD por partido real) | json_schema (azure-openai) | 22 / 22 | 10.869 / 6521 ms | 2 | 214.009 / 12.133 | 0,4900 USD | §5: pasó el smoke (22/22), pero con 2 / 10 USD por 1M (≈ 0,55 USD por lado y ≈ 1,27 USD por partido Sol contra Sol en la cota de §5) casi duplica la proyección previa, que ya no cumple. Retirado después de Astra (decisión de Opus el 22 oct al aplicar §5; Carlos puede revertirla). |
+| GPT-6 Sol (`cronista-sol6`, gpt-6-sol) | apto en smoke; **no publicado** (§5) | json_schema (azure-openai) | 22 / 22 | 10.869 / 6521 ms | 2 | 214.009 / 12.133 | 0,4900 USD | §5: pasó el smoke (22/22), pero con 2 / 10 USD por 1M (≈ 0,55 USD por lado y ≈ 1,27 USD por partido Sol contra Sol en la cota de §5) casi duplica la proyección previa, que ya no cumple. Retirado después de Astra (decisión de Opus el 22 oct al aplicar §5; Carlos puede revertirla). |
+| GPT-6.1 Sol (`cronista-sol61`, gpt-6.1-sol) | probado, no admitido | json_schema (azure-openai) | 22 / 22 | 10.711 / 8417 ms | 1 | 204.523 / 10.496 | — | sin precio anotado en precios.json (§5) |
 | DeepSeek-V4-Flash | no probado | — | — | — | — | — | — | no probado: cuota GlobalStandard 0 en la suscripción (InsufficientQuota); sin deployment |
 | Llama-4-Maverick-17B-128E-Instruct-FP8 | no probado | — | — | — | — | — | — | no probado: cuota GlobalStandard 0 en la suscripción (InsufficientQuota); sin deployment |
 | Llama-4-Scout-17B-16E-Instruct | no probado | — | — | — | — | — | — | no probado: Marketplace no ofrece el producto a la región de facturación de la cuenta (CR); sin deployment |
@@ -38,6 +39,8 @@ Sin muestras crudas: se guardan indicadores (`teniaThink`, `reasoningContentChar
 | `cronista-oss` | texto | inicio | semantico | 200 | 8459 | stop | 7255 / 1841 / — | no | 5218 | no |
 | `cronista-sol6` | json_schema | inicio | ok | 200 | 6364 | stop | 7748 / 470 / 46 | no | 0 | sí |
 | `cronista-sol6` | json_schema | mitad | ok | 200 | 6953 | stop | 9340 / 561 / 71 | no | 0 | sí |
+| `cronista-sol61` | json_schema | inicio | ok | 200 | 8088 | stop | 7748 / 434 / 0 | no | 0 | sí |
+| `cronista-sol61` | json_schema | mitad | ok | 200 | 7458 | stop | 9340 / 431 / 0 | no | 0 | sí |
 
 ## Partidos
 
@@ -63,6 +66,10 @@ Sin muestras crudas: se guardan indicadores (`teniaThink`, `reasoningContentChar
 | `cronista-sol6` | cruzadoA | 60 s / 15 s | 4 / 4 | 0 | 6199 ms | 200×4 | stop×4 | 9695 | {"local":1,"visita":0} |
 | `cronista-sol6` | cruzadoB | 60 s / 15 s | 4 / 4 | 0 | 6967 ms | 200×4 | stop×4 | 9860 | {"local":1,"visita":1} |
 | `cronista-sol6` | web | 180 s / 30 s | 6 / 6 | 0 | 10.869 ms | 200×7 | stop×7 | 10.292 | {"local":0,"visita":1} |
+| `cronista-sol61` | espejo | 60 s / 15 s | 8 / 8 | 0 | 10.711 ms | 200×8 | stop×8 | 9903 | {"local":0,"visita":1} |
+| `cronista-sol61` | cruzadoA | 60 s / 15 s | 4 / 4 | 0 | 9380 ms | 200×4 | stop×4 | 9823 | {"local":0,"visita":1} |
+| `cronista-sol61` | cruzadoB | 60 s / 15 s | 4 / 4 | 0 | 9318 ms | 200×4 | stop×4 | 9716 | {"local":1,"visita":1} |
+| `cronista-sol61` | web | 180 s / 30 s | 6 / 6 | 0 | 9255 ms | 200×6 | stop×6 | 10.041 | {"local":4,"visita":2} |
 
 ## Costo estimado por lado en un partido web (§5)
 
@@ -73,25 +80,28 @@ Sin muestras crudas: se guardan indicadores (`teniaThink`, `reasoningContentChar
 | `cronista-luna6` | 0.1 / 0.5 | 9896 | 0,0271 USD | ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2048 × salida) / 1e6 (§5). |
 | `cronista-oss` | 0.15 / 0.6 | 9352 | 0,0358 USD | ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2048 × salida) / 1e6 (§5). |
 | `cronista-sol6` | 2 / 10 | 10.292 | 0,5545 USD | ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2048 × salida) / 1e6 (§5). |
+| `cronista-sol61` | sin precio | 10.041 | — | ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2048 × salida) / 1e6 (§5). |
 
 ## Condición de presupuesto (§5)
 
-Entrada por solicitud: prompt máximo web observado 10.471 × 1.25; 12 solicitudes por lado; salida 2048 tokens (o la mayor observada si el razonamiento va fuera de `completion_tokens`). Narrador/comentarista: 12 llamadas en `cronista-rapido` × (10.471 de entrada como cota + 1200 de salida) = 0,159 USD. Speech: 120.000 caracteres/día × 15 USD/1M = 1,80 USD/día. Días hasta el 2026-11-10: 20. Condición: (costoMaxPartido × 10 + Speech/día) × días ≤ crédito − 30.
+Entrada por solicitud: prompt máximo web observado 10.471 × 1.25; 12 solicitudes por lado; salida 2048 tokens (o la mayor observada si el razonamiento va fuera de `completion_tokens`). Narrador/comentarista: 12 llamadas en `cronista-rapido` × (10.471 de entrada como cota + 1200 de salida) = 0,159 USD. Speech: 120.000 caracteres/día × 15 USD/1M = 1,80 USD/día. Días hasta el 2026-11-10: 19. Condición: (costoMaxPartido × 10 + Speech/día) × días ≤ crédito − 30.
 
 | Catálogo | Modelo más caro | Costo máx. por partido | Gasto proyectado | Crédito | Margen | ¿Cumple? |
 |---|---|---|---|---|---|---|
-| previo al 052 (`cronista-equilibrado`, `cronista-rapido`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | hipótesis (pendiente de Carlos): 50 USD | -139,16 USD | **no** |
-| previo al 052 (`cronista-equilibrado`, `cronista-rapido`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | último dato verificado (10 oct): 150 USD | -39,16 USD | **no** |
-| publicado + admitidos (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | hipótesis (pendiente de Carlos): 50 USD | -139,16 USD | **no** |
-| publicado + admitidos (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | último dato verificado (10 oct): 150 USD | -39,16 USD | **no** |
-| publicado + cronista-astra6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-astra6`) | `cronista-astra6` 2,710 USD/lado | 5,580 USD | 1151,97 USD | hipótesis (pendiente de Carlos): 50 USD | -1131,97 USD | **no** |
-| publicado + cronista-astra6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-astra6`) | `cronista-astra6` 2,710 USD/lado | 5,580 USD | 1151,97 USD | último dato verificado (10 oct): 150 USD | -1031,97 USD | **no** |
-| publicado + cronista-grok (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-grok`) | `cronista-grok` 0,469 USD/lado | 1,097 USD | 255,49 USD | hipótesis (pendiente de Carlos): 50 USD | -235,49 USD | **no** |
-| publicado + cronista-grok (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-grok`) | `cronista-grok` 0,469 USD/lado | 1,097 USD | 255,49 USD | último dato verificado (10 oct): 150 USD | -135,49 USD | **no** |
-| publicado + cronista-oss (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-oss`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | hipótesis (pendiente de Carlos): 50 USD | -139,16 USD | **no** |
-| publicado + cronista-oss (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-oss`) | `cronista-rapido` 0,228 USD/lado | 0,616 USD | 159,16 USD | último dato verificado (10 oct): 150 USD | -39,16 USD | **no** |
-| publicado + cronista-sol6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-sol6`) | `cronista-sol6` 0,555 USD/lado | 1,268 USD | 289,61 USD | hipótesis (pendiente de Carlos): 50 USD | -269,61 USD | **no** |
-| publicado + cronista-sol6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-luna6`, `cronista-sol6`) | `cronista-sol6` 0,555 USD/lado | 1,268 USD | 289,61 USD | último dato verificado (10 oct): 150 USD | -169,61 USD | **no** |
+| previo al 052 (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| previo al 052 (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + admitidos (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + admitidos (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + cronista-astra6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + cronista-astra6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + cronista-grok (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`, `cronista-grok`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + cronista-grok (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`, `cronista-grok`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + cronista-oss (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`, `cronista-oss`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + cronista-oss (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`, `cronista-oss`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + cronista-sol6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + cronista-sol6 (apto en smoke, retirado por §5, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
+| publicado + cronista-sol61 (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | hipótesis (pendiente de Carlos): 50 USD | — | — |
+| publicado + cronista-sol61 (no admitido, referencia) (`cronista-equilibrado`, `cronista-rapido`, `cronista-sol6`, `cronista-astra6`, `cronista-sol61`, `cronista-luna6`) | `cronista-sol61` sin dato | — | — | último dato verificado (10 oct): 150 USD | — | — |
 
 ## Despliegues intentados
 

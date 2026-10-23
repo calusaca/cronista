@@ -89,6 +89,18 @@
       "versionUpgradeOption": "NoAutoUpgrade",
       "creadoUtc": "2026-10-22T15:05Z",
       "nota": "Aprobación de Carlos del 22 oct («si puedes agregar más modelos de GPT los agregas, ejemplo sol, astra»). Creado con `az rest` PUT a ARM (api-version 2024-10-01) para fijar versionUpgradeOption = NoAutoUpgrade, que `az cognitiveservices account deployment create` no expone. Versión = la única GA del catálogo del recurso (isDefaultVersion). Cuota GlobalStandard de la suscripción en northcentralus: 250 (uso previo 0)."
+    },
+    {
+      "deployment": "cronista-sol61",
+      "modelo": "gpt-6.1-sol",
+      "version": "2026-09-29",
+      "formato": "OpenAI",
+      "capacidadPedida": 100,
+      "resultado": "Succeeded",
+      "capacidadAceptada": 100,
+      "versionUpgradeOption": "NoAutoUpgrade",
+      "creadoUtc": "2026-10-23T23:30Z",
+      "nota": "Pedido de Carlos del 23 oct (sexto modelo para el torneo). Despliegue propio de la arena, separado de `gpt-6.1-sol` que usa la app de crónicas, para no compartir límites. Creado con `az rest` PUT a ARM (api-version 2024-10-01). Cuota GlobalStandard gpt-6.1-sol en northcentralus: 250 (uso previo 100). Smoke de admisión: 22/22 decisiones sin respaldo, máximo 10,7 s (sol61.json)."
     }
   ],
   "noProbados": [
