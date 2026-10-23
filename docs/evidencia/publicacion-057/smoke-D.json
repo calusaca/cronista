@@ -1,0 +1,249 @@
+{
+  "fase": "D",
+  "inicioUtc": "2026-10-23T01:27:29.693Z",
+  "checks": {
+    "movil.carga-ejemplo": true,
+    "barra-preparando-360.png-barra": {
+      "textoProgreso": "Preparing narration 0/9",
+      "botonSinNarracion": true,
+      "velocidadBloqueada": true
+    },
+    "movil.sonando": {
+      "ok": true,
+      "textos": [
+        "Registering the recording…",
+        "Preparing narration 0/9",
+        "Preparing narration 1/9",
+        "Preparing narration 2/9",
+        "Preparing narration 3/9",
+        "Preparing narration 4/9",
+        "Preparing narration 5/9",
+        "Preparing narration 6/9",
+        "Preparing narration 7/9",
+        "Preparing narration 8/9"
+      ],
+      "segundos": 3.454
+    },
+    "movil.suena": {
+      "ok": true,
+      "a": {
+        "t": 0.291768,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 293.424,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      },
+      "b": {
+        "t": 1.794362,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 293.424,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      },
+      "nota": "Corregido tras la corrida: el audio suena (paused=false, currentTime 0,29 → 1,79 s); el reloj sigue en 0:00 porque en los primeros ~36 s suena la previa (tramos [0,0], v1.1 § 6). La condición del script exigía que avanzara el reloj; el avance del reloj con el narrador se comprobó en barra-sonando-360 (0:26 con currentTime 146 s) y en las fases A/B."
+    },
+    "movil.sin-desborde-barra": true,
+    "movil.importa": true,
+    "movil.nada-antes": {
+      "ok": true,
+      "pre": {
+        "rec": "vuelo",
+        "vista": false,
+        "rotulo": false
+      }
+    },
+    "movil.red": {
+      "ok": true,
+      "red": {
+        "rec": "red",
+        "cx": -1
+      }
+    },
+    "movil.todos-quietos-en-fotograma-previo": {
+      "ok": true,
+      "fichas": 21,
+      "enFotogramaPrevio": 21,
+      "tickPrevio": 255
+    },
+    "movil.vista-arco": {
+      "ok": true,
+      "cap": "Goal view · Club Puertoscuro · lateral from the record · illustrative height (high)",
+      "caja": {
+        "x": 33,
+        "y": -49.78125,
+        "width": 128,
+        "height": 135.921875
+      },
+      "cancha": {
+        "x": 21,
+        "y": -117.53125,
+        "width": 318,
+        "height": 215.671875
+      }
+    },
+    "movil.escudo-rotulo": {
+      "ok": true,
+      "escudo": {
+        "x": 51.6875,
+        "y": -100.46875,
+        "width": 16,
+        "height": 18
+      }
+    },
+    "movil.sin-desborde": true,
+    "movil.saque": {
+      "ok": true,
+      "tras": {
+        "rec": null,
+        "saque": "Kick-off · CPClub Puertoscuro"
+      }
+    }
+  },
+  "relatos": [
+    {
+      "utc": "2026-10-23T01:27:34.967Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:1-local:0",
+      "caracteres": 178,
+      "presupuestados": 640,
+      "audioBytes": 78912
+    },
+    {
+      "utc": "2026-10-23T01:27:35.122Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:2-visita:0",
+      "caracteres": 171,
+      "presupuestados": 633,
+      "audioBytes": 78192
+    },
+    {
+      "utc": "2026-10-23T01:27:35.284Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:3-condiciones:0",
+      "caracteres": 179,
+      "presupuestados": 641,
+      "audioBytes": 101808
+    },
+    {
+      "utc": "2026-10-23T01:27:35.549Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 100,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 542,
+      "presupuestados": 1656,
+      "audioBytes": 270144
+    },
+    {
+      "utc": "2026-10-23T01:27:35.728Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 100,
+      "hasta": 200,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 283,
+      "presupuestados": 903,
+      "audioBytes": 155664
+    },
+    {
+      "utc": "2026-10-23T01:27:35.957Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 200,
+      "hasta": 300,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 555,
+      "presupuestados": 2464,
+      "audioBytes": 295200
+    },
+    {
+      "utc": "2026-10-23T01:27:36.155Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 300,
+      "hasta": 400,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 584,
+      "presupuestados": 1843,
+      "audioBytes": 308016
+    },
+    {
+      "utc": "2026-10-23T01:27:36.329Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 400,
+      "hasta": 500,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 278,
+      "presupuestados": 1124,
+      "audioBytes": 155664
+    },
+    {
+      "utc": "2026-10-23T01:27:36.549Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 500,
+      "hasta": 600,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 575,
+      "presupuestados": 2325,
+      "audioBytes": 316944
+    }
+  ],
+  "grabaciones": [
+    {
+      "utc": "2026-10-23T01:27:34.627Z",
+      "status": 200,
+      "cuerpo": {
+        "archivo": "ejemplo-v3"
+      },
+      "id": "05377400-b29c-4849-8ab1-f58777aa77f1"
+    }
+  ],
+  "jsErrors": [],
+  "http5xx": [],
+  "notas": [],
+  "reproduccion": {
+    "textos": [
+      "Registering the recording…",
+      "Preparing narration 0/9",
+      "Preparing narration 1/9",
+      "Preparing narration 2/9",
+      "Preparing narration 3/9",
+      "Preparing narration 4/9",
+      "Preparing narration 5/9",
+      "Preparing narration 6/9",
+      "Preparing narration 7/9",
+      "Preparing narration 8/9"
+    ],
+    "segundosHastaSonar": 3.454,
+    "sonando": true,
+    "pulsar": false
+  },
+  "finUtc": "2026-10-23T01:27:43.125Z",
+  "ok": true
+}

@@ -1,0 +1,334 @@
+{
+  "fase": "B",
+  "inicioUtc": "2026-10-23T01:25:45.391Z",
+  "checks": {
+    "ejemplo-es.carga": true,
+    "ejemplo-es.conmutador-marcado": {
+      "ok": true,
+      "etiqueta": "Con narración"
+    },
+    "ejemplo-es.sin-pulsar-enable": {
+      "ok": true,
+      "botonEnableVisible": false
+    },
+    "barra-preparando-1440-es.png-barra": {
+      "textoProgreso": "Preparando narración 0/9",
+      "botonSinNarracion": true,
+      "velocidadBloqueada": true
+    },
+    "ejemplo-es.registro-solo": {
+      "ok": true,
+      "grabaciones": [
+        {
+          "utc": "2026-10-23T01:25:50.396Z",
+          "status": 200,
+          "cuerpo": {
+            "archivo": "ejemplo-v3"
+          },
+          "id": "05377400-b29c-4849-8ab1-f58777aa77f1"
+        }
+      ]
+    },
+    "ejemplo-es.progreso-junto-a-play": {
+      "ok": true,
+      "textos": [
+        "Registrando la grabación…",
+        "Preparando narración 0/9",
+        "Preparando narración 1/9",
+        "Preparando narración 2/9",
+        "Preparando narración 3/9",
+        "Preparando narración 4/9",
+        "Preparando narración 5/9",
+        "Preparando narración 6/9",
+        "Preparando narración 7/9",
+        "Preparando narración 8/9"
+      ]
+    },
+    "ejemplo-es.sonando": {
+      "ok": true,
+      "segundos": 16.917
+    },
+    "ejemplo-es.suena": {
+      "ok": true,
+      "antes": {
+        "t": 0.461978,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      },
+      "despues": {
+        "t": 2.465485,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      }
+    },
+    "ejemplo-es.previa-reloj-en-0": {
+      "ok": true,
+      "nota": "informativo",
+      "dv": 0,
+      "dt": 2
+    },
+    "ejemplo-es.pausa-nativa-congela-reloj": {
+      "ok": true,
+      "c": {
+        "t": 2.466508,
+        "pausado": true,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      },
+      "d": {
+        "t": 2.466508,
+        "pausado": true,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      }
+    },
+    "ejemplo-es.reanuda": {
+      "ok": true,
+      "e": {
+        "t": 3.67527,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      }
+    },
+    "ejemplo-es.pausa-boton": {
+      "ok": true,
+      "f": {
+        "t": 3.706227,
+        "pausado": true,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      },
+      "g": {
+        "t": 3.706227,
+        "pausado": true,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      }
+    },
+    "ejemplo-es.busqueda-deslizador": {
+      "ok": true,
+      "pedido": 30,
+      "h": {
+        "t": 164.976,
+        "pausado": true,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 30,
+        "reloj": "0:30 / 1:00"
+      }
+    },
+    "ejemplo-es.reproduce-desde-busqueda": {
+      "ok": true,
+      "i": {
+        "t": 166.405681,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 30.3,
+        "reloj": "0:30 / 1:00"
+      }
+    },
+    "ejemplo-es.reloj-avanza-con-audio": {
+      "ok": true,
+      "dv": 0.6,
+      "dt": 3,
+      "i2": {
+        "t": 169.408206,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 30.9,
+        "reloj": "0:30 / 1:00"
+      }
+    },
+    "ejemplo-es.reloj-sigue-busqueda-nativa": {
+      "ok": true,
+      "objetivo": 248.5128,
+      "j": {
+        "t": 249.146778,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 51.5,
+        "reloj": "0:51 / 1:00"
+      }
+    },
+    "ejemplo-es.volver-al-inicio": {
+      "ok": true,
+      "k": {
+        "t": 0.447689,
+        "pausado": false,
+        "src": "blob:https",
+        "dur": 292.368,
+        "v": 0,
+        "reloj": "0:00 / 1:00"
+      }
+    },
+    "ejemplo-es.idioma-relatos": {
+      "ok": true,
+      "n": 9
+    }
+  },
+  "relatos": [
+    {
+      "utc": "2026-10-23T01:25:51.451Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "es",
+      "modo": "buffer",
+      "intervencion": "previa:1-local:0",
+      "caracteres": 157,
+      "presupuestados": 550,
+      "audioBytes": 75456
+    },
+    {
+      "utc": "2026-10-23T01:25:52.163Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "es",
+      "modo": "buffer",
+      "intervencion": "previa:2-visita:0",
+      "caracteres": 150,
+      "presupuestados": 543,
+      "audioBytes": 74880
+    },
+    {
+      "utc": "2026-10-23T01:25:53.154Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "es",
+      "modo": "buffer",
+      "intervencion": "previa:3-condiciones:0",
+      "caracteres": 172,
+      "presupuestados": 565,
+      "audioBytes": 104544
+    },
+    {
+      "utc": "2026-10-23T01:25:55.208Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 0,
+      "hasta": 100,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 546,
+      "presupuestados": 1657,
+      "audioBytes": 279216
+    },
+    {
+      "utc": "2026-10-23T01:25:56.542Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 100,
+      "hasta": 200,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 293,
+      "presupuestados": 908,
+      "audioBytes": 167328
+    },
+    {
+      "utc": "2026-10-23T01:25:58.773Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 200,
+      "hasta": 300,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 548,
+      "presupuestados": 2465,
+      "audioBytes": 288432
+    },
+    {
+      "utc": "2026-10-23T01:26:01.256Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 300,
+      "hasta": 400,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 579,
+      "presupuestados": 1842,
+      "audioBytes": 300384
+    },
+    {
+      "utc": "2026-10-23T01:26:02.574Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 400,
+      "hasta": 500,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 275,
+      "presupuestados": 1123,
+      "audioBytes": 157104
+    },
+    {
+      "utc": "2026-10-23T01:26:05.806Z",
+      "sesion": "05377400-b29c-4849-8ab1-f58777aa77f1",
+      "status": 200,
+      "desde": 500,
+      "hasta": 600,
+      "idioma": "es",
+      "modo": "completo",
+      "caracteres": 584,
+      "presupuestados": 2341,
+      "audioBytes": 306864
+    }
+  ],
+  "grabaciones": [
+    {
+      "utc": "2026-10-23T01:25:50.396Z",
+      "status": 200,
+      "cuerpo": {
+        "archivo": "ejemplo-v3"
+      },
+      "id": "05377400-b29c-4849-8ab1-f58777aa77f1"
+    }
+  ],
+  "jsErrors": [],
+  "http5xx": [],
+  "notas": [],
+  "reproduccion": {
+    "textos": [
+      "Registrando la grabación…",
+      "Preparando narración 0/9",
+      "Preparando narración 1/9",
+      "Preparando narración 2/9",
+      "Preparando narración 3/9",
+      "Preparando narración 4/9",
+      "Preparando narración 5/9",
+      "Preparando narración 6/9",
+      "Preparando narración 7/9",
+      "Preparando narración 8/9"
+    ],
+    "segundosHastaSonar": 16.917,
+    "sonando": true,
+    "pulsar": false
+  },
+  "finUtc": "2026-10-23T01:26:18.412Z",
+  "ok": true
+}

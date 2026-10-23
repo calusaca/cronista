@@ -159,3 +159,30 @@ test("regresión · el escudo del rótulo de gol mide su tamaño (no el ancho de
     await ctx.close();
   }
 });
+
+test("smoke 057 · a 360 y 390 px el recuadro no tapa el balón en la red ni la boca del arco batido (los dos arcos)", async ({ browser }) => {
+  for (const ancho of [360, 390]) {
+    const ctx = await browser.newContext({ viewport: { width: ancho, height: 800 } });
+    const page = await ctx.newPage();
+    await cargarEjemplo(page);
+    for (const g of [g1, g2]) {
+      await cursor(page, g.tick / 10 + GOL_VISUAL.enRedS / 2);
+      await expect(balon(page)).toHaveAttribute("data-reconstruccion", "red");
+      await expect(page.getByTestId("arena-goal-view")).toBeVisible();
+      const derecho = g.hasta.x >= ARENA.largoM / 2;
+      // Boca del arco batido en pantalla: de la red (2 m tras la línea) al borde del área chica, entre los postes ± el área chica.
+      const r = await page.evaluate(([derecho, largo, ancho, areaChicaLargo, areaChicaAncho]) => {
+        const svg = document.querySelector<SVGSVGElement>('[data-testid="arena-pitch"]')!, m = svg.getScreenCTM()!;
+        const punto = (x: number, y: number) => new DOMPoint(x, y).matrixTransform(m);
+        const x0 = derecho ? largo - areaChicaLargo : -2, x1 = derecho ? largo + 2 : areaChicaLargo;
+        const a = punto(x0, ancho / 2 - areaChicaAncho / 2), b = punto(x1, ancho / 2 + areaChicaAncho / 2);
+        const caja = (el: Element) => { const q = el.getBoundingClientRect(); return { x0: q.left, y0: q.top, x1: q.right, y1: q.bottom }; };
+        return { recuadro: caja(document.querySelector('[data-testid="arena-goal-view"]')!), balon: caja(document.querySelector('[data-testid="arena-ball"]')!), boca: { x0: Math.min(a.x, b.x), y0: Math.min(a.y, b.y), x1: Math.max(a.x, b.x), y1: Math.max(a.y, b.y) } };
+      }, [derecho, ARENA.largoM, ARENA.anchoM, 5.5, 18.32] as const);
+      const solape = (p: typeof r.balon, q: typeof r.balon) => Math.max(0, Math.min(p.x1, q.x1) - Math.max(p.x0, q.x0)) * Math.max(0, Math.min(p.y1, q.y1) - Math.max(p.y0, q.y0));
+      expect(solape(r.recuadro, r.balon), `${ancho} px, gol ${g.id}`).toBe(0);
+      expect(solape(r.recuadro, r.boca), `${ancho} px, gol ${g.id} (boca)`).toBe(0);
+    }
+    await ctx.close();
+  }
+});

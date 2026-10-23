@@ -1,0 +1,130 @@
+{
+  "utc": "2026-10-23T01:32:19.815Z",
+  "capturas": [
+    "barra-preparando-1440-cancha.png",
+    "barra-preparando-1440.png",
+    "barra-sonando-1440.png",
+    "gol-red-recuadro-1440.png",
+    "gol-vista-arco-1440.png",
+    "gol-saque-centro-1440.png",
+    "barra-preparando-360-cancha.png",
+    "barra-preparando-360.png",
+    "barra-sonando-360.png",
+    "gol-red-recuadro-360.png",
+    "gol-vista-arco-360.png",
+    "gol-saque-centro-360.png"
+  ],
+  "relatos": [
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 178
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 171
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 179
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 542
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 283
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 555
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 584
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 278
+    },
+    {
+      "ancho": 1440,
+      "status": 200,
+      "caracteres": 575
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 178
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 171
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 179
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 542
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 283
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 555
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 584
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 278
+    },
+    {
+      "ancho": 360,
+      "status": 200,
+      "caracteres": 575
+    }
+  ],
+  "jsErrors": [],
+  "sonando-1440": {
+    "t": 146.053056,
+    "pausado": false,
+    "reloj": "0:26 / 1:00"
+  },
+  "red-1440": {
+    "rec": "red",
+    "cx": "-1"
+  },
+  "saque-1440": "Kick-off · CPClub Puertoscuro",
+  "sonando-360": {
+    "t": 146.055925,
+    "pausado": false,
+    "reloj": "0:26 / 1:00"
+  },
+  "red-360": {
+    "rec": "red",
+    "cx": "-1"
+  },
+  "saque-360": "Kick-off · CPClub Puertoscuro"
+}

@@ -1,0 +1,491 @@
+{
+  "fase": "C",
+  "inicioUtc": "2026-10-23T01:26:21.102Z",
+  "checks": {
+    "sinia.reglas-v5": {
+      "ok": true,
+      "duracionS": 30,
+      "finalTick": 300,
+      "version": "arena-v3",
+      "reglas": "reinicios-v5",
+      "gol": {
+        "tick": 257,
+        "lado": "visita",
+        "hasta": {
+          "x": 0,
+          "y": 37.59685601707495
+        },
+        "distanciaM": 22.81878879660018
+      },
+      "goles": [
+        257
+      ]
+    },
+    "sinia.conmutador-marcado": true,
+    "barra-preparando-sinia-1440.png-barra": {
+      "textoProgreso": "Preparing narration 0/6",
+      "botonSinNarracion": true,
+      "velocidadBloqueada": true
+    },
+    "sinia.subida-200": {
+      "ok": true,
+      "subida": {
+        "utc": "2026-10-23T01:26:26.730Z",
+        "status": 200,
+        "cuerpo": {
+          "claves": [
+            "registro"
+          ],
+          "bytes": 990996
+        },
+        "id": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd"
+      },
+      "todas": [
+        {
+          "status": 200
+        }
+      ]
+    },
+    "sinia.registrando-y-preparando": {
+      "ok": true,
+      "textos": [
+        "Registering the recording…",
+        "Preparing narration 0/6",
+        "Preparing narration 1/6",
+        "Preparing narration 2/6",
+        "Preparing narration 3/6",
+        "Preparing narration 4/6",
+        "Preparing narration 5/6"
+      ]
+    },
+    "sinia.sonando": {
+      "ok": true,
+      "segundos": 8.183
+    },
+    "sinia.empieza-desde-cursor": {
+      "ok": true,
+      "desde": 22.7,
+      "primero": {
+        "ms": 11,
+        "v": 22.8,
+        "at": 127.815352,
+        "rec": null,
+        "cx": 35.17426277233077,
+        "cy": 51.57362773474106,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0",
+        "saque": null
+      }
+    },
+    "sinia.play-nada-antes-del-gol": {
+      "ok": true,
+      "n": 664,
+      "malas": []
+    },
+    "sinia.play-vuelo": {
+      "ok": true,
+      "n": 46,
+      "primero": {
+        "ms": 10511,
+        "v": 25.5,
+        "at": 138.316051,
+        "rec": "vuelo",
+        "cx": 2.996858315200736,
+        "cy": 39.238740477172335,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0",
+        "saque": null
+      },
+      "ultimo": {
+        "ms": 11260,
+        "v": 25.7,
+        "at": 139.064899,
+        "rec": "vuelo",
+        "cx": 0.030318620369208293,
+        "cy": 37.61346663606327,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0",
+        "saque": null
+      }
+    },
+    "sinia.play-red": {
+      "ok": true,
+      "n": 230,
+      "msEnRed": 3814,
+      "partidoEnRedS": 1,
+      "primero": {
+        "ms": 11280,
+        "v": 25.7,
+        "at": 139.084162,
+        "rec": "red",
+        "cx": -0.007703124999996667,
+        "cy": 37.59685601707495,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": null
+      },
+      "ultimo": {
+        "ms": 15094,
+        "v": 26.7,
+        "at": 142.898945,
+        "rec": "red",
+        "cx": -1,
+        "cy": 37.59685601707495,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": null
+      }
+    },
+    "sinia.play-saque-de-centro": {
+      "ok": true,
+      "saque": {
+        "ms": 15112,
+        "v": 26.7,
+        "at": 142.916944,
+        "rec": null,
+        "cx": 52.5,
+        "cy": 34,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": "Kick-off · CPClub Puertoscuro"
+      }
+    },
+    "sinia.play-vista-en-gol": {
+      "ok": true,
+      "primeraVista": {
+        "ms": 11280,
+        "v": 25.7,
+        "at": 139.084162,
+        "rec": "red",
+        "cx": -0.007703124999996667,
+        "cy": 37.59685601707495,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": null
+      }
+    },
+    "sinia.cursor-vuelo": {
+      "ok": true,
+      "pre": {
+        "rec": "vuelo",
+        "cx": 3.038984657206744,
+        "cy": 39.26182017565177,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0"
+      },
+      "desdeX": 3.038984657206744,
+      "hastaX": 0
+    },
+    "sinia.cursor-nada-antes": {
+      "ok": true,
+      "pre": {
+        "rec": "vuelo",
+        "cx": 3.038984657206744,
+        "cy": 39.26182017565177,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0"
+      }
+    },
+    "sinia.cursor-red": {
+      "ok": true,
+      "cx": -1,
+      "cy": 37.59685601707495,
+      "hasta": {
+        "x": 0,
+        "y": 37.59685601707495
+      },
+      "saque": null,
+      "marcador": "0–1"
+    },
+    "sinia.vista-arco": {
+      "ok": true,
+      "cap": "Goal view · Club Puertoscuro · lateral from the record · illustrative height (high)",
+      "attrs": {
+        "arco": "local",
+        "altura": "alta",
+        "lado": "visita",
+        "aria": "Front view of Club Puertoscuro's goal: the ball goes in 3.5 m from the centre, to the viewer's left; illustrative height (high)"
+      }
+    },
+    "sinia.escudo-rotulo": {
+      "ok": true,
+      "escudo": {
+        "x": 338.2734375,
+        "y": -256.84002685546875,
+        "width": 16,
+        "height": 18
+      }
+    },
+    "sinia.cursor-red-1s-y-saque": {
+      "ok": true,
+      "a09": "red",
+      "a10": {
+        "rec": null,
+        "cx": 52.5,
+        "cy": 34,
+        "saque": "Kick-off · CPClub Puertoscuro",
+        "vista": true
+      }
+    },
+    "sinia.procedencia-declarada": {
+      "ok": true,
+      "asig": "Home: programado:geometria-v3 · Away: programado:geometria-v3 · controllers declared by the file, not verified"
+    },
+    "sinia.cursor-todos-quietos": {
+      "ok": true,
+      "fichas": 21,
+      "enFotogramaPrevio": 21,
+      "nota": "Corregido tras la corrida: la grabación tiene una roja en el tick 112, así que el fotograma previo al gol tiene 21 jugadores; las 21 fichas coinciden con sus posiciones (la comprobación «quietas» de la corrida dio verdadero). La primera versión del script esperaba 22 a mano."
+    }
+  },
+  "relatos": [
+    {
+      "utc": "2026-10-23T01:26:27.693Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:1-local:0",
+      "caracteres": 177,
+      "presupuestados": 639,
+      "audioBytes": 79632
+    },
+    {
+      "utc": "2026-10-23T01:26:28.315Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:2-visita:0",
+      "caracteres": 174,
+      "presupuestados": 636,
+      "audioBytes": 77040
+    },
+    {
+      "utc": "2026-10-23T01:26:28.954Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 0,
+      "hasta": 0,
+      "idioma": "en",
+      "modo": "buffer",
+      "intervencion": "previa:3-condiciones:0",
+      "caracteres": 166,
+      "presupuestados": 628,
+      "audioBytes": 94752
+    },
+    {
+      "utc": "2026-10-23T01:26:30.173Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 0,
+      "hasta": 100,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 424,
+      "presupuestados": 1303,
+      "audioBytes": 226800
+    },
+    {
+      "utc": "2026-10-23T01:26:31.389Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 100,
+      "hasta": 200,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 412,
+      "presupuestados": 1291,
+      "audioBytes": 224784
+    },
+    {
+      "utc": "2026-10-23T01:26:32.430Z",
+      "sesion": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd",
+      "status": 200,
+      "desde": 200,
+      "hasta": 300,
+      "idioma": "en",
+      "modo": "completo",
+      "caracteres": 400,
+      "presupuestados": 1663,
+      "audioBytes": 230400
+    }
+  ],
+  "grabaciones": [
+    {
+      "utc": "2026-10-23T01:26:26.730Z",
+      "status": 200,
+      "cuerpo": {
+        "claves": [
+          "registro"
+        ],
+        "bytes": 990996
+      },
+      "id": "9d7cf1d0-db6f-43d6-9009-6468e0e7b3dd"
+    }
+  ],
+  "jsErrors": [],
+  "http5xx": [],
+  "notas": [],
+  "intentosHastaGol": 2,
+  "registro": {
+    "duracionS": 30,
+    "finalTick": 300,
+    "version": "arena-v3",
+    "reglas": "reinicios-v5",
+    "gol": {
+      "tick": 257,
+      "lado": "visita",
+      "hasta": {
+        "x": 0,
+        "y": 37.59685601707495
+      },
+      "distanciaM": 22.81878879660018
+    },
+    "goles": [
+      257
+    ]
+  },
+  "cursorAntesDePlay": {
+    "t": 0,
+    "pausado": true,
+    "src": null,
+    "dur": null,
+    "v": 22.7,
+    "reloj": "0:22 / 0:30"
+  },
+  "reproduccion": {
+    "textos": [
+      "Registering the recording…",
+      "Preparing narration 0/6",
+      "Preparing narration 1/6",
+      "Preparing narration 2/6",
+      "Preparing narration 3/6",
+      "Preparing narration 4/6",
+      "Preparing narration 5/6"
+    ],
+    "segundosHastaSonar": 8.183,
+    "sonando": true,
+    "pulsar": false
+  },
+  "muestrasResumen": {
+    "n": 1357,
+    "primera": {
+      "ms": 11,
+      "v": 22.8,
+      "at": 127.815352,
+      "rec": null,
+      "cx": 35.17426277233077,
+      "cy": 51.57362773474106,
+      "vista": false,
+      "rotulo": false,
+      "dataGol": null,
+      "marcador": "0–0",
+      "saque": null
+    },
+    "ultima": {
+      "ms": 22611,
+      "v": 28.7,
+      "at": 150.415212,
+      "rec": null,
+      "cx": 41.48212815208306,
+      "cy": 10.087706348176207,
+      "vista": true,
+      "rotulo": true,
+      "dataGol": "visita",
+      "marcador": "0–1",
+      "saque": null
+    },
+    "secuencia": [
+      {
+        "ms": 11,
+        "v": 22.8,
+        "at": 127.815352,
+        "rec": null,
+        "cx": 35.17426277233077,
+        "cy": 51.57362773474106,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0",
+        "saque": null
+      },
+      {
+        "ms": 10511,
+        "v": 25.5,
+        "at": 138.316051,
+        "rec": "vuelo",
+        "cx": 2.996858315200736,
+        "cy": 39.238740477172335,
+        "vista": false,
+        "rotulo": false,
+        "dataGol": null,
+        "marcador": "0–0",
+        "saque": null
+      },
+      {
+        "ms": 11280,
+        "v": 25.7,
+        "at": 139.084162,
+        "rec": "red",
+        "cx": -0.007703124999996667,
+        "cy": 37.59685601707495,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": null
+      },
+      {
+        "ms": 15112,
+        "v": 26.7,
+        "at": 142.916944,
+        "rec": null,
+        "cx": 52.5,
+        "cy": 34,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": "Kick-off · CPClub Puertoscuro"
+      },
+      {
+        "ms": 18196,
+        "v": 27.5,
+        "at": 146.000131,
+        "rec": null,
+        "cx": 50.07121802610029,
+        "cy": 28.754682390200234,
+        "vista": true,
+        "rotulo": true,
+        "dataGol": "visita",
+        "marcador": "0–1",
+        "saque": null
+      }
+    ]
+  },
+  "finUtc": "2026-10-23T01:26:58.716Z",
+  "ok": true
+}
