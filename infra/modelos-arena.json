@@ -52,7 +52,7 @@
     "id": "astra6",
     "nombrePublico": "GPT-6 Astra",
     "llm": "azure-openai",
-    "publicar": false
+    "publicar": true
   },
   {
     "nombre": "cronista-grok",
