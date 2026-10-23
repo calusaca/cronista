@@ -1,7 +1,7 @@
 // Vídeo final de la entrega (docs/entrega/guion-video.md). Graba las dos apps públicas con
 // Playwright, sintetiza la voz en off con Azure Speech, monta tarjetas propias y subtítulos.
 // No modifica la app ni sube nada. Uso, desde la raíz del repo:
-//   node scripts/grabar-video-final.mjs [--fases=arena,recap,tarjetas,voz,montar,verificar] [--controladores=azar|programado] [--toma=arena]
+//   node scripts/grabar-video-final.mjs [--fases=arena,previa,recap,tarjetas,voz,montar,verificar] [--controladores=azar|programado] [--toma=arena]
 // Intermedios en .cache/video-final/; salida docs/entrega/cronista-demo-final.{mp4,en.srt}.
 // Credenciales: .env y .cache/azure-servicios.env (nunca se imprimen ni se escriben).
 import { chromium } from "@playwright/test";
@@ -19,11 +19,11 @@ const SALIDA = resolve("docs/entrega/cronista-demo-final.mp4");
 const SALIDA_SRT = resolve("docs/entrega/cronista-demo-final.en.srt");
 const EVIDENCIA = resolve("docs/evidencia/publicacion-048");
 const arg = (n, d) => process.argv.find(a => a.startsWith(`--${n}=`))?.split("=")[1] ?? d;
-const fases = arg("fases", "arena,recap,tarjetas,voz,montar,verificar").split(",");
+const fases = arg("fases", "arena,previa,recap,tarjetas,voz,montar,verificar").split(",");
 const controladores = arg("controladores", "azar");
 const toma = arg("toma", "arena");
-const duracionPartido = +arg("duracion", "180");
-const [modeloLocal, modeloVisita] = arg("modelos", "luna6,equilibrado").split(",");
+const duracionPartido = +arg("duracion", "60");
+const [modeloLocal, modeloVisita] = arg("modelos", "sol6,luna6").split(",");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 mkdirSync(TRABAJO, { recursive: true });
 
@@ -170,98 +170,102 @@ async function grabarArena() {
     await page.goto(ARENA, { waitUntil: "networkidle", timeout: 180_000 });
     await page.getByTestId("arena-pitch").waitFor();
     await sleep(800);
-    // Duración del partido (fuera de cuadro): 180 s da margen para goles y conversaciones.
+    const txt = sel => page.evaluate(s => document.querySelector(s)?.innerText ?? "", sel).catch(() => "");
+    const visible = sel => page.evaluate(s => { const e = document.querySelector(s); return !!e && e.getBoundingClientRect().height > 0; }, sel).catch(() => false);
+    // Duración (fuera de cuadro).
     { const dur = page.locator("select").filter({ has: page.locator(`option:text-is("${duracionPartido} s")`) }).first(); await dur.selectOption({ label: `${duracionPartido} s` }); }
-    // Escena 1: marcador 0–0, cancha con 22 fichas y árbitro; el cursor recorre la mesa.
-    await g.desplazar(page.getByTestId("arena-pitch"), 318, 1500);
+    // Escena 1: nueva identidad (emblema, escudos, equipaciones) en el primer encuadre.
+    await page.evaluate(() => window.scrollTo(0, 0)); await sleep(600);
     await g.marca("s1");
-    for (const rol of ["narrador", "comentarista", "estadista"]) await g.mover(page.getByTestId(`arena-mesa-${rol}`), 1900);
-    // Escena 2: elección manual de modelos (GPT-6 Luna frente a GPT-5.6 Luna) y arranque.
-    await g.desplazar(page.getByTestId("arena-live"), 84, 1400);
+    await g.mover(page.locator(".arena-score").first(), 1600);
+    await g.mover(page.getByTestId("arena-player").nth(3), 1500);
+    await g.mover(page.getByTestId("arena-player").nth(16), 1500);
+    // Escena 2: elección manual de modelos y arranque.
     const vivoPanel = page.getByTestId("arena-live");
+    await g.desplazar(vivoPanel, 84, 1300);
     const select = vivoPanel.locator("select").first();
-    await g.mover(select, 700);
+    await g.mover(select, 600);
     await g.marca("s2-modelos");
     if (controladores === "programado") await select.selectOption("programado");
     else {
       await select.selectOption("manual"); await sleep(700);
       const [local, visita] = [vivoPanel.locator("select").nth(1), vivoPanel.locator("select").nth(2)];
-      await g.mover(local, 500); await local.selectOption(modeloLocal); await sleep(900);
-      await g.mover(visita, 500); await visita.selectOption(modeloVisita); await sleep(900);
+      await g.mover(local, 450); await local.selectOption(modeloLocal); await sleep(800);
+      await g.mover(visita, 450); await visita.selectOption(modeloVisita); await sleep(800);
     }
     const boton = page.getByRole("button", { name: "Start live match" });
-    await g.mover(boton, 600);
+    await g.mover(boton, 500);
     await g.marca("s2-clic");
-    const b = await boton.boundingBox(); await page.mouse.click(b.x + 40, b.y + b.height / 2);
-    await sleep(500); await page.mouse.move(520, 215, { steps: 14 });
-    let arrancado = await g.esperar(async () => (await g.texto("[data-testid=arena-live-assignment]")) || null, 15_000, "asignación");
-    for (let intento = 0; !arrancado && intento < 3; intento++) {
-      console.log("  ! no arrancó; se reintenta en 45 s: " + (await g.texto("[data-testid=arena-live] [role=alert]")));
-      await sleep(45_000);
-      await g.marca("s2-clic");
-      const bb = await boton.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2);
-      arrancado = await g.esperar(async () => (await g.texto("[data-testid=arena-live-assignment]")) || null, 15_000, "asignación");
-    }
-    if (!arrancado) throw new Error("El partido no arrancó: " + await g.texto("[data-testid=arena-live]"));
-    await g.desplazar(page.getByTestId("arena-live"), 84, 900);
+    { const b = await boton.boundingBox(); await page.mouse.click(b.x + 40, b.y + b.height / 2); }
+    let arrancado = await g.esperar(async () => (await txt("[data-testid=arena-live-assignment]")) || null, 15_000, "asignación");
+    if (!arrancado) throw new Error("El partido no arrancó: " + await txt("[data-testid=arena-live]"));
     await g.marca("s2-asignacion", { texto: arrancado });
-    let tDec = null, tVivo = null; const ini2 = Date.now();
-    while (Date.now() - ini2 < 150_000) {
-      const st = await g.texto("[data-testid=arena-live-status]"), bs = await g.texto("[data-testid=arena-buffer-status]");
-      if (!tDec && /Coaches are deciding/.test(st)) { tDec = Date.now(); await g.marca("s2-decidiendo"); }
-      if (!tVivo && /Live · \d+ s ready/.test(bs)) { tVivo = Date.now(); await g.marca("s2-vivo", { texto: bs }); }
-      if (tVivo && (tDec || Date.now() - tVivo > 4000)) break;
-      await sleep(150);
-    }
-    if (!tVivo) throw new Error("La emisión no quedó lista");
-    while (Date.now() < Math.max(tVivo, tDec ?? 0) + 1500) await sleep(100);
-    // Narración activada en cuanto la emisión está lista.
+    // Narración activada en cuanto existe el botón (emisión preparándose, reloj en 0): así suena la previa.
     const activar = page.getByRole("button", { name: "Enable narration" });
-    await g.esperar(async () => activar.isVisible(), 30_000, "botón de narración");
-    await g.mover(activar, 500);
-    await g.marca("narracion");
+    await g.esperar(async () => activar.isVisible(), 60_000, "botón de narración");
+    await g.desplazar(page.getByTestId("arena-buffer"), 120, 900);
+    await g.mover(activar, 400);
+    await g.marca("narracion", { texto: await txt("[data-testid=arena-buffer-status]") });
     { const bb = await activar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
-    await sleep(1500);
-    // Escenas 3–4: toda la emisión en la vista cancha + mesa (goles, rótulo, marcador e intercambios).
-    await g.desplazar(page.getByTestId("arena-pitch"), 250, 1300);
-    await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 10 });
-    await g.marca("mesa");
-    const finEmision = Date.now() + (duracionPartido + 120) * 1000;
+    await sleep(400);
+    // Escena 3: tarjeta de alineaciones mientras el estadista habla la previa.
+    const conPrevia = await visible("[data-testid=arena-lineups]");
+    if (conPrevia) await g.desplazar(page.getByTestId("arena-lineups"), 76, 1100);
+    else { console.log("  ! la tarjeta de alineaciones ya no está (el reloj arrancó)"); await g.desplazar(page.getByTestId("arena-pitch"), 175, 900); }
+    await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 8 });
+    await g.marca("previa", { tarjeta: conPrevia });
+    // Dirección de cámara: alineaciones mientras siguen visibles; luego cancha; mesa durante cada intercambio.
+    let camara = conPrevia ? "previa" : "cancha";
+    const ir = async destino => {
+      if (destino === camara) return;
+      camara = destino;
+      if (destino === "cancha") await g.desplazar(page.getByTestId("arena-pitch"), 175, 700);
+      else if (destino === "mesa") await g.desplazar(page.locator("[data-testid=arena-mesa-dialogo]").first(), 84, 700);
+      await g.marca(`camara-${destino}`);
+    };
+    const finEmision = Date.now() + (duracionPartido + 150) * 1000;
     let finVisto = null;
     while (Date.now() < finEmision) {
-      const bs = await g.texto("[data-testid=arena-buffer]");
+      const ahora = Date.now();
+      const eventos = await page.evaluate(() => window.__audio).catch(() => []);
+      const sonando = eventos.filter(e => e.t <= ahora && ahora < (e.parada ?? e.t + (e.dur - e.offset) * 1000)).at(-1);
+      const r = sonando?.tag ? estado.relatos.get(sonando.tag) : null;
+      const esPreviaR = r?.intervencion?.startsWith("previa:");
+      const esMesa = r?.intervencion && !esPreviaR && (r.fragmentos ?? []).some(f => f.rol === "comentarista" || f.rol === "estadista");
+      if (camara === "previa") { if (!esPreviaR && !(await visible("[data-testid=arena-lineups]")) ) await ir("cancha"); }
+      else if (esMesa && await visible("[data-testid=arena-mesa-dialogo]")) await ir("mesa");
+      else if (!esMesa) await ir("cancha");
+      const bs = await txt("[data-testid=arena-buffer]");
       if (/End of narration/.test(bs)) break;
-      if (/End of broadcast/.test(bs)) { finVisto ??= Date.now(); if (Date.now() - finVisto > 25_000) break; }
-      await sleep(500);
+      if (/End of broadcast/.test(bs)) { finVisto ??= ahora; if (ahora - finVisto > 25_000) break; }
+      await sleep(250);
     }
-    await g.marca("fin-emision", { texto: await g.texto("[data-testid=arena-buffer-status]") });
-    await sleep(2500);
-    // Escena 5: hechos y verificaciones en la tarjeta del comentarista.
+    await g.marca("fin-emision", { texto: await txt("[data-testid=arena-buffer-status]") });
+    await sleep(2000);
+    // Escena: hechos y verificaciones en la tarjeta del comentarista.
     const tarjeta = page.getByTestId("arena-mesa-comentarista");
     await g.desplazar(tarjeta, 120, 1200);
     await g.pulsar(tarjeta.locator("details > summary").first(), 400);
     await g.marca("s5");
     await sleep(4500);
-    await g.desplazar(tarjeta.locator("details").first(), 60, 1500);
+    await g.desplazar(tarjeta, 84, 1500);
     await sleep(5500);
-    // Escena 6: cifras del partido (final) y ficha del goleador con sus cifras.
+    // Escena: cifras del partido (final) y ficha del goleador.
     const cifras = page.getByTestId("arena-stats");
     await g.desplazar(cifras, 84, 1300);
     await g.marca("s6-cifras");
     await sleep(3000);
     await g.desplazarPor(260, 1600);
     await sleep(1500);
-    const sesionId = estado.sesion;
-    const goleador = sesionId ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); if (!r.ok) return null; const j = await r.json(); return j.registro?.eventos?.filter(e => e.tipo === "gol" && !e.autogol).at(-1)?.jugador ?? null; }, sesionId).catch(() => null) : null;
-    await g.desplazar(page.getByTestId("arena-pitch"), 250, 1100);
+    const goleador = estado.sesion ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); if (!r.ok) return null; const j = await r.json(); return j.registro?.eventos?.filter(e => e.tipo === "gol" && !e.autogol).at(-1)?.jugador ?? null; }, estado.sesion).catch(() => null) : null;
+    await g.desplazar(page.getByTestId("arena-pitch"), 175, 1100);
     const ficha = goleador ? page.locator(`[data-testid=arena-player][data-player="${goleador}"]`) : page.getByTestId("arena-player").nth(9);
     await g.pulsar((await ficha.count()) ? ficha.first() : page.getByTestId("arena-player").nth(9), 500);
     await g.marca("s6-seleccion", { jugador: goleador });
-    const tarjetaJugador = page.getByTestId("arena-player-card");
-    await g.desplazar(tarjetaJugador, 84, 1400);
-    await g.marca("s6-jugador", { texto: (await g.texto("[data-testid=arena-player-card]")).slice(0, 600) });
+    await g.desplazar(page.getByTestId("arena-player-card"), 84, 1400);
+    await g.marca("s6-jugador", { texto: (await txt("[data-testid=arena-player-card]")).slice(0, 600) });
     await sleep(5000);
-    // Escena 7: descargar comentarios (Markdown).
+    // Escena: descargar comentarios (Markdown).
     const descargas = page.getByTestId("arena-downloads");
     await g.desplazar(descargas, 220, 1300);
     const md = descargas.getByRole("button", { name: "Download commentary (Markdown)" });
@@ -270,11 +274,10 @@ async function grabarArena() {
     const espera = page.waitForEvent("download", { timeout: 20_000 });
     { const bb = await md.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
     const descarga = await espera;
-    const nombreMd = descarga.suggestedFilename();
     await descarga.saveAs(join(dir, "descarga.md"));
-    await g.marca("s7-descargado", { archivo: nombreMd });
+    await g.marca("s7-descargado", { archivo: descarga.suggestedFilename() });
     await sleep(3000);
-    // Escena 8: agente de Foundry, estilo Analyst, herramientas y evidencia.
+    // Escena: agente de Foundry.
     const asistente = page.getByTestId("arena-assistant");
     await g.desplazar(asistente, 90, 1200);
     const [pregunta, estilo] = [asistente.locator("select").nth(0), asistente.locator("select").nth(1)];
@@ -287,16 +290,16 @@ async function grabarArena() {
     await g.marca("s8-pregunta");
     const respuesta = await g.esperar(async () => (await asistente.getByTestId("arena-assistant-answer").count()) > 0 || (await asistente.getByRole("alert").count()) > 0, 90_000, "respuesta del analista");
     await sleep(400);
-    await g.marca("s8-respuesta", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
+    await g.marca("s8-respuesta", { texto: await txt("[data-testid=arena-assistant-answer]") });
     if (respuesta && await asistente.getByTestId("arena-assistant-answer").count()) {
       await sleep(2200);
       await g.pulsar(asistente.getByTestId("arena-assistant-answer").locator("summary"), 300);
-      await g.marca("s8-herramientas", { texto: await g.texto("[data-testid=arena-assistant-answer]") });
+      await g.marca("s8-herramientas", { texto: await txt("[data-testid=arena-assistant-answer]") });
       await g.desplazar(asistente.getByTestId("arena-assistant-answer"), 120, 1200);
       await sleep(4500);
     }
-    // Fotograma final: la cancha.
-    await g.desplazar(page.getByTestId("arena-pitch"), 318, 1300);
+    // Fotograma final.
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" })); await sleep(1300);
     await page.mouse.move(ANCHO - 20, ALTO - 20, { steps: 6 });
     await g.marca("fin");
     await sleep(4000);
@@ -311,6 +314,55 @@ async function grabarArena() {
   }
   const video = readdirSync(dir).filter(f => f.endsWith(".webm")).map(f => join(dir, f)).at(-1);
   renameSync(video, join(dir, "arena.webm"));
+}
+
+// --------------------------------------------------------------------------------------------
+// Fase previa: el mismo partido, guardado, con «Reproducir con narración» (brief 057) desde 0:00:
+// la tarjeta de alineaciones y la previa hablada del estadista tal como la reproduce la página.
+async function grabarPrevia() {
+  const base = join(TRABAJO, toma), dir = join(base, "previa"); mkdirSync(dir, { recursive: true });
+  const sesion = JSON.parse(readFileSync(join(base, "datos.json"), "utf8")).sesion;
+  if (!sesion) throw new Error("La toma no tiene sesión");
+  const browser = await chromium.launch({ args: ["--autoplay-policy=no-user-gesture-required"] });
+  const context = await browser.newContext({ viewport: { width: ANCHO, height: ALTO }, colorScheme: "dark", locale: "en-US", recordVideo: { dir, size: { width: ANCHO, height: ALTO } } });
+  await context.addInitScript(scriptCursor);
+  const t0 = Date.now(), page = await context.newPage(), g = grabador(page, t0, dir);
+  const piezas = [];
+  page.on("response", async r => {
+    if (!/\/relato$/.test(r.url()) || !r.ok()) return;
+    try { const j = await r.json(); if (j.intervencion?.startsWith("previa:") && j.audio?.base64) { const n = piezas.length; writeFileSync(join(dir, `previa-${n}.mp3`), Buffer.from(j.audio.base64, "base64")); const { audio, ...resto } = j; piezas.push({ archivo: `previa-${n}.mp3`, recibidoS: (Date.now() - t0) / 1000, ...resto }); } } catch { /* parcial */ }
+  });
+  const audioEstado = () => page.evaluate(() => { const a = document.querySelector("[data-testid=arena-narration] audio"); return a ? { t: Date.now(), c: a.currentTime, pausado: a.paused } : null; });
+  let datos;
+  try {
+    await page.goto(`${ARENA}?partido=${sesion}`, { waitUntil: "networkidle", timeout: 180_000 });
+    await page.getByTestId("arena-lineups").waitFor({ timeout: 60_000 });
+    await sleep(1000);
+    const voz = page.getByTestId("arena-play-voice");
+    await voz.waitFor({ timeout: 30_000 });
+    if (!(await voz.isChecked())) await voz.check();
+    const play = page.locator(".arena-playback button.btn-primary").first();
+    await g.desplazar(page.getByTestId("arena-pitch"), 175, 900);
+    await g.mover(play, 500);
+    await g.marca("play");
+    { const b = await play.boundingBox(); await page.mouse.click(b.x + 30, b.y + b.height / 2); }
+    await sleep(600);
+    await g.desplazar(page.getByTestId("arena-lineups"), 76, 1000);
+    await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 8 });
+    const sonando = await g.esperar(async () => { const e = await audioEstado(); return e && !e.pausado && e.c > 0.05 ? e : null; }, 120_000, "pista narrada");
+    if (!sonando) throw new Error("La pista narrada no empezó");
+    await g.marca("sonando", { audioC: sonando.c, audioT: (sonando.t - t0) / 1000 });
+    await sleep(17_000);
+    const fin = await audioEstado();
+    await g.marca("fin", { audioC: fin?.c, tarjeta: await page.evaluate(() => { const e = document.querySelector("[data-testid=arena-lineups]"); return !!e && e.getBoundingClientRect().height > 0; }) });
+    await page.evaluate(() => document.querySelector("[data-testid=arena-narration] audio")?.pause());
+    await sleep(500);
+    datos = { t0, url: `${ARENA}?partido=${sesion}`, sesion, marcas: g.marcas, piezas };
+  } finally { await context.close(); await browser.close(); }
+  writeFileSync(join(dir, "datos.json"), JSON.stringify(datos, null, 1));
+  const video = readdirSync(dir).filter(f => f.endsWith(".webm") && f !== "previa.webm").map(f => join(dir, f)).at(-1);
+  renameSync(video, join(dir, "previa.webm"));
+  console.log(JSON.stringify({ piezas: piezas.map(p => [p.archivo, p.intervencion, p.texto?.slice(0, 80)]), marcas: datos.marcas.map(m => [m.nombre, m.t, m.audioC]) }, null, 1));
 }
 
 // --------------------------------------------------------------------------------------------
@@ -382,7 +434,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
  <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure</div>
  <h1>Separate roles, one shared journal,<br>a verifier before every spoken analysis.</h1>
  <div class="grid" style="grid-template-columns:1.05fr 40px 1.1fr 40px 1.1fr">
-  <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI deployment · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>GPT-6 Luna · GPT-5.6 Luna · GPT-5.4 mini</span></div></div>
+  <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI deployment · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>GPT-6 Sol · GPT-6 Luna · GPT-5.6 Luna · GPT-5.4 mini</span></div></div>
   <div class="arr">→</div>
   <div class="box" style="display:flex;flex-direction:column;justify-content:center"><b>Shared deterministic engine</b><span>Validates plans, resolves play.<br>Clock paused while coaches decide.</span></div>
   <div class="arr">→</div>
@@ -417,11 +469,11 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
  <div class="brand">CRONISTA</div><div class="over">Quality · evidence in the repository</div>
  <h1>More than two thousand automated checks</h1>
  <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-  <div class="box" style="padding:30px"><div class="num">2,037</div><div class="lbl">unit, invariant, oracle and lie-battery tests</div></div>
-  <div class="box" style="padding:30px"><div class="num">148</div><div class="lbl">Playwright journeys</div></div>
-  <div class="box" style="padding:30px"><div class="num">61</div><div class="lbl">statistical checks over simulated matches</div></div>
+  <div class="box" style="padding:30px"><div class="num">2,395</div><div class="lbl">unit, invariant, oracle and lie-battery tests</div></div>
+  <div class="box" style="padding:30px"><div class="num">190</div><div class="lbl">Playwright journeys</div></div>
+  <div class="box" style="padding:30px"><div class="num">61</div><div class="lbl">statistical checks over simulated matches (last run 22 Oct)</div></div>
  </div>
- <p style="margin-top:34px"><span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">run 39743502851 · three jobs · commit 0d16663 · 22 Oct 2026</span></p>
+ <p style="margin-top:34px"><span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">run 39883072278 · three jobs · commit 368357e · 23 Oct 2026</span></p>
  <p style="margin-top:26px"><span class="tag">All data synthetic</span><span class="tag">Open source</span><span class="tag">Claims link to evidence</span></p>
  <div class="foot">Live arena: cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena<br>Fictional clubs, players and broadcasters. The arena is a short 2D prototype, not a regulation match.</div>
 </main>
@@ -458,7 +510,7 @@ async function tarjetas() {
 // Fase voz: voz en off en inglés con Azure Speech (misma llamada REST que src/arena/voz.ts).
 const VOZ = {
   gancho: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable.",
-  modelos: "Two LLM coaches, GPT-6 Luna and GPT-5.6 Luna, receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both.",
+  modelos: "Two LLM coaches, GPT-6 Sol and GPT-6 Luna, receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both.",
   verificacion: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template.",
   cifras: "Match stats and each player's numbers are computed only from confirmed events, live as the broadcast plays.",
   descarga: "Every line of the commentary can be downloaded, with its time, voice, evidence and checks.",
@@ -497,8 +549,9 @@ async function voz() {
 // --------------------------------------------------------------------------------------------
 // Fase montar: escenas, subtítulos (rótulo superior + transcripción inferior), mezcla y MP4.
 const ROTULO = {
-  gancho: "CRONISTA — multi-agent match broadcast · every sentence traceable",
-  gol: "Goal call · real narrator audio as played in the public broadcast · GOAL banner and scoreboard highlight",
+  gancho: "CRONISTA — multi-agent match broadcast · own emblem, fictional crests and kits · every sentence traceable",
+  previa: "Pre-match · same match replayed with narration from Saved matches · line-up card and the statistician's spoken pre-match, real audio as played",
+  gol: "Goal call · real narrator audio as played in the live broadcast · ball in the net, GOAL banner, goal view (height illustrative)",
   verificacion: "V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims",
   cifras: "Match stats and the selected player's stats · counted from confirmed engine events · estimates labelled",
   descarga: "Download commentary · Markdown or JSON · each line with time, voice, evidence and checks",
@@ -523,11 +576,15 @@ function montar() {
   const eventos = arena.eventosAudio.map(e => ({ ...e, relato: e.relato ?? porHuella.get(e.tag) ?? null, fin: e.parada ?? e.t + (e.dur - e.offset) }));
   const rel = e => porArchivo.get(e.relato);
   const completo = e => e.offset === 0 && (e.parada === null || e.parada >= e.t + e.dur - 0.15);
-  const esCanto = r => (r?.fragmentos ?? []).some(f => /Goooal!/.test(f.texto));
-  const esIntercambio = r => !!r?.intervencion && (r.fragmentos ?? []).some(f => f.rol === "comentarista") && r.modoIntervencion === "llm";
-  const desdeMesa = m(arena, "mesa").t + 0.3, hastaMesa = m(arena, "fin-emision").t;
+  const esCanto = r => r?.temaVoz === "gol" || (r?.fragmentos ?? []).some(f => f.canto);
+  const esPreviaR = r => !!r?.intervencion?.startsWith("previa:");
+  const esIntercambioLlm = r => !!r?.intervencion && !esPreviaR(r) && (r.fragmentos ?? []).some(f => f.rol === "comentarista") && r.modoIntervencion === "llm";
+  const esIntercambioCualquiera = r => !!r?.intervencion && !esPreviaR(r) && (r.fragmentos ?? []).some(f => f.rol === "comentarista");
+  const desdeMesa = m(arena, "previa").t + 0.3, hastaMesa = m(arena, "fin-emision").t;
   const enMesa = eventos.filter(e => e.relato && e.t >= desdeMesa && e.fin <= hastaMesa && completo(e));
-  const cantos = enMesa.filter(e => esCanto(rel(e))), intercambios = enMesa.filter(e => esIntercambio(rel(e)));
+  const cantos = enMesa.filter(e => esCanto(rel(e)));
+  let intercambios = enMesa.filter(e => esIntercambioLlm(rel(e)));
+  if (!intercambios.length) intercambios = enMesa.filter(e => esIntercambioCualquiera(rel(e)));
   if (!cantos.length) throw new Error("No sonó ningún canto de gol completo en la vista de la cancha");
   const ajustar = (ini, fin) => {
     for (const e of eventos) if (e.t < ini && e.fin > ini) ini = e.fin + 0.03;
@@ -544,15 +601,36 @@ function montar() {
     const x = intercambios.find(i => i.t > canto.fin + 2) ?? intercambios.find(i => i.fin < canto.t - 2);
     if (x) ventanas.push({ id: "mesa", ini: x.t - 1.0, fin: x.fin + 1.0, intercambio: x });
   }
-  for (const v of ventanas) { [v.ini, v.fin] = ajustar(v.ini, v.fin); v.dur = +(v.fin - v.ini).toFixed(2); }
+  for (const v of ventanas) {
+    const ancla = v.id === "gol" ? canto : v.intercambio;
+    [v.ini, v.fin] = ajustar(v.ini, v.fin);
+    // Nunca empezar después de la locución que da sentido a la ventana (el canto o el intercambio).
+    if (ancla && v.ini > ancla.t - 0.4) v.ini = Math.max(desdeMesa, ancla.t - 0.4);
+    v.dur = +(v.fin - v.ini).toFixed(2);
+  }
+  console.log("  · cantos", cantos.map(c => [c.relato, +c.t.toFixed(1)]), "intercambios", intercambios.map(c => [c.relato, +c.t.toFixed(1)]), "ventanas", ventanas.map(v => [v.id, +v.ini.toFixed(1), +v.fin.toFixed(1)]));
 
-  const vivo = m(arena, "narracion").t, mod = m(arena, "s2-modelos").t, clic = m(arena, "s2-clic").t;
+  const vivo = m(arena, "narracion").t + 1.0, mod = m(arena, "s2-modelos").t, clic = m(arena, "s2-clic").t;
+  // Previa: el mismo partido reproducido con narración desde «Saved matches» (fase previa); la primera
+  // pieza del estadista suena al principio de la pista narrada, con la tarjeta de alineaciones en pantalla.
+  const dirPrevia = join(TRABAJO, toma, "previa"), P = join(dirPrevia, "previa.webm");
+  let ventanaPrevia = null;
+  if (existsSync(join(dirPrevia, "datos.json"))) {
+    const dp = JSON.parse(readFileSync(join(dirPrevia, "datos.json"), "utf8")), son = dp.marcas.find(k => k.nombre === "sonando");
+    const pieza = dp.piezas.find(x => x.intervencion === "previa:1-local:0");
+    if (son && pieza) {
+      const durPieza = duracion(join(dirPrevia, pieza.archivo)), cero = son.t - son.audioC;
+      ventanaPrevia = { id: "previa", ini: cero - 0.6, fin: cero + durPieza + 0.6, dur: +(durPieza + 1.2).toFixed(2), pieza, durPieza, desfase: 0.6 };
+    }
+  }
+  if (!ventanaPrevia) console.log("  ! sin fase previa: la escena de la previa se omite");
   const L = { gancho: largo("gancho", 8), modelos: largo("modelos", 13), verificacion: largo("verificacion", 12), cifras: largo("cifras", 10.5), descarga: largo("descarga", 8.5), analista: largo("analista", 10), cronica: largo("cronica", 11), cierre: largo("cierre", 12) };
   const piezaA2 = +(clic + 2.6 - (mod - 0.6)).toFixed(2);
   const s8 = m(arena, "s8").t, s8p = m(arena, "s8-pregunta").t, s8r = m(arena, "s8-respuesta").t, piezaA8 = +(s8p + 1.6 - (s8 - 1.8)).toFixed(2);
   const escenas = [
     { id: "gancho", voz: "gancho", piezas: [{ src: A, desde: m(arena, "s1").t - 0.3, dur: L.gancho }] },
-    { id: "modelos", voz: "modelos", piezas: [{ src: A, desde: mod - 0.6, dur: piezaA2 }, { src: A, desde: vivo - 0.6 - (L.modelos - piezaA2), dur: +(L.modelos - piezaA2).toFixed(2) }] },
+    { id: "modelos", voz: "modelos", piezas: [{ src: A, desde: mod - 0.6, dur: piezaA2 }, { src: A, desde: Math.max(clic + 2.6, vivo - 0.6 - (L.modelos - piezaA2)), dur: +(L.modelos - piezaA2).toFixed(2) }] },
+    ...(ventanaPrevia ? [{ id: "previa", piezas: [{ src: P, desde: ventanaPrevia.ini, dur: ventanaPrevia.dur }], previa: ventanaPrevia }] : []),
     ...ventanas.map(v => ({ id: v.id, piezas: [{ src: A, desde: v.ini, dur: v.dur }], ventana: v })),
     { id: "verificacion", voz: "verificacion", piezas: [{ src: A, desde: m(arena, "s5").t - 0.8, dur: L.verificacion }] },
     { id: "cifras", voz: "cifras", piezas: [{ src: A, desde: m(arena, "s6-cifras").t - 0.4, dur: 5.6 }, { src: A, desde: m(arena, "s6-jugador").t - 0.3, dur: +(L.cifras - 5.6).toFixed(2) }] },
@@ -562,7 +640,10 @@ function montar() {
   ].filter(e => !sin.includes(e.id));
   const fin9 = 1.6, cartas = L.cierre - fin9, c1 = +(cartas * 0.38).toFixed(2), c2 = +(cartas * 0.32).toFixed(2);
   escenas.push({ id: "cierre", voz: "cierre", piezas: [{ img: join(T, "arquitectura.png"), dur: c1 }, { img: join(T, "azure.png"), dur: c2 }, { img: join(T, "calidad.png"), dur: +(cartas - c1 - c2).toFixed(2) }, { src: A, desde: m(arena, "fin").t + 0.6, dur: fin9 }] });
-  const total = escenas.reduce((s, e) => s + e.piezas.reduce((t, p) => t + p.dur, 0), 0);
+  const durTotal = () => escenas.reduce((s, e) => s + e.piezas.reduce((t, p) => t + p.dur, 0), 0);
+  // Recorte automático para quedar ≤ 1:55: primero la crónica, luego el analista.
+  for (const id of ["cronica", "analista"]) if (durTotal() > 114.9 && escenas.some(e => e.id === id)) { escenas.splice(escenas.findIndex(e => e.id === id), 1); sin.push(id); console.log(`  · escena omitida por duración: ${id}`); }
+  const total = durTotal();
   console.log(`  · duración prevista ${total.toFixed(2)} s`);
   if (total > 114.9) throw new Error(`Supera 1:55 (${total.toFixed(2)} s): usa --sin=<escena>`);
 
@@ -594,8 +675,15 @@ function montar() {
     for (const tr of trozos) { const d = dur * tr.length / tot; subt.push({ ini: t, fin: t + d - 0.04, texto: tr }); t += d; }
   };
   for (const e of escenas.filter(e => e.voz)) { agregar(join(TRABAJO, "voz", `${e.voz}.wav`), inicio[e.id] + desfase(e.id)); repartir(VOZ[e.voz], inicio[e.id] + desfase(e.id) + 0.05, durVoz(e.voz) - 0.25); }
-  const rolDe = (r, f) => f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)"
-    : /Goooal!/.test(f.texto) ? "Narrator (goal call)" : r.reserva ? "Narrator (backup clip)" : r.intervencion ? "Narrator (template)" : "Narrator (play-by-play)";
+  const rolDe = (r, f) => esPreviaR(r) ? (f.rol === "estadista" ? "Statistician (spoken pre-match)" : "Narrator (pre-match)") : f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)"
+    : f.canto || r.temaVoz === "gol" ? "Narrator (goal call)" : r.reserva ? "Narrator (backup clip)" : r.intervencion ? "Narrator (template)" : "Narrator (play-by-play)";
+  for (const e of escenas.filter(e => e.previa)) {
+    const v = e.previa, alInicio = inicio[e.id] + v.desfase;
+    agregar(join(dirPrevia, v.pieza.archivo), alInicio, { dur: v.durPieza });
+    audioSesion.push({ escena: e.id, relato: `previa/${v.pieza.archivo}`, alInicio: +alInicio.toFixed(2), dur: +v.durPieza.toFixed(2) });
+    const texto = v.pieza.texto, frases = texto.split(/(?<=[.;])\s+/), tot = texto.length; let t = alInicio + 0.1;
+    for (const [i, fr] of frases.entries()) { const d = (v.durPieza - 0.3) * fr.length / tot; subt.push({ ini: t, fin: t + d - 0.04, texto: i === 0 ? `Statistician (spoken pre-match): ${fr}` : fr }); t += d; }
+  }
   for (const e of escenas.filter(e => e.ventana)) {
     const v = e.ventana;
     for (const ev of eventos.filter(x => x.relato && x.t >= v.ini - 0.05 && x.fin <= v.fin + 0.05 && x.fin - x.t >= 0.6)) {
@@ -622,7 +710,7 @@ function montar() {
   const partir = (t, max = 62) => { if (t.length <= max) return [t]; const pal = t.split(" "); let a = ""; const out = []; for (const p of pal) { if ((a + " " + p).trim().length > Math.ceil(t.length / Math.ceil(t.length / max)) + 6 && a) { out.push(a); a = p; } else a = (a + " " + p).trim(); } out.push(a); return out; };
   writeFileSync(SALIDA_SRT, subt.map((s, i) => `${i + 1}\n${srtT(s.ini)} --> ${srtT(s.fin)}\n${partir(s.texto).join("\n")}\n`).join("\n"));
   const asignacion = arena.asignacion;
-  const rotuloMesa = x => { const r = rel(x); return `Real audio from this match · desk exchange${r.variante === "breve" ? " (short variant)" : ""}: ${(r.fragmentos ?? []).map(f => f.rol === "comentarista" ? "Commentator (LLM, verified)" : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`; };
+  const rotuloMesa = x => { const r = rel(x); return `Real audio from this match · desk exchange${r.variante === "breve" ? " (short variant)" : ""}: ${(r.fragmentos ?? []).map(f => f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`; };
   const rotulos = { ...ROTULO,
     modelos: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · chosen manually · same observation, strict JSON, 60 s deadline`,
     analista: arena.analisis?.cuerpo?.comentario?.modo === "llm" ? "Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks" : "Microsoft Foundry Agent Service · this answer: verified template fallback · tools reject future ticks",
@@ -666,6 +754,7 @@ function verificar() {
 for (const f of fases) {
   console.log(`== ${f}`);
   if (f === "arena") await grabarArena();
+  else if (f === "previa") await grabarPrevia();
   else if (f === "recap") await grabarRecap();
   else if (f === "tarjetas") await tarjetas();
   else if (f === "voz") await voz();

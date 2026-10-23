@@ -1,9 +1,10 @@
 # Demo video shot list — 1:55 maximum
 
-Updated 22 October 2026 for the published arena revision `cronista-arena--0000018` (commit
-`e853fa2`: goal calls 050, shot realism `reinicios-v5` 051, GPT-6 Luna in the catalogue 052,
-match and player stats 049, commentary downloads 053) and the recap demo. Replaces the earlier
-22 October cut (rev. 0000013) and the 17 October draft.
+Updated 23 October 2026 for the published arena revision `cronista-arena--0000023` (commit
+`0d39ab0`: varied goal cries 054, football identity with emblem, fictional crests and kits 055,
+pre-match line-ups and spoken pre-match 056, Play with narration and the visible goal 057; GPT-6
+Sol in the public catalogue). Replaces the earlier cuts for revisions 0000013 and 0000018. GPT-6 Astra is deployed but not
+public, and is neither shown nor mentioned.
 
 **Rules of the cut** (official rules §4.4): under two minutes; footage of the real public apps;
 English captions burned in; no third-party trademarks, footage or music. The only audio is the
@@ -27,31 +28,33 @@ is the page's own audio from that match, captured as it plays (clips A–E are s
 cannot be started because the daily quota is spent, scene 2 uses **Saved matches → Load recorded
 model duel**, and the caption says "recorded duel, no new inference".
 
-## Scene by scene (target 1:54)
+## Scene by scene (target ≤ 1:55)
 
-| Time | On screen | Audio | Caption (burned in) | Judging criterion it serves |
+| Order | On screen | Audio | Caption (burned in) | Judging criterion it serves |
 |---|---|---|---|---|
-| 0:00–0:08 | Arena home in dark mode, 0–0, 22 shirts, referee; cursor over the three desk cards. | Voice-over: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable." | *CRONISTA — multi-agent match broadcast · every sentence traceable* | UX (hook); category |
-| 0:08–0:22 | **Live** tab: Controller selection **Choose models**, Home **GPT-6 Luna**, Away **GPT-5.6 Luna**; **Start live match**; cut to *Live · 19 s ready* with the assignment line. | Voice-over: "Two LLM coaches, GPT-6 Luna and GPT-5.6 Luna, receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both." | *Home: GPT-6 Luna · Away: GPT-5.6 Luna · chosen manually · same observation, strict JSON, 60 s deadline* | Agentic design; technological implementation |
-| 0:22–0:47 | Narration enabled; pitch and desk. A goal: **GOAL** banner over the pitch, scoreboard highlight and scorer ring while the real goal call plays; then the **Latest exchange** about that goal. | **Real audio as played by the page** (no voice-over): goal call «Goooal! … scores! … take the lead, nil–one, after N seconds», play-by-play, then the desk exchange (narrator → commentator, LLM verified). | Top: *Goal call · real narrator audio as played in the public broadcast · GOAL banner and scoreboard highlight*, then *Real audio from this match · desk exchange …* with the roles heard. Bottom: transcript of each clip prefixed by its role. | UX; multi-agent handoffs; storytelling |
-| 0:47–1:00 | **Inspect facts and checks** on the commentator card: fact and event IDs, rejected attempts with their rule. | Voice-over: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template." | *V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims* | Explainability |
-| 1:00–1:10 | **Final stats** panel (possession, shots, passes, saves, highlights); then the scorer's card with live per-player stats. | Voice-over: "Match stats and each player's numbers are computed only from confirmed events, live as the broadcast plays." | *Match stats and the selected player's stats · counted from confirmed engine events · estimates labelled* | Personalization (player focus); data |
-| 1:10–1:19 | **Download commentary** panel, click **Download commentary (Markdown)**; then an own card with the real file name and an unedited excerpt of the downloaded file. | Voice-over: "Every line of the commentary can be downloaded, with its time, voice, evidence and checks." | *Download commentary · Markdown or JSON · each line with time, voice, evidence and checks* | Explainability; real-world use |
-| 1:19–1:29 | **Ask the match analyst**: *What just happened?*, style Analyst, **Ask analyst**; answer; **Inspect tools and evidence** with `consultar_eventos`. | Voice-over: "A versioned Microsoft Foundry agent answers viewer questions with read-only tools over the confirmed play only. Its sentences pass the same verifier." | *Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks* | Hero technology; agentic design |
-| 1:29–1:40 | Recap demo, seed 246: click a sentence, events light up; **View process** (approved in attempt 1). | Voice-over: "The same verifier guards the automated recap: click any sentence to see its events and open the process view with every draft and verdict. We claim traceability, not better prose." | *Automated recap · GPT-6.1 Sol · 0/163 baseline, 0/167 pipeline flagged · no reduction demonstrated* | Challenge coverage; honesty |
-| 1:40–1:54 | Own cards (no logos): architecture, Azure services, quality (2,037 unit · 148 Playwright · 61 statistical; CI run 39743502851 on `0d16663`); final arena frame. | Voice-over: "It runs on Azure Container Apps with Blob, Key Vault, Application Insights, Speech and Foundry. More than two thousand automated tests run in CI. Everything is synthetic. CRONISTA: narrate the match, prove every sentence." | Azure services line, then *All data synthetic · open source · claims link to evidence* | Technological implementation; impact |
+| 1 · Hook (~8 s) | First frame of `/arena` in dark mode: own emblem, both fictional crests on the scoreboard, coloured kits on the pitch, referee; cursor over the scoreboard and two tokens. | Voice-over: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable." | *CRONISTA — multi-agent match broadcast · own emblem, fictional crests and kits · every sentence traceable* | UX (hook); category |
+| 2 · Models (~13 s) | Side panel: Controller selection **Choose models**, Home **GPT-6 Sol**, Away **GPT-6 Luna**; **Start live match**; **Enable narration** while the broadcast is still preparing. | Voice-over: "Two LLM coaches, GPT-6 Sol and GPT-6 Luna, receive the same committed observation and return a plan for every player. A shared deterministic engine resolves the play; the clock waits for both." | *Home: GPT-6 Sol · Away: GPT-6 Luna · chosen manually · same observation, strict JSON, 60 s deadline* | Agentic design; technological implementation |
+| 3 · Pre-match (~14 s) | The same match, opened from **Saved matches** and played with **With narration** (brief 057) from 0:00: the **Starting line-ups** card with both formations drawn with shirt numbers, captain, coach, traits, and chips for weather, pitch and referee. | **Real spoken pre-match** by the statistician as the narrated track played it (first piece: home line-up, formation, captain, coach). No voice-over. | *Pre-match · same match replayed with narration from Saved matches · line-up card and the statistician's spoken pre-match, real audio as played*; transcript prefixed "Statistician (spoken pre-match)". | UX; storytelling; data |
+| 4 · Goal and desk (~20 s) | Live broadcast: the ball in the net, **GOAL** banner with the crest, scoreboard highlight, scorer ring and the **Goal view** inset while the real varied cry plays; then **Latest exchange** while the desk speaks. | Real audio as played: goal call (one of ten cries per language), then the desk exchange (narrator → commentator). | *Goal call · real narrator audio as played in the live broadcast · ball in the net, GOAL banner, goal view (height illustrative)*, then *Real audio from this match · desk exchange …*; per-clip transcript. | UX; multi-agent handoffs |
+| 5 · Verification (~12 s) | **Inspect facts and checks** on the commentator card. | Voice-over (V1–V8 line). | *V1–V8: schema · citations · …* | Explainability |
+| 6 · Stats (~10.5 s) | Final stats panel with event icons, then the scorer's card with live stats. | Voice-over (stats line). | *Match stats and the selected player's stats …* | Personalization; data |
+| 7 · Download (~8.5 s) | **Download commentary (Markdown)** click, then the card with the real file name and an unedited excerpt. | Voice-over (download line). | *Download commentary · Markdown or JSON …* | Explainability |
+| 8 · Foundry analyst (~10 s, kept if it fits) | **Ask the match analyst**, style Analyst, answer and tools. | Voice-over (analyst line). | *Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks* | Hero technology |
+| 9 · Close (~14 s) | Own cards: architecture, Azure services, quality (2,395 unit · 190 Playwright · 61 statistical; CI run 39883072278 on `368357e`); final arena frame. | Voice-over (closing line). | Azure services line, then *All data synthetic · open source · claims link to evidence* | Technological implementation; impact |
 
-**Cut from the previous version to fit 1:55:** the Team plans and player orders scene, the Spanish
-switch with *Follow selected player* (and clip C under it). Spanish remains available in the app
-and is described in the README. Only GPT-6 Luna, GPT-5.6 Luna and GPT-5.4 mini appear; other model
-families tested in brief 052 were not admitted and are neither shown nor claimed.
+**Cut to fit 1:55**: the script drops scenes in this order until the cut fits: the recap demo
+(seed 246) first, then the Foundry analyst. Team plans and the Spanish switch were already cut in
+the previous version. The cut actually rendered is recorded below.
 
 ## What the video must not do
 
 - Show Azure Portal, keys, e-mail or personal tabs; record only the two public URLs and the
   static cards.
-- Use Premier League, club, broadcaster or Microsoft logos; the cards are plain text on the
-  arena's own palette.
+- Use Premier League, real club, broadcaster or Microsoft logos; the cards are plain text on the
+  arena's own palette. The CRONISTA emblem and the procedurally generated fictional crests and kits
+  (brief 055) are the project's own and may appear.
+- Show or name models that are not in the public catalogue (GPT-6 Astra, the families tested in
+  brief 052).
 - Call the verifier rejection a "caught hallucination" or say the pipeline writes better prose.
 - Claim Microsoft Agent Framework, MCP or A2A, Fabric or AKS.
 - Imply the arena is a regulation match, that voices were human-reviewed, or that model
@@ -71,24 +74,32 @@ families tested in brief 052 were not admitted and are neither shown nor claimed
 5. Verify the final file end to end, measure its length (must be under 2:00), test the public URL
    from another network, then publish on YouTube or Vimeo and replace `VIDEO_URL` in the README.
 
-## Final cut as rendered (22 October 2026, arena rev. 0000018)
+## Final cut as rendered (23 October 2026, arena rev. 0000023)
 
-File `cronista-demo-final.mp4` (1:53.5, 1440×900, H.264 + AAC, captions burned in) with
-transcript `cronista-demo-final.en.srt`, built by `scripts/grabar-video-final.mjs`
-(`--fases=arena --duracion=60 --modelos=luna6,equilibrado`, then `tarjetas,voz,montar,verificar`).
-Arena session `62b0aa76-957d-4ca3-b86e-c57490fab901`: manual selection, Home GPT-6 Luna, Away
-GPT-5.6 Luna, 60 s, `reinicios-v5`, 4 team decisions, 0 programmed fallbacks, final 0–2. A
-180 s take recorded first (session `6dd9a1e0…`, 2–1, 12 decisions) was not used: its desk
-analysis around the goals fell back to templates. Voice-over `en-US-AndrewNeural`; no music.
+File `cronista-demo-final.mp4` (1:51.5, 1440×900, H.264 + AAC, 9.7 MB, captions burned in) with
+transcript `cronista-demo-final.en.srt`, built by `scripts/grabar-video-final.mjs`:
+`--fases=arena --toma=toma2 --duracion=60 --modelos=sol6,luna6`, then `--fases=previa`, then
+`tarjetas,voz,montar,verificar`. Voice-over `en-US-AndrewNeural`; no music.
 
-| Scene | What the final cut uses |
-|---|---|
-| Goal (0:22–0:47) | The goal call was captured from the page as it played (matched by hash to the session's `/relato` audio), not taken from `publico-canto_en.mp3`: «Goooal! Darío Loraránez scores! Club Pradoalto take the lead, nil–one, after 26 seconds.» A play-by-play line that the broadcast itself cut short is captioned with an ellipsis. Then the short variant of the commentator exchange (narrator → commentator, LLM verified); the card shows the full exchange. |
-| Verification | The commentator card for the second goal is a labelled template fallback with its two rejected attempts (V3, V4) visible. |
-| Stats | Final stats panel at 1:00, then the scorer's card (2 goals, 3 shots, distance, top speed, time on the ball, estimated shot index). |
-| Download | Real click on *Download commentary (Markdown)*; the card shows the real file name `cronista-arena-70975826-comentarios-en.md` and an unedited excerpt (header lines and the start of the broadcast section; the skipped summary is marked "…"). |
-| Analyst | AI answer from the Foundry agent; the tools panel shows a rejected attempt (V3/V4/V7) and "3: Passed V1–V8". |
-| Recap | Same recording of seed 246 as the previous cut. |
+Live match: session `558b241f-3794-4e3a-9c7c-b1d16729e6b2`, manual selection, Home GPT-6 Sol, Away
+GPT-6 Luna, 60 s, `reinicios-v5`, 4 team decisions, 0 programmed fallbacks, final 0–3 (goals at 12.2,
+24.3 and 37.3 s).
 
-A visible cursor was drawn over the page during recording (Playwright does not record the
-pointer); no application code was changed.
+| Time | Scene | What the cut uses |
+|---|---|---|
+| 0:00–0:08 | Hook | First frame of `/arena`: emblem, two crests, kits. |
+| 0:08–0:22 | Models | Choose models → GPT-6 Sol / GPT-6 Luna → Start live match → Enable narration. |
+| 0:22–0:36 | Pre-match | In the live take the narration became ready before the clock stopped, so the spoken pre-match was not played there. The scene uses the **same match** reopened from Saved matches with *With narration* (brief 057), from 0:00. The first pre-match piece is "Here is Sporting Quebralta, in a three-five-two: Rafael Celoales wears the armband…" (12.8 s), taken from the page's own `/relato` response, which also built the narrated track. The caption says it is the replay. |
+| 0:36–0:56 | Goal and desk | Live broadcast. The third goal call as played: «Shot, and goooal! Mateo Soreloya, goal! It's a rout for Deportivo Lumbrera, nil–three, after 37 seconds.» Ball in the net, GOAL banner, Goal view inset. Then the short desk exchange (narrator → commentator, LLM verified). |
+| 0:56–1:09 | Verification | Commentator card: cited facts, "Attempt 1: passed the V1–V8 rules" (no rejection in this match; the voice-over describes the mechanism). |
+| 1:09–1:19 | Stats | Final stats with event icons, then the scorer's card (3 goals, 3 shots, 303 m, 24.2 km/h). |
+| 1:19–1:28 | Download | Real click on *Download commentary (Markdown)*; card with the real file name `cronista-arena-1555788435-comentarios-en.md` and an unedited excerpt that starts with the pre-match conversation. |
+| 1:28–1:38 | Analyst | Foundry agent, AI answer. |
+| 1:38–1:51 | Close | Architecture, Azure services and quality cards; final arena frame. |
+
+**Cut:** the recap demo (seed 246), dropped automatically to stay under 1:55; Team plans and the
+Spanish switch were already out. A first take on revision 0000021 (session `a19fc7b5…`, 23 Oct
+00:03 UTC) was stopped before the montage, because a published bug made the crest in the goal banner
+cover the pitch, and was discarded. The CRONISTA emblem and the procedurally generated fictional
+crests and kits are the project's own. A visible cursor was drawn over the page during recording
+(Playwright does not record the pointer); no application code was changed.
