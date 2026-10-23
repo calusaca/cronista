@@ -1,0 +1,400 @@
+{
+  "utc": "2026-10-23T01:47:31.895Z",
+  "casos": [
+    {
+      "ancho": 360,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 25.7,
+      "caso": "",
+      "balon": {
+        "x": 35,
+        "y": 678
+      },
+      "recuadro": {
+        "x": 199,
+        "y": 628,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.6
+    },
+    {
+      "ancho": 360,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.2,
+      "caso": "",
+      "balon": {
+        "x": 32,
+        "y": 678
+      },
+      "recuadro": {
+        "x": 199,
+        "y": 628,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.6
+    },
+    {
+      "ancho": 360,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.6,
+      "caso": "",
+      "balon": {
+        "x": 32,
+        "y": 678
+      },
+      "recuadro": {
+        "x": 199,
+        "y": 628,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.6
+    },
+    {
+      "ancho": 360,
+      "partido": "ejemplo-v3 gol tick 260 (x=0, y=32.9)",
+      "t": 26.5,
+      "caso": "",
+      "balon": {
+        "x": 32,
+        "y": 177
+      },
+      "recuadro": {
+        "x": 199,
+        "y": 126,
+        "w": 128,
+        "h": 150
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.6
+    },
+    {
+      "ancho": 360,
+      "partido": "ejemplo-v3 gol tick 545 (x=105, y=31.5)",
+      "t": 55,
+      "caso": "",
+      "balon": {
+        "x": 328,
+        "y": 173
+      },
+      "recuadro": {
+        "x": 33,
+        "y": 140,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.6
+    },
+    {
+      "ancho": 390,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 25.7,
+      "caso": "",
+      "balon": {
+        "x": 36,
+        "y": 689
+      },
+      "recuadro": {
+        "x": 229,
+        "y": 649,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.9
+    },
+    {
+      "ancho": 390,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.2,
+      "caso": "",
+      "balon": {
+        "x": 33,
+        "y": 689
+      },
+      "recuadro": {
+        "x": 229,
+        "y": 649,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.9
+    },
+    {
+      "ancho": 390,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.6,
+      "caso": "",
+      "balon": {
+        "x": 33,
+        "y": 689
+      },
+      "recuadro": {
+        "x": 229,
+        "y": 649,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.9
+    },
+    {
+      "ancho": 390,
+      "partido": "ejemplo-v3 gol tick 260 (x=0, y=32.9)",
+      "t": 26.5,
+      "caso": "",
+      "balon": {
+        "x": 33,
+        "y": 222
+      },
+      "recuadro": {
+        "x": 229,
+        "y": 181,
+        "w": 128,
+        "h": 150
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.9
+    },
+    {
+      "ancho": 390,
+      "partido": "ejemplo-v3 gol tick 545 (x=105, y=31.5)",
+      "t": 55,
+      "caso": "",
+      "balon": {
+        "x": 357,
+        "y": 218
+      },
+      "recuadro": {
+        "x": 33,
+        "y": 196,
+        "w": 128,
+        "h": 136
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 2.9
+    },
+    {
+      "ancho": 768,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 25.7,
+      "caso": "",
+      "balon": {
+        "x": 78,
+        "y": -383
+      },
+      "recuadro": {
+        "x": 61,
+        "y": -336,
+        "w": 214,
+        "h": 147
+      },
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 5.5
+    },
+    {
+      "ancho": 768,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.2,
+      "caso": "",
+      "balon": {
+        "x": 72,
+        "y": -383
+      },
+      "recuadro": {
+        "x": 61,
+        "y": -336,
+        "w": 214,
+        "h": 147
+      },
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 5.5
+    },
+    {
+      "ancho": 768,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.6,
+      "caso": "",
+      "balon": {
+        "x": 72,
+        "y": -383
+      },
+      "recuadro": {
+        "x": 61,
+        "y": -336,
+        "w": 214,
+        "h": 147
+      },
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 5.5
+    },
+    {
+      "ancho": 768,
+      "partido": "ejemplo-v3 gol tick 260 (x=0, y=32.9)",
+      "t": 26.5,
+      "caso": "",
+      "balon": {
+        "x": 72,
+        "y": -411
+      },
+      "recuadro": {
+        "x": 61,
+        "y": -336,
+        "w": 214,
+        "h": 147
+      },
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 5.5
+    },
+    {
+      "ancho": 768,
+      "partido": "ejemplo-v3 gol tick 545 (x=105, y=31.5)",
+      "t": 55,
+      "caso": "",
+      "balon": {
+        "x": 696,
+        "y": -419
+      },
+      "recuadro": {
+        "x": 493,
+        "y": -336,
+        "w": 214,
+        "h": 147
+      },
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 5.5
+    },
+    {
+      "ancho": 1440,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 25.7,
+      "caso": "",
+      "balon": {
+        "x": 143,
+        "y": 592
+      },
+      "recuadro": {
+        "x": 121,
+        "y": 659,
+        "w": 240,
+        "h": 159
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 6.4
+    },
+    {
+      "ancho": 1440,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.2,
+      "caso": "",
+      "balon": {
+        "x": 136,
+        "y": 592
+      },
+      "recuadro": {
+        "x": 121,
+        "y": 659,
+        "w": 240,
+        "h": 159
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 6.4
+    },
+    {
+      "ancho": 1440,
+      "partido": "sin IA (gol arco izquierdo, y=37.6)",
+      "t": 26.6,
+      "caso": "",
+      "balon": {
+        "x": 136,
+        "y": 592
+      },
+      "recuadro": {
+        "x": 121,
+        "y": 659,
+        "w": 240,
+        "h": 159
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 6.4
+    },
+    {
+      "ancho": 1440,
+      "partido": "ejemplo-v3 gol tick 260 (x=0, y=32.9)",
+      "t": 26.5,
+      "caso": "",
+      "balon": {
+        "x": 136,
+        "y": 560
+      },
+      "recuadro": {
+        "x": 121,
+        "y": 659,
+        "w": 240,
+        "h": 159
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 6.4
+    },
+    {
+      "ancho": 1440,
+      "partido": "ejemplo-v3 gol tick 545 (x=105, y=31.5)",
+      "t": 55,
+      "caso": "",
+      "balon": {
+        "x": 855,
+        "y": 551
+      },
+      "recuadro": {
+        "x": 630,
+        "y": 659,
+        "w": 240,
+        "h": 159
+      },
+      "encima": "arena-ball",
+      "balonTapado": false,
+      "porcentajeBalonTapado": 0,
+      "radioPx": 6.4
+    }
+  ]
+}

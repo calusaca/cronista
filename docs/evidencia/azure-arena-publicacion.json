@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-23T01:19:40.245Z",
+  "checkedUtc": "2026-10-23T01:47:14.480Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261023011655",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261023014428",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -216,8 +216,8 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 122944,
-      "sha256": "a0b83f395b6cfc09b2bea9e47d107ad01737ce711de4b6f23504f1bb4ff0dd20"
+      "bytes": 123342,
+      "sha256": "0357f6dc4e7a5ea3ebb5218851e50606f2c76dd317ee56512e8dc252221a41e4"
     },
     {
       "path": "src/app/icon.svg",
