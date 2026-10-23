@@ -8,7 +8,9 @@ export const RELATO_INTERVALOS = { vivo: 30, completo: 100, buffer: 50 } as cons
 
 export interface ModeloPublico { id: string; nombre: string; controlador: string }
 export type SeleccionModelos = { modo: "programado" | "azar" } | { modo: "manual"; local: string; visita: string };
-export interface AsignacionModelos { modo: SeleccionModelos["modo"]; local: ModeloPublico; visita: ModeloPublico }
+/** Brief 057 v1.1 § 4 · `procedencia`: ausente en sesiones creadas por el servidor y en los archivos del
+ * repositorio; "declarada" en grabaciones subidas (los controladores los declara el archivo, no se verifican). */
+export interface AsignacionModelos { modo: SeleccionModelos["modo"]; local: ModeloPublico; visita: ModeloPublico; procedencia?: "verificada" | "declarada" }
 export type EstadoSesion = "ejecutando" | "completa" | "cancelada" | "interrumpida" | "error";
 export interface MetricasSesion { duracionMs: number; decisiones: number; respaldos: number; esperaModeloMs: number[]; solicitudesEquipo?: number; uso?: { local: UsoLlm | null; visita: UsoLlm | null; narrador: UsoLlm | null } }
 /** Brief 045: roles de la mesa de transmisión. */

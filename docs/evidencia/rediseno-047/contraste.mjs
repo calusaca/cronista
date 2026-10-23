@@ -7,6 +7,9 @@
 // Por defecto mide la arena pública con un partido terminado. Sale con código 1 si algún
 // par presente falla su mínimo o si falta un elemento marcado como obligatorio.
 import { chromium } from "@playwright/test";
+import { readFileSync } from "node:fs";
+// Brief 057 v1.1 § 7 [v1.2] · Comprobación estática de la regla 047 (Node ≥ 23 importa el .ts sin tipos).
+import { violaciones047 } from "../../../src/ui/css-047.ts";
 
 const ARGS = process.argv.slice(2).filter(a => !a.startsWith("--"));
 const CARGAR = process.argv.find(a => a.startsWith("--cargar="))?.split("=")[1] ?? null;
@@ -85,6 +88,9 @@ const PARES = [
   ["tarjeta roja de cifras / rótulo", ".arena-stat-label [data-kind=roja] rect", "fill", [".arena-stats"], "background-color", 3, true],
   ["tarjeta amarilla del feed / tarjeta", ".arena-live-feed [data-kind=amarilla] rect", "fill", null, null, 3, false],
   ["tarjeta roja del feed / tarjeta", ".arena-live-feed [data-kind=roja] rect", "fill", null, null, 3, false],
+  // Brief 057 § 5.3 · Vista frontal del arco: solo existe durante la celebración (medir con un SEGUNDO de gol).
+  ["vista del arco: rótulo / caja", ".arena-goal-view figcaption", "color", [".arena-goal-view"], "background-color", 4.5, false],
+  ["vista del arco: palos / caja", ".arena-goal-view .arena-goal-view-posts", "stroke", [".arena-goal-view"], "background-color", 3, false],
 ];
 // Brief 056 · Tarjeta de alineaciones: solo existe en el tick 0 (medir con SEGUNDO = 0, --cargar y --previa).
 const PARES_PREVIA = [
@@ -101,8 +107,11 @@ const PARES_PREVIA = [
 for (const par of PARES) if (PREVIA) par[6] = false;
 for (const par of PARES_PREVIA) { par[6] = PREVIA; PARES.push(par); }
 
-const browser = await chromium.launch();
 let fallos = 0;
+const css047 = violaciones047(readFileSync(new URL("../../../src/app/globals.css", import.meta.url), "utf8"));
+for (const v of css047) console.log(`| 047 | ${v.selector} declara ${v.propiedad} | — | — | — | — | FALLA |`);
+fallos += css047.length;
+const browser = await chromium.launch();
 for (const tema of ["light", "dark"]) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: tema });
   const page = await ctx.newPage();
@@ -117,7 +126,7 @@ for (const tema of ["light", "dark"]) {
   const slider = page.getByRole("slider", { name: "Match time" });
   if (await slider.count()) { await slider.fill(ARGS[1] ?? "40"); await page.waitForTimeout(500); }
   const filas = await page.evaluate((PARES) => {
-    const rgb = s => { const m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 }; };
+    const rgb = s => { const srgb = String(s).match(/color\(srgb ([^)]+)\)/); if (srgb) { const p = srgb[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0] * 255, g: p[1] * 255, b: p[2] * 255, a: p[3] ?? 1 }; } /* Brief 057: color-mix() se resuelve como color(srgb …). */ const m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 }; };
     const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
     const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
     const opaco = el => { for (let e = el; e; e = e.parentElement) { const c = rgb(getComputedStyle(e).backgroundColor); if (c && c.a > 0.5) return c; } return rgb(getComputedStyle(document.body).backgroundColor); };

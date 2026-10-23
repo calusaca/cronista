@@ -104,6 +104,15 @@ const esquemaArchivo = z.strictObject({
   eventos: z.unknown(), fotogramas: z.unknown(), final: z.unknown(),
 });
 
+/** Brief 057 v1.1 § 4 (c) · Contenido canónico de un registro: lo que el validador comprueba (versión,
+ * configuración, estado inicial, observaciones, órdenes, eventos, fotogramas y final), sin los metadatos
+ * declarados de cada decisión (controlador, tipo, origen, motivo, tiempo, llamadas). Pura. */
+export function contenidoCanonico(registro: RegistroArena) {
+  return { version: registro.version, config: registro.config, inicial: registro.inicial,
+    rondas: registro.rondas.map(r => ({ observacion: r.observacion, inicioTick: r.inicioTick, finTick: r.finTick, ordenes: { local: r.decisiones.local.ordenes, visita: r.decisiones.visita.ordenes } })),
+    eventos: registro.eventos, fotogramas: registro.fotogramas, final: registro.final };
+}
+
 /** Recalcula todo desde configuración + órdenes. Valida los resultados del archivo
  * contra el motor versionado; no autentica quién produjo esas órdenes. */
 export function reproducirArena(raw: unknown): RegistroArena {

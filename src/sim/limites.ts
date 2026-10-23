@@ -1118,6 +1118,46 @@ export const CANTO_GOL = {
   },
 } as const;
 
+/** Brief 057 · Reproducir con narración. */
+export const PLAY_NARRADO = {
+  /** Un solo reintento del registro de la grabación tras un 429 (ms); con `retry-after`, el mayor. */
+  reintentoRegistroMs: 1500,
+  /** v1.1 § 3 · Admisión de subidas `{ registro }` a /api/arena/grabaciones, decidida ANTES de leer el
+   * cuerpo y de ejecutar `reproducirArena` (validación síncrona de hasta 180 s): ventana deslizante en
+   * memoria por IP (primer salto de x-forwarded-for) y global, más un tope de replays simultáneos. */
+  subida: {
+    porIpPorHora: 6,
+    globalPorHora: 30,
+    enCurso: 1,
+    /** Ventana deslizante de los dos cupos anteriores (ms): una hora. */
+    ventanaMs: 3_600_000,
+    /** Brief 057 v1.3 (1) · El cliente reintenta UNA vez un 429 solo si `retry-after` ≤ esto (s): el caso «en
+     * curso» (2 s). Con más (cupo por IP o global agotado) degrada al momento a reproducción muda (`ocupado`). */
+    reintentoMaxS: 5,
+  },
+} as const;
+/** Brief 057 · Reconstrucción visual del gol: datos del registro (punto de cruce `gol.hasta`, distancia,
+ * fotogramas) más una profundidad en la red y una altura ilustrativas. Nada de esto cambia el motor ni el
+ * registro. */
+export const GOL_VISUAL = {
+  /** Segundos de partido en que el balón recorre `profundidadRedM` tras cruzar la línea (fase del cursor). */
+  entradaRedS: 0.3,
+  /** Segundos de partido con el balón en la red y los 22 quietos en su último fotograma previo. DEBE ser
+   * menor que TECNICA_ARENA.pausaS (1,5 s): el corte al centro precede al saque registrado. */
+  enRedS: 1.0,
+  /** Metros tras la línea de meta a los que se detiene el balón (el arco real mide ≈ 2 m de fondo). */
+  profundidadRedM: 1.0,
+  /** Banda de altura de ALTURA_DESTINO_M según potenciaRemate(distanciaM) (051): corto → raso, lejano → alta.
+   * Es ilustrativa: el motor es 2D y no registra altura. */
+  cortesPotencia: { raso: 0.34, media: 0.67 },
+  vista: {
+    /** Radio esquemático del balón en la vista frontal (m); el real es 0,11. */
+    radioBalonM: 0.18,
+    /** Altura (viewBox) desde la que «llega» el balón antes de la fase del cursor, en décimas de metro. */
+    llegadaAltaM: 0.3,
+  },
+} as const;
+
 /** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
  * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
  * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por

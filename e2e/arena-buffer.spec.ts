@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 import { crearSesion } from "./sesiones";
 import { cantoGol, construirRelato } from "../src/arena/relato";
-import { CANTO_GOL, PRIORIDAD_EVENTO_ARENA } from "../src/sim/limites";
+import { ARENA, CANTO_GOL, GOL_VISUAL, PRIORIDAD_EVENTO_ARENA } from "../src/sim/limites";
 import { wavMono } from "../src/arena/pista-audio";
 import type { RegistroArena } from "../src/arena/tipos";
 
@@ -43,7 +43,8 @@ test("reinicios: banda, esquina, meta y centro se ven junto al campo y en la des
       await page.getByRole("slider", { name: "Match time" }).evaluate((el, valor) => {
         Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(el, valor);
         el.dispatchEvent(new Event("input", { bubbles: true }));
-      }, String(evento.tick / 10));
+      // Brief 057 § 8 (1): tras un gol el balón está en la red durante GOL_VISUAL.enRedS y el saque no se muestra.
+      }, String((tipo === "centro" && evento.tick > 0 ? evento.tick + GOL_VISUAL.enRedS / ARENA.pasoS : evento.tick) / 10));
       const nombre = { banda: "Throw-in", esquina: "Corner kick", centro: "Kick-off", meta: "Goal kick" }[tipo];
       await expect(page.getByTestId("arena-restart")).toContainText(nombre);
       await expect(page.getByTestId("arena-restart")).toContainText(registro.config.partido[evento.lado].nombre);

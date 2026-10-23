@@ -2464,7 +2464,7 @@ button.stats-row:hover {
 .arena-score > span:last-child { text-align: right; }
 .arena-score strong { font-size: 30px; white-space: nowrap; }
 .arena-pitch-wrap { margin-top: 14px; }
-.arena-pitch-wrap svg { display: block; width: 100%; height: auto; overflow: visible; }
+.arena-pitch-wrap > svg { display: block; width: 100%; height: auto; overflow: visible; }
 /* Brief 047: césped, líneas, fichas y selección viven en el bloque «transmisión nocturna» del final. */
 .arena-player text { font-family: var(--font-sans), sans-serif; font-weight: 700; }
 .arena-player { cursor: pointer; }
@@ -3114,6 +3114,8 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
   .arena-shell .btn, .arena-topbar .btn, .arena-mesa-card, .arena-stat-bar { transition: none; }
   /* Brief 050: rótulo, realce y anillo aparecen estáticos y desaparecen con el cursor. */
   .arena-goal-banner, .arena-score[data-gol] strong, .arena-player[data-gol] > .arena-token > circle.arena-goal-ring { animation: none; }
+  /* Brief 057 § 5.2: la entrada de la vista frontal del arco (especificidad 0,2,0: su regla va más abajo). */
+  .arena-pitch-wrap > .arena-goal-view { animation: none; }
 }
 
 /* ==========================================================================
@@ -3228,3 +3230,28 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
   .arena-lineups { padding: var(--ar-s3); }
   .arena-lineup-list { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Brief 057 · Reproducir con narración: conmutador «Con narración» y progreso junto al botón principal,
+   y aviso de degradación a reproducción muda. Solo tokens existentes.
+   ========================================================================== */
+.arena-playback .arena-with-voice { gap: var(--ar-s2); min-height: 44px; cursor: pointer; }
+.arena-playback .arena-with-voice input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+.arena-play-progress { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+[data-testid="arena-play-fallback"] { margin: var(--ar-s2) 0 0; }
+
+/* Brief 057 § 5.3 · Vista frontal del arco (B2): esquina inferior del lado del arco batido, tokens del 047/055
+   y del rótulo del 050, sin colores nuevos. El balón del recuadro no lleva animación CSS: su entrada es la fase
+   del cursor; solo el propio figure entra una vez (240 ms) y queda en none con movimiento reducido. */
+.arena-goal-view { position: absolute; bottom: var(--ar-s3); width: clamp(128px, 32%, 240px); margin: 0; padding: var(--ar-s1); border-radius: var(--ar-r-sm); background: color-mix(in srgb, var(--ar-score-bg) 92%, transparent); color: var(--ar-score-ink); border-left: 6px solid var(--ar-home); box-shadow: 0 0 0 1px var(--ar-home-ui); pointer-events: none; z-index: 1; box-sizing: border-box; animation: arena-gol-vista 240ms ease-out 1; }
+.arena-goal-view[data-arco="visita"] { right: var(--ar-s3); }
+.arena-goal-view[data-arco="local"] { left: var(--ar-s3); }
+.arena-goal-view[data-lado="visita"] { border-left-color: var(--ar-away); box-shadow: 0 0 0 1px var(--ar-away-ring); }
+.arena-goal-view svg { display: block; width: 100%; height: auto; }
+.arena-goal-view-posts { stroke: var(--ar-score-ink); stroke-width: 1.6; stroke-linejoin: round; }
+.arena-goal-view-line { stroke: var(--ar-score-ink); stroke-width: .6; opacity: .6; }
+.arena-goal-view-net { stroke: var(--ar-score-ink); opacity: .35; stroke-width: .5; }
+.arena-goal-view-ball { fill: var(--ar-ball); stroke: var(--ar-bug); stroke-width: .6; }
+.arena-goal-view figcaption { font: 600 11px/1.3 var(--font-display), sans-serif; margin-top: var(--ar-s1); overflow-wrap: anywhere; }
+@keyframes arena-gol-vista { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 480px) { .arena-goal-view figcaption strong { display: block; } }

@@ -28,3 +28,17 @@ export function instanteNarrado(tramos: readonly TramoTemporal[], segundos: numb
   const progreso = Math.max(0, Math.min(1, (segundos - t.inicioS) / (t.finS - t.inicioS)));
   return { indice: i, tick: t.desdeTick + progreso * (t.hastaTick - t.desdeTick) };
 }
+/** Brief 057 v1.1 § 6 · Inversa de `instanteNarrado` para buscar en la pista desde el cursor: `tick ≤ 0` → 0
+ * (inicio del audio, previa incluida: la única búsqueda que puede aterrizar fuera del narrador); si no, el
+ * tramo del narrador (ancho > 0 en ticks) con `desdeTick ≤ tick < hastaTick`, o el último con progreso 1 si
+ * `tick` lo rebasa; posición lineal acotada a `[inicioS, finS − 0,001]`, nunca `finS` (en una frontera
+ * compartida `instanteNarrado` elegiría el tramo siguiente, que puede ser una intervención de ancho cero). */
+export function instanteAudio(tramos: readonly TramoTemporal[], tick: number): number {
+  if (!Number.isFinite(tick)) throw new Error("Cursor inválido");
+  const narrador = tramos.filter(t => t.hastaTick > t.desdeTick);
+  if (tick <= 0 || !narrador.length) return 0;
+  const ultimo = narrador[narrador.length - 1]!;
+  const t = tick >= ultimo.hastaTick ? ultimo : narrador.find(x => x.desdeTick <= tick && tick < x.hastaTick) ?? narrador.find(x => x.hastaTick > tick) ?? ultimo;
+  const progreso = Math.max(0, Math.min(1, (tick - t.desdeTick) / (t.hastaTick - t.desdeTick)));
+  return Math.max(t.inicioS, Math.min(t.finS - 0.001, t.inicioS + progreso * (t.finS - t.inicioS)));
+}

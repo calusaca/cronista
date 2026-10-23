@@ -1,10 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
 import { ARENA, MESA_ARENA, PREVIA_ARENA } from "../sim/limites";
-import { ejecutarArena } from "./coordinador";
+import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
-import { peticionSesion } from "./peticiones";
+import { ErrorPeticion, peticionSesion } from "./peticiones";
 import type { AsignacionModelos, EstadoSesion, InstantaneaEmision, MensajeSesion, MetricasSesion, PublicacionSesion, ReproduccionArena } from "./protocolo";
 import type { RegistroArena } from "./tipos";
 import { aplicarPublicacion } from "./protocolo";
@@ -236,8 +236,10 @@ export class GestorSesiones {
     } catch (error) { if (error instanceof ErrorSesion) throw error; throw new ErrorSesion("Sesión inexistente o caducada", 404); }
   }
   async detener(id: string): Promise<void> { const s = await this.obtener(id); if (s.estado === "ejecutando") s.cancelar.abort(); }
-  /** Adjunta un archivo ya validado: no vuelve a jugar ni llama a los equipos. */
-  async registrarGrabacion(registro: RegistroArena, referencia: string) {
+  /** Adjunta un archivo ya validado: no vuelve a jugar ni llama a los equipos.
+   * Brief 057 v1.1 § 4: `procedencia` "declarada" (subidas) queda en la asignación (meta, mensaje `sesion`,
+   * reproducción y emisión) y la deduplicación compara el contenido canónico, no los metadatos declarados. */
+  async registrarGrabacion(registro: RegistroArena, referencia: string, procedencia?: "verificada" | "declarada") {
     await iniciarTelemetria();
     if (!/^[a-z0-9-]{1,50}$/.test(referencia)) throw new ErrorSesion("Referencia inválida", 400);
     if (this.creando) throw new ErrorSesion("Otra sesión se está iniciando", 429);
@@ -245,11 +247,12 @@ export class GestorSesiones {
     try {
       const a = await this.almacen(); await a.iniciar(); await this.asegurarEscritura();
       const indice = `grabacion-${referencia}.json`;
-      try { const id = JSON.parse(await a.leer(indice)).id as string; if ((await this.obtener(id)).estado === "completa" && JSON.stringify(await this.registro(id)) === JSON.stringify(registro)) return { id }; }
+      const forma = (r: RegistroArena) => JSON.stringify(procedencia === "declarada" ? contenidoCanonico(r) : r);
+      try { const id = JSON.parse(await a.leer(indice)).id as string; if ((await this.obtener(id)).estado === "completa" && forma(await this.registro(id)) === forma(registro)) return { id }; }
       catch (error) { if (!(error instanceof ErrorSesion && error.status === 404) && (error as { code?: string }).code !== "ENOENT" && (error as { statusCode?: number }).statusCode !== 404) throw error; }
       await this.limpiar();
       const equipo = (lado: "local" | "visita") => { const d = registro.rondas[0]!.decisiones[lado]; return { id: lado, nombre: d.controlador, controlador: d.controlador }; };
-      const asignacion: AsignacionModelos = { modo: "programado", local: equipo("local"), visita: equipo("visita") };
+      const asignacion: AsignacionModelos = { modo: "programado", local: equipo("local"), visita: equipo("visita"), ...(procedencia ? { procedencia } : {}) };
       const metricas: MetricasSesion = { duracionMs: 0, decisiones: registro.rondas.length * 2, respaldos: registro.rondas.flatMap(r => Object.values(r.decisiones)).filter(d => d.origen === "respaldo").length, esperaModeloMs: [] };
       const sesion: Sesion = { id: randomUUID(), creada: Date.now(), estado: "completa", asignacion, metricas, mensajes: [], suscriptores: new Set(), cancelar: new AbortController(), cola: Promise.resolve() };
       await a.escribir(this.archivo(sesion.id, "meta.json"), JSON.stringify({ id: sesion.id, creada: sesion.creada, asignacion, reproduccion: true }), true);
@@ -425,5 +428,7 @@ export class GestorSesiones {
 const compartido = globalThis as typeof globalThis & { __cronistaSesiones?: GestorSesiones };
 export function gestorSesiones(): GestorSesiones { return compartido.__cronistaSesiones ??= new GestorSesiones(); }
 export function respuestaErrorSesion(error: unknown): Response {
-  return Response.json({ error: error instanceof ErrorSesion ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor." }, { status: error instanceof ErrorSesion ? error.status : 400, headers: { "cache-control": "no-store" } });
+  // Brief 057 v1.1 § 9: el lector acotado responde su propio estado (413 / 400) y su mensaje.
+  const tipificado = error instanceof ErrorSesion || error instanceof ErrorPeticion;
+  return Response.json({ error: tipificado ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor." }, { status: tipificado ? error.status : 400, headers: { "cache-control": "no-store" } });
 }

@@ -20,16 +20,23 @@ export const peticionSesion = ajustesArena.extend({ presentacion: z.enum(["prepa
   z.strictObject({ modo: z.literal("manual"), local: z.string().min(1).max(40), visita: z.string().min(1).max(40) }),
 ]) });
 
-export async function leerJsonAcotado(req: Request, maxBytes = 16_384): Promise<unknown> {
-  if (!req.body) throw new Error("Petición vacía");
-  const lector = req.body.getReader(), partes: Uint8Array[] = []; let bytes = 0;
+/** Brief 057 v1.1 § 9 · Error tipificado del lector: 413 si el cuerpo supera el tope, 400 si falta o no
+ * es JSON. `respuestaErrorSesion` responde su `status` y su mensaje. */
+export class ErrorPeticion extends Error { constructor(mensaje: string, readonly status: 413 | 400) { super(mensaje); } }
+
+export async function leerJsonAcotado(req: Request, maxBytes = 16_384): Promise<unknown> { return leerJsonDeCuerpo(req.body, maxBytes); }
+/** El mismo lector sobre un flujo ya abierto (la ruta de grabaciones mira el primer fragmento antes). */
+export async function leerJsonDeCuerpo(cuerpo: ReadableStream<Uint8Array> | null, maxBytes = 16_384): Promise<unknown> {
+  if (!cuerpo) throw new ErrorPeticion("Petición vacía", 400);
+  const lector = cuerpo.getReader(), partes: Uint8Array[] = []; let bytes = 0;
   try {
     while (true) {
       const { done, value } = await lector.read(); if (done) break;
       bytes += value.byteLength;
-      if (bytes > maxBytes) { await lector.cancel(); throw new Error("Petición demasiado grande"); }
+      if (bytes > maxBytes) { await lector.cancel(); throw new ErrorPeticion("Petición demasiado grande", 413); }
       partes.push(value);
     }
   } finally { lector.releaseLock(); }
-  return JSON.parse(Buffer.concat(partes).toString("utf8")) as unknown;
+  try { return JSON.parse(Buffer.concat(partes).toString("utf8")) as unknown; }
+  catch { throw new ErrorPeticion(bytes ? "JSON inválido" : "Petición vacía", 400); }
 }

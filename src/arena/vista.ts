@@ -1,5 +1,7 @@
-import { ARENA, CANTO_GOL } from "../sim/limites";
-import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
+import { ALTURA_DESTINO_M, ARENA, CANTO_GOL, GOL_VISUAL } from "../sim/limites";
+import type { Lado } from "../sim/tipos";
+import { potenciaRemate } from "./remate";
+import type { EstadoArena, EventoArena, Punto, RegistroArena } from "./tipos";
 
 /** Interpolación visual de estados del motor. Los reinicios declarados cortan el
  * balón; no se dibuja una trayectoria ficticia de un arco al otro. */
@@ -36,6 +38,68 @@ export function golEnCelebracion(registro: RegistroArena, tick: number): EventoA
     if (e.tipo === "gol" && edad >= -1e-9 && edad < ventana && (!elegido || e.tick > elegido.tick)) elegido = e;
   }
   return elegido;
+}
+
+/** Brief 057 (v1.1 §§ 5 y 7) · Reconstrucción visual del gol sobre datos del registro: el vuelo previo (única
+ * excepción declarada a «ningún gol futuro», acotada al último hueco de fotogramas y sin exponer el gol) y el
+ * balón en la red durante GOL_VISUAL.enRedS con los 22 y el árbitro quietos en el último fotograma previo.
+ * Pura: nunca lee ni escribe `estadoVisual`, no usa el reloj y no modifica el registro. */
+export type FaseGol = "vuelo" | "red";
+export type ReconstruccionGol =
+  | { fase: "vuelo"; balon: Punto; congelado: EstadoArena }
+  | { fase: "red"; gol: EventoArena; balon: Punto; congelado: EstadoArena | null };
+/** Un gol se reconstruye solo con un punto de cruce finito dentro del arco (más medio metro de tolerancia). */
+const golReconstruible = (e: EventoArena) => e.tipo === "gol" && Number.isFinite(e.hasta?.x) && Number.isFinite(e.hasta?.y)
+  && Math.abs(e.hasta.y - ARENA.anchoM / 2) <= ARENA.arcoM / 2 + 0.5;
+/** Último fotograma con tick < `tick` (búsqueda binaria sobre fotogramas ordenados), o null. */
+function previoA(registro: RegistroArena, tick: number): EstadoArena | null {
+  let lo = 0, hi = registro.fotogramas.length - 1, elegido: EstadoArena | null = null;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1, f = registro.fotogramas[mid]!;
+    if (f.tick < tick) { elegido = f; lo = mid + 1; } else hi = mid - 1;
+  }
+  return elegido;
+}
+export function reconstruccionGol(registro: RegistroArena, segundos: number, discreto = false): ReconstruccionGol | null {
+  const bruto = segundos / ARENA.pasoS, entero = Math.round(bruto);
+  const tick = Math.max(0, Math.min(registro.final.tick, Math.abs(bruto - entero) <= Number.EPSILON * ARENA.duracionMaxS / ARENA.pasoS * 4 ? entero : bruto));
+  const enRed = GOL_VISUAL.enRedS / ARENA.pasoS, entrada = GOL_VISUAL.entradaRedS / ARENA.pasoS;
+  let red: EventoArena | null = null, siguiente: EventoArena | null = null;
+  for (const e of registro.eventos) {
+    if (!golReconstruible(e)) continue;
+    const edad = tick - e.tick;
+    // Misma cota inferior que golEnCelebracion: en el tick exacto del gol ya está en la red.
+    if (edad >= -1e-9 && edad < enRed && (!red || e.tick > red.tick)) red = e;
+    else if (edad < -1e-9 && (!siguiente || e.tick < siguiente.tick)) siguiente = e;
+  }
+  if (red) {
+    const s = red.hasta.x >= ARENA.largoM / 2 ? 1 : -1;
+    const u = discreto ? 1 : Math.min(1, Math.max(0, tick - red.tick) / entrada);
+    return { fase: "red", gol: red, balon: { x: red.hasta.x + s * u * GOL_VISUAL.profundidadRedM, y: red.hasta.y }, congelado: previoA(registro, red.tick) };
+  }
+  if (discreto || !siguiente) return null;
+  const A = previoA(registro, siguiente.tick);
+  if (!A || tick < A.tick) return null;
+  const k = (tick - A.tick) / (siguiente.tick - A.tick);
+  return { fase: "vuelo", balon: { x: A.balon.posicion.x + (siguiente.hasta.x - A.balon.posicion.x) * k, y: A.balon.posicion.y + (siguiente.hasta.y - A.balon.posicion.y) * k }, congelado: A };
+}
+
+/** Brief 057 § 5.1 · Banda de altura ilustrativa del gol en la vista frontal: el motor es 2D y no registra
+ * altura; la banda sale de potenciaRemate(distanciaM) (051) con los cortes de GOL_VISUAL. Sin distancia
+ * finita → raso, `derivada: false` («sin distancia registrada»). */
+export type BandaAltura = keyof typeof ALTURA_DESTINO_M;
+export function alturaIlustrativa(gol: EventoArena): { banda: BandaAltura; metros: number; derivada: boolean } {
+  if (!Number.isFinite(gol.distanciaM)) return { banda: "raso", metros: ALTURA_DESTINO_M.raso, derivada: false };
+  const p = potenciaRemate(gol.distanciaM), c = GOL_VISUAL.cortesPotencia;
+  const banda: BandaAltura = p < c.raso ? "raso" : p < c.media ? "media" : "alta";
+  return { banda, metros: ALTURA_DESTINO_M[banda], derivada: true };
+}
+/** Brief 057 § 5.1 · Arco batido por `hasta.x` (no por `lado`: el autogol señala el arco correcto) y posición
+ * lateral del cruce vista desde el campo (dato del registro), acotada para que el balón quepa entre los palos. */
+export function vistaArco(_registro: RegistroArena, gol: EventoArena): { defiende: Lado; lateralM: number; altura: ReturnType<typeof alturaIlustrativa> } {
+  const defiende: Lado = gol.hasta.x >= ARENA.largoM / 2 ? "visita" : "local";
+  const s = defiende === "visita" ? 1 : -1, tope = ARENA.arcoM / 2 - GOL_VISUAL.vista.radioBalonM;
+  return { defiende, lateralM: Math.max(-tope, Math.min(tope, s * (gol.hasta.y - ARENA.anchoM / 2))), altura: alturaIlustrativa(gol) };
 }
 
 export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, idioma: "es" | "en"): string {
