@@ -128,7 +128,8 @@ describe("Reanudaciones por salida real del balón", () => {
   });
 
   it("las reglas nuevas son explícitas; los archivos sin marca conservan el motor anterior", () => {
-    const config = crearConfigArena(); expect(config.reglas).toBe("reinicios-v5");
+    // Brief 063 § 3.3: la predeterminada de la publicación 1 es reinicios-v6 (literal).
+    const config = crearConfigArena(); expect(config.reglas).toBe("reinicios-v6");
     delete config.reglas; expect(() => validarConfigArena(config)).not.toThrow();
     expect(() => validarConfigArena({ ...config, reglas: "otra" as never })).toThrow("Reglas");
   });

@@ -587,12 +587,13 @@ describe("051 · versiones", () => {
     expect(r.rondas.flatMap(x => Object.values(x.decisiones)).every(d => d.tiempoMs === 0)).toBe(true);
     expect(reproducirArena(structuredClone(r))).toEqual(r);
 
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5]);
-    expect(ARENA.reglas).toBe(V5);
-    expect(crearConfigArena().reglas).toBe(V5);
-    const base = crearConfigArena();
+    // Brief 063 § 3.3: reinicios-v5 pasa a ser literal; la lista completa y la predeterminada de cada
+    // publicación las fija motor063.test.ts (0.1).
+    expect(reglasArena.slice(0, 5)).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5]);
+    expect(crearConfigArena({ reglas: V5 }).reglas).toBe(V5);
+    const base = crearConfigArena({ reglas: V5 });
     for (const reglas of reglasArena) expect(() => validarConfigArena({ ...base, reglas })).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v6" as never })).toThrow("Reglas");
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-otra" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) expect(reglasDesde({ ...base, reglas }, V5)).toBe(i >= 4);
   });
 
@@ -683,8 +684,8 @@ describe("051 · helper de métricas: desenlace físico, lectura 045 e intercepc
   const A = "local-5", B = "visita-3", K = "visita-0", COMP = "local-6";
   const ev = (id: string, tick: number, tipo: EventoArena["tipo"], jugador: string, lado: Lado, extra: Partial<EventoArena> = {}): EventoArena =>
     ({ id, tick, tipo, lado, jugador, receptor: null, desde: { x: 0, y: 0 }, hasta: { x: 0, y: 0 }, distanciaM: 0, ...extra });
-  const muestras: MuestraTick[] = [{ tick: 0, eventos: 0, poseedor: null, balon: { x: 0, y: 0 }, manos: null, pausado: false, manoAMano: null, conducir: null,
-    jugadores: [{ id: A, lado: "local", puesto: "DEL", x: 0, y: 0 }, { id: K, lado: "visita", puesto: "POR", x: ARENA.largoM, y: MEDIO_Y }, { id: "local-0", lado: "local", puesto: "POR", x: 0, y: MEDIO_Y }] }];
+  const muestras: MuestraTick[] = [{ tick: 0, eventos: 0, poseedor: null, balon: { x: 0, y: 0 }, manos: null, pausado: false, manoAMano: null, conducir: null, vuelo: false, superado: null, seleccion: null, persecucion: null,
+    jugadores: [{ id: A, lado: "local", puesto: "DEL", x: 0, y: 0, vx: 0, vy: 0 }, { id: K, lado: "visita", puesto: "POR", x: ARENA.largoM, y: MEDIO_Y, vx: 0, vy: 0 }, { id: "local-0", lado: "local", puesto: "POR", x: 0, y: MEDIO_Y, vx: 0, vy: 0 }] }];
   const tiro = ev("t", 1, "tiro", A, "local", { hasta: { x: ARENA.largoM, y: MEDIO_Y } });
 
   it("v1.1 #1 · listas sintéticas: desenlace físico frente a rematesPorLado y discrepancias", () => {

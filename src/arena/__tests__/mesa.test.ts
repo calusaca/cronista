@@ -24,6 +24,14 @@ import { GestorSesiones } from "../sesiones";
 import type { EventoArena, RegistroArena } from "../tipos";
 import { POST as relatoHttp } from "../../app/api/arena/sesiones/[id]/relato/route";
 
+// Brief 063 § 13 · pruebas existentes: estas candidaturas dependen de la semilla y del comportamiento
+// reinicios-v5 (p. ej. qué variante del intercambio cabe), y `GestorSesiones` no recibe reglas; se fijan
+// a reinicios-v5 las configuraciones nuevas de este archivo.
+vi.mock("../motor", async importOriginal => {
+  const real = await importOriginal<typeof import("../motor")>();
+  return { ...real, crearConfigArena: (opciones: Parameters<typeof real.crearConfigArena>[0] = {}) => real.crearConfigArena({ reglas: "reinicios-v5", ...opciones }) };
+});
+
 const registro = await ejecutarArena(crearConfigArena({ duracionS: 60 }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
 const tick = registro.final.tick;
 const prefijo = (r: RegistroArena, t: number): RegistroArena => ({ ...r, eventos: r.eventos.filter(e => e.tick <= t), fotogramas: r.fotogramas.filter(f => f.tick <= t), final: [...r.fotogramas].reverse().find(f => f.tick <= t)! });

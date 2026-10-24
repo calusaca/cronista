@@ -8,8 +8,9 @@ export type FormacionArena = (typeof formaciones)[number];
 export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalidades | typeof ARENA.versionLegado;
 /** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
 /** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`).
- * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", ARENA.reglas] as const;
+ * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5.
+ * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -48,6 +49,11 @@ export interface ResumenEquipo {
 export interface AficionArena { sector: string; canto: { es: string; en: string } }
 export interface EstadoAficion { animo: number; reaccion: "atencion" | "aliento" | "rugido" | "silbidos" | "silencio"; evento: string | null }
 export interface Punto { x: number; y: number }
+/** Brief 063 § 4.6: línea de un puesto (`lineaDePuesto`). */
+export type LineaArena = "POR" | "DEF" | "MED" | "DEL";
+/** Brief 063 (reinicios-v6): persecución tras pérdida activa. Desde v6 la clave existe siempre en el
+ * estado y vale null o este objeto; en v1–v5 no existe. */
+export interface PersecucionArena { jugador: string; lado: Lado; desdeTick: number; hastaTick: number }
 export const perfilesJugador = ["defensivo", "ofensivo", "pasador", "conductor", "rematador", "equilibrado"] as const;
 export type PerfilJugador = (typeof perfilesJugador)[number];
 export interface PersonalidadJugador {
@@ -101,6 +107,8 @@ export interface EstadoArena {
   aficion?: Record<Lado, EstadoAficion>;
   pausa?: { hastaTick: number; lado: Lado; punto: Punto; motivo: "falta" | "reinicio" } | null;
   finalizado?: { tick: number; motivo: "menos_de_siete" } | null;
+  /** Brief 063 (reinicios-v6): siempre presente (null o la persecución activa); ausente en v1–v5. */
+  persecucion?: PersecucionArena | null;
 }
 export interface ConfigArena {
   /** Ausente en archivos arena-v1; nunca se actualizan al reproducirlos. */

@@ -482,8 +482,9 @@ export const ARENA = {
   areaLargoM: 16.5, areaAnchoM: 40.32,
   /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`).
    * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros).
-   * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel). */
-  reglas: "reinicios-v5",
+   * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel).
+   * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida). */
+  reglas: "reinicios-v6",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -688,6 +689,52 @@ export const LOTE_ARENA_051 = {
     /** Diferencia de conversión entre jugadores de campo a `alto` y a `bajo`. */
     controladoCampoMin: 0.1,
   },
+} as const;
+
+/** Brief 063 · Bloque A (reinicios-v6): repliegue de emergencia y persecución tras pérdida. Cifras
+ * sintéticas del prototipo del 24 oct (docs/evidencia/motor-063); solo las usa el motor bajo
+ * reinicios-v6, vía `src/arena/persecucion.ts`. */
+export const PERSECUCION_ARENA = {
+  /** Repliegue: con un poseedor rival de campo por detrás del último defensor de campo, los jugadores
+   * de las líneas `lineas` a ≤ radioM (m) del balón, como máximo `max`, sin el perseguidor, corren a un
+   * destino a `adelantoM` (m) del balón sobre la recta balón–centro del arco propio. */
+  repliegue: { lineas: ["DEF", "MED"], radioM: 30, max: 4, adelantoM: 4 },
+  /** Persecución: segundos base por línea del perdedor. */
+  segundos: { DEF: 6, MED: 4, DEL: 3 },
+  /** Factores de la duración: agresividadMin + agresividadRango·agresividad/100; energiaMin +
+   * (1 − energiaMin)·energía; bloque del plan del entrenador. Duración acotada a [minS, maxS] (s). */
+  agresividadMin: 0.75, agresividadRango: 0.5, energiaMin: 0.5,
+  bloque: { bajo: 0.85, medio: 1, alto: 1.15 }, minS: 1.5, maxS: 8,
+  /** Límite espacial: x orientada propia mínima del destino del perdedor = fracción × largoM (DEF sin límite). */
+  limiteFraccion: { DEF: 0, MED: 1 / 3, DEL: 0.5 },
+  /** Frenado (m/s²) de quien está en repliegue o persecución cuando la velocidad deseada reduce la
+   * componente actual; el resto conserva ARENA.aceleracionMps2. */
+  frenadoMps2: 5,
+} as const;
+
+/**
+ * Brief 063 · Métricas de lote del bloque A (`src/arena/metricas-lote.ts`, en la misma pasada que las del
+ * 046 y el 051: programados, LOTE_ARENA_046.duracionS, todos los ticks; denominador cero = «sin muestra»,
+ * incumple). Bandas exigidas desde `desdeA`; `rapido` corre en `npm test` (semillas de
+ * LOTE_ARENA_046.rapido) y `completo` en `npm run test:stats` (LOTE_ARENA_046.completo y el segundo lote).
+ * Las métricas son geométricas: se miden igual en reinicios-v5, que debe incumplirlas (contraste).
+ */
+export const LOTE_ARENA_063 = {
+  desdeA: "reinicios-v6",
+  /** `repliegueCorren`: muestras de rivales DEF/MED a ≤ PERSECUCION_ARENA.repliegue.radioM del poseedor
+   * superado, con el episodio superado de al menos edadMinS (s); corren hacia su arco a ≥ velocidadMinMps. */
+  repliegue: { edadMinS: 1, velocidadMinMps: 3 },
+  /** `repliegueSeleccion` (v1.1 § 17.7): seleccionados por `seleccionRepliegue`, episodio ≥ edadMinS (s),
+   * corren a ≥ velocidadMinMps con cos(velocidad, destino − jugador) ≥ cosenoMin. */
+  seleccion: { edadMinS: 1.5, velocidadMinMps: 3, cosenoMin: 0.7 },
+  /** `persecucionPerdedor`: muestras de desdeS a hastaS (s) tras un robo en duelo; el perdedor corre a ≥
+   * velocidadMinMps con cos(velocidad, balón − perdedor) ≥ cosenoMin. */
+  persecucion: { desdeS: 1, hastaS: 4, velocidadMinMps: 3, cosenoMin: 0.7 },
+  /** v1.2 § 18.4: cota (bytes) del crecimiento máximo de un registro por las claves nuevas del 063; la
+   * prueba la recalcula con fórmulas y constantes. */
+  crecimientoMaxBytes: 200_000,
+  rapido: { repliegueCorrenMin: 0.55, persecucionPerdedorMin: 0.38 },
+  completo: { repliegueCorrenMin: 0.55, persecucionPerdedorMin: 0.4, repliegueSeleccionMin: 0.55 },
 } as const;
 
 /** Mini-encuentro v3: parámetros sintéticos, en segundos reales de simulación. */

@@ -788,15 +788,15 @@ describe("046 · versiones", () => {
     expect(reproducirArena(r)).toEqual(r);
     expect(r.rondas.flatMap(x => Object.values(x.decisiones)).every(d => d.tiempoMs === 0)).toBe(true);
 
-    // Brief 051: reinicios-v4 pasa a ser literal y la predeterminada es reinicios-v5.
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", V4, "reinicios-v5"]);
-    expect(crearConfigArena().reglas).toBe("reinicios-v5");
-    expect(ARENA.reglas).toBe("reinicios-v5");
+    // Brief 051: reinicios-v4 pasa a ser literal. Brief 063 § 3.3: también reinicios-v5; la lista completa y la
+    // predeterminada de cada publicación las fija motor063.test.ts (0.1).
+    expect(reglasArena.slice(0, 5)).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", V4, "reinicios-v5"]);
+    expect(crearConfigArena({ reglas: "reinicios-v5" }).reglas).toBe("reinicios-v5");
     expect(crearConfigArena({ reglas: "reinicios-v3" }).reglas).toBe("reinicios-v3");
     expect(() => crearConfigArena({ version: ARENA.versionPersonalidades, reglas: "reinicios-v3" })).toThrow();
-    const base = crearConfigArena();
+    const base = crearConfigArena({ reglas: "reinicios-v5" });
     for (const reglas of reglasArena) expect(() => validarConfigArena({ ...base, reglas })).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v6" as never })).toThrow("Reglas");
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-otra" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) {
       expect(reglasDesde({ ...base, reglas }, "reinicios-v3")).toBe(i >= 2);
       expect(reglasDesde({ ...base, reglas }, V4)).toBe(i >= 3);

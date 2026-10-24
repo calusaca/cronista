@@ -6,7 +6,9 @@
 // Brief 051: en la misma pasada, las métricas de remate (desenlace físico, «a puerta» por
 // `rematesPorLado`, colocación) con las bandas de LOTE_ARENA_051, el experimento controlado de
 // niveles (`partidoConNiveles`) y los dos contadores de intercepción inmediata (v1.1 #4).
-import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51 } from "../sim/limites";
+// Brief 063 · bloque A: `repliegueCorren`, `repliegueSeleccion` y `persecucionPerdedor` (§ 11.1, v1.1 § 17.7)
+// con las bandas de LOTE_ARENA_063, y las escenas para el smoke (`escenasPartido`).
+import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE } from "../sim/limites";
 import { configDeSemilla } from "../sim/plantillas";
 import type { Lado, SimConfig } from "../sim/tipos";
 import { enAreaRival } from "./ataque";
@@ -16,10 +18,13 @@ import { ejecutarArena } from "./coordinador";
 import { rematesPorLado } from "./estadista";
 import { distancia } from "./geometria";
 import { crearConfigArena, MotorArena } from "./motor";
+import { lineaDePuesto } from "./atributos";
+import { destinoRepliegue, perseguidoresDe, seleccionRepliegue, superadoPor } from "./persecucion";
 import { enAreaPropia, manoAMano } from "./portero";
-import { lados, rival, type EstadoArena, type EventoArena, type OrdenesEquipo, type Punto, type ReglasArena } from "./tipos";
+import { lados, reglasArena, rival, type EstadoArena, type EventoArena, type OrdenesEquipo, type PersecucionArena, type Punto, type ReglasArena } from "./tipos";
 
-interface JugadorMuestra { id: string; lado: Lado; puesto: string; x: number; y: number }
+/** Brief 063 § 11.1: con la velocidad (vx, vy) de cada jugador. */
+interface JugadorMuestra { id: string; lado: Lado; puesto: string; x: number; y: number; vx: number; vy: number }
 /** Estado al empezar el paso `tick` (o el final del partido). */
 export interface MuestraTick {
   tick: number; eventos: number; poseedor: string | null; balon: Punto;
@@ -29,6 +34,14 @@ export interface MuestraTick {
   /** `conducir` del poseedor de campo sin pausa ni saque: velocidad del poseedor (m/s). */
   conducir: number | null;
   jugadores: JugadorMuestra[];
+  /** Brief 063 § 11.1: hay un balón en vuelo. */
+  vuelo: boolean;
+  /** Brief 063 § 6.1: poseedor superado (`superadoPor`), fuera de pausa y saque, o null. Geométrico: igual en v5. */
+  superado: string | null;
+  /** Brief 063 v1.1 § 17.7: conjunto `seleccionRepliegue` reconstruido sobre la muestra y su destino. */
+  seleccion: { ids: string[]; destino: Punto } | null;
+  /** Brief 063: `estado.persecucion` (null también en v1–v5, donde la clave no existe). */
+  persecucion: PersecucionArena | null;
 }
 
 export interface MetricasPartido {
@@ -54,6 +67,10 @@ export interface MetricasPartido {
   metas: number; metasConduccion: number;
   tiroFueraTrasDesvio: number; recepcionPorteroRechace: number;
   ticksConducir: number; ticksConducirFrenado: number; fuerasDeJuego: number;
+  /** Brief 063 § 11.1 · numerador y denominador de cada métrica del bloque A. */
+  repliegueCorren: { corren: number; muestras: number };
+  repliegueSeleccion: { corren: number; muestras: number };
+  persecucionPerdedor: { persigue: number; muestras: number };
 }
 
 const tipoPosesion = new Set<EventoArena["tipo"]>(["tiro", "pase", "recuperacion", "intercepcion", "falta", "fuera_juego", "reinicio", "gol"]);
@@ -121,8 +138,12 @@ function muestrear(estado: EstadoArena, eventos: number, planes?: Record<Lado, O
   const mam = poseedor ? manoAMano(estado, rival(poseedor.lado), ARENA.radioTiroM) : null;
   const orden = poseedor && planes ? planes[poseedor.lado].ordenes.find(o => o.jugador === poseedor.id) : undefined;
   const conducir = poseedor && poseedor.puesto !== "POR" && !pausado && !estado.saque && orden?.accion === "conducir" ? Math.hypot(poseedor.velocidad.x, poseedor.velocidad.y) : null;
+  const superado = !pausado && !estado.saque ? superadoPor(estado) : null;
+  const ids = superado ? seleccionRepliegue(estado, perseguidoresDe(estado.jugadores, balon.posicion)).map(j => j.id) : [];
   return { tick: estado.tick, eventos, poseedor: balon.poseedor, balon: { ...balon.posicion }, manos: balon.manos?.portero ?? null, pausado, manoAMano: mam?.id ?? null, conducir,
-    jugadores: estado.jugadores.map(j => ({ id: j.id, lado: j.lado, puesto: j.puesto, x: j.posicion.x, y: j.posicion.y })) };
+    jugadores: estado.jugadores.map(j => ({ id: j.id, lado: j.lado, puesto: j.puesto, x: j.posicion.x, y: j.posicion.y, vx: j.velocidad.x, vy: j.velocidad.y })),
+    vuelo: balon.vuelo !== null, superado: superado?.id ?? null, seleccion: superado ? { ids, destino: destinoRepliegue(balon.posicion, rival(superado.lado)) } : null,
+    persecucion: estado.persecucion ? { ...estado.persecucion } : null };
 }
 
 /** Brief 051 · experimento controlado: la configuración de la semilla con `variantes.niveles` y el
@@ -160,7 +181,8 @@ export function analizarPartido(seed: number, muestras: readonly MuestraTick[], 
     pasesBanda: 0, pasesBandaAlArea: 0, centros: 0, saquesManos: 0, saquesPerdidos: 0, intercepcionesInmediatas: 0, intercepcionesInmediatasCercanas: 0, golesTrasSaque: 0,
     remates: Object.fromEntries(DESENLACES_REMATE.map(d => [d, 0])) as Record<DesenlaceRemate, number>, aPuerta045: 0, atajadas045: 0, discrepancias045: 0, golesSinRemate: 0,
     rematesDentro: 0, rematesLados: 0, sumaDesvioDestinoM: 0, metas: 0, metasConduccion: 0, tiroFueraTrasDesvio: 0, recepcionPorteroRechace: 0,
-    ticksConducir: 0, ticksConducirFrenado: 0, fuerasDeJuego: 0 };
+    ticksConducir: 0, ticksConducirFrenado: 0, fuerasDeJuego: 0,
+    repliegueCorren: { corren: 0, muestras: 0 }, repliegueSeleccion: { corren: 0, muestras: 0 }, persecucionPerdedor: { persigue: 0, muestras: 0 } };
   const porteros = new Set(muestras.flatMap(s => s.jugadores.filter(j => j.puesto === "POR").map(j => j.id)));
   const ladoDe = (id: string) => muestras.find(s => s.jugadores.some(j => j.id === id))?.jugadores.find(j => j.id === id)?.lado;
   const porTick = new Map(muestras.map(s => [s.tick, s]));
@@ -266,7 +288,81 @@ export function analizarPartido(seed: number, muestras: readonly MuestraTick[], 
     else { cerrar(); if (s.manoAMano) tramo = [s]; }
   }
   cerrar();
+  medirPersecucion(m, muestras);
   return m;
+}
+
+/** Brief 063 § 11.1 · velocidad hacia el arco propio (local defiende x = 0). */
+const haciaSuArco = (j: JugadorMuestra) => j.lado === "local" ? -j.vx : j.vx;
+/** Coseno entre la velocidad del jugador y la dirección a `hacia`; null sin velocidad o sin dirección. */
+function coseno(j: JugadorMuestra, hacia: Punto): number | null {
+  const dx = hacia.x - j.x, dy = hacia.y - j.y, v = Math.hypot(j.vx, j.vy), d = Math.hypot(dx, dy);
+  return v && d ? (j.vx * dx + j.vy * dy) / (v * d) : null;
+}
+/** Brief 063 § 11.1 y v1.1 § 17.7 · `repliegueCorren`, `repliegueSeleccion` y `persecucionPerdedor` (puro). */
+function medirPersecucion(m: MetricasPartido, muestras: readonly MuestraTick[]): void {
+  const edadRepliegue = Math.round(L63.repliegue.edadMinS / ARENA.pasoS), edadSeleccion = Math.round(L63.seleccion.edadMinS / ARENA.pasoS);
+  const lineas: readonly string[] = PE.repliegue.lineas;
+  let inicio = -1;
+  muestras.forEach((s, i) => {
+    const previa = muestras[i - 1];
+    if (!s.superado) { inicio = -1; return; }
+    if (!(previa && previa.superado === s.superado && previa.tick + 1 === s.tick)) inicio = s.tick;
+    const edad = s.tick - inicio, poseedor = s.jugadores.find(j => j.id === s.superado)!;
+    if (edad >= edadRepliegue) for (const d of s.jugadores) {
+      if (d.lado === poseedor.lado || !lineas.includes(lineaDePuesto(d.puesto)) || Math.hypot(d.x - poseedor.x, d.y - poseedor.y) > PE.repliegue.radioM) continue;
+      m.repliegueCorren.muestras++;
+      if (haciaSuArco(d) >= L63.repliegue.velocidadMinMps) m.repliegueCorren.corren++;
+    }
+    if (edad >= edadSeleccion && s.seleccion) for (const id of s.seleccion.ids) {
+      const j = s.jugadores.find(x => x.id === id);
+      if (!j) continue;
+      m.repliegueSeleccion.muestras++;
+      const c = coseno(j, s.seleccion.destino);
+      if (Math.hypot(j.vx, j.vy) >= L63.seleccion.velocidadMinMps && c !== null && c >= L63.seleccion.cosenoMin) m.repliegueSeleccion.corren++;
+    }
+  });
+  // Robo en duelo: entre dos muestras consecutivas el poseedor de campo pasa a un rival y la primera no tiene vuelo.
+  const desde = Math.round(L63.persecucion.desdeS / ARENA.pasoS), hasta = Math.round(L63.persecucion.hastaS / ARENA.pasoS);
+  for (let i = 1; i < muestras.length; i++) {
+    const a = muestras[i - 1]!, b = muestras[i]!;
+    if (b.tick !== a.tick + 1 || a.vuelo || !a.poseedor || !b.poseedor) continue;
+    const perdedor = a.jugadores.find(j => j.id === a.poseedor), nuevo = b.jugadores.find(j => j.id === b.poseedor);
+    if (!perdedor || !nuevo || perdedor.puesto === "POR" || nuevo.lado === perdedor.lado) continue;
+    for (let k = i; k < muestras.length; k++) {
+      const s = muestras[k]!, edad = s.tick - b.tick;
+      if (edad >= hasta || s.tick !== b.tick + (k - i)) break;
+      const z = s.jugadores.find(j => j.id === perdedor.id), poseedor = s.jugadores.find(j => j.id === s.poseedor);
+      // Se corta en la primera pausa, cuando el perdedor sale o cuando su lado recupera.
+      if (s.pausado || !z || poseedor?.lado === perdedor.lado) break;
+      if (edad < desde) continue;
+      m.persecucionPerdedor.muestras++;
+      const c = coseno(z, s.balon);
+      if (Math.hypot(z.vx, z.vy) >= L63.persecucion.velocidadMinMps && c !== null && c >= L63.persecucion.cosenoMin) m.persecucionPerdedor.persigue++;
+    }
+  }
+}
+
+/** Brief 063 § 14 · escenas para el smoke: los episodios superados (ticks consecutivos con el mismo
+ * poseedor superado) en los que alguien repliega, y cada persecución (de `estado.persecucion`). */
+export interface EscenasPartido {
+  seed: number;
+  superados: { desdeTick: number; hastaTick: number; poseedor: string; repliegue: string[] }[];
+  persecuciones: { jugador: string; linea: string; desdeTick: number; hastaTick: number }[];
+}
+export function escenasPartido(seed: number, muestras: readonly MuestraTick[]): EscenasPartido {
+  const superados: EscenasPartido["superados"] = [], persecuciones: EscenasPartido["persecuciones"] = [];
+  const linea = (id: string) => lineaDePuesto(muestras.flatMap(s => s.jugadores).find(j => j.id === id)?.puesto ?? "");
+  muestras.forEach((s, i) => {
+    const previa = muestras[i - 1], ultimo = superados.at(-1);
+    if (s.superado) {
+      if (ultimo && previa?.superado === s.superado && previa.tick + 1 === s.tick && ultimo.hastaTick === previa.tick) { ultimo.hastaTick = s.tick; ultimo.repliegue = [...new Set([...ultimo.repliegue, ...(s.seleccion?.ids ?? [])])]; }
+      else superados.push({ desdeTick: s.tick, hastaTick: s.tick, poseedor: s.superado, repliegue: [...(s.seleccion?.ids ?? [])] });
+    }
+    const p = s.persecucion, actual = persecuciones.at(-1);
+    if (p && !(actual && actual.jugador === p.jugador && actual.desdeTick === p.desdeTick)) persecuciones.push({ jugador: p.jugador, linea: linea(p.jugador), desdeTick: p.desdeTick, hastaTick: p.hastaTick });
+  });
+  return { seed, superados: superados.filter(e => e.repliegue.length), persecuciones };
 }
 
 const cociente = (a: number, b: number): number | null => b > 0 ? a / b : null;
@@ -294,6 +390,8 @@ export interface MetricasLote {
   metas: number; metasConduccion: number; metasConduccionPorPartido: number;
   tiroFueraTrasDesvio: number; recepcionPorteroRechace: number;
   conducir: { ticks: number; frenados: number; fraccion: number | null }; fuerasDeJuego: number;
+  /** Brief 063 § 11.1 · bloque A (fracciones; null = sin muestra). */
+  persecucion063: { repliegueCorren: number | null; repliegueSeleccion: number | null; persecucionPerdedor: number | null; muestras: { repliegue: number; seleccion: number; persecucion: number } };
 }
 
 export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: readonly MetricasPartido[]): MetricasLote {
@@ -316,6 +414,12 @@ export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: re
     tiroFueraTrasDesvio: suma(p => p.tiroFueraTrasDesvio), recepcionPorteroRechace: suma(p => p.recepcionPorteroRechace),
     conducir: { ticks: suma(p => p.ticksConducir), frenados: suma(p => p.ticksConducirFrenado), fraccion: cociente(suma(p => p.ticksConducirFrenado), suma(p => p.ticksConducir)) },
     fuerasDeJuego: suma(p => p.fuerasDeJuego),
+    persecucion063: {
+      repliegueCorren: cociente(suma(p => p.repliegueCorren.corren), suma(p => p.repliegueCorren.muestras)),
+      repliegueSeleccion: cociente(suma(p => p.repliegueSeleccion.corren), suma(p => p.repliegueSeleccion.muestras)),
+      persecucionPerdedor: cociente(suma(p => p.persecucionPerdedor.persigue), suma(p => p.persecucionPerdedor.muestras)),
+      muestras: { repliegue: suma(p => p.repliegueCorren.muestras), seleccion: suma(p => p.repliegueSeleccion.muestras), persecucion: suma(p => p.persecucionPerdedor.muestras) },
+    },
   };
 }
 
@@ -332,6 +436,13 @@ function agregarRemates(partidos: readonly MetricasPartido[]): MetricasLote["rem
     colocacionLados: cociente(suma(p => p.rematesLados), suma(p => p.rematesDentro)), desvioMedioM: cociente(suma(p => p.sumaDesvioDestinoM), remates),
     discrepancias045: suma(p => p.discrepancias045),
   };
+}
+
+/** Brief 063 § 14 · escenas de `semillas` partidos programados desde `desde` (smoke). */
+export async function escenasLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number }): Promise<EscenasPartido[]> {
+  const duracionS = opciones.duracionS ?? L.duracionS, reglas = opciones.reglas ?? ARENA.reglas, escenas: EscenasPartido[] = [];
+  for (let seed = opciones.desde; seed < opciones.desde + opciones.semillas; seed++) escenas.push(escenasPartido(seed, (await muestrasPartido(seed, duracionS, reglas)).muestras));
+  return escenas;
 }
 
 /** Lote de `semillas` partidos programados desde `desde` (siempre LOTE_ARENA_046.duracionS salvo prueba). */
@@ -375,6 +486,22 @@ const comprobar = (fallos: string[]) => ({
   min: (nombre: string, v: number | null, limite: number) => { if (v === null || v < limite) fallos.push(`${nombre}=${v ?? "sin muestra"} < ${limite}`); },
   entre: (nombre: string, v: number | null, r: { min: number; max: number }) => { if (v === null || v < r.min || v > r.max) fallos.push(`${nombre}=${v ?? "sin muestra"} ∉ [${r.min}; ${r.max}]`); },
 });
+
+type Banda063 = (typeof L63)["rapido"] | (typeof L63)["completo"];
+/** Brief 063 § 12.3 · bandas de un lote según sus reglas y su tamaño: 046 y 051 (v6 y anteriores, las
+ * originales) y las del bloque A desde LOTE_ARENA_063.desdeA (null antes). */
+export function bandasLote(reglas: ReglasArena, tamano: "rapido" | "completo"): { b046: Banda; b051: Banda051; b063: Banda063 | null } {
+  const conA = reglasArena.indexOf(reglas) >= reglasArena.indexOf(L63.desdeA);
+  return { b046: L[tamano], b051: L51[tamano], b063: conA ? L63[tamano] : null };
+}
+/** Brief 063 § 11.2 · bandas del bloque A (sin muestra = incumple). */
+export function incumplimientos063(m: MetricasLote, banda: Banda063): string[] {
+  const fallos: string[] = [], { min } = comprobar(fallos), a = m.persecucion063;
+  min("repliegueCorren", a.repliegueCorren, banda.repliegueCorrenMin);
+  min("persecucionPerdedor", a.persecucionPerdedor, banda.persecucionPerdedorMin);
+  if ("repliegueSeleccionMin" in banda) min("repliegueSeleccion", a.repliegueSeleccion, banda.repliegueSeleccionMin);
+  return fallos;
+}
 
 /** Brief 051 · bandas de remate de LOTE_ARENA_051 (salvo el experimento controlado). */
 export function incumplimientosRemate(m: MetricasLote, banda: Banda051): string[] {

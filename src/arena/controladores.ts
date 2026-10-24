@@ -1,5 +1,5 @@
 import type { Llm, Mensaje } from "../lib/llm";
-import { ARENA, ATAQUE_ARENA as A, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARENA, ATAQUE_ARENA as A, PERSECUCION_ARENA as PE, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { enAreaRival } from "./ataque";
 import { asignarPuestos } from "./alineacion";
 import { gestionarProgramado, planDelEntrenador } from "./entrenadores";
@@ -62,9 +62,12 @@ export function validarOrdenes(raw: unknown, obs: ObservacionArena): OrdenesEqui
   return { ...plan, ordenes: [...plan.ordenes].sort((a, b) => a.jugador.localeCompare(b.jugador)) };
 }
 
+/** Brief 063 § 3.2: un candidato de pase con su puntuación. */
+export interface CandidatoPase { p: JugadorArena; d: number; avance: number; margen: number; puntuacion: number }
 /** Selección local sencilla, no aprendida. La geometría decide viabilidad;
- * el estilo cambia la preferencia de progresar o conservar. */
-export function opcionPase(j: JugadorArena, obs: ObservacionArena): JugadorArena | undefined {
+ * el estilo cambia la preferencia de progresar o conservar. Brief 063 § 3.2: candidatos filtrados y
+ * ordenados exactamente como los elegía `opcionPase` (oráculo `opcion-pase-063.json`, prueba 0.4). */
+export function evaluarPases(j: JugadorArena, obs: ObservacionArena): CandidatoPase[] {
   const origen = transformar(j.posicion, j.lado);
   const adversarios = obs.estado.jugadores.filter(p => p.lado !== j.lado);
   const candidatos = obs.estado.jugadores.filter(p => p.lado === j.lado && p.id !== j.id).map(p => {
@@ -82,7 +85,10 @@ export function opcionPase(j: JugadorArena, obs: ObservacionArena): JugadorArena
     return { p, d, avance, margen, puntuacion };
   }).filter(c => c.d >= ARENA.paseMinM && c.d <= ARENA.paseMaxM && c.avance >= ARENA.avanceMinPaseM && c.margen > ARENA.controlM * ARENA.margenPase * (obs.equipos[j.lado].entrenador ? 1 - obs.equipos[j.lado].entrenador!.riesgo / 200 : 1))
     .sort((a, b) => b.puntuacion - a.puntuacion || a.p.id.localeCompare(b.p.id));
-  return candidatos[0]?.p;
+  return candidatos;
+}
+export function opcionPase(j: JugadorArena, obs: ObservacionArena): JugadorArena | undefined {
+  return evaluarPases(j, obs)[0]?.p;
 }
 
 export function planProgramado(obs: ObservacionArena): OrdenesEquipo {
@@ -144,6 +150,14 @@ export function frasesCentroPortero(c: { largoM: number; zonaCentroXM: number; c
 El portero sale solo ante un mano a mano y el balón en sus manos no se disputa: los rivales se quedan a ${c.distanciaManosM} m y lo pone en juego entre ${c.accionCadaS} y ${c.manosMaxS} s, sin que haga falta ordenarlo.`;
 }
 
+/** Brief 063 § 6.5: la frase del repliegue y la persecución (reinicios-v6), construida solo con constantes
+ * (la prueba la construye también con valores alterados). */
+export function frasesPersecucion(c: { max: number; radioM: number; minS: number; maxS: number } = {
+  max: PE.repliegue.max, radioM: PE.repliegue.radioM, minS: PE.minS, maxS: PE.maxS,
+}): string {
+  return `Si un rival con el balón supera a tu último defensor de campo, hasta ${c.max} de tus defensas y medios a ≤ ${c.radioM} m corren hacia tu arco aunque no lleguen; quien pierde el balón lo persigue entre ${c.minS} y ${c.maxS} s (un delantero no pasa de la mitad de tu campo, un medio no entra en tu tercio defensivo, un defensa no tiene límite). Ninguna orden lo activa; presionar sigue yendo al balón.`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -156,6 +170,7 @@ Coordenadas en metros: x=0..${ARENA.largoM}, y=0..${ARENA.anchoM}. Local ataca h
 No conoces órdenes nuevas del rival ni eventos futuros. Conserva amplitud, profundidad, apoyos y resguardo.
 Al defender coordina presión, cobertura y bloque. El portero debe proteger su arco.
 ${frasesCentroPortero()}
+${frasesPersecucion()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad
