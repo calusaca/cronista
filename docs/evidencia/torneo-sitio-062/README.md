@@ -161,3 +161,11 @@ Tras los cambios: `npm test` 2695/2695 (122 archivos), `npm run typecheck` exit 
    mutaciones C2b-2 y C2b-2-singular.
 
 Visto correr: `npm test` 2738/2738, typecheck 0, e2e completa 284/284, mutaciones de unidad 86/86.
+
+## Defectos visuales del smoke de grupos (rev. 0000033)
+
+- Cabeceras de la matriz de grupo con margen interior propio (`.arena-torneo-grupo .arena-torneo-matriz thead th`).
+- El paréntesis del modelo es un solo elemento (`.arena-torneo-paren`), así el hueco de la línea flexible no queda
+  dentro: «Deportivo Nebrisa (GPT-6 Sol)».
+- e2e 8 (1440 y 360 px) mide la distancia entre «(», el nombre visible y «)», y entre cabeceras consecutivas;
+  mutaciones E8-paren y E8-cabeceras en rojo (`mutaciones-e2e.md`, 10 de 10).

@@ -3410,3 +3410,9 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
   .arena-torneo-cuadro { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .arena-torneo-cuadro > li:last-child { grid-column: 1 / -1; }
 }
+
+/* Brief 062 · Correcciones visuales del smoke de grupos: el paréntesis del modelo es un solo elemento dentro de la
+   línea flexible (el hueco de la línea no se mete dentro del paréntesis) y las cabeceras de la matriz de un grupo tienen
+   su propio margen interior para no quedar pegadas. */
+.arena-torneo-paren { display: inline; white-space: nowrap; }
+.arena-torneo-grupo .arena-torneo-matriz thead th { padding: 0 var(--ar-s2); }

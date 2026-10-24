@@ -1,6 +1,6 @@
 # Brief 062 · mutaciones de la parte de servidor (P1-a)
 
-Generado por `node docs/evidencia/torneo-sitio-062/mutaciones.mjs` el 2026-10-24T13:08:24.418Z. Cada mutación se aplicó al
+Generado por `node docs/evidencia/torneo-sitio-062/mutaciones.mjs` el 2026-10-24T14:42:01.377Z. Cada mutación se aplicó al
 archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirtió (md5 comprobado). «md5» es el del archivo MUTADO.
 
 | # | Mutación | Archivo | md5 mutado | Prueba (`-t`) | Resultado | Resumen de vitest |
@@ -46,7 +46,7 @@ archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirt
 | G8-plan | omitir la reconstrucción del plan en la coherencia 062 | `src/arena/torneo-formatos.ts` | `1fbd8d24eb3f68e4a369aec6fe7bfa89` | torneo-formatos.test.ts · `G8` | ROJO (detectada) | Tests 1 failed · 3 passed · 12 skipped (16) |
 | G8-059 | aceptar `formato` en un 059 | `src/arena/torneo.ts` | `f2a1eb921f910343d81eae1a0c10b8d4` | torneo-formatos.test.ts · `G8` | ROJO (detectada) | Tests 1 failed · 3 passed · 12 skipped (16) |
 | G9-desempates | estimar grupos sin desempates | `src/arena/torneo-formatos.ts` | `64f53ea2af154aa530947c74a8ba6e5e` | torneo-formatos.test.ts · `G9` | ROJO (detectada) | Tests 2 failed · 1 passed · 13 skipped (16) |
-| G9-tope | tope de grupos por debajo de la reserva | `src/sim/limites.ts` | `c498d8330dab7c33596ec516cc44a409` | torneo-formatos.test.ts · `G9` | ROJO (detectada) | Tests 1 failed · 2 passed · 13 skipped (16) |
+| G9-tope | tope de grupos por debajo de la reserva | `src/sim/limites.ts` | `b4ab42a6689f276b8b50a8e8e6d5fac8` | torneo-formatos.test.ts · `G9` | ROJO (detectada) | Tests 1 failed · 2 passed · 13 skipped (16) |
 | G10 | c = n − 1 en grupos | `src/arena/torneo-formatos.ts` | `79db36a67398ef7cd814e71a1dcdd598` | torneo-formatos.test.ts · `G10` | ROJO (detectada) | Tests 1 failed · 15 skipped (16) |
 | G12 | aceptar campos extra en el encuentro 059 | `src/arena/torneo.ts` | `5a5218b3deaa1eca3ef0fbca0d37e3e5` | torneo-formatos.test.ts · `G12` | ROJO (detectada) | Tests 1 failed · 3 passed · 12 skipped (16) |
 | C3 | el cierre no relee una instantánea que falló al leerse | `src/arena/torneo-sitio.ts` | `2718439132f6bdc99f6071829541504e` | torneo-sitio.test.ts · `Codex #3` | ROJO (detectada) | Tests 2 failed · 43 skipped (45) |
@@ -65,12 +65,12 @@ archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirt
 | E2E-4-error | reconocer el ErrorSitio solo con instanceof (dos copias del módulo ⇒ 500) | `src/arena/torneo-sitio.ts` | `b0e5723a62cf8fe861087d5cb4fe9b25` | torneo-sitio-rutas.test.ts · `OTRA copia del módulo` | ROJO (detectada) | Tests 1 failed · 26 skipped (27) |
 | S17g-formato | grupos fuera de los formatos disponibles | `src/arena/torneo-formatos.ts` | `eca66da6e478f64b6514e8f9fb89bc16` | torneo-sitio.test.ts · `S17 · grupos` | ROJO (detectada) | Tests 2 failed · 43 skipped (45) |
 | S17g-desempate | desempate desactivado en el plan | `src/arena/torneo-formatos.ts` | `329b08f79d13e65e12b6478def352e9e` | torneo-sitio.test.ts · `empate forzado en la semifinal 1` | ROJO (detectada) | Tests 1 failed · 44 skipped (45) |
-| U1g-pasa | «Pasa» sin texto (solo se vería por color) | `src/ui/ArenaTorneoGrupos.tsx` | `19cd1662dd4fac7a670d05439fa0a445` | ArenaTorneoLanzar.test.tsx · `dos tablas de grupo` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
-| U1g-criterio | sin la línea del criterio del corte de grupo | `src/ui/ArenaTorneoGrupos.tsx` | `b2269a601779a566cd62b041e159f281` | ArenaTorneoLanzar.test.tsx · `dos tablas de grupo` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
-| U1g-desempate | desempate sin rotular «lados invertidos» | `src/ui/ArenaTorneoGrupos.tsx` | `90ea1e8bfad6a09ab6981450a4f5b16a` | ArenaTorneoLanzar.test.tsx · `cuadro: semifinales` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
-| U1g-campeon | «Gana este torneo» sin la frase de significación al lado | `src/ui/ArenaTorneoGrupos.tsx` | `a53ed47b0a5024a6f851eaf8e2b515fc` | ArenaTorneoLanzar.test.tsx · `cuadro: semifinales` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
+| U1g-pasa | «Pasa» sin texto (solo se vería por color) | `src/ui/ArenaTorneoGrupos.tsx` | `d01235ba1dac9c4930ac6ca9d8b7e96c` | ArenaTorneoLanzar.test.tsx · `dos tablas de grupo` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
+| U1g-criterio | sin la línea del criterio del corte de grupo | `src/ui/ArenaTorneoGrupos.tsx` | `565172d981c1e115cf54637bcd362cb9` | ArenaTorneoLanzar.test.tsx · `dos tablas de grupo` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
+| U1g-desempate | desempate sin rotular «lados invertidos» | `src/ui/ArenaTorneoGrupos.tsx` | `9d7c2f038504c4b841a71ec52ec77c6a` | ArenaTorneoLanzar.test.tsx · `cuadro: semifinales` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
+| U1g-campeon | «Gana este torneo» sin la frase de significación al lado | `src/ui/ArenaTorneoGrupos.tsx` | `251795fd64e9d3a5f6576342da9c5460` | ArenaTorneoLanzar.test.tsx · `cuadro: semifinales` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
 | U1g-carga-prueba | la repetición de una prueba no lo declara | `src/ui/torneo-carga.ts` | `a5c9cec9e1769b89cbd631a0a27f70e7` | torneo-carga.test.ts · `P1-b` | ROJO (detectada) | Tests 1 failed · 7 skipped (8) |
-| C2b-1-ui | la línea del corte usa el criterio de la posición (no el del corte) | `src/ui/ArenaTorneoGrupos.tsx` | `0919c4fee4eb939bc4496bb608b35724` | ArenaTorneoLanzar.test.tsx · `dos niveles` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
+| C2b-1-ui | la línea del corte usa el criterio de la posición (no el del corte) | `src/ui/ArenaTorneoGrupos.tsx` | `b5ab3dafc0e1ff849baf0891be3d503c` | ArenaTorneoLanzar.test.tsx · `dos niveles` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |
 | C2b-1-pura | el corte hereda el criterio que fijó la posición anterior (no el que separó esa frontera) | `src/arena/torneo-formatos.ts` | `8ef8c92caf88a8e757db5fcee9df0f90` | torneo-grupos.test.ts · `adversario de su subclase` | ROJO (detectada) | Tests 1 failed · 1 passed · 25 skipped (27) |
 | C2b-2 | partidos sin disputar de grupos desde el plan parcial | `src/ui/ArenaTorneo.tsx` | `367b3af4f32ea879cfd58999482ad59b` | ArenaTorneoLanzar.test.tsx · `#2 · grupos` | ROJO (detectada) | Tests 2 failed · 32 skipped (34) |
 | C2b-2-singular | sin concordancia del singular | `src/ui/textos-torneo-sitio.ts` | `c92297ece1656748773866f36e20b30a` | ArenaTorneoLanzar.test.tsx · `singular` | ROJO (detectada) | Tests 1 failed · 33 skipped (34) |

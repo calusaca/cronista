@@ -46,7 +46,7 @@ export function ArenaTorneoGrupos({ t, idioma, enlace, descarga, enCursoN }: { t
   const llaves = cuadro(t), ganador = campeon(t);
   const pendienteTexto = (n: number) => (enCursoN === n ? <strong>{T.enJuego[idioma]}</strong> : <>{T.porJugar[idioma]}</>);
   const lineaPartido = (x: EncuentroPlan062, e: EncuentroTorneo062 | undefined) => e
-    ? <><span className="arena-torneo-linea">P{x.n} · {e.local.club} (<Modelo p={p(x.local)} />) <strong className="tnum">{e.local.goles}–{e.visita.goles}</strong> {e.visita.club} (<Modelo p={p(x.visita)} />)</span>
+    ? <><span className="arena-torneo-linea">P{x.n} · {e.local.club} <span className="arena-torneo-paren" data-testid="arena-torneo-paren">(<Modelo p={p(x.local)} />)</span> <strong className="tnum">{e.local.goles}–{e.visita.goles}</strong> {e.visita.club} <span className="arena-torneo-paren" data-testid="arena-torneo-paren">(<Modelo p={p(x.visita)} />)</span></span>
       <span className="arena-torneo-acciones"><a href={enlace(x.n)}>{es ? "Ver repetición" : "Watch replay"}<span className="arena-torneo-oculto">{es ? ` del partido ${x.n}` : ` of match ${x.n}`}</span></a>
         <a href={descarga(archivoEncuentro(x.n))} download>{es ? "Descargar registro" : "Download record"}<span className="arena-torneo-oculto">{es ? ` del partido ${x.n}` : ` of match ${x.n}`}</span></a></span></>
     : <span className="arena-torneo-linea">P{x.n} · {p(x.local).corto} – {p(x.visita).corto} · {pendienteTexto(x.n)}</span>;

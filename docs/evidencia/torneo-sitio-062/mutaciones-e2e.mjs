@@ -24,12 +24,17 @@ const M = [
     ['...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ', ""]] },
   { id: "E7-cuadro", desc: "el cuadro en dos columnas también a 360 px", archivo: "src/app/globals.css", patron: "7 · 360 px \\(light, en\\)", cambios: [
     [".arena-torneo-cuadro { display: grid; grid-template-columns: minmax(0, 1fr);", ".arena-torneo-cuadro { display: grid; grid-template-columns: repeat(2, 200px);"]] },
+  { id: "E8-paren", desc: "hueco de la línea flexible dentro del paréntesis del modelo", archivo: "src/app/globals.css", patron: "8 · 1440 px", cambios: [
+    [".arena-torneo-paren { display: inline; white-space: nowrap; }", ".arena-torneo-paren { display: inline-flex; gap: 6px; white-space: nowrap; }"]] },
+  { id: "E8-cabeceras", desc: "cabeceras de la matriz de grupo sin margen interior", archivo: "src/app/globals.css", patron: "8 · 1440 px", cambios: [
+    [".arena-torneo-grupo .arena-torneo-matriz thead th { padding: 0 var(--ar-s2); }\n", ""]] },
   { id: "E7-360", desc: "las cifras del panel sin envolver a 360 px", archivo: "src/app/globals.css", patron: "7 · 360 px \\(light, en\\)", cambios: [
     [".arena-torneo-cifras { display: block; color: var(--muted); font-size: 14px; }", ".arena-torneo-cifras { display: block; color: var(--muted); font-size: 14px; white-space: nowrap; }"]] },
 ];
 
+const filtro = process.argv[2] ? new RegExp(process.argv[2]) : null;
 const filas = [];
-for (const m of M) {
+for (const m of M.filter(x => !filtro || filtro.test(x.id))) {
   const original = readFileSync(m.archivo, "utf8"), md5Original = md5(original);
   let mutado = original;
   for (const [buscar, reemplazo] of m.cambios) {
@@ -48,7 +53,7 @@ for (const m of M) {
   filas.push({ ...m, md5: md5(mutado), estado, resumen });
   console.log(`${estado.padEnd(22)} ${m.id.padEnd(10)} ${resumen}`);
 }
-writeFileSync("docs/evidencia/torneo-sitio-062/mutaciones-e2e.md", [
+if (!filtro) writeFileSync("docs/evidencia/torneo-sitio-062/mutaciones-e2e.md", [
   "# Brief 062 · mutaciones de los e2e del P1-a", "",
   `Generado por \`node docs/evidencia/torneo-sitio-062/mutaciones-e2e.mjs\` el ${new Date().toISOString()}. Cada mutación se aplicó al archivo real,`,
   "se ejecutó Playwright solo con el caso que la nombra (el servidor del e2e se reconstruye) y se revirtió (md5 comprobado).", "",

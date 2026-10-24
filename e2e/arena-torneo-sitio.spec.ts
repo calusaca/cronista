@@ -106,6 +106,32 @@ for (const tema of ["light", "dark"] as const) for (const idioma of ["en", "es"]
   });
 }
 
+for (const ancho of [1440, 360]) test(`8 · ${ancho} px: sin huecos dentro de los paréntesis del modelo y cabeceras de las matrices de grupo separadas`, async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: ancho, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(`/arena/torneo/${GRUPOS}?lang=es`);
+  await expect(page.getByTestId("arena-torneo-cuadro")).toBeVisible();
+  // Distancia visual entre «(» y el nombre visible del modelo, y entre el nombre y «)», en el cuadro y en la lista.
+  const huecos = await page.getByTestId("arena-torneo-paren").evaluateAll(els => els.map(e => {
+    const rect = (n: Node, i: number) => { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1); return r.getBoundingClientRect(); };
+    const nombre = [...e.querySelectorAll(".arena-torneo-largo, .arena-torneo-corto")].find(x => getComputedStyle(x).display !== "none" && x.getBoundingClientRect().width > 2)!.getBoundingClientRect();
+    const abre = rect(e.firstChild!, 0), cierra = rect(e.lastChild!, 0);
+    return { texto: e.textContent, dentroIzq: nombre.left - abre.right, dentroDer: cierra.left - nombre.right };
+  }));
+  expect(huecos.length).toBeGreaterThan(10);
+  for (const h of huecos) { expect(h.dentroIzq, h.texto!).toBeLessThan(2); expect(h.dentroDer, h.texto!).toBeLessThan(2); }
+  // Cada cabecera de la matriz tiene su propio texto y no se pega a la siguiente.
+  for (const G of ["A", "B"]) {
+    const cab = await page.getByTestId(`arena-torneo-matriz-${G}`).evaluate(t => {
+      const ths = [...t.querySelectorAll("thead th")], r = ths.map(th => { const x = document.createRange(); x.selectNodeContents(th); return x.getBoundingClientRect(); });
+      return { textos: ths.map(th => th.textContent!.trim()), huecos: r.slice(1).map((x, i) => x.left - r[i]!.right) };
+    });
+    expect(cab.textos.every(x => x.length > 0)).toBe(true);
+    for (const h of cab.huecos) expect(h).toBeGreaterThanOrEqual(4);
+  }
+  await ctx.close();
+});
+
 test("2 · lanzar grupos + eliminatoria: confirmación, 202 e «In play»; termina con dos tablas «Advances», el cuadro y «Wins this tournament» (filas iguales a clasificarGrupo/ordenGrupo)", async ({ page, request }) => {
   test.setTimeout(180_000);
   await page.goto("/arena/torneo");
