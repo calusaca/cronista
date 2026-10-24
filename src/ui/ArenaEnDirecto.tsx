@@ -33,6 +33,10 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
   /** v1.1 (4) · Bandera única de detención por el espectador («Stop match» o «Cancel live match»): un inicio pendiente
    * se cancela al llegar su id (sin adoptarlo) y un directo preparado ignora cualquier `terminada` posterior. */
   const detenidoPorUsuario = useRef(false);
+  /** Codex 060 (impl., #1) · Generación de la conexión: Detener la invalida, y toda respuesta que llega después de un
+   * `await` (instantánea de /emision o /reproduccion del preparado) se descarta antes de adoptar resultados, abrir el
+   * SSE o publicar el enlace; la sesión queda «cancelada» sin cargar nada. */
+  const generacion = useRef(0);
   const callbacks = useRef({ alMensaje, alActividad, alPreparado });
   useEffect(() => { callbacks.current = { alMensaje, alActividad, alPreparado }; }, [alMensaje, alActividad, alPreparado]);
   useEffect(() => { if (!id && !iniciando) setPresentacion(presentacionVista); }, [presentacionVista]); // Session presentation stays fixed while connected.
@@ -55,19 +59,29 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     if (!id) return;
     detenidoPorUsuario.current = false;
     callbacks.current.alActividad(true, presentacion); setEstado("conectando"); ultimoId.current = 0;
-    const carga = new AbortController();
+    const carga = new AbortController(), g = generacion.current;
     let eventos: EventSource | null = null;
+    const detenida = () => g !== generacion.current;
+    /** Detenida tras un `await`: no se adopta nada y la conexión termina como cancelada (sin SSE ni enlace). */
+    const cerrarDetenida = () => {
+      detenidoPorUsuario.current = false; eventos?.close(); if (fuente.current === eventos) fuente.current = null;
+      setEstado("cancelada"); callbacks.current.alActividad(false); sessionStorage.removeItem(claveSesion); setId(null);
+    };
     const iniciar = async () => {
       if (presentacion === "buffer") {
         let respuesta: Response | undefined;
         for (let intento = 0; intento < 8 && !carga.signal.aborted; intento++) {
           respuesta = await fetch(`/api/arena/sesiones/${id}/emision`, { signal: carga.signal });
+          if (detenida()) { cerrarDetenida(); return; }
           if (respuesta.status !== 409) break;
           await new Promise<void>(r => setTimeout(r, 250));
         }
+        if (carga.signal.aborted) return;
+        if (detenida()) { cerrarDetenida(); return; }
         if (!respuesta?.ok) throw new Error("Emisión");
         const instantanea = await respuesta.json() as InstantaneaEmision;
         if (carga.signal.aborted) return;
+        if (detenida()) { cerrarDetenida(); return; }
         ultimoId.current = instantanea.ultimoMensaje;
         setAsignacion(instantanea.asignacion); fijarAsignacionDirecto(id, instantanea.asignacion);
         const inicioTick = Math.max(0, Math.floor((instantanea.registro.final.tick - 200) / 50) * 50);
@@ -78,6 +92,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
         }
       }
       if (carga.signal.aborted) return;
+      if (detenida()) { cerrarDetenida(); return; }
       const flujo = new EventSource(`/api/arena/sesiones/${id}/eventos?desde=${ultimoId.current}`); eventos = flujo; fuente.current = flujo;
       flujo.addEventListener("arena", async (ev: MessageEvent<string>) => {
       try {
@@ -100,9 +115,12 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
           if (presentacion === "preparada" && p.estado === "completa") {
             setEstado("cargando");
             const respuesta = await fetch(`/api/arena/sesiones/${id}/reproduccion`, { signal: carga.signal });
+            if (carga.signal.aborted) return;
+            if (detenida()) { cerrarDetenida(); return; }
             if (!respuesta.ok) throw new Error("Registro");
             const resultado = await respuesta.json() as ReproduccionArena;
             if (carga.signal.aborted) return;
+            if (detenida()) { cerrarDetenida(); return; }
             callbacks.current.alPreparado(id, resultado);
             setGrabacionLista(id);
           }
@@ -155,7 +173,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
   };
   const cancelar = async () => {
     if (!id) { if (iniciandoRef.current) { detenidoPorUsuario.current = true; setEstado("cancelando"); } return; }
-    detenidoPorUsuario.current = true;
+    detenidoPorUsuario.current = true; generacion.current++;
     // El mensaje final del SSE puede llegar antes que la respuesta DELETE.
     // Nunca sobrescribir ese estado terminal con «Cancelando».
     const anterior = estado; setEstado("cancelando");

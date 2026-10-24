@@ -1,0 +1,50 @@
+[
+  {
+    "nombre": "cronista-equilibrado",
+    "modelo": "gpt-5.6-luna",
+    "nombrePublico": "GPT-5.6 Luna",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-rapido",
+    "modelo": "gpt-5.4-mini",
+    "nombrePublico": "GPT-5.4 mini",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-luna6",
+    "modelo": "gpt-6-luna",
+    "nombrePublico": "GPT-6 Luna",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-sol6",
+    "modelo": "gpt-6-sol",
+    "nombrePublico": "GPT-6 Sol",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-astra6",
+    "modelo": "gpt-6-astra",
+    "nombrePublico": "GPT-6 Astra",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-sol61",
+    "modelo": "gpt-6.1-sol",
+    "nombrePublico": "GPT-6.1 Sol",
+    "publicar": true
+  },
+  {
+    "nombre": "cronista-grok",
+    "modelo": "grok-4.7",
+    "nombrePublico": "Grok 4.7 (Foundry)",
+    "publicar": false
+  },
+  {
+    "nombre": "cronista-oss",
+    "modelo": "gpt-oss-120b",
+    "nombrePublico": "gpt-oss-120b (open weights, Foundry)",
+    "publicar": false
+  }
+]

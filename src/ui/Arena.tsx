@@ -39,7 +39,8 @@ import type { IntervencionArena, PublicacionSesion, PresentacionArena, Reproducc
 import { cargarEncuentroTorneo, esPeticionTorneo, peticionDeUrl, SinDescompresion, type OrigenTorneo } from "./torneo-carga";
 import { lineaModelos, type ContextoModelos, type EntradaCatalogo } from "../arena/modelos-jugados";
 import { atajoPausa, cadenaFoco } from "./atajo-pausa";
-import catalogoModelos from "../../infra/modelos-arena.json";
+// Codex 060 (impl., #2) · Proyección pública de infra/modelos-arena.json dentro de src (el despliegue no copia infra/).
+import catalogoModelos from "../arena/catalogo-publico.json";
 
 /** Brief 059 · Fecha (UTC) del torneo en la línea de procedencia. */
 const fechaTorneo = (iso: string, idioma: "es" | "en") => new Intl.DateTimeFormat(idioma, { dateStyle: "long", timeZone: "UTC" }).format(new Date(iso));

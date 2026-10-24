@@ -520,3 +520,40 @@ test("060 E9 · 360 × 780, oscuro y movimiento reducido: sin desborde, barra a 
   await p2.locator(".arena-board").screenshot({ path: "docs/evidencia/repeticion-060/barra-1440-claro.png" });
   await p2.close();
 });
+
+// Codex 060 (impl., #1) · Detener invalida la conexión: una respuesta retenida que llega después no se adopta.
+test("060 E7 · preparado: Detener con /reproduccion en vuelo no carga el partido ni publica el enlace", async ({ page }) => {
+  test.setTimeout(90_000);
+  const retener = barreraLocal(); let pedida!: () => void; const enVuelo = new Promise<void>(r => { pedida = r; });
+  await page.route("**/api/arena/sesiones/*/reproduccion", async r => { pedida(); await retener.p; await r.continue().catch(() => {}); });
+  await page.goto("/arena");
+  const antes = await page.getByTestId("arena-clock").textContent();
+  await boton(page, "Saved matches").click();
+  await page.getByTestId("arena-live").getByRole("button", { name: "Generate match", exact: true }).click();
+  await enVuelo;
+  await page.getByTestId("arena-stop").click();
+  retener.soltar();
+  await expect(page.getByTestId("arena-live-status")).toHaveText("Match cancelled", { timeout: 20_000 });
+  await page.waitForTimeout(800);
+  await expect(page.getByRole("link", { name: "Open or share this saved match" })).toHaveCount(0);
+  await expect(page.getByTestId("arena-clock")).toHaveText(antes!);
+  await expect(boton(page, "Play")).toBeEnabled();
+});
+
+test("060 E7 · búfer: Detener con /emision en vuelo no reactiva la emisión ni abre el SSE", async ({ page }) => {
+  const retener = barreraLocal(), urls: string[] = []; let pedida!: () => void; const enVuelo = new Promise<void>(r => { pedida = r; });
+  page.on("request", r => urls.push(`${r.method()} ${new URL(r.url()).pathname}`));
+  await page.route("**/api/arena/sesiones/*/emision", async r => { pedida(); await retener.p; await r.continue().catch(() => {}); });
+  await page.goto("/arena");
+  const antes = await page.getByTestId("arena-clock").textContent();
+  await page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
+  await enVuelo;
+  await page.getByTestId("arena-stop").click();
+  retener.soltar();
+  await expect(page.getByTestId("arena-live-status")).toHaveText("Match cancelled", { timeout: 20_000 });
+  await page.waitForTimeout(800);
+  await expect(page.getByTestId("arena-buffer")).toHaveCount(0);
+  expect(urls.filter(u => u.startsWith("DELETE /api/arena/sesiones/"))).toHaveLength(1);
+  expect(urls.filter(u => u.endsWith("/eventos"))).toEqual([]);
+  await expect(page.getByTestId("arena-clock")).toHaveText(antes!);
+});
