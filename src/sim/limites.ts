@@ -1243,6 +1243,20 @@ export const REPETICION_NARRADA = {
   varianteInvitado: "breve",
 } as const;
 
+/** Defecto de producción (smokes de capacidad y grupos, 24 oct) · El cierre del directo recibía 429 «Hay otras
+ * consultas en curso»: el servidor admite 2 síntesis de voz simultáneas en total y, al terminar el partido, el cliente
+ * pide a la vez el último tramo, el cierre y el invitado final de la Mesa. El presupuesto no se agotaba (la reserva
+ * propia del cierre ya existe: MESA_ARENA.dialogo.reservaSpeechCierre*). */
+export const CIERRE_VOZ = {
+  /** Plazas de síntesis simultánea que solo puede ocupar un cierre, además de las 2 comunes (prioridad del cierre). */
+  plazasPropias: 1,
+  /** s que anuncia `retry-after` en el 429 de concurrencia (los 429 de presupuesto no lo llevan y son finales). */
+  retryAfterS: 1,
+  /** El cliente reintenta el cierre ante un 429 con `retry-after`: espera max(retry-after, reintentoMs · 2^k) ms,
+   * hasta maxReintentos veces (1 + 2 + 4 = 7 s, dentro de la reserva de la emisión). */
+  reintentoMs: 1000, maxReintentos: 3,
+} as const;
+
 /** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
  * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
  * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por

@@ -8,7 +8,7 @@ import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import { elegirReservaVoz, ordenPrimeraVuelta, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
 import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../arena/reservas-voz";
-import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
+import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoCierre, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { esPrevia } from "../arena/previa";
 import { ANTESALA_ARENA, ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
@@ -390,7 +390,14 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       const signal = AbortSignal.any([a.signal, AbortSignal.timeout(15_000)]);
       void (async () => {
         try {
-          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: desde, hastaTick: hasta, modo: "buffer", idioma, memoria: s.memoria, ...(cierre ? { cierre: true } : {}), ...(entradaTick === undefined ? {} : { entradaTick }) }) });
+          let r: Response;
+          // CIERRE_VOZ · El cierre reintenta un 429 de concurrencia (con retry-after); el resto de fallos es final.
+          for (let reintentos = 0; ; reintentos++) {
+            r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: desde, hastaTick: hasta, modo: "buffer", idioma, memoria: s.memoria, ...(cierre ? { cierre: true } : {}), ...(entradaTick === undefined ? {} : { entradaTick }) }) });
+            const espera = cierre && !r.ok ? esperaReintentoCierre(r.status, r.headers.get("retry-after"), reintentos) : null;
+            if (espera === null) break;
+            await new Promise<void>((resolver, rechazar) => { const t = setTimeout(resolver, espera); signal.addEventListener("abort", () => { clearTimeout(t); rechazar(new Error("Cancelada")); }, { once: true }); });
+          }
           if (!r.ok) throw new Error("Relato no disponible");
           const segmento = await r.json() as Segmento;
           if (!segmentoVozValido(segmento, { desde, hasta, idioma, entradaTick })) throw new Error("Ventana inconsistente");

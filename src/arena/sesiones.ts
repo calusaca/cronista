@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ANTESALA_ARENA, ARENA, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
+import { ANTESALA_ARENA, ARENA, CIERRE_VOZ, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -16,7 +16,8 @@ import { RitmoProduccionBuffer } from "./buffer";
 import { MesaSesion } from "./mesa";
 import type { IntervencionArena } from "./protocolo";
 
-export class ErrorSesion extends Error { constructor(message: string, readonly status: number) { super(message); } }
+/** `retryAfterS`: un 429 transitorio (concurrencia) lo anuncia en `retry-after`; los de presupuesto no. */
+export class ErrorSesion extends Error { constructor(message: string, readonly status: number, readonly retryAfterS?: number) { super(message); } }
 interface Sesion {
   id: string; estado: EstadoSesion; creada: number; asignacion: AsignacionModelos;
   mensajes: MensajeSesion[]; suscriptores: Set<(m: MensajeSesion) => void>; cancelar: AbortController;
@@ -319,7 +320,8 @@ export class GestorSesiones {
     finally { this.consultasEnCurso.delete(solicitud); }
   }
   private async extraIndividual<T>(id: string, tipo: "analisis" | "audio", clave: string, tarea: () => Promise<T>, caracteres = 0, clase?: ClaseVoz): Promise<T> {
-    if ([...this.extrasActivos.values()].reduce((s, n) => s + n, 0) >= 2) throw new ErrorSesion("Hay otras consultas en curso; espera a que terminen", 429);
+    // CIERRE_VOZ · 2 síntesis simultáneas en total; el cierre tiene plaza propia (prioridad) y el 429 dice cuándo reintentar.
+    if ([...this.extrasActivos.values()].reduce((s, n) => s + n, 0) >= 2 + (clase === "cierre" ? CIERRE_VOZ.plazasPropias : 0)) throw new ErrorSesion("Hay otras consultas en curso; espera a que terminen", 429, CIERRE_VOZ.retryAfterS);
     this.archivo(id, "meta.json");
     this.extrasActivos.set(id, (this.extrasActivos.get(id) ?? 0) + 1);
     try { await this.obtener(id); return await this.ejecutarExtra(id, tipo, clave, tarea, caracteres, clase); }
@@ -441,5 +443,6 @@ export function gestorSesiones(): GestorSesiones { return compartido.__cronistaS
 export function respuestaErrorSesion(error: unknown): Response {
   // Brief 057 v1.1 § 9: el lector acotado responde su propio estado (413 / 400) y su mensaje.
   const tipificado = error instanceof ErrorSesion || error instanceof ErrorPeticion;
-  return Response.json({ error: tipificado ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor." }, { status: tipificado ? error.status : 400, headers: { "cache-control": "no-store" } });
+  const retry: Record<string, string> = error instanceof ErrorSesion && error.retryAfterS !== undefined ? { "retry-after": String(error.retryAfterS) } : {};
+  return Response.json({ error: tipificado ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor." }, { status: tipificado ? error.status : 400, headers: { "cache-control": "no-store", ...retry } });
 }

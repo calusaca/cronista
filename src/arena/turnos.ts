@@ -1,4 +1,4 @@
-import { ARENA, CANTO_GOL, MESA_ARENA, PREVIA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL, CIERRE_VOZ, MESA_ARENA, PREVIA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
 import { VOZ_BUFFER } from "./buffer";
 import type { RecuerdoVoz } from "./editorial";
 import type { IntervencionArena, TurnoMesa, VarianteIntercambio } from "./protocolo";
@@ -194,6 +194,15 @@ export function segmentoVozValido(s: SegmentoRecibido, esperado: { desde: number
   return !(s.entradaTick !== esperado.entradaTick || s.fragmentos.length > 1 || s.fragmentos.some(f => f.tick < esperado.desde || f.tick > esperado.hasta) || s.texto && !s.audio || s.audio && s.fragmentos.length !== 1);
 }
 
+/** CIERRE_VOZ · Espera (ms) antes de reintentar el cierre del narrador, o `null` si el fallo es final: solo un 429
+ * con `retry-after` legible (la concurrencia de síntesis del servidor) se reintenta, hasta maxReintentos veces; un 429
+ * de presupuesto (sin retry-after) o cualquier otro estado no. */
+export function esperaReintentoCierre(estado: number, retryAfter: string | null, reintentosHechos: number): number | null {
+  if (estado !== 429 || retryAfter === null || !Number.isInteger(reintentosHechos) || reintentosHechos < 0 || reintentosHechos >= CIERRE_VOZ.maxReintentos) return null;
+  const segundos = Number(retryAfter);
+  if (!Number.isFinite(segundos) || segundos < 0) return null;
+  return Math.max(segundos * 1000, CIERRE_VOZ.reintentoMs * 2 ** reintentosHechos);
+}
 /** Fallo de la petición de una variante de invitado: respuesta HTTP no correcta, red caída o plazo
  * agotado, o respuesta recibida pero inválida (segmento, audio o decodificación). */
 export type FalloInvitado = { tipo: "http"; estado: number } | { tipo: "red" } | { tipo: "invalida" };
