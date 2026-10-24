@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-24T17:11:28.646Z",
+  "checkedUtc": "2026-10-24T18:54:46.985Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024170844",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024185200",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -1105,6 +1105,11 @@
       "sha256": "6f4557f18ee3284a004cbf51068dbe72ab0a994f69cbd6494228cb76ecf8937e"
     },
     {
+      "path": "src/arena/__tests__/rechazos-sesion.test.ts",
+      "bytes": 8624,
+      "sha256": "6915a791fabb7570e9a631ee053058063a4d12f0a79b5cc015b1235bdc1db1a9"
+    },
+    {
       "path": "src/arena/__tests__/reinicios.test.ts",
       "bytes": 9098,
       "sha256": "810417152eee653fa009a50e483fbbb99b97dbc9f469217a16ad2c92c28cc74e"
@@ -1466,8 +1471,8 @@
     },
     {
       "path": "src/arena/sesiones.ts",
-      "bytes": 34835,
-      "sha256": "bc00a603c1b0e24311a643f158aca6d213dbc9bf591ed04ac7d3f6084ba85ca9"
+      "bytes": 36566,
+      "sha256": "b49f623549185f8778f605b04b04473221537fb58864d7814a6b88782239938c"
     },
     {
       "path": "src/arena/smoke-modelos-cli.ts",
@@ -1546,8 +1551,8 @@
     },
     {
       "path": "src/arena/turnos.ts",
-      "bytes": 17576,
-      "sha256": "6266181e1c871c2a52834e532fc86471dba3e06b0ca0fccc9adcb743aa97f9f8"
+      "bytes": 18071,
+      "sha256": "f0c67534465f055be455603dd7b6e90b4e5e9e7fd483aad4194eb107dd742605"
     },
     {
       "path": "src/arena/ventanas-dialogo.ts",
@@ -2066,8 +2071,8 @@
     },
     {
       "path": "src/sim/limites.ts",
-      "bytes": 86540,
-      "sha256": "15aec6ba6abcf255307250b5742612eacdcc207550fbdd799aae9a9319761234"
+      "bytes": 86820,
+      "sha256": "44bd4b48081ed8d264266cd923c34bbd67a1aa4c36ecb1414e3bbaf37b89df25"
     },
     {
       "path": "src/sim/micro.ts",
@@ -2156,13 +2161,13 @@
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
-      "bytes": 61128,
-      "sha256": "1d55752e44e14e2516e5a46b2a69a3a525683b711f32af8b5ff8bf6f4f76845b"
+      "bytes": 62767,
+      "sha256": "71248e233617ceffba69044a09260fc04a06b6c71009dcb3292b2c177c944a2a"
     },
     {
       "path": "src/ui/ArenaEnDirecto.tsx",
-      "bytes": 21025,
-      "sha256": "56491b44d700e03707cdabad731b2be4aaefdb637075c97e91d540967d858f93"
+      "bytes": 22895,
+      "sha256": "88b81a0a626f5ddb0a27cae1069240aa476bd012b377a245c41f82d27240dd1c"
     },
     {
       "path": "src/ui/ArenaFavoritos.tsx",
