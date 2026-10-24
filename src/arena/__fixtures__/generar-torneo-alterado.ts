@@ -1,4 +1,4 @@
-// Brief 059 § 7 — `ensayo-059-alterado/`: copia de `torneos/ensayo-059/` con un gol cambiado en torneo.json (P1,
+// Brief 059 § 7 — `torneos-rechazo/ensayo-059-alterado/` (fuera de la raíz publicada: no es un torneo del índice): copia de `torneos/ensayo-059/` con un gol cambiado en torneo.json (P1,
 // local +1) y una orden cambiada dentro de e03.json.gz (primer destino del local en la ronda 1, x + 1), sin tocar
 // su `archivoSha256`. Solo para las pruebas de rechazo (torneos-archivados.test.ts); no figura en indice.json.
 //
@@ -8,7 +8,7 @@ import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { gunzipSync, gzipSync } from "node:zlib";
 import type { TorneoArchivado } from "../torneo";
 
-const ORIGEN = "src/arena/__fixtures__/torneos/ensayo-059", DESTINO = "src/arena/__fixtures__/torneos/ensayo-059-alterado";
+const ORIGEN = "src/arena/__fixtures__/torneos/ensayo-059", DESTINO = "src/arena/__fixtures__/torneos-rechazo/ensayo-059-alterado";
 rmSync(DESTINO, { recursive: true, force: true });
 cpSync(ORIGEN, DESTINO, { recursive: true });
 const t = JSON.parse(readFileSync(`${DESTINO}/torneo.json`, "utf8")) as TorneoArchivado;

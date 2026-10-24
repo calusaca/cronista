@@ -4,13 +4,15 @@
 // `node:crypto` y el motor: solo servidor, CLI y CI. Lo puro y apto para el cliente está en `torneo.ts`.
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { ARENA } from "../sim/limites";
 import type { Lado } from "../sim/tipos";
 import { reproducirArena } from "./coordinador";
 import { cifrasEquipos, pasesIntentados, type ClaveCifraEquipo } from "./estadisticas";
 import { crearConfigArena } from "./motor";
-import { archivoEncuentro, calendarioTorneo, esquemaEncuentro, esquemaTorneo, LADOS_TORNEO, validarCoherencia,
+import { archivoEncuentro, calendarioTorneo, esquemaEncuentro, esquemaIndice, esquemaTorneo, LADOS_TORNEO, validarCoherencia,
   type CifrasLado, type DeclaradoLado, type EjecutorEncuentro, type EncuentroPlan, type EncuentroTorneo, type LadoEncuentro, type MarcoTorneo,
   type ParticipanteTorneo, type TorneoArchivado } from "./torneo";
 import type { ConfigArena, RegistroArena, ReglasArena, VersionArena } from "./tipos";
@@ -99,4 +101,32 @@ export function validarTorneo(raw: unknown, leer: (archivo: string) => Uint8Arra
   if (t.tipo === "real" && plan.length !== t.participantes.length * (t.participantes.length - 1)) throw new Error("Un torneo real juega ida y vuelta completa");
   for (const e of t.encuentros) validarEncuentro(e, plan[e.n - 1]!, t.participantes, leer(e.archivo), t);
   return t;
+}
+
+/** Revisión Codex (#1) · Todo lo publicado en una raíz de torneos (`public/torneos` o el fixture): los directorios
+ * coinciden EXACTAMENTE con `indice.json` (ni huérfanos ni entradas sin directorio), cada directorio contiene solo
+ * `torneo.json` y los `eNN.json.gz` de sus encuentros, y cada torneo supera `validarTorneo` con su id, fecha y
+ * título iguales a los del índice. Lanza ante el primer desajuste; devuelve los torneos en el orden del índice. */
+export function validarRaizTorneos(raiz: string): TorneoArchivado[] {
+  const entradas = existsSync(raiz) ? readdirSync(raiz, { withFileTypes: true }) : [];
+  const dirs = entradas.filter(x => x.isDirectory()).map(x => x.name).sort();
+  const sueltos = entradas.filter(x => !x.isDirectory() && x.name !== "indice.json").map(x => x.name);
+  if (sueltos.length) throw new Error(`Archivos inesperados en ${raiz}: ${sueltos.join(", ")}`);
+  if (!existsSync(join(raiz, "indice.json"))) { if (dirs.length) throw new Error(`${raiz}: torneos sin indice.json`); return []; }
+  const indice = esquemaIndice.parse(JSON.parse(readFileSync(join(raiz, "indice.json"), "utf8")));
+  const ids = indice.map(x => x.id);
+  if (new Set(ids).size !== ids.length) throw new Error(`${raiz}/indice.json: ids repetidos`);
+  const ordenado = [...indice].sort((a, b) => b.inicioUtc.localeCompare(a.inicioUtc) || a.id.localeCompare(b.id));
+  if (ordenado.some((x, i) => x.id !== indice[i]!.id)) throw new Error(`${raiz}/indice.json: no está ordenado por inicioUtc descendente`);
+  const huerfanos = dirs.filter(d => !ids.includes(d)), ausentes = ids.filter(id => !dirs.includes(id));
+  if (huerfanos.length) throw new Error(`Torneos huérfanos (sin entrada en indice.json): ${huerfanos.join(", ")}`);
+  if (ausentes.length) throw new Error(`Entradas de indice.json sin directorio: ${ausentes.join(", ")}`);
+  return indice.map(entrada => {
+    const dir = join(raiz, entrada.id);
+    const t = validarTorneo(JSON.parse(readFileSync(join(dir, "torneo.json"), "utf8")), archivo => readFileSync(join(dir, archivo)));
+    if (t.id !== entrada.id || t.inicioUtc !== entrada.inicioUtc || t.titulo.es !== entrada.titulo.es || t.titulo.en !== entrada.titulo.en) throw new Error(`${entrada.id}: id, fecha o título distintos del índice`);
+    const esperados = ["torneo.json", ...t.encuentros.map(e => e.archivo)].sort(), presentes = readdirSync(dir).sort();
+    if (esperados.join() !== presentes.join()) throw new Error(`${entrada.id}: archivos distintos de los del torneo (${presentes.filter(x => !esperados.includes(x)).join(", ") || "faltan"})`);
+    return t;
+  });
 }

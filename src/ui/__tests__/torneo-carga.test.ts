@@ -42,10 +42,26 @@ describe("059 · carga de un partido del torneo (§ 15.8)", () => {
     await expect(cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, new AbortController().signal, f)).rejects.toBeInstanceOf(SinDescompresion);
     expect(f).toHaveBeenCalledTimes(1);
   });
-  it("si el servidor ya lo sirvió con Content-Encoding: gzip, no se descomprime dos veces", async () => {
+  it("revisión Codex #2 · intercambiar dos registros válidos se rechaza: por la huella, y con las huellas también intercambiadas, por semilla, clubes o lados", async () => {
+    const s = new AbortController().signal, gz = (n: string) => () => new Response(readFileSync(`${DIR}/e${n}.json.gz`));
+    // El servidor devuelve el registro de P2 en la URL de P1.
+    await expect(cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, s, servidor({ "/torneos/ensayo-059/e01.json.gz": gz("02") }))).rejects.toThrow(/huella/);
+    // torneo.json con las huellas de dos partidos intercambiadas (sigue siendo coherente) y los archivos también.
+    const cruzar = (a: number, b: number) => {
+      const ha = torneo.encuentros.find(x => x.n === a)!.archivoSha256, hb = torneo.encuentros.find(x => x.n === b)!.archivoSha256;
+      const t = { ...torneo, encuentros: torneo.encuentros.map(x => x.n === a ? { ...x, archivoSha256: hb } : x.n === b ? { ...x, archivoSha256: ha } : x) };
+      return servidor({ "/torneos/ensayo-059/torneo.json": () => Response.json(t), [`/torneos/ensayo-059/e0${a}.json.gz`]: gz(`0${b}`), [`/torneos/ensayo-059/e0${b}.json.gz`]: gz(`0${a}`) });
+    };
+    // P1 y P2: otro cruce (otra semilla y otros clubes).
+    await expect(cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, s, cruzar(1, 2))).rejects.toThrow(/no corresponde/);
+    // P1 y P4: ida y vuelta del mismo cruce (misma semilla y mismos clubes): los lados delatan el cambio.
+    expect(torneo.encuentros.find(x => x.n === 1)!.seed).toBe(torneo.encuentros.find(x => x.n === 4)!.seed);
+    await expect(cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, s, cruzar(1, 4))).rejects.toThrow(/no corresponde/);
+  });
+  it("un registro servido ya descomprimido (Content-Encoding) no supera la huella del archivo íntegro", async () => {
     const plano = gunzipSync(readFileSync(`${DIR}/e01.json.gz`));
     const f = servidor({ "/torneos/ensayo-059/e01.json.gz": () => new Response(plano, { headers: { "content-encoding": "gzip" } }) });
-    expect((await cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, new AbortController().signal, f)).registro).toEqual(JSON.parse(plano.toString("utf8")));
+    await expect(cargarEncuentroTorneo({ torneo: "ensayo-059", encuentro: "01" }, new AbortController().signal, f)).rejects.toThrow(/huella/);
   });
   it("precedencia: partido gana sobre torneo; torneo sin encuentro de dos dígitos se ignora", () => {
     expect(peticionDeUrl(new URLSearchParams("torneo=ensayo-059&encuentro=07"))).toEqual({ torneo: "ensayo-059", encuentro: "07" });

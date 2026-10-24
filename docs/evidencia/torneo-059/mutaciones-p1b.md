@@ -23,3 +23,14 @@ Generado el 2026-10-24T01:52:59.051Z con un script local: cada mutación se apli
 N14: la primera versión de la mutación (quitar solo la señal de la carga del .gz y la comprobación de vigencia) quedó en **verde**: tras «Cancelar», el `POST /api/arena` con la señal ya abortada también impide el reemplazo. Son defensas redundantes; la mutación final quita las tres en el camino del torneo y la prueba se pone en rojo.
 
 No aplicables en P1 (§ 15): M24 (la rama `torneo:` de `/api/arena/grabaciones` se eliminó; la narración usa `{ registro }`) y la parte «alterado → 409» de M23 (no hay ruta GET; el servidor no valida registros en P1: lo hace CI).
+
+## Revisión de Codex, iteración 1 (#1 huérfanos e índice; #2 registro ligado a su encuentro)
+
+| # | Mutación | Archivo mutado | md5 del archivo mutado | Prueba | Resultado |
+|---|---|---|---|---|---|
+| C1 | CI recorre solo el índice: sin rechazo de huérfanos | `src/arena/torneo-validacion.ts` | `8e746824caf8c0a058f27e0968c113f5` | `vitest src/arena/__tests__/torneos-archivados.test.ts -t "huérfano"` | rojo · Tests  1 failed / 9 skipped (10) |
+| C1 | CI sin comprobar los archivos de cada directorio | `src/arena/torneo-validacion.ts` | `39b4a56406a1ccb8152086e04a7b46f6` | `vitest src/arena/__tests__/torneos-archivados.test.ts -t "huérfano"` | rojo · Tests  1 failed / 9 skipped (10) |
+| C1 | servidor sirve ids fuera del índice | `src/arena/torneo-archivo.ts` | `6cb3a331c674cef02fd92c61fb5f82a3` | `vitest src/arena/__tests__/torneo-archivo.test.ts -t "huérfano"` | rojo · Tests  1 failed / 3 skipped (4) |
+| C2 | carga sin la huella SHA-256 del archivo | `src/ui/torneo-carga.ts` | `d7ac5f7a757a85b17cebebb30da68140` | `vitest src/ui/__tests__/torneo-carga.test.ts -t "Codex #2"` | rojo · Tests  1 failed / 5 skipped (6) |
+| C2 | carga sin contrastar el registro con el encuentro | `src/ui/torneo-carga.ts` | `c0e79ae85355119ae3ad4ed444f70f5d` | `vitest src/ui/__tests__/torneo-carga.test.ts -t "Codex #2"` | rojo · Tests  1 failed / 5 skipped (6) |
+| C2 | contraste sin los controladores por lado | `src/ui/torneo-carga.ts` | `a2c1f15768b0a0d72b505c5cde24f641` | `vitest src/ui/__tests__/torneo-carga.test.ts -t "Codex #2"` | rojo · Tests  1 failed / 5 skipped (6) |

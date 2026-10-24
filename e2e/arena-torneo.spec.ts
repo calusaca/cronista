@@ -157,6 +157,16 @@ test("N14 · una respuesta tardía del torneo, cancelada, no reemplaza el regist
   expect(posts).toHaveLength(1);
 });
 
+test("revisión Codex #2 · si la URL de un encuentro devuelve el registro válido de otro, se muestra el error y no se atribuye", async ({ page }) => {
+  await page.route("**/torneos/ensayo-059/e01.json.gz", r => r.fulfill({ path: "src/arena/__fixtures__/torneos/ensayo-059/e02.json.gz", contentType: "application/gzip" }));
+  await page.goto("/arena");
+  const inicial = await page.locator(".arena-score").textContent();
+  await page.goto("/arena?torneo=ensayo-059&encuentro=01");
+  await expect(page.getByTestId("arena-torneo-error")).toContainText("Could not open this tournament match. The previous one is still available.");
+  await expect(page.getByTestId("arena-torneo-origen")).toHaveCount(0);
+  await expect(page.locator(".arena-score")).toHaveText(inicial!);
+});
+
 test("9 · regresión: el enlace «Tournament» está en /arena", async ({ page }) => {
   await page.goto("/arena");
   await expect(page.getByRole("link", { name: "Tournament", exact: true })).toHaveAttribute("href", "/arena/torneo");

@@ -24,9 +24,12 @@ export async function leerIndice(): Promise<IndiceTorneos> {
   return v.success ? v.data : [];
 }
 
-/** null = id inválido o sin archivo (404). «incoherente» = existe pero no supera esquema o coherencia: sin cifras. */
+/** null = id inválido, fuera de indice.json o sin archivo (404). «incoherente» = existe pero no supera esquema o
+ * coherencia: sin cifras. Revisión Codex #1: solo se sirven los ids del índice, que son los que CI enumera y valida
+ * (`validarRaizTorneos` exige que directorios e índice coincidan). */
 export async function leerTorneo(id: string): Promise<LecturaTorneo | null> {
   if (!ID_TORNEO.test(id)) return null;
+  if (!(await leerIndice()).some(x => x.id === id)) return null;
   const raw = await leerJson(join(dirTorneos(), id, "torneo.json"));
   if (raw === undefined) return null;
   const v = esquemaTorneo.safeParse(raw);

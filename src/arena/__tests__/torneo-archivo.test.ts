@@ -32,7 +32,19 @@ describe("059 · lector de torneos archivados", () => {
       otro: JSON.stringify(t),
     };
     for (const [id, texto] of Object.entries(casos)) { cpSync(join(FIXTURE, "ensayo-059"), join(dir, id), { recursive: true }); writeFileSync(join(dir, id, "torneo.json"), texto); }
+    // Sin índice no se sirve nada; con los casos en el índice, cada uno es «incoherente».
+    for (const id of Object.keys(casos)) expect(await leerTorneo(id)).toBeNull();
+    writeFileSync(join(dir, "indice.json"), JSON.stringify(Object.keys(casos).map(id => ({ id, inicioUtc: t.inicioUtc, titulo: t.titulo }))));
     for (const id of Object.keys(casos)) expect((await leerTorneo(id))?.estado).toBe("incoherente");
-    expect(await leerIndice()).toEqual([]);
+  });
+  it("revisión Codex #1 · un directorio huérfano (coherente pero fuera de indice.json) no se sirve", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "torneo-archivo-")); dirs.push(dir);
+    cpSync(FIXTURE, dir, { recursive: true });
+    cpSync(join(dir, "ensayo-059"), join(dir, "huerfano"), { recursive: true });
+    const t = JSON.parse(readFileSync(join(dir, "huerfano", "torneo.json"), "utf8"));
+    writeFileSync(join(dir, "huerfano", "torneo.json"), JSON.stringify({ ...t, id: "huerfano" }));
+    process.env.ARENA_TORNEOS_DIR = dir;
+    expect(await leerTorneo("huerfano")).toBeNull();
+    expect((await leerTorneo("ensayo-059"))?.estado).toBe("ok");
   });
 });

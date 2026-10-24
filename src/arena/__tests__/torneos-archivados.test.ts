@@ -3,36 +3,32 @@
 // clubes, goles, controladores por lado, cifras 049 y lo declarado que consta en el archivo, iguales a lo
 // recalculado (§ 15.5, § 16.1); un torneo real cubre su plan completo (30 partidos con 6) y su resumen.md se
 // regenera idéntico byte a byte. Además, los rechazos: M22, N11, N12 y N16.
-import { existsSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gunzipSync, gzipSync } from "node:zlib";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import { ARENA } from "../../sim/limites";
 import type { Lado } from "../../sim/tipos";
 import { ejecutarArena } from "../coordinador";
 import {
-  calendarioTorneo, esquemaIndice, esquemaTorneo, LADOS_TORNEO, resumenTorneo, type EncuentroTorneo, type TorneoArchivado,
+  calendarioTorneo, esquemaTorneo, LADOS_TORNEO, resumenTorneo, type EncuentroTorneo, type TorneoArchivado,
 } from "../torneo";
-import { cifrasDeRegistro, constaEnArchivo, sha256, validarEncuentro, validarTorneo } from "../torneo-validacion";
+import { cifrasDeRegistro, constaEnArchivo, sha256, validarEncuentro, validarRaizTorneos, validarTorneo } from "../torneo-validacion";
 import type { ConfigArena, ControladorEquipo, RegistroArena } from "../tipos";
 
-const RAICES = ["public/torneos", "src/arena/__fixtures__/torneos"].filter(r => existsSync(join(r, "indice.json")));
-const FIXTURE = "src/arena/__fixtures__/torneos/ensayo-059", ALTERADO = "src/arena/__fixtures__/torneos/ensayo-059-alterado";
+const RAICES = ["public/torneos", "src/arena/__fixtures__/torneos"];
+const FIXTURE = "src/arena/__fixtures__/torneos/ensayo-059", ALTERADO = "src/arena/__fixtures__/torneos-rechazo/ensayo-059-alterado";
 const leerDe = (dir: string) => (archivo: string) => readFileSync(join(dir, archivo));
 const cargar = (dir: string) => JSON.parse(readFileSync(join(dir, "torneo.json"), "utf8")) as TorneoArchivado;
+const temporales: string[] = [];
+afterAll(() => { for (const d of temporales) rmSync(d, { recursive: true, force: true }); });
 
 describe("059 · torneos archivados (CI)", () => {
-  it("hay al menos el fixture de ensayo", () => expect(RAICES).toContain("src/arena/__fixtures__/torneos"));
-  for (const raiz of RAICES) {
-    const indice = esquemaIndice.parse(JSON.parse(readFileSync(join(raiz, "indice.json"), "utf8")));
-    it(`${raiz}/indice.json: ordenado por inicioUtc descendente y sin ids repetidos`, () => {
-      expect([...indice].sort((a, b) => b.inicioUtc.localeCompare(a.inicioUtc) || a.id.localeCompare(b.id))).toEqual(indice);
-      expect(new Set(indice.map(x => x.id)).size).toBe(indice.length);
-    });
-    for (const entrada of indice) it(`${raiz}/${entrada.id}: cada registro se reproduce y coincide con torneo.json`, () => {
-      const dir = join(raiz, entrada.id);
-      const t = validarTorneo(cargar(dir), leerDe(dir));
-      expect([t.id, t.inicioUtc, t.titulo]).toEqual([entrada.id, entrada.inicioUtc, entrada.titulo]);
+  it("hay al menos el fixture de ensayo", () => expect(existsSync("src/arena/__fixtures__/torneos/indice.json")).toBe(true));
+  // Revisión Codex #1: se enumeran los DIRECTORIOS publicados (no solo el índice) y todos sus archivos.
+  for (const raiz of RAICES) it(`${raiz}: directorios = indice.json, solo los archivos de cada torneo, y cada registro se reproduce y coincide con torneo.json`, () => {
+    for (const t of validarRaizTorneos(raiz)) {
       expect(t.encuentros.length + t.pendientes.length).toBe(calendarioTorneo(t.participantes.map(p => p.id), t.semilla).length);
       if (t.tipo === "real") {
         expect(raiz).toBe("public/torneos");
@@ -40,8 +36,21 @@ describe("059 · torneos archivados (CI)", () => {
         // README (resumen.md) regenerado idéntico byte a byte.
         expect(readFileSync(join("docs/evidencia/torneo-059", t.id, "resumen.md"), "utf8")).toBe(resumenTorneo(t));
       } else expect(raiz).not.toBe("public/torneos");
-    }, 120_000);
-  }
+    }
+  }, 120_000);
+
+  it("revisión Codex #1 · un torneo huérfano (directorio sin entrada en el índice), una entrada sin directorio o un archivo de más se rechazan", () => {
+    const copia = () => { const d = mkdtempSync(join(tmpdir(), "torneos-raiz-")); temporales.push(d); cpSync("src/arena/__fixtures__/torneos", d, { recursive: true }); return d; };
+    expect(validarRaizTorneos(copia()).map(t => t.id)).toEqual(["ensayo-059"]);
+    const huerfano = copia(); cpSync(join(huerfano, "ensayo-059"), join(huerfano, "otro"), { recursive: true });
+    expect(() => validarRaizTorneos(huerfano)).toThrow(/huérfanos.*otro/);
+    const sinDir = copia(); rmSync(join(sinDir, "ensayo-059"), { recursive: true });
+    expect(() => validarRaizTorneos(sinDir)).toThrow(/sin directorio/);
+    const extra = copia(); writeFileSync(join(extra, "ensayo-059", "e99.json.gz"), "x");
+    expect(() => validarRaizTorneos(extra)).toThrow(/archivos distintos/);
+    const suelto = copia(); writeFileSync(join(suelto, "nota.txt"), "x");
+    expect(() => validarRaizTorneos(suelto)).toThrow(/inesperados/);
+  });
 });
 
 // ---- rechazos ----------------------------------------------------------------------------------------------

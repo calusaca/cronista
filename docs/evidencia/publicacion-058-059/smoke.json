@@ -1,0 +1,49 @@
+{
+  "utc": "2026-10-24T02:42:12.130Z",
+  "torneo1440": {
+    "h1": "Model tournament",
+    "filas": [
+      "1 GPT-6 Astra 10 5-4-1 7:2 +5 19",
+      "2 GPT-6.1 Sol 10 4-4-2 7:4 +3 16",
+      "3 GPT-5.4 mini 10 4-3-3 5:4 +1 15",
+      "4 GPT-6 Luna 10 4-3-3 6:6 0 15",
+      "5 GPT-6 Sol 10 2-2-6 6:10 -4 8",
+      "6 GPT-5.6 Luna 10 1-4-5 3:8 -5 7"
+    ],
+    "significacion": "In an illustrative sign test — assuming independent pairings, each with a ½ chance of winning — even winning all 5 pairings would not reach p < 0.05 (p = 0.0625). The table describes this tournament; it does not rank the models by quality. Each model plays both clubs and both sides of every pairing; this spreads the conditions across models, it does not remove their effect.",
+    "enlacesRepeticion": 60,
+    "scrollWidth": 1440,
+    "errores": []
+  },
+  "repeticion": {
+    "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena?torneo=2026-10-24&encuentro=28",
+    "origen": "Match 28 of the October 24, 2026 tournament · Home: Atlético Islaverde Sur (GPT-6 Astra) · Away: Unión Brezal (GPT-6.1 Sol) · Back to the tournament",
+    "marcador": "0–0"
+  },
+  "torneo360": {
+    "h1": "Model tournament",
+    "filas": [
+      "1 GPT-6 Astra 6 Astra 10 5-4-1 7:2 +5 19",
+      "2 GPT-6.1 Sol 6.1 Sol 10 4-4-2 7:4 +3 16",
+      "3 GPT-5.4 mini 5.4 mini 10 4-3-3 5:4 +1 15",
+      "4 GPT-6 Luna 6 Luna 10 4-3-3 6:6 0 15",
+      "5 GPT-6 Sol 6 Sol 10 2-2-6 6:10 -4 8",
+      "6 GPT-5.6 Luna 5.6 Luna 10 1-4-5 3:8 -5 7"
+    ],
+    "significacion": "In an illustrative sign test — assuming independent pairings, each with a ½ chance of winning — even winning all 5 pairings would not reach p < 0.05 (p = 0.0625). The table describes this tournament; it does not rank the models by quality. Each model plays both clubs and both sides of every pairing; this spreads the conditions across models, it does not remove their effect.",
+    "enlacesRepeticion": 60,
+    "scrollWidth": 360,
+    "errores": []
+  },
+  "antesala": {
+    "presentacionVisibleMs": 40066,
+    "estado": "Live · 19 s ready",
+    "botonSaltar": false,
+    "tras25s": {
+      "estado": "Live · 0 s ready",
+      "marcador": "ON OLÍMPICO NEBRISA 0–0 UNIÓN LUMBRERA UL"
+    },
+    "peticionesVoz": [],
+    "errores": []
+  }
+}
