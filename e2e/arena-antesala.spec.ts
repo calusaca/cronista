@@ -29,8 +29,8 @@ const clave = NARRACION_DIRECTO.clavePreferencia;
 
 /** Instrumenta el gesto, el AudioContext y las marcas de tiempo de los botones de voz. Con `bloquearAudio`,
  * `resume()` no se resuelve nunca y el estado es `suspended` hasta que la prueba ponga `__desbloquear`. */
-async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; bloquearAlmacen?: boolean; bloquearNuevos?: boolean } = {}) {
-  await page.addInitScript(({ bloquearAudio, bloquearAlmacen, bloquearNuevos }) => {
+async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; bloquearAlmacen?: boolean; bloquearNuevos?: boolean; resumeLentoMs?: number } = {}) {
+  await page.addInitScript(({ bloquearAudio, bloquearAlmacen, bloquearNuevos, resumeLentoMs }) => {
     const w = window as unknown as Ventana & typeof window;
     w.__llamadas = []; w.__clic = []; w.__contextos = []; w.__marcas = {}; w.__desbloquear = false;
     let enGesto = false;
@@ -45,7 +45,12 @@ async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; blo
       bloqueado = false;
       constructor(o?: AudioContextOptions) { const t = performance.now(), dentro = enGesto, previos = w.__contextos.length; super(o); this.bloqueado = !!bloquearNuevos && previos > 0; w.__llamadas.push({ tipo: "ctor", enGesto: dentro, t }); w.__contextos.push(this); }
       override get state(): AudioContextState { const real = super.state; return (bloquearAudio && !w.__desbloquear || this.bloqueado) && real !== "closed" ? "suspended" : real; }
-      override resume() { w.__llamadas.push({ tipo: "resume", enGesto, t: performance.now() }); return bloquearAudio && !w.__desbloquear || this.bloqueado ? new Promise<void>(() => {}) : super.resume(); }
+      override resume() {
+        w.__llamadas.push({ tipo: "resume", enGesto, t: performance.now() });
+        if (bloquearAudio && !w.__desbloquear || this.bloqueado) return new Promise<void>(() => {});
+        // Reanudación lenta (máquina cargada): el contexto sigue suspendido durante resumeLentoMs.
+        return resumeLentoMs ? new Promise<void>(r => setTimeout(r, resumeLentoMs)).then(() => super.resume()) : super.resume();
+      }
     };
     const iniciar = AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start = function (this: AudioBufferSourceNode, ...a: Parameters<AudioBufferSourceNode["start"]>) { w.__llamadas.push({ tipo: "start", enGesto, t: performance.now() }); return iniciar.apply(this, a); };
@@ -54,7 +59,7 @@ async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; blo
         if (w.__marcas[texto] === undefined && [...document.querySelectorAll("button")].some(b => b.textContent === texto)) w.__marcas[texto] = performance.now();
       }
     }).observe(document.body, { subtree: true, childList: true, characterData: true }));
-  }, { bloquearAudio: opciones.bloquearAudio ?? false, bloquearAlmacen: opciones.bloquearAlmacen ?? false, bloquearNuevos: opciones.bloquearNuevos ?? false });
+  }, { bloquearAudio: opciones.bloquearAudio ?? false, bloquearAlmacen: opciones.bloquearAlmacen ?? false, bloquearNuevos: opciones.bloquearNuevos ?? false, resumeLentoMs: opciones.resumeLentoMs ?? 0 });
 }
 const ventana = (page: Page) => page.evaluate(() => { const w = window as unknown as Ventana; return { llamadas: w.__llamadas, clic: w.__clic, estados: w.__contextos.map(c => c.state), marcas: w.__marcas }; });
 
@@ -63,17 +68,17 @@ const soloKeepalive = (r: Route) => r.fulfill({ headers: { "content-type": "text
 /** Directo simulado: POST que crea `id` (con `retrasoPostMs`), instantánea hasta `corte` y SSE que, con
  * `avanceMs`, entrega todo hasta el tick 300 a ese plazo. /relato: 404 a las intervenciones; tramos vacíos;
  * la entrada, 0,3 s de audio. */
-async function directo(page: Page, id: string, opciones: { voz?: boolean; herramientas?: Promise<unknown>; retrasoPostMs?: number; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
+async function directo(page: Page, id: string, opciones: { voz?: boolean; herramientas?: Promise<unknown>; retrasoPostMs?: number; hasta?: number; terminar?: boolean; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
   /** Manejador propio de /relato (antesala, previa…): devuelve true si respondió. */
   relato?: (p: Pedido, r: Route) => Promise<boolean> } = {}) {
-  const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = 300;
+  const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = opciones.hasta ?? 300;
   const entrada = await wav(0.3);
-  const pedidos: (Pedido & { t: number })[] = [], posts: number[] = [], enVuelo = { ahora: 0, maximo: 0 };
+  const pedidos: (Pedido & { t: number })[] = [], posts: number[] = [], cuerpos: Record<string, unknown>[] = [], enVuelo = { ahora: 0, maximo: 0 };
   const asignacion = opciones.asignacion ?? asignacionProgramada;
   await page.route("**/api/arena/herramientas", async r => { if (opciones.herramientas) await opciones.herramientas; await r.fulfill({ json: { voz: opciones.voz ?? true, analista: false } }).catch(() => {}); });
   await page.route("**/api/arena/sesiones", async r => {
     if (r.request().method() !== "POST") return r.fallback();
-    posts.push(Date.now());
+    posts.push(Date.now()); cuerpos.push(r.request().postDataJSON() as Record<string, unknown>);
     if (opciones.retrasoPostMs) await esperar(opciones.retrasoPostMs);
     await r.fulfill({ json: { id, asignacion } }).catch(() => {});
   });
@@ -83,6 +88,7 @@ async function directo(page: Page, id: string, opciones: { voz?: boolean; herram
   const publicaciones = [
     ...registro.rondas.filter(x => x.inicioTick >= corte && x.inicioTick < hasta).map(ronda => ({ tipo: "ordenes", ronda })),
     { tipo: "avance", estado: final, fotogramas: registro.fotogramas.filter(f => f.tick > corte && f.tick <= hasta), eventos: registro.eventos.filter(e => e.tick > corte && e.tick <= hasta) },
+    ...opciones.terminar ? [{ tipo: "fin" }, { tipo: "terminada", estado: "completa", metricas: { decisiones: 4, respaldos: 0, duracionMs: 0, esperaModeloMs: [] } }] : [],
   ];
   await page.route(`**/api/arena/sesiones/${id}/eventos*`, async r => {
     if (llamadas++ > 0 || opciones.avanceMs === undefined && !opciones.avance) return soloKeepalive(r);
@@ -100,7 +106,7 @@ async function directo(page: Page, id: string, opciones: { voz?: boolean; herram
     if (p.entradaTick !== undefined) return r.fulfill({ json: { desdeTick: p.desdeTick, hastaTick: p.hastaTick, modo: "buffer", idioma: p.idioma, entradaTick: p.entradaTick, texto: "Apertura", fragmentos: [{ tick: p.entradaTick, texto: "Apertura", emocion: "serena", intensidad: .2, variante: 0, fuentes: [], fotogramas: [] }], fuentes: [], fotogramas: [], eventosDisponibles: 0, eventosNarrados: 1, conduccionesNarradas: 0, prioridad: 10, cierre: false, tipoRelato: "entrada", claveVoz: "prueba:entrada", audio: { base64: entrada, tipo: "audio/wav" } } }).catch(() => {});
     return r.fulfill({ json: { desdeTick: p.desdeTick, hastaTick: p.hastaTick, modo: "buffer", idioma: p.idioma, texto: "", fragmentos: [], fuentes: [], fotogramas: [], eventosDisponibles: 0, eventosNarrados: 0, conduccionesNarradas: 0, prioridad: 10, cierre: false, tipoRelato: "comentario", audio: null } }).catch(() => {});
   }
-  return { pedidos, posts, enVuelo, registro };
+  return { pedidos, posts, cuerpos, enVuelo, registro };
 }
 const iniciar = (page: Page) => page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
 const casilla = (page: Page) => page.getByTestId("arena-live-voice").getByRole("checkbox");
@@ -509,11 +515,14 @@ test("058 · B6 (a) activación a mano en pausa en 0:00: la antesala espera a «
   const id = "00000000-0000-4000-8000-000000005826";
   const registro = await leer("public/experimentos/arena-duelo-v3.json");
   const { pedidos } = await directo(page, id, { corte: BUFFER_ARENA.tramoTicks, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 2 }) });
+  await instrumentar(page, { resumeLentoMs: NARRACION_DIRECTO.desbloqueoMs - 300 });
   await instrumentarB(page);
   await page.goto(`/arena?partido=${id}&vista=buffer`);
   await page.getByRole("button", { name: "Pause broadcast", exact: true }).click();
   await vozActivar(page).click();
-  await page.waitForTimeout(1000);
+  // Más que desbloqueoMs: el contexto suspendido por la pausa no cuenta como audio bloqueado ni suelta la retención.
+  await page.waitForTimeout(NARRACION_DIRECTO.desbloqueoMs + 1000);
+  await expect(page.getByRole("button", { name: "Enable audio playback", exact: true })).toHaveCount(0);
   expect(deAntesala((await datosB(page)).fuentes)).toEqual([]);
   expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toEqual([]);
   await page.getByRole("button", { name: "Resume broadcast", exact: true }).click();
@@ -750,4 +759,41 @@ for (const voz of [true, false]) test(`058 · B13 (smoke rev. 0000027) «Start l
     const despues = (await datosB(page)).estados.filter(e => e.t > t);
     expect(despues.some(e => e.texto.includes("Pre-match presentation"))).toBe(false);
   }
+});
+
+test("defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados", async ({ page }) => {
+  test.setTimeout(60_000);
+  const id = "00000000-0000-4000-8000-000000005836";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  let liberar!: () => void; const fin = new Promise<void>(r => { liberar = r; });
+  const { cuerpos } = await directo(page, id, { voz: false, avance: fin, hasta: registro.final.tick, terminar: true });
+  await page.goto("/arena");
+  // La configuración vive en un <details> que se pliega al iniciar: se abre antes de cada comprobación.
+  const abrir = () => page.evaluate(() => { for (const d of document.querySelectorAll<HTMLDetailsElement>("details.arena-setup, details.arena-setup details")) d.open = true; });
+  const control = (etiqueta: string) => page.getByRole(etiqueta.startsWith("Match seed") ? "textbox" : "combobox", { name: etiqueta, exact: true });
+  const duracion = control("Simulated duration");
+  await abrir();
+  await expect(duracion).toBeEnabled();
+  await iniciar(page);
+  // Durante la generación: deshabilitados.
+  await expect(page.getByTestId("arena-buffer")).toBeVisible();
+  await abrir();
+  for (const etiqueta of ["Simulated duration", "Home formation", "Away formation", "Weather", "Surface", "Crowd pressure: home / away", "Match seed (optional)"]) await expect(control(etiqueta)).toBeDisabled();
+  liberar();
+  await expect(page.getByTestId("arena-live-status")).toContainText("Match complete");
+  // La emisión sigue en pantalla (sin pulsar «Open available replay») y los ajustes del próximo partido se habilitan.
+  await expect(page.getByTestId("arena-buffer")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Open available replay", exact: true })).toBeVisible();
+  await abrir();
+  for (const etiqueta of ["Simulated duration", "Home formation", "Away formation", "Weather", "Surface", "Crowd pressure: home / away", "Match seed (optional)"]) await expect(control(etiqueta)).toBeEnabled();
+  // Los botones que reemplazan el partido mostrado conservan su bloqueo.
+  await expect(page.getByRole("button", { name: "Saved matches", exact: true })).toBeDisabled();
+  // Cambiar la duración no altera la emisión actual: el reloj sigue con la duración del registro.
+  const reloj = await page.getByTestId("arena-clock").textContent();
+  await duracion.selectOption("30");
+  await expect(page.getByTestId("arena-clock")).toHaveText(reloj!);
+  await iniciar(page);
+  await expect.poll(() => cuerpos.length).toBe(2);
+  expect(cuerpos[1]).toMatchObject({ segundos: 30 });
+  expect(cuerpos[0]).toMatchObject({ segundos: 60 });
 });

@@ -113,6 +113,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
    * [sesion, idioma] lo deja aquí en lugar de cerrarlo; si nadie lo adopta en el mismo vaciado de efectos (la
    * reactivación en el idioma nuevo), se cierra en la siguiente microtarea (desmontaje o voz apagada). */
   const contextoPrevio = useRef<AudioContext | null>(null);
+  /** Último fin de una suspensión propia (pausa o pestaña oculta), en performance.now(). */
+  const finSuspensionPropia = useRef(0);
   const limpiar = (conservarContexto = false) => {
     generacion.current++; reanudando.current = false;
     const s = sonido.current; sonido.current = null;
@@ -214,12 +216,18 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     // Brief 058 § 3.2: si el contexto no corre tras `desbloqueoMs`, aparece «Habilitar reproducción de audio»
     // (también cuando la promesa de resume() no se resuelve nunca).
     const armado = s, activacion = s.activacion;
-    window.setTimeout(() => {
+    const verificarDesbloqueo = () => {
       if (sonido.current !== armado || armado.activacion !== activacion || armado.silenciada || armado.contexto.state === "running") return;
+      // Un contexto que suspendemos nosotros (emisión en pausa o pestaña oculta) no es audio bloqueado: se vuelve a
+      // comprobar después, sin mostrar «Habilitar reproducción de audio» ni soltar la retención de la antesala.
+      // Tras reanudar, resume() tiene desbloqueoMs de gracia antes de considerarse bloqueado.
+      const gracia = finSuspensionPropia.current + NARRACION_DIRECTO.desbloqueoMs - performance.now();
+      if (reloj.current.estado === "pausada" || document.hidden || gracia > 0) { window.setTimeout(verificarDesbloqueo, Math.max(gracia, 0) || NARRACION_DIRECTO.desbloqueoMs); return; }
       setPulsar(true);
       // § 4.5: sin audio a los desbloqueoMs, la antesala no retiene el reloj (empieza si se habilita en 0:00).
       if (armado.antesalaEspera) soltarEspera(armado);
-    }, NARRACION_DIRECTO.desbloqueoMs);
+    };
+    window.setTimeout(verificarDesbloqueo, NARRACION_DIRECTO.desbloqueoMs);
     vozRef.current = true; setVoz(true); setAutomatica(automaticaAhora); setVersion(v => v + 1);
     // Brief 058 v1.1 §§ 2–3 · En el mismo manejador síncrono: decidir y aplicar la retención (t0 = clic).
     t0Antesala.current = t0Ms ?? (automaticaAhora ? instanteArranquePropio(sesion) : null) ?? performance.now();
@@ -622,7 +630,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       }
       frame = requestAnimationFrame(animar);
     };
-    const ocultar = () => { if (document.hidden) { reloj.current.pausar(); void sonido.current?.contexto.suspend(); } };
+    const ocultar = () => { if (document.hidden) { reloj.current.pausar(); void sonido.current?.contexto.suspend(); } else finSuspensionPropia.current = performance.now(); };
     document.addEventListener("visibilitychange", ocultar); frame = requestAnimationFrame(animar);
     return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", ocultar); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -639,7 +647,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     }
   };
   const pausar = () => {
-    if (reloj.current.estado === "pausada") reloj.current.continuar();
+    if (reloj.current.estado === "pausada") { reloj.current.continuar(); finSuspensionPropia.current = performance.now(); }
     else { reloj.current.pausar(); void sonido.current?.contexto.suspend(); }
     setVersion(v => v + 1);
   };
