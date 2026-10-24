@@ -20,12 +20,16 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   // Brief 050: el gol se canta con `cantoGol`; aquí solo llega si el goleador no está en la plantilla.
   if (e.autogol || e.motivo === "desvio") return es ? h.texto_es : h.texto_en;
   if (e.tipo === "atajada") return (es ? [`¡Ataja ${j}!`, `¡${j} detiene el remate!`, `¡El remate lo ataja ${j}!`, `¡Atajada de ${j}!`] : [`${j} makes the save!`, `${j} stops the shot!`, `The shot is saved by ${j}!`, `A save by ${j}!`])[variante]!;
+  // Brief 063 § 8.3: el remate lejano (reinicios-v7) tiene sus propias variantes breves.
+  if (breve && e.tipo === "tiro" && e.motivo === "lejano") return (es ? [`¡Prueba desde lejos ${j}!`, `¡Disparo lejano de ${j}!`, `¡${j} se anima desde fuera!`, `¡Le pega de lejos ${j}!`] : [`${j} tries it from distance!`, `A long-range effort from ${j}!`, `${j} lets fly from range!`, `${j} has a go from deep!`])[variante]!;
   if (breve && e.tipo === "tiro") return (es ? [`¡Remata ${j}!`, `¡Disparo de ${j}!`, `¡${j} prueba el remate!`, `¡Le pega ${j}!`] : [`${j} shoots!`, `An attempt from ${j}!`, `${j} takes the shot!`, `${j} goes for goal!`])[variante]!;
   // Brief 051: el remate por encima del travesaño (reinicios-v5) tiene sus propias variantes breves.
   if (breve && e.tipo === "tiro_fuera" && e.motivo === "alto") return (es ? [`¡Alto el remate de ${j}!`, `¡Se va por encima el disparo de ${j}!`, `¡${j} la manda por encima del travesaño!`, `¡Por encima! Remate de ${j}.`] : [`${j} blazes it over!`, `${j}'s shot sails over the bar!`, `Over the bar from ${j}!`, `${j} lifts it over!`])[variante]!;
   if (breve && e.tipo === "fuera_juego") return (es ? [`Fuera de juego de ${j}.`, `Señalan posición adelantada de ${j}.`, `${j} estaba en fuera de juego.`, `La acción se detiene: fuera de juego de ${j}.`] : [`${j} is offside.`, `Offside against ${j}.`, `${j} was caught offside.`, `Play stops for offside against ${j}.`])[variante]!;
   // Brief 046: el centro tiene frase breve propia; el saque desde las manos usa el texto de `vista`.
   if (breve && e.tipo === "pase" && e.motivo === "centro") return es ? `¡Centro de ${j}!` : `${j} sends in a cross!`;
+  // Brief 063 § 8.3: el balón largo (reinicios-v7).
+  if (breve && e.tipo === "pase" && e.motivo === "largo") return es ? `¡Balón largo de ${j}!` : `Long ball from ${j}!`;
   if (e.tipo === "pase" && e.motivo === "saque_manos") return es ? h.texto_es : h.texto_en;
   if (breve && e.tipo === "pase" && receptor) return es ? `${j} busca a ${receptor}.` : `${j} looks for ${receptor}.`;
   if (breve && e.tipo === "recepcion") return es ? `Recibe ${j}.` : `${j} receives it.`;

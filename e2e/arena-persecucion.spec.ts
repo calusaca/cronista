@@ -86,7 +86,8 @@ test("063 A · un delantero que pierde el balón lo persigue y se detiene en la 
   // y no hubo gol en los segundos previos (el rótulo del gol taparía la escena).
   let hallado: { registro: RegistroArena; tick: number; id: string; lado: "local" | "visita"; limite: number } | undefined;
   for (let seed = 1; seed <= BUSQUEDA.semillas && !hallado; seed++) {
-    const registro = await ejecutarArena(crearConfigArena({ seed, duracionS: L.duracionS }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+    // Smoke de la publicación 1: el bloque A con sus reglas (reinicios-v6), no la predeterminada.
+    const registro = await ejecutarArena(crearConfigArena({ seed, duracionS: L.duracionS, reglas: "reinicios-v6" }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
     const enLimite = (f: EstadoArena | undefined, id: string) => {
       const p = f?.persecucion, j = f && p?.jugador === id ? f.jugadores.find(x => x.id === id) : undefined;
       const poseedor = f?.jugadores.find(x => x.id === f.balon.poseedor);

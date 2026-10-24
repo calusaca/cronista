@@ -18,7 +18,7 @@ import { agregarPrefijo } from "../estadisticas";
 import { condicionesFixtureV5, cumpleFixtureV5, DURACION_FIXTURE_V5_S } from "../__fixtures__/generar-reinicios-v5";
 import { distancia, proyeccion } from "../geometria";
 import { agregarLote, analizarPartido, desenlaceFisico, incumplimientos, incumplimientosControlado, incumplimientosSaques, medirControlado, medirLote, partidoConNiveles, type MuestraTick } from "../metricas-lote";
-import { crearConfigArena, crearEstadoArena, MotorArena, reglasDesde, validarConfigArena } from "../motor";
+import { atributosPlantillas, crearConfigArena, crearEstadoArena, MotorArena, reglasDesde, validarConfigArena } from "../motor";
 import { narrarArena } from "../narrador";
 import { destinoSalida, enAreaPropia } from "../portero";
 import { RELATO_INTERVALOS } from "../protocolo";
@@ -31,6 +31,8 @@ import { narrarEventoArena } from "../vista";
 const MEDIO_Y = ARENA.anchoM / 2;
 const C_LOCAL: Punto = { x: 0, y: MEDIO_Y };
 const V5 = "reinicios-v5" as const;
+/** Brief 063 § 4.3: la configuración `base` con otras reglas; desde reinicios-v7, con sus atributos. */
+const conReglas = (base: ConfigArena, reglas: ReglasArena): ConfigArena => { const { atributos: _a, ...resto } = base; return reglasDesde({ ...resto, reglas }, "reinicios-v7") ? { ...resto, reglas, atributos: atributosPlantillas(base.partido) } : { ...resto, reglas }; };
 type Reglas = ReglasArena | undefined;
 /** Matriz de versiones: v1–v4 y archivos sin `reglas` frente a v5. */
 const ANTERIORES: readonly Reglas[] = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", undefined];
@@ -82,9 +84,10 @@ interface Escenario {
   hasta(fin: (m: MotorArena) => boolean, max: number, antes?: (m: MotorArena) => void): void;
 }
 function montar(reglas: Reglas, preparar: (e: EstadoArena, config: ConfigArena) => void, ordenes: (e: EstadoArena) => Record<string, OrdenEscenario> = () => ({}), seed: number = ESCENARIO.semilla, partido?: SimConfig): Escenario {
-  const config: ConfigArena = { ...crearConfigArena({ seed, duracionS: ESCENARIO.duracionS, intervaloS: ESCENARIO.intervaloS, ...(partido ? { partido } : {}) }) };
+  // Brief 063 § 4.3: la configuración se crea con sus reglas (los atributos de reinicios-v7 no existen antes).
+  const config: ConfigArena = { ...crearConfigArena({ seed, duracionS: ESCENARIO.duracionS, intervaloS: ESCENARIO.intervaloS, reglas: reglas ?? V5, ...(partido ? { partido } : {}) }) };
   config.partido = structuredClone(config.partido);
-  if (reglas) config.reglas = reglas; else delete config.reglas;
+  if (!reglas) delete config.reglas;
   const inicial = crearEstadoArena(config);
   inicial.saque = null; inicial.pausa = null;
   for (const lado of lados) {
@@ -592,7 +595,8 @@ describe("051 · versiones", () => {
     expect(reglasArena.slice(0, 5)).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5]);
     expect(crearConfigArena({ reglas: V5 }).reglas).toBe(V5);
     const base = crearConfigArena({ reglas: V5 });
-    for (const reglas of reglasArena) expect(() => validarConfigArena({ ...base, reglas })).not.toThrow();
+    // Brief 063 § 4.3: desde reinicios-v7 la configuración lleva además sus atributos.
+    for (const reglas of reglasArena) expect(() => validarConfigArena(conReglas(base, reglas))).not.toThrow();
     expect(() => validarConfigArena({ ...base, reglas: "reinicios-otra" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) expect(reglasDesde({ ...base, reglas }, V5)).toBe(i >= 4);
   });

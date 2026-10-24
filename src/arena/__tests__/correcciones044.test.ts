@@ -63,7 +63,8 @@ describe("044 · rechace del portero (reinicios-v3)", () => {
    * frente al arco; con `recoge`, desde un lateral del área y con un jugador de ese lado
    * plantado en la trayectoria del rechace. */
   function remateAlPortero(seed: number, reglas: NonNullable<ConfigArena["reglas"]>, recoge?: Lado) {
-    const config = { ...crearConfigArena({ seed, duracionS: 10, intervaloS: 5 }), reglas };
+    // Brief 063 § 4.3: la configuración se crea con sus reglas (los atributos de reinicios-v7 no existen en v3).
+    const config = { ...crearConfigArena({ seed, duracionS: 10, intervaloS: 5, reglas }) };
     const inicial = crearEstadoArena(config);
     inicial.saque = null; inicial.pausa = null;
     for (const j of inicial.jugadores) { j.posicion = { x: j.lado === "local" ? 60 : 70, y: 60 }; j.velocidad = { x: 0, y: 0 }; }

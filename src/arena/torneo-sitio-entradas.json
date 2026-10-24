@@ -124,9 +124,11 @@
     }
   ],
   "promptMax": {
-    "tokens": 10231,
+    "tokens": 13505,
     "archivo": "docs/evidencia/modelos-052/grok.json",
-    "partido": "espejo"
+    "partido": "espejo",
+    "medido": 10231,
+    "factorObservacion063": 1.32
   },
   "medidas": [
     {

@@ -9,7 +9,8 @@ import type { IdentidadPartido } from "../arena/identidad";
 import { etiquetasPerfil, etiquetaTemperamento } from "../arena/personalidades";
 import type { FocoAntesala } from "../arena/antesala";
 import { claveSuperficie, GEOMETRIA_PREVIA, mayusculaInicial, type PreviaVisual } from "../arena/previa";
-import { ANTESALA_ARENA, ARENA, IDENTIDAD_ARENA, PREVIA_ARENA } from "../sim/limites";
+import { ANTESALA_ARENA, ARENA, ATRIBUTOS_ARENA, IDENTIDAD_ARENA, PREVIA_ARENA } from "../sim/limites";
+import { rasgoDistintivo } from "../arena/atributos";
 import { Escudo } from "./Escudo";
 
 const T = PREVIA_ARENA.tarjeta;
@@ -44,7 +45,8 @@ function MediaCancha({ equipo, enVoz }: { equipo: PreviaVisual["equipos"]["local
 
 /** Brief 058 · C · Tira «En voz»: perfil previo de los jugadores que la antesala nombra ahora. Solo campos que existen
  * en `inicial` (dorsal, nombre, puesto, nivel; perfil y temperamento con `personalidad`; rol natural si difiere;
- * capitanía). No es región viva: la voz ya informa y arena-buffer-status anuncia la fase. */
+ * capitanía). Brief 063 § 9.1: tras el nivel, el rasgo distintivo de `config.atributos` si lo hay. No es región viva:
+ * la voz ya informa y arena-buffer-status anuncia la fase. */
 function TiraEnVoz({ previa, foco, idioma }: { previa: PreviaVisual; foco: FocoAntesala; idioma: "es" | "en" }) {
   const t = (en: string, es: string) => idioma === "es" ? es : en;
   if (!foco.lado || foco.bloque === "apertura") return null;
@@ -56,6 +58,7 @@ function TiraEnVoz({ previa, foco, idioma }: { previa: PreviaVisual; foco: FocoA
     {jugadores.length > 0 && <ul className="arena-lineups-now-list">{jugadores.map(j => <li key={j.id} className="arena-lineups-now-row" data-jugador={j.id}>
       <span className="tnum" data-campo="dorsal">{j.dorsal}</span> <strong data-campo="nombre">{j.nombre}</strong> <span data-campo="puesto">{j.puesto}</span>
       {" · "}<span data-campo="nivel">{t(`Ability ${j.nivel}`, `Nivel ${j.nivel}`)}</span>
+      {(() => { const r = e.atributos?.[j.id] ? rasgoDistintivo(e.atributos[j.id]!) : null; return r && <>{" · "}<span data-campo="rasgo">{ATRIBUTOS_ARENA.rasgos[idioma][r.atributo]} {r.valor}</span></>; })()}
       {j.personalidad && <>{" · "}<span data-campo="perfil">{etiquetasPerfil[j.personalidad.perfil][idioma]}</span>{" · "}<span data-campo="temperamento">{etiquetaTemperamento(j.personalidad, idioma)}</span></>}
       {j.posicionNatural && j.posicionNatural !== j.puesto && <>{" · "}<span data-campo="rol-natural">{t(`Natural role: ${j.posicionNatural}`, `Rol natural: ${j.posicionNatural}`)}</span></>}
       {j.capitan && <>{" · "}<span data-campo="capitan">{t("Captain", "Capitán")}</span></>}

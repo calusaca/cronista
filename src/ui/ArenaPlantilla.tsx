@@ -7,7 +7,8 @@ import { memoAgregado, type MemoAgregado } from "../arena/estadisticas";
 import { ArenaCifrasJugador } from "./ArenaCifrasJugador";
 import { EstrellaFavorito } from "./ArenaFavoritos";
 import type { IdentidadPartido } from "../arena/identidad";
-import { IDENTIDAD_ARENA } from "../sim/limites";
+import { ATRIBUTOS_ARENA, IDENTIDAD_ARENA } from "../sim/limites";
+import { atributosJugador } from "../arena/tipos";
 import { Escudo } from "./Escudo";
 
 export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, idioma, tick, favorito, alternarFavorito, avisos, transporte = false, saltar, memo = memoAgregado, identidad }: {
@@ -59,6 +60,14 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
         {estado.banco && <p className="arena-muted">{estado.banco.some(p => p.id === j.id) ? t("Available substitute", "Suplente disponible") : estado.retirados?.some(p => p.id === j.id) ? t("Substituted — cannot return", "Sustituido — sin reingreso") : estado.expulsados?.some(p => p.id === j.id) ? t("Sent off — cannot be replaced", "Expulsado — no puede ser reemplazado") : t("On the pitch", "En cancha")}{j.posicionNatural ? ` · ${t("Natural role", "Puesto natural")}: ${j.posicionNatural}` : ""}{j.amarillas ? ` · ${j.amarillas} ${t("yellow card(s)", "amarilla(s)")}` : ""}</p>}
         {p && <p className="arena-profile-tags" data-testid="arena-profile-tags"><span>{etiquetasPerfil[p.perfil][idioma]}</span><span>{etiquetaTemperamento(p, idioma)}</span></p>}
         <dl className="arena-player-metrics"><div><dt>{t("Ability", "Nivel")}</dt><dd>{j.nivel}<small>/100</small></dd></div><div><dt>{t("Current energy", "Energía actual")}</dt><dd>{Math.round(j.energia * 100)}<small>%</small></dd></div></dl>
+        {/* Brief 063 § 9.1: los seis atributos de `registro.config.atributos` (reinicios-v7); sin ellos, la nota de grabación anterior. */}
+        {registro.config.atributos?.[j.id] ? <section className="arena-player-attributes" data-testid="arena-player-attributes" aria-label={t("Player attributes", "Atributos del jugador")}>
+          <h4 className="overline">{t("Attributes", "Atributos")}</h4>
+          <div className="arena-traits">{atributosJugador.map(a => <div className="arena-trait" key={a} data-atributo={a}>
+            <label htmlFor={`atributo-${j.id}-${a}`}>{ATRIBUTOS_ARENA.etiquetas[idioma][a]}<span className="tnum">{registro.config.atributos![j.id]![a]}</span></label><meter id={`atributo-${j.id}-${a}`} min="0" max="100" value={registro.config.atributos![j.id]![a]} />
+          </div>)}</div>
+          <details className="arena-profile-help"><summary>{t("How they show on the pitch", "Cómo se notan en la cancha")}</summary><dl>{atributosJugador.map(a => <div key={a}><dt>{ATRIBUTOS_ARENA.etiquetas[idioma][a]}</dt><dd>{ATRIBUTOS_ARENA.efectos[idioma][a]}</dd></div>)}</dl></details>
+        </section> : <p className="arena-muted" data-testid="arena-legacy-attributes">{t("This recording predates player attributes.", "Esta grabación es anterior a los atributos de jugador.")}</p>}
         {tick !== undefined && <ArenaCifrasJugador registro={registro} tick={tick} jugador={j} idioma={idioma} transporte={transporte} saltar={saltar} memo={memo} />}
         {p ? <>
           <p className="arena-muted">{t("Independent traits: a passer can be aggressive and captain. These synthetic preferences guide programmed decisions and local choices; model controllers receive them as context. Ability determines execution.", "Rasgos independientes: un pasador puede ser agresivo y capitán. Estas preferencias sintéticas orientan decisiones programadas y elecciones locales; los modelos las reciben como contexto. El nivel determina la capacidad de ejecución.")}</p>

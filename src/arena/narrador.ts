@@ -25,7 +25,9 @@ export function contextoNarradorArena(registro: RegistroArena, hastaTick: number
     const evento = registro.eventos.find(e => `arena:${e.id}` === h.id)!;
     const jugador = plantilla.find(j => j.id === evento.jugador)!, receptor = plantilla.find(j => j.id === evento.receptor);
     return { id: h.id, tipo: evento.autogol ? "autogol" : h.tipo === "gol" ? "gol_anotado" : "accion_arena", texto_es: h.texto_es, texto_en: h.texto_en, eventos: h.eventos, relevancia: h.tipo === "gol" ? 100 : 50,
-      datos: { jugador: jugador.nombre, equipo: registro.config.partido[evento.lado].nombre, dorsal: jugador.dorsal, distancia: Math.round(evento.distanciaM), ...(receptor ? { receptor: receptor.nombre, dorsal_receptor: receptor.dorsal } : {}) },
+      datos: { jugador: jugador.nombre, equipo: registro.config.partido[evento.lado].nombre, dorsal: jugador.dorsal, distancia: Math.round(evento.distanciaM), ...(receptor ? { receptor: receptor.nombre, dorsal_receptor: receptor.dorsal } : {}),
+        // Brief 063 § 8.3 (reinicios-v7): el remate lejano registra su distancia como magnitud del tiro (V8 de «desde lejos»).
+        ...(evento.tipo === "tiro" && evento.motivo === "lejano" ? { distancia_m: Math.round(evento.distanciaM) } : {}) },
     };
   });
 }

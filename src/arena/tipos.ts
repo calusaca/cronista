@@ -9,8 +9,9 @@ export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalid
 /** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
 /** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`).
  * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5.
- * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", ARENA.reglas] as const;
+ * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6.
+ * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -54,6 +55,13 @@ export type LineaArena = "POR" | "DEF" | "MED" | "DEL";
 /** Brief 063 (reinicios-v6): persecución tras pérdida activa. Desde v6 la clave existe siempre en el
  * estado y vale null o este objeto; en v1–v5 no existe. */
 export interface PersecucionArena { jugador: string; lado: Lado; desdeTick: number; hastaTick: number }
+/** Brief 063 § 4.1 (reinicios-v7): seis atributos enteros en [ATRIBUTOS_ARENA.min, .max] por jugador. */
+export const atributosJugador = ["velocidad", "resistencia", "aguante", "entrada", "vision", "potencia"] as const;
+export type AtributoJugador = (typeof atributosJugador)[number];
+export type AtributosJugador = Record<AtributoJugador, number>;
+/** Brief 063 § 4.1 (reinicios-v8, todavía no publicada): identidad de juego del club. */
+export const estilosJuego = ["defensivo", "ofensivo", "posesion", "contragolpe", "directo", "presion"] as const;
+export type EstiloJuego = (typeof estilosJuego)[number];
 export const perfilesJugador = ["defensivo", "ofensivo", "pasador", "conductor", "rematador", "equilibrado"] as const;
 export type PerfilJugador = (typeof perfilesJugador)[number];
 export interface PersonalidadJugador {
@@ -91,6 +99,8 @@ export interface Vuelo {
   /** Brief 051 (reinicios-v5): remate por encima del travesaño (probabilidad modelada, sin altura
    * simulada). Nadie lo toca y al cruzar la línea de fondo es `tiro_fuera` con `motivo: "alto"`. */
   alto?: true;
+  /** Brief 063 (reinicios-v7), solo en remates desde más de ARENA.radioTiroM: el portero va a la trayectoria. */
+  lejano?: true;
 }
 export interface EstadoArena {
   tick: number;
@@ -118,13 +128,18 @@ export interface ConfigArena {
   formaciones: Record<Lado, FormacionArena>;
   entrenadores?: Record<Lado, EntrenadorArena>;
   aficiones?: Record<Lado, AficionArena>;
+  /** Brief 063 § 4.2 (desde reinicios-v7, y solo entonces): los atributos de los 2 × min(16, plantilla) IDs, por ID. */
+  atributos?: Record<string, AtributosJugador>;
+  /** Brief 063 (desde reinicios-v8, todavía no publicada): se rechaza en cualquier versión actual. */
+  estilosJuego?: Record<Lado, EstiloJuego>;
   duracionS: number; intervaloS: number;
 }
 export type TipoEventoArena = "pase" | "recepcion" | "intercepcion" | "recuperacion" | "tiro" | "gol" | "atajada" | "tiro_fuera" | "fuera_juego" | "reinicio" | "plan_equipo" | "cambio" | "falta" | "amarilla" | "roja" | "final_anticipado";
 export interface EventoArena {
   id: string; tick: number; tipo: TipoEventoArena; lado: Lado; jugador: string;
   receptor: string | null; desde: Punto; hasta: Punto; distanciaM: number;
-  /** `motivo`: p. ej. "desvio" (atajada), "centro"/"saque_manos" (pase), "alto" (tiro_fuera, brief 051). */
+  /** `motivo`: p. ej. "desvio" (atajada), "centro"/"saque_manos"/"largo" (pase), "alto" (tiro_fuera, brief 051),
+   * "lejano" (tiro, brief 063). */
   sale?: string; entrenador?: string; motivo?: string; fuentes?: string[];
   formacion?: FormacionArena;
   gravedad?: "imprudente" | "temeraria" | "fuerza_excesiva";
@@ -158,7 +173,8 @@ export interface ObservacionArena {
   id: string; lado: Lado; tiempoS: number; horizonteS: number;
   duracionS?: number;
   estado: EstadoArena;
-  equipos: Record<Lado, { nombre: string; ataque: number; defensa: number; estilo: string; formacion: FormacionArena; entrenador?: EntrenadorArena }>;
+  /** Brief 063 (reinicios-v7): `atributos` con los IDs de ese lado (titulares y banco). */
+  equipos: Record<Lado, { nombre: string; ataque: number; defensa: number; estilo: string; formacion: FormacionArena; entrenador?: EntrenadorArena; atributos?: Record<string, AtributosJugador> }>;
   condiciones: SimConfig["condiciones"] | null;
   recientes: EventoArena[];
   resumen?: Record<Lado, ResumenEquipo>;

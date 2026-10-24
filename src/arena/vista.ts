@@ -120,6 +120,10 @@ export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, 
     ? `${nombre} centra al área hacia ${receptor?.nombre ?? "un compañero"} (${metros} m).` : `${nombre} crosses into the box towards ${receptor?.nombre ?? "a teammate"} (${metros} m).`;
   if (evento.tipo === "pase" && evento.motivo === "saque_manos") return idioma === "es"
     ? `${nombre} pone el balón en juego desde sus manos hacia ${receptor?.nombre ?? "el centro del campo"} (${metros} m).` : `${nombre} puts the ball back in play from the hands towards ${receptor?.nombre ?? "midfield"} (${metros} m).`;
+  // Brief 063 § 8.3: balón largo (pase) y remate lejano (tiro), reinicios-v7.
+  if (evento.tipo === "pase" && evento.motivo === "largo") return idioma === "es"
+    ? `${nombre} lanza un balón largo hacia ${receptor?.nombre ?? "un compañero"} (${metros} m).` : `${nombre} plays a long ball towards ${receptor?.nombre ?? "a teammate"} (${metros} m).`;
+  if (evento.tipo === "tiro" && evento.motivo === "lejano") return idioma === "es" ? `${nombre} prueba desde lejos (${metros} m).` : `${nombre} tries a long-range shot (${metros} m).`;
   if (evento.tipo === "atajada" && evento.motivo === "desvio") return idioma === "es" ? `${nombre} desvía el remate; el balón sigue en juego.` : `${nombre} deflects the shot; the ball stays in play.`;
   // Brief 051: remate por encima del travesaño (reinicios-v5); sin motivo, el texto genérico de abajo.
   if (evento.tipo === "tiro_fuera" && evento.motivo === "alto") return idioma === "es" ? `El remate de ${nombre} se va por encima del travesaño.` : `${nombre}'s shot goes over the bar.`;

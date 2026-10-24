@@ -9,7 +9,7 @@ import type { Estilo, Lado } from "../sim/tipos";
 import { anclas, puestos } from "./catalogo";
 import { etiquetasEntrenador } from "./entrenadores";
 import type { EvidenciaMesa, IntervencionArena, TurnoMesa } from "./protocolo";
-import { perfilesJugador, type FormacionArena, type JugadorArena, type PerfilEntrenador, type PerfilJugador, type RegistroArena } from "./tipos";
+import { perfilesJugador, type AtributosJugador, type EstiloJuego, type FormacionArena, type JugadorArena, type PerfilEntrenador, type PerfilJugador, type RegistroArena } from "./tipos";
 
 const T = PREVIA_ARENA.tarjeta;
 /** v1.2 · Geometría derivada de la tarjeta: escala de profundidad estirada (PREVIA_ARENA), línea de fondo
@@ -27,6 +27,9 @@ export interface EquipoPrevia {
   banco: JugadorArena[]; nivelMedio: number;
   perfiles: { perfil: PerfilJugador; n: number }[];
   ataque: number; defensa: number; estilo: Estilo;
+  /** Brief 063 § 9.1 · atributos de los IDs de ese lado (`config.atributos`, reinicios-v7) e identidad de juego
+   * (`config.estilosJuego`, reinicios-v8); null en grabaciones anteriores. La previa hablada no los usa. */
+  atributos: Record<string, AtributosJugador> | null; estiloJuego: EstiloJuego | null;
 }
 export type SuperficiePrevia = keyof typeof PREVIA_ARENA.textos.superficie.es;
 export interface PreviaVisual {
@@ -79,6 +82,8 @@ function equipoPrevia(registro: RegistroArena, lado: Lado): EquipoPrevia {
     banco: registro.inicial.banco?.filter(j => j.lado === lado) ?? [],
     nivelMedio: Math.round(media(propios.map(j => j.nivel))),
     perfiles, ataque: equipo.ataque, defensa: equipo.defensa, estilo: equipo.estilo,
+    atributos: registro.config.atributos ? Object.fromEntries(Object.entries(registro.config.atributos).filter(([id]) => id.startsWith(`${lado}-`))) : null,
+    estiloJuego: registro.config.estilosJuego?.[lado] ?? null,
   };
 }
 

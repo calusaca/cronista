@@ -1,7 +1,7 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ENTORNO_ARENA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -12,15 +12,17 @@ import { emocionesEntrenador, entrenadorDe, estadoInicialEntrenador, planDelEntr
 import { capacidadEfectiva, efectosEntorno, prepararPartido, reaccionarAficion, resumir } from "./entorno";
 import { anclas, puestos, transformar } from "./catalogo";
 import { crearArbitro, moverArbitro } from "./arbitro";
-import { opcionPase, planProgramado } from "./controladores";
+import { evaluarPases, opcionPase, planProgramado } from "./controladores";
 import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } from "./personalidades";
 import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
 import { despejeManos, destinoSalida, enAreaPropia, limitarAreaPropia, manoAMano, radioAtajada, respetarManos, saqueAdmisible, saqueForzado, ticksManos } from "./portero";
 import { alcancePortero, balonCercaDelArco, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, REMATE_NEUTRO, velocidadRemate } from "./remate";
+import { ajusteDuelo, atributosDe, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax } from "./atributos";
+import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "./largo";
 import { destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, perseguidoresDe, seleccionRepliegue } from "./persecucion";
 import { conduccionPorDefecto, destinosLlegada, enZonaCentro, limitarConduccion, lineaFueraDeJuego, opcionCentro, puedeCentrar, receptorCentro } from "./ataque";
-import { formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
+import { atributosJugador, formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type AtributosJugador, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
 
 export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones>; reglas?: ReglasArena } = {}): ConfigArena {
   const version = opciones.version ?? ARENA.version;
@@ -50,18 +52,32 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
     formaciones: { local: forma("local"), visita: forma("visita") },
     ...(version === ARENA.version ? { entrenadores, aficiones: { local: aficionDe(partido.local.nombre), visita: aficionDe(partido.visita.nombre) } } : {}),
   };
+  // Brief 063 § 4.3 (reinicios-v7): los atributos de toda la plantilla de arena de los dos lados, una sola vez.
+  if (reglasDesde(config, "reinicios-v7")) config.atributos = atributosPlantillas(partido);
   validarConfigArena(config);
   return config;
+}
+/** Brief 063 § 4.3 · `atributosDe` para cada jugador de `plantillaArena(partido, lado, true)` de los dos lados. */
+export function atributosPlantillas(partido: SimConfig): Record<string, AtributosJugador> {
+  return Object.fromEntries(lados.flatMap(lado => plantillaArena(partido, lado, true).map(j => [j.id, atributosDe(partido[lado].nombre, j.nombre, j.posicionNatural!, j.personalidad!.perfil)])));
 }
 export function validarConfigArena(config: ConfigArena): void {
   if (config.version !== undefined && ![ARENA.version, ARENA.versionPersonalidades, ARENA.versionLegado].includes(config.version)) throw new Error("Versión de motor de arena desconocida");
   if (config.reglas !== undefined && (!(reglasArena as readonly string[]).includes(config.reglas) || config.version !== ARENA.version)) throw new Error("Reglas de reinicio desconocidas");
-  // Brief 063: los atributos (reinicios-v7) y la identidad de juego (reinicios-v8) no existen todavía en
-  // ninguna versión publicada; una configuración que los traiga se rechaza.
+  // Brief 063 § 4.3: los atributos existen si y solo si las reglas son ≥ reinicios-v7; la identidad de juego
+  // (reinicios-v8) no existe todavía en ninguna versión publicada y se rechaza.
   const extra = config as unknown as Record<string, unknown>;
-  if (extra.atributos !== undefined) throw new Error("Atributos fuera de su versión");
+  const v7 = reglasDesde(config, "reinicios-v7");
+  if (extra.atributos !== undefined && !v7) throw new Error("Atributos fuera de su versión");
+  if (extra.atributos === undefined && v7) throw new Error("Faltan los atributos de jugador");
   if (extra.estilosJuego !== undefined) throw new Error("Identidad de juego fuera de su versión");
   validarConfig(config.partido);
+  if (v7) {
+    const valor = z.number().int().min(AT.min).max(AT.max);
+    const uno = z.strictObject(Object.fromEntries(atributosJugador.map(a => [a, valor])) as Record<(typeof atributosJugador)[number], typeof valor>);
+    const ids = lados.flatMap(lado => config.partido[lado].jugadores.slice(0, ARENA.plantillaArena).map((_, n) => `${lado}-${n}`));
+    z.strictObject(Object.fromEntries(ids.map(id => [id, uno]))).parse(extra.atributos);
+  }
   for (const lado of lados) {
     z.string().min(1).max(100).parse(config.partido[lado].nombre);
     for (const j of config.partido[lado].jugadores) {
@@ -143,6 +159,8 @@ export function datosEquipos(config: ConfigArena, estado?: EstadoArena): Observa
     defensa: config.partido[lado].defensa, estilo: config.partido[lado].estilo,
     formacion: estado?.entrenadores?.[lado].formacion ?? config.formaciones[lado],
     ...(config.entrenadores ? { entrenador: config.entrenadores[lado] } : {}),
+    // Brief 063 § 4.3 (reinicios-v7): solo los IDs de ese lado (titulares y banco).
+    ...(config.atributos ? { atributos: Object.fromEntries(Object.entries(config.atributos).filter(([id]) => id.startsWith(`${lado}-`))) } : {}),
   }])) as ObservacionArena["equipos"];
 }
 
@@ -176,6 +194,11 @@ export class MotorArena {
   /** Todo el comportamiento del bloque A del brief 063 (repliegue de emergencia, persecución tras
    * pérdida y su frenado) vive tras esta condición. */
   private get v6() { return reglasDesde(this.config, "reinicios-v6"); }
+  /** Todo el comportamiento de los bloques B y C del brief 063 (atributos, remate lejano, portero a la
+   * trayectoria y balón largo) vive tras esta condición. */
+  private get v7() { return reglasDesde(this.config, "reinicios-v7"); }
+  /** Brief 063 § 4.2: los atributos guardados en la configuración (bajo v7; undefined en otro caso). */
+  private atributos(id: string): AtributosJugador | undefined { return this.v7 ? this.config.atributos?.[id] : undefined; }
   constructor(readonly config: ConfigArena, inicial: EstadoArena = crearEstadoArena(config)) {
     validarConfigArena(config);
     this.estado = structuredClone(inicial);
@@ -286,7 +309,7 @@ export class MotorArena {
     if (portador) this.estado.balon.posicion = { ...portador.posicion };
   }
   /** `extra` (solo reinicios-v4): `motivo` del evento (`centro`, `saque_manos`) y vuelo `centro`. */
-  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null, extra: { motivo?: "centro" | "saque_manos"; centro?: true; aereo?: true } = {}): void {
+  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null, extra: { motivo?: "centro" | "saque_manos" | "largo"; centro?: true; aereo?: true } = {}): void {
     const desde = { ...j.posicion };
     const rng = prngDerivado(this.config.partido.seed, `arena:golpe:${this.estado.tick}:${j.id}`);
     const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado, distancia(desde, destino)) : null;
@@ -297,21 +320,33 @@ export class MotorArena {
     // Brief 051 (v5): el remate apunta dentro del arco al lado libre del portero, con potencia según la
     // distancia, error triangular (dos extracciones de `arena:golpe`) y un posible balón por encima
     // (PRNG `arena:remate`). Pases y centros no cambian.
-    let remate5: { potencia: number; alto: boolean } | null = null;
+    // Brief 063 § 7.1 y § 8.2 (v7): la visión del pasador escala el error de todo pase; el balón largo suma su
+    // error extra.
+    const a7 = this.atributos(j.id);
+    if (a7 && tipo === "pase") {
+      error *= factorErrorPase(a7.vision);
+      if (extra.motivo === "largo") error += errorExtraLargo(distancia(desde, destino), a7.vision);
+    }
+    let remate5: { potencia: number; alto: boolean } | null = null, lejano = false;
     if (this.v5 && tipo === "tiro") {
       const portero = this.estado.jugadores.find(p => p.lado !== j.lado && p.puesto === "POR");
       const d = distancia(desde, destino), potencia = potenciaRemate(d);
       destino = transformar({ x: ARENA.largoM, y: objetivoRemate(desde, portero?.posicion ?? null, nivel, j.personalidad?.remate ?? REMATE_NEUTRO, j.lado).y }, j.lado);
-      error = errorRemate(nivel, d, potencia) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
-      remate5 = { potencia, alto: prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`).chance(probabilidadAlto(nivel, potencia)) };
+      // Brief 063 § 8.1 (v7): un remate desde más de radioTiroM (y como mucho maxM) es lejano: más error y más
+      // probabilidad de irse alto (acotada). A d ≤ radioTiroM nada cambia.
+      const lejos = this.v7 ? lejosRemate(d) : 0;
+      lejano = lejos > 0;
+      error = (lejano ? errorRemate(nivel, d, potencia) * factorErrorLejano(lejos) : errorRemate(nivel, d, potencia)) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
+      const alto = lejano ? altoLejano(probabilidadAlto(nivel, potencia), lejos) : probabilidadAlto(nivel, potencia);
+      remate5 = { potencia, alto: prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`).chance(alto) };
     }
     const lateral = remate5 ? rng.next() + rng.next() - 1 : rng.next() * 2 - 1;
     const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + lateral * error };
     const objetivo = this.conReinicios ? bruto : enCancha(bruto);
     const fuera = adelantados(this.estado, j.lado);
     this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}),
-      ...(remate5 ? { potencia: remate5.potencia, ...(remate5.alto ? { alto: true as const } : {}) } : {}) } };
-    this.evento(tipo, j, desde, objetivo, receptor, extra.motivo ? { motivo: extra.motivo } : {});
+      ...(remate5 ? { potencia: remate5.potencia, ...(remate5.alto ? { alto: true as const } : {}) } : {}), ...(lejano ? { lejano: true as const } : {}) } };
+    this.evento(tipo, j, desde, objetivo, receptor, lejano ? { motivo: "lejano" } : extra.motivo ? { motivo: extra.motivo } : {});
     this.ultimaAccion = this.estado.tick;
   }
   private accionBalon(planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>): void {
@@ -324,19 +359,35 @@ export class MotorArena {
     const usarOrden = !ejecutadas.has(j.id);
     const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, j.lado);
     const receptorOrden = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor) : undefined;
+    // Brief 063 § 8.2 (v7): un `pasar` a un compañero de campo entre paseMaxM y el alcance de visión del pasador
+    // (de campo) sale como balón largo, sin exigir ventaja.
+    const v7 = this.v7, a7 = this.atributos(j.id);
+    const alcance = v7 && j.puesto !== "POR" ? alcanceLargo(a7) : null;
+    const dOrden = receptorOrden ? distancia(j.posicion, receptorOrden.posicion) : Infinity;
+    const pasarLargo = alcance !== null && !!receptorOrden && receptorOrden.lado === j.lado && receptorOrden.id !== j.id && receptorOrden.puesto !== "POR" && dOrden > ARENA.paseMaxM && dOrden <= alcance;
     // Brief 046, lateral A (v4): un `pasar` hacia un receptor inexistente o fuera de alcance no
     // bloquea al poseedor; en este tick decide en local y la orden sigue pendiente.
-    const pasarImposible = this.v4 && usarOrden && orden.accion === "pasar" && (!receptorOrden || distancia(j.posicion, receptorOrden.posicion) > ARENA.paseMaxM);
+    const pasarImposible = this.v4 && usarOrden && orden.accion === "pasar" && !pasarLargo && (!receptorOrden || dOrden > ARENA.paseMaxM);
+    // Brief 063 § 8.1 (v7, v1.1 § 17.2): un `tirar` desde más de LARGO_ARENA.remate.maxM no se ejecuta; ese tick
+    // decide en local (soltar el balón consume la orden; conducir no, v1.2 § 18.5).
+    const tirarImposible = v7 && usarOrden && orden.accion === "tirar" && distancia(j.posicion, arco) > LA.remate.maxM;
     // V2 respeta un pase/conducción explícito aun cerca del arco. La personalidad
     // decide solo al elegir una acción local; no reemplaza una orden válida del LLM.
     // Bajo v1–v3, `centrar` no es explícita: decide en local (límite declarado del brief 046).
-    const accionExplicita = usarOrden && (["pasar", "conducir", "tirar"].includes(orden.accion) || this.v4 && orden.accion === "centrar") && !pasarImposible;
-    // Solo una acción local usa la opción de pase; con orden explícita se descartaba.
-    const paseLocal = j.personalidad && !accionExplicita ? opcionPase(j, this.observar(j.lado)) : undefined;
+    const accionExplicita = usarOrden && (["pasar", "conducir", "tirar"].includes(orden.accion) || this.v4 && orden.accion === "centrar") && !pasarImposible && !tirarImposible;
+    // Solo una acción local usa la opción de pase; con orden explícita se descartaba. Brief 063 § 3.2: los
+    // candidatos de `evaluarPases` (su primero es exactamente `opcionPase`).
+    const candidatosLocal = j.personalidad && !accionExplicita ? evaluarPases(j, this.observar(j.lado)) : undefined;
+    const paseLocal = candidatosLocal?.[0]?.p;
     const tiroLocal = j.personalidad
       ? !accionExplicita && prefiereTirar(j, distancia(j.posicion, arco), !!paseLocal)
       : distancia(j.posicion, arco) <= ARENA.radioTiroM;
-    if ((usarOrden && orden.accion === "tirar") || tiroLocal) {
+    if ((usarOrden && orden.accion === "tirar" && !tirarImposible) || tiroLocal) {
+      this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
+    }
+    // Brief 063 § 8.1 (v7): remate lejano local, tras `tiroLocal` falso y sin acción explícita, antes del centro.
+    if (v7 && !accionExplicita && puedeRematarLejos(j, a7, this.estado)
+      && prngDerivado(this.config.partido.seed, `arena:lejano:${this.estado.tick}:${j.id}`).chance(Math.min(1, probabilidadLejano(j.personalidad?.remate ?? REMATE_NEUTRO, a7!.potencia)))) {
       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
     }
     if (this.v4 && usarOrden && orden.accion === "centrar") { this.centrarOrden(j, orden, ejecutadas); return; }
@@ -345,6 +396,17 @@ export class MotorArena {
       if (centro) { this.sacarBalon(j, "pase", centro.destino, centro.receptor.id, { motivo: "centro", centro: true }); ejecutadas.add(j.id); return; }
     }
     if (usarOrden && orden.accion === "conducir") { ejecutadas.add(j.id); this.ultimaAccion = this.estado.tick; return; }
+    // Brief 063 § 8.2 (v7): el `pasar` largo del LLM, y después el balón largo local si puntúa más que el mejor
+    // pase corto (fase aérea del 046: solo se toca a ≤ caidaM de su destino).
+    if (usarOrden && orden.accion === "pasar" && pasarLargo) {
+      this.sacarBalon(j, "pase", this.destinoPase(j, receptorOrden!), receptorOrden!.id, { motivo: "largo", aereo: true }); ejecutadas.add(j.id); return;
+    }
+    if (v7 && !(usarOrden && orden.accion === "pasar" && !pasarImposible) && !prefiereConducir(j) && j.puesto !== "POR") {
+      const largo = opcionPaseLargo(j, a7, this.estado);
+      if (largo && largo.puntuacion > ((candidatosLocal ?? evaluarPases(j, this.observar(j.lado)))[0]?.puntuacion ?? -Infinity)) {
+        this.sacarBalon(j, "pase", largo.destino, largo.receptor.id, { motivo: "largo", aereo: true }); ejecutadas.add(j.id); return;
+      }
+    }
     const receptor = usarOrden && orden.accion === "pasar" && !pasarImposible ? receptorOrden
       : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : opcionPase(j, this.observar(j.lado));
     if (receptor && distancia(j.posicion, receptor.posicion) <= ARENA.paseMaxM) {
@@ -414,6 +476,7 @@ export class MotorArena {
     const llegada = v4 && ladoBalon ? destinosLlegada(this.estado, ladoBalon, planes[ladoBalon].ordenes, ladoBalon !== posesionInicial) : null;
     // Brief 063 (v6): la persecución vencida se borra al empezar el paso; el repliegue y quien persigue se
     // evalúan una vez sobre el estado anterior al paso, fuera de pausa y saque.
+    const v7 = this.v7;
     const v6 = this.v6, enJuego = !this.estado.saque && !(this.estado.pausa && this.estado.tick < this.estado.pausa.hastaTick);
     if (v6 && this.estado.persecucion && this.estado.tick >= this.estado.persecucion.hastaTick) this.estado.persecucion = null;
     const repliegue = new Set(v6 && enJuego ? seleccionRepliegue(this.estado, perseguidores).map(j => j.id) : []);
@@ -450,6 +513,9 @@ export class MotorArena {
       // Brief 051 (v5): fuera del mano a mano, con el balón de un rival (poseedor o vuelo) cerca de su
       // arco y sin saque, el portero se coloca sobre la línea balón–centro del arco.
       else if (this.v5 && j.puesto === "POR" && j.id !== balon.poseedor && ladoBalon !== undefined && ladoBalon !== j.lado && !this.estado.saque && balonCercaDelArco(balon.posicion, j.lado)) destino = destinoPosicionamiento(balon.posicion, j.lado);
+      // Brief 063 § 8.1 (v7): ante un remate lejano rival el portero va al punto de la trayectoria en su x; sustituye
+      // a la salida y al posicionamiento del 051 (el límite de área de abajo sigue).
+      if (v7 && j.puesto === "POR" && j.id !== balon.poseedor && balon.vuelo?.tipo === "tiro" && balon.vuelo.lado !== j.lado && balon.vuelo.lejano) destino = destinoTrayectoria(balon.vuelo, j);
       // Ningún rival se dirige a menos de distanciaManosM del portero con el balón en las manos.
       if (porteroManos && j.lado !== porteroManos.lado) destino = respetarManos(destino, j.posicion, porteroManos.posicion);
       const porteroEnArea = v4 && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado);
@@ -470,15 +536,19 @@ export class MotorArena {
       const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado) : null;
       const ritmo = this.estado.entrenadores ? T.ritmo[this.estado.entrenadores[j.lado].plan.ritmo] : 1;
       const nivel = entorno ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel;
-      const max = ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor * nivel / 100) * (ARENA.factorEnergiaMin + (1 - ARENA.factorEnergiaMin) * j.energia) * ritmo * (entorno?.velocidadJugador ?? 1);
-      const rapidez = Math.min(max, Math.sqrt(2 * ARENA.aceleracionMps2 * Math.max(0, d - ARENA.toleranciaM)));
+      // Brief 063 § 7.1 (v7): la velocidad escala la velocidad máxima y la aceleración del jugador (no el frenado).
+      const a7 = v7 ? this.config.atributos?.[j.id] : undefined;
+      const maxBase = ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor * nivel / 100) * (ARENA.factorEnergiaMin + (1 - ARENA.factorEnergiaMin) * j.energia) * ritmo * (entorno?.velocidadJugador ?? 1);
+      const max = a7 ? maxBase * factorVelocidadMax(a7.velocidad) : maxBase;
+      const aceleracion = a7 ? ARENA.aceleracionMps2 * factorAceleracion(a7.velocidad) : ARENA.aceleracionMps2;
+      const rapidez = Math.min(max, Math.sqrt(2 * aceleracion * Math.max(0, d - ARENA.toleranciaM)));
       const deseada = { x: d ? dx / d * rapidez : 0, y: d ? dy / d * rapidez : 0 };
       const ax = deseada.x - j.velocidad.x, ay = deseada.y - j.velocidad.y;
       // Brief 063 § 6.4 (v6): quien repliega o persigue frena a frenadoMps2 cuando la velocidad deseada reduce
       // su componente actual; el resto conserva exactamente la física anterior.
       const actual = Math.hypot(j.velocidad.x, j.velocidad.y);
       const frena = (repliegue.has(j.id) || persiguen.has(j.id)) && actual > 0 && (deseada.x * j.velocidad.x + deseada.y * j.velocidad.y) / actual < actual;
-      const cambioMax = frena ? PE.frenadoMps2 : ARENA.aceleracionMps2;
+      const cambioMax = frena ? PE.frenadoMps2 : aceleracion;
       const delta = Math.hypot(ax, ay), factor = delta ? Math.min(1, cambioMax * ARENA.pasoS / delta) : 0;
       const velocidad = { x: j.velocidad.x + ax * factor, y: j.velocidad.y + ay * factor };
       let bruto = { x: j.posicion.x + velocidad.x * ARENA.pasoS, y: j.posicion.y + velocidad.y * ARENA.pasoS };
@@ -490,7 +560,9 @@ export class MotorArena {
       j.velocidad = { x: (siguiente.x - j.posicion.x) / ARENA.pasoS, y: (siguiente.y - j.posicion.y) / ARENA.pasoS };
       j.posicion = siguiente;
       const calor = entorno?.desgaste ?? (this.config.partido.condiciones?.clima === "calor" ? ARENA.factorCalor : 1);
-      j.energia = limitar(j.energia - recorrido * (entorno ? T.energiaPorMetro * (1 + Math.max(0, ritmo - 1) * T.desgasteRitmo) : ARENA.energiaPorMetro) * calor + (recorrido < ARENA.toleranciaM ? ARENA.recuperacionEnergiaS * ARENA.pasoS : 0), ARENA.energiaMin, 1);
+      // Brief 063 § 7.1 (v7): la resistencia escala el desgaste por metro.
+      const desgaste = recorrido * (entorno ? T.energiaPorMetro * (1 + Math.max(0, ritmo - 1) * T.desgasteRitmo) : ARENA.energiaPorMetro) * calor;
+      j.energia = limitar(j.energia - (a7 ? desgaste * factorDesgaste(a7.resistencia) : desgaste) + (recorrido < ARENA.toleranciaM ? ARENA.recuperacionEnergiaS * ARENA.pasoS : 0), ARENA.energiaMin, 1);
     }
   }
   /** Brief 046 (v4): destino del poseedor. El de campo conduce hacia el área (sin cruzar la línea)
@@ -667,7 +739,10 @@ export class MotorArena {
       if (defensor) {
         this.ultimaDisputa = this.estado.tick;
         if (this.resolverFalta(defensor, portador)) return;
-        const p = limitar(ARENA.dueloBase + (defensor.nivel - portador.nivel) * ARENA.dueloNivel + (this.config.partido[defensor.lado].defensa - this.config.partido[portador.lado].ataque) * ARENA.dueloFuerza, ARENA.dueloMin, ARENA.dueloMax);
+        // Brief 063 § 7.1 (v7): entrada del defensor y aguante del portador, antes del `limitar` existente.
+        const bruto = ARENA.dueloBase + (defensor.nivel - portador.nivel) * ARENA.dueloNivel + (this.config.partido[defensor.lado].defensa - this.config.partido[portador.lado].ataque) * ARENA.dueloFuerza;
+        const aD = this.atributos(defensor.id), aP = this.atributos(portador.id);
+        const p = limitar(aD && aP ? bruto + ajusteDuelo(aD.entrada, aP.aguante) : bruto, ARENA.dueloMin, ARENA.dueloMax);
         if (prngDerivado(this.config.partido.seed, `arena:duelo:${this.estado.tick}:${defensor.id}`).chance(p)) this.recibir(defensor, portador);
       }
       return;
@@ -679,7 +754,10 @@ export class MotorArena {
     const remate5 = this.v5 && vuelo?.tipo === "tiro" && vuelo.potencia !== undefined ? { potencia: vuelo.potencia, alto: vuelo.alto === true } : null;
     let velocidadEfectiva = 0;
     if (vuelo) {
-      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo !== "pase" ? (remate5 ? velocidadRemate(remate5.potencia) : ARENA.velocidadTiroMps) : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
+      const d = distancia(desde, vuelo.destino), base = (vuelo.tipo !== "pase" ? (remate5 ? velocidadRemate(remate5.potencia) : ARENA.velocidadTiroMps) : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
+      // Brief 063 § 7.1 (v7): la potencia del autor escala la velocidad del remate (y el tiempo de reacción del portero).
+      const autor = vuelo.tipo === "tiro" ? this.atributos(vuelo.autor) : undefined;
+      const velocidad = autor ? base * factorPotencia(autor.potencia) : base;
       velocidadEfectiva = velocidad;
       const factor = d ? Math.min(1, velocidad * ARENA.pasoS / d) : 1;
       balon.posicion = factor === 1 ? { ...vuelo.destino } : { x: desde.x + (vuelo.destino.x - desde.x) * factor, y: desde.y + (vuelo.destino.y - desde.y) * factor };

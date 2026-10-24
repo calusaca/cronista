@@ -11,7 +11,9 @@ import { previaPartido } from "../src/arena/previa";
 import type { AsignacionModelos } from "../src/arena/protocolo";
 import { relatoIntervencion } from "../src/arena/relato";
 import type { RegistroArena } from "../src/arena/tipos";
-import { ANTESALA_ARENA, NARRACION_DIRECTO } from "../src/sim/limites";
+import { rasgoDistintivo } from "../src/arena/atributos";
+import { mkdir } from "node:fs/promises";
+import { ANTESALA_ARENA, ATRIBUTOS_ARENA, NARRACION_DIRECTO } from "../src/sim/limites";
 
 test.describe.configure({ mode: "serial" });
 
@@ -69,9 +71,11 @@ const soloKeepalive = (r: Route) => r.fulfill({ headers: { "content-type": "text
  * `avanceMs`, entrega todo hasta el tick 300 a ese plazo. /relato: 404 a las intervenciones; tramos vacíos;
  * la entrada, 0,3 s de audio. */
 async function directo(page: Page, id: string, opciones: { voz?: boolean; herramientas?: Promise<unknown>; retrasoPostMs?: number; hasta?: number; terminar?: boolean; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
+  /** Brief 063 · B6: otro registro servido por la sesión simulada (por defecto, arena-duelo-v3). */
+  ruta?: string;
   /** Manejador propio de /relato (antesala, previa…): devuelve true si respondió. */
   relato?: (p: Pedido, r: Route) => Promise<boolean> } = {}) {
-  const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = opciones.hasta ?? 300;
+  const registro = await leer(opciones.ruta ?? "public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = opciones.hasta ?? 300;
   const entrada = await wav(0.3);
   const pedidos: (Pedido & { t: number })[] = [], posts: number[] = [], cuerpos: Record<string, unknown>[] = [], enVuelo = { ahora: 0, maximo: 0 };
   const asignacion = opciones.asignacion ?? asignacionProgramada;
@@ -851,4 +855,50 @@ test("defecto rev. 0000029 · con el directo terminado (sin abrir la repetición
   await expect.poll(() => cuerpos.length).toBe(2);
   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
   expect(cuerpos[0]).toMatchObject({ segundos: 60 });
+});
+
+test("063 · B6 tira «En voz» con el rasgo distintivo de config.atributos (fixture reinicios-v7), 360 px, EN y ES, sin desbordar; arena-duelo-v3 (sin atributos) no lo muestra", async ({ browser }) => {
+  test.setTimeout(240_000);
+  const carpeta = "docs/evidencia/motor-063/smoke-bc", ruta = "src/arena/__fixtures__/arena-reinicios-v7.json";
+  await mkdir(carpeta, { recursive: true });
+  const registro = await leer(ruta);
+  let n = 0;
+  for (const idioma of ["en", "es"] as const) {
+    const ctx = await browser.newContext({ viewport: { width: 360, height: 740 }, colorScheme: "light" });
+    const page = await ctx.newPage();
+    await directo(page, `00000000-0000-4000-8000-0000000063${String(10 + n++)}`, { avanceMs: 500, ruta, asignacion: asignacionModelos, relato: servirAntesala(registro, asignacionModelos as AsignacionModelos, { duracionS: 2 }) });
+    await page.goto("/arena");
+    if (idioma === "es") await page.getByRole("button", { name: "Switch to Spanish" }).click();
+    await page.getByTestId("arena-live").getByRole("button", { name: idioma === "es" ? "Iniciar partido en vivo" : "Start live match", exact: true }).click();
+    const tira = page.getByTestId("arena-lineups-now");
+    // Recorre los clips de la antesala hasta ver una fila con rasgo; en cada fila vista, el rasgo es exactamente el
+    // de rasgoDistintivo (o no hay) y va después del nivel.
+    let conRasgo = false;
+    for (let k = 0; k < 60 && !conRasgo; k++) {
+      const filas = await page.locator(".arena-lineups-now-row").evaluateAll(es => es.map(e => ({ id: (e as HTMLElement).dataset.jugador ?? "", rasgo: e.querySelector('[data-campo="rasgo"]')?.textContent ?? null,
+        orden: [...e.querySelectorAll("[data-campo]")].map(x => (x as HTMLElement).dataset.campo) })));
+      for (const f of filas) {
+        const r = rasgoDistintivo(registro.config.atributos![f.id]!);
+        expect({ id: f.id, rasgo: f.rasgo }).toEqual({ id: f.id, rasgo: r ? `${ATRIBUTOS_ARENA.rasgos[idioma][r.atributo]} ${r.valor}` : null });
+        if (r) { expect(f.orden.indexOf("rasgo")).toBe(f.orden.indexOf("nivel") + 1); conRasgo = true; }
+      }
+      if (!conRasgo) await page.waitForTimeout(250);
+    }
+    expect(conRasgo).toBe(true);
+    await tira.scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+    for (const alto of await page.locator(".arena-lineups-now-row").evaluateAll(es => es.map(e => e.getBoundingClientRect().height))) expect(alto).toBeGreaterThanOrEqual(44);
+    await tira.screenshot({ path: `${carpeta}/en-voz-rasgo-${idioma}-360.png` });
+    await ctx.close();
+  }
+  // Sin atributos (arena-duelo-v3): la tira nunca muestra el campo rasgo.
+  const ctx = await browser.newContext({ viewport: { width: 360, height: 740 } });
+  const page = await ctx.newPage();
+  const v3 = await leer("public/experimentos/arena-duelo-v3.json");
+  await directo(page, "00000000-0000-4000-8000-000000006320", { avanceMs: 500, asignacion: asignacionModelos, relato: servirAntesala(v3, asignacionModelos as AsignacionModelos, { duracionS: 2 }) });
+  await page.goto("/arena");
+  await page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
+  await expect(page.locator(".arena-lineups-now-row").first()).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('[data-testid="arena-lineups-now"] [data-campo="rasgo"]')).toHaveCount(0);
+  await ctx.close();
 });

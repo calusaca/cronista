@@ -1,5 +1,5 @@
 import type { Llm, Mensaje } from "../lib/llm";
-import { ARENA, ATAQUE_ARENA as A, PERSECUCION_ARENA as PE, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARENA, ATAQUE_ARENA as A, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { enAreaRival } from "./ataque";
 import { asignarPuestos } from "./alineacion";
 import { gestionarProgramado, planDelEntrenador } from "./entrenadores";
@@ -158,6 +158,18 @@ export function frasesPersecucion(c: { max: number; radioM: number; minS: number
   return `Si un rival con el balón supera a tu último defensor de campo, hasta ${c.max} de tus defensas y medios a ≤ ${c.radioM} m corren hacia tu arco aunque no lleguen; quien pierde el balón lo persigue entre ${c.minS} y ${c.maxS} s (un delantero no pasa de la mitad de tu campo, un medio no entra en tu tercio defensivo, un defensa no tiene límite). Ninguna orden lo activa; presionar sigue yendo al balón.`;
 }
 
+/** Brief 063 § 8.3: la frase de los atributos (reinicios-v7). Sin cifras propias. */
+export function frasesAtributos(): string {
+  return "equipos[lado].atributos da, por ID, seis capacidades 0–100: velocidad (punta y aceleración), resistencia (desgaste), aguante (conservar el balón en el duelo), entrada (robarlo), vision (precisión y balón largo) y potencia (fuerza y remate lejano); el nivel sigue siendo la capacidad general.";
+}
+/** Brief 063 § 8.3 y v1.1 § 17.2: la frase del balón largo y el remate lejano (reinicios-v7), construida solo con
+ * constantes (la prueba la construye también con valores alterados). */
+export function frasesLargo(c: { paseMaxM: number; largoMaxM: number; radioTiroM: number; remateMaxM: number } = {
+  paseMaxM: ARENA.paseMaxM, largoMaxM: LA.pase.maxM, radioTiroM: ARENA.radioTiroM, remateMaxM: LA.remate.maxM,
+}): string {
+  return `Un pasar a un compañero de campo entre ${c.paseMaxM} m y el alcance de visión del pasador (hasta ${c.largoMaxM} m) sale como balón largo por arriba; un tirar desde más de ${c.radioTiroM} m es un remate lejano, con más error, más probabilidad de irse alto y un portero que va a la trayectoria; un tirar desde más de ${c.remateMaxM} m no se ejecuta: el jugador decide por su cuenta.`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -171,6 +183,8 @@ No conoces órdenes nuevas del rival ni eventos futuros. Conserva amplitud, prof
 Al defender coordina presión, cobertura y bloque. El portero debe proteger su arco.
 ${frasesCentroPortero()}
 ${frasesPersecucion()}
+${frasesAtributos()}
+${frasesLargo()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad

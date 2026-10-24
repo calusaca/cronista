@@ -1,4 +1,4 @@
-// Brief 063 · publicación 1 (bloques 0 y A, reglas reinicios-v6): compatibilidad, repliegue de emergencia,
+// Brief 063 · publicaciones 1 (bloques 0 y A, reglas reinicios-v6) y 2 (bloques B y C, reinicios-v7): compatibilidad, repliegue de emergencia,
 // persecución tras pérdida y su frenado, con gating por versión. Las cifras salen de limites.ts
 // (PERSECUCION_ARENA, LOTE_ARENA_063, LOTE_ARENA_046/051, ARENA); los valores propios de cada escenario se
 // nombran como tales en ESCENARIO. Cada prueba nombra la mutación que la pone en rojo.
@@ -6,21 +6,41 @@ import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE } from "../../sim/limites";
+import { execFileSync } from "node:child_process";
+import { ARENA, ATAQUE_ARENA as A46, ATRIBUTOS_ARENA as AT, LARGO_ARENA as LA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE, TECNICA_ARENA as T, TORNEO_ARENA, TORNEO_SITIO } from "../../sim/limites";
+import { prngDerivado } from "../../sim/prng";
+import type { Llm } from "../../lib/llm";
+import { ajusteDuelo, atributosDe, efectoAtributo, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax, lineaDePuesto } from "../atributos";
+import { compatibilidadPuesto } from "../alineacion";
+import { anclas, transformar } from "../catalogo";
+import { contextoCompetitivo } from "../competencia";
+import { esquemaRespuestaArena, evaluarPases, frasesAtributos, frasesLargo, frasesPersecucion, opcionPase, planProgramado, SISTEMA_ARENA, crearControladorProgramado, validarOrdenes } from "../controladores";
+import { ejecutarArena, observarArena, reproducirArena } from "../coordinador";
+import { capacidadEfectiva } from "../entorno";
+import { varianteVoz } from "../expresion";
+import { condicionesFixtureV7, cumpleFixtureV7, DURACION_FIXTURE_V7_S } from "../__fixtures__/generar-reinicios-v7";
+import { distancia } from "../geometria";
+import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "../largo";
+import { narrarArena } from "../narrador";
+import { personalidadDe } from "../personalidades";
+import { RELATO_INTERVALOS } from "../protocolo";
+import { construirRelato } from "../relato";
+import { errorRemate, objetivoRemate, potenciaRemate, probabilidadAlto, REMATE_NEUTRO } from "../remate";
+import { RUTA_ENTRADAS_SITIO } from "../torneo-entradas-cli";
+import { estimarFormato, tipicoPartidoMaxMicroUsd, type EntradasSitio } from "../torneo-formatos";
+import { narrarEventoArena } from "../vista";
 import type { Lado } from "../../sim/tipos";
-import { lineaDePuesto } from "../atributos";
-import { anclas } from "../catalogo";
-import { evaluarPases, frasesPersecucion, opcionPase, SISTEMA_ARENA, crearControladorProgramado } from "../controladores";
-import { ejecutarArena, reproducirArena } from "../coordinador";
 import { estadosOraculo, observacionOraculo, type EntradaOraculo063 } from "../__fixtures__/generar-opcion-pase-063";
 import { condicionesFixtureV6, cumpleFixtureV6, DURACION_FIXTURE_V6_S } from "../__fixtures__/generar-reinicios-v6";
-import { bandasLote, incumplimientos, incumplimientos063, incumplimientosControlado, medirControlado, medirLote } from "../metricas-lote";
-import { crearConfigArena, crearEstadoArena, MotorArena, reglasDesde, validarConfigArena } from "../motor";
+import { bandasLote, incumplimientos, incumplimientos063, incumplimientosBC, incumplimientosControlado, medirControlado, medirLote } from "../metricas-lote";
+import { atributosPlantillas, crearConfigArena, crearEstadoArena, MotorArena, reglasDesde, validarConfigArena } from "../motor";
 import { destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, limiteXPersecucion, perseguidoresDe, seleccionRepliegue, superadoPor } from "../persecucion";
 import { validarRaizTorneos, validarTorneo } from "../torneo-validacion";
-import { lados, reglasArena, type ConfigArena, type EstadoArena, type FormacionArena, type JugadorArena, type OrdenesEquipo, type OrdenJugador, type PersecucionArena, type Punto, type RegistroArena, type ReglasArena, type Vuelo } from "../tipos";
+import { atributosJugador, lados, reglasArena, type AtributoJugador, type AtributosJugador, type ConfigArena, type ControladorEquipo, type EstadoArena, type FormacionArena, type JugadorArena, type OrdenesEquipo, type OrdenJugador, type PersecucionArena, type Punto, type RegistroArena, type ReglasArena, type Vuelo } from "../tipos";
 
-const V6 = "reinicios-v6" as const, V5 = "reinicios-v5" as const;
+const V7 = "reinicios-v7" as const, V6 = "reinicios-v6" as const, V5 = "reinicios-v5" as const;
+/** § 4.3: la configuración `base` con otras reglas; desde reinicios-v7, con sus atributos. */
+const conReglas = (base: ConfigArena, reglas: ReglasArena): ConfigArena => { const { atributos: _a, ...resto } = base; return reglasDesde({ ...resto, reglas }, V7) ? { ...resto, reglas, atributos: atributosPlantillas(base.partido) } : { ...resto, reglas }; };
 type Reglas = ReglasArena | undefined;
 /** Matriz de versiones: v1–v5 y archivos sin `reglas` frente a v6. */
 const ANTERIORES: readonly Reglas[] = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, undefined];
@@ -80,9 +100,10 @@ interface Escenario {
   ticks(n: number, cada?: (m: MotorArena) => void): void;
 }
 function montar(reglas: Reglas, preparar: (e: EstadoArena, config: ConfigArena) => void, ordenes: (e: EstadoArena) => Record<string, OrdenEscenario> = () => ({}), opciones: { seed?: number; parqueLocalX?: number; parqueVisitaX?: number } = {}): Escenario {
-  const config: ConfigArena = { ...crearConfigArena({ seed: opciones.seed ?? ESCENARIO.semilla, duracionS: ESCENARIO.duracionS, intervaloS: ESCENARIO.intervaloS, local: ESCENARIO.local, visita: ESCENARIO.visita }) };
+  // § 4.3: la configuración se crea con sus reglas (desde reinicios-v7 lleva atributos; antes, no).
+  const config: ConfigArena = { ...crearConfigArena({ seed: opciones.seed ?? ESCENARIO.semilla, duracionS: ESCENARIO.duracionS, intervaloS: ESCENARIO.intervaloS, local: ESCENARIO.local, visita: ESCENARIO.visita, reglas: reglas ?? V5 }) };
   config.partido = structuredClone(config.partido);
-  if (reglas) config.reglas = reglas; else delete config.reglas;
+  if (!reglas) delete config.reglas;
   const inicial = crearEstadoArena(config);
   inicial.saque = null; inicial.pausa = null;
   for (const lado of lados) {
@@ -221,15 +242,20 @@ function duracionReferencia(linea: "DEF" | "MED" | "DEL", agresividad: number, b
 describe("063 · bloque 0 · compatibilidad", () => {
   const leer = async (nombre: string) => JSON.parse(await readFile(`src/arena/__fixtures__/${nombre}.json`, "utf8")) as RegistroArena;
 
-  it("0.1 · reglasArena y la predeterminada de la publicación 1; v1–v6 válidas, reinicios-v7 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6]);
-    expect(ARENA.reglas).toBe(V6);
-    expect(crearConfigArena().reglas).toBe(V6);
-    const base = crearConfigArena();
-    for (const reglas of reglasArena) expect(() => validarConfigArena({ ...base, reglas })).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v7" as never })).toThrow("Reglas");
-    for (const [i, reglas] of reglasArena.entries()) expect(reglasDesde({ ...base, reglas }, V6)).toBe(i >= 5);
+  it("0.1 · reglasArena y la predeterminada de la publicación 2; v1–v7 válidas (v7 con sus atributos), reinicios-v8 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
+    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6, V7]);
+    expect(ARENA.reglas).toBe(V7);
+    expect(crearConfigArena().reglas).toBe(V7);
+    const base = crearConfigArena({ reglas: V6 });
+    for (const reglas of reglasArena) expect(() => validarConfigArena(conReglas(base, reglas))).not.toThrow();
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v8" as never })).toThrow("Reglas");
+    for (const [i, reglas] of reglasArena.entries()) {
+      expect(reglasDesde({ ...base, reglas }, V6)).toBe(i >= 5);
+      expect(reglasDesde({ ...base, reglas }, V7)).toBe(i >= 6);
+    }
     expect(L63.desdeA).toBe(V6);
+    expect(L63.desdeBC).toBe(V7);
+    expect(L63.recalibracion046.desde).toBe(V7);
   });
 
   it("0.2 · los fixtures v1–v5 se reproducen exactos y los torneos archivados validan (mutación: activar algo con v5 o conReinicios)", { timeout: 300_000 }, async () => {
@@ -281,14 +307,15 @@ describe("063 · bloque 0 · compatibilidad", () => {
     expect("persecucion" in crearEstadoArena(c5)).toBe(false);
     const r5 = await leer("arena-reinicios-v5");
     expect([r5.inicial, r5.final, ...r5.fotogramas].some(f => "persecucion" in f)).toBe(false);
-    const c6 = crearConfigArena();
+    const c6 = crearConfigArena({ reglas: V6 });
     expect(["atributos", "estilosJuego"].some(k => k in c6)).toBe(false);
     const inicial = crearEstadoArena(c6);
     expect(Object.hasOwn(inicial, "persecucion") && inicial.persecucion === null).toBe(true);
     expect(() => validarConfigArena({ ...c6, atributos: {} } as ConfigArena)).toThrow("Atributos fuera de su versión");
     expect(() => validarConfigArena({ ...c5, atributos: {} } as ConfigArena)).toThrow("Atributos fuera de su versión");
     expect(() => validarConfigArena({ ...c6, estilosJuego: { local: "presion", visita: "directo" } } as ConfigArena)).toThrow("Identidad de juego fuera de su versión");
-    const registros = [await leer("arena-reinicios-v6"), ...await Promise.all(ESCENARIO.semillasEstado.map(seed => ejecutarArena(crearConfigArena({ seed, duracionS: ESCENARIO.duracionEstadoS }), { local: crearControladorProgramado(), visita: crearControladorProgramado() })))];
+    // Desde v6 (también en v7) la clave existe siempre.
+    const registros = [await leer("arena-reinicios-v6"), ...await Promise.all(ESCENARIO.semillasEstado.flatMap(seed => [V6, V7].map(reglas => ejecutarArena(crearConfigArena({ seed, duracionS: ESCENARIO.duracionEstadoS, reglas }), { local: crearControladorProgramado(), visita: crearControladorProgramado() }))))];
     let activas = 0;
     for (const r of registros) for (const f of [r.inicial, ...r.fotogramas, r.final]) {
       expect(Object.hasOwn(f, "persecucion")).toBe(true);
@@ -568,5 +595,557 @@ describe("063 · bloque A · persecución (reinicios-v6)", () => {
       expect({ seed, intervaloS, dentroDeCota: b6 < b5 + cota, menorQueMaximo: b6 < ARENA.archivoMaxBytes }).toEqual({ seed, intervaloS, dentroDeCota: true, menorQueMaximo: true });
     }
     console.log("[063 A10 tamaño]", JSON.stringify({ mayorBytes: mayor, archivoMaxBytes: ARENA.archivoMaxBytes }));
+  });
+});
+
+// =============================================================================================
+// Publicación 2 · bloques B y C (reglas reinicios-v7)
+// =============================================================================================
+/** Valores propios de los escenarios de los bloques B y C (posiciones, atributos y duraciones). */
+const BC = {
+  /** Valores de un atributo para las parejas de integración (B4) y el atributo de un jugador «neutro». */
+  bajo: 30, alto: 90, neutro: 50,
+  /** Corredor (B4): carril, destino lejano, velocidad y energía iniciales para el desgaste, y ticks hasta saturar. */
+  corredor: { x: 20, y: 60 }, destinoCorredor: { x: 95, y: 60 }, velocidadInicial: 6, energiaInicial: 0.8, ticksSaturar: 30,
+  /** Pase (B4/C6): pasador, receptor quieto a 20 m y receptor de un balón largo a 40 m. */
+  pasador: { x: 45, y: 50 }, receptorCorto: { x: 65, y: 50 }, receptorLargo: { x: 85, y: 50 },
+  /** Remates (B4, C1–C3): distancias (m) al centro del arco rival. */
+  remateCortoM: 20, remateLejanoM: 28, remateCercaM: 22, fueraDeAlcanceM: 0.1, remateLejisimosM: 100, remateConduceM: 35,
+  /** C1: separación lateral para salir de la banda del área y un rival a esa distancia del rematador o de la línea. */
+  fueraBandaY: 1, cercaM: 1,
+  /** C5: visión alta y baja para el alcance; distancia de un balón largo y desplazamiento lateral del cambio. */
+  visionAlta: 90, visionBaja: 40, largoM: 38, cambioY: 30, cortoM: 25,
+  /** B3: semillas y duración de los partidos neutros, y cuántos deben cumplir la condición del bloque C. */
+  semillasNeutral: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], duracionNeutralS: 5, minNeutrales: 6,
+  /** C2/C3/B4: semillas a barrer. */
+  semillas: 40, ticksMax: 60,
+  /** 17.4/18.2: semillas del presupuesto del torneo. */
+  semillasTorneo: 50,
+} as const;
+const conAtributos = (c: ConfigArena, id: string, cambios: Partial<AtributosJugador>) => { c.atributos![id] = { ...c.atributos![id]!, ...cambios }; };
+const todosA = (c: ConfigArena, valor: number) => { for (const id of Object.keys(c.atributos!)) c.atributos![id] = Object.fromEntries(atributosJugador.map(a => [a, valor])) as AtributosJugador; };
+const arcoVisita: Punto = { x: ARENA.largoM, y: MEDIO_Y };
+const aDistancia = (m: number, dy = 0): Punto => ({ x: ARENA.largoM - Math.sqrt(m * m - dy * dy), y: MEDIO_Y + dy });
+const deTipo = (m: MotorArena, tipo: string) => m.eventos.filter(e => e.tipo === tipo);
+/** Rematador local (MED) con el balón en `origen`, orden `accion`, atributos `cambios` y sin entorno (error del 051 puro). */
+function rematador(reglas: Reglas, origen: Punto, accion: OrdenJugador["accion"], cambios: Partial<AtributosJugador> = {}, o: { seed?: number; sinEntorno?: boolean; preparar?: (e: EstadoArena) => void } = {}) {
+  let id = "";
+  const s = montar(reglas, (e, c) => {
+    const t = deLinea(e, "local", "MED")[0]!; colocar(t, origen); id = t.id;
+    e.balon = { posicion: { ...origen }, poseedor: t.id, vuelo: null };
+    if (c.atributos) conAtributos(c, t.id, cambios);
+    if (o.sinEntorno ?? true) delete c.partido.condiciones;
+    o.preparar?.(e);
+  }, () => ({ [id]: { accion, destino: { ...arcoVisita } } }), { seed: o.seed });
+  return { s, id };
+}
+
+describe("063 · bloque B · atributos (reinicios-v7)", () => {
+  it("B1 · atributosDe: determinista, sin semilla, lado ni formación; enteros en [min, max]; personalidad y partido intactos; coherencia en 1–200 (mutación: usar la semilla del partido; quitar el perfil)", () => {
+    const c = crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7 });
+    for (const lado of lados) c.partido[lado].jugadores.slice(0, ARENA.plantillaArena).forEach((j, n) => {
+      const esperado = atributosDe(c.partido[lado].nombre, j.nombre, j.posicion, personalidadDe(c.partido[lado].nombre, j.nombre, j.posicion).perfil);
+      expect(c.atributos![`${lado}-${n}`]).toEqual(esperado);
+      expect(atributosDe(c.partido[lado].nombre, j.nombre, j.posicion, personalidadDe(c.partido[lado].nombre, j.nombre, j.posicion).perfil)).toEqual(esperado);
+      for (const a of atributosJugador) expect(Number.isInteger(esperado[a]) && esperado[a] >= AT.min && esperado[a] <= AT.max).toBe(true);
+    });
+    // Otra formación, otra duración, otra semilla del partido y los lados invertidos: los mismos atributos por jugador.
+    expect(crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7, local: "4-4-2", visita: "3-5-2", duracionS: ESCENARIO.duracionS }).atributos).toEqual(c.atributos);
+    expect(crearConfigArena({ partido: { ...structuredClone(c.partido), seed: c.partido.seed + 1 }, reglas: V7 }).atributos).toEqual(c.atributos);
+    const invertida = crearConfigArena({ partido: { ...structuredClone(c.partido), local: c.partido.visita, visita: c.partido.local }, reglas: V7 });
+    for (const [k, v] of Object.entries(c.atributos!)) expect(invertida.atributos![k.startsWith("local-") ? k.replace("local-", "visita-") : k.replace("visita-", "local-")]).toEqual(v);
+    // Mutación «quitar el perfil»: el perfil cambia el resultado.
+    const j0 = c.partido.local.jugadores[1]!;
+    expect(atributosDe(c.partido.local.nombre, j0.nombre, j0.posicion, "pasador")).not.toEqual(atributosDe(c.partido.local.nombre, j0.nombre, j0.posicion, "rematador"));
+    // La personalidad y el partido de v6 y v7 coinciden.
+    const c6 = crearConfigArena({ seed: ESCENARIO.semilla, reglas: V6 });
+    expect(c.partido).toEqual(c6.partido);
+    expect(crearEstadoArena(c).jugadores.map(j => j.personalidad)).toEqual(crearEstadoArena(c6).jugadores.map(j => j.personalidad));
+    // Coherencia: medias globales de los jugadores de campo de 1–200 y orden por línea (posición natural).
+    const suma: Record<string, Record<string, { s: number; n: number }>> = {};
+    const anotar = (grupo: string, a: AtributosJugador) => { for (const k of atributosJugador) { const g = (suma[grupo] ??= {}); const x = (g[k] ??= { s: 0, n: 0 }); x.s += a[k]; x.n++; } };
+    for (let seed = 1; seed <= L63.coherenciaAtributos.semillas; seed++) {
+      const cs = crearConfigArena({ seed, reglas: V7 });
+      for (const lado of lados) cs.partido[lado].jugadores.slice(0, ARENA.plantillaArena).forEach((j, n) => { if (j.posicion !== "POR") { anotar("todos", cs.atributos![`${lado}-${n}`]!); anotar(j.posicion, cs.atributos![`${lado}-${n}`]!); } });
+    }
+    const media = (g: string, k: AtributoJugador) => suma[g]![k]!.s / suma[g]![k]!.n;
+    for (const k of atributosJugador) expect({ k, media: media("todos", k) >= L63.coherenciaAtributos.media.min && media("todos", k) <= L63.coherenciaAtributos.media.max }).toEqual({ k, media: true });
+    expect(media("DEL", "velocidad")).toBeGreaterThan(media("DEF", "velocidad"));
+    expect(media("DEF", "entrada")).toBeGreaterThan(media("DEL", "entrada"));
+    expect(media("MED", "vision")).toBeGreaterThan(media("DEF", "vision"));
+    expect(media("DEL", "potencia")).toBeGreaterThan(media("DEF", "potencia"));
+  });
+
+  it("B2 · configuración v7 con exactamente los IDs de la plantilla; rechazo de clave faltante o sobrante, fuera de rango, no entero, campo de más o de menos (mutación: validación laxa)", () => {
+    const c = crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7 });
+    const ids = lados.flatMap(lado => c.partido[lado].jugadores.slice(0, ARENA.plantillaArena).map((_, n) => `${lado}-${n}`));
+    expect(Object.keys(c.atributos!).sort()).toEqual([...ids].sort());
+    expect(() => validarConfigArena(c)).not.toThrow();
+    const con = (f: (a: Record<string, AtributosJugador>) => void) => { const x = structuredClone(c); f(x.atributos!); return () => validarConfigArena(x); };
+    expect(con(a => { delete a[ids[0]!]; })).toThrow();
+    expect(con(a => { a["local-99"] = { ...a[ids[0]!]! }; })).toThrow();
+    expect(con(a => { a[ids[0]!]!.velocidad = AT.max + 1; })).toThrow();
+    expect(con(a => { a[ids[0]!]!.vision = AT.min - 1; })).toThrow();
+    expect(con(a => { a[ids[0]!]!.potencia = AT.neutro + 0.5; })).toThrow();
+    expect(con(a => { delete (a[ids[0]!] as Partial<AtributosJugador>).entrada; })).toThrow();
+    expect(con(a => { (a[ids[0]!] as unknown as Record<string, number>).aereo = AT.neutro; })).toThrow();
+    const { atributos: _a, ...sin } = c;
+    expect(() => validarConfigArena(sin)).toThrow("Faltan los atributos de jugador");
+    expect(() => validarConfigArena({ ...c, estilosJuego: { local: "presion", visita: "directo" } })).toThrow("Identidad de juego fuera de su versión");
+  });
+
+  it("B3 · neutralidad por multiplicador; con todo a 50 y sin remates a más de radioTiroM ni pases a más de paseMaxM, v7 da los mismos eventos y fotogramas que v6 (mutación: efecto no centrado)", async () => {
+    expect([factorVelocidadMax(AT.neutro), factorAceleracion(AT.neutro), factorDesgaste(AT.neutro), factorErrorPase(AT.neutro), factorPotencia(AT.neutro)]).toEqual([1, 1, 1, 1, 1]);
+    expect(ajusteDuelo(AT.neutro, AT.neutro)).toBe(0);
+    expect(efectoAtributo(AT.neutro)).toBe(0);
+    let comparados = 0;
+    for (const seed of BC.semillasNeutral) {
+      const c7 = crearConfigArena({ seed, duracionS: BC.duracionNeutralS, reglas: V7 }); todosA(c7, AT.neutro);
+      const r7 = await ejecutarArena(c7, { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+      const intervieneC = r7.eventos.some(e => (e.tipo === "tiro" && distancia(transformar(e.desde, e.lado), arcoVisita) > ARENA.radioTiroM) || (e.tipo === "pase" && e.distanciaM > ARENA.paseMaxM && e.motivo !== "saque_manos" && !e.reinicio));
+      if (intervieneC) continue;
+      const r6 = await ejecutarArena(crearConfigArena({ seed, duracionS: BC.duracionNeutralS, reglas: V6 }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
+      expect({ seed, eventos: r7.eventos, fotogramas: r7.fotogramas, final: r7.final }).toEqual({ seed, eventos: r6.eventos, fotogramas: r6.fotogramas, final: r6.final });
+      comparados++;
+    }
+    expect(comparados).toBeGreaterThanOrEqual(BC.minNeutrales);
+  });
+
+  it("B4 · integración: un atributo de un jugador cambia exactamente su velocidad máxima y aceleración, su desgaste, el duelo, el error de su pase y la velocidad de su remate (mutación: ignorar un atributo)", () => {
+    // Velocidad y resistencia: corredor local (MED) sin balón hacia un destino lejano; el portero local tiene el balón en las manos.
+    const corredor = (cambios: Partial<AtributosJugador>, inicial?: { v: number; energia: number }) => {
+      let id = "";
+      const s = montar(V7, (e, c) => {
+        const j = deLinea(e, "local", "MED")[0]!; colocar(j, BC.corredor, inicial ? { x: inicial.v, y: 0 } : { x: 0, y: 0 }); id = j.id;
+        if (inicial) j.energia = inicial.energia;
+        conAtributos(c, j.id, cambios);
+        const k = portero(e, "local"); e.balon = { posicion: { ...k.posicion }, poseedor: k.id, vuelo: null, manos: { portero: k.id, desdeTick: 0, hastaTick: ticksDe(ARENA.duracionMaxS) } };
+      }, () => ({ [id]: { accion: "mover", destino: { ...BC.destinoCorredor } } }), { parqueLocalX: ESCENARIO.parqueLejosX, parqueVisitaX: ESCENARIO.parqueLejosX });
+      return { s, id };
+    };
+    const rapidez = (s: Escenario, id: string) => Math.hypot(s.j(id).velocidad.x, s.j(id).velocidad.y);
+    const lento = corredor({ velocidad: BC.bajo }), rapido = corredor({ velocidad: BC.alto });
+    lento.s.ticks(1); rapido.s.ticks(1);
+    expect(rapidez(rapido.s, rapido.id) / rapidez(lento.s, lento.id)).toBeCloseTo(factorAceleracion(BC.alto) / factorAceleracion(BC.bajo), 9);
+    let eL = 0, eR = 0;
+    for (let k = 1; k < BC.ticksSaturar; k++) { eL = lento.s.j(lento.id).energia; eR = rapido.s.j(rapido.id).energia; lento.s.ticks(1); rapido.s.ticks(1); }
+    const porEnergia = (v: number, e: number) => v / (ARENA.factorEnergiaMin + (1 - ARENA.factorEnergiaMin) * e);
+    expect(porEnergia(rapidez(rapido.s, rapido.id), eR) / porEnergia(rapidez(lento.s, lento.id), eL)).toBeCloseTo(factorVelocidadMax(BC.alto) / factorVelocidadMax(BC.bajo), 6);
+    // Resistencia: el mismo recorrido del primer paso con distinto desgaste por metro.
+    const inicial = { v: BC.velocidadInicial, energia: BC.energiaInicial };
+    const blando = corredor({ resistencia: BC.bajo }, inicial), duro = corredor({ resistencia: BC.alto }, inicial);
+    blando.s.ticks(1); duro.s.ticks(1);
+    expect(blando.s.j(blando.id).posicion).toEqual(duro.s.j(duro.id).posicion);
+    expect((BC.energiaInicial - duro.s.j(duro.id).energia) / (BC.energiaInicial - blando.s.j(blando.id).energia)).toBeCloseTo(factorDesgaste(BC.alto) / factorDesgaste(BC.bajo), 9);
+    // Duelo: la misma extracción de `arena:duelo` frente a dos p; entrada del defensor y aguante del portador.
+    const duelo = (seed: number, entrada: number, aguante: number) => {
+      let defensor = "";
+      const s = montar(V7, (e, c) => {
+        const p = deLinea(e, "local", "MED")[0]!, d = deLinea(e, "visita", "DEF")[0]!;
+        colocar(p, ESCENARIO.portador); colocar(d, { x: ESCENARIO.portador.x + ESCENARIO.defensorDx, y: ESCENARIO.portador.y }); defensor = d.id;
+        conAtributos(c, d.id, { entrada }); conAtributos(c, p.id, { aguante, vision: BC.visionBaja });
+        e.balon = { posicion: { ...ESCENARIO.portador }, poseedor: p.id, vuelo: null };
+      }, () => ({}), { seed });
+      s.ticks(1);
+      return { robo: s.motor.eventos.some(x => x.tipo === "recuperacion" && x.jugador === defensor), falta: s.motor.eventos.some(x => x.tipo === "falta") };
+    };
+    let cambiaEntrada = 0, cambiaAguante = 0;
+    for (let seed = 1; seed <= ESCENARIO.semillaMax; seed++) {
+      const bajo = duelo(seed, BC.bajo, AT.neutro), alto = duelo(seed, BC.alto, AT.neutro);
+      if (bajo.falta || alto.falta) continue;
+      expect({ seed, monotono: !bajo.robo || alto.robo }).toEqual({ seed, monotono: true });
+      if (alto.robo && !bajo.robo) cambiaEntrada++;
+      const debil = duelo(seed, AT.neutro, BC.bajo), fuerte = duelo(seed, AT.neutro, BC.alto);
+      expect({ seed, monotono: !fuerte.robo || debil.robo }).toEqual({ seed, monotono: true });
+      if (debil.robo && !fuerte.robo) cambiaAguante++;
+    }
+    expect(cambiaEntrada).toBeGreaterThan(0); expect(cambiaAguante).toBeGreaterThan(0);
+    // Visión: el desvío lateral del pase al receptor quieto escala con factorErrorPase (misma extracción `arena:golpe`).
+    const pase = (vision: number) => {
+      let pasador = "", receptor = "";
+      const s = montar(V7, (e, c) => {
+        const [p, r] = deLinea(e, "local", "MED"); colocar(p!, BC.pasador); colocar(r!, BC.receptorCorto); pasador = p!.id; receptor = r!.id;
+        conAtributos(c, p!.id, { vision }); e.balon = { posicion: { ...BC.pasador }, poseedor: p!.id, vuelo: null };
+      }, () => ({ [pasador]: { accion: "pasar", receptor, destino: { ...BC.receptorCorto } } }));
+      s.ticks(1);
+      return deTipo(s.motor, "pase")[0]!;
+    };
+    const pv = pase(BC.alto), pb = pase(BC.bajo);
+    expect(pv.motivo).toBeUndefined();
+    expect((pv.hasta.y - BC.receptorCorto.y) / (pb.hasta.y - BC.receptorCorto.y)).toBeCloseTo(factorErrorPase(BC.alto) / factorErrorPase(BC.bajo), 9);
+    // Potencia: el primer paso del remate (a 20 m: no es lejano) recorre velocidad·pasoS.
+    const remate = (potencia: number) => { const { s } = rematador(V7, aDistancia(BC.remateCortoM), "tirar", { potencia }); s.ticks(1); return { s, tiro: deTipo(s.motor, "tiro")[0]! }; };
+    const fuerte = remate(BC.alto), suave = remate(BC.bajo);
+    expect(fuerte.tiro.motivo).toBeUndefined();
+    const avance = (r: { s: Escenario; tiro: { desde: Punto } }) => distancia(r.s.motor.estado.balon.posicion, r.tiro.desde);
+    expect(avance(fuerte) / avance(suave)).toBeCloseTo(factorPotencia(BC.alto) / factorPotencia(BC.bajo), 9);
+  });
+
+  it("B5 · observación v7: equipos[lado].atributos solo con los IDs de ese lado; esquema de respuesta y validarOrdenes como en v6 (mutación: mezclar lados)", () => {
+    const m7 = new MotorArena(crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7 })), m6 = new MotorArena(crearConfigArena({ seed: ESCENARIO.semilla, reglas: V6 }));
+    for (const lado of lados) {
+      const o7 = observarArena(m7, lado), o6 = observarArena(m6, lado);
+      for (const l of lados) {
+        const ids = Object.keys(o7.equipos[l].atributos!);
+        expect(ids.length).toBe(Math.min(ARENA.plantillaArena, m7.config.partido[l].jugadores.length));
+        expect(ids.every(id => id.startsWith(`${l}-`))).toBe(true);
+        expect(o7.equipos[l].atributos).toEqual(Object.fromEntries(ids.map(id => [id, m7.config.atributos![id]])));
+        expect("atributos" in o6.equipos[l]).toBe(false);
+      }
+      // El id de la observación es un hash que incluye `equipos`: el resto del esquema es idéntico.
+      const sinId = (o: typeof o7) => { const e = esquemaRespuestaArena(o) as { properties: Record<string, unknown> }; return { ...e, properties: { ...e.properties, observacion: null } }; };
+      expect(sinId(o7)).toEqual(sinId(o6));
+      expect(() => validarOrdenes(planProgramado(o7), o7)).not.toThrow();
+      expect(validarOrdenes(planProgramado(o6), o6).ordenes.map(o => o.jugador)).toEqual(validarOrdenes(planProgramado(o7), o7).ordenes.map(o => o.jugador));
+    }
+  });
+
+  it("v1.1 § 17.4 y v1.2 § 18.2 · la petición completa v7 / v5 (semillas 1–50, tick 0 y mitad de partido) cabe en factorObservacion063 con un 10 % de margen; con el promptMax nuevo cada formato cabe en su tope", async () => {
+    const sistemaV5 = SISTEMA_ARENA.replace(`${frasesPersecucion()}\n`, "").replace(`${frasesAtributos()}\n`, "").replace(`${frasesLargo()}\n`, "");
+    expect(sistemaV5.length).toBeLessThan(SISTEMA_ARENA.length);
+    const peticiones = async (seed: number, reglas: ReglasArena, sistema: string) => {
+      const vistas: number[] = [];
+      let previa: { tick: number; ordenes: OrdenesEquipo } | null = null;
+      const local: ControladorEquipo = { id: "captura", tipo: "programado", async decidir(obs) {
+        vistas.push(sistema.length + JSON.stringify({ ...obs, competencia: contextoCompetitivo(obs), ultimaPropuestaValidaPropia: previa }).length);
+        const plan = planProgramado(obs); previa = { tick: obs.estado.tick, ordenes: validarOrdenes(plan, obs) }; return plan;
+      } };
+      await ejecutarArena(crearConfigArena({ seed, duracionS: TORNEO_ARENA.duracionS, intervaloS: TORNEO_SITIO.intervaloS, reglas }), { local, visita: crearControladorProgramado() });
+      return vistas;
+    };
+    let mayor = 0;
+    for (let seed = 1; seed <= BC.semillasTorneo; seed++) {
+      const v7 = await peticiones(seed, V7, SISTEMA_ARENA), v5 = await peticiones(seed, V5, sistemaV5);
+      expect(v7.length).toBe(Math.ceil(TORNEO_ARENA.duracionS / TORNEO_SITIO.intervaloS));
+      v7.forEach((n, k) => { mayor = Math.max(mayor, n / v5[k]!); });
+    }
+    console.log("[063 17.4 cociente de la petición]", JSON.stringify({ mayor, factor: TORNEO_SITIO.factorObservacion063 }));
+    expect(TORNEO_SITIO.factorObservacion063).toBeGreaterThanOrEqual(1.1 * mayor);
+    const entradas = JSON.parse(readFileSync(RUTA_ENTRADAS_SITIO, "utf8")) as EntradasSitio;
+    expect(entradas.promptMax).toMatchObject({ factorObservacion063: TORNEO_SITIO.factorObservacion063, tokens: Math.ceil(entradas.promptMax.medido! * TORNEO_SITIO.factorObservacion063) });
+    for (const formato of ["liga", "grupos"] as const) {
+      const ficha = estimarFormato(formato, entradas);
+      expect({ formato, cabe: ficha.tipicoMicroUsd.maxConDesempates - tipicoPartidoMaxMicroUsd(entradas) + ficha.reservaMaxPartidoMicroUsd <= ficha.topeMicroUsd }).toEqual({ formato, cabe: true });
+    }
+  });
+});
+
+describe("063 · bloque C · remate lejano y balón largo (reinicios-v7)", () => {
+  /** Estado de referencia de C1: rematador local con potencia alta a remateLejanoM en el eje, todos los demás lejos. */
+  const baseC1 = () => {
+    const c = crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7, local: ESCENARIO.local, visita: ESCENARIO.visita });
+    const e = crearEstadoArena(c); e.saque = null; e.pausa = null;
+    for (const lado of lados) campo(e, lado).forEach((j, k) => colocar(j, { x: lado === "local" ? ESCENARIO.parqueLocalX : ESCENARIO.parqueVisitaX, y: ESCENARIO.filaY0 + ESCENARIO.filaDY * k }));
+    const t = deLinea(e, "local", "MED")[0]!; colocar(t, aDistancia(BC.remateLejanoM));
+    colocar(portero(e, "visita"), { x: ARENA.largoM - 1, y: MEDIO_Y });
+    return { e, t, a: { ...c.atributos![t.id]!, potencia: BC.alto } };
+  };
+  it("C1 · puedeRematarLejos: cada condición alterna el resultado (potencia, distancia, banda, espacio, línea; el portero no tapa la línea) (mutación: quitar una condición)", () => {
+    const { e, t, a } = baseC1();
+    expect(puedeRematarLejos(t, a, e)).toBe(true);
+    expect(puedeRematarLejos(t, { ...a, potencia: LA.remate.potenciaMin - 1 }, e)).toBe(false);
+    expect(puedeRematarLejos(t, { ...a, potencia: LA.remate.potenciaMin }, e)).toBe(true);
+    expect(puedeRematarLejos(t, undefined, e)).toBe(false);
+    const en = (p: Punto) => { colocar(t, p); return puedeRematarLejos(t, a, e); };
+    expect(en(aDistancia(ARENA.radioTiroM))).toBe(false);
+    expect(en(aDistancia(ARENA.radioTiroM + BC.fueraDeAlcanceM))).toBe(true);
+    expect(en(aDistancia(LA.remate.maxM))).toBe(true);
+    expect(en(aDistancia(LA.remate.maxM + BC.fueraDeAlcanceM))).toBe(false);
+    expect(en(aDistancia(BC.remateLejanoM, ARENA.areaAnchoM / 2 + BC.fueraBandaY))).toBe(false);
+    expect(en(aDistancia(BC.remateLejanoM, ARENA.areaAnchoM / 2 - BC.fueraBandaY))).toBe(true);
+    colocar(t, aDistancia(BC.remateLejanoM));
+    const rival = deLinea(e, "visita", "MED")[0]!, guardado = { ...rival.posicion };
+    colocar(rival, { x: t.posicion.x - LA.remate.espacioM + BC.cercaM, y: t.posicion.y }); expect(puedeRematarLejos(t, a, e)).toBe(false);
+    colocar(rival, { x: t.posicion.x + LA.remate.espacioM + BC.cercaM, y: t.posicion.y + LA.remate.lineaM - BC.cercaM / 2 }); expect(puedeRematarLejos(t, a, e)).toBe(false);
+    colocar(rival, { x: t.posicion.x + LA.remate.espacioM + BC.cercaM, y: t.posicion.y + LA.remate.lineaM + BC.cercaM }); expect(puedeRematarLejos(t, a, e)).toBe(true);
+    colocar(rival, guardado);
+    colocar(portero(e, "visita"), { x: t.posicion.x + LA.remate.espacioM + BC.cercaM, y: MEDIO_Y }); expect(puedeRematarLejos(t, a, e)).toBe(true);
+    expect(puedeRematarLejos({ ...t, puesto: "POR" }, a, e)).toBe(false);
+  });
+
+  it("C2 · decisión local: PRNG arena:lejano con la probabilidad de la fórmula; una orden explícita no se sustituye (mutación: disparar sin PRNG)", () => {
+    let si = 0, no = 0;
+    for (let seed = 1; seed <= BC.semillas; seed++) {
+      const { s, id } = rematador(V7, aDistancia(BC.remateLejanoM), "mover", { potencia: BC.alto, vision: BC.visionBaja }, { seed });
+      const j = s.j(id), p = Math.min(1, LA.remate.probabilidad * (LA.remate.remateBase + (j.personalidad?.remate ?? REMATE_NEUTRO) / 100) * (LA.remate.potenciaBase + efectoAtributo(BC.alto)));
+      expect(probabilidadLejano(j.personalidad?.remate ?? REMATE_NEUTRO, BC.alto)).toBeCloseTo(p, 12);
+      const esperado = prngDerivado(seed, `arena:lejano:0:${id}`).chance(p);
+      s.ticks(1);
+      const tiro = deTipo(s.motor, "tiro")[0];
+      expect({ seed, tiro: tiro?.motivo ?? null }).toEqual({ seed, tiro: esperado ? "lejano" : null });
+      if (esperado) si++; else no++;
+      if (esperado) for (const accion of ["conducir", "pasar"] as const) {
+        const otro = rematador(V7, aDistancia(BC.remateLejanoM), accion, { potencia: BC.alto, vision: BC.visionBaja }, { seed, preparar: e => colocar(deLinea(e, "local", "MED")[1]!, { x: ARENA.largoM - BC.remateLejanoM - BC.remateCortoM / 2, y: MEDIO_Y }) });
+        if (accion === "pasar") otro.s.planes.local.ordenes.find(o => o.jugador === otro.id)!.receptor = deLinea(otro.s.motor.estado, "local", "MED")[1]!.id;
+        otro.s.ticks(1);
+        expect({ seed, accion, tiro: deTipo(otro.s.motor, "tiro").length }).toEqual({ seed, accion, tiro: 0 });
+      }
+    }
+    expect(si).toBeGreaterThan(0); expect(no).toBeGreaterThan(0);
+  });
+
+  it("C3 · ejecución de un tiro a d > radioTiroM: motivo lejano, vuelo.lejano, error × (1 + errorPorM·lejos), alto acotado; a d ≤ radioTiroM igual que v6; tirar del LLM a maxM sí, a maxM + 0,1 y a 100 m no; varios ticks con la orden pendiente o consumida (mutación: aplicarlo también a d ≤ 25 m; ejecutar el tirar a cualquier distancia)", () => {
+    const comprobar = (metros: number, seed: number) => {
+      const { s, id } = rematador(V7, aDistancia(metros), "tirar", {}, { seed });
+      const antes = structuredClone(s.motor.estado), t = antes.jugadores.find(j => j.id === id)!;
+      s.ticks(1);
+      const tiro = deTipo(s.motor, "tiro")[0]!, nivel = capacidadEfectiva(t, compatibilidadPuesto(t, t.puesto)), d = distancia(t.posicion, arcoVisita), potencia = potenciaRemate(d);
+      const lejos = Math.max(0, d - ARENA.radioTiroM);
+      const ob = objetivoRemate(t.posicion, portero(antes, "visita").posicion, nivel, t.personalidad?.remate ?? REMATE_NEUTRO, "local");
+      const rng = prngDerivado(seed, `arena:golpe:0:${id}`), lateral = rng.next() + rng.next() - 1;
+      expect(tiro.hasta.y).toBeCloseTo(ob.y + lateral * errorRemate(nivel, d, potencia) * (1 + LA.remate.errorPorM * lejos), 9);
+      const alto = prngDerivado(seed, `arena:remate:0:${id}`).chance(lejos > 0 ? Math.min(LA.remate.altoMax, probabilidadAlto(nivel, potencia) + LA.remate.altoPorM * lejos) : probabilidadAlto(nivel, potencia));
+      expect(s.motor.estado.balon.vuelo?.alto === true).toBe(alto);
+      return { s, tiro };
+    };
+    for (let seed = 1; seed <= BC.semillas / 4; seed++) {
+      const lejano = comprobar(BC.remateLejanoM, seed);
+      expect(lejano.tiro.motivo).toBe("lejano"); expect(lejano.s.motor.estado.balon.vuelo?.lejano).toBe(true);
+      const maximo = comprobar(LA.remate.maxM, seed);
+      expect(maximo.tiro.motivo).toBe("lejano");
+      // A d ≤ radioTiroM, idéntico a v6 (evento y vuelo).
+      const cerca7 = comprobar(BC.remateCercaM, seed);
+      const cerca6 = rematador(V6, aDistancia(BC.remateCercaM), "tirar", {}, { seed }); cerca6.s.ticks(1);
+      expect(cerca7.tiro).toEqual(deTipo(cerca6.s.motor, "tiro")[0]);
+      expect(cerca7.s.motor.estado.balon.vuelo).toEqual(cerca6.s.motor.estado.balon.vuelo);
+    }
+    // El alto acotado y el multiplicador máximo del dominio.
+    expect(altoLejano(1, LA.remate.maxM)).toBe(LA.remate.altoMax);
+    expect(factorErrorLejano(lejosRemate(LA.remate.maxM))).toBeCloseTo(1 + LA.remate.errorPorM * (LA.remate.maxM - ARENA.radioTiroM), 12);
+    expect(lejosRemate(ARENA.radioTiroM)).toBe(0);
+    // Fuera de alcance: ningún tiro ese tick (decide en local); v6 sí lo ejecutaba.
+    for (const metros of [LA.remate.maxM + BC.fueraDeAlcanceM, BC.remateLejisimosM]) {
+      const lejos = rematador(V7, metros > ARENA.largoM ? { x: ARENA.largoM - metros + ARENA.largoM / 2, y: MEDIO_Y } : aDistancia(metros), "tirar", { vision: BC.visionBaja });
+      lejos.s.ticks(1);
+      expect({ metros, tiros: deTipo(lejos.s.motor, "tiro").length }).toEqual({ metros, tiros: 0 });
+      const v6 = rematador(V6, aDistancia(Math.min(metros, LA.remate.maxM + BC.fueraDeAlcanceM)), "tirar"); v6.s.ticks(1);
+      expect(deTipo(v6.s.motor, "tiro").length).toBe(1);
+    }
+    // Varios ticks en una sola ronda: sin opción de pase conduce, entra en maxM y remata por la orden pendiente.
+    const conduce = rematador(V7, aDistancia(BC.remateConduceM), "tirar", { vision: BC.visionBaja, potencia: LA.remate.potenciaMin - 1 });
+    conduce.s.motor.avanzar(conduce.s.planes, ticksDe(ESCENARIO.intervaloS));
+    const t1 = deTipo(conduce.s.motor, "tiro")[0];
+    expect(t1).toBeDefined();
+    expect(distancia(transformar(t1!.desde, "local"), arcoVisita)).toBeLessThanOrEqual(LA.remate.maxM);
+    expect(t1!.tick).toBeGreaterThan(1);
+    // Con opción de pase: el pase local consume la orden y no hay remate en la ronda.
+    const pasa = rematador(V7, aDistancia(BC.remateConduceM), "tirar", { vision: BC.visionBaja }, { preparar: e => colocar(deLinea(e, "local", "MED")[1]!, { x: ARENA.largoM - BC.remateConduceM + BC.remateCortoM / 2, y: MEDIO_Y + ESCENARIO.filaDY }) });
+    pasa.s.motor.avanzar(pasa.s.planes, ticksDe(ESCENARIO.intervaloS));
+    expect(deTipo(pasa.s.motor, "pase").find(e => e.jugador === pasa.id)?.tick).toBe(1);
+    expect(deTipo(pasa.s.motor, "tiro").filter(e => e.jugador === pasa.id)).toEqual([]);
+  });
+
+  it("C4 · portero: ante un vuelo lejano va al punto de la trayectoria en su x; ante un remate no lejano, igual que v6 (mutación: aplicarlo a todos los remates)", () => {
+    const vuelo = (reglas: Reglas, lejano: boolean) => montar(reglas, (e, c) => {
+      if (c.atributos) todosA(c, AT.neutro);
+      const t = deLinea(e, "local", "MED")[0]!, origen = aDistancia(BC.remateLejanoM), destino = { x: ARENA.largoM + ARENA.remateTrasLineaM, y: MEDIO_Y + ARENA.arcoM / 2 - BC.cercaM };
+      colocar(t, origen);
+      const v: Vuelo = { tipo: "tiro", autor: t.id, lado: "local", receptor: null, origen, destino, inicioTick: 0, adelantados: [], potencia: 1, ...(lejano ? { lejano: true as const } : {}) };
+      e.balon = { posicion: { ...origen }, poseedor: null, ultimoToque: { jugador: t.id, lado: "local" }, vuelo: v };
+    });
+    const k7 = vuelo(V7, true), k = portero(k7.motor.estado, "visita"), p0 = { ...k.posicion };
+    const objetivo = destinoTrayectoria(k7.motor.estado.balon.vuelo!, k);
+    expect(objetivo.x).toBeCloseTo(p0.x, 12);
+    k7.ticks(1);
+    expect(coseno(k7.j(k.id).velocidad, p0, objetivo)).toBeGreaterThan(ESCENARIO.cosenoDireccion);
+    // Sin `lejano`, v7 y v6 mueven igual al portero.
+    const n7 = vuelo(V7, false), n6 = vuelo(V6, false);
+    n7.ticks(3); n6.ticks(3);
+    expect(n7.j(k.id).posicion).toEqual(n6.j(k.id).posicion);
+    expect(n7.j(k.id).posicion).not.toEqual(k7.j(k.id).posicion);
+  });
+
+  it("C5 · opcionPaseLargo: ventana de distancia, avance o cambio de orientación, ventaja, puntuación y desempate; sin visión, conductor o portero nada; gana al corto solo si puntúa más (mutación: elegir siempre el largo)", () => {
+    const c = crearConfigArena({ seed: ESCENARIO.semilla, reglas: V7, local: ESCENARIO.local, visita: ESCENARIO.visita });
+    const e = crearEstadoArena(c); e.saque = null; e.pausa = null;
+    const origen = { x: ARENA.largoM / 2 - BC.largoM / 2, y: MEDIO_Y };
+    // Los compañeros que no intervienen, a menos de paseMaxM del pasador (nunca son candidatos de balón largo); los rivales, lejos.
+    for (const lado of lados) campo(e, lado).forEach((j, k) => colocar(j, lado === "local" ? { x: origen.x - BC.cercaM, y: ESCENARIO.filaY0 + ESCENARIO.filaDY * k } : { x: ESCENARIO.parqueLocalX, y: ESCENARIO.filaY0 + ESCENARIO.filaDY * k }));
+    const [j, r, r2] = deLinea(e, "local", "MED"); const a = { ...c.atributos![j!.id]!, vision: BC.visionAlta };
+    colocar(j!, origen);
+    for (const x of campo(e, "local")) expect(distancia(x.posicion, origen)).toBeLessThanOrEqual(ARENA.paseMaxM);
+    const alcance = alcanceLargo(a)!;
+    expect(alcance).toBeCloseTo(ARENA.paseMaxM + (LA.pase.maxM - ARENA.paseMaxM) * Math.min(1, (BC.visionAlta - LA.pase.visionMin) / (100 - LA.pase.visionMin)), 12);
+    expect(alcanceLargo({ ...a, vision: LA.pase.visionMin - 1 })).toBeNull();
+    colocar(r!, { x: origen.x + BC.largoM, y: MEDIO_Y });
+    const op = opcionPaseLargo(j!, a, e)!;
+    expect(op.receptor.id).toBe(r!.id);
+    const rivalMasCerca = Math.min(...e.jugadores.filter(x => x.lado === "visita" && x.puesto !== "POR").map(x => distancia(x.posicion, op.destino)));
+    expect(op.puntuacion).toBeCloseTo(BC.largoM + Math.min(rivalMasCerca - distancia(r!.posicion, op.destino), ARENA.margenUtilM) - BC.largoM * ARENA.pesoDistanciaPase * LA.pase.penalizacion, 9);
+    // Ventana: a paseMaxM o menos, o por encima del alcance, nada.
+    colocar(r!, { x: origen.x + ARENA.paseMaxM, y: MEDIO_Y }); expect(opcionPaseLargo(j!, a, e)).toBeUndefined();
+    colocar(r!, { x: origen.x + alcance + BC.fueraDeAlcanceM, y: MEDIO_Y }); expect(opcionPaseLargo(j!, a, e)).toBeUndefined();
+    // Sin avance suficiente: nada, salvo cambio de orientación.
+    colocar(r!, { x: origen.x + LA.pase.avanceMinM - BC.cercaM, y: MEDIO_Y + ESCENARIO.filaDY }); expect(opcionPaseLargo(j!, a, e)).toBeUndefined();
+    colocar(r!, { x: origen.x + Math.sqrt(BC.largoM ** 2 - BC.cambioY ** 2), y: MEDIO_Y - BC.cambioY }); expect(opcionPaseLargo(j!, a, e)?.receptor.id).toBe(r!.id);
+    // Ventaja: un rival en la caída (ventaja 0, no positiva) lo impide.
+    colocar(r!, { x: origen.x + BC.largoM, y: MEDIO_Y });
+    const rival = deLinea(e, "visita", "MED")[0]!; colocar(rival, { ...r!.posicion }); expect(opcionPaseLargo(j!, a, e)).toBeUndefined();
+    colocar(rival, { x: ESCENARIO.parqueLocalX, y: ESCENARIO.filaY0 });
+    // Desempate: dos receptores simétricos → el id menor.
+    colocar(r!, { x: origen.x + BC.largoM - 1, y: MEDIO_Y + ESCENARIO.filaDY }); colocar(r2!, { x: origen.x + BC.largoM - 1, y: MEDIO_Y - ESCENARIO.filaDY });
+    for (const x of e.jugadores.filter(x => x.lado === "visita" && x.puesto !== "POR")) colocar(x, { x: ESCENARIO.parqueLocalX, y: MEDIO_Y });
+    expect(opcionPaseLargo(j!, a, e)?.receptor.id).toBe([r!.id, r2!.id].sort()[0]);
+    // Portero: nada.
+    expect(opcionPaseLargo(portero(e, "local"), a, e)).toBeUndefined();
+    // Motor: gana al corto solo si puntúa más; un conductor no lo lanza.
+    const decide = (corto: boolean, conductor = false) => {
+      let pasador = "";
+      const s = montar(V7, (st, cf) => {
+        const [p, l, k] = deLinea(st, "local", "MED"); colocar(p!, origen); pasador = p!.id;
+        colocar(l!, { x: origen.x + BC.largoM, y: MEDIO_Y });
+        if (corto) colocar(k!, { x: origen.x + BC.cortoM, y: MEDIO_Y + ESCENARIO.filaDY });
+        conAtributos(cf, p!.id, { vision: BC.visionAlta, potencia: LA.remate.potenciaMin - 1 });
+        if (conductor) p!.personalidad = { ...p!.personalidad!, conduccion: 100, pase: 0 };
+        st.balon = { posicion: { ...origen }, poseedor: p!.id, vuelo: null };
+      }, () => ({}), { parqueLocalX: ESCENARIO.parqueLocalX, parqueVisitaX: ESCENARIO.parqueLocalX });
+      const antes = structuredClone(s.motor.estado), quien = antes.jugadores.find(x => x.id === pasador)!;
+      const largo = opcionPaseLargo(quien, s.config.atributos![pasador], antes), mejorCorto = evaluarPases(quien, observarArena(s.motor, "local"))[0]?.puntuacion ?? -Infinity;
+      s.ticks(1);
+      return { largo, mejorCorto, pase: deTipo(s.motor, "pase")[0] };
+    };
+    const soloLargo = decide(false);
+    expect(soloLargo.largo).toBeDefined(); expect(soloLargo.pase?.motivo).toBe("largo");
+    const conCorto = decide(true);
+    expect(conCorto.pase?.motivo === "largo").toBe(conCorto.largo!.puntuacion > conCorto.mejorCorto);
+    expect(decide(false, true).pase?.motivo).not.toBe("largo");
+  });
+
+  it("C6 · vuelo del balón largo: aéreo, motivo largo, error extra por la fórmula y contacto solo a ≤ caidaM (mutación: sin fase aérea)", () => {
+    let pasador = "", receptor = "", rival = "";
+    const s = montar(V7, (e, c) => {
+      const [p, r] = deLinea(e, "local", "MED"); colocar(p!, BC.pasador); colocar(r!, BC.receptorLargo); pasador = p!.id; receptor = r!.id;
+      const v = deLinea(e, "visita", "MED")[0]!; colocar(v, { x: (BC.pasador.x + BC.receptorLargo.x) / 2, y: BC.pasador.y }); rival = v.id;
+      conAtributos(c, p!.id, { vision: BC.visionAlta }); delete c.partido.condiciones;
+      e.balon = { posicion: { ...BC.pasador }, poseedor: p!.id, vuelo: null };
+    }, () => ({ [pasador]: { accion: "pasar", receptor, destino: { ...BC.receptorLargo } } }), { parqueVisitaX: ESCENARIO.parqueLejosX });
+    const antes = structuredClone(s.motor.estado), j = antes.jugadores.find(x => x.id === pasador)!;
+    s.ticks(1);
+    const pase = deTipo(s.motor, "pase")[0]!, d = distancia(BC.pasador, BC.receptorLargo), nivel = capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto));
+    expect(pase).toMatchObject({ motivo: "largo", receptor });
+    expect(s.motor.estado.balon.vuelo).toMatchObject({ tipo: "pase", aereo: true });
+    const lateral = prngDerivado(ESCENARIO.semilla, `arena:golpe:0:${pasador}`).next() * 2 - 1;
+    const error = (1 - nivel / 100) * ARENA.errorPaseM * factorErrorPase(BC.visionAlta) + errorExtraLargo(d, BC.visionAlta);
+    expect(errorExtraLargo(d, BC.visionAlta)).toBeCloseTo(LA.pase.errorM * (d - ARENA.paseMaxM) / (LA.pase.maxM - ARENA.paseMaxM) * (LA.pase.errorVisionBase - BC.visionAlta / 100), 12);
+    expect(pase.hasta.y).toBeCloseTo(BC.receptorLargo.y + lateral * error, 9);
+    for (let k = 0; k < BC.ticksMax && s.motor.estado.balon.vuelo; k++) s.ticks(1);
+    expect(s.motor.eventos.some(e => e.jugador === rival && ["intercepcion", "recuperacion"].includes(e.tipo))).toBe(false);
+    const toque = s.motor.eventos.find(e => ["recepcion", "intercepcion", "recuperacion", "fuera_juego"].includes(e.tipo))!;
+    expect(toque).toMatchObject({ tipo: "recepcion", jugador: receptor });
+    expect(distancia(toque.hasta, pase.hasta)).toBeLessThanOrEqual(A46.caidaM + ARENA.controlM);
+  });
+
+  it("C7 · pasar del LLM a 40 m: con alcance ≥ 40 es un balón largo; con alcance < 40 la rama pasarImposible del 046 queda intacta (igual que v6 con todo a 50) (mutación: permitir cualquier distancia)", () => {
+    const pasar = (reglas: Reglas, vision: number | null) => {
+      let pasador = "", receptor = "";
+      const s = montar(reglas, (e, c) => {
+        const [p, r] = deLinea(e, "local", "MED"); colocar(p!, BC.pasador); colocar(r!, { x: BC.pasador.x + 40, y: BC.pasador.y }); pasador = p!.id; receptor = r!.id;
+        if (c.atributos) { todosA(c, AT.neutro); if (vision !== null) conAtributos(c, p!.id, { vision }); }
+        e.balon = { posicion: { ...BC.pasador }, poseedor: p!.id, vuelo: null };
+      }, () => ({ [pasador]: { accion: "pasar", receptor, destino: { x: BC.pasador.x + 40, y: BC.pasador.y } } }));
+      return { s, pasador, receptor };
+    };
+    const largo = pasar(V7, BC.visionAlta);
+    expect(alcanceLargo({ ...largo.s.config.atributos![largo.pasador]! })!).toBeGreaterThanOrEqual(40);
+    largo.s.ticks(1);
+    expect(deTipo(largo.s.motor, "pase")[0]).toMatchObject({ jugador: largo.pasador, receptor: largo.receptor, motivo: "largo" });
+    const corto7 = pasar(V7, null), corto6 = pasar(V6, null);
+    expect(alcanceLargo(corto7.s.config.atributos![corto7.pasador])).toBe(ARENA.paseMaxM);
+    for (let k = 0; k < ticksDe(ARENA.accionCadaS) + 1; k++) { corto7.s.ticks(1); corto6.s.ticks(1); }
+    expect(corto7.s.motor.eventos).toEqual(corto6.s.motor.eventos);
+    expect(corto7.s.motor.estado.jugadores).toEqual(corto6.s.motor.estado.jugadores);
+    expect(corto7.s.motor.eventos.some(e => e.motivo === "largo")).toBe(false);
+  });
+
+  it("C8 · textos ES/EN de vista y relato; narrador de plantilla con un lejano como principal; estadista.ts y estadisticas.ts sin cambios (mutación: texto genérico)", async () => {
+    const r = JSON.parse(await readFile("src/arena/__fixtures__/arena-reinicios-v7.json", "utf8")) as RegistroArena;
+    const plantilla = [...r.inicial.jugadores, ...r.inicial.banco ?? []], de = (id: string | null) => plantilla.find(j => j.id === id)!;
+    const lejano = r.eventos.find(e => e.tipo === "tiro" && e.motivo === "lejano")!, largo = r.eventos.find(e => e.tipo === "pase" && e.motivo === "largo")!;
+    const jl = de(lejano.jugador), jp = de(largo.jugador), rp = de(largo.receptor);
+    expect(narrarEventoArena(lejano, r, "es")).toBe(`${jl.nombre} (${jl.dorsal}) prueba desde lejos (${Math.round(lejano.distanciaM)} m).`);
+    expect(narrarEventoArena(lejano, r, "en")).toBe(`${jl.nombre} (${jl.dorsal}) tries a long-range shot (${Math.round(lejano.distanciaM)} m).`);
+    expect(narrarEventoArena(largo, r, "es")).toBe(`${jp.nombre} (${jp.dorsal}) lanza un balón largo hacia ${rp.nombre} (${Math.round(largo.distanciaM)} m).`);
+    expect(narrarEventoArena(largo, r, "en")).toBe(`${jp.nombre} (${jp.dorsal}) plays a long ball towards ${rp.nombre} (${Math.round(largo.distanciaM)} m).`);
+    const variantes = {
+      es: [`¡Prueba desde lejos ${jl.nombre}!`, `¡Disparo lejano de ${jl.nombre}!`, `¡${jl.nombre} se anima desde fuera!`, `¡Le pega de lejos ${jl.nombre}!`],
+      en: [`${jl.nombre} tries it from distance!`, `A long-range effort from ${jl.nombre}!`, `${jl.nombre} lets fly from range!`, `${jl.nombre} has a go from deep!`],
+    };
+    const intervalo = RELATO_INTERVALOS.vivo, desde = Math.floor((lejano.tick - 1) / intervalo) * intervalo;
+    for (let k = 0; k < variantes.es.length; k++) {
+      let n = 0; while (varianteVoz(r.config.partido.seed, `lejano-${n}`) !== k) n++;
+      const id = `lejano-${n}`, renombrado = { ...r, eventos: r.eventos.map(e => e.id === lejano.id ? { ...e, id } : e) };
+      for (const idioma of ["es", "en"] as const) {
+        const texto = construirRelato(renombrado, desde, lejano.tick, "vivo", idioma).texto;
+        expect({ idioma, k, esta: texto.includes(variantes[idioma][k]!), otras: variantes[idioma].filter((v, i) => i !== k && texto.includes(v)) }).toEqual({ idioma, k, esta: true, otras: [] });
+      }
+    }
+    const caido: Llm = { id: "llm-caido", async completar() { throw new Error("sin servicio"); } };
+    const c = await narrarArena(r, lejano.tick, caido, { principal: `arena:${lejano.id}` });
+    expect(c).toMatchObject({ modo: "plantilla", principal: `arena:${lejano.id}` });
+    expect(c!.oraciones[0]!.texto_es).toBe(narrarEventoArena(lejano, r, "es"));
+    expect(c!.oraciones[0]!.texto_en).toBe(narrarEventoArena(lejano, r, "en"));
+    for (const archivo of ["src/arena/estadista.ts", "src/arena/estadisticas.ts"]) {
+      let diff: string | null = null;
+      try { diff = execFileSync("git", ["-c", "safe.directory=*", "diff", "HEAD", "--", archivo], { encoding: "utf8" }); } catch { diff = null; }
+      if (diff !== null) expect({ archivo, diff }).toEqual({ archivo, diff: "" });
+    }
+  });
+
+  it("C9 · frasesAtributos() y frasesLargo() con constantes alteradas; SISTEMA_ARENA las incluye (mutación: cifras a mano)", () => {
+    const alterada = frasesLargo({ paseMaxM: 31, largoMaxM: 57, radioTiroM: 23, remateMaxM: 37 });
+    for (const t of ["entre 31 m", "hasta 57 m", "más de 23 m", "más de 37 m"]) expect(alterada).toContain(t);
+    const real = frasesLargo();
+    for (const t of [`entre ${ARENA.paseMaxM} m`, `hasta ${LA.pase.maxM} m`, `más de ${ARENA.radioTiroM} m`, `más de ${LA.remate.maxM} m`]) expect(real).toContain(t);
+    for (const a of atributosJugador) expect(frasesAtributos()).toContain(a);
+    expect(SISTEMA_ARENA).toContain(real); expect(SISTEMA_ARENA).toContain(frasesAtributos());
+  });
+
+  it("C10 · lote rápido v7: bandas `rapido` del 046 (recalibradas), del 051 (y su controlado de porteros), del bloque A y de los bloques B y C", { timeout: 300_000 }, async () => {
+    const lote = { desde: L.rapido.semillaDesde, semillas: L.rapido.semillas, reglas: V7 };
+    const m = await medirLote(lote);
+    const { b046, b051, b063, bBC } = bandasLote(V7, "rapido");
+    console.log("[063 v7 rápido]", JSON.stringify({ goles: m.golesPorPartido, centros: m.centros.porPartido, a: m.persecucion063, bc: m.largoLejano063 }));
+    expect(b046.golesPorPartido).toEqual(L63.recalibracion046.rapido.golesPorPartido);
+    expect(b046.centrosPorPartidoMin).toBe(L63.recalibracion046.rapido.centrosPorPartidoMin);
+    expect(bandasLote(V6, "rapido").b046).toBe(L.rapido);
+    expect(bandasLote(V6, "rapido").bBC).toBeNull();
+    expect(incumplimientos(m, b046, b051)).toEqual([]);
+    expect(incumplimientos063(m, b063!)).toEqual([]);
+    expect(incumplimientosBC(m, bBC!)).toEqual([]);
+    const porteros = await medirControlado({ ...lote, quien: "portero" });
+    expect(incumplimientosControlado({ porteros: porteros.diferencia }, L51.rapido)).toEqual([]);
+  });
+
+  it("C11 · fixture v7 (45 s, búsqueda 1–400) con un balón largo, un remate lejano y config.atributos; reproducción exacta; tamaño con atributos: cota pura ≤ crecimientoMaxBytes y registros reales de 180 s", { timeout: 300_000 }, async () => {
+    const r = JSON.parse(await readFile("src/arena/__fixtures__/arena-reinicios-v7.json", "utf8")) as RegistroArena;
+    expect(r.config.duracionS).toBe(DURACION_FIXTURE_V7_S);
+    expect(condicionesFixtureV7(r)).toEqual({ reglas: true, atributos: true, largo: true, lejano: true });
+    expect(cumpleFixtureV7(r)).toBe(true);
+    expect(r.rondas.flatMap(x => Object.values(x.decisiones)).every(d => d.tiempoMs === 0)).toBe(true);
+    expect(reproducirArena(structuredClone(r))).toEqual(r);
+    // Los fixtures anteriores siguen exactos.
+    const r6 = JSON.parse(await readFile("src/arena/__fixtures__/arena-reinicios-v6.json", "utf8")) as RegistroArena;
+    expect(reproducirArena(structuredClone(r6))).toEqual(r6);
+    // Cota pura (v1.2 § 18.4) con fórmulas y constantes: persecución, atributos y los `motivo` nuevos.
+    const idMasLargo = `visita-${ARENA.plantillaArena - 1}`, tickMax = Math.round(ARENA.duracionMaxS / ARENA.pasoS) + Math.round(PE.maxS / ARENA.pasoS);
+    const clave = JSON.stringify({ persecucion: { jugador: idMasLargo, lado: "visita", desdeTick: tickMax, hastaTick: tickMax } }).length - 2 + 1;
+    const fotogramas = Math.round(ARENA.duracionMaxS / ARENA.pasoS) + 1;
+    const unAtributo = JSON.stringify(Object.fromEntries(atributosJugador.map(a => [a, AT.max])));
+    const atributos = JSON.stringify({ atributos: Object.fromEntries(Array.from({ length: 2 * ARENA.plantillaArena }, (_, k) => [`${idMasLargo}${k}`.slice(0, idMasLargo.length), JSON.parse(unAtributo)])) }).length;
+    const atributosCota = 2 * ARENA.plantillaArena * (JSON.stringify(idMasLargo).length + 1 + unAtributo.length + 1) + JSON.stringify("atributos").length + 3;
+    expect(atributosCota).toBeGreaterThanOrEqual(atributos);
+    const motivos = JSON.stringify({ motivo: "lejano" }).length - 2 + 1;
+    const acciones = Math.ceil(ARENA.duracionMaxS * T.ritmo.alto / ARENA.accionCadaS);
+    const cota = clave * fotogramas + 2 * clave + atributosCota + motivos * acciones;
+    console.log("[063 C11 cota]", JSON.stringify({ clave, fotogramas, atributosCota, motivos, acciones, cota, maximo: L63.crecimientoMaxBytes }));
+    expect(cota).toBeLessThanOrEqual(L63.crecimientoMaxBytes);
+    let mayor = 0;
+    for (const seed of ESCENARIO.semillasTamano) for (const intervaloS of ESCENARIO.intervalosTamano) {
+      const tam = async (reglas: ReglasArena) => Buffer.byteLength(JSON.stringify(await ejecutarArena(crearConfigArena({ seed, duracionS: ARENA.duracionMaxS, intervaloS, reglas }), { local: crearControladorProgramado(), visita: crearControladorProgramado() })));
+      const b7 = await tam(V7), b5 = await tam(V5);
+      mayor = Math.max(mayor, b7);
+      expect({ seed, intervaloS, dentroDeCota: b7 < b5 + cota, menorQueMaximo: b7 < ARENA.archivoMaxBytes }).toEqual({ seed, intervaloS, dentroDeCota: true, menorQueMaximo: true });
+    }
+    console.log("[063 C11 tamaño]", JSON.stringify({ mayorBytes: mayor, archivoMaxBytes: ARENA.archivoMaxBytes }));
   });
 });

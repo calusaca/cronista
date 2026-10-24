@@ -252,7 +252,8 @@ export interface EntradasSitio {
   /** Torneo del que salen los participantes («los mismos modelos»). */
   torneoOrigen: string;
   participantes: ParticipanteTorneo[];
-  promptMax: { tokens: number; archivo: string; partido: string };
+  /** Brief 063 v1.1 § 17.4: `tokens` = ceil(`medido` × `factorObservacion063`). */
+  promptMax: { tokens: number; archivo: string; partido: string; medido?: number; factorObservacion063?: number };
   medidas: MedidaEntrada[];
 }
 export interface FichaFormato {

@@ -483,8 +483,9 @@ export const ARENA = {
   /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`).
    * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros).
    * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel).
-   * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida). */
-  reglas: "reinicios-v6",
+   * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida).
+   * Brief 063 (publicación 2): reinicios-v7 (atributos de jugador, balones largos y remates lejanos). */
+  reglas: "reinicios-v7",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -712,6 +713,70 @@ export const PERSECUCION_ARENA = {
   frenadoMps2: 5,
 } as const;
 
+/** Brief 063 · Bloque B (reinicios-v7): atributos de jugador. Seis índices sintéticos 0–100 por jugador, guardados
+ * en `config.atributos` (el motor usa los guardados). `atributosDe` (src/arena/atributos.ts): PRNG
+ * `atributos:arena-v7:{equipo}:{jugador}` con esta semilla, seis extracciones en [−variacion, variacion], un atributo
+ * distintivo (+distintivo; el portero, entre velocidad y visión), base por posición natural más ajuste por perfil,
+ * redondeo y cota [min, max]. Cifras del prototipo del 24 oct (docs/evidencia/motor-063). Efecto de un valor a:
+ * ef = (a − neutro)/neutro; cada multiplicador vale exactamente 1 (o suma 0) con a = neutro. */
+export const ATRIBUTOS_ARENA = {
+  semilla: 0x61747231, min: 20, max: 95, variacion: 12, distintivo: 12, neutro: 50,
+  base: {
+    POR: { velocidad: 40, resistencia: 46, aguante: 38, entrada: 28, vision: 48, potencia: 50 },
+    DEF: { velocidad: 43, resistencia: 48, aguante: 44, entrada: 60, vision: 40, potencia: 38 },
+    MED: { velocidad: 46, resistencia: 56, aguante: 48, entrada: 48, vision: 56, potencia: 46 },
+    DEL: { velocidad: 56, resistencia: 42, aguante: 52, entrada: 30, vision: 44, potencia: 59 },
+  },
+  /** Ajuste por perfil de la personalidad (los atributos que no aparecen suman 0). */
+  perfil: {
+    defensivo: { entrada: 8, potencia: -5, vision: -3 }, ofensivo: { velocidad: 7, potencia: 5, entrada: -7 },
+    pasador: { vision: 12, aguante: 3, velocidad: -4, potencia: -4 }, conductor: { aguante: 9, velocidad: 7, vision: -4 },
+    rematador: { potencia: 11, resistencia: -5, vision: -6 }, equilibrado: { resistencia: 5 },
+  },
+  /** Efectos: velocidad máxima × (1 + velocidadMax·ef) y aceleración × (1 + aceleracion·ef) (velocidad); desgaste
+   * por metro × (1 − resistenciaDesgaste·ef) (resistencia); p del duelo − aguanteDuelo·ef del portador (aguante) y
+   * + entradaDuelo·ef del defensor (entrada); error de todo pase × (1 − visionError·ef) (visión); velocidad del
+   * remate × (1 + potenciaVelocidad·ef) del autor (potencia). */
+  velocidadMax: 0.10, aceleracion: 0.15, resistenciaDesgaste: 0.35,
+  /** Ajuste 1 de § 12.2 (24 oct): aguanteDuelo y entradaDuelo 0,15 → 0,12. Con 0,15 el lote 1–100 de reinicios-v7
+   * incumplía la conversión del mano a mano del 046 (0,4202 > 0,42); con 0,12 los tres lotes cumplen todas las bandas del
+   * 046, del 051 y de los bloques A, B y C (docs/evidencia/motor-063/publicacion-2). El primer ajuste de la lista
+   * (probabilidad del lejano y penalización del largo) no aplicaba: lejanos y largos estaban dentro de banda. */
+  aguanteDuelo: 0.12, entradaDuelo: 0.12, visionError: 0.2, potenciaVelocidad: 0.08,
+  /** Rasgo distintivo mostrado en la UI: el atributo mayor (en empate, el primero) si alcanza este valor. */
+  distintivoMin: 70,
+  /** § 9.1 · Textos de la ficha y de la tira «En voz». */
+  etiquetas: {
+    es: { velocidad: "Velocidad", resistencia: "Resistencia", aguante: "Aguante con balón", entrada: "Entrada", vision: "Visión", potencia: "Potencia de disparo" },
+    en: { velocidad: "Pace", resistencia: "Stamina", aguante: "Ball retention", entrada: "Tackling", vision: "Vision", potencia: "Shot power" },
+  },
+  rasgos: {
+    es: { velocidad: "Muy rápido", resistencia: "Incansable", aguante: "Protege el balón", entrada: "Gran quite", vision: "Lee el juego", potencia: "Disparo potente" },
+    en: { velocidad: "Very quick", resistencia: "Tireless", aguante: "Shields the ball", entrada: "Strong tackler", vision: "Reads the game", potencia: "Powerful shot" },
+  },
+  efectos: {
+    es: { velocidad: "Más velocidad punta y aceleración.", resistencia: "Se desgasta menos al correr.", aguante: "Pierde menos duelos con el balón.", entrada: "Gana más duelos para robar.", vision: "Pasa con más precisión y ve balones largos.", potencia: "Dispara más fuerte y se anima desde lejos." },
+    en: { velocidad: "Higher top speed and acceleration.", resistencia: "Tires less when running.", aguante: "Loses fewer duels on the ball.", entrada: "Wins more tackles.", vision: "Passes more accurately and spots long balls.", potencia: "Shoots harder and tries from distance." },
+  },
+} as const;
+
+/** Brief 063 · Bloque C (reinicios-v7): remate lejano y balón largo. Cifras del prototipo del 24 oct. */
+export const LARGO_ARENA = {
+  /** Remate lejano: candidato de campo con potencia ≥ potenciaMin, a (radioTiroM, maxM] m del centro del arco, dentro
+   * del ancho del área, sin rivales a < espacioM ni rivales de campo a < lineaM de la línea al arco; decisión local con
+   * p = probabilidad · (remateBase + remate/100) · (potenciaBase + ef(potencia)). Un `tirar` del LLM a más de maxM no
+   * se ejecuta (decide en local). Con lejos = d − radioTiroM > 0 (y d ≤ maxM): el error del remate × (1 + errorPorM·lejos)
+   * y la probabilidad de alto + altoPorM·lejos, acotada a altoMax. */
+  remate: { potenciaMin: 60, maxM: 33, espacioM: 5, lineaM: 2, probabilidad: 0.35, remateBase: 0.5, potenciaBase: 0.5,
+    errorPorM: 0.3, altoPorM: 0.03, altoMax: 0.6 },
+  /** Balón largo por arriba (fase aérea del 046): alcance = paseMaxM + (maxM − paseMaxM)·min(1, (visión − visionMin)/
+   * (100 − visionMin)), nada con visión < visionMin; candidato con avance ≥ avanceMinM o |Δy| ≥ cambioFraccion·anchoM y
+   * ventaja en la caída; puntuación avance + min(ventaja, margenUtilM) − d·pesoDistanciaPase·penalizacion. Error extra
+   * = errorM · (d − paseMaxM)/(maxM − paseMaxM) · (errorVisionBase − visión/100). */
+  pase: { visionMin: 50, maxM: 55, penalizacion: 0.7, avanceMinM: 10, cambioFraccion: 0.4,
+    errorM: 3, errorVisionBase: 1.5 },
+} as const;
+
 /**
  * Brief 063 · Métricas de lote del bloque A (`src/arena/metricas-lote.ts`, en la misma pasada que las del
  * 046 y el 051: programados, LOTE_ARENA_046.duracionS, todos los ticks; denominador cero = «sin muestra»,
@@ -735,6 +800,42 @@ export const LOTE_ARENA_063 = {
   crecimientoMaxBytes: 200_000,
   rapido: { repliegueCorrenMin: 0.55, persecucionPerdedorMin: 0.38 },
   completo: { repliegueCorrenMin: 0.55, persecucionPerdedorMin: 0.4, repliegueSeleccionMin: 0.55 },
+  /** Bloques B y C (§ 11.2): bandas exigidas desde `desdeBC`. `rapido`: cuentas mínimas en el lote; `completo`: por
+   * partido. Éxito de un balón largo: el primer toque posterior es una recepción del mismo lado. «A puerta» de un
+   * remate lejano: gol, atrapada o desvío (desenlace físico del 051). */
+  desdeBC: "reinicios-v7",
+  bloqueBC: {
+    rapido: { largosMinLote: 8, lejanosMinLote: 5 },
+    completo: { largosPorPartido: { min: 0.4, max: 1.6 }, exitoLargos: { min: 0.3, max: 0.7 }, lejanosPorPartido: { min: 0.3, max: 1.2 },
+      conversionLejanosMax: 0.3, aPuertaLejanosMax: 0.7 },
+  },
+  /** § 12.3 · Recalibración explícita de dos bandas del 046 solo para reglas ≥ `desde`: goles por partido (el suelo
+   * queda unas dos veces el error típico del lote por debajo de la media nueva medida en el prototipo, ≈ 1,84) y
+   * centros por partido (el balón largo y el remate lejano sustituyen parte del juego por banda; la proporción de
+   * centros no cambia). v6 y anteriores conservan las originales. */
+  recalibracion046: {
+    desde: "reinicios-v7",
+    rapido: { golesPorPartido: { min: 1.3, max: 3 }, centrosPorPartidoMin: 0.2 },
+    completo: { golesPorPartido: { min: 1.5, max: 2.8 }, centrosPorPartidoMin: 0.35 },
+  },
+  /** § 13 B1 · Coherencia de `atributosDe` en los jugadores de campo de las semillas 1 a `semillas`: media global de cada
+   * atributo dentro de `media` (centrados en ATRIBUTOS_ARENA.neutro). */
+  coherenciaAtributos: { semillas: 200, media: { min: 45, max: 55 } },
+  /** § 11.2 · Experimento controlado de atributos (v7, `completo.semillas` desde `completo.semillaDesde`): el
+   * atributo de los jugadores de campo del `local` (titulares y banco) forzado a `bajo` y a `alto`; diferencia
+   * mínima alto − bajo de su métrica (aguante: bajo − alto de los robos sufridos por minuto de posesión). */
+  controlado: {
+    valores: { bajo: 30, alto: 80 },
+    diferenciaMin: { velocidad: 0.4, aguante: 0.3, entrada: 0.3, vision: 0.8, potencia: 0.4, resistencia: 0.03 },
+  },
+  /** v1.2 § 18.3 · Visión y potencia por encima de su umbral de acceso: cociente máximo alto/bajo de la métrica
+   * (visión: |hasta − destino previsto| medio de los pases cortos con receptor del `local`; potencia: ticks de vuelo
+   * por metro de los remates del `local` que terminan sin contacto o en el portero). Derivados de las fórmulas: el
+   * semiancho del pase baja un 12,5 % y los ticks por metro del remate un 3,8 %. */
+  sobreUmbral: {
+    vision: { bajo: 60, alto: 90, cocienteMax: 0.95 },
+    potencia: { bajo: 65, alto: 90, cocienteMax: 0.985 },
+  },
 } as const;
 
 /** Mini-encuentro v3: parámetros sintéticos, en segundos reales de simulación. */
@@ -1406,4 +1507,11 @@ export const TORNEO_SITIO = {
   cierrePlazoMs: 600_000,
   /** § 17.6 · Token de administración (cancelación, cierre y liga de prueba): fallos por hora y longitud mínima. */
   admin: { fallosPorHora: 10, tokenMinCaracteres: 32 },
+  /** Brief 063 v1.1 § 17.4 y v1.2 § 18.2 · Factor sobre el prompt máximo medido el 22 oct (sin atributos): las
+   * peticiones de reinicios-v7 llevan `equipos[lado].atributos` y frases nuevas en el sistema. La observación más
+   * grande medida (tick 0 con banco) pasa de 16,8 a ≈ 19,5 KB (×1,16); el factor cubre la petición completa con un 10 %
+   * de margen de tokens (la prueba exige factor ≥ 1,1 × el mayor cociente de caracteres v7/v5, semillas 1–50). v1.2 § 18.2:
+   * 1,3 no bastaba (mayor cociente medido de la petición completa 1,1924 → 1,1 × 1,1924 = 1,3117); se sube a 1,32 y los
+   * dos formatos siguen cabiendo en su tope. */
+  factorObservacion063: 1.32,
 } as const;
