@@ -203,6 +203,11 @@ export function esperaReintentoCierre(estado: number, retryAfter: string | null,
   if (!Number.isFinite(segundos) || segundos < 0) return null;
   return Math.max(segundos * 1000, CIERRE_VOZ.reintentoMs * 2 ** reintentosHechos);
 }
+/** Rev. 0000035 · 429 del tope diario de Speech (SPEECH_DIARIO): final y sin `retry-after`, con `motivo`
+ * "speech-diario" en el cuerpo. Los 429 de concurrencia llevan retry-after y los de bolsas por encuentro otro motivo. */
+export function vozDiariaAgotada(estado: number, retryAfter: string | null, cuerpo: unknown): boolean {
+  return estado === 429 && retryAfter === null && typeof cuerpo === "object" && cuerpo !== null && (cuerpo as { motivo?: unknown }).motivo === "speech-diario";
+}
 /** Fallo de la petición de una variante de invitado: respuesta HTTP no correcta, red caída o plazo
  * agotado, o respuesta recibida pero inválida (segmento, audio o decodificación). */
 export type FalloInvitado = { tipo: "http"; estado: number } | { tipo: "red" } | { tipo: "invalida" };

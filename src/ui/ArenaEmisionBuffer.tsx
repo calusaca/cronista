@@ -8,7 +8,7 @@ import type { RegistroArena } from "../arena/tipos";
 import type { construirRelato } from "../arena/relato";
 import { elegirReservaVoz, ordenPrimeraVuelta, recordarVoz, repetidaVoz, type RecuerdoVoz } from "../arena/editorial";
 import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../arena/reservas-voz";
-import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoCierre, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
+import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoCierre, esperaReintentoInvitado, vozDiariaAgotada, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { esPrevia } from "../arena/previa";
 import { ANTESALA_ARENA, ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
@@ -199,7 +199,26 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
     s.activa = undefined; void s.contexto.suspend(); vozRef.current = false; setVoz(false); setAutomatica(false);
   };
+  /** Rev. 0000035 · Tope diario de Speech agotado: se cancela la narración restante de este partido (sin reintentos),
+   * la antesala se abandona, se suelta la retención del saque y queda un aviso visible, anunciado una sola vez. */
+  const [vozAgotada, setVozAgotada] = useState(false), agotada = useRef(false);
+  const agotarVoz = () => {
+    if (agotada.current) return;
+    agotada.current = true; setVozAgotada(true);
+    apagarVoz(); limpiar();
+    retencionAntesala.current = false; soltarAgotada();
+    setError(false); setPasaje(null); setHablando(false); vozRef.current = false; setVoz(false); setAutomatica(false);
+  };
+  const soltarAgotada = () => { if (reloj.current.retenido) reloj.current.soltar(); setVersion(v => v + 1); };
+  /** Si la respuesta es el 429 del tope diario de Speech, agota la voz y devuelve true. */
+  const comprobarAgotada = async (r: Response) => {
+    if (r.status !== 429 || r.headers.get("retry-after") !== null) return false;
+    const cuerpo: unknown = await r.clone().json().catch(() => null);
+    if (!vozDiariaAgotada(r.status, r.headers.get("retry-after"), cuerpo)) return false;
+    agotarVoz(); return true;
+  };
   const activarVoz = (automaticaAhora: boolean, t0Ms?: number) => {
+    if (agotada.current) return;
     setError(false); setPulsar(false); setPasaje(null); setHablando(false);
     let s = sonido.current;
     const tick = Math.floor(reloj.current.segundo * 10);
@@ -339,7 +358,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       try {
         const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: 0, hastaTick: 0, modo: "buffer", idioma, intervencion: id, variante: "completa" }) })
           .catch((e: unknown) => { resultado = { tipo: "red" }; throw e; });
-        if (!r.ok) { resultado = { tipo: "http", estado: r.status }; throw new Error("Antesala no disponible"); }
+        if (!r.ok) { resultado = { tipo: "http", estado: r.status }; await comprobarAgotada(r); throw new Error("Antesala no disponible"); }
         const segmento = await r.json() as Segmento;
         if (!vigente()) return;
         if (!segmentoVozValido(segmento, { desde: 0, hasta: 0, idioma, intervencion: { id, tick: 0, variante: "completa" } })) throw new Error("Clip inconsistente");
@@ -410,7 +429,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
             if (espera === null) break;
             await new Promise<void>((resolver, rechazar) => { const t = setTimeout(resolver, espera); signal.addEventListener("abort", () => { clearTimeout(t); rechazar(new Error("Cancelada")); }, { once: true }); });
           }
-          if (!r.ok) throw new Error("Relato no disponible");
+          if (!r.ok) { await comprobarAgotada(r); throw new Error("Relato no disponible"); }
           const segmento = await r.json() as Segmento;
           if (!segmentoVozValido(segmento, { desde, hasta, idioma, entradaTick })) throw new Error("Ventana inconsistente");
           const audio = segmento.audio ? await s.contexto.decodeAudioData(Uint8Array.from(atob(segmento.audio.base64), c => c.charCodeAt(0)).buffer) : null;
@@ -474,7 +493,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
           // v3.1: sin memoria; la intervención es la misma para todos los espectadores.
           const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal, body: JSON.stringify({ desdeTick: tick, hastaTick: tick, modo: "buffer", idioma, intervencion: id, variante }) })
             .catch((e: unknown) => { fallo = { tipo: "red" }; throw e; });
-          if (!r.ok) { fallo = { tipo: "http", estado: r.status }; throw new Error("Intervención no disponible"); }
+          if (!r.ok) { fallo = { tipo: "http", estado: r.status }; await comprobarAgotada(r); throw new Error("Intervención no disponible"); }
           const segmento = await r.json() as Segmento;
           if (!segmentoVozValido(segmento, { desde: tick, hasta: tick, idioma, intervencion: { id, tick, variante: varianteEfectiva(inv.intervencion, variante) } })) throw new Error("Intervención inconsistente");
           const audio = await s.contexto.decodeAudioData(Uint8Array.from(atob(segmento.audio!.base64), c => c.charCodeAt(0)).buffer);
@@ -691,7 +710,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     <p role="status" data-testid="arena-buffer-status" data-ready-seconds={vista.reserva.toFixed(2)}>{textoEstado}</p>
     <div className="arena-live-controls">
       {faseAntesala && <button className="btn" ref={saltarRef} data-testid="arena-antesala-skip" onClick={saltarAntesala}>{t("Skip to kick-off", "Saltar al saque")}</button>}
-      <button className="btn" ref={vozBotonRef} disabled={!disponible || vista.estado === "final" && !voz} aria-pressed={voz} onClick={cambiarVoz}>{voz ? t("Turn narration off", "Desactivar narración") : t("Enable narration", "Activar narración")}</button>
+      <button className="btn" ref={vozBotonRef} disabled={!disponible || vozAgotada || vista.estado === "final" && !voz} aria-pressed={voz} onClick={cambiarVoz}>{voz ? t("Turn narration off", "Desactivar narración") : t("Enable narration", "Activar narración")}</button>
       {pulsar && <button className="btn" onClick={habilitarAudio}>{t("Enable audio playback", "Habilitar reproducción de audio")}</button>}
       {terminada && <button className="btn" onClick={alRepeticion}>{t("Open available replay", "Abrir repetición disponible")}</button>}
     </div>
@@ -701,6 +720,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     {voz && <p role={vista.retenido || faseAntesala ? undefined : "status"} data-testid="arena-voice-status">{hablando ? pasaje?.cierre ? t("Closing commentary", "Comentario de cierre") : t("Narration playing", "Narración en reproducción") : pasaje?.cierre ? t("End of narration", "Fin de la narración") : t("Preparing the next passage", "Preparando la siguiente intervención")}</p>}
     {pasaje && <details data-testid="arena-voice-transcript" data-narration-tick={pasaje.fragmentos[0]?.tick} data-narration-kind={"tipoRelato" in pasaje ? pasaje.tipoRelato : "comentario"} data-narration-role={pasaje.rol ?? "narrador"} data-narration-variant={pasaje.variante} data-narration-intervention={pasaje.intervencion}><summary>{t("Narration transcript and evidence", "Transcripción y evidencia de la narración")}</summary>{pasaje.fragmentos.map((f, k) => <p key={k} data-narration-role={f.rol ?? "narrador"}>{f.texto}</p>)}<p className="arena-muted">{pasaje.fuentes.join(" · ")}</p></details>}
     {voz && error && <p role="alert">{t("A passage was unavailable. Backup commentary covers the wait while narration retries.", "Una intervención no estuvo disponible. Los comentarios de respaldo cubren la espera mientras la narración reintenta.")}</p>}
+    {vozAgotada && <p role="status" data-testid="arena-voice-exhausted">{t("Narration unavailable: the daily voice budget is exhausted; it returns at 00:00 UTC. The match continues without voice.", "Narración no disponible: se agotó el presupuesto diario de voz; vuelve a las 00:00 UTC. El partido sigue sin voz.")}</p>}
     {!disponible && <p className="arena-muted">{t("Audio is unavailable on this server. Follow the text description below.", "El audio no está disponible en este servidor. Sigue la descripción de texto abajo.")}</p>}
   </section>;
 }

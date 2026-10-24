@@ -1247,6 +1247,10 @@ export const REPETICION_NARRADA = {
  * consultas en curso»: el servidor admite 2 síntesis de voz simultáneas en total y, al terminar el partido, el cliente
  * pide a la vez el último tramo, el cierre y el invitado final de la Mesa. El presupuesto no se agotaba (la reserva
  * propia del cierre ya existe: MESA_ARENA.dialogo.reservaSpeechCierre*). */
+/** Defecto de producción (rev. 0000035) · Cupo de encuentros con modelos por día UTC de la réplica (antes, el 10 literal
+ * de sesiones.ts). El 429 que lo aplica lleva `motivo: "limite-diario"` y `limite`, y el panel lo explica. */
+export const ENCUENTROS_LLM_DIARIOS = 10;
+
 export const CIERRE_VOZ = {
   /** Plazas de síntesis simultánea que solo puede ocupar un cierre, además de las 2 comunes (prioridad del cierre). */
   plazasPropias: 1,

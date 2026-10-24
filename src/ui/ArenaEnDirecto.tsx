@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { AsignacionModelos, InstantaneaEmision, MensajeSesion, MetricasSesion, ModeloPublico, PublicacionSesion, SeleccionModelos, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
+import { ENCUENTROS_LLM_DIARIOS } from "../sim/limites";
 import { cebarAudioDirecto, descartarAudioCebado, fijarAsignacionDirecto, guardarPreferenciaNarracion, leerPreferenciaNarracion, marcarArranquePropio } from "./audio-directo";
 
 const claveSesion = "cronista:arena:sesion";
@@ -21,6 +22,8 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
    * espectador no eligió ninguno; un modo elegido que deja de ser válido (sin modelos) se convierte y se avisa. */
   const modoElegido = useRef(false), [modoConvertido, setModoConvertido] = useState(false);
   const modoActual = useRef(modo); modoActual.current = modo;
+  /** Rev. 0000035 · Motivo del rechazo al crear la sesión (cuerpo del 429): sin él, el error genérico de siempre. */
+  const [rechazo, setRechazo] = useState<{ motivo: "en-curso" | "limite-diario"; limite?: number } | null>(null);
   const [estado, setEstado] = useState("lista"), [error, setError] = useState(false), [asignacion, setAsignacion] = useState<AsignacionModelos | null>(null);
   const [presentacion, setPresentacion] = useState<PresentacionArena>("buffer");
   const [grabacionLista, setGrabacionLista] = useState<string | null>(null);
@@ -153,12 +156,16 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     const t0 = performance.now(), narrada = presentacion === "buffer" && vozDisponible !== false && narrar;
     if (narrada) cebarAudioDirecto();
     iniciandoRef.current = true; detenidoPorUsuario.current = false; callbacks.current.alActividad(true, presentacion);
-    setIniciando(true); setError(false); setAsignacion(null); setMetricas(null); setGrabacionLista(null); setReintento(null);
+    setIniciando(true); setError(false); setRechazo(null); setAsignacion(null); setMetricas(null); setGrabacionLista(null); setReintento(null);
     const abort = new AbortController(); solicitud.current = abort;
     try {
       const seleccion = modo === "manual" ? { modo, local, visita } : { modo };
       const r = await fetch("/api/arena/sesiones", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...(ajustes as object), seed: (ajustes as { seed?: number }).seed ?? crypto.getRandomValues(new Uint32Array(1))[0], seleccion, presentacion }), signal: abort.signal });
-      if (!r.ok) throw new Error("Inicio");
+      if (!r.ok) {
+        const cuerpo = await r.json().catch(() => null) as { motivo?: string; limite?: number } | null;
+        if (r.status === 429 && (cuerpo?.motivo === "en-curso" || cuerpo?.motivo === "limite-diario")) setRechazo({ motivo: cuerpo.motivo, ...(Number.isInteger(cuerpo.limite) ? { limite: cuerpo.limite } : {}) });
+        throw new Error("Inicio");
+      }
       const s = await r.json() as { id: string; asignacion: AsignacionModelos };
       // v1.1 (4) · Detenido con el POST en vuelo: el servidor pudo crear la sesión; se cancela ya y no se adopta.
       if (detenidoPorUsuario.current) {
@@ -222,6 +229,10 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     {grabacionLista && <p><a href={`/arena?partido=${grabacionLista}`}>{t("Open or share this saved match", "Abrir o compartir este partido guardado")}</a> · {t("Available for up to 24 hours", "Disponible hasta 24 horas")}</p>}
     {reintento && !id && <button className="btn" onClick={() => { setError(false); setId(reintento); setReintento(null); }}>{t("Reconnect to this match", "Reconectar a este partido")}</button>}
     {metricas && <p className="arena-muted" data-testid="arena-live-metrics">{t(`${metricas.decisiones} team decisions · ${metricas.respaldos} programmed fallbacks · ${(metricas.duracionMs / 1000).toFixed(1)} s elapsed`, `${metricas.decisiones} decisiones de equipo · ${metricas.respaldos} respaldos programados · ${(metricas.duracionMs / 1000).toFixed(1)} s transcurridos`)}{metricas.respaldos > 0 && t(". This result includes programmed intervention.", ". Este resultado incluye intervención programada.")}</p>}
-    {error && <p role="alert">{t("Could not start or update this match. Check availability and try again.", "No se pudo iniciar o actualizar el partido. Revisa la disponibilidad e inténtalo de nuevo.")}</p>}
+    {error && <p role="alert" data-testid="arena-live-error" data-motivo={rechazo?.motivo}>{rechazo?.motivo === "limite-diario" ? (() => {
+      const n = rechazo.limite ?? ENCUENTROS_LLM_DIARIOS, ahora = Date.now(), medianoche = Date.UTC(new Date(ahora).getUTCFullYear(), new Date(ahora).getUTCMonth(), new Date(ahora).getUTCDate() + 1), horas = Math.max(1, Math.ceil((medianoche - ahora) / 3_600_000));
+      return <>{t(`The daily limit of matches with models has been reached (${n} per day, UTC). It is available again at 00:00 UTC (in ~${horas}h). Meanwhile you can use the programmed demonstration.`, `Se alcanzó el límite diario de partidos con modelos (${n} por día, UTC). Vuelve a estar disponible a las 00:00 UTC (en ~${horas}h). Mientras tanto puedes usar la demostración programada.`)} <button className="btn" onClick={() => { modoElegido.current = true; setModo("programado"); setError(false); setRechazo(null); }}>{t("Use the programmed demonstration", "Usar la demostración programada")}</button></>;
+    })() : rechazo?.motivo === "en-curso" ? t("Another match is already running on the server. Wait for it to finish and try again.", "Ya hay otro partido en curso en el servidor. Espera a que termine e inténtalo de nuevo.")
+      : t("Could not start or update this match. Check availability and try again.", "No se pudo iniciar o actualizar el partido. Revisa la disponibilidad e inténtalo de nuevo.")}</p>}
   </section>;
 }

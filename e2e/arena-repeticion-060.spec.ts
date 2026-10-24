@@ -583,3 +583,54 @@ test("D1 · sin elección del espectador, el catálogo sigue fijando «Random mo
   await expect(page.getByTestId("arena-live").getByRole("combobox", { name: "Controller selection" })).toHaveValue("azar");
   await expect(page.getByTestId("arena-live-mode-note")).toHaveCount(0);
 });
+
+// Rev. 0000035 · (a) Motivo concreto al no poder iniciar el partido; (b) tope diario de Speech agotado en el directo.
+test("0000035 (a) · límite diario de partidos con modelos: motivo con el cupo y la hora UTC, y botón a la demostración programada (EN y ES)", async ({ page }) => {
+  const { ENCUENTROS_LLM_DIARIOS } = await import("../src/sim/limites");
+  await page.route("**/api/arena/modelos", r => r.fulfill({ json: { modelos: [{ id: "a", nombre: "Modelo A", controlador: "azure-openai:a" }] } }));
+  let respuesta: { status: number; json: object } = { status: 429, json: { error: "Se alcanzó el límite diario de encuentros con modelos", motivo: "limite-diario", limite: ENCUENTROS_LLM_DIARIOS } };
+  await page.route("**/api/arena/sesiones", r => r.request().method() === "POST" ? r.fulfill(respuesta) : r.fallback());
+  await page.goto("/arena");
+  const panel = page.getByTestId("arena-live"), selector = panel.getByRole("combobox", { name: "Controller selection" });
+  await expect(selector).toHaveValue("azar");
+  await panel.getByRole("button", { name: "Start live match", exact: true }).click();
+  const aviso = page.getByTestId("arena-live-error");
+  await expect(aviso).toHaveAttribute("role", "alert");
+  await expect(aviso).toContainText(`The daily limit of matches with models has been reached (${ENCUENTROS_LLM_DIARIOS} per day, UTC). It is available again at 00:00 UTC (in ~`);
+  await expect(aviso).toContainText("Meanwhile you can use the programmed demonstration.");
+  await page.getByRole("button", { name: "Switch to Spanish" }).click();
+  await expect(aviso).toContainText(`Se alcanzó el límite diario de partidos con modelos (${ENCUENTROS_LLM_DIARIOS} por día, UTC). Vuelve a estar disponible a las 00:00 UTC (en ~`);
+  await aviso.getByRole("button", { name: "Usar la demostración programada", exact: true }).click();
+  await expect(panel.getByRole("combobox", { name: "Elección de controladores" })).toHaveValue("programado");
+  await expect(aviso).toHaveCount(0);
+  // Otro partido en curso.
+  respuesta = { status: 429, json: { error: "Hay un encuentro en ejecución; espera a que termine", motivo: "en-curso" } };
+  await panel.getByRole("button", { name: "Iniciar partido en vivo", exact: true }).click();
+  await expect(aviso).toHaveText("Ya hay otro partido en curso en el servidor. Espera a que termine e inténtalo de nuevo.");
+  // Cualquier otro error: el genérico.
+  respuesta = { status: 500, json: { error: "Fallo" } };
+  await panel.getByRole("button", { name: "Iniciar partido en vivo", exact: true }).click();
+  await expect(aviso).toHaveText("No se pudo iniciar o actualizar el partido. Revisa la disponibilidad e inténtalo de nuevo.");
+});
+
+test("0000035 (b) · tope diario de Speech: el directo deja la antesala, suelta el saque, no reintenta y avisa una vez", async ({ page }) => {
+  test.setTimeout(90_000);
+  const relatos: number[] = [];
+  await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: true, analista: false } }));
+  await page.route("**/api/arena/sesiones/*/relato", r => { relatos.push(Date.now()); return r.fulfill({ status: 429, json: { error: "Presupuesto diario de este servicio agotado", motivo: "speech-diario" } }); });
+  await page.goto("/arena");
+  await page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
+  const aviso = page.getByTestId("arena-voice-exhausted");
+  await expect(aviso).toHaveText("Narration unavailable: the daily voice budget is exhausted; it returns at 00:00 UTC. The match continues without voice.", { timeout: 30_000 });
+  await expect(aviso).toHaveAttribute("role", "status");
+  await expect(page.getByTestId("arena-voice-exhausted")).toHaveCount(1);
+  // Sin reintentos: ninguna petición de relato más en 3 s.
+  const pedidos = relatos.length;
+  await page.waitForTimeout(3000);
+  expect(relatos.length).toBe(pedidos);
+  // La antesala se abandonó y el saque no queda retenido: el reloj avanza.
+  await expect(page.getByTestId("arena-antesala-skip")).toHaveCount(0);
+  await expect.poll(async () => Number(await page.getByTestId("arena-clock").getAttribute("data-cursor-s")), { timeout: 30_000 }).toBeGreaterThan(0);
+  await expect(page.getByRole("button", { name: "Enable narration", exact: true })).toBeDisabled();
+  await page.getByTestId("arena-stop").click();
+});

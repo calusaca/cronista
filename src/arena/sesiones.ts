@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ANTESALA_ARENA, ARENA, CIERRE_VOZ, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
+import { ANTESALA_ARENA, ARENA, CIERRE_VOZ, ENCUENTROS_LLM_DIARIOS, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -17,7 +17,24 @@ import { MesaSesion } from "./mesa";
 import type { IntervencionArena } from "./protocolo";
 
 /** `retryAfterS`: un 429 transitorio (concurrencia) lo anuncia en `retry-after`; los de presupuesto no. */
-export class ErrorSesion extends Error { constructor(message: string, readonly status: number, readonly retryAfterS?: number) { super(message); } }
+/** Rev. 0000035 · `motivo` (y sus cifras) viajan en el cuerpo para que el cliente explique el rechazo: "en-curso",
+ * "limite-diario" (con `limite`) o "speech-diario" (tope diario de Speech, final: sin retry-after). */
+/** Pruebas de Carlos (24 oct) · Cupos diarios sustituibles por entorno, leídos en cada uso (no al importar): un entero
+ * > 0 en `nombre` sustituye a la constante; un valor ausente o inválido se ignora. */
+export function enteroPositivoEnv(nombre: string, defecto: number): number {
+  const v = process.env[nombre]?.trim();
+  if (!v || !/^\d+$/.test(v)) return defecto;
+  const n = Number(v);
+  return Number.isSafeInteger(n) && n > 0 ? n : defecto;
+}
+/** Cupos diarios efectivos: encuentros con modelos (ARENA_LIMITE_LLM_DIARIO) y Speech (ARENA_SPEECH_DIARIO_CARACTERES y
+ * ARENA_SPEECH_DIARIO_AUDIOS); sin override válido, ENCUENTROS_LLM_DIARIOS y SPEECH_DIARIO. */
+export const cuposDiarios = () => ({
+  encuentrosLlm: enteroPositivoEnv("ARENA_LIMITE_LLM_DIARIO", ENCUENTROS_LLM_DIARIOS),
+  speech: { audios: enteroPositivoEnv("ARENA_SPEECH_DIARIO_AUDIOS", SPEECH_DIARIO.audios), caracteres: enteroPositivoEnv("ARENA_SPEECH_DIARIO_CARACTERES", SPEECH_DIARIO.caracteres) },
+});
+export type MotivoRechazo = { motivo: "en-curso" | "limite-diario" | "speech-diario"; limite?: number };
+export class ErrorSesion extends Error { constructor(message: string, readonly status: number, readonly retryAfterS?: number, readonly rechazo?: MotivoRechazo) { super(message); } }
 interface Sesion {
   id: string; estado: EstadoSesion; creada: number; asignacion: AsignacionModelos;
   mensajes: MensajeSesion[]; suscriptores: Set<(m: MensajeSesion) => void>; cancelar: AbortController;
@@ -127,13 +144,13 @@ export class GestorSesiones {
   async crear(raw: unknown): Promise<{ id: string; asignacion: AsignacionModelos }> {
     const p = peticionSesion.parse(raw);
     await iniciarTelemetria();
-    if (this.creando) throw new ErrorSesion("Otra sesión se está iniciando", 429);
+    if (this.creando) throw new ErrorSesion("Otra sesión se está iniciando", 429, undefined, { motivo: "en-curso" });
     this.creando = true;
     try {
       const almacen = await this.almacen(); await almacen.iniciar(); await this.asegurarEscritura();
       await this.limpiar();
       const activas = [...this.sesiones.values()].filter(s => s.estado === "ejecutando");
-      if (activas.length >= (this.opciones.maxActivas ?? 2) || (p.seleccion.modo !== "programado" && activas.some(s => s.asignacion.modo !== "programado"))) throw new ErrorSesion("Hay un encuentro en ejecución; espera a que termine", 429);
+      if (activas.length >= (this.opciones.maxActivas ?? 2) || (p.seleccion.modo !== "programado" && activas.some(s => s.asignacion.modo !== "programado"))) throw new ErrorSesion("Hay un encuentro en ejecución; espera a que termine", 429, undefined, { motivo: "en-curso" });
       if (p.seleccion.modo !== "programado") {
         const hoy = new Date().toISOString().slice(0, 10);
         let usados = 0;
@@ -141,7 +158,8 @@ export class GestorSesiones {
           const meta = JSON.parse(await almacen.leer(nombre)) as { creada: number; asignacion: AsignacionModelos };
           if (new Date(meta.creada).toISOString().startsWith(hoy) && meta.asignacion.modo !== "programado") usados++;
         }
-        if (usados >= (this.opciones.maxLlmDiarias ?? 10)) throw new ErrorSesion("Se alcanzó el límite diario de encuentros con modelos", 429);
+        const limite = this.opciones.maxLlmDiarias ?? cuposDiarios().encuentrosLlm;
+        if (usados >= limite) throw new ErrorSesion("Se alcanzó el límite diario de encuentros con modelos", 429, undefined, { motivo: "limite-diario", limite });
       }
       const catalogo = p.seleccion.modo === "programado" ? [] : (this.opciones.catalogo ?? catalogoModelos)();
       const { asignacion, controladores, uso } = elegirModelos(p.seleccion, p.seed, catalogo);
@@ -363,7 +381,8 @@ export class GestorSesiones {
       try { total = JSON.parse(await a.leer(diario)); }
       catch (error) { if ((error as { code?: string }).code === "ENOENT" || (error as { statusCode?: number }).statusCode === 404) total = {}; else throw error; }
       // Brief 058 · C1: el tope diario de Speech vive en SPEECH_DIARIO; el análisis conserva sus 20 consultas.
-      if ((total[tipo] ?? 0) >= (tipo === "analisis" ? 20 : SPEECH_DIARIO.audios) || (total.caracteres ?? 0) + caracteres > SPEECH_DIARIO.caracteres) throw new ErrorSesion("Presupuesto diario de este servicio agotado", 429);
+      const speech = cuposDiarios().speech;
+      if ((total[tipo] ?? 0) >= (tipo === "analisis" ? 20 : speech.audios) || (total.caracteres ?? 0) + caracteres > speech.caracteres) throw new ErrorSesion("Presupuesto diario de este servicio agotado", 429, undefined, tipo === "audio" ? { motivo: "speech-diario" } : undefined);
       total[tipo] = (total[tipo] ?? 0) + 1; total.caracteres = (total.caracteres ?? 0) + caracteres; await a.escribir(diario, JSON.stringify(total));
       r[clave] = { tipo, estado: "pendiente", caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); return null;
     });
@@ -444,5 +463,6 @@ export function respuestaErrorSesion(error: unknown): Response {
   // Brief 057 v1.1 § 9: el lector acotado responde su propio estado (413 / 400) y su mensaje.
   const tipificado = error instanceof ErrorSesion || error instanceof ErrorPeticion;
   const retry: Record<string, string> = error instanceof ErrorSesion && error.retryAfterS !== undefined ? { "retry-after": String(error.retryAfterS) } : {};
-  return Response.json({ error: tipificado ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor." }, { status: tipificado ? error.status : 400, headers: { "cache-control": "no-store", ...retry } });
+  const rechazo = error instanceof ErrorSesion ? error.rechazo ?? {} : {};
+  return Response.json({ error: tipificado ? error.message : "No se pudo preparar el encuentro. Revisa la configuración del servidor.", ...rechazo }, { status: tipificado ? error.status : 400, headers: { "cache-control": "no-store", ...retry } });
 }
