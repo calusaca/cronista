@@ -152,6 +152,15 @@ const M = [
     ["<strong>{T.gana[idioma](p(ganador).nombre)}</strong> {textoSignificacionFormato(t, idioma)}</p>", "<strong>{T.gana[idioma](p(ganador).nombre)}</strong></p>"]] },
   { id: "U1g-carga-prueba", desc: "la repetición de una prueba no lo declara", archivo: "src/ui/torneo-carga.ts", test: "src/ui/__tests__/torneo-carga.test.ts", patron: "P1-b", cambios: [
     ['...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ', ""]] },
+  // --- Revisión Codex 062b (iteración 1) ---------------------------------------------------------------------------
+  { id: "C2b-1-ui", desc: "la línea del corte usa el criterio de la posición (no el del corte)", archivo: "src/ui/ArenaTorneoGrupos.tsx", test: T_U1, patron: "dos niveles", cambios: [
+    ['    return [`${nombre(orden[i]!.id)}: ${T.pasaComo[idioma](i + 1, T.criterios[c.criterio][idioma], detalle)}', '    return [`${nombre(orden[i]!.id)}: ${T.pasaComo[idioma](i + 1, T.criterios[orden[i]!.criterio][idioma], detalle)}']] },
+  { id: "C2b-1-pura", desc: "el corte hereda el criterio que fijó la posición anterior (no el que separó esa frontera)", archivo: FORMATOS, test: T_GRUPOS, patron: "adversario de su subclase", cambios: [
+    ["i => ({ criterio: nombre, arriba: distintos[i - 1]!, abajo: distintos[i]! })", "i => ({ criterio: previo, arriba: distintos[i - 1]!, abajo: distintos[i]! })"]] },
+  { id: "C2b-2", desc: "partidos sin disputar de grupos desde el plan parcial", archivo: PAGINA_UI, test: T_U1, patron: "#2 · grupos", cambios: [
+    ["  const restante = grupos\n", "  const restante = false\n"]] },
+  { id: "C2b-2-singular", desc: "sin concordancia del singular", archivo: "src/ui/textos-torneo-sitio.ts", test: T_U1, patron: "singular", cambios: [
+    ['`${min} ${min === 1 ? "match" : "matches"} not played`', '`${min} matches not played`']] },
   // --- P1-b, funciones puras de grupos (sin exponer) ---------------------------------------------------------------
   { id: "G1-sin-barajar", desc: "sorteo de grupos sin barajar", archivo: FORMATOS, test: T_GRUPOS, patron: "G1", cambios: [
     ["  for (let i = orden.length - 1; i > 0; i--) { const j = rng.int(0, i); [orden[i], orden[j]] = [orden[j]!, orden[i]!]; }\n  return orden;", "  void rng;\n  return orden;"]] },
@@ -164,11 +173,11 @@ const M = [
   { id: "G3", desc: "clasificarGrupo con todos los partidos (llaves incluidas)", archivo: FORMATOS, test: T_GRUPOS, patron: "G3", cambios: [
     ["encuentros: deFase(t, `grupo-${G}`) as never });", "encuentros: t.encuentros as never });"]] },
   { id: "G4-alfabetico", desc: "orden alfabético en lugar del sorteo para pasar", archivo: FORMATOS, test: T_GRUPOS, patron: "G4", cambios: [
-    ["if (k === criterios.length) return sorteoSubconjunto(clase, t.semilla, `grupo-${G}`)", "if (k === criterios.length) return [...clase].sort()"]] },
+    ["if (k === criterios.length) { const o = sorteoSubconjunto(clase, t.semilla, `grupo-${G}`);", "if (k === criterios.length) { const o = [...clase].sort();"]] },
   { id: "G4-posesion", desc: "posesión como criterio en vez de remates directos", archivo: FORMATOS, test: T_GRUPOS, patron: "G4", cambios: [
     ['const criterios: [CriterioPase, ClaveCifra][] = [["remates_directos", "rematesDirectos"], ["remates", "remates"]];', 'const criterios: [CriterioPase, ClaveCifra][] = [["remates_directos", "posesionPct" as ClaveCifra], ["remates", "remates"]];']] },
   { id: "G4-sorteo-antes", desc: "sorteo antes que remates", archivo: FORMATOS, test: T_GRUPOS, patron: "G4", cambios: [
-    ["if (k === criterios.length) return sorteoSubconjunto(", "if (k === 1) return sorteoSubconjunto("]] },
+    ["if (k === criterios.length) { const o = sorteoSubconjunto(", "if (k === 1) { const o = sorteoSubconjunto("]] },
   { id: "G5-1A2A", desc: "semifinal 1 = 1A–2A", archivo: FORMATOS, test: T_GRUPOS, patron: "G5", cambios: [
     ['jugarLlave("semifinal-1", A[0]!, B[1]!, jornadaKo, cruceKo)', 'jugarLlave("semifinal-1", A[0]!, A[1]!, jornadaKo, cruceKo)']] },
   { id: "G5-local", desc: "el 2.º de local en la semifinal", archivo: FORMATOS, test: T_GRUPOS, patron: "G5", cambios: [

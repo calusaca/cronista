@@ -12,6 +12,8 @@ import type { EstadoSitio, MotivoSitio } from "../../arena/torneo-sitio";
 import entradas from "../../arena/torneo-sitio-entradas.json";
 import { anunciosCambio, ArenaTorneo, rotuloOrigen } from "../ArenaTorneo";
 import { cifrasFormato, PanelLanzar, textoMotivo, type VistaPanel } from "../ArenaTorneoLanzar";
+import { lineasCriterioGrupo } from "../ArenaTorneoGrupos";
+import { planTorneo, siguientePartido } from "../../arena/torneo-formatos";
 import { TEXTOS_TORNEO_SITIO as T } from "../textos-torneo-sitio";
 import { listaTorneos, torneoAMostrar } from "../torneo-lista";
 import { clubesDelPlan } from "../../arena/torneo-pagina";
@@ -163,6 +165,7 @@ describe("062 · los componentes de cliente no arrastran módulos de servidor al
   });
 });
 
+const PARTICIPANTES_REALES = (entradas as EntradasSitio).participantes;
 const GRUPOS = esquemaTorneo062.parse(JSON.parse(readFileSync("src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.torneo.json", "utf8")));
 describe("062 · U1 (P1-b) · grupos + eliminatoria", () => {
   const h = pagina(GRUPOS), es = pagina(GRUPOS, "es");
@@ -205,5 +208,44 @@ describe("062 · U1 (P1-b) · grupos + eliminatoria", () => {
   it("la significación de grupos (p = 0,125) y el resumen del formato en la cabecera", () => {
     expect(h).toContain("6 AI coaches: 2 groups of 3, home and away, then a knockout (semi-finals and final), 10 s per match");
     expect(h).toContain("15–18");
+  });
+});
+
+describe("062 · revisión Codex 062b · textos de grupos", () => {
+  it("#1 · refinamiento en dos niveles: cada línea compara los dos puestos del corte con el criterio que los separó", () => {
+    // Grupos A = [sol61, sol6, equilibrado] con la semilla 20261025; se juega con resultados elegidos a mano.
+    const ids = PARTICIPANTES_REALES.map(p => p.id), semilla = 20261025;
+    const c = (rd: number, r: number) => ({ posesionPct: null, remates: r, rematesDirectos: rd, pasesCompletados: null, pasesIntentados: null, recuperaciones: null });
+    const res: Record<number, [number, number, ReturnType<typeof c>, ReturnType<typeof c>]> = {
+      1: [0, 0, c(0, 25), c(3, 5)], 3: [0, 0, c(3, 3), c(0, 25)], 5: [0, 0, c(3, 5), c(3, 3)], 7: [0, 0, c(2, 5), c(0, 25)], 9: [0, 0, c(0, 25), c(2, 2)], 11: [0, 0, c(2, 2), c(2, 5)],
+      2: [1, 0, c(0, 0), c(0, 0)], 4: [0, 1, c(0, 0), c(0, 0)], 6: [1, 0, c(0, 0), c(0, 0)], 8: [0, 1, c(0, 0), c(0, 0)], 10: [1, 0, c(0, 0), c(0, 0)], 12: [0, 1, c(0, 0), c(0, 0)],
+    };
+    const encuentros: Torneo062["encuentros"] = [];
+    for (let i = 0; i < 12; i++) { const x = siguientePartido("grupos", ids, semilla, { encuentros, pendientes: [] })!; const [gl, gv, cl, cv] = res[x.n]!; encuentros.push({ ...x, local: { participante: x.local, goles: gl, cifras: cl }, visita: { participante: x.visita, goles: gv, cifras: cv } } as never); }
+    const t = { ...GRUPOS, participantes: PARTICIPANTES_REALES, semilla, encuentros } as Torneo062;
+    const nombre = (id: string) => PARTICIPANTES_REALES.find(p => p.id === id)!.nombre;
+    expect(lineasCriterioGrupo(t, "A", "en")).toEqual([
+      `${nombre("sol6")}: Advances as 1st on shots (20 to 10) · tournament criterion, not a football rule`,
+      `${nombre("equilibrado")}: Advances as 2nd on shots on target (10 to 0) · tournament criterion, not a football rule`,
+    ]);
+    expect(lineasCriterioGrupo(t, "A", "es")[1]).toBe(`${nombre("equilibrado")}: Pasa como 2.º por remates directos (10 a 0) · criterio del torneo, no reglamentario`);
+    expect(planTorneo("grupos", ids, semilla, { encuentros, pendientes: [] })).toHaveLength(13);
+  });
+  it("#2 · grupos interrumpidos tras la fase de grupos: un rango, no «1 partidos»", () => {
+    const tras = { ...GRUPOS, encuentros: GRUPOS.encuentros.slice(0, 12), estado: "interrumpido" as const, motivoFin: "reinicio" as const };
+    expect(pagina(tras)).toContain("Interrupted tournament (server restart): between 3 and 6 matches not played (knockout ties still to be determined)");
+    expect(pagina(tras, "es")).toContain("Torneo interrumpido (reinicio del servidor): entre 3 y 6 partidos sin disputar (quedan eliminatorias por determinar)");
+  });
+  it("#2 · grupos incompletos con un pendiente en la fase de grupos, y tras un desempate ya planificado", () => {
+    const sinP5 = { ...GRUPOS, encuentros: GRUPOS.encuentros.slice(0, 12).filter(e => e.n !== 5), pendientes: [5], estado: "incompleto" as const, motivoFin: "infraestructura" as const };
+    expect(pagina(sinP5)).toContain("Incomplete tournament (repeated infrastructure failures): between 4 and 7 matches not played");
+    // Jugados 13 (P13 empató): su desempate ya está en el plan ⇒ como mínimo 16 en total.
+    const tras13 = { ...GRUPOS, encuentros: GRUPOS.encuentros.slice(0, 13), estado: "interrumpido" as const, motivoFin: "almacen" as const };
+    expect(pagina(tras13)).toContain("between 3 and 5 matches not played");
+  });
+  it("#2 · singular: «1 match not played» / «1 partido sin disputar»", () => {
+    const una = { ...SITIO, encuentros: SITIO.encuentros.slice(0, 29), estado: "incompleto" as const, motivoFin: "tope" as const };
+    expect(pagina(una)).toContain("Incomplete tournament (estimated cap reached): 1 match not played");
+    expect(pagina(una, "es")).toContain("Torneo incompleto (se alcanzó el tope por estimación): 1 partido sin disputar");
   });
 });

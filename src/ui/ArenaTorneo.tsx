@@ -157,7 +157,7 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
   const grupos = t.version !== "059-v1.1" && t.formato === "grupos";
   // La matriz y los cruces de ida y vuelta son de la liga (calendario Berger de 6); en grupos los calcula ArenaTorneoGrupos.
   const filas = useMemo(() => clasificar(t), [t]), matriz = useMemo(() => (grupos ? { ids: [], celdas: [] } : matrizResultados(t)), [t, grupos]);
-  const plan = useMemo((): (EncuentroPlan & { fase?: string })[] => t.version !== "059-v1.1" ? planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t) : calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => (grupos ? [] : cruces(t)), [t, grupos]);
+  const plan = useMemo((): (EncuentroPlan & { fase?: string; desempate?: boolean })[] => t.version !== "059-v1.1" ? planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t) : calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => (grupos ? [] : cruces(t)), [t, grupos]);
   const porN = new Map(t.encuentros.map(e => [e.n, e]));
   const p = (id: string) => part.get(id)!;
   const jornadas = [...new Set(plan.map(x => x.jornada))];
@@ -166,7 +166,12 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
   const estimados = t.participantes.filter(x => x.precio.estimadoDe);
   const etiqueta = (clave: keyof typeof ETIQUETAS_CIFRAS) => ETIQUETAS_CIFRAS[clave][idioma];
   const declarado = sitio ? TS.declaradoServidor[idioma] : tx("declarado"), quien = sitio ? (es ? "el servidor" : "the server") : (es ? "el CLI" : "the CLI");
-  const sinDisputar = plan.length - t.encuentros.length;
+  // En grupos el plan solo contiene lo que los resultados ya determinan: lo que falta es un rango (15 + desempates ya
+  // planificados … 18) menos lo jugado (revisión Codex 062b #2).
+  const restante = grupos
+    ? { min: Math.max(0, partidosFormato("grupos").min + plan.filter(x => x.desempate).length - t.encuentros.length), max: Math.max(0, partidosFormato("grupos").max - t.encuentros.length) }
+    : { min: plan.length - t.encuentros.length, max: plan.length - t.encuentros.length };
+  const sinDisputar = TS.sinDisputar[idioma](restante.min, restante.max);
   const enJuego = t062?.enCurso ? plan.find(x => x.n === t062.enCurso!.n) : undefined, clubesEnJuego = enJuego ? clubes[enJuego.n] ?? null : null;
   const hora = (iso: string) => `${new Intl.DateTimeFormat(idioma, { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" }).format(new Date(iso))} UTC`;
   return <>

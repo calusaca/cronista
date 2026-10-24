@@ -5,8 +5,8 @@
 // con las funciones puras de `torneo-formatos.ts` desde la instantánea; ningún color lleva información por sí solo.
 import { archivoEncuentro, type EncuentroTorneo062, type ParticipanteTorneo, type Torneo062 } from "../arena/torneo";
 import {
-  campeon, cifraEnGrupo, clasificarGrupo, cuadro, grupoCompleto, ordenGrupo, planTorneo, textoSignificacionFormato,
-  type CriterioPase, type EncuentroPlan062, type Grupo, type Llave,
+  campeon, clasificarGrupo, cuadro, grupoCompleto, ordenGrupo, ordenGrupoDetalle, planTorneo, textoSignificacionFormato,
+  type EncuentroPlan062, type Grupo, type Llave,
 } from "../arena/torneo-formatos";
 import { TEXTOS_TORNEO_SITIO as T } from "./textos-torneo-sitio";
 
@@ -17,6 +17,17 @@ function Modelo({ p }: { p: ParticipanteTorneo }) {
   return <span className="arena-torneo-modelo" title={p.nombre}><span className="arena-torneo-largo">{p.nombre}</span><span className="arena-torneo-corto" aria-hidden="true">{p.corto}</span></span>;
 }
 const firmar = (x: number) => (x > 0 ? `+${x}` : String(x));
+
+/** § 7.4 + D6 · Las líneas de los dos cortes de un grupo completo (1.º|2.º y 2.º|3.º, el que decide quién pasa): el
+ * criterio que separó a ESOS dos puestos y la cifra de cada uno en esa comparación (revisión Codex 062b #1). */
+export function lineasCriterioGrupo(t: Torneo062, G: Grupo, idioma: Idioma): string[] {
+  const { orden, cortes } = ordenGrupoDetalle(t, G), nombre = (id: string) => t.participantes.find(p => p.id === id)!.nombre;
+  return cortes.slice(0, 2).flatMap((c, i) => {
+    if (c.criterio === "resultado") return [];
+    const detalle = c.arriba !== null && c.abajo !== null ? ` (${c.arriba} ${idioma === "es" ? "a" : "to"} ${c.abajo})` : "";
+    return [`${nombre(orden[i]!.id)}: ${T.pasaComo[idioma](i + 1, T.criterios[c.criterio][idioma], detalle)} · ${T.criterio[idioma]}`];
+  });
+}
 
 /** § 7.4 · Texto del criterio que hizo pasar a alguien (grupo o llave); null si decidió el resultado. */
 export function textoCriterioLlave(l: Llave, nombre: (id: string) => string, idioma: Idioma): string | null {
@@ -42,12 +53,7 @@ export function ArenaTorneoGrupos({ t, idioma, enlace, descarga, enCursoN }: { t
 
   const tablaGrupo = (G: Grupo) => {
     const filas = clasificarGrupo(t, G), orden = ordenGrupo(t, G), completo = grupoCompleto(t, G), fila = (id: string) => filas.find(f => f.id === id)!;
-    const valor = (id: string, c: CriterioPase) => cifraEnGrupo(t, G, id, c === "remates_directos" ? "rematesDirectos" : "remates");
-    const lineas = completo ? orden.slice(0, 2).flatMap((x, i) => {
-      if (x.criterio === "resultado") return [];
-      const sig = orden[i + 1]!, detalle = x.criterio === "remates_directos" || x.criterio === "remates" ? ` (${valor(x.id, x.criterio)} ${es ? "a" : "to"} ${valor(sig.id, x.criterio)})` : "";
-      return [`${p(x.id).nombre}: ${T.pasaComo[idioma](i + 1, T.criterios[x.criterio][idioma], detalle)} · ${T.criterio[idioma]}`];
-    }) : [];
+    const lineas = completo ? lineasCriterioGrupo(t, G, idioma) : [];
     return <div key={G} className="arena-torneo-grupo" data-testid={`arena-torneo-grupo-${G}`}>
       <h3 id={`arena-torneo-h-grupo-${G}`}>{T.grupo[idioma](G)}</h3>
       <table className="arena-torneo-tabla arena-torneo-tabla-grupo" data-testid={`arena-torneo-tabla-${G}`} aria-labelledby={`arena-torneo-h-grupo-${G}`}>

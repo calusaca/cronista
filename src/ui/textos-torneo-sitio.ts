@@ -27,8 +27,13 @@ export const TEXTOS_TORNEO_SITIO = {
   vacioLanzar: { es: "Aún no hay torneos. Puedes lanzar el primero.", en: "No tournaments yet. You can launch the first one." },
   declaradoServidor: { es: "† declarado por el servidor; no se puede comprobar con el registro", en: "† declared by the server; not verifiable from the record" },
   decisiones: { es: (n: number) => `${n} ${n === 1 ? "decisión" : "decisiones"} por entrenador y partido`, en: (n: number) => `${n} ${n === 1 ? "decision" : "decisions"} per coach and match` },
-  incompletoMotivo: { es: (motivo: string, k: number) => `Torneo incompleto (${motivo}): ${k} partidos sin disputar`, en: (motivo: string, k: number) => `Incomplete tournament (${motivo}): ${k} matches not played` },
-  interrumpido: { es: (motivo: string, k: number) => `Torneo interrumpido (${motivo}): ${k} partidos sin disputar`, en: (motivo: string, k: number) => `Interrupted tournament (${motivo}): ${k} matches not played` },
+  incompletoMotivo: { es: (motivo: string, sinDisputar: string) => `Torneo incompleto (${motivo}): ${sinDisputar}`, en: (motivo: string, sinDisputar: string) => `Incomplete tournament (${motivo}): ${sinDisputar}` },
+  interrumpido: { es: (motivo: string, sinDisputar: string) => `Torneo interrumpido (${motivo}): ${sinDisputar}`, en: (motivo: string, sinDisputar: string) => `Interrupted tournament (${motivo}): ${sinDisputar}` },
+  /** Revisión Codex 062b #2 · Partidos sin disputar: exacto en la liga; en grupos, un rango si quedan llaves por determinar. */
+  sinDisputar: {
+    es: (min: number, max: number) => min === max ? `${min} ${min === 1 ? "partido" : "partidos"} sin disputar` : `entre ${min} y ${max} partidos sin disputar (quedan eliminatorias por determinar)`,
+    en: (min: number, max: number) => min === max ? `${min} ${min === 1 ? "match" : "matches"} not played` : `between ${min} and ${max} matches not played (knockout ties still to be determined)`,
+  },
   cancelado: { es: "Torneo cancelado por el operador", en: "Tournament cancelled by the operator" },
   motivosFin: {
     tope: { es: "se alcanzó el tope por estimación", en: "estimated cap reached" },

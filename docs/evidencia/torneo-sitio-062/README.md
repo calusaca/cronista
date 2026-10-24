@@ -149,3 +149,15 @@ Tras los cambios: `npm test` 2695/2695 (122 archivos), `npm run typecheck` exit 
   una línea en `Arena.tsx`); fixture de grupos de prueba `sitio-prueba-aaaaaa660000` (21 oct).
 - Visto correr: `npm test` 2732/2732, typecheck 0, e2e completa 284/284 (`e2e-completa.txt`), mutaciones de unidad
   82/82 (`mutaciones.md`) y e2e 8/8 (`mutaciones-e2e.md`).
+
+## Revisión de Codex del P1-b (iteración 1): dos defectos medios corregidos
+
+1. Criterio del corte de grupo: `ordenGrupoDetalle` devuelve, además del orden, `cortes[i]` con el criterio que separó
+   las posiciones i+1 e i+2 y las cifras de ESOS dos en esa comparación; la UI (`lineasCriterioGrupo`) los usa.
+   Prueba con refinamiento en dos niveles (remates directos 10/10/0 y remates 20/10/100); mutaciones C2b-1-ui y
+   C2b-1-pura.
+2. «Partidos sin disputar»: en grupos, rango `15 + desempates ya planificados … 18` menos lo jugado, con «quedan
+   eliminatorias por determinar»; singular «1 partido / 1 match». Pruebas de grupos interrumpidos e incompletos;
+   mutaciones C2b-2 y C2b-2-singular.
+
+Visto correr: `npm test` 2738/2738, typecheck 0, e2e completa 284/284, mutaciones de unidad 86/86.

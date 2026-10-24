@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { ARENA, TORNEO_ARENA as T, TORNEO_SITIO as S } from "../../sim/limites";
 import { claveCruce, esquemaTorneo062, semillasCruce, validarCoherencia, type CifrasLado, type EncuentroTorneo062, type Torneo062 } from "../torneo";
 import {
-  barajar, campeon, clasificarGrupo, cuadro, ordenGrupo, planGrupos, planTorneo, resolverLlave, siguientePartido, sorteoGrupos, sorteoSubconjunto, u32,
+  barajar, campeon, clasificarGrupo, cuadro, ordenGrupo, ordenGrupoDetalle, planGrupos, planTorneo, resolverLlave, siguientePartido, sorteoGrupos, sorteoSubconjunto, u32,
   type EncuentroPlan062, type ResultadosPlan,
 } from "../torneo-formatos";
 import entradasJson from "../torneo-sitio-entradas.json";
@@ -256,5 +256,25 @@ describe("062 · G8 (grupos) · coherencia contra el plan reconstruido", () => {
     const incompleto = { ...t, encuentros: t.encuentros.filter(e => e.n !== 5).map(e => e) , pendientes: [5], estado: "incompleto" as const, motivoFin: "infraestructura" as const };
     expect(validarCoherencia(incompleto).filter(x => !/prefijo/.test(x))).toEqual([]);
     expect(validarCoherencia({ ...t, estado: "completo" }).join()).toMatch(/completo con pendientes o con partidos por jugar/);
+  });
+});
+
+/** Revisión Codex 062b #1 · Refinamiento en dos niveles: en A todo 0–0; remates directos sol6 10, equilibrado 10,
+ * sol61 0 (separan a sol61 del corte); remates sol6 20, equilibrado 10, sol61 100 (solo ordenan la subclase de arriba). */
+export const DOS_NIVELES: Record<number, Res> = {
+  ...F1,
+  1: [0, 0, { rd: 0, r: 25 }, { rd: 3, r: 5 }], 3: [0, 0, { rd: 3, r: 3 }, { rd: 0, r: 25 }], 5: [0, 0, { rd: 3, r: 5 }, { rd: 3, r: 3 }],
+  7: [0, 0, { rd: 2, r: 5 }, { rd: 0, r: 25 }], 9: [0, 0, { rd: 0, r: 25 }, { rd: 2, r: 2 }], 11: [0, 0, { rd: 2, r: 2 }, { rd: 2, r: 5 }],
+};
+describe("062 · revisión Codex 062b #1 · el criterio de cada corte compara con el adversario de su subclase", () => {
+  it("1.º|2.º lo decide remates (20 a 10); 2.º|3.º, el corte, remates directos (10 a 0); sol61 no pasa aunque tenga 100 remates", () => {
+    const d = ordenGrupoDetalle(contexto(jugar(DOS_NIVELES).encuentros), "A");
+    expect(d.orden).toEqual([{ id: "sol6", criterio: "remates" }, { id: "equilibrado", criterio: "remates" }, { id: "sol61", criterio: "remates_directos" }]);
+    expect(d.cortes).toEqual([{ criterio: "remates", arriba: 20, abajo: 10 }, { criterio: "remates_directos", arriba: 10, abajo: 0 }]);
+  });
+  it("cortes de «resultado» y de «sorteo» sin cifras", () => {
+    expect(ordenGrupoDetalle(contexto(jugar(F1).encuentros), "A").cortes).toEqual([{ criterio: "resultado", arriba: null, abajo: null }, { criterio: "resultado", arriba: null, abajo: null }]);
+    const todos = { ...F1 }; for (const n of [1, 3, 5, 7, 9, 11]) todos[n] = [0, 0];
+    expect(ordenGrupoDetalle(contexto(jugar(todos).encuentros), "A").cortes.map(c => c.criterio)).toEqual(["sorteo", "sorteo"]);
   });
 });

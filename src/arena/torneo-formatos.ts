@@ -104,23 +104,31 @@ function sumaCifra(partidos: readonly PartidoResultado[], id: string, clave: Cla
 export const cifraEnGrupo = (t: TorneoGrupos, G: Grupo, id: string, clave: ClaveCifra) => sumaCifra(deFase(t, `grupo-${G}`), id, clave);
 /** El grupo jugó todos sus partidos (ida y vuelta). */
 export const grupoCompleto = (t: TorneoGrupos, G: Grupo) => deFase(t, `grupo-${G}`).length === S.formatos.grupos.porGrupo * (S.formatos.grupos.porGrupo - 1);
+/** Lo que separa dos posiciones consecutivas del orden de un grupo: el criterio y la cifra de cada lado en ESA
+ * comparación (los dos estaban en la misma subclase hasta entonces); null en «resultado» y «sorteo». */
+export interface CorteGrupo { criterio: CriterioPase; arriba: number | null; abajo: number | null }
+type Resuelto = { orden: { id: string; criterio: CriterioPase }[]; cortes: CorteGrupo[] };
 /** § 17.4 · Orden estricto de un grupo por refinamiento de particiones: clases de clasificarGrupo; después remates
- * directos, remates y sorteo del subconjunto. Criterio por posición: el ÚLTIMO que la separó. */
-export function ordenGrupo(t: TorneoGrupos, G: Grupo): { id: string; criterio: CriterioPase }[] {
+ * directos, remates y sorteo del subconjunto. Criterio por posición: el ÚLTIMO que la separó. `cortes[i]` explica la
+ * frontera entre las posiciones i+1 e i+2 (revisión Codex 062b #1: el criterio que fija una posición puede no ser el
+ * que decide el corte, y la comparación es siempre con el adversario de esa subclase). */
+export function ordenGrupoDetalle(t: TorneoGrupos, G: Grupo): Resuelto {
   const filas = clasificarGrupo(t, G), partidos = deFase(t, `grupo-${G}`), clases: string[][] = [];
   for (const f of filas) { const ultima = clases.at(-1); if (ultima && filas.find(x => x.id === ultima[0])!.pos === f.pos) ultima.push(f.id); else clases.push([f.id]); }
   const criterios: [CriterioPase, ClaveCifra][] = [["remates_directos", "rematesDirectos"], ["remates", "remates"]];
-  const resolver = (clase: string[], k: number, previo: CriterioPase): { id: string; criterio: CriterioPase }[] => {
-    if (clase.length === 1) return [{ id: clase[0]!, criterio: previo }];
-    if (k === criterios.length) return sorteoSubconjunto(clase, t.semilla, `grupo-${G}`).map(id => ({ id, criterio: "sorteo" as const }));
+  const unir = (partes: Resuelto[], corte: (i: number) => CorteGrupo): Resuelto => partes.reduce((acc, p, i) => ({ orden: [...acc.orden, ...p.orden], cortes: i ? [...acc.cortes, corte(i), ...p.cortes] : [...p.cortes] }), { orden: [], cortes: [] } as Resuelto);
+  const resolver = (clase: string[], k: number, previo: CriterioPase): Resuelto => {
+    if (clase.length === 1) return { orden: [{ id: clase[0]!, criterio: previo }], cortes: [] };
+    if (k === criterios.length) { const o = sorteoSubconjunto(clase, t.semilla, `grupo-${G}`); return { orden: o.map(id => ({ id, criterio: "sorteo" as const })), cortes: o.slice(1).map(() => ({ criterio: "sorteo" as const, arriba: null, abajo: null })) }; }
     const [nombre, clave] = criterios[k]!, valores = new Map(clase.map(id => [id, sumaCifra(partidos, id, clave)]));
     if ([...valores.values()].some(v => v === null)) return resolver(clase, k + 1, previo);
     const distintos = [...new Set(valores.values() as Iterable<number>)].sort((a, b) => b - a);
     if (distintos.length === 1) return resolver(clase, k + 1, previo);
-    return distintos.flatMap(v => resolver(clase.filter(id => valores.get(id) === v), k + 1, nombre));
+    return unir(distintos.map(v => resolver(clase.filter(id => valores.get(id) === v), k + 1, nombre)), i => ({ criterio: nombre, arriba: distintos[i - 1]!, abajo: distintos[i]! }));
   };
-  return clases.flatMap(c => resolver(c, 0, "resultado"));
+  return unir(clases.map(c => resolver(c, 0, "resultado")), () => ({ criterio: "resultado", arriba: null, abajo: null }));
 }
+export const ordenGrupo = (t: TorneoGrupos, G: Grupo): { id: string; criterio: CriterioPase }[] => ordenGrupoDetalle(t, G).orden;
 /** § 17.4 · Ganador de una llave: el partido, su desempate (lados invertidos) y, si ambos empatan, sobre los DOS
  * partidos: remates directos, remates, coeficiente de grupo (pts, DG, GF) y sorteo por semilla. */
 export function resolverLlave(t: TorneoGrupos, fase: FaseLlave, local: string, visita: string, partidos: readonly PartidoResultado[]): Pick<Llave, "ganador" | "criterio" | "detalle"> {
