@@ -1,0 +1,3065 @@
+{
+ "brief": "062 P1-b · grupos + eliminatoria · smoke público",
+ "produccion": {
+  "revision": "cronista-arena--0000033",
+  "commit": "420e31a114fd4cae2a264000f22fd73315bb0a9f",
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "replicas": {
+   "min": 1,
+   "max": 1
+  },
+  "cpu": 0.5,
+  "memoria": "1Gi",
+  "ARENA_TORNEO_SITIO": "1",
+  "ARENA_MAX_REPLICAS": "1"
+ },
+ "monitor": {
+  "inicioUtc": "2026-10-24T13:45:32.639Z",
+  "barrera": [
+   {
+    "t": "2026-10-24T13:45:33.082Z",
+    "status": 200,
+    "ms": 442,
+    "habilitado": true,
+    "motivo": null,
+    "activo": null,
+    "hoy": null,
+    "bolsa": {
+     "conocidoMicroUsd": 3353857,
+     "bolsaMicroUsd": 50000000
+    },
+    "fichaGrupos": {
+     "disponible": true,
+     "partidos": {
+      "min": 15,
+      "max": 18
+     },
+     "tipicoMicroUsd": {
+      "min": 1503152,
+      "max": 2035268,
+      "maxConDesempates": 2655168
+     },
+     "topeMicroUsd": 7000000,
+     "reservaMaxPartidoMicroUsd": 3684816,
+     "duracionMin": {
+      "min": 16,
+      "max": 20
+     }
+    }
+   }
+  ],
+  "healthBase": {
+   "n": 15,
+   "p50": 96,
+   "max": 486,
+   "no200": []
+  },
+  "lanzamiento": {
+   "t": "2026-10-24T13:46:05.047Z",
+   "status": 202,
+   "ms": 130,
+   "cuerpo": {
+    "id": "sitio-prueba-32ad2249691f"
+   }
+  },
+  "id": "sitio-prueba-32ad2249691f",
+  "health": {
+   "n": 441,
+   "p50": 94,
+   "p95": 96,
+   "p99": 819,
+   "max": 1482,
+   "no200": []
+  },
+  "sitio": {
+   "n": 57,
+   "p50": 368,
+   "p95": 804,
+   "p99": 1179,
+   "max": 1179,
+   "no200": []
+  },
+  "torneo": {
+   "n": 45,
+   "p50": 365,
+   "p95": 505,
+   "p99": 525,
+   "max": 525,
+   "no200": []
+  },
+  "ultimo": {
+   "t": "2026-10-24T14:02:12.148Z",
+   "status": 200,
+   "ms": 199,
+   "estado": "completo",
+   "motivoFin": null,
+   "enCurso": null,
+   "completados": 15,
+   "pendientes": [],
+   "reintentados": [],
+   "anuladosEstimados": 0,
+   "gastoConocidoUsd": 1.880365,
+   "topeUsd": 7,
+   "tipicoUsd": 2.035268,
+   "lanzamiento": "prueba",
+   "formato": "grupos",
+   "intervaloS": 30,
+   "duracionS": 60,
+   "partidos": [
+    "1:grupo-A:astra6 2-1 sol6",
+    "2:grupo-B:luna6 1-2 sol61",
+    "3:grupo-A:equilibrado 1-0 astra6",
+    "4:grupo-B:rapido 0-0 luna6",
+    "5:grupo-A:sol6 2-0 equilibrado",
+    "6:grupo-B:sol61 2-1 rapido",
+    "7:grupo-A:sol6 1-0 astra6",
+    "8:grupo-B:sol61 1-2 luna6",
+    "9:grupo-A:astra6 0-0 equilibrado",
+    "10:grupo-B:luna6 1-1 rapido",
+    "11:grupo-A:equilibrado 0-1 sol6",
+    "12:grupo-B:rapido 0-2 sol61",
+    "13:semifinal-1:sol6 0-1 luna6",
+    "14:semifinal-2:sol61 0-1 astra6",
+    "15:final:luna6 1-0 astra6"
+   ]
+  },
+  "ultimoSitio": {
+   "t": "2026-10-24T14:02:11.948Z",
+   "status": 200,
+   "habilitado": true,
+   "motivo": null,
+   "activo": null,
+   "hoy": null,
+   "bolsa": {
+    "conocidoMicroUsd": 5234222,
+    "bolsaMicroUsd": 50000000
+   }
+  },
+  "cancelacion": null,
+  "finUtc": "2026-10-24T14:02:12.148Z",
+  "motivoFin": "terminado: completo",
+  "total5xx": 0
+ },
+ "healthMas500ms": [
+  {
+   "t": "2026-10-24T13:46:15.461Z",
+   "ms": 1482
+  },
+  {
+   "t": "2026-10-24T13:47:06.491Z",
+   "ms": 819
+  },
+  {
+   "t": "2026-10-24T13:48:10.696Z",
+   "ms": 934
+  },
+  {
+   "t": "2026-10-24T13:59:05.767Z",
+   "ms": 1430
+  },
+  {
+   "t": "2026-10-24T13:59:56.463Z",
+   "ms": 882
+  }
+ ],
+ "correlacionPicos": {
+  "13:46:15": "carga SSR de /arena del directo 1 (inicio 13:46:11)",
+  "13:47:06": "cierre de P1 (log 13:47:06.5)",
+  "13:48:10": "cierre de P2 (log 13:48:11.0)",
+  "13:59:05": "carga SSR de /arena del directo 2 (inicio 13:59:03)",
+  "13:59:56": "cierre de P13 (log 13:59:56.5)"
+ },
+ "logTorneo": "[torneo-sitio] admitido 13:46:05.0; P1 13:47:06.5 … P15 14:02:04.8; completo 14:02:04.8 con 15 partidos y 1880365 µUSD",
+ "validacion": {
+  "id": "sitio-prueba-32ad2249691f",
+  "inicioUtc": "2026-10-24T14:05:58.812Z",
+  "instantaneaStatus": 200,
+  "resumen": {
+   "estado": "completo",
+   "motivoFin": null,
+   "lanzamiento": "prueba",
+   "origen": "sitio",
+   "formato": "grupos",
+   "titulo": {
+    "es": "Torneo de prueba del operador · 2026-10-24",
+    "en": "Operator test tournament · 2026-10-24"
+   },
+   "semilla": 20261024,
+   "inicioUtc": "2026-10-24T13:46:04.977Z",
+   "finUtc": "2026-10-24T14:02:04.826Z",
+   "commit": "420e31a114fd4cae2a264000f22fd73315bb0a9f",
+   "duracionS": 60,
+   "intervaloS": 30,
+   "participantes": [
+    "equilibrado",
+    "rapido",
+    "luna6",
+    "sol6",
+    "astra6",
+    "sol61"
+   ],
+   "encuentros": 15,
+   "pendientes": [],
+   "gasto": {
+    "conocidoMicroUsd": 1880365,
+    "tipicoMicroUsd": 2035268,
+    "topeMicroUsd": 7000000,
+    "reservaMaxPartidoMicroUsd": 3684816
+   }
+  },
+  "encuentros": [
+   {
+    "n": 1,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 1583083262,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "sol6",
+    "marcador": "2-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 53,
+      "remates": 4,
+      "rematesDirectos": 3,
+      "pasesCompletados": 2,
+      "pasesIntentados": 3,
+      "recuperaciones": 2
+     },
+     "visita": {
+      "posesionPct": 47,
+      "remates": 3,
+      "rematesDirectos": 1,
+      "pasesCompletados": 3,
+      "pasesIntentados": 5,
+      "recuperaciones": 1
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 263518,
+    "sinUso": 0
+   },
+   {
+    "n": 2,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 870599395,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "sol61",
+    "marcador": "1-2",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 56,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 5,
+      "pasesIntentados": 7,
+      "recuperaciones": 0
+     },
+     "visita": {
+      "posesionPct": 44,
+      "remates": 2,
+      "rematesDirectos": 2,
+      "pasesCompletados": 5,
+      "pasesIntentados": 5,
+      "recuperaciones": 0
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 46508,
+    "sinUso": 0
+   },
+   {
+    "n": 3,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 450632159,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 56,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 7,
+      "pasesIntentados": 9,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 44,
+      "remates": 0,
+      "rematesDirectos": 0,
+      "pasesCompletados": 3,
+      "pasesIntentados": 6,
+      "recuperaciones": 3
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 231787,
+    "sinUso": 0
+   },
+   {
+    "n": 4,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 3338504925,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "luna6",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 65,
+      "remates": 1,
+      "rematesDirectos": 0,
+      "pasesCompletados": 7,
+      "pasesIntentados": 9,
+      "recuperaciones": 2
+     },
+     "visita": {
+      "posesionPct": 35,
+      "remates": 0,
+      "rematesDirectos": 0,
+      "pasesCompletados": 4,
+      "pasesIntentados": 6,
+      "recuperaciones": 1
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 20163,
+    "sinUso": 0
+   },
+   {
+    "n": 5,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 317018803,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "equilibrado",
+    "marcador": "2-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 59,
+      "remates": 2,
+      "rematesDirectos": 2,
+      "pasesCompletados": 7,
+      "pasesIntentados": 8,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 41,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 5,
+      "pasesIntentados": 5,
+      "recuperaciones": 0
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 49443,
+    "sinUso": 0
+   },
+   {
+    "n": 6,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 4222279991,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "rapido",
+    "marcador": "2-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 67,
+      "remates": 3,
+      "rematesDirectos": 2,
+      "pasesCompletados": 9,
+      "pasesIntentados": 11,
+      "recuperaciones": 0
+     },
+     "visita": {
+      "posesionPct": 33,
+      "remates": 3,
+      "rematesDirectos": 1,
+      "pasesCompletados": 2,
+      "pasesIntentados": 2,
+      "recuperaciones": 2
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 62759,
+    "sinUso": 0
+   },
+   {
+    "n": 7,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 1583083262,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 49,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 4,
+      "pasesIntentados": 6,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 51,
+      "remates": 2,
+      "rematesDirectos": 1,
+      "pasesCompletados": 4,
+      "pasesIntentados": 6,
+      "recuperaciones": 1
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 268154,
+    "sinUso": 0
+   },
+   {
+    "n": 8,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 870599395,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "luna6",
+    "marcador": "1-2",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 53,
+      "remates": 2,
+      "rematesDirectos": 1,
+      "pasesCompletados": 3,
+      "pasesIntentados": 5,
+      "recuperaciones": 0
+     },
+     "visita": {
+      "posesionPct": 47,
+      "remates": 3,
+      "rematesDirectos": 2,
+      "pasesCompletados": 5,
+      "pasesIntentados": 5,
+      "recuperaciones": 2
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 47240,
+    "sinUso": 0
+   },
+   {
+    "n": 9,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 450632159,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "equilibrado",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 52,
+      "remates": 1,
+      "rematesDirectos": 0,
+      "pasesCompletados": 7,
+      "pasesIntentados": 9,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 48,
+      "remates": 0,
+      "rematesDirectos": 0,
+      "pasesCompletados": 7,
+      "pasesIntentados": 9,
+      "recuperaciones": 1
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 222002,
+    "sinUso": 0
+   },
+   {
+    "n": 10,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 3338504925,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "rapido",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 60,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 8,
+      "pasesIntentados": 11,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 40,
+      "remates": 2,
+      "rematesDirectos": 1,
+      "pasesCompletados": 4,
+      "pasesIntentados": 6,
+      "recuperaciones": 3
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 20813,
+    "sinUso": 0
+   },
+   {
+    "n": 11,
+    "fase": "grupo-A",
+    "desempate": false,
+    "seed": 317018803,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "sol6",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 52,
+      "remates": 0,
+      "rematesDirectos": 0,
+      "pasesCompletados": 8,
+      "pasesIntentados": 9,
+      "recuperaciones": 0
+     },
+     "visita": {
+      "posesionPct": 48,
+      "remates": 2,
+      "rematesDirectos": 1,
+      "pasesCompletados": 1,
+      "pasesIntentados": 1,
+      "recuperaciones": 3
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 49871,
+    "sinUso": 0
+   },
+   {
+    "n": 12,
+    "fase": "grupo-B",
+    "desempate": false,
+    "seed": 4222279991,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "sol61",
+    "marcador": "0-2",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 51,
+      "remates": 1,
+      "rematesDirectos": 0,
+      "pasesCompletados": 6,
+      "pasesIntentados": 8,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 49,
+      "remates": 2,
+      "rematesDirectos": 2,
+      "pasesCompletados": 4,
+      "pasesIntentados": 4,
+      "recuperaciones": 2
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 62041,
+    "sinUso": 0
+   },
+   {
+    "n": 13,
+    "fase": "semifinal-1",
+    "desempate": false,
+    "seed": 4287836348,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "luna6",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 55,
+      "remates": 1,
+      "rematesDirectos": 0,
+      "pasesCompletados": 6,
+      "pasesIntentados": 9,
+      "recuperaciones": 2
+     },
+     "visita": {
+      "posesionPct": 45,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 3,
+      "pasesIntentados": 5,
+      "recuperaciones": 2
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 47732,
+    "sinUso": 0
+   },
+   {
+    "n": 14,
+    "fase": "semifinal-2",
+    "desempate": false,
+    "seed": 2716992278,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "astra6",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 56,
+      "remates": 2,
+      "rematesDirectos": 2,
+      "pasesCompletados": 7,
+      "pasesIntentados": 8,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 44,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 5,
+      "pasesIntentados": 6,
+      "recuperaciones": 2
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 265434,
+    "sinUso": 0
+   },
+   {
+    "n": 15,
+    "fase": "final",
+    "desempate": false,
+    "seed": 3114867431,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "cifras": {
+     "local": {
+      "posesionPct": 56,
+      "remates": 1,
+      "rematesDirectos": 1,
+      "pasesCompletados": 6,
+      "pasesIntentados": 8,
+      "recuperaciones": 1
+     },
+     "visita": {
+      "posesionPct": 44,
+      "remates": 0,
+      "rematesDirectos": 0,
+      "pasesCompletados": 5,
+      "pasesIntentados": 7,
+      "recuperaciones": 0
+     }
+    },
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 222900,
+    "sinUso": 0
+   }
+  ],
+  "descargasOk": true,
+  "shaOk": true,
+  "golesOk": true,
+  "motivos": {
+   "valida": 60
+  },
+  "estadosIntentos": {
+   "200": 60
+  },
+  "reintentados": [],
+  "costoSumaMicroUsd": 1880365,
+  "validarTorneo": "ok",
+  "coherencia062": [],
+  "sorteo": {
+   "A": [
+    "astra6",
+    "sol6",
+    "equilibrado"
+   ],
+   "B": [
+    "luna6",
+    "sol61",
+    "rapido"
+   ]
+  },
+  "grupos": {
+   "A": {
+    "miembros": [
+     "astra6",
+     "sol6",
+     "equilibrado"
+    ],
+    "tabla": [
+     {
+      "id": "sol6",
+      "pos": 1,
+      "empatada": false,
+      "pj": 4,
+      "pts": 9,
+      "dg": 3,
+      "gf": 5
+     },
+     {
+      "id": "astra6",
+      "pos": 2,
+      "empatada": false,
+      "pj": 4,
+      "pts": 4,
+      "dg": -1,
+      "gf": 2
+     },
+     {
+      "id": "equilibrado",
+      "pos": 3,
+      "empatada": false,
+      "pj": 4,
+      "pts": 4,
+      "dg": -2,
+      "gf": 1
+     }
+    ],
+    "mano": {
+     "astra6": {
+      "pj": 4,
+      "pts": 4,
+      "gf": 2,
+      "gc": 3
+     },
+     "sol6": {
+      "pj": 4,
+      "pts": 9,
+      "gf": 5,
+      "gc": 2
+     },
+     "equilibrado": {
+      "pj": 4,
+      "pts": 4,
+      "gf": 1,
+      "gc": 3
+     }
+    },
+    "manoOk": true,
+    "orden": [
+     {
+      "id": "sol6",
+      "criterio": "resultado"
+     },
+     {
+      "id": "astra6",
+      "criterio": "resultado"
+     },
+     {
+      "id": "equilibrado",
+      "criterio": "resultado"
+     }
+    ],
+    "cortes": [
+     {
+      "criterio": "resultado",
+      "arriba": null,
+      "abajo": null
+     },
+     {
+      "criterio": "resultado",
+      "arriba": null,
+      "abajo": null
+     }
+    ]
+   },
+   "B": {
+    "miembros": [
+     "luna6",
+     "sol61",
+     "rapido"
+    ],
+    "tabla": [
+     {
+      "id": "sol61",
+      "pos": 1,
+      "empatada": false,
+      "pj": 4,
+      "pts": 9,
+      "dg": 3,
+      "gf": 7
+     },
+     {
+      "id": "luna6",
+      "pos": 2,
+      "empatada": false,
+      "pj": 4,
+      "pts": 5,
+      "dg": 0,
+      "gf": 4
+     },
+     {
+      "id": "rapido",
+      "pos": 3,
+      "empatada": false,
+      "pj": 4,
+      "pts": 2,
+      "dg": -3,
+      "gf": 2
+     }
+    ],
+    "mano": {
+     "luna6": {
+      "pj": 4,
+      "pts": 5,
+      "gf": 4,
+      "gc": 4
+     },
+     "sol61": {
+      "pj": 4,
+      "pts": 9,
+      "gf": 7,
+      "gc": 4
+     },
+     "rapido": {
+      "pj": 4,
+      "pts": 2,
+      "gf": 2,
+      "gc": 5
+     }
+    },
+    "manoOk": true,
+    "orden": [
+     {
+      "id": "sol61",
+      "criterio": "resultado"
+     },
+     {
+      "id": "luna6",
+      "criterio": "resultado"
+     },
+     {
+      "id": "rapido",
+      "criterio": "resultado"
+     }
+    ],
+    "cortes": [
+     {
+      "criterio": "resultado",
+      "arriba": null,
+      "abajo": null
+     },
+     {
+      "criterio": "resultado",
+      "arriba": null,
+      "abajo": null
+     }
+    ]
+   }
+  },
+  "llaves": [
+   {
+    "fase": "semifinal-1",
+    "local": "sol6",
+    "visita": "luna6",
+    "partidos": [
+     13
+    ],
+    "ganador": "luna6",
+    "criterio": "resultado",
+    "detalle": null
+   },
+   {
+    "fase": "semifinal-2",
+    "local": "sol61",
+    "visita": "astra6",
+    "partidos": [
+     14
+    ],
+    "ganador": "astra6",
+    "criterio": "resultado",
+    "detalle": null
+   },
+   {
+    "fase": "final",
+    "local": "luna6",
+    "visita": "astra6",
+    "partidos": [
+     15
+    ],
+    "ganador": "luna6",
+    "criterio": "resultado",
+    "detalle": null
+   }
+  ],
+  "campeon": "luna6",
+  "cuadroOk": {
+   "sf1_1A_2B": true,
+   "sf2_1B_2A": true,
+   "final_ganadorSF1Local": true,
+   "desempatesLadosInvertidosMismaSemilla": true,
+   "empatesSinDesempate": [],
+   "campeonEsGanadorFinal": true
+  },
+  "desempates": [],
+  "criteriosLlave": [
+   {
+    "fase": "semifinal-1",
+    "local": "sol6",
+    "visita": "luna6",
+    "partidos": [
+     13
+    ],
+    "ganador": "luna6",
+    "criterio": "resultado",
+    "detalle": null
+   },
+   {
+    "fase": "semifinal-2",
+    "local": "sol61",
+    "visita": "astra6",
+    "partidos": [
+     14
+    ],
+    "ganador": "astra6",
+    "criterio": "resultado",
+    "detalle": null
+   },
+   {
+    "fase": "final",
+    "local": "luna6",
+    "visita": "astra6",
+    "partidos": [
+     15
+    ],
+    "ganador": "luna6",
+    "criterio": "resultado",
+    "detalle": null
+   }
+  ],
+  "significacion": {
+   "es": "En una prueba de signos ilustrativa —que supone cruces independientes y una probabilidad de ½ de ganar cada uno—, ni ganar sus 4 cruces y llaves alcanzaría p < 0,05 (p = 0,125). Este cuadro describe este torneo; no ordena los modelos por calidad.",
+   "en": "In an illustrative sign test — assuming independent ties, each with a ½ chance of winning — even winning all 4 pairings and ties would not reach p < 0.05 (p = 0.125). This bracket describes this tournament; it does not rank the models by quality."
+  },
+  "finUtc": "2026-10-24T14:06:04.349Z"
+ },
+ "directos": [
+  {
+   "n": 1,
+   "inicioUtc": "2026-10-24T13:46:11.645Z",
+   "modelosStatus": 200,
+   "herramientas": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+     "es": {
+      "narrador": {
+       "voz": "es-MX-JorgeNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "es-MX-DaliaNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "es-MX-GerardoNeural",
+       "motivo": "predeterminada"
+      }
+     },
+     "en": {
+      "narrador": {
+       "voz": "en-US-JennyNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "en-US-DavisNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "en-US-GuyNeural",
+       "motivo": "predeterminada"
+      }
+     }
+    },
+    "catalogo": "consultado"
+   },
+   "seleccion": "programado",
+   "narrar": true,
+   "duracion": "60",
+   "post": {
+    "status": 201,
+    "ms": 1145
+   },
+   "sesion": {
+    "id": "04ac6e34-9972-483c-b2ae-a524ce4c6be7",
+    "modo": "programado"
+   },
+   "liveTrasClickMs": 58137,
+   "relojMitad": "0:15 / 1:00",
+   "vozMitad": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "generacionTerminadaMs": 73194,
+   "emisionTerminadaMs": 118214,
+   "relojFinal": "1:00 / 1:00",
+   "vozFinal": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "estadoFinal": "Match complete · recording available",
+   "metricasTexto": "4 team decisions · 0 programmed fallbacks · 41.5 s elapsed",
+   "asignacion": "Home: Programmed policy / Política programada · Away: Programmed policy / Política programada",
+   "espectadores": [
+    {
+     "nombre": "A",
+     "status": 200,
+     "primerByteMs": 518,
+     "trozos": 346,
+     "mensajes": 142,
+     "keepalives": 2,
+     "huecoMaxMs": 734,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41478,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41490
+     }
+    },
+    {
+     "nombre": "B",
+     "status": 200,
+     "primerByteMs": 501,
+     "trozos": 369,
+     "mensajes": 142,
+     "keepalives": 2,
+     "huecoMaxMs": 734,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41467,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41490
+     }
+    }
+   ],
+   "latencias": {
+    "GET /_next/*": {
+     "n": 16,
+     "p50": 389,
+     "p95": 405,
+     "max": 405,
+     "estados": [
+      200
+     ]
+    },
+    "GET /arena": {
+     "n": 1,
+     "p50": 4166,
+     "p95": 4166,
+     "max": 4166,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/modelos": {
+     "n": 1,
+     "p50": 123,
+     "p95": 123,
+     "max": 123,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/herramientas": {
+     "n": 4,
+     "p50": 372,
+     "p95": 378,
+     "max": 378,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones": {
+     "n": 1,
+     "p50": 1104,
+     "p95": 1104,
+     "max": 1104,
+     "estados": [
+      201
+     ]
+    },
+    "GET /api/arena/sesiones/:id/emision": {
+     "n": 1,
+     "p50": 288,
+     "p95": 288,
+     "max": 288,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/indice.json": {
+     "n": 1,
+     "p50": 267,
+     "p95": 267,
+     "max": 267,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/cierre.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/20.mp3": {
+     "n": 1,
+     "p50": 112,
+     "p95": 112,
+     "max": 112,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/19.mp3": {
+     "n": 1,
+     "p50": 113,
+     "p95": 113,
+     "max": 113,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/18.mp3": {
+     "n": 1,
+     "p50": 114,
+     "p95": 114,
+     "max": 114,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/21.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/24.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/23.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/22.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/25.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/26.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/27.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/28.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones/:id/relato": {
+     "n": 30,
+     "p50": 548,
+     "p95": 1400,
+     "max": 2713,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/29.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/30.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/01.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/02.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/03.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/04.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/05.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/06.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/07.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/08.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/09.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/10.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/11.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/12.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/13.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/14.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/15.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/16.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/17.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/sesiones/:id/eventos": {
+     "n": 0,
+     "estados": [
+      "fallida"
+     ]
+    }
+   },
+   "relato": {
+    "n": 30,
+    "p50": 548,
+    "p95": 1400,
+    "max": 2713,
+    "ttfb": {
+     "n": 30,
+     "p50": 479,
+     "p95": 1308,
+     "max": 2532
+    },
+    "estados": {
+     "200": 30
+    }
+   },
+   "respuestas4xx": [],
+   "fallidas": [
+    {
+     "s": 49.5,
+     "metodo": "GET",
+     "url": "/api/arena/sesiones/:id/eventos",
+     "error": "net::ERR_ABORTED"
+    }
+   ],
+   "reservasVozDescargadas": 31,
+   "http5xx": [],
+   "errores": [],
+   "sesionesBloqueadas": [],
+   "finUtc": "2026-10-24T13:48:21.838Z"
+  },
+  {
+   "n": 2,
+   "inicioUtc": "2026-10-24T13:59:03.763Z",
+   "modelosStatus": 200,
+   "herramientas": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+     "es": {
+      "narrador": {
+       "voz": "es-MX-JorgeNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "es-MX-DaliaNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "es-MX-GerardoNeural",
+       "motivo": "predeterminada"
+      }
+     },
+     "en": {
+      "narrador": {
+       "voz": "en-US-JennyNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "en-US-DavisNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "en-US-GuyNeural",
+       "motivo": "predeterminada"
+      }
+     }
+    },
+    "catalogo": "consultado"
+   },
+   "seleccion": "programado",
+   "narrar": true,
+   "duracion": "60",
+   "post": {
+    "status": 201,
+    "ms": 1076
+   },
+   "sesion": {
+    "id": "f1f15172-41cb-48b0-8a8b-4ba4f5809a6f",
+    "modo": "programado"
+   },
+   "liveTrasClickMs": 59094,
+   "relojMitad": "0:15 / 1:00",
+   "vozMitad": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "generacionTerminadaMs": 74150,
+   "emisionTerminadaMs": 119171,
+   "relojFinal": "1:00 / 1:00",
+   "vozFinal": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "estadoFinal": "Match complete · recording available",
+   "metricasTexto": "4 team decisions · 0 programmed fallbacks · 41.2 s elapsed",
+   "asignacion": "Home: Programmed policy / Política programada · Away: Programmed policy / Política programada",
+   "espectadores": [
+    {
+     "nombre": "A",
+     "status": 200,
+     "primerByteMs": 388,
+     "trozos": 355,
+     "mensajes": 139,
+     "keepalives": 2,
+     "huecoMaxMs": 660,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41137,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41173
+     }
+    },
+    {
+     "nombre": "B",
+     "status": 200,
+     "primerByteMs": 371,
+     "trozos": 355,
+     "mensajes": 139,
+     "keepalives": 2,
+     "huecoMaxMs": 660,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41130,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41173
+     }
+    }
+   ],
+   "latencias": {
+    "GET /_next/*": {
+     "n": 16,
+     "p50": 369,
+     "p95": 459,
+     "max": 459,
+     "estados": [
+      200
+     ]
+    },
+    "GET /arena": {
+     "n": 1,
+     "p50": 2339,
+     "p95": 2339,
+     "max": 2339,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/herramientas": {
+     "n": 4,
+     "p50": 115,
+     "p95": 275,
+     "max": 275,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/modelos": {
+     "n": 1,
+     "p50": 115,
+     "p95": 115,
+     "max": 115,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones": {
+     "n": 1,
+     "p50": 1041,
+     "p95": 1041,
+     "max": 1041,
+     "estados": [
+      201
+     ]
+    },
+    "GET /api/arena/sesiones/:id/emision": {
+     "n": 1,
+     "p50": 282,
+     "p95": 282,
+     "max": 282,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/indice.json": {
+     "n": 1,
+     "p50": 306,
+     "p95": 306,
+     "max": 306,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/06.mp3": {
+     "n": 1,
+     "p50": 116,
+     "p95": 116,
+     "max": 116,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/04.mp3": {
+     "n": 1,
+     "p50": 117,
+     "p95": 117,
+     "max": 117,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/05.mp3": {
+     "n": 1,
+     "p50": 117,
+     "p95": 117,
+     "max": 117,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/cierre.mp3": {
+     "n": 1,
+     "p50": 117,
+     "p95": 117,
+     "max": 117,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/07.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/08.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/09.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/10.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/12.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/11.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/13.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/14.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/15.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/17.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/18.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/16.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones/:id/relato": {
+     "n": 28,
+     "p50": 583,
+     "p95": 1026,
+     "max": 1208,
+     "estados": [
+      200,
+      "fallida"
+     ]
+    },
+    "GET /voz-reserva/en/19.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/20.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/21.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/22.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/23.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/24.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/26.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/25.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/27.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/28.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/29.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/30.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/01.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/02.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/03.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/sesiones/:id/eventos": {
+     "n": 0,
+     "estados": [
+      "fallida"
+     ]
+    }
+   },
+   "relato": {
+    "n": 28,
+    "p50": 583,
+    "p95": 1026,
+    "max": 1208,
+    "ttfb": {
+     "n": 28,
+     "p50": 523,
+     "p95": 933,
+     "max": 1115
+    },
+    "estados": {
+     "200": 28
+    }
+   },
+   "respuestas4xx": [
+    {
+     "s": 93.6,
+     "status": 429,
+     "metodo": "POST",
+     "url": "/api/arena/sesiones/:id/relato",
+     "reintentar": null,
+     "pedido": {
+      "desdeTick": 550,
+      "hastaTick": 600,
+      "cierre": true,
+      "intervencion": null,
+      "evento": null
+     }
+    }
+   ],
+   "fallidas": [
+    {
+     "s": 46.9,
+     "metodo": "GET",
+     "url": "/api/arena/sesiones/:id/eventos",
+     "error": "net::ERR_ABORTED"
+    },
+    {
+     "s": 108.5,
+     "metodo": "POST",
+     "url": "/api/arena/sesiones/:id/relato",
+     "error": "net::ERR_ABORTED"
+    }
+   ],
+   "reservasVozDescargadas": 31,
+   "http5xx": [],
+   "errores": [
+    "console: Failed to load resource: the server responded with a status of 429 ()"
+   ],
+   "sesionesBloqueadas": [],
+   "finUtc": "2026-10-24T14:01:12.640Z"
+  }
+ ],
+ "final": {
+  "id": "sitio-prueba-32ad2249691f",
+  "inicioUtc": "2026-10-24T14:15:00.456Z",
+  "lista_es": {
+   "grupoPruebas": {
+    "titulo": "Torneos de prueba del operador",
+    "items": [
+     {
+      "id": "sitio-prueba-32ad2249691f",
+      "texto": "24 oct · Grupos + eliminatoria · completo · campeón GPT-6 Luna"
+     },
+     {
+      "id": "sitio-prueba-a213fdf1c09f",
+      "texto": "24 oct · Liga · completo · 1.º GPT-5.6 Luna"
+     }
+    ]
+   },
+   "enLanzados": 0
+  },
+  "lista_en": {
+   "grupoPruebas": {
+    "titulo": "Operator test tournaments",
+    "items": [
+     {
+      "id": "sitio-prueba-32ad2249691f",
+      "texto": "Oct 24 · Groups + knockout · complete · champion GPT-6 Luna"
+     },
+     {
+      "id": "sitio-prueba-a213fdf1c09f",
+      "texto": "Oct 24 · League · complete · 1st GPT-5.6 Luna"
+     }
+    ]
+   },
+   "enLanzados": 0
+  },
+  "pagina_es_1440": {
+   "h1": "Torneo entre modelos",
+   "rotulo": "Lanzado en el sitio · validado en el servidor al terminar cada partido",
+   "banda": "Torneo de prueba del operador",
+   "estados": {
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "enjuego": 0
+   },
+   "grupos": {
+    "A": {
+     "titulo": "Grupo A",
+     "filas": [
+      {
+       "id": "sol6",
+       "celdas": [
+        "1",
+        "GPT-6 Sol6 Sol",
+        "4",
+        "+3",
+        "9",
+        "Sí (1.º)"
+       ]
+      },
+      {
+       "id": "astra6",
+       "celdas": [
+        "2",
+        "GPT-6 Astra6 Astra",
+        "4",
+        "-1",
+        "4",
+        "Sí (2.º)"
+       ]
+      },
+      {
+       "id": "equilibrado",
+       "celdas": [
+        "3",
+        "GPT-5.6 Luna5.6 Luna",
+        "4",
+        "-2",
+        "4",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Modelo",
+      "PJ",
+      "DG",
+      "Pts",
+      "Pasa"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Grupo A: local en filas, visita en columnas",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–0",
+        "2–0"
+       ],
+       [
+        "2–1",
+        "—",
+        "0–0"
+       ],
+       [
+        "0–1",
+        "1–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    },
+    "B": {
+     "titulo": "Grupo B",
+     "filas": [
+      {
+       "id": "sol61",
+       "celdas": [
+        "1",
+        "GPT-6.1 Sol6.1 Sol",
+        "4",
+        "+3",
+        "9",
+        "Sí (1.º)"
+       ]
+      },
+      {
+       "id": "luna6",
+       "celdas": [
+        "2",
+        "GPT-6 Luna6 Luna",
+        "4",
+        "0",
+        "5",
+        "Sí (2.º)"
+       ]
+      },
+      {
+       "id": "rapido",
+       "celdas": [
+        "3",
+        "GPT-5.4 mini5.4 mini",
+        "4",
+        "-3",
+        "2",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Modelo",
+      "PJ",
+      "DG",
+      "Pts",
+      "Pasa"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Grupo B: local en filas, visita en columnas",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–2",
+        "2–1"
+       ],
+       [
+        "1–2",
+        "—",
+        "1–1"
+       ],
+       [
+        "0–2",
+        "0–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    }
+   },
+   "llaves": {
+    "semifinal-1": {
+     "texto": "Semifinal 1 P13 · Deportivo Nebrisa ( GPT-6 Sol ) 0–1 Sporting Caleteo ( GPT-6 Luna ) Ver repetición del partido 13 Descargar registro del partido 13 Pasa GPT-6 Luna",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=13&lang=es"
+     ]
+    },
+    "semifinal-2": {
+     "texto": "Semifinal 2 P14 · Club Lumbrera ( GPT-6.1 Sol ) 0–1 Club Brezal ( GPT-6 Astra ) Ver repetición del partido 14 Descargar registro del partido 14 Pasa GPT-6 Astra",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=14&lang=es"
+     ]
+    },
+    "final": {
+     "texto": "Final P15 · Deportivo Ventolera ( GPT-6 Luna ) 1–0 Olímpico Puertoscuro ( GPT-6 Astra ) Ver repetición del partido 15 Descargar registro del partido 15 Pasa GPT-6 Luna",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=15&lang=es"
+     ]
+    }
+   },
+   "campeon": "Gana este torneo: GPT-6 Luna En una prueba de signos ilustrativa —que supone cruces independientes y una probabilidad de ½ de ganar cada uno—, ni ganar sus 4 cruces y llaves alcanzaría p < 0,05 (p = 0,125). Este cuadro describe este torneo; no ordena los modelos por calidad.",
+   "partidos": 15,
+   "celdas": 12,
+   "scrollWidth": 1440,
+   "anchoVentana": 1440
+  },
+  "pagina_es_360": {
+   "h1": "Torneo entre modelos",
+   "rotulo": "Lanzado en el sitio · validado en el servidor al terminar cada partido",
+   "banda": "Torneo de prueba del operador",
+   "estados": {
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "enjuego": 0
+   },
+   "grupos": {
+    "A": {
+     "titulo": "Grupo A",
+     "filas": [
+      {
+       "id": "sol6",
+       "celdas": [
+        "1",
+        "GPT-6 Sol6 Sol",
+        "4",
+        "+3",
+        "9",
+        "Sí (1.º)"
+       ]
+      },
+      {
+       "id": "astra6",
+       "celdas": [
+        "2",
+        "GPT-6 Astra6 Astra",
+        "4",
+        "-1",
+        "4",
+        "Sí (2.º)"
+       ]
+      },
+      {
+       "id": "equilibrado",
+       "celdas": [
+        "3",
+        "GPT-5.6 Luna5.6 Luna",
+        "4",
+        "-2",
+        "4",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Modelo",
+      "PJ",
+      "DG",
+      "Pts",
+      "Pasa"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Grupo A: local en filas, visita en columnas",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–0",
+        "2–0"
+       ],
+       [
+        "2–1",
+        "—",
+        "0–0"
+       ],
+       [
+        "0–1",
+        "1–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    },
+    "B": {
+     "titulo": "Grupo B",
+     "filas": [
+      {
+       "id": "sol61",
+       "celdas": [
+        "1",
+        "GPT-6.1 Sol6.1 Sol",
+        "4",
+        "+3",
+        "9",
+        "Sí (1.º)"
+       ]
+      },
+      {
+       "id": "luna6",
+       "celdas": [
+        "2",
+        "GPT-6 Luna6 Luna",
+        "4",
+        "0",
+        "5",
+        "Sí (2.º)"
+       ]
+      },
+      {
+       "id": "rapido",
+       "celdas": [
+        "3",
+        "GPT-5.4 mini5.4 mini",
+        "4",
+        "-3",
+        "2",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Modelo",
+      "PJ",
+      "DG",
+      "Pts",
+      "Pasa"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Grupo B: local en filas, visita en columnas",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–2",
+        "2–1"
+       ],
+       [
+        "1–2",
+        "—",
+        "1–1"
+       ],
+       [
+        "0–2",
+        "0–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    }
+   },
+   "llaves": {
+    "semifinal-1": {
+     "texto": "Semifinal 1 P13 · Deportivo Nebrisa ( GPT-6 Sol 6 Sol ) 0–1 Sporting Caleteo ( GPT-6 Luna 6 Luna ) Ver repetición del partido 13 Descargar registro del partido 13 Pasa GPT-6 Luna",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=13&lang=es"
+     ]
+    },
+    "semifinal-2": {
+     "texto": "Semifinal 2 P14 · Club Lumbrera ( GPT-6.1 Sol 6.1 Sol ) 0–1 Club Brezal ( GPT-6 Astra 6 Astra ) Ver repetición del partido 14 Descargar registro del partido 14 Pasa GPT-6 Astra",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=14&lang=es"
+     ]
+    },
+    "final": {
+     "texto": "Final P15 · Deportivo Ventolera ( GPT-6 Luna 6 Luna ) 1–0 Olímpico Puertoscuro ( GPT-6 Astra 6 Astra ) Ver repetición del partido 15 Descargar registro del partido 15 Pasa GPT-6 Luna",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=15&lang=es"
+     ]
+    }
+   },
+   "campeon": "Gana este torneo: GPT-6 Luna En una prueba de signos ilustrativa —que supone cruces independientes y una probabilidad de ½ de ganar cada uno—, ni ganar sus 4 cruces y llaves alcanzaría p < 0,05 (p = 0,125). Este cuadro describe este torneo; no ordena los modelos por calidad.",
+   "partidos": 15,
+   "celdas": 12,
+   "scrollWidth": 360,
+   "anchoVentana": 360
+  },
+  "pagina_en_1440": {
+   "h1": "Model tournament",
+   "rotulo": "Launched on the site · validated on the server after each match",
+   "banda": "Operator test tournament",
+   "estados": {
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "enjuego": 0
+   },
+   "grupos": {
+    "A": {
+     "titulo": "Group A",
+     "filas": [
+      {
+       "id": "sol6",
+       "celdas": [
+        "1",
+        "GPT-6 Sol6 Sol",
+        "4",
+        "+3",
+        "9",
+        "Yes (1st)"
+       ]
+      },
+      {
+       "id": "astra6",
+       "celdas": [
+        "2",
+        "GPT-6 Astra6 Astra",
+        "4",
+        "-1",
+        "4",
+        "Yes (2nd)"
+       ]
+      },
+      {
+       "id": "equilibrado",
+       "celdas": [
+        "3",
+        "GPT-5.6 Luna5.6 Luna",
+        "4",
+        "-2",
+        "4",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Model",
+      "P",
+      "GD",
+      "Pts",
+      "Advances"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Group A: home in rows, away in columns",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–0",
+        "2–0"
+       ],
+       [
+        "2–1",
+        "—",
+        "0–0"
+       ],
+       [
+        "0–1",
+        "1–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    },
+    "B": {
+     "titulo": "Group B",
+     "filas": [
+      {
+       "id": "sol61",
+       "celdas": [
+        "1",
+        "GPT-6.1 Sol6.1 Sol",
+        "4",
+        "+3",
+        "9",
+        "Yes (1st)"
+       ]
+      },
+      {
+       "id": "luna6",
+       "celdas": [
+        "2",
+        "GPT-6 Luna6 Luna",
+        "4",
+        "0",
+        "5",
+        "Yes (2nd)"
+       ]
+      },
+      {
+       "id": "rapido",
+       "celdas": [
+        "3",
+        "GPT-5.4 mini5.4 mini",
+        "4",
+        "-3",
+        "2",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Model",
+      "P",
+      "GD",
+      "Pts",
+      "Advances"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Group B: home in rows, away in columns",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–2",
+        "2–1"
+       ],
+       [
+        "1–2",
+        "—",
+        "1–1"
+       ],
+       [
+        "0–2",
+        "0–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    }
+   },
+   "llaves": {
+    "semifinal-1": {
+     "texto": "Semi-final 1 P13 · Deportivo Nebrisa ( GPT-6 Sol ) 0–1 Sporting Caleteo ( GPT-6 Luna ) Watch replay of match 13 Download record of match 13 GPT-6 Luna advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=13"
+     ]
+    },
+    "semifinal-2": {
+     "texto": "Semi-final 2 P14 · Club Lumbrera ( GPT-6.1 Sol ) 0–1 Club Brezal ( GPT-6 Astra ) Watch replay of match 14 Download record of match 14 GPT-6 Astra advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=14"
+     ]
+    },
+    "final": {
+     "texto": "Final P15 · Deportivo Ventolera ( GPT-6 Luna ) 1–0 Olímpico Puertoscuro ( GPT-6 Astra ) Watch replay of match 15 Download record of match 15 GPT-6 Luna advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=15"
+     ]
+    }
+   },
+   "campeon": "Wins this tournament: GPT-6 Luna In an illustrative sign test — assuming independent ties, each with a ½ chance of winning — even winning all 4 pairings and ties would not reach p < 0.05 (p = 0.125). This bracket describes this tournament; it does not rank the models by quality.",
+   "partidos": 15,
+   "celdas": 12,
+   "scrollWidth": 1440,
+   "anchoVentana": 1440
+  },
+  "pagina_en_360": {
+   "h1": "Model tournament",
+   "rotulo": "Launched on the site · validated on the server after each match",
+   "banda": "Operator test tournament",
+   "estados": {
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "enjuego": 0
+   },
+   "grupos": {
+    "A": {
+     "titulo": "Group A",
+     "filas": [
+      {
+       "id": "sol6",
+       "celdas": [
+        "1",
+        "GPT-6 Sol6 Sol",
+        "4",
+        "+3",
+        "9",
+        "Yes (1st)"
+       ]
+      },
+      {
+       "id": "astra6",
+       "celdas": [
+        "2",
+        "GPT-6 Astra6 Astra",
+        "4",
+        "-1",
+        "4",
+        "Yes (2nd)"
+       ]
+      },
+      {
+       "id": "equilibrado",
+       "celdas": [
+        "3",
+        "GPT-5.6 Luna5.6 Luna",
+        "4",
+        "-2",
+        "4",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Model",
+      "P",
+      "GD",
+      "Pts",
+      "Advances"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Group A: home in rows, away in columns",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–0",
+        "2–0"
+       ],
+       [
+        "2–1",
+        "—",
+        "0–0"
+       ],
+       [
+        "0–1",
+        "1–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    },
+    "B": {
+     "titulo": "Group B",
+     "filas": [
+      {
+       "id": "sol61",
+       "celdas": [
+        "1",
+        "GPT-6.1 Sol6.1 Sol",
+        "4",
+        "+3",
+        "9",
+        "Yes (1st)"
+       ]
+      },
+      {
+       "id": "luna6",
+       "celdas": [
+        "2",
+        "GPT-6 Luna6 Luna",
+        "4",
+        "0",
+        "5",
+        "Yes (2nd)"
+       ]
+      },
+      {
+       "id": "rapido",
+       "celdas": [
+        "3",
+        "GPT-5.4 mini5.4 mini",
+        "4",
+        "-3",
+        "2",
+        "No"
+       ]
+      }
+     ],
+     "cabecera": [
+      "Pos",
+      "Model",
+      "P",
+      "GD",
+      "Pts",
+      "Advances"
+     ],
+     "criterio": [],
+     "matriz": {
+      "caption": "Group B: home in rows, away in columns",
+      "columnas": 3,
+      "filas": 3,
+      "celdasPorFila": [
+       3,
+       3,
+       3
+      ],
+      "enlaces": 6,
+      "textos": [
+       [
+        "—",
+        "1–2",
+        "2–1"
+       ],
+       [
+        "1–2",
+        "—",
+        "1–1"
+       ],
+       [
+        "0–2",
+        "0–0",
+        "—"
+       ]
+      ]
+     },
+     "enContenedorDesplazable": false
+    }
+   },
+   "llaves": {
+    "semifinal-1": {
+     "texto": "Semi-final 1 P13 · Deportivo Nebrisa ( GPT-6 Sol 6 Sol ) 0–1 Sporting Caleteo ( GPT-6 Luna 6 Luna ) Watch replay of match 13 Download record of match 13 GPT-6 Luna advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=13"
+     ]
+    },
+    "semifinal-2": {
+     "texto": "Semi-final 2 P14 · Club Lumbrera ( GPT-6.1 Sol 6.1 Sol ) 0–1 Club Brezal ( GPT-6 Astra 6 Astra ) Watch replay of match 14 Download record of match 14 GPT-6 Astra advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=14"
+     ]
+    },
+    "final": {
+     "texto": "Final P15 · Deportivo Ventolera ( GPT-6 Luna 6 Luna ) 1–0 Olímpico Puertoscuro ( GPT-6 Astra 6 Astra ) Watch replay of match 15 Download record of match 15 GPT-6 Luna advances",
+     "desempate": null,
+     "criterio": null,
+     "enlaces": [
+      "/arena?torneo=sitio-prueba-32ad2249691f&encuentro=15"
+     ]
+    }
+   },
+   "campeon": "Wins this tournament: GPT-6 Luna In an illustrative sign test — assuming independent ties, each with a ½ chance of winning — even winning all 4 pairings and ties would not reach p < 0.05 (p = 0.125). This bracket describes this tournament; it does not rank the models by quality.",
+   "partidos": 15,
+   "celdas": 12,
+   "scrollWidth": 360,
+   "anchoVentana": 360
+  },
+  "repeticion_es": {
+   "origen": "Partido 13 del torneo del 24 de octubre de 2026 (torneo de prueba del operador) · Semifinal 1 · Local: Deportivo Nebrisa (GPT-6 Sol) · Visita: Sporting Caleteo (GPT-6 Luna) · Volver al torneo",
+   "modelos": "Local: GPT-6 Sol · Visita: GPT-6 Luna · declarada por el ejecutor del torneo, no verificada",
+   "error": 0,
+   "relojAntes": "0:00 / 1:00",
+   "relojTras8s": "0:15 / 1:00"
+  },
+  "repeticion_en": {
+   "origen": "Match 13 of the October 24, 2026 tournament (operator test tournament) · Semi-final 1 · Home: Deportivo Nebrisa (GPT-6 Sol) · Away: Sporting Caleteo (GPT-6 Luna) · Back to the tournament",
+   "modelos": "Home: GPT-6 Sol · Away: GPT-6 Luna · declared by the tournament runner, not verified",
+   "error": 0
+  },
+  "sitio": {
+   "status": 200,
+   "habilitado": true,
+   "motivo": null,
+   "diaUtc": "2026-10-24",
+   "activo": null,
+   "hoy": null,
+   "bolsa": {
+    "conocidoMicroUsd": 5234222,
+    "bolsaMicroUsd": 50000000
+   },
+   "proximoCupoUtc": "2026-10-25T00:00:00.000Z"
+  },
+  "cupoDisponible": true,
+  "panel": {
+   "lanzar": "Launch a tournament Format League · double round robin 30 matches · ≈ 3.5 USD typical · cap 8 USD · ≈ 33 min Groups + knockout 15–18 matches · ≈ 1.5–2.0 USD (up to 2.7 with play-offs) typical · cap 7 USD · ≈ 16–20 min Start new tournament One tournament per day (UTC) for the whole site. Period budget: 5.2 of 50 USD † († list-price estimate, not the invoice)",
+   "botones": [
+    {
+     "t": "Start new tournament",
+     "deshabilitado": false
+    }
+   ]
+  },
+  "http5xx": [],
+  "errores": [],
+  "postsBloqueados": [],
+  "finUtc": "2026-10-24T14:15:34.661Z"
+ },
+ "capturas360ElementoScrollWidth": {
+  "es-light": 360,
+  "en-dark": 360
+ },
+ "azureMonitor": {
+  "ventana": "2026-10-24T13:45Z–14:17Z",
+  "Requests": {
+   "2xx": 1042,
+   "4xx": 1,
+   "5xx": 0
+  },
+  "cpuMaxNucleos": 0.112,
+  "cpuMediaNucleos": 0.023,
+  "memoriaMaxMB": 387,
+  "reinicios": 0
+ }
+}

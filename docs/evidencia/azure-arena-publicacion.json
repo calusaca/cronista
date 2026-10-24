@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-24T10:53:04.630Z",
+  "checkedUtc": "2026-10-24T13:44:07.613Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024104946",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024134114",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -251,8 +251,8 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 135003,
-      "sha256": "67ec10611fba5a5189462e873e1f604e1454b7c74e1168ccc2c91941e31abadb"
+      "bytes": 136057,
+      "sha256": "af0840a2428dd1c6d85a3bd5eca785b60521023d6e8e3af2c7cd4bc76fdae178"
     },
     {
       "path": "src/app/icon.svg",
@@ -432,307 +432,312 @@
     {
       "path": "src/arena/__fixtures__/torneos-sitio/dia-2026-10-20.json",
       "bytes": 3676,
-      "sha256": "0730b0f544ae7e187b0887641c2ec3095dde7693e6295a3dc33f8f08bb98d897"
+      "sha256": "591f6287aebc6c96a9f9da52bb66491d402478fd0b423e3620bfb35563aefbd2"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/prueba-aaaaaa660000.json",
+      "bytes": 3686,
+      "sha256": "58567c769c0856b9ab2d2c318fab60f05ad50db33949ad41cd8d798c4d31669b"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e01.ejecutor.json",
-      "bytes": 713,
-      "sha256": "251c21d38a8a8f30ccd3044cad077245ee05b8fbc90ee8a7e64136352ccdd89f"
+      "bytes": 715,
+      "sha256": "507cfe1658ba17a7ebafa31ca8e9da0fe2c3ec4076546747477a21292ef1ee7d"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e01.json.gz",
-      "bytes": 21338,
-      "sha256": "b09549cb2a12717bad4603aff9c6544d34cc62a6bdcd24ed4280fce9bba11b42"
+      "bytes": 21337,
+      "sha256": "e99d0647f2d461536b4825ca82b7f4935cf0a093fe5d72e83bf4076e8717ec90"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e02.ejecutor.json",
       "bytes": 715,
-      "sha256": "e4d87fd786db4aeaf854afe22830212e8c764486fef2e0607b088c0dbc2bfd9e"
+      "sha256": "0c73d8348e89debed62434c31d04c35cc58148d13023c2a85b266afc58492a92"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e02.json.gz",
-      "bytes": 21302,
-      "sha256": "072b7c3490351b145253959feb977f728f8a3dd8f94e597f297837550ae75a8e"
+      "bytes": 21301,
+      "sha256": "9424e4b8fd404ef2d540599b67da02468a5edfd8fffd4f4ed39827650dc17a85"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e03.ejecutor.json",
-      "bytes": 715,
-      "sha256": "736cbc47bac4a74042505ad1a2977c9f2acf86eda76ed40583bc4c35ac7142ae"
+      "bytes": 716,
+      "sha256": "731799df27193f3a156f4eb9f8c54f3bca30944f20641bdacdd445cbeaddcbbb"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e03.json.gz",
-      "bytes": 19365,
-      "sha256": "1ede563963e76fcc046e550c7edac9c4e542105aa937dcd2fd6c740915d6cb3f"
+      "bytes": 19364,
+      "sha256": "227700cde0e55beb0d5793cddea0d792ecd30904065701ad5c19f888f7dd0444"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e04.ejecutor.json",
       "bytes": 715,
-      "sha256": "0ba6a6476bb7793bdb7fb5328c2b3d6178db6dbe7a0b21436c6715914c3ca4d4"
+      "sha256": "533e09a565898849546b0724f252b9d9e7094290cae63d888d540f4200b9a846"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e04.json.gz",
-      "bytes": 21835,
-      "sha256": "a9dac40df04c1f4cc25dca05a76b10eab90c2ce5c912f419327e6b5548aa67f6"
+      "bytes": 21834,
+      "sha256": "52c74b88ff02076430561938175a6548ddac3cebe7eda576c783b9ffb0f50a8c"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e05.ejecutor.json",
       "bytes": 716,
-      "sha256": "f168d4e9481a55e819ee0244980ab20cbf8f4d8466dd4cd524007dd6d568b286"
+      "sha256": "7069d0cef3694109afdb2284aaef7232a4da5c52e1458b1f7264db9cd95ec899"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e05.json.gz",
       "bytes": 23620,
-      "sha256": "1365962671b1a6919b3e3f21ad2307ff9392abc454c6a3e296eb09ec0183bc3a"
+      "sha256": "b6bda3ff11fbda67fcc57b1b6b6314b61cabe5accabb575c7c4a3d1e22f57c81"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e06.ejecutor.json",
-      "bytes": 716,
-      "sha256": "30f9726622db7bc1aaf906fd85e3b5997b8d7649ceacdd517811f1a20a39c9da"
+      "bytes": 715,
+      "sha256": "3125de6fc3c7476021a2a195e0966d6f16e2c041615242cad8c618ee5db384c1"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e06.json.gz",
-      "bytes": 19521,
-      "sha256": "775faec559561042a4733232bcd3d18290022bad0f3e8f74d652e0539b182a6d"
+      "bytes": 19519,
+      "sha256": "c7f4e78e2cd97586a9b6fc6a7240f7afd2025fba5206cfe60b4815b7f6d06bdc"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e07.ejecutor.json",
-      "bytes": 715,
-      "sha256": "eea1e59eacf119a159e9b57fb39046c10af759c61f47f50f2320f01128a78093"
+      "bytes": 717,
+      "sha256": "cf67972c1dd59da9502b1c3f23044210de96e51189d743d1834c8fafe1915d91"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e07.json.gz",
       "bytes": 18388,
-      "sha256": "e8f2a4c499cd41515c2b51b68108521836c4a9c1c3b2af76472ab10181ec0e8a"
+      "sha256": "f9e8939298a386a62546d14ac4e9d2147bf1cd2b880847d4da05933d1f848387"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e08.ejecutor.json",
       "bytes": 716,
-      "sha256": "09d597c2208736688883761b40fce22bb39d265fa907153784eca9d6d65fce27"
+      "sha256": "c1986212e380c4822af3acbdfd3ae773dbd14efb81a9888f1848ed8059e4feab"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e08.json.gz",
-      "bytes": 19914,
-      "sha256": "fd1d6c208ccbcf2ca6daf041a0990cd6203d61be26df9cccf94353db02740de3"
+      "bytes": 19913,
+      "sha256": "e1464ffcf26b8614b26a97027178fd49fdecf19256fa79a499537d8acfa1a7dd"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e09.ejecutor.json",
-      "bytes": 715,
-      "sha256": "e8934646b757a0e7240ec76d7ae49ad41638f78fed764bd2c7eb9f02b122e55b"
+      "bytes": 717,
+      "sha256": "e6c715424174a7bc80f8f004886a7ca87a47811f71d3a130157cc6c38601bb9c"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e09.json.gz",
-      "bytes": 19421,
-      "sha256": "ebf3d64ce458dcdc6636d15ad85305a51c598bf22d6f1da304a5696a3f73eddf"
+      "bytes": 19422,
+      "sha256": "71a4d99b0ca21ab71c4302afaf4e3fd7242b2d9e31c50e6a190e7ecd9f6ea425"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e10.ejecutor.json",
       "bytes": 718,
-      "sha256": "435d9f26f1d42af61556af6cd7fde56095586c8c310341638fa0b6d2a985c963"
+      "sha256": "45f5d7dddcb2f409dfb8ad6d66b2a4d9fe7b3befb8393d470bf26b6041374774"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e10.json.gz",
       "bytes": 21873,
-      "sha256": "5fd30ee01f928d39882cde5ce7faba5018fa9824b85880cc736b3132070bdcb1"
+      "sha256": "3a158fe60646f086b2a3813f8fd95cdf921da3f99a8339d3635cddd2dcbcdb47"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e11.ejecutor.json",
-      "bytes": 717,
-      "sha256": "6fa7011655a37c1534d77816a5a071c433628c84f024b0600e06cb490286f501"
+      "bytes": 718,
+      "sha256": "9ed13e9a63bb4ddcfbb57196be8a1f2547b29fefb112aedffa0875e16a5d14b8"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e11.json.gz",
-      "bytes": 22609,
-      "sha256": "203909b4009ed90e2a7d96209fbb3730532c5b73f6dd73f0d5e5d633b1a4a3a9"
+      "bytes": 22608,
+      "sha256": "e32d7637e2db04d7b5aef72be561cd6e69fb5b75246b183fd742ae36c29ed6f1"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e12.ejecutor.json",
-      "bytes": 717,
-      "sha256": "6a5f9e55315f925b31ec9c93081a9201a1521dce90b00edd4368d2655e13c166"
+      "bytes": 718,
+      "sha256": "7c29e04faaa31fef6e027be69a37bde2dd71e2c8fc98cc4a157be4ed9bc11a61"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e12.json.gz",
-      "bytes": 22596,
-      "sha256": "6fa0b3377cf4c7768a4633f165737689c3881478272d20ea374c70e1617212f3"
+      "bytes": 22595,
+      "sha256": "51affb98a56dee4be4dd9f885d19a349e9cead8f91cb9a4dc62e9279e38aafd3"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e13.ejecutor.json",
-      "bytes": 715,
-      "sha256": "9b7646329de6f67ba560f7fdededfb79b85cf258c4e3811783f161ce5e6f5d9c"
+      "bytes": 716,
+      "sha256": "876a8941ac164bd600baa29b57f3ab8c4f3266790b840ba2afe86b85dfd2b86d"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e13.json.gz",
-      "bytes": 24514,
-      "sha256": "1eb7545ae4c32f6e94d36f2a203b1f5ce580ddfd5ce79d08abae825d3256a6f5"
+      "bytes": 24515,
+      "sha256": "cfc13760786d788e193423217ec659c897acd5d946008dd3f8253a76342cdcde"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e14.ejecutor.json",
       "bytes": 718,
-      "sha256": "16dda30a793986b1b21ac33495434156aeddd24b6e89862e479f5c281afd7156"
+      "sha256": "03fd7d00777f86058d73acf68c9cb6a662888b2be2feceeb3df2598984710492"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e14.json.gz",
-      "bytes": 23512,
-      "sha256": "efc46985d04dc7af738aca701ecf85b98fcd55ce219d23e640452df77f6dd3bd"
+      "bytes": 23509,
+      "sha256": "c00f8b9e4d602b9abfcdfc27fb82d8ccb074bada7273bae7dad4babad5c78c7d"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e15.ejecutor.json",
-      "bytes": 716,
-      "sha256": "46868b152c72f2f68c76536ab121e29ecd18bee2d03c2091b59fd47d00e29289"
+      "bytes": 718,
+      "sha256": "76ae77d24fb5ccacac87885502576ec9b2ec7df2de16fe4d6a9e0fdf09c0e58c"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e15.json.gz",
-      "bytes": 17771,
-      "sha256": "6c21252821b6f7cce8154c9749c79d7680bb658131959631c8f89fce4157221e"
+      "bytes": 17774,
+      "sha256": "84f53c0d1752328435f8dfb1717f4ec85f72fe0dac37b54a769d3aedaa4da2a3"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e16.ejecutor.json",
-      "bytes": 716,
-      "sha256": "1fb24049e00bae9da11331175afc5dc684581bbe765f36111660ee7eaf378197"
+      "bytes": 718,
+      "sha256": "2c65bba966a907a034c20b1b984f857b0768876b6e72f170009882cc730ca64b"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e16.json.gz",
       "bytes": 21339,
-      "sha256": "b1e682049ca95f4df0b48582be7cd2f139a5dc5c256a080e0488d0c5b7c0b199"
+      "sha256": "5759f37aad7906ec9db8e853b465eecd3559552ab82d25657cecb7bd6b76173a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e17.ejecutor.json",
       "bytes": 718,
-      "sha256": "f984ece4fbe17fa1b1ed785674c9bdb433f9527eff5c72a9627b6259610b4d3d"
+      "sha256": "19788e5ffb37b3b2695336bac77c2139cf1183cbb76c507ffc5b5c262b402828"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e17.json.gz",
       "bytes": 21305,
-      "sha256": "8d3c7a0b4e857eaac3b27ff02a7606aeab292c274fd16e2e60bfc3d0074dc25f"
+      "sha256": "26947c94068ae7add639ade6cd5aaf69d0e0ab90d26eb1a0c731bf3ea81837f1"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e18.ejecutor.json",
       "bytes": 718,
-      "sha256": "ff12196e4c558b001c278b7a83bd55696ae04efa4d9fa94458cb0e78ed37485c"
+      "sha256": "75228885b5ce0d65dcfe11ad22e0cdc470180da50e76f39e354f76150c9aa1e8"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e18.json.gz",
-      "bytes": 19366,
-      "sha256": "292ec566fc5080fdf85d962c14957a4567ccf852aa1f5a033b111ecd874592e4"
+      "bytes": 19367,
+      "sha256": "571782fecf070aa9ab1558bffb22324c6403a9c2a3dec8a2a54b05a8c406cc80"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e19.ejecutor.json",
-      "bytes": 717,
-      "sha256": "7e6b6aed3080c107d127f22297e2d796cf2cb7ddd9d4cebb03f29b8281d809b6"
+      "bytes": 716,
+      "sha256": "1bd80abdc1cf9386f06708e7aabb5aac7edb9a57c6bc6f0b837e13e6c8ff99d0"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e19.json.gz",
-      "bytes": 21840,
-      "sha256": "f9f8a8aa80bd4a7c8706cfcb2f5600142b74aa8b1c0b25dccbdc941dbf256de7"
+      "bytes": 21837,
+      "sha256": "77a7202d63302a45832eaaca0ea17f57d7d39ee2cb0c32984b1c66a7454dc343"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e20.ejecutor.json",
-      "bytes": 717,
-      "sha256": "af212719f7f93a096b931b180f615cf8ecff83e478bb84557085733b49a0f239"
+      "bytes": 718,
+      "sha256": "d85afbcf61d55c5f132f115a3d024d2c4791941916c30804daa55d855384c645"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e20.json.gz",
-      "bytes": 23621,
-      "sha256": "d6b5b1f50f54574b4eab33f00f163f05333808992f65b4ffafefef842689475c"
+      "bytes": 23623,
+      "sha256": "0dc98579d7898bf5bb1192adbd38815805b00498fbf0848bc2f6673bc0f70201"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e21.ejecutor.json",
-      "bytes": 717,
-      "sha256": "3ab393c01ae7bd58a8765cb8a45a684e5ebf80d28817f1f3869e51430e7a932a"
+      "bytes": 718,
+      "sha256": "f880ef3f68ae42a8dfa9d27b020d08cc5cfbd7a227016104bb392a038b7fbaf4"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e21.json.gz",
       "bytes": 19520,
-      "sha256": "e80b792eb157976ad9154f3a510eaa87f38559867ce34244d3f9cd34d00989d1"
+      "sha256": "0638e03df644b36de7887f87d44abb956dfff4f6be5861f55b680055837e2189"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e22.ejecutor.json",
       "bytes": 718,
-      "sha256": "e50ea944624d21b8d6fb899f495d9fd7147e07fe93e3d4d17f94acedcc6c81a6"
+      "sha256": "52104b8ede48d13ec64b61fc924181a3174eb4e2449070bdbadeda57fd47078e"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e22.json.gz",
-      "bytes": 18389,
-      "sha256": "397128414eae86b2872974fa1f2079af8b44ab9666f0f63b51c4a0bc827c79e5"
+      "bytes": 18387,
+      "sha256": "9893a9b565f12cd4f34b3e4bf2657858e63b521ea989fe7f14bf3c533e4c1135"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e23.ejecutor.json",
-      "bytes": 717,
-      "sha256": "d16dd93b0d77135383e50ab6c1e17bf0c4106fcc2e1740f4cfa84547fd3e2c78"
+      "bytes": 718,
+      "sha256": "1df3fd512d9b2e6c20ad8fd5f6bc82a0e0fa2434a1fb01e015e41ac83b22aa4a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e23.json.gz",
       "bytes": 19913,
-      "sha256": "df08d37ec853392c3c0f397b26babb697e8e67398a47fd46a2232ea4d12ef248"
+      "sha256": "55602b49c417853e61fc2a42a618b6cb264bf8fc0c327f510a59a504241fbfaf"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e24.ejecutor.json",
-      "bytes": 716,
-      "sha256": "860197ac6f8220db423ba4c805834f126846e6ead4f12dd8c1d1120324babd3d"
+      "bytes": 717,
+      "sha256": "f20e07996f1a90392da390c325160a855ce0385d4cb4e2687042aa95ebd64e48"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e24.json.gz",
-      "bytes": 19419,
-      "sha256": "a0d667d5fc183745456337542c1c9ebb03cd938e2397bd3d882fc9ad62c10014"
+      "bytes": 19423,
+      "sha256": "8132f6465da478e0f6b44f81ac3e4e1c5261e003e054c5cf218ce6e02234805a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e25.ejecutor.json",
       "bytes": 717,
-      "sha256": "a59b05264b5eb340dfa2595a2469db595724a5062eee2a61fb85efc95b361858"
+      "sha256": "29c4110f182305862d2df748e65ebf5c81c06cb3a48e8e1ffd679a753c0328fd"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e25.json.gz",
       "bytes": 21872,
-      "sha256": "362f699c86d38c74969320ed42516ee4ffe65aa3a67228dfe735efadc95facc0"
+      "sha256": "aa6b25ec9ff9bad8cfcd918911f1b2876fa6b4d46e0b96953c047f7d8c7ef80c"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e26.ejecutor.json",
       "bytes": 718,
-      "sha256": "d19e8f41c32374cb44ea023f6b73d7d6eb16a7d77a52c8a70d777f2c47821f0d"
+      "sha256": "01d0367a5b9f4450813f0adcd59c0695ecc409952a341736b946445115848415"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e26.json.gz",
-      "bytes": 22608,
-      "sha256": "1f79f9c250bf8d2cd71f88450a1f8bcdf2bc731aedc6df122310ec465aa3407a"
+      "bytes": 22609,
+      "sha256": "1051bd05b9aab9fb20f25d980e482545992b4cbfc1d35b674de7e93552eda3fa"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e27.ejecutor.json",
-      "bytes": 717,
-      "sha256": "8aa16f3872a98bfaba39238e5148f35a24bca94d85b430a003ff59024287ef58"
+      "bytes": 718,
+      "sha256": "1ffb556810a46c00cc446f129754c7aeae4ca4716b3d5fa5003018341c782c5a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e27.json.gz",
       "bytes": 22597,
-      "sha256": "3376e4fdfa3053245ee2113c2a2bf9fa44eaf2292722f6c2d0303a143f148d04"
+      "sha256": "6673b62e0fe095414aacdcb626405c2cb0623a29ac577137fc88295a4d8bc466"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e28.ejecutor.json",
-      "bytes": 716,
-      "sha256": "7eaae0f8fece78fda2686c8442e5cc31e0bb9e06b008cf61bdddfd0e0f741dc1"
+      "bytes": 717,
+      "sha256": "8ee092bbde6b0f285f267cfe6641f44d3120f298cc3c2b8196532252ceded26a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e28.json.gz",
-      "bytes": 24513,
-      "sha256": "f461f75ee9e60fc44227d7a74cc698cda3b6e25cbec9f555cb08ec752f6246b3"
+      "bytes": 24514,
+      "sha256": "86b9c8ac28c834ff95f0d28f5cf6f2f4fa6267c114166b52752312e36d7f71f7"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e29.ejecutor.json",
-      "bytes": 717,
-      "sha256": "1d33eff92eb0b340a94930049fa7ad4bfc51a150c969054a1cf4600e2a38305f"
+      "bytes": 718,
+      "sha256": "2f1e2a238ee6f3f6ca70cc113a884fd5b47ed6f08f2db1e740acdb85c2f2ae6d"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e29.json.gz",
       "bytes": 23511,
-      "sha256": "2d49809d94399862e13cb2777928aa3762946ab3d2a57b3e33845e11e297c8a4"
+      "sha256": "babc216427e3137e7c6a565416c973b304824dc683e534e03da7f51a734e9944"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e30.ejecutor.json",
-      "bytes": 716,
-      "sha256": "47998fb5672a36c8aef02245547d767c083d2bcb2268449f082a52486a5eca8f"
+      "bytes": 718,
+      "sha256": "a08315e8c0ea84d0e08816a23ead065adc9d660cc8348dacfe2caea11867bd1a"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.e30.json.gz",
-      "bytes": 17772,
-      "sha256": "e2077541548bdc1f0021bf94af7767ed94e2bd4ea7b192774931a5d4b9f2d1a5"
+      "bytes": 17773,
+      "sha256": "e2dfb7abe863e28f5c0a76ec4f7948e9c3e88d3e2a2f2b988fc27790688b6a91"
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.gasto.ndjson",
@@ -741,8 +746,198 @@
     },
     {
       "path": "src/arena/__fixtures__/torneos-sitio/sitio-2026-10-20.torneo.json",
-      "bytes": 57966,
-      "sha256": "bff477ae44ab3209a6bc8e5b313acfe2641a83854f4e9420a02285d809a9a767"
+      "bytes": 57987,
+      "sha256": "600dd291546e886630753323ac71ba69d7263ea81de72df5a91af95d62575f6c"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e01.ejecutor.json",
+      "bytes": 716,
+      "sha256": "97f7e623499b1183bc2064ed06291185ad3ba3a61e7cba6bb9cfd9890c5bf997"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e01.json.gz",
+      "bytes": 20340,
+      "sha256": "861da8b37062c3a26dfbe8029c0b2d75e655891ca02f7da03989b2322cc51d90"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e02.ejecutor.json",
+      "bytes": 717,
+      "sha256": "e1456983d95ba75edc0a9cf95a46d617cb0eb2e5a7dc03f3cc0795e4e4a117c8"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e02.json.gz",
+      "bytes": 25202,
+      "sha256": "916a1a08c3499f8e800e0c0d0f8f1e4f5337f4ffaf5c2c769dae27d229a7f016"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e03.ejecutor.json",
+      "bytes": 717,
+      "sha256": "213f395a5d57d4c6df130f3ecdd8319d86fd27bd9ef37347384f1072bd917a0f"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e03.json.gz",
+      "bytes": 21765,
+      "sha256": "7c8c5cffdf20ff54896647a00e2056191b5d0316a57bc57095b4f4caffa443a2"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e04.ejecutor.json",
+      "bytes": 717,
+      "sha256": "a47048bd7cf4daa077c29a7d63f7b8061d37c804d32aefc325974280e9a913a8"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e04.json.gz",
+      "bytes": 21033,
+      "sha256": "a3e63e489bea603f8eb8c3336bd25428fe78966097edd93460df118212798eec"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e05.ejecutor.json",
+      "bytes": 716,
+      "sha256": "be0562eaa0f91a4ab6fc8914cb6b16e94313531f0d6d150da0d8b26829bbf6c3"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e05.json.gz",
+      "bytes": 23397,
+      "sha256": "600407c489e889848f009b26358f7317e5c29ac66e0922fc1b4245627363a3e7"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e06.ejecutor.json",
+      "bytes": 717,
+      "sha256": "57f7f0802203c160c03644077e5d7cd5dbda348069e6903c9260846ea75343ad"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e06.json.gz",
+      "bytes": 25034,
+      "sha256": "6e443e7b256255100d5436f35e45e5526dd4784b390296de62e68f4064a880e6"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e07.ejecutor.json",
+      "bytes": 716,
+      "sha256": "5e67d5e3a4f62d5e2e646c0e45aab01a0c58b4fd735882bdabc479c3d4c9f504"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e07.json.gz",
+      "bytes": 20340,
+      "sha256": "1757f63214c71c36db2f98e0b7a73879b4a85fce8192ef12396efa8916c19d87"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e08.ejecutor.json",
+      "bytes": 717,
+      "sha256": "3b9955539c1954ed2614f7f36a680bfb73f64ff18f2e5ffc3c48cb7fbc34a7b8"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e08.json.gz",
+      "bytes": 25200,
+      "sha256": "88ca9fe94e33720c3955ce0d9225fb8c0fabe2126d24954753268a6690d8329a"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e09.ejecutor.json",
+      "bytes": 717,
+      "sha256": "74c0e2bac5c3902a1c7b1d385c111b615b30196d7aea8bdb69165d986e854165"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e09.json.gz",
+      "bytes": 21765,
+      "sha256": "e949dcc417b12fbd7a121592a607bf71787e81f59f7066a53777a23a422b6a20"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e10.ejecutor.json",
+      "bytes": 718,
+      "sha256": "3ffa0d79893e162af5a3b0fb30b9698593666fcc07723adb6a46e49cc9f3d38b"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e10.json.gz",
+      "bytes": 21034,
+      "sha256": "3af833cc9046b01ddd50ec22e0e8008452cef658565931beb52c2d764a125cc2"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e11.ejecutor.json",
+      "bytes": 717,
+      "sha256": "714418e34cb18d71b6730c06bfc98bdf8682cfc67518831f18847481e2120f42"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e11.json.gz",
+      "bytes": 23399,
+      "sha256": "2100030d36b6838588565b7c191916789370542c94b427fd03c9ff9cfd45976c"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e12.ejecutor.json",
+      "bytes": 717,
+      "sha256": "f5856897f2da6e26b69debc6e2a737e367cb194fd65bf8eca215e93f897c6948"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e12.json.gz",
+      "bytes": 25031,
+      "sha256": "56a2f92c79ad1ad2089cf79eb4af1c0f0af03e257082aedae20d843402a69b68"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e13.ejecutor.json",
+      "bytes": 718,
+      "sha256": "5e92f699f7b02fb4ba0a3501f536b3af66503c087c3e05d550daa33f2cb518cd"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e13.json.gz",
+      "bytes": 23486,
+      "sha256": "95d40904b23c9c00270328412bb529422d29698fec755d28778b4e81381c07dc"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e14.ejecutor.json",
+      "bytes": 718,
+      "sha256": "11a4a59de5f5f6695fff477b99a892bcdb14fc8161135cce5ebcc69a0e168c66"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e14.json.gz",
+      "bytes": 23486,
+      "sha256": "23cb9ee2b097f1d37198cb674a7f419bfed5991a489c6b4edaabc921c5c2c306"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e15.ejecutor.json",
+      "bytes": 718,
+      "sha256": "2e2b1219ad2439bb06ad57162c4a88b4be3537c1d5f657ee792a57bcc0164d6e"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e15.json.gz",
+      "bytes": 21655,
+      "sha256": "bfa85182ea47eb0c19be2bf6cbdd4e762bde23ccd54ea2a9a5e1184adf0b414e"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e16.ejecutor.json",
+      "bytes": 718,
+      "sha256": "485cc6e67934c459d75db6dffde1285e689df951f37f843b4d245cf6a3d1a481"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e16.json.gz",
+      "bytes": 21653,
+      "sha256": "05e352b93cffeacd193b31f9feb403ef0f2685acc9c02614ae2d5b3fcb6a8f37"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e17.ejecutor.json",
+      "bytes": 718,
+      "sha256": "576c90c6b695525610a632c4d72ce03a25f0606ee14fa39e5ab70d03608e7722"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e17.json.gz",
+      "bytes": 20131,
+      "sha256": "89dbb74bc5ba4ce7a4acd3eca09a45ce7a24aeb36c7f60d7f3a4241b81b0b07f"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e18.ejecutor.json",
+      "bytes": 718,
+      "sha256": "67b4d7513a34e693f446b4b34b8ae3be6b62af1b7c84aebd4280cf7ba53f20cd"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.e18.json.gz",
+      "bytes": 20136,
+      "sha256": "cfff0392546f5bc21cdafce23fa24e91327f19b92128a82aa4df3fa491b1aa3c"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.gasto.ndjson",
+      "bytes": 2178,
+      "sha256": "317c6f5ecdf5e0f3c8fafbb1cdc3fdd6caf1ba2bb06274863555aba05c5c56e3"
+    },
+    {
+      "path": "src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.torneo.json",
+      "bytes": 36451,
+      "sha256": "78a8404333f0a97b25d22bd8453d9fea7405c090b7303b8d502dcd3b2bddaf94"
     },
     {
       "path": "src/arena/__tests__/antesala.test.ts",
@@ -956,18 +1151,18 @@
     },
     {
       "path": "src/arena/__tests__/torneo-formatos.test.ts",
-      "bytes": 10933,
-      "sha256": "597596d119065dac99ebafefdfa9f5ce34f038a4bcdbe01039ea75f7e552650b"
+      "bytes": 10931,
+      "sha256": "04b99da8038a7bdce0cefa76c3cc8ce8852803a9f75c57e5268d58352dc182fc"
     },
     {
       "path": "src/arena/__tests__/torneo-grupos.test.ts",
-      "bytes": 20361,
-      "sha256": "c9de8a7c6a332cf905f149143ba70deab268ad32c1fd5585ef45b4176d9a5c4c"
+      "bytes": 22092,
+      "sha256": "3bfb9d0202fae18075a3a0550223eacd248775a0c46623ccff6722bc7e2d2a9f"
     },
     {
       "path": "src/arena/__tests__/torneo-pagina.test.ts",
-      "bytes": 1867,
-      "sha256": "551eadd21359afbe5d0d0218f8c78a578bcef2f940ad32d35304693d0a5a90ca"
+      "bytes": 1954,
+      "sha256": "fd3eda48f2ed2b01f1b8666026be5dfa13b79584484ca16e35d65268cab6f365"
     },
     {
       "path": "src/arena/__tests__/torneo-sitio-ayuda.ts",
@@ -976,13 +1171,13 @@
     },
     {
       "path": "src/arena/__tests__/torneo-sitio-rutas.test.ts",
-      "bytes": 15348,
-      "sha256": "992e0e49ec0fb7820575c9acf0eed32b227c21ee6a605f59b6b1d65d5edc8373"
+      "bytes": 15347,
+      "sha256": "a23332309e5685b9f7380be08bf163833711e33febc92825513de23cfd8fcd3a"
     },
     {
       "path": "src/arena/__tests__/torneo-sitio.test.ts",
-      "bytes": 50662,
-      "sha256": "ad565fe93b49e601f26f8f3e202d808f429c60a916dd10129cb1e36c7a49e099"
+      "bytes": 53167,
+      "sha256": "c922ef266b60ea3688e2e65aa081862663a3d762e6e461901a8a411144f9b313"
     },
     {
       "path": "src/arena/__tests__/torneo.test.ts",
@@ -991,8 +1186,8 @@
     },
     {
       "path": "src/arena/__tests__/torneos-archivados.test.ts",
-      "bytes": 11120,
-      "sha256": "bd2009bd06b87f957253b2a696dfc73a6e6d4e88e407d9733ffbb0156ee47f08"
+      "bytes": 11332,
+      "sha256": "be18fced0b290a07f285f45d8b92a2d7309a0345ecf672cb1d7db8abc6c68d67"
     },
     {
       "path": "src/arena/__tests__/transcripcion.test.ts",
@@ -1306,8 +1501,8 @@
     },
     {
       "path": "src/arena/torneo-formatos.ts",
-      "bytes": 26008,
-      "sha256": "859d3f6a0a42791cd8f16a68a0911992b9aa055be3ea58e014f4b6bdf02315dd"
+      "bytes": 27523,
+      "sha256": "77e753cc1342afee051c7f23049d1650d1a7aa06b9b97fff4f9c767ff85b5947"
     },
     {
       "path": "src/arena/torneo-pagina.ts",
@@ -1316,8 +1511,8 @@
     },
     {
       "path": "src/arena/torneo-sitio-cli.ts",
-      "bytes": 5143,
-      "sha256": "d8ce76e524fb506111248b6d3200122812302b893f5ba4fc3f5dedba1464e08c"
+      "bytes": 5725,
+      "sha256": "bd8c4505a5153f690fc8249ebbf797892608be243873ec31a1700a084106ce3d"
     },
     {
       "path": "src/arena/torneo-sitio-entradas.json",
@@ -1326,8 +1521,8 @@
     },
     {
       "path": "src/arena/torneo-sitio.ts",
-      "bytes": 56801,
-      "sha256": "447769da07466b42db561ce8e021a8af085f8931657bd473b63e9b04e6096914"
+      "bytes": 56957,
+      "sha256": "742cdf6e28505f014b249916af134247e7c6738a284e0884781e4d9376d53efb"
     },
     {
       "path": "src/arena/torneo-validacion.ts",
@@ -1916,8 +2111,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 66654,
-      "sha256": "f0a513429cdce7099afab5722917f94bee4b3689ceb3447d3736f287c5040148"
+      "bytes": 66920,
+      "sha256": "84ee5fb88ae1864d12b28245561637a8c82940bd80aaa572972180e382c838a0"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -1996,8 +2191,13 @@
     },
     {
       "path": "src/ui/ArenaTorneo.tsx",
-      "bytes": 31188,
-      "sha256": "ce9e324f64c560ec51a96b65cb86b0eca5b812c51f69b35afd25f6549f00ddab"
+      "bytes": 33161,
+      "sha256": "b6b0996bb04ca83955ad2b5da22625363f0d24cd78ba6ceb3ac656aa0bf2ddd6"
+    },
+    {
+      "path": "src/ui/ArenaTorneoGrupos.tsx",
+      "bytes": 11168,
+      "sha256": "86cfa55e2845358337f377d01d044972b2cda863c8065b7c5280d5863b1ed8d6"
     },
     {
       "path": "src/ui/ArenaTorneoLanzar.tsx",
@@ -2126,8 +2326,8 @@
     },
     {
       "path": "src/ui/__tests__/ArenaTorneoLanzar.test.tsx",
-      "bytes": 13083,
-      "sha256": "c036130dbca2ec3e0bc5239ce475d1f9ac84cb964e769b172f5429379633d7de"
+      "bytes": 21985,
+      "sha256": "a301aac0c2bbde2f30c095309ebc8bca9a922eea67340f06e714537ce6a48db6"
     },
     {
       "path": "src/ui/__tests__/arena-canto-gol.test.tsx",
@@ -2206,8 +2406,8 @@
     },
     {
       "path": "src/ui/__tests__/torneo-carga.test.ts",
-      "bytes": 7680,
-      "sha256": "414833171b613f7b3e3cd853dae6c7a4d56dd68627a973530f4e4bd0f809ca72"
+      "bytes": 8954,
+      "sha256": "24633aeeac801d27f21e515725534e664784c3a79b353d4977fe65fc86d0743a"
     },
     {
       "path": "src/ui/__tests__/xg.test.ts",
@@ -2241,8 +2441,8 @@
     },
     {
       "path": "src/ui/textos-torneo-sitio.ts",
-      "bytes": 5084,
-      "sha256": "757a5d2ead57590eea7e784e92d61f222a3c855db3c6d7358c2305572dbb50e7"
+      "bytes": 7575,
+      "sha256": "7bc8e823acf1a0bf1c3bcb047e4c261b136e568c71835f86632c06856da1a9a2"
     },
     {
       "path": "src/ui/textos.ts",
@@ -2251,13 +2451,13 @@
     },
     {
       "path": "src/ui/torneo-carga.ts",
-      "bytes": 5597,
-      "sha256": "cd69ad25320a4023a4038bbc8a007861097b7aff1ff2eceb43ab084b5fd303ae"
+      "bytes": 6273,
+      "sha256": "f53637d4f1cf6ae642bfe2116ff893fe5dc5e7ca999c7ea98b8473b491a32775"
     },
     {
       "path": "src/ui/torneo-lista.ts",
-      "bytes": 2403,
-      "sha256": "b22b9ec0142d7ea81722d4454fdbf9b174433a29c3668e41545533ab33b14296"
+      "bytes": 2777,
+      "sha256": "0e5a9df328d0e89082114b77102d2ce9f4c6523c105ff01dc9af74d9e4301e96"
     },
     {
       "path": "src/vista/__tests__/condiciones.test.ts",
