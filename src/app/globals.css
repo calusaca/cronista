@@ -3156,6 +3156,9 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-control-room .arena-live > :not(:first-child) { margin-top: var(--ar-s2); }
 .arena-control-room .arena-live .arena-live-controls { flex-direction: column; align-items: stretch; }
 .arena-control-room .arena-live .arena-live-controls label { display: grid; flex: 0 0 auto; white-space: normal; }
+/* Brief 058 · A: casilla «Narrar el partido» en una fila, con objetivo táctil de 44 px (también en la sala de control). */
+.arena-live-controls label.arena-live-voice, .arena-control-room .arena-live .arena-live-controls label.arena-live-voice { display: inline-flex; align-items: center; gap: var(--ar-s2); flex: 0 1 auto; min-height: 44px; cursor: pointer; white-space: normal; }
+.arena-live-controls label.arena-live-voice input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
 .arena-control-room .arena-live-controls .btn-primary { width: 100%; }
 /* Aviso de vista previa: una sola línea de 36 px sobre el marcador (en móvil puede partirse). */
 .arena-board > .arena-empty:first-child { min-height: 36px; box-sizing: border-box; padding-block: var(--ar-s1); line-height: 1.3; }

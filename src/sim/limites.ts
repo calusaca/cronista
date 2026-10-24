@@ -1158,6 +1158,22 @@ export const GOL_VISUAL = {
   },
 } as const;
 
+/** Brief 058 · Narración activa por defecto en el directo (solo cliente). Quien inicia el partido con la
+ * casilla marcada oye la emisión sin otro clic: el AudioContext se ceba dentro de ese gesto. */
+export const NARRACION_DIRECTO = {
+  /** Preferencia por espectador en localStorage: "1" | "0"; ausente o ilegible ⇒ porDefecto. */
+  clavePreferencia: "cronista:arena:narracion",
+  porDefecto: true,
+  /** Si el AudioContext no corre tras este plazo (ms), se muestra «Habilitar reproducción de audio». */
+  desbloqueoMs: 1500,
+  /** Retención inicial del reloj (ms) mientras se sabe si hay voz en una sesión propia (bloque B). */
+  esperaHerramientasMs: 1500,
+} as const;
+
+/** Brief 058 · C1 (23 oct): tope diario de Speech de la réplica. 200.000 c la semana de jueces (antes 120.000);
+ * 800 audios sin cambio. A ≈ 15,5 USD por millón, como máximo ≈ 3,1 USD al día. Revisar tras el fallo. */
+export const SPEECH_DIARIO = { audios: 800, caracteres: 200_000 } as const;
+
 /** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
  * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
  * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por
@@ -1171,4 +1187,36 @@ export const SMOKE_MODELOS_ARENA = {
   webS: 180, webIntervaloS: 30,
   /** Margen sobre el prompt_tokens máximo observado para estimar la entrada con reintento (§5). */
   factorEntradaReintento: 1.25,
+} as const;
+
+/** Brief 059 (v1.2) · Torneo entre modelos (`npm run arena:torneo`). Cotas operativas del CLI y de la
+ * tabla; no son parámetros del motor ni del sitio público (que no lanza torneos). Toda autorización de
+ * gasto se calcula en micro-USD enteros con redondeo al alza (§ 15.1): es un «tope por estimación», no una
+ * garantía monetaria; el control real del gasto es la facturación de Azure. */
+export const TORNEO_ARENA = {
+  /** Versión del archivo `torneo.json` (esquema único y estricto de § 15.6). */
+  version: "059-v1.1",
+  /** Partido corto del smoke 052: 4 decisiones por lado, cubierto por la admisión de los seis. */
+  duracionS: SMOKE_MODELOS_ARENA.cortoS,
+  /** Intervalo por defecto y la única alternativa (variante barata, § 9). */
+  intervalosS: [SMOKE_MODELOS_ARENA.cortoIntervaloS, SMOKE_MODELOS_ARENA.webIntervaloS],
+  semillaDefecto: 59,
+  participantes: { min: 3, max: 6 },
+  puntos: { victoria: 3, empate: 1, derrota: 0 },
+  /** Transporte: reintentos solo ante estos estados o error de red, dentro del plazo de la decisión
+   * (v1.1: 2 reintentos, para que la reserva por partido sea útil). */
+  http: { reintentos: 2, esperasMs: [2_000, 5_000], esperaMaxMs: 20_000, estadosReintentables: [408, 429, 500, 502, 503, 504] },
+  /** Un partido anulado por infraestructura se repite hasta 2 veces; con 3 anulaciones seguidas se detiene. */
+  repeticionesMax: 2, anuladosSeguidosMax: 3, enfriamientoMs: 120_000, pausaEntrePartidosMs: 3_000,
+  /** `--tope-usd` obligatorio y nunca mayor que `topeMaxUsd`; `topePropuestoUsd` solo aparece como ayuda del CLI. */
+  topeMaxUsd: 20, topePropuestoUsd: 16,
+  /** Tokens de entrada añadidos al máximo por intento HTTP: cubren la respuesta anterior y el diagnóstico
+   * del validador que reenvía el segundo intento del controlador (`controladores.ts`). */
+  reserva: { margenCorreccionTokens: 512 },
+  /** Registro comprimido (gzip 9) por partido; el descomprimido se acota con ARENA.archivoMaxBytes. */
+  registroGzMaxBytes: 1_000_000,
+  /** Umbral con el que se redacta la frase de la prueba de signos ilustrativa (§ 15.7). */
+  alfa: 0.05,
+  /** Ensayo sin inferencia (fixtures): duraciones admitidas en segundos. */
+  ensayoSegundos: { min: 10, max: 60 },
 } as const;

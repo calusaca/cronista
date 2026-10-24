@@ -27,7 +27,10 @@ quotas listed at the end. The latest public walkthrough of exactly this path is 
    clock paused* while both models answer, then *Live · N s ready* once the 20-second buffer is
    filled. Open **Team plans and player orders** below the pitch to read each coach's validated
    JSON plan, its stated reason and whether a programmed fallback was used.
-4. **Enable narration.** Press **Enable narration** (and allow audio if the browser asks). The
+4. **Listen to the narration.** With **Narrate the match** ticked next to **Start live match**
+   (the default), narration starts with the match, without another click; **Turn narration off**
+   mutes it and the browser remembers that choice. On a shared link, press **Enable narration**
+   (and **Enable audio playback** if the browser blocks sound). The
    narrator (Mark Ellison / Rodrigo Valle) calls the play; in the first calm window he hands the
    floor to the commentator (Priya Chandra / Ana Cedeño) or the statistician (Owen Platt / Tomás
    Ibarra). The **Broadcast desk** panel shows the three cards and, after the first exchange,
@@ -78,7 +81,7 @@ a real GPT-5.6 Luna vs GPT-5.4 mini match replayed with no model calls, with
   question. Over quota, the panel says the service is unavailable and the confirmed events stay
   visible.
 - **Speech:** per match, 80 narrator requests / 24,000 characters plus a separate pool of 16
-  requests / 4,800 characters for the guest voices; 800 requests / 120,000 characters per day.
+  requests / 4,800 characters for the guest voices; 800 requests / 200,000 characters per day (raised from 120,000 for the judging week).
   Listening to a 60-second match in both languages with both exchange variants can exhaust the
   guest pool (the public smoke did: guests returned 429, the narrator was unaffected). Bundled
   backup clips cover Speech delays; a silent clip is never a failed match.

@@ -10,7 +10,8 @@ import { ARCHIVO_INDICE_RESERVAS, leerIndiceReservas, RUTA_RESERVAS } from "../a
 import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesTurno, esperaReintentoInvitado, estadoPorDuracion, estimarDuracionS, horizonteS, segmentoVozValido, siguienteTurno, varianteEfectiva, type EntradaTurno, type EstadoVariante, type FalloInvitado, type Rol } from "../arena/turnos";
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { esPrevia } from "../arena/previa";
-import { ARENA, MESA_ARENA, RESERVAS_VOZ } from "../sim/limites";
+import { ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
+import { guardarPreferenciaNarracion, narracionAutomatica, tomarAudioCebado } from "./audio-directo";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
@@ -82,6 +83,10 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   const [voz, setVoz] = useState(false), [disponible, setDisponible] = useState(false), [error, setError] = useState(false), [pulsar, setPulsar] = useState(false), [version, setVersion] = useState(0);
   const [pasaje, setPasaje] = useState<Segmento | null>(null), [hablando, setHablando] = useState(false);
   const sonido = useRef<Sonido | null>(null), generacion = useRef(0), reanudando = useRef(false);
+  // Brief 058 · A: activación automática (una vez por montaje) en una sesión propia, y nota fija.
+  const [automatica, setAutomatica] = useState(false), autoIntentada = useRef(false);
+  const vozRef = useRef(voz); vozRef.current = voz;
+  const disponibleRef = useRef(disponible); disponibleRef.current = disponible;
   const actual = useRef({ hastaTick, terminada, registro, alTiempo, intervenciones }); actual.current = { hastaTick, terminada, registro, alTiempo, intervenciones };
   const limpiar = () => {
     generacion.current++; reanudando.current = false;
@@ -100,7 +105,11 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     return () => a.abort();
   }, []);
   useEffect(() => {
-    limpiar(); setVoz(false); setError(false); setPulsar(false); setPasaje(null); setHablando(false);
+    // Brief 058 § 3.1: al cambiar de idioma en una sesión propia, la narración vuelve a activarse sola en el
+    // idioma nuevo si la preferencia sigue activa y la voz estaba activa antes del cambio.
+    const reactivar = vozRef.current && narracionAutomatica(sesion, disponibleRef.current);
+    limpiar(); setVoz(false); setAutomatica(false); setError(false); setPulsar(false); setPasaje(null); setHablando(false);
+    if (reactivar) activarVoz(true);
     return limpiar;
     // La sesión tiene una key propia; los datos entrantes no reinician la voz.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,24 +117,36 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
 
   const reanudarAudio = (forzar = false) => {
     const s = sonido.current;
+    // Brief 058 · A4: un contexto que ya corre (p. ej. se desbloqueó en este clic) retira el aviso.
+    if (s && forzar && s.contexto.state === "running") { setPulsar(false); return; }
     if (!s || reanudando.current && !forzar || s.contexto.state === "running") return;
     reanudando.current = true;
     void s.contexto.resume().then(() => {
       if (sonido.current === s) setPulsar(s.contexto.state !== "running");
     }).catch(() => { if (sonido.current === s) setPulsar(true); }).finally(() => { if (sonido.current === s) reanudando.current = false; });
   };
+  /** Brief 058 · A: solo los gestos del usuario escriben la preferencia; la activación automática no. */
   const cambiarVoz = () => {
+    const encender = !(voz && sonido.current);
+    if (encender) activarVoz(false); else apagarVoz();
+    guardarPreferenciaNarracion(encender);
+  };
+  const apagarVoz = () => {
+    setError(false); setPulsar(false); setPasaje(null); setHablando(false);
+    const s = sonido.current;
+    if (!s) return;
+    s.silenciada = true;
+    if (s.activa) s.activa.recuerdo.estado = "interrumpida";
+    try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
+    s.activa = undefined; void s.contexto.suspend(); vozRef.current = false; setVoz(false); setAutomatica(false);
+  };
+  const activarVoz = (automaticaAhora: boolean) => {
     setError(false); setPulsar(false); setPasaje(null); setHablando(false);
     let s = sonido.current;
-    if (voz && s) {
-      s.silenciada = true;
-      if (s.activa) s.activa.recuerdo.estado = "interrumpida";
-      try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
-      s.activa = undefined; void s.contexto.suspend(); setVoz(false); return;
-    }
     const tick = Math.floor(reloj.current.segundo * 10);
     if (!s) {
-      const contexto = new AudioContext({ sampleRate: 24000 });
+      // Brief 058 § 3.2: se adopta el contexto cebado en el clic de «Iniciar partido en vivo», si lo hay.
+      const contexto = tomarAudioCebado() ?? new AudioContext({ sampleRate: 24000 });
       const desde = Math.floor(tick / BUFFER_ARENA.tramoTicks) * BUFFER_ARENA.tramoTicks;
       s = { silenciada: false, activacion: 0, activadoTick: tick, entradaPendiente: true, idioma, contexto, clips: new Map(), peticiones: new Map(), desde, cierrePedido: false, cierreFallido: false, cerrando: false, ultimoFin: contexto.currentTime, reservas: [], memoria: [], reservasOidas: [], cargaReservas: new AbortController(), totalReservas: 0,
         invitados: new Map(), peticionesInvitado: new Map(), pedidas: new Set(), sonadas: new Set(), finUltimaNoticia: null, finUltimoInvitado: null, ultimoInvitado: null };
@@ -140,8 +161,19 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     // Brief 056 v1.1 § 3: una pieza de la previa aún pendiente y vigente se conserva al reactivar.
     for (const id of candidatasAlReactivar([...s.invitados.values()].map(inv => inv.intervencion), tick, s.pedidas)) terminarInvitado(s, id);
     reanudarAudio(true);
-    setVoz(true); setVersion(v => v + 1);
+    // Brief 058 § 3.2: si el contexto no corre tras `desbloqueoMs`, aparece «Habilitar reproducción de audio»
+    // (también cuando la promesa de resume() no se resuelve nunca).
+    const armado = s, activacion = s.activacion;
+    window.setTimeout(() => { if (sonido.current === armado && armado.activacion === activacion && !armado.silenciada && armado.contexto.state !== "running") setPulsar(true); }, NARRACION_DIRECTO.desbloqueoMs);
+    vozRef.current = true; setVoz(true); setAutomatica(automaticaAhora); setVersion(v => v + 1);
   };
+  useEffect(() => {
+    if (!disponible || autoIntentada.current || sonido.current) return;
+    autoIntentada.current = true;
+    if (reloj.current.estado !== "final" && narracionAutomatica(sesion, disponible)) activarVoz(true);
+    // Una sola vez por montaje, cuando /herramientas confirma la voz.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disponible]);
 
   const bloque = Math.floor(vista.segundo / 5);
   useEffect(() => {
@@ -390,6 +422,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       {pulsar && <button className="btn" onClick={() => reanudarAudio(true)}>{t("Enable audio playback", "Habilitar reproducción de audio")}</button>}
       {terminada && <button className="btn" onClick={alRepeticion}>{t("Open available replay", "Abrir repetición disponible")}</button>}
     </div>
+    {voz && automatica && <p className="arena-muted" data-testid="arena-voice-default-note">{t("Narration started with the match. «Turn narration off» mutes it; this browser remembers your choice.", "La narración empezó con el partido. «Desactivar narración» la silencia; este navegador recuerda tu elección.")}</p>}
     {voz && <p role="status" data-testid="arena-voice-status">{hablando ? pasaje?.cierre ? t("Closing commentary", "Comentario de cierre") : t("Narration playing", "Narración en reproducción") : pasaje?.cierre ? t("End of narration", "Fin de la narración") : t("Preparing the next passage", "Preparando la siguiente intervención")}</p>}
     {pasaje && <details data-testid="arena-voice-transcript" data-narration-tick={pasaje.fragmentos[0]?.tick} data-narration-kind={"tipoRelato" in pasaje ? pasaje.tipoRelato : "comentario"} data-narration-role={pasaje.rol ?? "narrador"} data-narration-variant={pasaje.variante}><summary>{t("Narration transcript and evidence", "Transcripción y evidencia de la narración")}</summary>{pasaje.fragmentos.map((f, k) => <p key={k} data-narration-role={f.rol ?? "narrador"}>{f.texto}</p>)}<p className="arena-muted">{pasaje.fuentes.join(" · ")}</p></details>}
     {voz && error && <p role="alert">{t("A passage was unavailable. Backup commentary covers the wait while narration retries.", "Una intervención no estuvo disponible. Los comentarios de respaldo cubren la espera mientras la narración reintenta.")}</p>}

@@ -201,12 +201,15 @@ async function grabarArena() {
     if (!arrancado) throw new Error("El partido no arrancó: " + await txt("[data-testid=arena-live]"));
     await g.marca("s2-asignacion", { texto: arrancado });
     // Narración activada en cuanto existe el botón (emisión preparándose, reloj en 0): así suena la previa.
-    const activar = page.getByRole("button", { name: "Enable narration" });
-    await g.esperar(async () => activar.isVisible(), 60_000, "botón de narración");
+    // Brief 058: la narración arranca sola con el partido («Turn narration off»); solo se pulsa si no.
+    const activar = page.getByRole("button", { name: "Enable narration" }), activa = page.getByRole("button", { name: "Turn narration off" });
+    await g.esperar(async () => await activar.isVisible() || await activa.isVisible(), 60_000, "botón de narración");
     await g.desplazar(page.getByTestId("arena-buffer"), 120, 900);
-    await g.mover(activar, 400);
     await g.marca("narracion", { texto: await txt("[data-testid=arena-buffer-status]") });
-    { const bb = await activar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
+    if (await activar.isVisible()) {
+      await g.mover(activar, 400);
+      const bb = await activar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2);
+    }
     await sleep(400);
     // Escena 3: tarjeta de alineaciones mientras el estadista habla la previa.
     const conPrevia = await visible("[data-testid=arena-lineups]");

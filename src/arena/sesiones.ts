@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ARENA, MESA_ARENA, PREVIA_ARENA } from "../sim/limites";
+import { ARENA, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -355,7 +355,8 @@ export class GestorSesiones {
       let total: Record<string, number>;
       try { total = JSON.parse(await a.leer(diario)); }
       catch (error) { if ((error as { code?: string }).code === "ENOENT" || (error as { statusCode?: number }).statusCode === 404) total = {}; else throw error; }
-      if ((total[tipo] ?? 0) >= (tipo === "analisis" ? 20 : 800) || (total.caracteres ?? 0) + caracteres > 120_000) throw new ErrorSesion("Presupuesto diario de este servicio agotado", 429);
+      // Brief 058 · C1: el tope diario de Speech vive en SPEECH_DIARIO; el análisis conserva sus 20 consultas.
+      if ((total[tipo] ?? 0) >= (tipo === "analisis" ? 20 : SPEECH_DIARIO.audios) || (total.caracteres ?? 0) + caracteres > SPEECH_DIARIO.caracteres) throw new ErrorSesion("Presupuesto diario de este servicio agotado", 429);
       total[tipo] = (total[tipo] ?? 0) + 1; total.caracteres = (total.caracteres ?? 0) + caracteres; await a.escribir(diario, JSON.stringify(total));
       r[clave] = { tipo, estado: "pendiente", caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); return null;
     });

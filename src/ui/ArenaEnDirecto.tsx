@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { AsignacionModelos, InstantaneaEmision, MensajeSesion, MetricasSesion, ModeloPublico, PublicacionSesion, SeleccionModelos, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
+import { cebarAudioDirecto, guardarPreferenciaNarracion, leerPreferenciaNarracion, marcarArranquePropio } from "./audio-directo";
 
 const claveSesion = "cronista:arena:sesion";
 const clavePresentacion = "cronista:arena:presentacion";
@@ -19,6 +20,10 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
   const [reintento, setReintento] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null), [iniciando, setIniciando] = useState(false);
   const [metricas, setMetricas] = useState<MetricasSesion | null>(null);
+  // Brief 058 · A: casilla «Narrar el partido» (solo en búfer y con voz en el servidor). Su valor inicial sale
+  // de la preferencia después de hidratar, en un efecto, para no romper el SSR.
+  const [vozDisponible, setVozDisponible] = useState(false), [narrar, setNarrar] = useState(true);
+  useEffect(() => { setNarrar(leerPreferenciaNarracion()); }, []);
   const fuente = useRef<EventSource | null>(null), ultimoId = useRef(0), solicitud = useRef<AbortController | null>(null);
   const iniciandoRef = useRef(false);
   const callbacks = useRef({ alMensaje, alActividad, alPreparado });
@@ -30,6 +35,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       setModelos(r.modelos); setLocal(r.modelos[0]?.id ?? ""); setVisita(r.modelos[1]?.id ?? r.modelos[0]?.id ?? "");
       if (r.modelos.length) setModo("azar");
     }).catch(() => {});
+    void fetch("/api/arena/herramientas", { signal: abort.signal }).then(r => r.json()).then((r: { voz?: unknown }) => setVozDisponible(r.voz === true)).catch(() => {});
     const compartido = new URLSearchParams(window.location.search).get("partido");
     const anterior = compartido ?? sessionStorage.getItem(claveSesion);
     if (anterior && /^[a-f0-9-]{36}$/.test(anterior)) {
@@ -107,6 +113,9 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
   }, [id, presentacion]);
   const comenzar = async () => {
     if (ocupado || id || iniciandoRef.current) return;
+    // Brief 058 · A: el cebado del audio va ANTES de cualquier await, dentro del gesto del clic.
+    const t0 = performance.now(), narrada = presentacion === "buffer" && vozDisponible && narrar;
+    if (narrada) cebarAudioDirecto();
     iniciandoRef.current = true; callbacks.current.alActividad(true, presentacion);
     setIniciando(true); setError(false); setAsignacion(null); setMetricas(null); setGrabacionLista(null); setReintento(null);
     const abort = new AbortController(); solicitud.current = abort;
@@ -115,6 +124,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       const r = await fetch("/api/arena/sesiones", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...(ajustes as object), seed: (ajustes as { seed?: number }).seed ?? crypto.getRandomValues(new Uint32Array(1))[0], seleccion, presentacion }), signal: abort.signal });
       if (!r.ok) throw new Error("Inicio");
       const s = await r.json() as { id: string; asignacion: AsignacionModelos };
+      if (narrada) marcarArranquePropio(s.id, t0);
       sessionStorage.setItem(clavePresentacion, presentacion); sessionStorage.setItem(claveSesion, s.id); setAsignacion(s.asignacion); setId(s.id);
     } catch { if (!abort.signal.aborted) { setError(true); callbacks.current.alActividad(false); } }
     finally { if (solicitud.current === abort) solicitud.current = null; iniciandoRef.current = false; setIniciando(false); }
@@ -151,6 +161,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       </select></label>
       {modo === "manual" && <>{(["local", "visita"] as const).map(lado => <label key={lado}>{lado === "local" ? t("Home model", "Modelo local") : t("Away model", "Modelo visitante")}<select className="field" disabled={bloqueado} value={lado === "local" ? local : visita} onChange={e => (lado === "local" ? setLocal : setVisita)(e.target.value)}>{modelos.map(m => <option key={m.id} value={m.id}>{m.nombre}</option>)}</select></label>)}</>}
       <button className="btn btn-primary" disabled={bloqueado || (modo !== "programado" && !modelos.length)} onClick={() => void comenzar()}>{iniciando ? t("Starting…", "Iniciando…") : presentacion === "preparada" ? t("Generate match", "Generar partido") : t("Start live match", "Iniciar partido en vivo")}</button>
+      {presentacionVista === "buffer" && vozDisponible && <label className="arena-live-voice" data-testid="arena-live-voice"><input type="checkbox" checked={narrar} disabled={bloqueado} onChange={e => { setNarrar(e.target.checked); guardarPreferenciaNarracion(e.target.checked); }} /> {t("Narrate the match", "Narrar el partido")}</label>}
       {id && <button className="btn" onClick={() => void cancelar()} disabled={estado === "cancelando"}>{t("Cancel live match", "Cancelar partido en vivo")}</button>}
     </div>
     {!modelos.length && <p className="arena-muted">{t("Model play is not enabled on this server. The live programmed demonstration is available.", "Los modelos no están habilitados en este servidor. Puedes ejecutar la demostración programada en vivo.")}</p>}

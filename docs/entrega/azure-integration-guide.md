@@ -68,7 +68,7 @@ Evidence: [public service smoke](../evidencia/azure-arena-publica-smoke.json),
 [follow-up evaluation](../evidencia/arena-eval-revision-alcance/README.md).
 
 Runtime limits are persisted: ten model matches, twenty analyst questions and
-120,000 speech characters per UTC day, with per-session and concurrency limits.
+200,000 speech characters per UTC day (brief 058 C1, judging week), with per-session and concurrency limits.
 These are usage limits, not a guarantee of a maximum total Azure invoice.
 See [operations and limitations](../azure-integraciones.md).
 

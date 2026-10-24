@@ -130,7 +130,7 @@ las duraciones. Falta revisión humana de pronunciación y escucha íntegra.
   preguntas por día UTC. Máximo tres solicitudes del agente por pregunta y seis
   funciones. Las herramientas rechazan futuro, IDs ajenos y mutaciones.
 - Voz: hasta 80 solicitudes y 24.000 caracteres reservados por sesión; 800
-  solicitudes y 120.000 por día UTC. La revisión expresiva reserva el SSML
+  solicitudes y 200.000 por día UTC (brief 058, C1: semana de jueces; `SPEECH_DIARIO`). La revisión expresiva reserva el SSML
   completo de forma conservadora, además de limitar a 6.000 el texto hablado.
   Cada síntesis tiene plazo de quince segundos. La caché incluye voz, versión,
   idioma, tick y SSML; repetir la interpretación recupera el mismo audio.
