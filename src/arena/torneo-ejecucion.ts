@@ -17,12 +17,13 @@ import type { Lado } from "../sim/tipos";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { razonamientoFuera, transporteInstrumentado, type EspecLlm, type EvidenciaSmoke, type FormatoSonda, type Peticion } from "./smoke-modelos";
 import {
-  archivoEncuentro, calendarioTorneo, causaTerminal, configDelPlan, constaEnArchivo, cortoDe, costoLadoMicro, descomprimirRegistro, encuentroDesdeEjecutor, esquemaCerrojo,
+  archivoEncuentro, calendarioTorneo, causaTerminal, cortoDe, costoLadoMicro, esquemaCerrojo,
   esquemaConfigTorneo, esquemaEjecutor, esquemaIndice, esquemaMovimiento, gastoConocido, LADOS_TORNEO, microMaxIntento, microTipicoDecision, rondasPartido,
-  reservaPartido, resumenTorneo, sha256, validarEncuentro, validarTorneo, VERSION_TORNEO,
+  reservaPartido, resumenTorneo, VERSION_TORNEO,
   type DeclaradoLado, type EjecutorEncuentro, type EncuentroPlan, type EncuentroTorneo, type EsperaHttp, type IntentoHttp, type MarcoTorneo, type MovimientoGasto,
   type ParticipanteTorneo, type TorneoArchivado,
 } from "./torneo";
+import { configDelPlan, constaEnArchivo, descomprimirRegistro, encuentroDesdeEjecutor, sha256, validarEncuentro, validarTorneo } from "./torneo-validacion";
 import type { ControladorEquipo, RegistroArena } from "./tipos";
 
 /** Error con el código de salida del CLI (1 por defecto). */

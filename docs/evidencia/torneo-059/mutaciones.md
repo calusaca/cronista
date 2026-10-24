@@ -56,3 +56,5 @@ Generado por un script de mutación local el 2026-10-24T00:48:37.972Z: cada muta
 | M22 | una orden cambiada dentro de e03.json.gz | `src/arena/__fixtures__/torneos/ensayo-059/e03.json.gz` | `076cd162b37498d670c432c6c14b192a` | `src/arena/__tests__/torneos-archivados.test.ts -t "torneos archivados"` | rojo · Tests  1 failed / 2 passed / 6 skipped (9) |
 
 Fuera de esta tanda (P1-B o no aplicables): M12 (métricas por modelo, no implementadas aún), M23–M25 (lector del servidor, rutas y render), N13 y N14 (Arena.tsx), M26 y M27 (sustituidas por § 15.9). M9: `torneo.json` ya no guarda anulados (§ 15.6) y `clasificar` solo recibe `encuentros`; la prueba existe pero no hay una mutación con sentido. M22 «editar el README»: se aplica cuando exista un torneo real archivado.
+
+Nota (P1-B, 24 oct): las validaciones con archivos (N11, N12, N16, M22 de código y M23*) se movieron de `src/arena/torneo.ts` a `src/arena/torneo-validacion.ts` para que `torneo.ts` no dependa de Node en el cliente; los md5 de arriba son los del archivo de entonces. Las mutaciones de P1-B están en [mutaciones-p1b.md](mutaciones-p1b.md).

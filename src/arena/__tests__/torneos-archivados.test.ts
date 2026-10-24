@@ -11,9 +11,9 @@ import { ARENA } from "../../sim/limites";
 import type { Lado } from "../../sim/tipos";
 import { ejecutarArena } from "../coordinador";
 import {
-  calendarioTorneo, cifrasDeRegistro, constaEnArchivo, esquemaIndice, esquemaTorneo, LADOS_TORNEO, resumenTorneo, sha256, validarEncuentro, validarTorneo,
-  type EncuentroTorneo, type TorneoArchivado,
+  calendarioTorneo, esquemaIndice, esquemaTorneo, LADOS_TORNEO, resumenTorneo, type EncuentroTorneo, type TorneoArchivado,
 } from "../torneo";
+import { cifrasDeRegistro, constaEnArchivo, sha256, validarEncuentro, validarTorneo } from "../torneo-validacion";
 import type { ConfigArena, ControladorEquipo, RegistroArena } from "../tipos";
 
 const RAICES = ["public/torneos", "src/arena/__fixtures__/torneos"].filter(r => existsSync(join(r, "indice.json")));

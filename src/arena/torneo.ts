@@ -4,20 +4,13 @@
 // § 15.7), micro-USD y reservas (§ 15.1), causa terminal de un respaldo (§ 16.2), esquema único y estricto
 // (§ 15.6) y la validación compartida de cada partido contra su registro (§ 15.5, § 16.1).
 //
-// `validarEncuentro` necesita `node:zlib` y `node:crypto` (descomprime y hashea el archivo íntegro): este
-// módulo es puro (sin E/S) pero es de servidor/CLI; una página de cliente debe recibir las filas ya
-// calculadas o importar solo lo que no dependa de Node.
-import { createHash } from "node:crypto";
-import { isDeepStrictEqual } from "node:util";
-import { gunzipSync } from "node:zlib";
+// Sin dependencias de Node: lo importan también la página (cliente) y Arena.tsx. La validación contra los archivos
+// (`node:zlib`, `node:crypto`, motor) vive en `torneo-validacion.ts` (servidor, CLI y CI).
 import { z } from "zod";
 import { ARENA, SMOKE_MODELOS_ARENA, TORNEO_ARENA as T } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import type { Lado } from "../sim/tipos";
-import { reproducirArena } from "./coordinador";
-import { cifrasEquipos, pasesIntentados, type ClaveCifraEquipo } from "./estadisticas";
-import { crearConfigArena } from "./motor";
-import type { ConfigArena, DecisionArena, RegistroArena, ReglasArena, VersionArena } from "./tipos";
+import type { DecisionArena } from "./tipos";
 
 export const VERSION_TORNEO = T.version;
 export const LADOS_TORNEO = ["local", "visita"] as const satisfies readonly Lado[];
@@ -115,7 +108,6 @@ export type IndiceTorneos = z.infer<typeof esquemaIndice>;
 export type MarcoTorneo = Pick<TorneoArchivado, "duracionS" | "intervaloS" | "motor">;
 
 export const archivoEncuentro = (n: number) => `e${String(n).padStart(2, "0")}.json.gz`;
-export const sha256 = (datos: Uint8Array | string) => createHash("sha256").update(datos).digest("hex");
 
 /** § 3.2 · Nombre corto: sin el prefijo «GPT-», 8 caracteres como máximo. */
 export function cortoDe(nombre: string): string {
@@ -219,7 +211,7 @@ function particionar(ids: readonly string[], st: Map<string, Base>): string[][] 
   const clases: string[][] = [];
   for (const id of ordenados) {
     const ultima = clases.at(-1);
-    if (ultima && isDeepStrictEqual(clave(ultima[0]!), clave(id))) ultima.push(id); else clases.push([id]);
+    if (ultima && clave(ultima[0]!).every((v, i) => v === clave(id)[i])) ultima.push(id); else clases.push([id]);
   }
   return clases;
 }
@@ -389,79 +381,6 @@ export function causaTerminal(motivo: DecisionArena["motivo"], intentos: readonl
 }
 
 // ---------------------------------------------------------------------------------------------------
-// Cifras del 049 recalculadas desde el registro (nunca las estimadas `igr` ni `remates_cercanos`).
-// ---------------------------------------------------------------------------------------------------
-export function cifrasDeRegistro(registro: RegistroArena): Record<Lado, CifrasLado> {
-  const tick = registro.final.tick, panel = cifrasEquipos(registro, tick), intentados = pasesIntentados(registro, tick);
-  const fila = (clave: ClaveCifraEquipo) => { const f = panel.filas.find(x => x.clave === clave); if (!f) throw new Error(`Cifra ${clave} ausente del panel`); return f; };
-  const de = (lado: Lado): CifrasLado => ({
-    posesionPct: fila("posesion_pct")[lado].valor, remates: fila("remates")[lado].valor, rematesDirectos: fila("remates_directos")[lado].valor,
-    pasesCompletados: fila("pases_completados")[lado].valor, pasesIntentados: intentados[lado], recuperaciones: fila("recuperaciones")[lado].valor,
-  });
-  return { local: de("local"), visita: de("visita") };
-}
-
-/** § 16.1 · La configuración que el plan prescribe: la MISMA llamada en el CLI y en la validación. */
-export function configDelPlan(plan: Pick<EncuentroPlan, "seed">, t: MarcoTorneo): ConfigArena {
-  return crearConfigArena({ seed: plan.seed, duracionS: t.duracionS, intervaloS: t.intervaloS, version: t.motor.version as VersionArena, reglas: t.motor.reglas as ReglasArena });
-}
-
-/** Lo que consta en el archivo por lado (tiempos, solicitudes y motivos de cada decisión). */
-export function constaEnArchivo(registro: RegistroArena, lado: Lado): Pick<DeclaradoLado, "tiemposMs" | "llamadas" | "motivos"> {
-  const ds = registro.rondas.map(r => r.decisiones[lado]);
-  return { tiemposMs: ds.map(d => d.tiempoMs), llamadas: ds.map(d => d.llamadas ?? 0), motivos: ds.map(d => d.motivo) };
-}
-
-/** Partido archivado a partir de lo declarado por el ejecutor y del registro (el CLI lo usa para saber si un
- * partido está hecho; validarEncuentro sigue contrastándolo todo contra el archivo). */
-export function encuentroDesdeEjecutor(ej: EjecutorEncuentro, plan: EncuentroPlan, registro: RegistroArena): EncuentroTorneo {
-  const cifras = cifrasDeRegistro(registro);
-  const lado = (l: Lado): LadoEncuentro => ({ participante: plan[l], club: registro.config.partido[l].nombre, goles: registro.final.marcador[l], cifras: cifras[l], declarado: ej[l] });
-  return { n: plan.n, jornada: plan.jornada, cruce: plan.cruce, vuelta: plan.vuelta, seed: plan.seed, archivo: archivoEncuentro(plan.n), archivoSha256: ej.archivoSha256, intento: ej.intento, local: lado("local"), visita: lado("visita") };
-}
-
-/** Descomprime un registro sin agotar memoria (como mucho ARENA.archivoMaxBytes). */
-export function descomprimirRegistro(bytesGz: Uint8Array): unknown {
-  let textoJson: string;
-  try { textoJson = gunzipSync(bytesGz, { maxOutputLength: ARENA.archivoMaxBytes }).toString("utf8"); }
-  catch { throw new Error(`Registro comprimido ilegible o mayor que ${ARENA.archivoMaxBytes} bytes`); }
-  return JSON.parse(textoJson) as unknown;
-}
-
-/** § 15.5 + § 16.1 · Validación de un partido contra su archivo íntegro. Lanza ante cualquier desajuste y
- * devuelve el registro reproducido. La comprueban el CLI (antes de dar un partido por hecho y al escribir
- * `torneo.json`) y CI. */
-export function validarEncuentro(e: EncuentroTorneo, plan: EncuentroPlan, participantes: readonly ParticipanteTorneo[], bytesGz: Uint8Array, t: MarcoTorneo): RegistroArena {
-  esquemaEncuentro.parse(e);
-  // 1. Huella del archivo íntegro tal como se publica.
-  if (sha256(bytesGz) !== e.archivoSha256) throw new Error(`P${e.n}: la huella SHA-256 del archivo no coincide`);
-  if (e.archivo !== archivoEncuentro(plan.n)) throw new Error(`P${e.n}: nombre de archivo inesperado`);
-  if (e.n !== plan.n || e.jornada !== plan.jornada || e.cruce !== plan.cruce || e.vuelta !== plan.vuelta || e.seed !== plan.seed || e.local.participante !== plan.local || e.visita.participante !== plan.visita) throw new Error(`P${e.n}: el partido no coincide con el calendario`);
-  // 2. Descompresión acotada y reproducción con el motor.
-  const raw = descomprimirRegistro(bytesGz);
-  const registro = reproducirArena(raw);
-  // 3–4 (§ 16.1). Configuración COMPLETA igual a la prescrita por el plan (JSON: el archivo es JSON).
-  const esperada = JSON.parse(JSON.stringify(configDelPlan(plan, t))) as unknown;
-  if (!isDeepStrictEqual((raw as { config: unknown }).config, esperada)) throw new Error(`P${e.n}: configuración distinta de la prescrita por el plan`);
-  const cifras = cifrasDeRegistro(registro);
-  for (const lado of LADOS_TORNEO) {
-    const l = e[lado], p = participantes.find(x => x.id === l.participante);
-    if (!p) throw new Error(`P${e.n}: participante ${l.participante} ausente`);
-    if (l.club !== registro.config.partido[lado].nombre) throw new Error(`P${e.n}: club ${lado} distinto del registro`);
-    // 5. Cada decisión de ese lado lleva el controlador del participante que el plan pone ahí.
-    if (!registro.rondas.every(r => r.decisiones[lado].controlador === p.controlador)) throw new Error(`P${e.n}: controlador ${lado} distinto del participante`);
-    // 6. Goles.
-    if (l.goles !== registro.final.marcador[lado]) throw new Error(`P${e.n}: goles ${lado} distintos del registro`);
-    // 7. Cifras 049 recalculadas.
-    if (!isDeepStrictEqual(l.cifras, cifras[lado])) throw new Error(`P${e.n}: cifras ${lado} distintas de las recalculadas`);
-    // 8. Lo declarado que consta en el archivo.
-    const consta = constaEnArchivo(registro, lado);
-    if (!isDeepStrictEqual(l.declarado.tiemposMs, consta.tiemposMs) || !isDeepStrictEqual(l.declarado.llamadas, consta.llamadas) || !isDeepStrictEqual(l.declarado.motivos, consta.motivos)) throw new Error(`P${e.n}: tiempos, solicitudes o motivos ${lado} distintos del archivo`);
-  }
-  return registro;
-}
-
-// ---------------------------------------------------------------------------------------------------
 // Coherencia interna (página, CI y CLI) y validación completa del torneo (CLI y CI).
 // ---------------------------------------------------------------------------------------------------
 export function validarCoherencia(t: TorneoArchivado): string[] {
@@ -496,18 +415,6 @@ export function validarCoherencia(t: TorneoArchivado): string[] {
   if (costos > t.gasto.conocidoMicroUsd) errores.push("el gasto conocido es menor que la suma de los partidos");
   if ((t.estado === "completo") !== (t.pendientes.length === 0)) errores.push("estado incoherente con los pendientes");
   return errores;
-}
-
-/** Valida el esquema, la coherencia y cada partido contra su `.gz` (leído con `leer(archivo)`). */
-export function validarTorneo(raw: unknown, leer: (archivo: string) => Uint8Array): TorneoArchivado {
-  const t = esquemaTorneo.parse(raw);
-  const errores = validarCoherencia(t);
-  if (errores.length) throw new Error(`Torneo ${t.id} incoherente: ${errores.join("; ")}`);
-  const plan = calendarioTorneo(t.participantes.map(p => p.id), t.semilla);
-  if (t.encuentros.length + t.pendientes.length !== plan.length) throw new Error("Encuentros más pendientes distintos del plan");
-  if (t.tipo === "real" && plan.length !== t.participantes.length * (t.participantes.length - 1)) throw new Error("Un torneo real juega ida y vuelta completa");
-  for (const e of t.encuentros) validarEncuentro(e, plan[e.n - 1]!, t.participantes, leer(e.archivo), t);
-  return t;
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -549,4 +456,50 @@ export function resumenTorneo(t: TorneoArchivado): string {
     "- Motor 2D sintético con parámetros por calibrar y reglas simplificadas; no es un partido reglamentario.", "",
   ];
   return l.join("\n");
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Métricas por participante (§ 4.3 con los rótulos de § 15.5): cada cifra lleva su fuente. «recalculada» = el
+// motor la recalcula desde el registro (CI); «declarada» = la declara el ejecutor (con la huella del archivo).
+// ---------------------------------------------------------------------------------------------------
+export type FuenteMetrica = "recalculada" | "declarada";
+export interface Metrica { valor: number | null; fuente: FuenteMetrica }
+export interface MetricasParticipante {
+  id: string; partidos: Metrica; decisiones: Metrica; validas: Metrica;
+  respaldos: { orden_invalida: Metrica; error_controlador: Metrica; plazo_agotado: Metrica };
+  solicitudes: Metrica; reintentosValidacion: Metrica;
+  /** Segundos, sin las decisiones que esperaron por un reintento HTTP (429, 5xx o red); se cuentan aparte. */
+  latenciaMedianaS: Metrica; latenciaMaxS: Metrica; decisionesConReintentoHttp: Metrica;
+  tokensEntrada: Metrica; tokensSalida: Metrica; tokensCache: Metrica; costoMicroUsd: Metrica;
+  posesionMediaPct: Metrica; rematesPorPartido: Metrica; rematesDirectosPorPartido: Metrica; precisionPasePct: Metrica; recuperacionesPorPartido: Metrica;
+}
+/** Rondas de un lado cuya decisión esperó por la infraestructura: algún intento reintentable o de red, o una espera. */
+export function rondasConReintentoHttp(d: Pick<DeclaradoLado, "intentos" | "esperas">): number[] {
+  const rondas = new Set([...d.intentos.filter(i => i.naturaleza === "reintentable" || i.naturaleza === "red").map(i => i.ronda), ...d.esperas.map(e => e.ronda)]);
+  return [...rondas].sort((a, b) => a - b);
+}
+const medianaDe = (xs: readonly number[]) => { if (!xs.length) return null; const v = [...xs].sort((a, b) => a - b), m = Math.floor(v.length / 2); return v.length % 2 ? v[m]! : (v[m - 1]! + v[m]!) / 2; };
+export function metricasParticipante(t: Pick<TorneoArchivado, "encuentros">, id: string): MetricasParticipante {
+  const lados = t.encuentros.flatMap(e => LADOS_TORNEO.filter(l => e[l].participante === id).map(l => e[l]));
+  const d = lados.map(l => l.declarado), n = lados.length;
+  const suma = (f: (x: DeclaradoLado) => number) => d.reduce((s, x) => s + f(x), 0);
+  const dec = (valor: number | null): Metrica => ({ valor, fuente: "declarada" }), rec = (valor: number | null): Metrica => ({ valor, fuente: "recalculada" });
+  const decisiones = suma(x => x.motivos.length), solicitudes = suma(x => x.llamadas.reduce((a, b) => a + b, 0));
+  const tiempos = d.flatMap(x => { const excluidas = new Set(rondasConReintentoHttp(x)); return x.tiemposMs.filter((_, i) => !excluidas.has(i + 1)); });
+  const cifras = lados.map(l => l.cifras);
+  const media = (f: (c: CifrasLado) => number | null) => { const v = cifras.map(f); return !n || v.some(x => x === null) ? null : (v as number[]).reduce((a, b) => a + b, 0) / n; };
+  const completados = cifras.map(c => c.pasesCompletados), intentados = cifras.map(c => c.pasesIntentados);
+  const sumaIntentados = intentados.every(x => x !== null) ? (intentados as number[]).reduce((a, b) => a + b, 0) : null;
+  const precision = !n || completados.some(x => x === null) || sumaIntentados === null || sumaIntentados === 0 ? null : 100 * (completados as number[]).reduce((a, b) => a + b, 0) / sumaIntentados;
+  const motivo = (m: string) => dec(suma(x => x.motivos.filter(y => y === m).length));
+  return {
+    id, partidos: rec(n), decisiones: dec(decisiones), validas: motivo("valida"),
+    respaldos: { orden_invalida: motivo("orden_invalida"), error_controlador: motivo("error_controlador"), plazo_agotado: motivo("plazo_agotado") },
+    solicitudes: dec(solicitudes), reintentosValidacion: dec(Math.max(0, solicitudes - decisiones)),
+    latenciaMedianaS: dec(tiempos.length ? medianaDe(tiempos)! / 1000 : null), latenciaMaxS: dec(tiempos.length ? Math.max(...tiempos) / 1000 : null),
+    decisionesConReintentoHttp: dec(suma(x => rondasConReintentoHttp(x).length)),
+    tokensEntrada: dec(suma(x => x.entrada)), tokensSalida: dec(suma(x => x.salida)), tokensCache: dec(suma(x => x.cache)), costoMicroUsd: dec(suma(x => x.costoMicroUsd)),
+    posesionMediaPct: rec(media(c => c.posesionPct)), rematesPorPartido: rec(media(c => c.remates)), rematesDirectosPorPartido: rec(media(c => c.rematesDirectos)),
+    precisionPasePct: rec(precision), recuperacionesPorPartido: rec(media(c => c.recuperaciones)),
+  };
 }

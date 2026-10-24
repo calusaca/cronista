@@ -1,0 +1,28 @@
+// Brief 059 § 8 · Solo para el e2e. (1) El torneo de ensayo (fixture, nunca en public/torneos) se sirve como
+// estático desde el build standalone local (.next/standalone/public/torneos/ensayo-059), igual que un torneo real.
+// (2) La página lee ARENA_TORNEOS_DIR = .cache/e2e/torneos: una COPIA de public/torneos (los torneos reales
+// archivados, que no se modifican) más el fixture, con un índice combinado. El despliegue construye desde el
+// código fuente (ACR) y no usa este artefacto.
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+
+const raiz = process.cwd();
+const fixture = resolve(raiz, "src/arena/__fixtures__/torneos");
+if (!existsSync(join(raiz, ".next/standalone/server.js"))) throw new Error("Ejecuta npm run build y npm run package:standalone primero.");
+const estatico = resolve(raiz, ".next/standalone/public/torneos/ensayo-059");
+rmSync(estatico, { recursive: true, force: true });
+cpSync(join(fixture, "ensayo-059"), estatico, { recursive: true });
+
+const combinado = resolve(raiz, ".cache/e2e/torneos");
+rmSync(combinado, { recursive: true, force: true });
+mkdirSync(combinado, { recursive: true });
+const leerIndice = dir => existsSync(join(dir, "indice.json")) ? JSON.parse(readFileSync(join(dir, "indice.json"), "utf8")) : [];
+const publicos = resolve(raiz, "public/torneos");
+const indice = [...leerIndice(publicos), ...leerIndice(fixture)].sort((a, b) => b.inicioUtc.localeCompare(a.inicioUtc) || a.id.localeCompare(b.id));
+for (const e of indice) {
+  const origen = existsSync(join(publicos, e.id, "torneo.json")) ? join(publicos, e.id) : join(fixture, e.id);
+  mkdirSync(join(combinado, e.id));
+  for (const f of readdirSync(origen).filter(f => f === "torneo.json")) cpSync(join(origen, f), join(combinado, e.id, f));
+}
+writeFileSync(join(combinado, "indice.json"), JSON.stringify(indice, null, 2) + "\n");
+console.log(`Torneos para el e2e: ${indice.map(e => e.id).join(", ")} (ensayo-059 servido como estático solo en el build del e2e).`);

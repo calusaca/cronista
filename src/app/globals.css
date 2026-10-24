@@ -3264,3 +3264,59 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
   .arena-goal-view[data-arco="visita"] { right: auto; left: var(--ar-s3); }
   .arena-goal-view[data-arco="local"] { left: auto; right: var(--ar-s3); }
 }
+
+/* ==========================================================================
+   Brief 059 § 5.4 · Torneo entre modelos (/arena/torneo) y procedencia en /arena. Solo tokens 047/055 y clases
+   nuevas con el prefijo arena-torneo-; ninguna regla existente cambia. Sin animaciones. A 360 px la tabla y la
+   matriz caben sin desplazamiento; solo la tabla de métricas se desplaza dentro de su región.
+   ========================================================================== */
+.arena-torneo { color: var(--ink); font-size: 15px; }
+.arena-torneo h1 { margin: var(--ar-s2) 0; font: 900 clamp(28px, 4vw, 44px)/1.1 var(--font-display), sans-serif; letter-spacing: -0.03em; }
+.arena-torneo h2 { margin: 0 0 var(--ar-s3); font: 700 20px/1.25 var(--font-display), sans-serif; }
+.arena-torneo h3 { margin: var(--ar-s4) 0 var(--ar-s2); font: 700 16px/1.3 var(--font-display), sans-serif; }
+.arena-torneo a { color: var(--accent); font-weight: 600; }
+.arena-torneo a:focus-visible, .arena-torneo-scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-torneo-cabecera, .arena-torneo-panel, .arena-torneo-vacio { margin: 0 0 var(--ar-s5); padding: var(--ar-s5); border: 1px solid var(--line); border-radius: var(--ar-r); background: var(--surface); }
+.arena-torneo-cabecera > p, .arena-torneo-vacio > p { max-width: 75ch; margin: var(--ar-s2) 0; line-height: 1.5; }
+.arena-torneo-datos { display: flex; flex-wrap: wrap; gap: var(--ar-s3) var(--ar-s5); margin: var(--ar-s4) 0; }
+.arena-torneo-datos dt { color: var(--muted); font-size: 13px; font-weight: 600; }
+.arena-torneo-datos dd { margin: 0; font: 700 17px/1.3 var(--font-display), sans-serif; }
+.arena-torneo-banda { margin: var(--ar-s3) 0; padding: var(--ar-s2) var(--ar-s3); border-left: 4px solid var(--ar-score-bg); border-radius: var(--ar-r-sm); background: var(--ar-bug); color: var(--ar-bug-ink); }
+.arena-torneo-aviso { padding: var(--ar-s3); border: 1px solid var(--line); border-radius: var(--ar-r-sm); background: var(--ar-surface-2); }
+.arena-torneo table { border-collapse: collapse; }
+.arena-torneo caption { padding-bottom: var(--ar-s2); color: var(--muted); font-size: 13px; text-align: left; }
+.arena-torneo th, .arena-torneo td { padding: var(--ar-s2); border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.arena-torneo thead th { color: var(--muted); font-size: 13px; }
+.arena-torneo abbr { text-decoration: none; }
+.arena-torneo-tabla { width: 100%; max-width: 720px; }
+.arena-torneo-tabla td { text-align: right; }
+.arena-torneo-tabla td:first-child { text-align: left; }
+.arena-torneo-matriz { font-size: 13px; }
+.arena-torneo-matriz th, .arena-torneo-matriz td { box-sizing: border-box; min-width: 44px; height: 44px; padding: 0; text-align: center; }
+.arena-torneo-matriz tbody th { max-width: 56px; padding: 0 var(--ar-s1) 0 0; text-align: left; line-height: 1.2; }
+.arena-torneo-matriz a { display: flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
+.arena-torneo-jornada ol { margin: 0; padding: 0; list-style: none; }
+.arena-torneo-jornada li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s1) var(--ar-s3); padding: var(--ar-s2) 0; border-bottom: 1px solid var(--line); }
+.arena-torneo-linea { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s1); }
+.arena-torneo-acciones { display: inline-flex; flex-wrap: wrap; gap: var(--ar-s3); }
+.arena-torneo-acciones a { display: inline-flex; align-items: center; min-height: 44px; }
+.arena-torneo-scroll { max-width: 100%; overflow-x: auto; }
+.arena-torneo-metricas { font-size: 14px; }
+.arena-torneo-metricas td, .arena-torneo-metricas th { white-space: nowrap; }
+.arena-torneo-procedencia { display: grid; gap: var(--ar-s2); margin: 0; }
+.arena-torneo-procedencia dt { font-weight: 700; }
+.arena-torneo-procedencia dd { margin: 0; overflow-wrap: anywhere; }
+.arena-torneo-corto { display: none; }
+.arena-torneo-oculto { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+.arena-intro p.arena-torneo-origen { color: var(--ar-bug-ink); font-weight: 600; }
+.arena-intro p.arena-torneo-origen a { color: var(--ar-score-bg); }
+.arena-intro p.arena-torneo-origen a:focus-visible { outline: 2px solid var(--ar-select); outline-offset: 2px; }
+@media (min-width: 1100px) { .arena-intro p.arena-torneo-origen { grid-column: 1 / -1; grid-row: 3; max-width: none; margin-top: var(--ar-s2); } }
+@media (max-width: 520px) {
+  .arena-torneo-cabecera, .arena-torneo-panel, .arena-torneo-vacio { padding: var(--ar-s3) var(--ar-s1); }
+  .arena-torneo th, .arena-torneo td { padding: var(--ar-s1); font-size: 13px; }
+  .arena-torneo-matriz th, .arena-torneo-matriz td { padding: 0; }
+  .arena-torneo-matriz tbody th { padding-right: var(--ar-s1); }
+  .arena-torneo-largo { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+  .arena-torneo-corto { display: inline; }
+}

@@ -1,0 +1,4549 @@
+{
+  "version": "059-v1.1",
+  "id": "2026-10-24",
+  "tipo": "real",
+  "titulo": {
+    "es": "Torneo entre modelos · 2026-10-24",
+    "en": "Model tournament · 2026-10-24"
+  },
+  "inicioUtc": "2026-10-24T01:31:50.961Z",
+  "finUtc": "2026-10-24T01:47:19.869Z",
+  "commit": "c0231302197893816f457300321d8d9f2f09b9fc",
+  "motor": {
+    "version": "arena-v3",
+    "reglas": "reinicios-v5"
+  },
+  "duracionS": 60,
+  "intervaloS": 15,
+  "semilla": 59,
+  "participantes": [
+    {
+      "id": "equilibrado",
+      "nombre": "GPT-5.6 Luna",
+      "corto": "5.6 Luna",
+      "deployment": "cronista-equilibrado",
+      "modelo": "gpt-5.6-luna",
+      "version": "2026-07-09",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.2,
+        "salida": 1.2,
+        "cache": 0.02,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+    },
+    {
+      "id": "rapido",
+      "nombre": "GPT-5.4 mini",
+      "corto": "5.4 mini",
+      "deployment": "cronista-rapido",
+      "modelo": "gpt-5.4-mini",
+      "version": "2026-03-17",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.75,
+        "salida": 4.5,
+        "cache": 0.075,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-rapido:reasoning-low"
+    },
+    {
+      "id": "luna6",
+      "nombre": "GPT-6 Luna",
+      "corto": "6 Luna",
+      "deployment": "cronista-luna6",
+      "modelo": "gpt-6-luna",
+      "version": "2026-09-22",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.1,
+        "salida": 0.5,
+        "cache": 0.01,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-luna6:reasoning-low"
+    },
+    {
+      "id": "sol6",
+      "nombre": "GPT-6 Sol",
+      "corto": "6 Sol",
+      "deployment": "cronista-sol6",
+      "modelo": "gpt-6-sol",
+      "version": "2026-09-22",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 2,
+        "salida": 10,
+        "cache": 0.2,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-sol6:reasoning-low"
+    },
+    {
+      "id": "astra6",
+      "nombre": "GPT-6 Astra",
+      "corto": "6 Astra",
+      "deployment": "cronista-astra6",
+      "modelo": "gpt-6-astra",
+      "version": "2026-09-03",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 10,
+        "salida": 50,
+        "cache": 1,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-astra6:reasoning-low"
+    },
+    {
+      "id": "sol61",
+      "nombre": "GPT-6.1 Sol",
+      "corto": "6.1 Sol",
+      "deployment": "cronista-sol61",
+      "modelo": "gpt-6.1-sol",
+      "version": "2026-09-29",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 2,
+        "salida": 10,
+        "cache": 0.2,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": "cronista-sol6"
+      },
+      "controlador": "azure-openai:cronista-sol61:reasoning-low"
+    }
+  ],
+  "encuentros": [
+    {
+      "n": 1,
+      "jornada": 1,
+      "cruce": 1,
+      "vuelta": false,
+      "seed": 522019775,
+      "archivo": "e01.json.gz",
+      "archivoSha256": "fa08f4274de9a3c0306e949dcbc969ee64ccfd4de11e5f587129e4d6bd182cfe",
+      "intento": 1,
+      "local": {
+        "participante": "sol6",
+        "club": "Sporting Marisal",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 56,
+          "remates": 3,
+          "rematesDirectos": 2,
+          "pasesCompletados": 7,
+          "pasesIntentados": 8,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            5660.6232899999995,
+            4662.440137000001,
+            5257.70924,
+            4780.025454999999
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36717,
+          "salida": 2136,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 94794,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "astra6",
+        "club": "Atlético Quebralta",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 44,
+          "remates": 2,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 5,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            8495.230969,
+            7612.429535000001,
+            11105.639204000003,
+            8050.217729000004
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36995,
+          "salida": 1852,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 462550,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      }
+    },
+    {
+      "n": 2,
+      "jornada": 1,
+      "cruce": 2,
+      "vuelta": false,
+      "seed": 1930107723,
+      "archivo": "e02.json.gz",
+      "archivoSha256": "21500524bc5f563e9f04e0c6e2b1b33ff674a71e64f396a24921f34c9656a94f",
+      "intento": 1,
+      "local": {
+        "participante": "equilibrado",
+        "club": "Atlético Nebrisa",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 63,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 7,
+          "pasesIntentados": 8,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            14788.585213000006,
+            3936.0131230000043,
+            3729.4944909999977,
+            6905.203088000002
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            2
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 46039,
+          "salida": 2626,
+          "cache": 9594,
+          "sinUso": 0,
+          "costoMicroUsd": 10633,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "luna6",
+        "club": "Unión Caleteo",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 37,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 6,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3424.6935200000007,
+            4674.8316660000055,
+            4879.1795219999985,
+            4250.887584000004
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36202,
+          "salida": 2355,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4798,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 3,
+      "jornada": 1,
+      "cruce": 3,
+      "vuelta": false,
+      "seed": 4291797757,
+      "archivo": "e03.json.gz",
+      "archivoSha256": "07262ddcf528af7a059e0d3d45c99845a80283ebe238529954fd6d299fc70ede",
+      "intento": 1,
+      "local": {
+        "participante": "sol61",
+        "club": "Unión Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 8,
+          "pasesIntentados": 11,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            9045.255669000006,
+            9269.990806000002,
+            7172.998970000001,
+            11361.609345000004
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36400,
+          "salida": 1930,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 92100,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "rapido",
+        "club": "Sporting Torreluna",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 6,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            3389.289678999994,
+            3792.503906999991,
+            4645.83250199999,
+            4680.8814589999965
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36715,
+          "salida": 2662,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 39516,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      }
+    },
+    {
+      "n": 4,
+      "jornada": 2,
+      "cruce": 4,
+      "vuelta": false,
+      "seed": 3676103631,
+      "archivo": "e04.json.gz",
+      "archivoSha256": "d102071852f695fd1b3ffb86b1f079aafd75b7be3a70df50715c232815502953",
+      "intento": 1,
+      "local": {
+        "participante": "astra6",
+        "club": "Sporting Pradoalto",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 61,
+          "remates": 3,
+          "rematesDirectos": 3,
+          "pasesCompletados": 3,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            8287.162308999992,
+            7867.224948000003,
+            8316.351750000002,
+            7433.008445999993
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36381,
+          "salida": 1725,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 450060,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "rapido",
+        "club": "Racing Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 39,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 6,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3774.1439570000075,
+            3404.9675730000017,
+            4559.264095000006,
+            3112.3115220000036
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36594,
+          "salida": 2354,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 38039,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      }
+    },
+    {
+      "n": 5,
+      "jornada": 2,
+      "cruce": 5,
+      "vuelta": false,
+      "seed": 367338243,
+      "archivo": "e05.json.gz",
+      "archivoSha256": "132a4782cb452e0106e1b34fb6e964ff74ead90d126672a403412221ebf3adda",
+      "intento": 1,
+      "local": {
+        "participante": "luna6",
+        "club": "Racing Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 63,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 7,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3067.6462610000162,
+            2778.2973810000112,
+            6367.956736000022,
+            5015.385180999991
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37021,
+          "salida": 2213,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4809,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol61",
+        "club": "Sporting Valdecristal",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 37,
+          "remates": 3,
+          "rematesDirectos": 3,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            6881.994986999984,
+            7248.3838749999995,
+            8206.579689000006,
+            7297.865075000009
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37182,
+          "salida": 1798,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 92344,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      }
+    },
+    {
+      "n": 6,
+      "jornada": 2,
+      "cruce": 6,
+      "vuelta": false,
+      "seed": 4014904874,
+      "archivo": "e06.json.gz",
+      "archivoSha256": "25920953e39d4366fee5fbb476daaea54a2833e30acf0c1827f3df6a4bdedf41",
+      "intento": 1,
+      "local": {
+        "participante": "sol6",
+        "club": "Club Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 52,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 5,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            5772.988902000012,
+            4159.831072000001,
+            5367.528285000008,
+            5893.832732999988
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36130,
+          "salida": 2142,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 93680,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "equilibrado",
+        "club": "Olímpico Arenablanca",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 48,
+          "remates": 2,
+          "rematesDirectos": 1,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3963.536529999983,
+            3418.181746999995,
+            4350.362936999998,
+            3224.7354549999873
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36501,
+          "salida": 2118,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9842,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      }
+    },
+    {
+      "n": 7,
+      "jornada": 3,
+      "cruce": 7,
+      "vuelta": false,
+      "seed": 2114466601,
+      "archivo": "e07.json.gz",
+      "archivoSha256": "6e6308329bd83dcdac6f8cd657a664e71887329ccca9b3256b88c5db0b186182",
+      "intento": 1,
+      "local": {
+        "participante": "equilibrado",
+        "club": "Unión Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3577.5848140000016,
+            4689.091867999989,
+            3111.796031999984,
+            4223.85134199998
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36014,
+          "salida": 2022,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9630,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "astra6",
+        "club": "Sporting Islaverde Sur",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 2,
+          "rematesDirectos": 1,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            7778.5871599999955,
+            8242.632060000004,
+            7532.052526999993,
+            8322.213051000028
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36090,
+          "salida": 1797,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 450750,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      }
+    },
+    {
+      "n": 8,
+      "jornada": 3,
+      "cruce": 8,
+      "vuelta": false,
+      "seed": 1054810414,
+      "archivo": "e08.json.gz",
+      "archivoSha256": "4b36be5c70fe8174b912d62ee5deff606744fce93342065e11f1eed8ba3e0f4f",
+      "intento": 1,
+      "local": {
+        "participante": "sol61",
+        "club": "Sporting Puertoscuro",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 50,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 7,
+          "pasesIntentados": 8,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            7698.104511999991,
+            6691.671234999987,
+            7407.867598000012,
+            8601.23969800002
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37351,
+          "salida": 1851,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 93212,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol6",
+        "club": "Club Quebralta",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 50,
+          "remates": 3,
+          "rematesDirectos": 2,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3966.6850390000036,
+            4765.831337999989,
+            4773.746742999996,
+            4521.558388000005
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37506,
+          "salida": 2052,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 95532,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 9,
+      "jornada": 3,
+      "cruce": 9,
+      "vuelta": false,
+      "seed": 3968029144,
+      "archivo": "e09.json.gz",
+      "archivoSha256": "e30f0a7a5cb237b5386d4bd45e0a48bab77b76dd1ea4b34a4d0ae56f64ee61a0",
+      "intento": 1,
+      "local": {
+        "participante": "rapido",
+        "club": "Sporting Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 60,
+          "remates": 3,
+          "rematesDirectos": 2,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3960.268611000036,
+            3793.215079000045,
+            3001.836352000013,
+            4086.946066000033
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36129,
+          "salida": 2499,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 38343,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "luna6",
+        "club": "Deportivo Islaverde Sur",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 40,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 5,
+          "pasesIntentados": 5,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            4277.619672000001,
+            5488.98152099998,
+            8313.58629800001,
+            3088.091444999969
+          ],
+          "llamadas": [
+            1,
+            1,
+            2,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 46169,
+          "salida": 2796,
+          "cache": 9378,
+          "sinUso": 0,
+          "costoMicroUsd": 5171,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 10,
+      "jornada": 4,
+      "cruce": 10,
+      "vuelta": false,
+      "seed": 3272008794,
+      "archivo": "e10.json.gz",
+      "archivoSha256": "286d3a2b12ab3bf3e8f84743d0746541e627b747203f50b94d38566fe4386161",
+      "intento": 1,
+      "local": {
+        "participante": "astra6",
+        "club": "Racing Pradoalto",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 52,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 5,
+          "pasesIntentados": 8,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            7564.197153999994,
+            6872.599866000004,
+            8801.400495000009,
+            8240.738399999973
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36692,
+          "salida": 1773,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 455570,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "luna6",
+        "club": "Atlético Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 48,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 5,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            2662.7543660000083,
+            3029.479127000028,
+            5991.09294100001,
+            3911.9150750000263
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36839,
+          "salida": 2166,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4767,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 11,
+      "jornada": 4,
+      "cruce": 11,
+      "vuelta": false,
+      "seed": 2769604746,
+      "archivo": "e11.json.gz",
+      "archivoSha256": "2d73c54c10e9d7da59fa070e5cfb9ff9bca42534707d7c7245dbdc047fdee5f2",
+      "intento": 1,
+      "local": {
+        "participante": "sol6",
+        "club": "Atlético Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 60,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 9,
+          "pasesIntentados": 12,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            5017.508756000025,
+            3985.260505000013,
+            5170.071148000017,
+            5363.136210000026
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36701,
+          "salida": 2158,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 94982,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "rapido",
+        "club": "Deportivo Arenablanca",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 40,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3604.2278260000166,
+            4102.9855810000445,
+            3738.8620749999536,
+            4300.461886000005
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37076,
+          "salida": 2521,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 39152,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      }
+    },
+    {
+      "n": 12,
+      "jornada": 4,
+      "cruce": 12,
+      "vuelta": false,
+      "seed": 3871573215,
+      "archivo": "e12.json.gz",
+      "archivoSha256": "ae0a238ee9313fb52052378bdb9fe975b5a8e7ef3190b555e0f4ecbc424143e1",
+      "intento": 1,
+      "local": {
+        "participante": "equilibrado",
+        "club": "Olímpico Ventolera",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 66,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 9,
+          "pasesIntentados": 10,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3698.8945809999714,
+            3311.333695999987,
+            3755.32381099998,
+            3566.3383870000253
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36611,
+          "salida": 1970,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9687,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol61",
+        "club": "Unión Solcanto",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 34,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 5,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            6673.959401,
+            7753.806467999995,
+            8134.508467000036,
+            7231.990292000002
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37169,
+          "salida": 1809,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 92428,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      }
+    },
+    {
+      "n": 13,
+      "jornada": 5,
+      "cruce": 13,
+      "vuelta": false,
+      "seed": 1381523929,
+      "archivo": "e13.json.gz",
+      "archivoSha256": "0aa7f460f1cf37b090c406c9cd2a5a5a6287db2da4f61a3d9ad676ef36cdcd01",
+      "intento": 1,
+      "local": {
+        "participante": "sol61",
+        "club": "Atlético Islaverde Sur",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 55,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 6,
+          "pasesIntentados": 6,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            7263.680453000008,
+            6980.339577000006,
+            7170.500071000017,
+            7503.973744999967
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36556,
+          "salida": 1733,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 90442,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "astra6",
+        "club": "Unión Brezal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 45,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 6,
+          "pasesIntentados": 7,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            7522.033714999969,
+            8753.095007000025,
+            8349.998997999995,
+            8217.682218000002
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36738,
+          "salida": 1789,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 456830,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      }
+    },
+    {
+      "n": 14,
+      "jornada": 5,
+      "cruce": 14,
+      "vuelta": false,
+      "seed": 26967769,
+      "archivo": "e14.json.gz",
+      "archivoSha256": "c5720fe603e354662fc822b9d499a23bfe41d4a64884c067599698b192728796",
+      "intento": 1,
+      "local": {
+        "participante": "rapido",
+        "club": "Atlético Ormidia",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 64,
+          "remates": 3,
+          "rematesDirectos": 1,
+          "pasesCompletados": 3,
+          "pasesIntentados": 5,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            3973.62695299997,
+            2895.499271000037,
+            3500.5578749999986,
+            3157.563613000035
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36833,
+          "salida": 2271,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 37845,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "equilibrado",
+        "club": "Deportivo Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 36,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 8,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3741.083463000017,
+            3266.802112000005,
+            3621.393808999972,
+            3663.124858999974
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37040,
+          "salida": 2072,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9895,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      }
+    },
+    {
+      "n": 15,
+      "jornada": 5,
+      "cruce": 15,
+      "vuelta": false,
+      "seed": 83909521,
+      "archivo": "e15.json.gz",
+      "archivoSha256": "3500f020984e03b33df79b0d3b849121d3350ccac9880280741d236d10995cc1",
+      "intento": 1,
+      "local": {
+        "participante": "luna6",
+        "club": "Atlético Ventolera",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 4,
+          "pasesIntentados": 5,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            2738.5566869999748,
+            3939.9923629999976,
+            5115.527330000012,
+            4472.806993999984
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36259,
+          "salida": 2246,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4749,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol6",
+        "club": "Unión Quebralta",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 2,
+          "rematesDirectos": 1,
+          "pasesCompletados": 3,
+          "pasesIntentados": 4,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            4547.692922000017,
+            5242.333655000024,
+            4776.411968,
+            5894.430072000017
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36519,
+          "salida": 2108,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 94118,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 16,
+      "jornada": 6,
+      "cruce": 1,
+      "vuelta": true,
+      "seed": 522019775,
+      "archivo": "e16.json.gz",
+      "archivoSha256": "c9ef6ccaa093f2178dcf318b194fde68482b0c5e7daa533c207cbf08273a796b",
+      "intento": 1,
+      "local": {
+        "participante": "astra6",
+        "club": "Sporting Marisal",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 49,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 3,
+          "pasesIntentados": 5,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            7284.186780999997,
+            6210.62535799999,
+            7981.779504999984,
+            8078.374483000021
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36946,
+          "salida": 1693,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 454110,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol6",
+        "club": "Atlético Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 51,
+          "remates": 5,
+          "rematesDirectos": 1,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 4
+        },
+        "declarado": {
+          "tiemposMs": [
+            4078.6957689999836,
+            4993.441379999975,
+            4978.060058000032,
+            5394.055911000003
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37259,
+          "salida": 2095,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 95468,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 17,
+      "jornada": 6,
+      "cruce": 2,
+      "vuelta": true,
+      "seed": 1930107723,
+      "archivo": "e17.json.gz",
+      "archivoSha256": "880793032758ecf7f85944767998a6e8f81e8aaaeb164a6d37b84e7df35280ed",
+      "intento": 1,
+      "local": {
+        "participante": "luna6",
+        "club": "Atlético Nebrisa",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 48,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 8,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            4796.106217000051,
+            4060.5354550000047,
+            5081.900266999961,
+            3456.2141999999876
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36099,
+          "salida": 2303,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4762,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "equilibrado",
+        "club": "Unión Caleteo",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 52,
+          "remates": 2,
+          "rematesDirectos": 1,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3617.502227000019,
+            3573.8497579999967,
+            4364.035397000029,
+            3760.2711920000147
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36427,
+          "salida": 2225,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9956,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      }
+    },
+    {
+      "n": 18,
+      "jornada": 6,
+      "cruce": 3,
+      "vuelta": true,
+      "seed": 4291797757,
+      "archivo": "e18.json.gz",
+      "archivoSha256": "9c159e68f0c1934c3aeae92b0a8abad69ee5930d4e24d61612ee9ed2d9482df1",
+      "intento": 1,
+      "local": {
+        "participante": "rapido",
+        "club": "Unión Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 60,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 10,
+          "pasesIntentados": 10,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3999.3016210000496,
+            4822.083728999947,
+            5693.552738000057,
+            4670.229240000015
+          ],
+          "llamadas": [
+            1,
+            1,
+            2,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 46954,
+          "salida": 3110,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 49211,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol61",
+        "club": "Sporting Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 40,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 7,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            6325.551401000004,
+            7644.380833999952,
+            8073.553705999977,
+            8044.700444999966
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37050,
+          "salida": 1806,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 92160,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      }
+    },
+    {
+      "n": 19,
+      "jornada": 7,
+      "cruce": 4,
+      "vuelta": true,
+      "seed": 3676103631,
+      "archivo": "e19.json.gz",
+      "archivoSha256": "fe2d533794731b77b841027e4ada5cdaadc0381519f3ab6b243d48020c17ed1d",
+      "intento": 1,
+      "local": {
+        "participante": "rapido",
+        "club": "Sporting Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 70,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 8,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            4219.0207450001035,
+            3066.440189999994,
+            4309.008912999998,
+            2664.8959190000314
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36301,
+          "salida": 2324,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 37684,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "astra6",
+        "club": "Racing Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 30,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 5,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            8099.051188000012,
+            7192.565865000011,
+            7878.636261000065,
+            9454.508985999972
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36888,
+          "salida": 1835,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 460630,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      }
+    },
+    {
+      "n": 20,
+      "jornada": 7,
+      "cruce": 5,
+      "vuelta": true,
+      "seed": 367338243,
+      "archivo": "e20.json.gz",
+      "archivoSha256": "eb1c047b872c11fd5404e387913bf3bd9d4bed113097b97d7a77e9d3dc84feea",
+      "intento": 1,
+      "local": {
+        "participante": "sol61",
+        "club": "Racing Marisal",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 59,
+          "remates": 3,
+          "rematesDirectos": 2,
+          "pasesCompletados": 6,
+          "pasesIntentados": 7,
+          "recuperaciones": 3
+        },
+        "declarado": {
+          "tiemposMs": [
+            8984.653552999953,
+            6833.861350000021,
+            7067.04109199997,
+            8942.899689999991
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36713,
+          "salida": 1761,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 91036,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "luna6",
+        "club": "Sporting Valdecristal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 41,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 6,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            5171.940130000003,
+            3408.901080999989,
+            4851.77116600005,
+            5421.3378889999585
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36916,
+          "salida": 2538,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4961,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 21,
+      "jornada": 7,
+      "cruce": 6,
+      "vuelta": true,
+      "seed": 4014904874,
+      "archivo": "e21.json.gz",
+      "archivoSha256": "7807e9a91437f972b6d421c19d2473b800b95e14d21dfdd709136fdb48f58ab1",
+      "intento": 1,
+      "local": {
+        "participante": "equilibrado",
+        "club": "Club Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 45,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 7,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3494.9324679999845,
+            3257.280950000044,
+            3415.7684949999675,
+            3083.385285000084
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36578,
+          "salida": 1982,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9694,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol6",
+        "club": "Olímpico Arenablanca",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 55,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 4,
+          "pasesIntentados": 4,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            4474.844022999983,
+            4574.748981000041,
+            7206.1184389999835,
+            5113.0677820000565
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36879,
+          "salida": 2195,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 95708,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 22,
+      "jornada": 8,
+      "cruce": 7,
+      "vuelta": true,
+      "seed": 2114466601,
+      "archivo": "e22.json.gz",
+      "archivoSha256": "4fd9b4b468d49b20f4d345bb8ffe2ee3b5e28d4ead52f4ca8f75fbfac915f3e7",
+      "intento": 1,
+      "local": {
+        "participante": "astra6",
+        "club": "Unión Ventolera",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 53,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 6,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            7400.0823240000755,
+            6983.339627999929,
+            8530.760766999912,
+            9493.323358000023
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36092,
+          "salida": 1784,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 450120,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "equilibrado",
+        "club": "Sporting Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 47,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 5,
+          "pasesIntentados": 6,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3447.71707699995,
+            4107.773705000058,
+            3789.302571999957,
+            4880.140287999995
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36180,
+          "salida": 2200,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9876,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      }
+    },
+    {
+      "n": 23,
+      "jornada": 8,
+      "cruce": 8,
+      "vuelta": true,
+      "seed": 1054810414,
+      "archivo": "e23.json.gz",
+      "archivoSha256": "67ee2b68ba560a5d53b3607beb5502ee07fe102afefd41b4b51a2f112533de89",
+      "intento": 1,
+      "local": {
+        "participante": "sol6",
+        "club": "Sporting Puertoscuro",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 8,
+          "pasesIntentados": 9,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            5416.575973000028,
+            4456.382915999973,
+            5472.61118300003,
+            4839.967258999939
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36629,
+          "salida": 2170,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 94958,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol61",
+        "club": "Club Quebralta",
+        "goles": 2,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 2,
+          "rematesDirectos": 2,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            7737.820432999986,
+            9111.026840999955,
+            8118.873358999961,
+            8207.047941000084
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36955,
+          "salida": 1875,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 92660,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      }
+    },
+    {
+      "n": 24,
+      "jornada": 8,
+      "cruce": 9,
+      "vuelta": true,
+      "seed": 3968029144,
+      "archivo": "e24.json.gz",
+      "archivoSha256": "33649ce04507cd1884034df7f179793f8df1c2e455ccbc94fdcac7d479ecbebe",
+      "intento": 1,
+      "local": {
+        "participante": "luna6",
+        "club": "Sporting Islaverde Sur",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 64,
+          "remates": 3,
+          "rematesDirectos": 2,
+          "pasesCompletados": 5,
+          "pasesIntentados": 6,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            3408.52543899999,
+            4637.290517000016,
+            6113.603207999957,
+            6074.510348999989
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36245,
+          "salida": 2488,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4869,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "rapido",
+        "club": "Deportivo Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 36,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 5,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            4522.03530499991,
+            3507.8082309999736,
+            3748.0010610000463,
+            5157.7467010000255
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36342,
+          "salida": 2670,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 39272,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      }
+    },
+    {
+      "n": 25,
+      "jornada": 9,
+      "cruce": 10,
+      "vuelta": true,
+      "seed": 3272008794,
+      "archivo": "e25.json.gz",
+      "archivoSha256": "9ee28c7a92e42733756cd7da478d10f57ef3acd32aec6b22628577cc2198c78c",
+      "intento": 1,
+      "local": {
+        "participante": "luna6",
+        "club": "Racing Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 62,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 8,
+          "pasesIntentados": 9,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3720.350895999931,
+            4729.231189000071,
+            2894.6444260000717,
+            4600.699355000048
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36935,
+          "salida": 1968,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4678,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "astra6",
+        "club": "Atlético Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 38,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 5,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            8003.010924999951,
+            7653.371181000024,
+            7780.925665000104,
+            7934.75326700008
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37125,
+          "salida": 1751,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 458800,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      }
+    },
+    {
+      "n": 26,
+      "jornada": 9,
+      "cruce": 11,
+      "vuelta": true,
+      "seed": 2769604746,
+      "archivo": "e26.json.gz",
+      "archivoSha256": "0163d074c90be3cc8d704469d752d50a30daace27127e335f1a7ce9409f151ef",
+      "intento": 1,
+      "local": {
+        "participante": "rapido",
+        "club": "Atlético Lumbrera",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 55,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 9,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3106.723711999948,
+            2751.748442000011,
+            3614.7269849999575,
+            2927.700118000037
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36870,
+          "salida": 2051,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 36882,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol6",
+        "club": "Deportivo Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 45,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 7,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            4279.657068000059,
+            5003.625177000067,
+            4597.154615000007,
+            4458.867356999894
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37272,
+          "salida": 2077,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 95314,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      }
+    },
+    {
+      "n": 27,
+      "jornada": 9,
+      "cruce": 12,
+      "vuelta": true,
+      "seed": 3871573215,
+      "archivo": "e27.json.gz",
+      "archivoSha256": "cd34ed79d9c55c2bdee4f9dd534e1cf0b9c78e353be4e264dc0cf1551dd70495",
+      "intento": 1,
+      "local": {
+        "participante": "sol61",
+        "club": "Olímpico Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 56,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 7,
+          "pasesIntentados": 8,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            7932.243954999954,
+            7503.59714800003,
+            9730.195492999977,
+            7070.015621999977
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36731,
+          "salida": 1764,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 91102,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "equilibrado",
+        "club": "Unión Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 44,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 8,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3998.8139430000447,
+            3411.827575000003,
+            4300.176057999954,
+            4172.873531999998
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36799,
+          "salida": 2086,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9863,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      }
+    },
+    {
+      "n": 28,
+      "jornada": 10,
+      "cruce": 13,
+      "vuelta": true,
+      "seed": 1381523929,
+      "archivo": "e28.json.gz",
+      "archivoSha256": "ad27a6a1a5a03c386761c17df4d150a60e62d2fa6f1f885516cec7994e2d1649",
+      "intento": 1,
+      "local": {
+        "participante": "astra6",
+        "club": "Atlético Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 52,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 8,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            9411.641463999986,
+            6957.906331999926,
+            7784.698444999987,
+            8335.780282999971
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36787,
+          "salida": 1731,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 454420,
+          "modelosDevueltos": [
+            "gpt-6-astra-2026-09-03"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "sol61",
+        "club": "Unión Brezal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 48,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 7,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            7095.71053599997,
+            9491.492549999966,
+            11645.80655400001,
+            11139.035492999945
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36950,
+          "salida": 2089,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 94790,
+          "modelosDevueltos": [
+            "gpt-6.1-sol-2026-09-29"
+          ]
+        }
+      }
+    },
+    {
+      "n": 29,
+      "jornada": 10,
+      "cruce": 14,
+      "vuelta": true,
+      "seed": 26967769,
+      "archivo": "e29.json.gz",
+      "archivoSha256": "d00eac8af02915dd4450632b543c01582a71d633ad9f74e95ad0a2bfdef7c424",
+      "intento": 1,
+      "local": {
+        "participante": "equilibrado",
+        "club": "Atlético Ormidia",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 43,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 4,
+          "pasesIntentados": 8,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            3791.451339000021,
+            2845.5071669999743,
+            3252.488241999992,
+            3070.3605760000646
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36941,
+          "salida": 1937,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 9713,
+          "modelosDevueltos": [
+            "gpt-5.6-luna-2026-07-09"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "rapido",
+        "club": "Deportivo Solcanto",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 57,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 4,
+          "pasesIntentados": 7,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            4120.219332000008,
+            4722.75307700003,
+            4856.919821999967,
+            4279.052581000025
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 37079,
+          "salida": 2503,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 39073,
+          "modelosDevueltos": [
+            "gpt-5.4-mini-2026-03-17"
+          ]
+        }
+      }
+    },
+    {
+      "n": 30,
+      "jornada": 10,
+      "cruce": 15,
+      "vuelta": true,
+      "seed": 83909521,
+      "archivo": "e30.json.gz",
+      "archivoSha256": "0741fefe821623c6f2dd497c5c20255a4db23939602b6f3a641fe30746fd4a8d",
+      "intento": 1,
+      "local": {
+        "participante": "sol6",
+        "club": "Atlético Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 57,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 6,
+          "pasesIntentados": 6,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            5062.873819999979,
+            5004.566880000057,
+            5416.372871999978,
+            3899.4023870000383
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36380,
+          "salida": 2095,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 93710,
+          "modelosDevueltos": [
+            "gpt-6-sol-2026-09-22"
+          ]
+        }
+      },
+      "visita": {
+        "participante": "luna6",
+        "club": "Unión Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 43,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 5,
+          "pasesIntentados": 5,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            3135.196593999979,
+            5995.498808000004,
+            2767.9945780000417,
+            4922.415595000028
+          ],
+          "llamadas": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "motivos": [
+            "valida",
+            "valida",
+            "valida",
+            "valida"
+          ],
+          "intentos": [
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 1
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 2
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 3
+            },
+            {
+              "naturaleza": "ok",
+              "status": 200,
+              "conUso": true,
+              "ronda": 4
+            }
+          ],
+          "esperas": [],
+          "entrada": 36387,
+          "salida": 2142,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 4710,
+          "modelosDevueltos": [
+            "gpt-6-luna-2026-09-22"
+          ]
+        }
+      }
+    }
+  ],
+  "pendientes": [],
+  "gasto": {
+    "conocidoMicroUsd": 6966458,
+    "tipicoMicroUsd": 7076840,
+    "topeMicroUsd": 16000000,
+    "reservaMaxPartidoMicroUsd": 7369632
+  },
+  "estado": "completo"
+}

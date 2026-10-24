@@ -1,0 +1,399 @@
+{
+  "orden": "npm run arena:torneo -- --id 2026-10-24 --tope-usd 16 --participantes equilibrado,rapido,luna6,sol6,astra6,sol61 --confirmar",
+  "commit": "c0231302197893816f457300321d8d9f2f09b9fc",
+  "topeMicroUsd": 16000000,
+  "tipicoMicroUsd": 7076840,
+  "conocidoMicroUsd": 6966458,
+  "movimientos": [
+    {
+      "n": 1,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 7369632
+    },
+    {
+      "n": 1,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 557344,
+      "resultado": "valido"
+    },
+    {
+      "n": 2,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 194088
+    },
+    {
+      "n": 2,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 15431,
+      "resultado": "valido"
+    },
+    {
+      "n": 3,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1725744
+    },
+    {
+      "n": 3,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 131616,
+      "resultado": "valido"
+    },
+    {
+      "n": 4,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6638832
+    },
+    {
+      "n": 4,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 488099,
+      "resultado": "valido"
+    },
+    {
+      "n": 5,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1289688
+    },
+    {
+      "n": 5,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 97153,
+      "resultado": "valido"
+    },
+    {
+      "n": 6,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1360944
+    },
+    {
+      "n": 6,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 103522,
+      "resultado": "valido"
+    },
+    {
+      "n": 7,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6274032
+    },
+    {
+      "n": 7,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 460380,
+      "resultado": "valido"
+    },
+    {
+      "n": 8,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 2456544
+    },
+    {
+      "n": 8,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 188744,
+      "resultado": "valido"
+    },
+    {
+      "n": 9,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 558888
+    },
+    {
+      "n": 9,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 43514,
+      "resultado": "valido"
+    },
+    {
+      "n": 10,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6202776
+    },
+    {
+      "n": 10,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 460337,
+      "resultado": "valido"
+    },
+    {
+      "n": 11,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1725744
+    },
+    {
+      "n": 11,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 134134,
+      "resultado": "valido"
+    },
+    {
+      "n": 12,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1360944
+    },
+    {
+      "n": 12,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 102115,
+      "resultado": "valido"
+    },
+    {
+      "n": 13,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 7369632
+    },
+    {
+      "n": 13,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 547272,
+      "resultado": "valido"
+    },
+    {
+      "n": 14,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 630144
+    },
+    {
+      "n": 14,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 47740,
+      "resultado": "valido"
+    },
+    {
+      "n": 15,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1289688
+    },
+    {
+      "n": 15,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 98867,
+      "resultado": "valido"
+    },
+    {
+      "n": 16,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 7369632
+    },
+    {
+      "n": 16,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 549578,
+      "resultado": "valido"
+    },
+    {
+      "n": 17,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 194088
+    },
+    {
+      "n": 17,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 14718,
+      "resultado": "valido"
+    },
+    {
+      "n": 18,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1725744
+    },
+    {
+      "n": 18,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 141371,
+      "resultado": "valido"
+    },
+    {
+      "n": 19,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6638832
+    },
+    {
+      "n": 19,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 498314,
+      "resultado": "valido"
+    },
+    {
+      "n": 20,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1289688
+    },
+    {
+      "n": 20,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 95997,
+      "resultado": "valido"
+    },
+    {
+      "n": 21,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1360944
+    },
+    {
+      "n": 21,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 105402,
+      "resultado": "valido"
+    },
+    {
+      "n": 22,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6274032
+    },
+    {
+      "n": 22,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 459996,
+      "resultado": "valido"
+    },
+    {
+      "n": 23,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 2456544
+    },
+    {
+      "n": 23,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 187618,
+      "resultado": "valido"
+    },
+    {
+      "n": 24,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 558888
+    },
+    {
+      "n": 24,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 44141,
+      "resultado": "valido"
+    },
+    {
+      "n": 25,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 6202776
+    },
+    {
+      "n": 25,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 463478,
+      "resultado": "valido"
+    },
+    {
+      "n": 26,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1725744
+    },
+    {
+      "n": 26,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 132196,
+      "resultado": "valido"
+    },
+    {
+      "n": 27,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1360944
+    },
+    {
+      "n": 27,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 100965,
+      "resultado": "valido"
+    },
+    {
+      "n": 28,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 7369632
+    },
+    {
+      "n": 28,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 549210,
+      "resultado": "valido"
+    },
+    {
+      "n": 29,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 630144
+    },
+    {
+      "n": 29,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 48786,
+      "resultado": "valido"
+    },
+    {
+      "n": 30,
+      "intento": 1,
+      "tipo": "reserva",
+      "microUsd": 1289688
+    },
+    {
+      "n": 30,
+      "intento": 1,
+      "tipo": "cierre",
+      "microUsd": 98420,
+      "resultado": "valido"
+    }
+  ]
+}

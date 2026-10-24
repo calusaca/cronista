@@ -8,8 +8,8 @@ import { describe, expect, it } from "vitest";
 import { TORNEO_ARENA as T } from "../../sim/limites";
 import {
   calendarioTorneo, causaTerminal, clasificar, costoLadoMicro, cruces, esquemaTorneo, gastoConocido, microCostoUso, microMaxIntento, ordenTorneo,
-  pMinimaTorneo, pSignosBilateral, reservaPartido, semillasCruce, TABLAS_BERGER, textoSignificacion, validarCoherencia, cortoDe,
-  type EncuentroTorneo, type ParticipanteTorneo, type TorneoArchivado,
+  metricasParticipante, pMinimaTorneo, pSignosBilateral, reservaPartido, rondasConReintentoHttp, semillasCruce, TABLAS_BERGER, textoSignificacion, validarCoherencia, cortoDe,
+  type CifrasLado, type DeclaradoLado, type EncuentroTorneo, type ParticipanteTorneo, type TorneoArchivado,
 } from "../torneo";
 
 const SEIS = ["equilibrado", "rapido", "luna6", "sol6", "astra6", "sol61"];
@@ -260,5 +260,43 @@ describe("059 · esquema estricto y coherencia (§ 15.6, M20, M21)", () => {
     expect(validarCoherencia(conCoste).join()).toMatch(/gasto conocido es menor/);
     expect(validarCoherencia({ ...t, estado: "incompleto" }).join()).toMatch(/estado incoherente/);
     expect(validarCoherencia({ ...t, encuentros: t.encuentros.slice(1) }).join()).toMatch(/no cubren el calendario/);
+  });
+});
+
+describe("059 · métricas por participante (§ 4.3, M12)", () => {
+  const declarado = (tiemposMs: number[], extra: Partial<DeclaradoLado> = {}): DeclaradoLado => ({ tiemposMs, llamadas: tiemposMs.map(() => 1), motivos: tiemposMs.map(() => "valida" as const), intentos: [], esperas: [],
+    entrada: 100, salida: 10, cache: 0, sinUso: 0, costoMicroUsd: 7, modelosDevueltos: [], ...extra });
+  const cifras = (c: Partial<CifrasLado>): CifrasLado => ({ posesionPct: 50, remates: 2, rematesDirectos: 1, pasesCompletados: 9, pasesIntentados: 10, recuperaciones: 3, ...c });
+  const lado = (participante: string, d: DeclaradoLado, c: CifrasLado) => ({ participante, club: "Club", goles: 0, cifras: c, declarado: d });
+  const enc = (a: ReturnType<typeof lado>, b: ReturnType<typeof lado>) => ({ local: a, visita: b }) as unknown as EncuentroTorneo;
+  // P1: «a» de local; su ronda 2 esperó un 429 (9 s, excluida). P2: «a» de visita, 1/30 pases.
+  const t = { encuentros: [
+    enc(lado("a", declarado([1000, 9000], { intentos: [{ naturaleza: "reintentable", status: 429, conUso: false, ronda: 2 }, { naturaleza: "ok", status: 200, conUso: true, ronda: 2 }], llamadas: [1, 2], motivos: ["valida", "orden_invalida"] }), cifras({ posesionPct: 60 })), lado("b", declarado([500, 500]), cifras({}))),
+    enc(lado("b", declarado([700, 700]), cifras({})), lado("a", declarado([2000, 3000]), cifras({ posesionPct: 40, pasesCompletados: 1, pasesIntentados: 30, remates: 4 }))),
+  ] };
+  it("latencia sin las decisiones con reintento HTTP (contadas aparte); solicitudes y respaldos declarados", () => {
+    const m = metricasParticipante(t, "a");
+    expect(rondasConReintentoHttp(t.encuentros[0]!.local.declarado)).toEqual([2]);
+    expect([m.latenciaMedianaS, m.latenciaMaxS, m.decisionesConReintentoHttp]).toEqual([{ valor: 2, fuente: "declarada" }, { valor: 3, fuente: "declarada" }, { valor: 1, fuente: "declarada" }]);
+    expect([m.partidos.valor, m.decisiones.valor, m.validas.valor, m.respaldos.orden_invalida.valor, m.solicitudes.valor, m.reintentosValidacion.valor]).toEqual([2, 4, 3, 1, 5, 1]);
+    expect([m.tokensEntrada.valor, m.costoMicroUsd.valor, m.costoMicroUsd.fuente]).toEqual([200, 14, "declarada"]);
+  });
+  it("precisión de pase = Σ completados / Σ intentados (no la media de porcentajes); medias por partido recalculadas", () => {
+    const m = metricasParticipante(t, "a");
+    expect(m.precisionPasePct).toEqual({ valor: 100 * (9 + 1) / (10 + 30), fuente: "recalculada" });
+    expect([m.posesionMediaPct.valor, m.rematesPorPartido.valor]).toEqual([50, 3]);
+  });
+  it("un null en algún partido deja la media en null (nunca una media parcial)", () => {
+    const conNull = { encuentros: [t.encuentros[0]!, enc(lado("b", declarado([700]), cifras({})), lado("a", declarado([2000]), cifras({ posesionPct: null, pasesIntentados: null })))] };
+    const m = metricasParticipante(conNull, "a");
+    expect([m.posesionMediaPct.valor, m.precisionPasePct.valor]).toEqual([null, null]);
+  });
+});
+
+describe("059 · torneo.ts apto para el cliente", () => {
+  it("no importa módulos de Node ni el motor (la validación con archivos vive en torneo-validacion.ts)", () => {
+    const fuente = readFileSync("src/arena/torneo.ts", "utf8");
+    expect(fuente).not.toMatch(/from "node:/);
+    expect(fuente).not.toMatch(/from "\.\/(coordinador|motor|estadisticas)"/);
   });
 });

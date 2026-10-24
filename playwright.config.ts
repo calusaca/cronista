@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 // E2e del camino del juez (brief 004 + 006). Corre contra el build de producción, en un
@@ -20,7 +21,8 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
   webServer: {
-    command: "npm run build && npm run package:standalone && node .next/standalone/server.js",
+    // Brief 059 § 8: el fixture del torneo de ensayo se sirve como estático solo en el build del e2e.
+    command: "npm run build && npm run package:standalone && node scripts/e2e-torneos.mjs && node .next/standalone/server.js",
     url: `http://127.0.0.1:${PUERTO}`,
     reuseExistingServer: false,
     timeout: 300_000,
@@ -29,6 +31,8 @@ export default defineConfig({
       HOSTNAME: "127.0.0.1",
       CRONISTA_LLM: "ensayo",
       CRONISTA_CACHE_DIR: ".cache/e2e",
+      // Brief 059 § 8: la página lee una copia de public/torneos más el fixture de ensayo (scripts/e2e-torneos.mjs).
+      ARENA_TORNEOS_DIR: resolve(".cache/e2e/torneos"),
     },
   },
 });

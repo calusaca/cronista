@@ -9,7 +9,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ARENA, TORNEO_ARENA as T } from "../../sim/limites";
 import { crearControladorLlm, planProgramado } from "../controladores";
 import { fabricaLlmReal } from "../smoke-modelos";
-import { calendarioTorneo, causaTerminal, microMaxIntento, reservaPartido, resumenTorneo, rondasPartido, validarTorneo, type ParticipanteTorneo } from "../torneo";
+import { calendarioTorneo, causaTerminal, microMaxIntento, reservaPartido, resumenTorneo, rondasPartido, type ParticipanteTorneo } from "../torneo";
+import { validarTorneo } from "../torneo-validacion";
 import {
   ejecutarTorneo, ErrorTorneo, especDe, esperaReintento, jugarEncuentro, leerLibro, liberarCerrojo, nuevoRegistroTransporte, participantesReales, tomarCerrojo,
   transporteTorneo, type CrearControlador, type EntradaCatalogo, type OpcionesTorneo, type PreciosJson,

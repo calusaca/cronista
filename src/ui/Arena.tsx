@@ -36,7 +36,10 @@ import { AvisosFavoritos, EstrellaFavorito } from "./ArenaFavoritos";
 import { memoAgregado } from "../arena/estadisticas";
 import { almacenFavoritos, alternarClub, alternarJugador, FAVORITOS_VACIOS, favoritosEn, guardarFavoritos, leerFavoritos, preseleccionFavorita, type FavoritosArena } from "../arena/favoritos";
 import type { IntervencionArena, PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
+import { cargarEncuentroTorneo, esPeticionTorneo, peticionDeUrl, SinDescompresion, type OrigenTorneo } from "./torneo-carga";
 
+/** Brief 059 · Fecha (UTC) del torneo en la línea de procedencia. */
+const fechaTorneo = (iso: string, idioma: "es" | "en") => new Intl.DateTimeFormat(idioma, { dateStyle: "long", timeZone: "UTC" }).format(new Date(iso));
 const reloj = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 /** Brief 057 § 3.1 · Motivos de la degradación a reproducción muda (ES / EN). */
 const MOTIVOS_NARRACION: Record<MotivoNarracion, { es: string; en: string }> = {
@@ -84,6 +87,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [intervenciones, setIntervenciones] = useState<IntervencionArena[]>([]);
   const [sesionActual, setSesionActual] = useState<string | null>(null);
   const [archivoActual, setArchivoActual] = useState<"duelo" | "ejemplo-v3" | "ejemplo" | null>(null);
+  // Brief 059 § 15.8 · Procedencia de una repetición del torneo (club y modelo por lado, de torneo.json). Solo se
+  // fija si la solicitud sigue vigente y se limpia en cada ejecutar, recibirPreparado, actividadDirecto(true) y cargar.
+  const [origenTorneo, setOrigenTorneo] = useState<OrigenTorneo | null>(null);
+  const [errorTorneo, setErrorTorneo] = useState<"abrir" | "descompresion" | null>(null);
   const solicitud = useRef<AbortController | null>(null), cursor = useRef(0);
   const ultimaPeticion = useRef<unknown>(null);
   // Brief 049 (v1.1 § 10) · Favoritos: vacíos y sin hidratar en el primer render (SSR y cliente);
@@ -134,6 +141,11 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     if (q.has("partido") && q.get("vista") !== "buffer") { setVista("guardados"); setConfigurando(false); }
+    // Brief 059 § 15.8 · ?torneo=<id>&encuentro=<nn> abre esa repetición (partido gana sobre torneo); ?lang=es.
+    if (q.get("lang") === "es") setIdioma("es");
+    const torneo = peticionDeUrl(q);
+    if (torneo) { setVista("guardados"); setConfigurando(false); void ejecutar(torneo); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const cancelar = () => { solicitud.current?.abort(); solicitud.current = null; setPendiente(false); };
   const recibirDirecto = (p: PublicacionSesion) => {
@@ -151,9 +163,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (presentacion) { presentacionActual.current = presentacion; setBufferActivo(presentacion === "buffer"); if (presentacion === "buffer") setVelocidad(1); }
     setPreparandoPartido(activa && presentacion === "preparada"); setEnDirecto(activa);
     if (!activa && !bufferRecibido.current) setBufferActivo(false);
-    if (activa) { bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
+    if (activa) { setOrigenTorneo(null); bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
   const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
+    setOrigenTorneo(null);
     setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id); setCargaId(c => c + 1);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
@@ -165,14 +178,17 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   };
   const entornoElegido = entornoDeFormulario({ clima, temperatura, superficie, cesped, presion });
   const ejecutar = async (payload: unknown) => {
-    setSesionActual(null); setBufferActivo(false);
+    setSesionActual(null); setBufferActivo(false); setOrigenTorneo(null); setErrorTorneo(null);
     solicitud.current?.abort();
     const controlador = new AbortController(); solicitud.current = controlador;
     ultimaPeticion.current = payload;
     setPendiente(true); setError(null); setReproduciendo(false);
     try {
-      let cuerpo = payload;
-      if (payload === "ejemplo" || payload === "ejemplo-v3" || payload === "duelo") {
+      let cuerpo = payload, origen: OrigenTorneo | null = null;
+      if (esPeticionTorneo(payload)) {
+        const encuentro = await cargarEncuentroTorneo(payload, controlador.signal);
+        cuerpo = { accion: "reproducir", registro: encuentro.registro }; origen = encuentro.origen;
+      } else if (payload === "ejemplo" || payload === "ejemplo-v3" || payload === "duelo") {
         const archivo = await fetch(payload === "duelo" ? "/experimentos/arena-duelo-v3.json" : payload === "ejemplo-v3" ? "/experimentos/arena-llm-v3.json" : "/experimentos/arena-llm-v1.json", { signal: controlador.signal });
         if (!archivo.ok) throw new Error("ejemplo");
         cuerpo = { accion: "reproducir", registro: await archivo.json() as unknown };
@@ -186,8 +202,10 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       setComentarios([]); setIntervenciones([]);
       setSeleccionado(null); setCargaId(c => c + 1);
       setImportado((cuerpo as { accion: string }).accion === "reproducir");
-    } catch {
-      if (!controlador.signal.aborted && solicitud.current === controlador) setError(t("Could not validate or run this experiment. Your previous run is still available.", "No se pudo validar o ejecutar el experimento. El anterior sigue disponible."));
+      setOrigenTorneo(origen);
+    } catch (fallo) {
+      if (!controlador.signal.aborted && solicitud.current === controlador && esPeticionTorneo(payload)) setErrorTorneo(fallo instanceof SinDescompresion ? "descompresion" : "abrir");
+      else if (!controlador.signal.aborted && solicitud.current === controlador) setError(t("Could not validate or run this experiment. Your previous run is still available.", "No se pudo validar o ejecutar el experimento. El anterior sigue disponible."));
     } finally {
       if (solicitud.current === controlador) { solicitud.current = null; setPendiente(false); }
     }
@@ -199,6 +217,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   };
   const cargar = async (archivo: File | undefined) => {
     if (!archivo || bloqueado) return;
+    setOrigenTorneo(null);
     if (archivo.size > ARENA.archivoMaxBytes) { setError(t("The recording exceeds 8 MB.", "El registro supera los 8 MB.")); return; }
     try { await ejecutar({ accion: "reproducir", registro: JSON.parse(await archivo.text()) as unknown }); }
     catch { setError(t("Choose a valid JSON recording.", "Selecciona un registro JSON válido.")); }
@@ -275,15 +294,17 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   return <>
     <header className="topbar arena-topbar">
       <Link href="/" className="brand" prefetch={false}><EmblemaCronista /><span className="brand-mark">CRONISTA</span><span className="brand-tag">{t("Team agents lab", "Laboratorio de equipos")}</span></Link>
-      <nav className="topbar-links" aria-label={t("Sections", "Secciones")}><Link href="/" prefetch={false}>{t("Match reports", "Crónicas")}</Link><button className="btn" onClick={() => setIdioma(es ? "en" : "es")} aria-label={t("Switch to Spanish", "Cambiar a inglés")}>{es ? "EN" : "ES"}</button></nav>
+      <nav className="topbar-links" aria-label={t("Sections", "Secciones")}><Link href="/" prefetch={false}>{t("Match reports", "Crónicas")}</Link><Link href={`/arena/torneo${es ? "?lang=es" : ""}`} prefetch={false}>{t("Tournament", "Torneo")}</Link><button className="btn" onClick={() => setIdioma(es ? "en" : "es")} aria-label={t("Switch to Spanish", "Cambiar a inglés")}>{es ? "EN" : "ES"}</button></nav>
     </header>
     <main className="arena-shell" lang={idioma} data-testid="arena" style={identidad.variables as CSSProperties}>
       <div className="arena-intro"><p className="overline">{t("Experimental · simulated football", "Experimental · fútbol simulado")}</p>
         <h1>{t("Two teams. One shared pitch.", "Dos equipos. Una misma cancha.")}</h1>
         <p>{t("Each controller tries to win: create goals, defend its own goal and adapt to the opponent. One shared engine resolves movement, the ball and the outcome.", "Cada controlador intenta ganar: crear goles, defender su portería y adaptarse al rival. Un motor compartido resuelve movimientos, balón y resultados.")}</p>
         <a className="arena-intro-cta" href="#arena-control">{t("Set up or choose a match", "Configurar o elegir un partido")}</a>
+        {origenTorneo && <p className="arena-torneo-origen" data-testid="arena-torneo-origen">{t(`Match ${origenTorneo.n} of the ${fechaTorneo(origenTorneo.inicioUtc, idioma)} tournament`, `Partido ${origenTorneo.n} del torneo del ${fechaTorneo(origenTorneo.inicioUtc, idioma)}`)} · {t("Home", "Local")}: {origenTorneo.local.club} ({origenTorneo.local.modelo}) · {t("Away", "Visita")}: {origenTorneo.visita.club} ({origenTorneo.visita.modelo}) · <Link href={`/arena/torneo/${origenTorneo.id}${es ? "?lang=es" : ""}`} prefetch={false}>{t("Back to the tournament", "Volver al torneo")}</Link></p>}
       </div>
       {pendiente && <div className="arena-notice" role="status"><IndicadorCarga />{t("Resolving orders and validating the sequence…", "Resolviendo órdenes y validando la secuencia…")}<button className="btn" onClick={cancelar}>{t("Cancel", "Cancelar")}</button></div>}
+      {errorTorneo && <div className="arena-notice" role="alert" data-testid="arena-torneo-error">{errorTorneo === "descompresion" ? t("This browser cannot open the compressed record. The previous one is still available.", "Este navegador no puede abrir el registro comprimido. El anterior sigue disponible.") : t("Could not open this tournament match. The previous one is still available.", "No se pudo abrir este partido del torneo. El anterior sigue disponible.")}<button className="btn" onClick={() => void ejecutar(ultimaPeticion.current)} disabled={bloqueado}>{t("Retry", "Reintentar")}</button></div>}
       {error && <div className="arena-notice" role="alert">{error}{ultimaPeticion.current !== null && <button className="btn" onClick={() => void ejecutar(ultimaPeticion.current)} disabled={bloqueado}>{t("Retry", "Reintentar")}</button>}</div>}
       <div className="arena-grid" id="arena-watch">
         <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
