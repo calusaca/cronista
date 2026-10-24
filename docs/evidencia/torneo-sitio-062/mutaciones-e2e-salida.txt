@@ -1,0 +1,6 @@
+ROJO (detectada)       E1-rotulo  1 failed
+ROJO (detectada)       E3-base    1 failed
+ROJO (detectada)       E4-cupo    1 failed
+ROJO (detectada)       E5-origen  1 failed
+ROJO (detectada)       E7-360     1 failed
+exit=0

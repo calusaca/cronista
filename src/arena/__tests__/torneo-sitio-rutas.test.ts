@@ -13,7 +13,7 @@ import { POST as postCancelar } from "../../app/api/arena/torneos/sitio/cancelar
 import { POST as postCerrar } from "../../app/api/arena/torneos/sitio/cerrar/route";
 import type { Torneo062 } from "../torneo";
 import { diaUtc } from "../torneo-formatos";
-import { claveLimitador, GestorTorneoSitio } from "../torneo-sitio";
+import { claveLimitador, GestorTorneoSitio, respuestaErrorSitio } from "../torneo-sitio";
 import { AlmacenFalso, arrancar, envEnsayo, nuevoGestor, ORIGEN, RelojFalso, TOKEN, vaciar } from "./torneo-sitio-ayuda";
 
 const global = globalThis as typeof globalThis & { __cronistaTorneoSitio?: GestorTorneoSitio };
@@ -229,5 +229,14 @@ describe("062 · R5 · bicep: réplica única, gracia e interruptor apagado por 
   });
   it("el ensayo de e2e queda dentro de los límites del 059", () => {
     expect(T.ensayoSegundos.min).toBeLessThanOrEqual(T.ensayoSegundos.max);
+  });
+});
+
+describe("062 · e2e #4 · un ErrorSitio de OTRA copia del módulo (instrumentación frente a rutas) conserva su estado", () => {
+  it("se reconoce por nombre y forma: 409 cupo, no 500", async () => {
+    class OtraCopia extends Error { constructor(m: string, readonly status: number, readonly motivo: string | null = null) { super(m); this.name = "ErrorSitio"; } }
+    const r = respuestaErrorSitio(new OtraCopia("Ya se lanzó el torneo de hoy (UTC).", 409, "cupo"));
+    expect([r.status, (await r.json()).motivo]).toEqual([409, "cupo"]);
+    expect(respuestaErrorSitio(new Error("otro")).status).toBe(500);
   });
 });

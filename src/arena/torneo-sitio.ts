@@ -56,7 +56,14 @@ export const TEXTO_MOTIVO: Record<MotivoSitio, string> = {
 const ESTADO_HTTP: Record<MotivoSitio, number> = { desactivado: 503, commit: 503, origen: 503, cancelacion: 503, replicas: 503, catalogo: 422, iniciando: 503, relevo: 503, cierre: 503, activo: 409, cupo: 409, bolsa: 422 };
 
 export class ErrorSitio extends Error {
-  constructor(mensaje: string, readonly status: number, readonly motivo: string | null = null, readonly reintentarS?: number) { super(mensaje); }
+  constructor(mensaje: string, readonly status: number, readonly motivo: string | null = null, readonly reintentarS?: number) { super(mensaje); this.name = "ErrorSitio"; }
+}
+/** Next puede cargar este módulo dos veces (instrumentación y rutas): el gestor compartido lanza el ErrorSitio de SU
+ * copia, así que `instanceof` no basta. Se reconoce por nombre y forma. */
+export function esErrorSitio(e: unknown): e is ErrorSitio {
+  if (e instanceof ErrorSitio) return true;
+  const x = e as { name?: unknown; status?: unknown; message?: unknown } | null;
+  return e instanceof Error && x?.name === "ErrorSitio" && typeof x.status === "number" && x.status >= 400 && x.status <= 599;
 }
 const errorMotivo = (motivo: MotivoSitio) => new ErrorSitio(TEXTO_MOTIVO[motivo], ESTADO_HTTP[motivo], motivo);
 /** Escritura rechazada porque el proceso está detenido, silenciado o sin latido vigente (§ 19). */
@@ -781,7 +788,7 @@ export async function leerCuerpoAcotado(req: Request, maxBytes: number, plazoMs:
 }
 export const esquemaPeticionLanzar = z.strictObject({ formato: z.enum(FORMATOS_TORNEO) });
 export function respuestaErrorSitio(error: unknown): Response {
-  if (error instanceof ErrorSitio) {
+  if (esErrorSitio(error)) {
     return Response.json({ error: error.message, motivo: error.motivo }, { status: error.status, headers: { "cache-control": "no-store", ...(error.reintentarS ? { "retry-after": String(Math.max(1, error.reintentarS)) } : {}) } });
   }
   console.error(`[torneo-sitio] ${mensaje(error)}`);

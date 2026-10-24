@@ -2,7 +2,15 @@
 // `ejecutar`: torneo.json estático (esquema + coherencia), `eNN.json.gz` estático descomprimido con
 // DecompressionStream y después `POST /api/arena { accion: "reproducir", registro }` (lo hace `ejecutar`), como
 // los ejemplos. Sin rutas de servidor nuevas. La identidad del modelo de cada lado la declara el ejecutor.
-import { esquemaTorneo, ID_TORNEO, archivoEncuentro, validarCoherencia, type EncuentroTorneo } from "../arena/torneo";
+// Brief 062 § 7.6 · Un torneo lanzado en el sitio (`sitio-…`) no es estático: su base es /api/arena/torneos/sitio/<id>
+// (la instantánea en `[id]` y los registros en `[id]/[archivo]`). Las comprobaciones no cambian: esquema (ahora la
+// unión 059 | 062), coherencia, SHA-256, semilla, clubes y controladores.
+import { esquemaTorneoCualquiera, ID_TORNEO, archivoEncuentro, validarCoherencia, type EncuentroTorneo } from "../arena/torneo";
+import { TORNEO_SITIO } from "../sim/limites";
+
+/** Base de los archivos de un torneo según su origen (por el prefijo del id). */
+export const baseTorneo = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? `/api/arena/torneos/sitio/${id}` : `/torneos/${id}`;
+const urlInstantanea = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? baseTorneo(id) : `${baseTorneo(id)}/torneo.json`;
 
 export interface PeticionTorneo { torneo: string; encuentro: string }
 export interface OrigenTorneo { id: string; n: number; inicioUtc: string; local: { club: string; modelo: string }; visita: { club: string; modelo: string } }
@@ -20,14 +28,14 @@ export function peticionDeUrl(q: URLSearchParams): PeticionTorneo | null {
 
 export async function cargarEncuentroTorneo(p: PeticionTorneo, signal: AbortSignal, f: typeof fetch = fetch): Promise<{ registro: unknown; origen: OrigenTorneo }> {
   if (!ID_TORNEO.test(p.torneo) || !/^\d{2}$/.test(p.encuentro)) throw new Error("petición de torneo inválida");
-  const rTorneo = await f(`/torneos/${p.torneo}/torneo.json`, { signal });
+  const rTorneo = await f(urlInstantanea(p.torneo), { signal });
   if (!rTorneo.ok) throw new Error("torneo");
-  const torneo = esquemaTorneo.parse(await rTorneo.json());
+  const torneo = esquemaTorneoCualquiera.parse(await rTorneo.json());
   if (torneo.id !== p.torneo || validarCoherencia(torneo).length) throw new Error("torneo incoherente");
   const n = Number(p.encuentro), e = torneo.encuentros.find(x => x.n === n);
   if (!e || e.archivo !== archivoEncuentro(n)) throw new Error("encuentro");
   if (typeof DecompressionStream === "undefined") throw new SinDescompresion();
-  const rGz = await f(`/torneos/${p.torneo}/${e.archivo}`, { signal });
+  const rGz = await f(`${baseTorneo(p.torneo)}/${e.archivo}`, { signal });
   if (!rGz.ok) throw new Error("registro");
   // Revisión Codex (#2) · El archivo descargado tiene que ser EL de este encuentro: huella SHA-256 del archivo
   // íntegro (la archivada en torneo.json) y, ya descomprimido, semilla, clubes y controlador de cada lado.

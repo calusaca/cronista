@@ -122,3 +122,21 @@ El ensayo se rechaza (motivo `desactivado`) si `ARENA_BLOB_ENDPOINT` está defin
   apagado no hay admisiones públicas y la barrera de mantenimiento completa queda para cuando se encienda.
 
 Tras los cambios: `npm test` 2695/2695 (122 archivos), `npm run typecheck` exit 0 y 64 de 64 mutaciones en rojo.
+
+## UI del P1-a (unidad en verde; e2e escrito, sin ejecutar)
+
+- Panel `src/ui/ArenaTorneoLanzar.tsx` (selector liga / grupos deshabilitado «Disponible pronto», cifras de la Ficha
+  del servidor, botón con el motivo visible, confirmación en la página, POST sin doble envío); textos en
+  `src/ui/textos-torneo-sitio.ts`.
+- `src/ui/ArenaTorneo.tsx`: rótulo de origen, leyenda «†» según quién declara, bandas (incompleto con motivo,
+  cancelado, interrumpido, prueba), bloque «En juego» con sondeo cada `sondeoUiMs` solo con la pestaña visible,
+  `aria-live` solo con cambios, descargas por la ruta del sitio y lista «Torneos» separada por origen
+  (`src/ui/torneo-lista.ts`). Los clubes del partido en juego los calcula el servidor (`clubesDelPlan`): el motor
+  no va al navegador (una prueba lo vigila; mutación U1-bundle).
+- Páginas con `src/arena/torneo-pagina.ts`; repetición del sitio por `torneo-carga.ts` (base según el prefijo).
+- Fixture del sitio `src/arena/__fixtures__/torneos-sitio/` (`npm run arena:torneo-sitio -- --fixture …`), sembrado
+  por `scripts/e2e-torneos.mjs`; entorno del e2e en `playwright.config.ts`; `e2e/arena-torneo-sitio.spec.ts`
+  (1, 3, 4, 5 y 7) **sin ejecutar** (Playwright reservado).
+- `npm run build` en verde (`build.txt`; hubo que borrar `.next/cache`, que daba un pánico interno de Turbopack).
+- Decisión: la portada muestra el torneo activo y, si no hay, el más reciente **real** antes que uno de ensayo
+  (en producción no hay ensayos); evita que el ensayo lanzado por el e2e desplace al archivado del 24 oct.

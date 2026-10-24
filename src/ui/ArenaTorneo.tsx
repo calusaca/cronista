@@ -1,13 +1,23 @@
 "use client";
 // Brief 059 § 5.2–5.5 + § 15.7/15.10 · Página del torneo entre modelos (cliente). Todo número sale de
 // `torneo.json` (validado por el servidor con el esquema y la coherencia; los registros, en CI) y de funciones
-// puras de `torneo.ts`; las cifras que declara el ejecutor llevan «†». El público no lanza torneos (D1).
-import { useMemo, useState } from "react";
+// puras de `torneo.ts`; las cifras que declara el ejecutor llevan «†».
+// Brief 062 § 7 (P1-a) · Además: panel «Lanzar un torneo» (ArenaTorneoLanzar), torneos lanzados en el sitio (esquema
+// 062) con su rótulo de origen, la leyenda «†» según quién declara, el estado por partido con sondeo mientras el torneo
+// está `en_curso` (solo con la pestaña visible) y la lista «Torneos» separada por origen.
+import { useEffect, useMemo, useRef, useState } from "react";
+import { esquemaTorneoCualquiera, rondasPartido, validarCoherencia, type TorneoCualquiera } from "../arena/torneo";
+import { planTorneo, textoSignificacionFormato } from "../arena/torneo-formatos";
+import { TORNEO_SITIO } from "../sim/limites";
+import { ArenaTorneoLanzar } from "./ArenaTorneoLanzar";
+import { baseTorneo } from "./torneo-carga";
+import type { ResumenTorneo } from "./torneo-lista";
+import { TEXTOS_TORNEO_SITIO } from "./textos-torneo-sitio";
 import { identidadPartido } from "../arena/identidad";
 import { ETIQUETAS_CIFRAS } from "../arena/estadisticas";
 import {
   archivoEncuentro, calendarioTorneo, clasificar, cruces, matrizResultados, metricasParticipante, TEXTO_PAREO, textoSignificacion,
-  type IndiceTorneos, type Metrica, type ParticipanteTorneo, type TorneoArchivado,
+  type EncuentroPlan, type IndiceTorneos, type Metrica, type ParticipanteTorneo,
 } from "../arena/torneo";
 import type { LecturaTorneo } from "../arena/torneo-archivo";
 import { IDENTIDAD_ARENA } from "../sim/limites";
@@ -39,6 +49,22 @@ export const TEXTOS_TORNEO = {
   nav: { es: "Torneo", en: "Tournament" },
 } as const;
 
+export { TEXTOS_TORNEO_SITIO };
+
+/** § 7.3 · Lo que la región `aria-live` anuncia al pasar de una instantánea a la siguiente (solo los cambios). */
+export function anunciosCambio(antes: TorneoCualquiera, despues: TorneoCualquiera, idioma: Idioma): string[] {
+  const vistos = new Set(antes.encuentros.map(e => e.n)), T = TEXTOS_TORNEO_SITIO;
+  const nuevos = despues.encuentros.filter(e => !vistos.has(e.n)).map(e => T.partidoTerminado[idioma](e.n, e.local.club, e.local.goles, e.visita.goles, e.visita.club));
+  return [...nuevos, ...(antes.estado === "en_curso" && despues.estado !== "en_curso" ? [T.terminado[idioma]] : [])];
+}
+/** Rótulo de origen (D11). */
+export function rotuloOrigen(t: TorneoCualquiera, idioma: Idioma): string {
+  const T = TEXTOS_TORNEO_SITIO;
+  if (t.version === "059-v1.1" || t.origen === "repositorio") return t.id.startsWith(TORNEO_SITIO.prefijoId) ? T.origenPromovido[idioma] : T.origenRepo[idioma];
+  return T.origenSitio[idioma];
+}
+const delSitio = (t: TorneoCualquiera) => t.version !== "059-v1.1" && t.origen === "sitio";
+
 type ClaveTexto = { [K in keyof typeof TEXTOS_TORNEO]: (typeof TEXTOS_TORNEO)[K]["es"] extends string ? K : never }[keyof typeof TEXTOS_TORNEO];
 const fechaDe = (iso: string, idioma: Idioma) => new Intl.DateTimeFormat(idioma, { dateStyle: "long", timeZone: "UTC" }).format(new Date(iso));
 const numero = (x: number, idioma: Idioma, decimales = 0) => new Intl.NumberFormat(idioma, { minimumFractionDigits: decimales, maximumFractionDigits: decimales }).format(x);
@@ -66,32 +92,69 @@ function Modelo({ p }: { p: ParticipanteTorneo }) {
 const Valor = ({ m, idioma, decimales = 0, sufijo = "" }: { m: Metrica; idioma: Idioma; decimales?: number; sufijo?: string }) =>
   <>{m.valor === null ? "—" : `${numero(m.valor, idioma, decimales)}${sufijo}`}{m.fuente === "declarada" ? " †" : ""}</>;
 
-export function ArenaTorneo({ lectura, ediciones, idiomaInicial }: { lectura: LecturaTorneo | null; ediciones: IndiceTorneos; idiomaInicial: Idioma }) {
+type LecturaCualquiera = LecturaTorneo | { estado: "ok"; torneo: TorneoCualquiera } | { estado: "incoherente"; id: string; errores: string[] };
+export function ArenaTorneo({ lectura, ediciones = [], lista, panel = false, clubes = {}, idiomaInicial }: { lectura: LecturaCualquiera | null; ediciones?: IndiceTorneos; lista?: ResumenTorneo[]; panel?: boolean; clubes?: ClubesPlan; idiomaInicial: Idioma }) {
   const [idioma, setIdioma] = useState<Idioma>(idiomaInicial);
   const es = idioma === "es", tx = (k: ClaveTexto) => TEXTOS_TORNEO[k][idioma] as string;
   const cambiar = () => setIdioma(es ? "en" : "es");
   const cuerpo = !lectura ? <section className="arena-torneo-vacio" aria-labelledby="arena-torneo-h1">
       <p className="overline">{tx("overline")}</p><h1 id="arena-torneo-h1">{tx("vacio")}</h1>
-      <p>{es ? "Los torneos se juegan fuera del sitio, con un tope de gasto propio, y se publican ya archivados y comprobados en CI: desde aquí no se puede lanzar ninguno." : "Tournaments are played off-site with their own spending cap and published already archived and checked in CI: none can be launched from here."}</p>
+      <p data-testid="arena-torneo-vacio">{TEXTOS_TORNEO_SITIO.vacioLanzar[idioma]}</p>
     </section>
     : lectura.estado === "incoherente" ? <section aria-labelledby="arena-torneo-h1"><p className="overline">{tx("overline")}</p><h1 id="arena-torneo-h1">{tx("titulo")}</h1>
       <p role="alert" className="arena-torneo-banda" data-testid="arena-torneo-incoherente">{tx("incoherente")}</p></section>
-    : <Contenido torneo={lectura.torneo} idioma={idioma} />;
+    : <Contenido torneo={lectura.torneo} idioma={idioma} clubes={clubes} />;
   return <>
     <Barra idioma={idioma} cambiar={cambiar} />
     <main className="arena-shell arena-torneo" lang={idioma} data-testid="arena-torneo">
+      {panel && <ArenaTorneoLanzar idioma={idioma} />}
       {cuerpo}
-      {ediciones.length > 1 && <section className="arena-torneo-panel" aria-labelledby="arena-torneo-ediciones"><h2 id="arena-torneo-ediciones">{es ? "Otras ediciones" : "Other editions"}</h2>
+      {lista && <ListaTorneos lista={lista} idioma={idioma} />}
+      {!lista && ediciones.length > 1 && <section className="arena-torneo-panel" aria-labelledby="arena-torneo-ediciones"><h2 id="arena-torneo-ediciones">{es ? "Otras ediciones" : "Other editions"}</h2>
         <ul>{ediciones.map(e => <li key={e.id}><Link href={`/arena/torneo/${e.id}${es ? "?lang=es" : ""}`} prefetch={false}>{e.titulo[idioma]}</Link></li>)}</ul></section>}
     </main>
   </>;
 }
 
-function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idioma }) {
-  const es = idioma === "es", tx = (k: ClaveTexto) => TEXTOS_TORNEO[k][idioma] as string;
+/** § 7.3 · Sondeo de la instantánea mientras un torneo del sitio está `en_curso` (cada sondeoUiMs, solo con la pestaña
+ * visible; sin sondeo al terminar) y anuncios accesibles de los cambios. */
+function useTorneoVivo(inicial: TorneoCualquiera, idioma: Idioma): { t: TorneoCualquiera; anuncio: string } {
+  const [t, setT] = useState(inicial), [anuncio, setAnuncio] = useState("");
+  const actual = useRef(inicial);
+  useEffect(() => { actual.current = inicial; setT(inicial); }, [inicial]);
+  const vivo = delSitio(t) && t.estado === "en_curso";
+  useEffect(() => {
+    if (!vivo) return;
+    let cancelado = false;
+    const sondear = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const r = await fetch(baseTorneo(actual.current.id), { cache: "no-store" });
+        if (!r.ok || cancelado) return;
+        const v = esquemaTorneoCualquiera.safeParse(await r.json());
+        if (!v.success || v.data.id !== actual.current.id || validarCoherencia(v.data).length || cancelado) return;
+        const cambios = anunciosCambio(actual.current, v.data, idioma);
+        actual.current = v.data; setT(v.data);
+        if (cambios.length) setAnuncio(cambios.join(". "));
+      } catch { /* el siguiente sondeo lo vuelve a intentar */ }
+    };
+    const id = setInterval(() => void sondear(), TORNEO_SITIO.sondeoUiMs);
+    return () => { cancelado = true; clearInterval(id); };
+  }, [vivo, idioma]);
+  return { t, anuncio };
+}
+/** Clubes de cada partido del plan, por n (los fija la semilla; los calcula el servidor: el motor no va al navegador). */
+export type ClubesPlan = Record<number, { local: string; visita: string }>;
+
+function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquiera; idioma: Idioma; clubes: ClubesPlan }) {
+  const { t, anuncio } = useTorneoVivo(inicial, idioma);
+  const es = idioma === "es", tx = (k: ClaveTexto) => TEXTOS_TORNEO[k][idioma] as string, TS = TEXTOS_TORNEO_SITIO;
+  const sitio = delSitio(t), t062 = t.version !== "059-v1.1" ? t : null, enCurso = t062?.estado === "en_curso";
+  const estadoRef = useRef<HTMLElement>(null);
+  useEffect(() => { if (enCurso && typeof location !== "undefined" && location.hash === "#arena-torneo-estado") estadoRef.current?.focus(); }, [enCurso]);
   const part = useMemo(() => new Map(t.participantes.map(p => [p.id, p])), [t]);
   const filas = useMemo(() => clasificar(t), [t]), matriz = useMemo(() => matrizResultados(t), [t]);
-  const plan = useMemo(() => calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => cruces(t), [t]);
+  const plan = useMemo((): (EncuentroPlan & { fase?: string })[] => t.version !== "059-v1.1" ? planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t) : calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => cruces(t), [t]);
   const porN = new Map(t.encuentros.map(e => [e.n, e]));
   const p = (id: string) => part.get(id)!;
   const jornadas = [...new Set(plan.map(x => x.jornada))];
@@ -99,11 +162,16 @@ function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idi
   const devueltos = (id: string) => [...new Set(t.encuentros.flatMap(e => [e.local, e.visita]).filter(l => l.participante === id).flatMap(l => l.declarado.modelosDevueltos))].sort();
   const estimados = t.participantes.filter(x => x.precio.estimadoDe);
   const etiqueta = (clave: keyof typeof ETIQUETAS_CIFRAS) => ETIQUETAS_CIFRAS[clave][idioma];
+  const declarado = sitio ? TS.declaradoServidor[idioma] : tx("declarado"), quien = sitio ? (es ? "el servidor" : "the server") : (es ? "el CLI" : "the CLI");
+  const sinDisputar = plan.length - t.encuentros.length;
+  const enJuego = t062?.enCurso ? plan.find(x => x.n === t062.enCurso!.n) : undefined, clubesEnJuego = enJuego ? clubes[enJuego.n] ?? null : null;
+  const hora = (iso: string) => `${new Intl.DateTimeFormat(idioma, { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "UTC" }).format(new Date(iso))} UTC`;
   return <>
     <section className="arena-torneo-cabecera" aria-labelledby="arena-torneo-h1">
       <p className="overline">{tx("overline")}</p>
       <h1 id="arena-torneo-h1">{tx("titulo")}</h1>
-      <p>{TEXTOS_TORNEO.resumen[idioma](t.participantes.length, t.duracionS)}</p>
+      <p className="arena-torneo-rotulo" data-testid="arena-torneo-rotulo">{rotuloOrigen(t, idioma)}</p>
+      <p>{TEXTOS_TORNEO.resumen[idioma](t.participantes.length, t.duracionS)}{t062 ? ` · ${TS.decisiones[idioma](rondasPartido(t.duracionS, t.intervaloS))}` : ""}</p>
       <dl className="arena-torneo-datos">
         <div><dt>{es ? "Fecha (UTC)" : "Date (UTC)"}</dt><dd>{fechaDe(t.inicioUtc, idioma)}</dd></div>
         <div><dt>{es ? "Modelos" : "Models"}</dt><dd className="tnum">{t.participantes.length}</dd></div>
@@ -111,9 +179,20 @@ function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idi
         <div><dt>{es ? "Coste total" : "Total cost"}</dt><dd className="tnum">{usd(t.gasto.conocidoMicroUsd, idioma)} †</dd></div>
       </dl>
       {t.tipo === "ensayo" && <p className="arena-torneo-banda" data-testid="arena-torneo-ensayo"><strong>{tx("ensayo")}</strong>{es ? ": entrenadores programados con nombre de prueba." : ": programmed coaches with test names."}</p>}
-      {t.estado === "incompleto" && <p className="arena-torneo-banda" data-testid="arena-torneo-incompleto"><strong>{TEXTOS_TORNEO.incompleto[idioma](t.pendientes.length)}</strong></p>}
-      <p className="arena-torneo-aviso" data-testid="arena-torneo-significacion">{textoSignificacion(t, idioma)} {TEXTO_PAREO[idioma]}</p>
+      {t062?.lanzamiento === "prueba" && <p className="arena-torneo-banda" data-testid="arena-torneo-prueba"><strong>{TS.prueba[idioma]}</strong></p>}
+      {!t062 && t.estado === "incompleto" && <p className="arena-torneo-banda" data-testid="arena-torneo-incompleto"><strong>{TEXTOS_TORNEO.incompleto[idioma](t.pendientes.length)}</strong></p>}
+      {t062?.estado === "incompleto" && <p className="arena-torneo-banda" data-testid="arena-torneo-incompleto"><strong>{TS.incompletoMotivo[idioma](TS.motivosFin[t062.motivoFin ?? "infraestructura"][idioma], sinDisputar)}</strong></p>}
+      {t062?.estado === "interrumpido" && <p className="arena-torneo-banda" data-testid="arena-torneo-interrumpido"><strong>{TS.interrumpido[idioma](TS.motivosFin[t062.motivoFin ?? "reinicio"][idioma], sinDisputar)}</strong></p>}
+      {t062?.estado === "cancelado" && <p className="arena-torneo-banda" data-testid="arena-torneo-cancelado"><strong>{TS.cancelado[idioma]}</strong></p>}
+      <p className="arena-torneo-aviso" data-testid="arena-torneo-significacion">{t062 ? textoSignificacionFormato(t062, idioma) : textoSignificacion(t, idioma)} {TEXTO_PAREO[idioma]}</p>
     </section>
+
+    {enCurso && <section className="arena-torneo-panel arena-torneo-enjuego" aria-labelledby="arena-torneo-h-enjuego" id="arena-torneo-estado" tabIndex={-1} ref={estadoRef} data-testid="arena-torneo-enjuego">
+      <h2 id="arena-torneo-h-enjuego">{TS.enJuego[idioma]}</h2>
+      <p>{enJuego && t062?.enCurso ? <>P{enJuego.n} · {TS.fases[(enJuego.fase ?? "liga") as keyof typeof TS.fases]?.[idioma] ?? TS.fases.liga[idioma]} · {clubesEnJuego ? `${clubesEnJuego.local} (${p(enJuego.local).corto}) – ${clubesEnJuego.visita} (${p(enJuego.visita).corto})` : `${p(enJuego.local).corto} – ${p(enJuego.visita).corto}`} · {TS.empezo[idioma](hora(t062.enCurso.inicioUtc))}</> : TS.preparando[idioma]}</p>
+      <p className="arena-muted">{es ? `Partidos jugados: ${t.encuentros.length} de ${plan.length}. La página se actualiza sola mientras el torneo está en curso.` : `Matches played: ${t.encuentros.length} of ${plan.length}. This page updates itself while the tournament is in progress.`}</p>
+    </section>}
+    <p className="arena-torneo-oculto" aria-live="polite" data-testid="arena-torneo-anuncio">{anuncio}</p>
 
     <section className="arena-torneo-panel" aria-labelledby="arena-torneo-h-tabla">
       <h2 id="arena-torneo-h-tabla">{tx("tabla")}</h2>
@@ -156,10 +235,10 @@ function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idi
           const identidad = e ? identidadPartido(e.local.club, e.visita.club) : null;
           return <li key={x.n} data-testid="arena-torneo-partido" data-n={x.n}>
             {e && identidad ? <span className="arena-torneo-linea">J{x.jornada} · P{x.n} · <Escudo identidad={identidad.local} size={IDENTIDAD_ARENA.escudoPx.cifras} /> {e.local.club} ({p(x.local).corto}) <strong className="tnum">{e.local.goles}–{e.visita.goles}</strong> <Escudo identidad={identidad.visita} size={IDENTIDAD_ARENA.escudoPx.cifras} /> {e.visita.club} ({p(x.visita).corto})</span>
-              : <span className="arena-torneo-linea">J{x.jornada} · P{x.n} · {p(x.local).corto} – {p(x.visita).corto} · {es ? "sin disputar" : "not played"}</span>}
+              : <span className="arena-torneo-linea">J{x.jornada} · P{x.n} · {p(x.local).corto} – {p(x.visita).corto} · {enCurso ? (t062?.enCurso?.n === x.n ? <strong>{TS.enJuego[idioma]}</strong> : TS.porJugar[idioma]) : (es ? "sin disputar" : "not played")}</span>}
             {x.vuelta && g.completo && <span className="arena-muted"> · {es ? "Global" : "Aggregate"}: {p(g.a).corto} {g.golesA}–{g.golesB} {p(g.b).corto}</span>}
             {e && <span className="arena-torneo-acciones"><a href={enlaceRepeticion(t.id, x.n, idioma)}>{tx("repeticion")}<span className="arena-torneo-oculto">{es ? ` del partido ${x.n}` : ` of match ${x.n}`}</span></a>
-              <a href={`/torneos/${t.id}/${archivoEncuentro(x.n)}`} download>{tx("descargar")}<span className="arena-torneo-oculto">{es ? ` del partido ${x.n}` : ` of match ${x.n}`}</span></a></span>}
+              <a href={`${baseTorneo(t.id)}/${archivoEncuentro(x.n)}`} download>{tx("descargar")}<span className="arena-torneo-oculto">{es ? ` del partido ${x.n}` : ` of match ${x.n}`}</span></a></span>}
           </li>;
         })}</ol></div>)}
     </section>
@@ -191,7 +270,7 @@ function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idi
           </tr>)}</tbody>
         </table>
       </div>
-      <p className="arena-muted">{tx("declarado")}. {es ? "Goles, clubes, configuración, semilla y cifras de juego los recalcula el motor desde cada registro." : "Goals, clubs, configuration, seed and play figures are recomputed by the engine from each record."}</p>
+      <p className="arena-muted">{declarado}. {es ? "Goles, clubes, configuración, semilla y cifras de juego los recalcula el motor desde cada registro." : "Goals, clubs, configuration, seed and play figures are recomputed by the engine from each record."}</p>
     </section>
 
     <section className="arena-torneo-panel" aria-labelledby="arena-torneo-h-procedencia">
@@ -212,15 +291,36 @@ function Contenido({ torneo: t, idioma }: { torneo: TorneoArchivado; idioma: Idi
         `Pocos partidos: ${t.encuentros.length} partidos de ${t.duracionS} s y ${t.participantes.length - 1} cruces por modelo; la tabla describe este torneo.`,
         "La semilla fija clubes, niveles, condiciones y grada, no la suerte de cada jugada: con órdenes distintas, el azar del motor diverge.",
         "Motor 2D sintético con parámetros por calibrar y reglas simplificadas; no es un partido reglamentario y los goles no son la única medida de calidad.",
-        "La reproducción prueba que las órdenes archivadas producen el registro, no quién las escribió: la identidad del modelo, los tokens y el coste los declara el CLI.",
+        `La reproducción prueba que las órdenes archivadas producen el registro, no quién las escribió: la identidad del modelo, los tokens y el coste los declara ${quien}.`,
         "Mismo prompt y esfuerzo «low» para todos; las latencias dependen de la carga de deployments compartidos con la arena pública.",
       ] : [
         `Few matches: ${t.encuentros.length} matches of ${t.duracionS} s and ${t.participantes.length - 1} pairings per model; the table describes this tournament.`,
         "The seed fixes clubs, levels, conditions and crowd, not the luck of each play: with different orders, the engine's randomness diverges.",
         "Synthetic 2D engine with uncalibrated parameters and simplified rules; not a regulation match, and goals are not the only measure of quality.",
-        "Replay proves that the archived orders produce the record, not who wrote them: model identity, tokens and cost are declared by the CLI.",
+        `Replay proves that the archived orders produce the record, not who wrote them: model identity, tokens and cost are declared by ${quien}.`,
         "Same prompt and “low” effort for everyone; latencies depend on the load of deployments shared with the public arena.",
       ]).map(x => <li key={x}>{x}</li>)}</ul>
     </section>
   </>;
+}
+
+/** § 7.5 · Lista «Torneos» separada por origen; las pruebas del operador, aparte. */
+function ListaTorneos({ lista, idioma }: { lista: ResumenTorneo[]; idioma: Idioma }) {
+  const T = TEXTOS_TORNEO_SITIO, es = idioma === "es";
+  const fecha = (iso: string) => new Intl.DateTimeFormat(idioma, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(iso));
+  const item = (r: ResumenTorneo) => <li key={r.id} data-testid="arena-torneo-lista-item" data-id={r.id}>
+    <Link href={`/arena/torneo/${r.id}${es ? "?lang=es" : ""}`} prefetch={false}>{[fecha(r.inicioUtc), T.formatosCorto[r.formato][idioma], T.estados[r.estado][idioma], r.primero ? `${es ? "1.º" : "1st"}${r.primeroCompartido ? "=" : ""} ${r.primero}` : null, r.tipo === "ensayo" ? (es ? "ensayo · sin IA" : "rehearsal · no AI") : null].filter(Boolean).join(" · ")}</Link>
+  </li>;
+  const grupos: [string, string, ResumenTorneo[]][] = [
+    ["archivados", T.archivados[idioma], lista.filter(r => r.origen === "repositorio")],
+    ["lanzados", T.lanzados[idioma], lista.filter(r => r.origen === "sitio" && r.lanzamiento === "publico")],
+    ...(lista.some(r => r.origen === "sitio" && r.lanzamiento === "prueba") ? [["pruebas", T.pruebas[idioma], lista.filter(r => r.origen === "sitio" && r.lanzamiento === "prueba")] as [string, string, ResumenTorneo[]]] : []),
+  ];
+  return <section className="arena-torneo-panel arena-torneo-lista" aria-labelledby="arena-torneo-h-torneos" data-testid="arena-torneo-lista">
+    <h2 id="arena-torneo-h-torneos">{T.torneos[idioma]}</h2>
+    {grupos.map(([clave, titulo, xs]) => <div key={clave} data-testid={`arena-torneo-lista-${clave}`}>
+      <h3 id={`arena-torneo-h-${clave}`}>{titulo}</h3>
+      {xs.length ? <ul aria-labelledby={`arena-torneo-h-${clave}`}>{xs.map(item)}</ul> : <p className="arena-muted">{T.ninguno[idioma]}</p>}
+    </div>)}
+  </section>;
 }

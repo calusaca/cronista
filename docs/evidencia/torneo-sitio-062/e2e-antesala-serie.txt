@@ -1,0 +1,9 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (1.7s)
+  ✓  2 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (1.7s)
+  ✓  3 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (2.2s)
+  ✓  4 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (1.8s)
+
+  4 passed (25.3s)

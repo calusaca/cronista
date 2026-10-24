@@ -3371,3 +3371,29 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-playback[data-modo] { margin-top: 12px; }
 .arena-playback[data-modo] .btn { min-height: 44px; }
 .arena-playback[data-modo] > .arena-playback-ranura { display: contents; }
+
+/* Brief 062 § 7 (P1-a) · Torneo lanzable desde el sitio: panel «Lanzar un torneo», rótulo de origen, bloque «En juego»
+   y lista «Torneos». Solo reglas nuevas `arena-torneo-*`, tokens del 047/055, sin hex ni animaciones. A 360 px todo
+   se envuelve (sin contenedores desplazables). */
+.arena-torneo-rotulo { margin: 0 0 var(--ar-s2); color: var(--muted); font-size: 14px; font-weight: 700; }
+.arena-torneo-formatos { margin: 0 0 var(--ar-s4); padding: 0; border: 0; }
+.arena-torneo-formatos legend { margin-bottom: var(--ar-s2); padding: 0; font-weight: 700; }
+.arena-torneo-opcion { display: flex; align-items: flex-start; gap: var(--ar-s2); min-height: 44px; padding: var(--ar-s2) 0; border-bottom: 1px solid var(--line); line-height: 1.4; overflow-wrap: anywhere; }
+.arena-torneo-opcion input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); }
+.arena-torneo-opcion input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-torneo-opcion input:disabled + span { color: var(--muted); }
+.arena-torneo-cifras { display: block; color: var(--muted); font-size: 14px; }
+.arena-torneo-accion { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s3); }
+.arena-torneo-accion .btn, .arena-torneo-botones .btn { min-height: 44px; }
+.arena-torneo-accion .btn:focus-visible, .arena-torneo-botones .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-torneo-motivo { flex: 1 1 240px; margin: 0; color: var(--ink); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.arena-torneo-motivo:empty { display: none; }
+.arena-torneo-confirmar { margin: var(--ar-s3) 0; padding: var(--ar-s3); border: 1px solid var(--line); border-radius: var(--ar-r-sm); background: var(--ar-surface-2); }
+.arena-torneo-confirmar h3 { margin-top: 0; }
+.arena-torneo-confirmar h3:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-torneo-confirmar p { max-width: 75ch; line-height: 1.5; overflow-wrap: anywhere; }
+.arena-torneo-botones { display: flex; flex-wrap: wrap; gap: var(--ar-s2); }
+.arena-torneo-enjuego p { margin: var(--ar-s2) 0; line-height: 1.5; overflow-wrap: anywhere; }
+.arena-torneo-enjuego:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-torneo-lista ul { margin: 0; padding: 0; list-style: none; }
+.arena-torneo-lista li a { display: inline-flex; align-items: center; min-height: 44px; overflow-wrap: anywhere; }

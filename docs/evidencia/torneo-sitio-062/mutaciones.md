@@ -1,6 +1,6 @@
 # Brief 062 · mutaciones de la parte de servidor (P1-a)
 
-Generado por `node docs/evidencia/torneo-sitio-062/mutaciones.mjs` el 2026-10-24T08:14:28.130Z. Cada mutación se aplicó al
+Generado por `node docs/evidencia/torneo-sitio-062/mutaciones.mjs` el 2026-10-24T09:19:01.289Z. Cada mutación se aplicó al
 archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirtió (md5 comprobado). «md5» es el del archivo MUTADO.
 
 | # | Mutación | Archivo | md5 mutado | Prueba (`-t`) | Resultado | Resumen de vitest |
@@ -52,6 +52,16 @@ archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirt
 | C3 | el cierre no relee una instantánea que falló al leerse | `src/arena/torneo-sitio.ts` | `2c821e75527126f4127a5a617d7bf22b` | torneo-sitio.test.ts · `Codex #3` | ROJO (detectada) | Tests 2 failed · 42 skipped (44) |
 | C4 | esperar la cancelación del cuerpo al vencer el plazo | `src/arena/torneo-sitio.ts` | `8c5f1fe2b6ef73c2635412e2f09fdbb6` | torneo-sitio-rutas.test.ts · `Codex #4` | ROJO (detectada) | Tests 1 failed · 25 skipped (26) |
 | C5 | sin la segunda comprobación del torneo activo antes de ARM | `scripts/deploy-azure-arena.mjs` | `f69650fda9af780f2a663a87ea889570` | torneo-sitio-rutas.test.ts · `Codex #5` | ROJO (detectada) | Tests 1 failed · 25 skipped (26) |
+| U1-cifras | cifras fijas en el panel (no las de la Ficha) | `src/ui/ArenaTorneoLanzar.tsx` | `f22597d2b55cb955a660ce85292813bc` | ArenaTorneoLanzar.test.tsx · `salen de la Ficha` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-motivo | botón deshabilitado sin el motivo visible | `src/ui/ArenaTorneoLanzar.tsx` | `d46b079085b0336c43ae79bda5c4b351` | ArenaTorneoLanzar.test.tsx · `motivo «` | ROJO (detectada) | Tests 12 failed · 13 skipped (25) |
+| U1-disabled | el botón nunca se deshabilita | `src/ui/ArenaTorneoLanzar.tsx` | `bc130ecd26389cbb23ebad94fad2ecc4` | ArenaTorneoLanzar.test.tsx · `motivo «` | ROJO (detectada) | Tests 12 failed · 13 skipped (25) |
+| U1-grupos | grupos habilitado en P1-a | `src/ui/ArenaTorneoLanzar.tsx` | `2dfd51972e7eb6eb0b620afc0bb49e74` | ArenaTorneoLanzar.test.tsx · `Grupos visible` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-rotulo | quitar el rótulo de origen | `src/ui/ArenaTorneo.tsx` | `d29c99dad00ab9bd4cae41972aa09d63` | ArenaTorneoLanzar.test.tsx · `rótulos de origen` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-declarado | leyenda «†» del CLI también en los del sitio | `src/ui/ArenaTorneo.tsx` | `b0eca1600bdfa779c44652d044bf53b1` | ArenaTorneoLanzar.test.tsx · `rótulos de origen` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-aria-live | aria-live anuncia todos los partidos, no solo los nuevos | `src/ui/ArenaTorneo.tsx` | `e0e9898a30e5be8ac7102e6edd1e9d74` | ArenaTorneoLanzar.test.tsx · `aria-live solo anuncia` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-mostrar | portada sin preferir los reales a los ensayos | `src/ui/torneo-lista.ts` | `2ff075e0a7fcea9d7d4177200266ce32` | ArenaTorneoLanzar.test.tsx · `torneoAMostrar` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
+| U1-carga | repetición del sitio cargada desde /torneos (sin la base del prefijo) | `src/ui/torneo-carga.ts` | `6278c8c32f8d966364277cab334e1f61` | torneo-carga.test.ts · `062` | ROJO (detectada) | Tests 1 failed · 6 skipped (7) |
+| U1-bundle | el cliente vuelve a importar el motor (arrastra la telemetría al navegador) | `src/ui/ArenaTorneo.tsx` | `dc936737dc5f10df6d0321f56725fc17` | ArenaTorneoLanzar.test.tsx · `no arrastran` | ROJO (detectada) | Tests 1 failed · 24 skipped (25) |
 | G1-sin-barajar | sorteo de grupos sin barajar | `src/arena/torneo-formatos.ts` | `a586b0b1dcad6e67938b94fdf20d7ecd` | torneo-grupos.test.ts · `G1` | ROJO (detectada) | Tests 3 failed · 22 skipped (25) |
 | G1-entrada | barajar el orden de entrada (sin ordenar antes) | `src/arena/torneo-formatos.ts` | `e30cb0b6ff479a7d69c5675a321ede7d` | torneo-grupos.test.ts · `G1` | ROJO (detectada) | Tests 3 failed · 22 skipped (25) |
 | G2-por-grupo | semillasCruce por grupo (no sobre los 6) | `src/arena/torneo-formatos.ts` | `3debbe8affe0664bf86912204c8d88b5` | torneo-grupos.test.ts · `G2` | ROJO (detectada) | Tests 1 failed · 2 passed · 22 skipped (25) |
@@ -70,4 +80,4 @@ archivo real, se ejecutó solo la prueba que la nombra (`vitest -t`) y se revirt
 | G7 | cuadro con un grupo incompleto (pendiente) | `src/arena/torneo-formatos.ts` | `ba2c38c569d0d67164d4d7780223dc7b` | torneo-grupos.test.ts · `G7` | ROJO (detectada) | Tests 1 failed · 2 passed · 22 skipped (25) |
 | G8-grupos | omitir la reconstrucción del plan (grupos) | `src/arena/torneo-formatos.ts` | `a45dc1dfe9cc2103a64624c00f045a2b` | torneo-grupos.test.ts · `G8` | ROJO (detectada) | Tests 1 failed · 2 passed · 22 skipped (25) |
 
-Detectadas: 64 de 64.
+Detectadas: 74 de 74.

@@ -69,3 +69,20 @@ describe("059 · carga de un partido del torneo (§ 15.8)", () => {
     for (const q of ["torneo=ensayo-059", "torneo=ensayo-059&encuentro=7", "torneo=ensayo-059&encuentro=e7", "torneo=..&encuentro=07", "encuentro=07"]) expect(peticionDeUrl(new URLSearchParams(q))).toBeNull();
   });
 });
+
+describe("062 · § 7.6 · un torneo lanzado en el sitio se carga por /api/arena/torneos/sitio/<id>", () => {
+  const ID = "sitio-2026-10-20", DS = "src/arena/__fixtures__/torneos-sitio";
+  const sitio = vi.fn(async (url: string | URL | Request) => {
+    const ruta = String(url);
+    if (ruta === `/api/arena/torneos/sitio/${ID}`) return new Response(readFileSync(`${DS}/${ID}.torneo.json`), { headers: { "content-type": "application/json" } });
+    const m = ruta.match(new RegExp(`^/api/arena/torneos/sitio/${ID}/(e\\d{2}\\.json\\.gz)$`));
+    return m ? new Response(readFileSync(`${DS}/${ID}.${m[1]}`), { headers: { "content-type": "application/gzip" } }) : new Response("no", { status: 404 });
+  }) as unknown as typeof fetch & ReturnType<typeof vi.fn>;
+  it("instantánea por la ruta [id] (esquema 062) y registro por la ruta [archivo], con las mismas comprobaciones", async () => {
+    const r = await cargarEncuentroTorneo({ torneo: ID, encuentro: "03" }, new AbortController().signal, sitio);
+    expect(r.registro).toEqual(JSON.parse(gunzipSync(readFileSync(`${DS}/${ID}.e03.json.gz`)).toString("utf8")));
+    expect(r.origen.id).toBe(ID);
+    expect(sitio.mock.calls.map(c => String(c[0]))).toEqual([`/api/arena/torneos/sitio/${ID}`, `/api/arena/torneos/sitio/${ID}/e03.json.gz`]);
+    expect(peticionDeUrl(new URLSearchParams(`torneo=${ID}&encuentro=03`))).toEqual({ torneo: ID, encuentro: "03" });
+  });
+});

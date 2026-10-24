@@ -3,6 +3,8 @@
 // (2) La página lee ARENA_TORNEOS_DIR = .cache/e2e/torneos: una COPIA de public/torneos (los torneos reales
 // archivados, que no se modifican) más el fixture, con un índice combinado. El despliegue construye desde el
 // código fuente (ACR) y no usa este artefacto.
+// (3) Brief 062 § 10 · El almacén local del torneo del sitio (ARENA_TORNEOS_SITIO_DIR = .cache/e2e/torneos-sitio) se
+// VACÍA y se siembra con el fixture del sitio (una liga de ensayo de un día pasado, sin el dia- de hoy).
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -26,3 +28,11 @@ for (const e of indice) {
 }
 writeFileSync(join(combinado, "indice.json"), JSON.stringify(indice, null, 2) + "\n");
 console.log(`Torneos para el e2e: ${indice.map(e => e.id).join(", ")} (ensayo-059 servido como estático solo en el build del e2e).`);
+
+const sitio = resolve(raiz, ".cache/e2e/torneos-sitio"), fixtureSitio = resolve(raiz, "src/arena/__fixtures__/torneos-sitio");
+rmSync(sitio, { recursive: true, force: true });
+mkdirSync(sitio, { recursive: true });
+const hoy = new Date().toISOString().slice(0, 10);
+const sembrados = readdirSync(fixtureSitio).filter(f => f !== `dia-${hoy}.json`);
+for (const f of sembrados) cpSync(join(fixtureSitio, f), join(sitio, f));
+console.log(`Almacén del torneo del sitio para el e2e: ${sembrados.filter(f => f.endsWith(".torneo.json")).join(", ")}.`);

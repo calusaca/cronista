@@ -1,0 +1,58 @@
+
+> cronista@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+- Environments: .env
+✓ Running next.config.ts took 29ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 9.4s
+  Skipping validation of types
+  Finished TypeScript config validation in 4ms ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/4) ...
+  Generating static pages using 7 workers (1/4) 
+  Generating static pages using 7 workers (2/4) 
+  Generating static pages using 7 workers (3/4) 
+✓ Generating static pages using 7 workers (4/4) in 119ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /api/arena
+├ ƒ /api/arena/grabaciones
+├ ƒ /api/arena/herramientas
+├ ƒ /api/arena/modelos
+├ ƒ /api/arena/sesiones
+├ ƒ /api/arena/sesiones/[id]
+├ ƒ /api/arena/sesiones/[id]/analisis
+├ ƒ /api/arena/sesiones/[id]/emision
+├ ƒ /api/arena/sesiones/[id]/eventos
+├ ƒ /api/arena/sesiones/[id]/registro
+├ ƒ /api/arena/sesiones/[id]/relato
+├ ƒ /api/arena/sesiones/[id]/reproduccion
+├ ƒ /api/arena/sesiones/[id]/voz
+├ ƒ /api/arena/torneos/sitio
+├ ƒ /api/arena/torneos/sitio/[id]
+├ ƒ /api/arena/torneos/sitio/[id]/[archivo]
+├ ƒ /api/arena/torneos/sitio/cancelar
+├ ƒ /api/arena/torneos/sitio/cerrar
+├ ƒ /api/health
+├ ƒ /api/liga/[jornada]/[partido]/overlay
+├ ƒ /api/overlay/[seed]
+├ ƒ /arena
+├ ƒ /arena/torneo
+├ ƒ /arena/torneo/[id]
+├ ƒ /datos
+├ ƒ /datos/datasheet
+├ ○ /icon.svg
+├ ƒ /liga
+├ ƒ /liga/[jornada]/[partido]
+└ ƒ /match/[seed]
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

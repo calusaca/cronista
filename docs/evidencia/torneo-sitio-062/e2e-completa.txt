@@ -1,0 +1,374 @@
+
+Running 282 tests using 4 workers
+
+  ✓    1 [chromium] › e2e/actividad.spec.ts:31:3 › / → /liga: aviso durante toda la navegación (1.8s)
+  ✓    5 [chromium] › e2e/actividad.spec.ts:31:3 › / → /datos: aviso durante toda la navegación (1.0s)
+  ✓    4 [chromium] › e2e/arena-antesala.spec.ts:128:1 › 058 · A1 arranque con voz por defecto: contexto cebado dentro del clic, narración activa sin otro clic, nota fija y sin variantes breves (3.2s)
+  ✓    6 [chromium] › e2e/actividad.spec.ts:31:3 › /datos → /: aviso durante toda la navegación (780ms)
+  ✓    3 [chromium] › e2e/arena-canto-gol.spec.ts:34:1 › celebración por cursor en la repetición: rótulo, marcador, anillo con sus estilos y retroceso (3.9s)
+  ✓    8 [chromium] › e2e/actividad.spec.ts:31:3 › /match/246 → /match/246?perspectiva=visita: aviso durante toda la navegación (1.1s)
+  ✓   10 [chromium] › e2e/actividad.spec.ts:31:3 › /liga → /liga?tab=players&j=1: aviso durante toda la navegación (774ms)
+  ✓   11 [chromium] › e2e/actividad.spec.ts:31:3 › /liga → /liga?j=7: aviso durante toda la navegación (439ms)
+  ✓   12 [chromium] › e2e/actividad.spec.ts:31:3 › /liga → /liga/1/1: aviso durante toda la navegación (734ms)
+  ✓   13 [chromium] › e2e/actividad.spec.ts:31:3 › /liga/7/3 → /liga/7/4: aviso durante toda la navegación (910ms)
+  ✓    7 [chromium] › e2e/arena-antesala.spec.ts:155:1 › 058 · A1b el POST tarda 3 s: la voz arranca igual con el contexto adoptado (5.1s)
+  ✓   14 [chromium] › e2e/actividad.spec.ts:31:3 › /liga/7/3 → /liga?j=7: aviso durante toda la navegación (1.2s)
+  ✓    2 [chromium] › e2e/arena-buffer.spec.ts:12:1 › reinicios: banda, esquina, meta y centro se ven junto al campo y en la descripción (9.2s)
+  ✓   16 [chromium] › e2e/actividad.spec.ts:46:1 › los enlaces conservan Enter, clic modificado y no dejan un aviso al volver (824ms)
+  ✓   18 [chromium] › e2e/actividad.spec.ts:60:1 › descarga: espera, un solo fetch, bytes originales y error recuperable (727ms)
+  ✓   15 [chromium] › e2e/arena-antesala.spec.ts:166:1 › 058 · A1c cambiar de idioma en una sesión propia con la voz activa la reactiva sola en el idioma nuevo (2.5s)
+  ✓   19 [chromium] › e2e/actividad.spec.ts:89:1 › replay: error, reintento y salir/entrar durante la espera no duplica la petición (3.0s)
+  ✓   21 [chromium] › e2e/actividad.spec.ts:118:1 › partido completo: la primera apertura avisa mientras se descarga su módulo (940ms)
+  ✓    9 [chromium] › e2e/arena-canto-gol.spec.ts:95:1 › M11 · con el cursor inmóvil más de celebracionS, la celebración permanece: depende del cursor, no del reloj (10.7s)
+  ✓   22 [chromium] › e2e/actividad.spec.ts:135:1 › 3D: aviso hasta recibir el motor y retirada al mostrar la cancha (1.4s)
+  ✓   24 [chromium] › e2e/actividad.spec.ts:150:1 › fallo del módulo 3D retira la espera y conserva la alternativa 2D (1.3s)
+  ✓   20 [chromium] › e2e/arena-antesala.spec.ts:185:1 › 058 · A2 preferencia: «Turn narration off» guarda «0»; la casilla vuelve sin marcar y la voz no arranca; marcarla guarda «1»; almacenamiento bloqueado (7.0s)
+  ✓   25 [chromium] › e2e/actividad.spec.ts:161:1 › fallo al abrir el partido completo ofrece reintento sin dejar la carga permanente (1.9s)
+  ✓   23 [chromium] › e2e/arena-canto-gol.spec.ts:116:1 › movimiento reducido, 360 px y oscuro: celebración estática sin desborde (6.7s)
+  ✓   17 [chromium] › e2e/arena-buffer.spec.ts:61:1 › narración continua: el cierre de reserva en español termina sin repetir comentarios (12.5s)
+  ✓   26 [chromium] › e2e/arena-antesala.spec.ts:233:1 › 058 · A3 sin voz en el servidor: ni casilla ni contexto, y el reloj como hoy (5.2s)
+  ✓   27 [chromium] › e2e/arena-cifras.spec.ts:9:1 › arena: cifras en vivo y finales, ficha del jugador y favoritos que sobreviven a la recarga (6.6s)
+  ✓   31 [chromium] › e2e/arena-cifras.spec.ts:107:1 › arena: localStorage cuyo getter lanza ⇒ aviso visible y el favorito se aplica en memoria (1.3s)
+  ✓   30 [chromium] › e2e/arena-antesala.spec.ts:248:1 › 058 · A4 autoplay bloqueado: «Enable audio playback» aparece antes de desbloqueoMs + 0,5 s, el reloj no se retiene y el clic lo recupera (4.9s)
+  ✓   32 [chromium] › e2e/arena-cifras.spec.ts:119:1 › arena: setItem que lanza al pulsar las estrellas ⇒ aviso y favoritos aplicados en memoria (1.3s)
+  ✓   34 [chromium] › e2e/arena-cifras.spec.ts:137:1 › arena: un suplente favorito guardado se preselecciona en la ficha al cargar el partido (1.7s)
+  ✓   33 [chromium] › e2e/arena-antesala.spec.ts:267:1 › 058 · A5 enlace compartido: con voz y preferencia por defecto no se activa sola (hace falta el gesto) (3.2s)
+  ✓   35 [chromium] › e2e/arena-descargas.spec.ts:111:1 › 053 · guardado: comentarios completos al final y parciales con el cursor a mitad, en EN y ES (3.0s)
+  ✓   37 [chromium] › e2e/arena-descargas.spec.ts:175:1 › 053 · en vivo (búfer): parcial hasta el reloj visible, sin nada por delante del cursor (1.9s)
+  ✓   36 [chromium] › e2e/arena-antesala.spec.ts:283:1 › 058 · A6 360 px y 1440 px, claro y oscuro, EN y ES: casilla y nota sin desbordar (capturas con CAPTURAS_058=1) (10.4s)
+  ✓   28 [chromium] › e2e/arena-canto-gol.spec.ts:168:1 › dos goles seguidos (ticks 231 y 290): el segundo corta el primer canto y arranca (20.3s)
+  ✓   38 [chromium] › e2e/arena-descargas.spec.ts:223:1 › 053 · WAV: el mismo blob del <audio> (hash igual), sin síntesis nuevas, y se suelta al cambiar de idioma (8.3s)
+  ✓   41 [chromium] › e2e/arena-descargas.spec.ts:280:1 › 053 · compatibilidad: el validador real importa los registros públicos y rechaza la transcripción (427ms)
+  ✓   29 [chromium] › e2e/arena-buffer.spec.ts:78:1 › narración continua: cubre Speech lento y fallido con voz audible, incluso al recuperar el búfer (26.0s)
+  ✓   42 [chromium] › e2e/arena-formaciones.spec.ts:3:1 › formaciones: expone doce opciones y las cinco nuevas cambian la cancha con un registro reproducible (4.2s)
+  ✓   44 [chromium] › e2e/arena-formaciones.spec.ts:28:1 › interfaz: live es el valor inicial, los ajustes se envían antes de iniciar y la semilla es opcional (1.8s)
+  ✓   39 [chromium] › e2e/arena-antesala.spec.ts:386:1 › 058 · B1 antesala completa: orden, huecos, reloj retenido con «Pre-match presentation», entrada al final, saque en ≤ 1 s y sin previa (10.1s)
+  ✓   45 [chromium] › e2e/arena-formaciones.spec.ts:53:1 › interfaz: narración y audio junto a la cancha, sin anticipar eventos y sin desborde en móvil (2.9s)
+  ✓   43 [chromium] › e2e/arena-buffer.spec.ts:136:1 › búfer: empieza antes del final, interpola, pausa y comparte sin volver a generar (6.8s)
+  ✓   47 [chromium] › e2e/arena-formaciones.spec.ts:80:1 › descripción: permite recorrer todas las acciones confirmadas sin mostrar eventos futuros (3.2s)
+  ✓   46 [chromium] › e2e/arena-antesala.spec.ts:426:1 › 058 · B2 «Skip to kick-off» con el teclado: la fuente se detiene, el botón desaparece, el reloj sale en ≤ 1,5 s y el foco pasa al botón de narración (5.7s)
+  ✓   48 [chromium] › e2e/arena-buffer.spec.ts:174:1 › búfer: una síntesis lenta no detiene el partido y la preparación es independiente (4.0s)
+  ✓   49 [chromium] › e2e/arena-gol-visual.spec.ts:33:1 › B1 · los dos goles del ejemplo: vuelo hasta el cruce, balón en la red con los 22 quietos, sin «Saque» durante la red y corte al estado registrado (4.2s)
+  ✓   52 [chromium] › e2e/arena-gol-visual.spec.ts:96:1 › B1 · movimiento reducido: no hay vuelo previo y la red aparece ya en su profundidad (1.8s)
+  ✓   50 [chromium] › e2e/arena-antesala.spec.ts:449:1 › 058 · B3 fallos: con 404 en antesala:* la retención se suelta en ≤ 2 s, la previa del 056 suena y no vuelve «Pre-match presentation» (7.5s)
+  ✓   54 [chromium] › e2e/arena-antesala.spec.ts:479:1 › 058 · B4 enlace compartido con el reloj en marcha: «Enable narration» no pide la antesala (3.1s)
+  ✓   53 [chromium] › e2e/arena-gol-visual.spec.ts:109:1 › B2 · 360 px (oscuro, reducido) y 1440 px (oscuro): recuadro sin desborde; capturas (6.4s)
+  ✓   40 [chromium] › e2e/arena-canto-gol.spec.ts:191:1 › gol en la última ventana con cierre tardío y una respuesta normal retenida: canto, cierre y nada más (29.3s)
+  ✓   56 [chromium] › e2e/arena-gol-visual.spec.ts:126:1 › B1 · con reglas (fixture reinicios-v5 importado): sin «Kick-off» mientras el balón está en la red; al cumplirse enRedS, centro y «Kick-off» (M11) (2.2s)
+  ✓   58 [chromium] › e2e/arena-gol-visual.spec.ts:145:1 › regresión · el escudo del rótulo de gol mide su tamaño (no el ancho de la cancha) y la cancha sigue ocupando todo .arena-pitch-wrap (4.3s)
+  ✓   59 [chromium] › e2e/arena-gol-visual.spec.ts:163:1 › smoke 057 · a 360 y 390 px el recuadro no tapa el balón en la red ni la boca del arco batido (los dos arcos) (4.1s)
+  ✓   51 [chromium] › e2e/arena-buffer.spec.ts:209:1 › búfer: una demora prolongada agota la reserva y la reconexión continúa sin saltar (22.9s)
+  ✓   60 [chromium] › e2e/arena-identidad.spec.ts:76:1 › 055 · favicon SVG y emblema en / y en /arena (2.3s)
+  ✓   61 [chromium] › e2e/arena-buffer.spec.ts:237:1 › búfer: descarta audio atrasado al cambiar idioma y se recupera de un fallo de voz (2.4s)
+  ✓   63 [chromium] › e2e/arena-buffer.spec.ts:257:1 › búfer: un consumidor tardío entra cerca del frente y no revela el gol antes de su cursor (1.5s)
+  ✓   62 [chromium] › e2e/arena-identidad.spec.ts:94:1 › 055 · escudos y equipaciones: portada, ejemplo de entrenadores IA (dos veces) y duelo; sin barras de color (4.8s)
+  ✓   65 [chromium] › e2e/arena-identidad.spec.ts:125:1 › 055 · anillos de selección y favorito: cuatro estados, estilos calculados y realce del escudo en la celebración (2.2s)
+  ✓   66 [chromium] › e2e/arena-identidad.spec.ts:227:1 › 055 · partido primero en escritorio: cancha y marcador sin desplazar, sala de control en el acompañante y CTA por teclado (2.7s)
+  ✓   57 [chromium] › e2e/arena-canto-gol.spec.ts:249:1 › v1.1 (1a) · dos cantos vigentes disponibles a la vez: el consumidor arranca el reciente y descarta el anterior sin arrancarlo (21.0s)
+  ✓   67 [chromium] › e2e/arena-identidad.spec.ts:248:3 › 055 · móvil › 360 px, oscuro, movimiento reducido y español: sin desborde, encabezado y CTA visibles; el CTA lleva a la sala de control (1.5s)
+  ✓   69 [chromium] › e2e/arena-identidad.spec.ts:263:1 › 055 · iconos de eventos en el feed, la descripción y el panel de cifras (2.0s)
+  ✓   64 [chromium] › e2e/arena-buffer.spec.ts:272:1 › voz independiente: un pasaje largo conserva su ritmo y un gol lo interrumpe sin anticiparse (20.4s)
+  ✓   71 [chromium] › e2e/arena-buffer.spec.ts:343:1 › voz independiente: termina el partido mientras continúa el relato y después suena el cierre (6.1s)
+  ✓   68 [chromium] › e2e/arena-canto-gol.spec.ts:274:1 › v1.1 (1b) · respuestas fuera de orden: el clip del gol anterior llega tras arrancar el reciente y se descarta (20.8s)
+  ✓   72 [chromium] › e2e/arena-buffer.spec.ts:368:1 › búfer: una instantánea que ya llega cancelada libera los controles (CI 39610110045) (1.1s)
+  ✓   74 [chromium] › e2e/arena-previa.spec.ts:35:1 › 056 · (2) la tarjeta se ve antes del saque, se oculta al reproducir y vuelve con Restart; teclado y foco (3.2s)
+  ✓   75 [chromium] › e2e/arena-previa.spec.ts:103:1 › 056 · (2) 360 px, oscuro, movimiento reducido y español (1.7s)
+  ✓   73 [chromium] › e2e/arena-play-narrado.spec.ts:116:1 › 057 · crear grabación sin IA → Reproducir sube el registro, prepara, suena y la cancha sigue a la voz; pausa, búsqueda y volver al inicio (5.7s)
+  ✓   76 [chromium] › e2e/arena-previa.spec.ts:179:1 › 056 · (1) antes del saque, con el reloj detenido: la entrada y las tres piezas completas, en orden y sin solaparse (8.3s)
+  ✓   78 [chromium] › e2e/arena-previa.spec.ts:240:1 › 056 · (3) «Listen from the start» empieza por las tres piezas de la previa con el reloj en 0 (2.6s)
+  ✓   55 [chromium] › e2e/arena-antesala.spec.ts:491:1 › 058 · B5 @lento tope de pared: con clips de 20 s la fuente se corta y el reloj sale entre t0 + topeS y t0 + topeS + 1,5 s (1.3m)
+  ✓   77 [chromium] › e2e/arena-play-narrado.spec.ts:180:1 › 057 · fin del audio: Reproducir vuelve a sonar desde 0 sin pedir de nuevo la pista (32.8s)
+  ✓   80 [chromium] › e2e/arena-antesala.spec.ts:513:1 › 058 · B6 (a) activación a mano en pausa en 0:00: la antesala espera a «Resume broadcast»; (b) pausar a mitad la suspende y el reloj no se mueve (8.5s)
+  ✓   81 [chromium] › e2e/arena-play-narrado.spec.ts:201:1 › 057 · relato 404: un único re-registro por subida y, si vuelve a fallar, «expired» con reproducción muda (M16) (3.9s)
+  ✓   82 [chromium] › e2e/arena-antesala.spec.ts:541:1 › 058 · B6 (c) activación a mano y la reserva se llena justo después: el reloj sigue en 0:00 en todos los fotogramas (3.6s)
+  ✓   83 [chromium] › e2e/arena-play-narrado.spec.ts:221:1 › 057 · ?partido= de una sesión borrada: se re-registra con una sola subida del registro en memoria y suena (2.0s)
+  ✓   85 [chromium] › e2e/arena-play-narrado.spec.ts:240:1 › 057 · sin voz (herramientas voz: false): no hay conmutador y Reproducir mueve la cancha como hoy (M17) (2.6s)
+  ✓   70 [chromium] › e2e/arena-mesa.spec.ts:96:1 › mesa: narrador, comentarista y estadista se ceden la palabra sin solaparse en una línea de tiempo controlada (1.1m)
+  ✓   86 [chromium] › e2e/arena-play-narrado.spec.ts:252:1 › 057 · conmutador desmarcado: Reproducir no pide grabaciones ni relato (3.7s)
+  ✓   84 [chromium] › e2e/arena-antesala.spec.ts:558:1 › 058 · B7 token: una respuesta retenida que llega después de saltar no arranca ninguna fuente ni pide más clips (7.2s)
+  ✓   88 [chromium] › e2e/arena-play-narrado.spec.ts:265:1 › 057 · ejemplo de entrenadores IA con voz: Reproducir registra { archivo: "ejemplo-v3" }, no { registro } (3.1s)
+  ✓   89 [chromium] › e2e/arena-antesala.spec.ts:581:1 › 058 · B8 cambio de idioma con la antesala sonando y la reserva completa: el reloj sigue en 0:00 en cada fotograma; el clip EN tardío se descarta y sigue en ES desde el clip 1 (4.1s)
+  ✓   90 [chromium] › e2e/arena-play-narrado.spec.ts:279:1 › 057 v1.1 (1) · con la cancha muda en marcha, «Listen from the start» la detiene antes de la primera petición de relato (3.5s)
+  ✓   92 [chromium] › e2e/arena-play-narrado.spec.ts:303:1 › 057 v1.1 (1d) · con la pista sonando, desmarcar el conmutador pausa el audio, suelta su URL y deja la cancha quieta (3.2s)
+  ✓   79 [chromium] › e2e/arena-previa.spec.ts:332:1 › 056 · (4) preparación, saque, calma y caducidad: ninguna pieza se solapa ni se repite; la 3 caduca; reservas cubren el silencio (45.9s)
+  ✓   93 [chromium] › e2e/arena-play-narrado.spec.ts:320:1 › 057 v1.1 (2a) · registro retenido y se carga otro partido: al liberar, ni relato, ni audio, ni aviso (3.0s)
+  ✓   95 [chromium] › e2e/arena-play-narrado.spec.ts:337:1 › 057 v1.1 (2b) · registro retenido y «Play without narration»: la pista no arranca al liberar y la cancha sigue muda (3.5s)
+  ✓   96 [chromium] › e2e/arena-play-narrado.spec.ts:353:1 › 057 v1.2 (2c, N1) · preparación retenida y cambio de idioma: todo se cancela y queda apagado; otra pulsación pide la pista en español (2.8s)
+  ✓   97 [chromium] › e2e/arena-play-narrado.spec.ts:390:1 › 057 v1.1 (8) · autoplay bloqueado: fase «pulsar», el botón dice Play y un clic hace sonar la pista (2.0s)
+  ✓   98 [chromium] › e2e/arena-play-narrado.spec.ts:407:1 › 057 v1.1 (8) · error tardío: 200 en dos ventanas y 500 en la tercera → sin pista, aviso y cancha muda (2.9s)
+  ✓   99 [chromium] › e2e/arena-play-narrado.spec.ts:419:1 › 057 · 360 × 780, oscuro y movimiento reducido: sin desborde; escuchar, detener y WAV siguen presentes y el WAV se habilita tras preparar (2.4s)
+  ✓  100 [chromium] › e2e/arena-play-narrado.spec.ts:459:1 › Codex 057 #2 · play() retenido y detener: el rechazo tardío no pone «Press play to listen» (2.5s)
+  ✓   91 [chromium] › e2e/arena-antesala.spec.ts:607:1 › 058 · B9 Speech lento (2,5 s por respuesta): nunca más de 2 /relato en vuelo; con el último clip pendiente se pide la entrada y ningún invitado (25.2s)
+  ✓  101 [chromium] › e2e/arena-play-narrado.spec.ts:473:1 › Codex 057 #2 · play() retenido y otra carga: el rechazo tardío se descarta (3.3s)
+  ✓  103 [chromium] › e2e/arena-play-narrado.spec.ts:490:1 › Codex 057 #2 · reiniciar la pista antes de que resuelva el play() anterior: su rechazo no pisa la reproducción nueva (2.8s)
+  ✓   94 [chromium] › e2e/arena-previa.spec.ts:369:1 › 056 · (4) reactivación: desactivar con la pieza 2 pendiente y reactivar con el reloj en marcha la conserva; activación tardía pide las tres (26.6s)
+  ✓   87 [chromium] › e2e/arena-mesa.spec.ts:208:1 › mesa: con noticias continuas y audio del invitado demorado no arranca ningún invitado ni una cesión suelta (40.7s)
+  ✓  104 [chromium] › e2e/arena-play-narrado.spec.ts:510:1 › Codex 057 #2 · reanudar con play() retenido y detener: su resolución tardía no anuncia «Narration playing» (3.3s)
+  ✓  107 [chromium] › e2e/arena-play-narrado.spec.ts:531:1 › v1.3 · subida con 429 y retry-after: 2 una vez: reintenta una sola vez y suena (4.3s)
+  ✓  102 [chromium] › e2e/arena-antesala.spec.ts:629:1 › 058 · B10 dos espectadores en la misma sesión: cada uno ≤ 2 en vuelo y completa o abandona su antesala (15.5s)
+  ✓  108 [chromium] › e2e/arena-play-narrado.spec.ts:542:1 › v1.3 · subida con 429 y retry-after: 3600: degrada al momento («ocupado») sin esperar ni reintentar (3.1s)
+  ✓  105 [chromium] › e2e/arena-previa.spec.ts:382:1 › 056 · (4) activación tardía (8 s): las tres piezas se piden y suena al menos la 1 (9.6s)
+  ✓  110 [chromium] › e2e/arena-play-narrado.spec.ts:554:1 › v1.3 · subida con 500: «sin-sesion» y reproducción muda (2.8s)
+  ✓  112 [chromium] › e2e/arena-play-narrado.spec.ts:564:1 › v1.3 · «pulsar» y play con el control nativo del audio: la barra pasa a Pausa (1.9s)
+  ✓  111 [chromium] › e2e/arena-repeticion-060.spec.ts:104:1 › 060 E1 · ritmo y orden: previa, ventanas buffer en orden (con eventos importantes y cierre) y la cancha a 1× entre clips (3.3s)
+  ✓  106 [chromium] › e2e/arena-mesa.spec.ts:262:1 › mesa: «Escuchar desde el inicio» inserta las intervenciones del diario en la pista guardada (13.7s)
+  ✓  114 [chromium] › e2e/arena-repeticion-060.spec.ts:140:1 › 060 E1 · invitados de la Mesa con variante breve, tras la primera ventana que cubre su tick (1.8s)
+  ✓  113 [chromium] › e2e/arena-play-narrado.spec.ts:580:1 › v1.3 · Reproducir desde el cursor en 0:15: la pista empieza ahí (reloj ≥ 0:14) (2.6s)
+  ✓  109 [chromium] › e2e/arena-antesala.spec.ts:650:1 › 058 · A4b autoplay bloqueado y recuperado con el reloj en 0:00: la antesala empieza al habilitar el audio (8.8s)
+  ✓  116 [chromium] › e2e/arena-repeticion-060.spec.ts:160:1 › 060 E2 · nunca delante: en el inicio de cada clip el cursor ya está en su hecho + reaccionS; también reproduciendo el gol (8.9s)
+  ✓  119 [chromium] › e2e/arena-repeticion-060.spec.ts:195:1 › 060 E3 · saltar la previa: el botón aparece con la previa sonando, lleva al saque y deja el foco en el botón principal (y en ES) (2.4s)
+  ✓  118 [chromium] › e2e/arena-antesala.spec.ts:669:1 › 058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso sin desbordar (capturas con CAPTURAS_058=1) (10.8s)
+  ✓  120 [chromium] › e2e/arena-repeticion-060.spec.ts:214:1 › 060 E3 · EN: «Skip to kick-off» con la previa en pausa (2.3s)
+  ✓  122 [chromium] › e2e/arena-repeticion-060.spec.ts:228:1 › 060 E4 · dos pistas, dos claves: «Listen from the start» (detallada) y después Reproducir pide ventanas buffer (2.7s)
+  ✓  123 [chromium] › e2e/arena-repeticion-060.spec.ts:253:1 › 060 E4 · Detener y Reproducir otra vez no hace ningún pedido nuevo a /relato (la pista de ritmo se conserva) (2.2s)
+  ✓  121 [chromium] › e2e/arena-antesala.spec.ts:698:1 › 058 · B12 (Codex #3) con una política que bloquea contextos creados fuera del gesto, cambiar de idioma no pide otro clic y transfiere la retención (7.8s)
+  ✓  124 [chromium] › e2e/arena-repeticion-060.spec.ts:268:1 › 060 E5 · Detener con voz: audio en pausa sin src, reloj 0:00, Play habilitado y foco en el botón principal (M12) (3.3s)
+  ✓  125 [chromium] › e2e/arena-antesala.spec.ts:726:34 › 058 · B13 (smoke rev. 0000027) «Start live match» antes de que responda /herramientas (voz: true): cebado en el gesto, reloj retenido hasta la respuesta y antesala sin otro clic (4.4s)
+  ✓  126 [chromium] › e2e/arena-repeticion-060.spec.ts:285:1 › 060 E5 · Detener sin voz: el reloj en marcha vuelve a 0:00 y se queda quieto 500 ms; en ES, «Detener» (3.6s)
+  ✓  128 [chromium] › e2e/arena-repeticion-060.spec.ts:300:1 › 060 E5 · Detener durante la preparación: cancela sin pedir más tramos (2.8s)
+  ✓  127 [chromium] › e2e/arena-antesala.spec.ts:726:34 › 058 · B13 (smoke rev. 0000027) «Start live match» antes de que responda /herramientas (voz: false): cebado en el gesto, reloj retenido hasta la respuesta y contexto cerrado sin efectos (6.8s)
+  ✓  129 [chromium] › e2e/arena-repeticion-060.spec.ts:318:1 › 060 E6 · espacio: con el foco en body pausa y reanuda (muda y pista); en el selector, el deslizador o una ficha no hace nada (M13) (5.2s)
+  ✓  131 [chromium] › e2e/arena-repeticion-060.spec.ts:353:1 › 060 E6 · espacio durante la preparación retenida: ni pedidos ni cambios de reloj (2.7s)
+  ✓  132 [chromium] › e2e/arena-repeticion-060.spec.ts:369:1 › 060 E7 · directo con búfer: un único «Pause broadcast» bajo la cancha, pausa con «generation continues», espacio y «Stop match» con un DELETE (M14, M15) (4.1s)
+  ✓  133 [chromium] › e2e/arena-repeticion-060.spec.ts:400:1 › 060 E7 · Stop match con el POST retenido: un DELETE tras su respuesta, sin /eventos ni /reproduccion, y la vista anterior (2.2s)
+  ✘  130 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (13.5s)
+  ✓  134 [chromium] › e2e/arena-repeticion-060.spec.ts:417:1 › 060 E7 · preparado: una «completa» que llega después del DELETE no se carga (3.1s)
+  ✓  135 [chromium] › e2e/arena-repeticion-060.spec.ts:441:1 › 060 E8 · modelos por forma sin mock: duelo, ejemplo-v3, archivo importado, grabación sin IA y torneo de ensayo (EN y ES) (6.0s)
+  ✓  136 [chromium] › e2e/arena-sincronia.spec.ts:7:1 › activar y silenciar voz conserva su preparación y omite el gol ocurrido mientras estaba apagada (6.4s)
+  ✓  138 [chromium] › e2e/arena-torneo-sitio.spec.ts:18:1 › 1 · lista con los dos orígenes, rótulo del sitio y cifras del panel iguales a GET /api/arena/torneos/sitio (1.2s)
+  ✓  137 [chromium] › e2e/arena-repeticion-060.spec.ts:472:1 › 060 E8 · sesión del servidor con fixtures (/emision): verificada, incoherente, mixta y sin decisiones (4.9s)
+  ✓  139 [chromium] › e2e/arena-torneo-sitio.spec.ts:42:1 › 3 · «Watch replay» de un partido del sitio abre /arena con su marcador, la procedencia y «Back to the tournament» (3.9s)
+  ✓  141 [chromium] › e2e/arena-torneo-sitio.spec.ts:58:1 › 3b · el registro del sitio se sirve por la ruta del manifiesto con su huella; fuera del manifiesto, 404 (24ms)
+  ✓  142 [chromium] › e2e/arena-torneo-sitio.spec.ts:65:1 › 5 · un POST con un Origin ajeno da 403 (y sin JSON, 415) (17ms)
+  ✓  143 [chromium] › e2e/arena-torneo-sitio.spec.ts:71:3 › 7 · 360 px (light, en): panel y liga del fixture sin desplazamiento; tabla y matriz fuera de contenedores desplazables (1.6s)
+  ✓  144 [chromium] › e2e/arena-torneo-sitio.spec.ts:71:3 › 7 · 360 px (light, es): panel y liga del fixture sin desplazamiento; tabla y matriz fuera de contenedores desplazables (1.1s)
+  ✓  140 [chromium] › e2e/arena-repeticion-060.spec.ts:493:1 › 060 E9 · 360 × 780, oscuro y movimiento reducido: sin desborde, barra a ≤ 32 px de la cancha, botones de ≥ 44 px y modelos visibles (5.4s)
+  ✓  145 [chromium] › e2e/arena-torneo-sitio.spec.ts:71:3 › 7 · 360 px (dark, en): panel y liga del fixture sin desplazamiento; tabla y matriz fuera de contenedores desplazables (1.6s)
+  ✓  147 [chromium] › e2e/arena-torneo-sitio.spec.ts:71:3 › 7 · 360 px (dark, es): panel y liga del fixture sin desplazamiento; tabla y matriz fuera de contenedores desplazables (1.3s)
+[WebServer] [torneo-sitio] admitido sitio-2026-10-24 (liga, ensayo, publico); bolsa conocida 0 µUSD
+[WebServer] [torneo-sitio] sitio-2026-10-24 P1 0–0 (coste declarado 0 µUSD)
+  ✓  115 [chromium] › e2e/arena-mesa.spec.ts:365:1 › 048 · diálogo: ronda completa, pregunta breve gracias a las manos, estadista completo y final solo texto (1.1m)
+[WebServer] [torneo-sitio] sitio-2026-10-24 cancelado (cancelado): 1 partidos; gasto conocido 0 µUSD
+  ✓  148 [chromium] › e2e/arena-torneo-sitio.spec.ts:89:1 › 4 · lanzar una liga: confirmación, 202 y «In play»; al recargar, el botón está deshabilitado por el cupo y un POST directo da 409 (1.8s)
+  ✓  146 [chromium] › e2e/arena-repeticion-060.spec.ts:526:1 › 060 E7 · preparado: Detener con /reproduccion en vuelo no carga el partido ni publica el enlace (3.2s)
+  ✓  150 [chromium] › e2e/arena-torneo.spec.ts:27:1 › 1 · tabla literal, banda de ensayo, matriz con n(n−1) enlaces y lista con las mismas repeticiones; el .gz se sirve (744ms)
+  ✓  151 [chromium] › e2e/arena-repeticion-060.spec.ts:544:1 › 060 E7 · búfer: Detener con /emision en vuelo no reactiva la emisión ni abre el SSE (2.2s)
+  ✓  153 [chromium] › e2e/arena-repeticion-060.spec.ts:563:1 › D1 · /modelos retenido: elegir «Programmed demonstration» antes de que llegue se respeta y el POST lleva modo programado (1.8s)
+  ✓  152 [chromium] › e2e/arena-torneo.spec.ts:43:1 › 2 · una celda abre la repetición: marcador final del partido, procedencia y la cancha se mueve al reproducir (3.5s)
+  ✓  154 [chromium] › e2e/arena-repeticion-060.spec.ts:580:1 › D1 · sin elección del espectador, el catálogo sigue fijando «Random models» por defecto (1.1s)
+  ✓  155 [chromium] › e2e/arena-torneo.spec.ts:62:1 › 4 · el botón de idioma cambia los textos; ?lang=es arranca en español y los enlaces conservan el idioma (2.3s)
+  ✓  157 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · ensayo-059 · 360 px (light, en): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (623ms)
+  ✓  158 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · ensayo-059 · 360 px (light, es): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (625ms)
+  ✓  159 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · ensayo-059 · 360 px (dark, en): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (494ms)
+  ✓  160 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · ensayo-059 · 360 px (dark, es): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (610ms)
+  ✓  161 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · 2026-10-24 · 360 px (light, en): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (629ms)
+  ✓  162 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · 2026-10-24 · 360 px (light, es): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (630ms)
+  ✓  163 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · 2026-10-24 · 360 px (dark, en): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (642ms)
+  ✓  164 [chromium] › e2e/arena-torneo.spec.ts:82:3 › 5 · 2026-10-24 · 360 px (dark, es): sin desplazamiento de página; tabla y matriz fuera de contenedores desplazables y ≤ 328 px (654ms)
+  ✓  165 [chromium] › e2e/arena-torneo.spec.ts:100:70 › 6 · ensayo-059 · contraste por estilos calculados (light): texto ≥ 4.5, anillo de foco ≥ 3 (636ms)
+  ✓  166 [chromium] › e2e/arena-torneo.spec.ts:100:70 › 6 · ensayo-059 · contraste por estilos calculados (dark): texto ≥ 4.5, anillo de foco ≥ 3 (676ms)
+  ✓  167 [chromium] › e2e/arena-torneo.spec.ts:100:70 › 6 · 2026-10-24 · contraste por estilos calculados (light): texto ≥ 4.5, anillo de foco ≥ 3 (867ms)
+  ✓  168 [chromium] › e2e/arena-torneo.spec.ts:100:70 › 6 · 2026-10-24 · contraste por estilos calculados (dark): texto ≥ 4.5, anillo de foco ≥ 3 (965ms)
+  ✓  149 [chromium] › e2e/arena-mesa.spec.ts:507:1 › 048 · con la breve retrasada 3 s y la completa que no cabe, el invitado espera y arranca la breve en cuanto llega (16.7s)
+  ✓  169 [chromium] › e2e/arena-torneo.spec.ts:120:1 › 8 · /arena/torneo/no-existe es 404; un encuentro inexistente muestra el error y conserva el partido inicial (2.2s)
+  ✓  171 [chromium] › e2e/arena-torneo.spec.ts:131:1 › N13 · la procedencia se limpia al empezar otra carga, aunque esta falle (1.4s)
+  ✓  172 [chromium] › e2e/arena-torneo.spec.ts:141:1 › N14 · una respuesta tardía del torneo, cancelada, no reemplaza el registro elegido después (3.1s)
+  ✓  173 [chromium] › e2e/arena-torneo.spec.ts:160:1 › revisión Codex #2 · si la URL de un encuentro devuelve el registro válido de otro, se muestra el error y no se atribuye (1.9s)
+  ✓  174 [chromium] › e2e/arena-torneo.spec.ts:170:1 › 9 · regresión: el enlace «Tournament» está en /arena (949ms)
+  ✓  156 [chromium] › e2e/arena-variedad.spec.ts:7:1 › voz: recuerda lo reproducido y descarta ideas duplicadas preparadas antes de oírlas (19.7s)
+  ✓  175 [chromium] › e2e/arena-torneo.spec.ts:175:26 › real · 2026-10-24: /arena/torneo muestra el más reciente; 6 filas, matriz de 30 enlaces, p calculada; un partido real se abre con su marcador (2.4s)
+  ✓  177 [chromium] › e2e/arena.spec.ts:18:1 › arena: la voz en vivo pide tramos de tres segundos y permite detenerlos (6.4s)
+  ✓  170 [chromium] › e2e/arena-mesa.spec.ts:561:1 › 048 · completa decodificada que ya no cabe cuando llega el turno: arranca la breve y termina antes de la noticia (23.3s)
+  ✓  178 [chromium] › e2e/arena.spec.ts:45:1 › arena: analista con evidencia y narración completa por tramos, sin servicios de pago (13.7s)
+  ✓  180 [chromium] › e2e/arena.spec.ts:87:1 › arena: sorteo y elección manual envían solo IDs del catálogo del servidor (1.6s)
+  ✓  181 [chromium] › e2e/arena.spec.ts:111:1 › arena: duelo real archivado entre dos modelos, sin respaldos ni nuevas inferencias (3.0s)
+  ✓  182 [chromium] › e2e/arena.spec.ts:124:1 › arena: transmisión incremental, reconexión al mismo encuentro y archivo final (8.5s)
+  ✓  179 [chromium] › e2e/arena-mesa.spec.ts:609:1 › 048 v1.2 G03 · una noticia alcanzada pero pendiente de sonar anula la ventana: el invitado espera y no es cortado (21.5s)
+  ✓  183 [chromium] › e2e/arena.spec.ts:144:1 › arena: cancelar en vivo y personalizar la inteligencia con evidencia (2.7s)
+  ✓  185 [chromium] › e2e/arena.spec.ts:172:1 › arena: 22 jugadores, movimiento, pausa y selección temporal (2.6s)
+  ✓  176 [chromium] › e2e/arena-variedad.spec.ts:48:1 › voz: Speech fallido mantiene comentarios audibles distintos durante cuarenta segundos (42.2s)
+  ✓  186 [chromium] › e2e/arena.spec.ts:195:1 › arena: espera visible, una petición y controles deshabilitados (2.6s)
+  ✓  187 [chromium] › e2e/carga.spec.ts:19:3 › semilla: aviso inmediato hasta recibir el partido y sin solicitudes duplicadas (1.9s)
+  ✓  189 [chromium] › e2e/carga.spec.ts:19:3 › azar: aviso inmediato hasta recibir el partido y sin solicitudes duplicadas (1.5s)
+  ✓  190 [chromium] › e2e/carga.spec.ts:19:3 › vacia: aviso inmediato hasta recibir el partido y sin solicitudes duplicadas (1.4s)
+  ✓  188 [chromium] › e2e/arena.spec.ts:214:1 › arena: error recuperable, descarga íntegra e importación comprobada (4.2s)
+  ✓  191 [chromium] › e2e/carga.spec.ts:19:3 › historia: aviso inmediato hasta recibir el partido y sin solicitudes duplicadas (1.2s)
+  ✓  193 [chromium] › e2e/carga.spec.ts:62:1 › semilla inválida y misma ruta no dejan la barra en espera (826ms)
+  ✓  192 [chromium] › e2e/arena.spec.ts:238:1 › arena: móvil oscuro, español y movimiento reducido sin desborde (1.8s)
+  ✓  194 [chromium] › e2e/carga.spec.ts:77:1 › espera visible en móvil oscuro, sin desborde y con movimiento reducido (975ms)
+  ✓  196 [chromium] › e2e/condiciones.spec.ts:5:1 › 2/2: chip de condiciones → efectos destacados → evidencia (desglose y jugada a jugada) (1.1s)
+  ✓  195 [chromium] › e2e/arena.spec.ts:255:1 › arena: ejemplo real archivado, dos controladores del mismo modelo y reproducción sin inferencia (2.2s)
+  ✓  197 [chromium] › e2e/condiciones.spec.ts:33:1 › 9/3: con calor, el chip dice la temperatura y el efecto del calor queda destacado (1.1s)
+  ✓  184 [chromium] › e2e/arena-mesa.spec.ts:700:1 › 045/048 · el invitado que recibe 429 al activar la voz se reintenta con espera y suena sin solaparse (17.6s)
+  ✓  199 [chromium] › e2e/condiciones.spec.ts:43:1 › en el replay las condiciones se ven desde el 0'; un partido suelto no tiene condiciones (1.6s)
+  ✓  198 [chromium] › e2e/arena.spec.ts:271:1 › arena: perfiles, capitanes y selección accesible desde la cancha y la plantilla (2.9s)
+  ✓  201 [chromium] › e2e/condiciones.spec.ts:54:1 › a 360 px: el chip y el bloque de condiciones no desbordan (671ms)
+  ✓  203 [chromium] › e2e/consecuencias.spec.ts:7:1 › Players: top visible → clic en un rating → desglose → link a un partido (1.7s)
+  ✓  202 [chromium] › e2e/arena.spec.ts:299:1 › arena: ejemplo real de entrenadores con cuatro decisiones válidas y sin inferencia al cargar (2.3s)
+  ✓  204 [chromium] › e2e/consecuencias.spec.ts:28:1 › bajas: el suspendido de la jornada 2 figura en la jornada 3 (lista y cabecera del partido) (1.0s)
+  ✓  206 [chromium] › e2e/consecuencias.spec.ts:39:1 › a 360 px: la pestaña Players y su desglose no desbordan (359ms)
+  ✓  205 [chromium] › e2e/arena.spec.ts:315:1 › arena: entrenadores, entorno configurable y banco con perfiles (2.8s)
+  ✓  207 [chromium] › e2e/cronica-061.spec.ts:24:3 › 061 · «← Arena» (v1.1 § V3) › (1) desde / lleva a la arena con un push: Atrás vuelve a / y otro Atrás a /datos (2.1s)
+  ✓  209 [chromium] › e2e/cronica-061.spec.ts:37:3 › 061 · «← Arena» (v1.1 § V3) › (2) en /match/246 está visible, se llama exactamente «Arena», va a /arena y cabe a 360 px (1.2s)
+  ✓  210 [chromium] › e2e/cronica-061.spec.ts:56:3 › 061 · misma semilla y perspectiva (v1.1 § V2) › (3a) en /, tras un error, «Simulate match» con 246 no navega, limpia el error y no muestra espera (3.1s)
+  ✓  208 [chromium] › e2e/arena.spec.ts:347:1 › arena: cambios durante la reproducción, descarga y reimportación v3 (5.2s)
+  ✓  211 [chromium] › e2e/cronica-061.spec.ts:76:5 › 061 · misma semilla y perspectiva (v1.1 § V2) › (3b) desde /match/246?perspectiva=local, «Simulate match» con 246 abre la neutral y Atrás vuelve (1.9s)
+  ✓  213 [chromium] › e2e/cronica-061.spec.ts:76:5 › 061 · misma semilla y perspectiva (v1.1 § V2) › (3c) desde /?perspectiva=visita, «Simulate match» con 246 abre la neutral y Atrás vuelve (1.2s)
+  ✓  214 [chromium] › e2e/cronica-061.spec.ts:86:3 › 061 · misma semilla y perspectiva (v1.1 § V2) › (4) la perspectiva reemplaza: misma longitud de historial y Atrás vuelve a /datos (1.5s)
+  ✓  212 [chromium] › e2e/arena.spec.ts:372:1 › arena: generar primero entrega el partido pausado, comparte el registro y permite reproducir sin red (5.6s)
+  ✓  216 [chromium] › e2e/arena.spec.ts:405:1 › arena: prepara todos los audios antes de sonar, sigue un reloj continuo y cancela sin publicar audio parcial (2.0s)
+  ✓  215 [chromium] › e2e/cronica-061.spec.ts:134:3 › 061 · barra sin desborde (v1.1 § V1) › (5a) /match/246, de 320 a 1440 px en pasos de 10, con el error visible (5.3s)
+  ✓  218 [chromium] › e2e/cronica-061.spec.ts:144:5 › 061 · barra sin desborde (v1.1 § V1) › (5b) /: límites 480/481, 900/901 y 1279/1280 en claro y 360 en oscuro (1.5s)
+  ✓  217 [chromium] › e2e/arena.spec.ts:441:1 › arena: prepara una pista continua con los seis MP3 reales archivados, sin llamadas de Azure (4.4s)
+  ✓  219 [chromium] › e2e/cronica-061.spec.ts:144:5 › 061 · barra sin desborde (v1.1 § V1) › (5b) /match/246: límites 480/481, 900/901 y 1279/1280 en claro y 360 en oscuro (1.6s)
+  ✓  200 [chromium] › e2e/arena-mesa.spec.ts:733:1 › 045/048 · con 429 persistente el invitado caduca sin sonar, sin pedirse tras caducar, y la emisión sigue (24.5s)
+  ✓  221 [chromium] › e2e/cronica-061.spec.ts:144:5 › 061 · barra sin desborde (v1.1 § V1) › (5b) /liga: límites 480/481, 900/901 y 1279/1280 en claro y 360 en oscuro (1.2s)
+  ✓  220 [chromium] › e2e/arena.spec.ts:480:1 › arena: cancelar la preparación o cambiar idioma descarta las respuestas atrasadas (1.8s)
+  ✓  222 [chromium] › e2e/datos.spec.ts:16:1 › barra → Data → cifras de la corrida, descarga de la muestra real, el DATASHEET; y a 360 px sin desborde (1.2s)
+  ✓  223 [chromium] › e2e/cronica-061.spec.ts:144:5 › 061 · barra sin desborde (v1.1 § V1) › (5b) /liga/1/1: límites 480/481, 900/901 y 1279/1280 en claro y 360 en oscuro (1.5s)
+  ✓  226 [chromium] › e2e/cronica-061.spec.ts:144:5 › 061 · barra sin desborde (v1.1 § V1) › (5b) /datos: límites 480/481, 900/901 y 1279/1280 en claro y 360 en oscuro (1.0s)
+  ✓  224 [chromium] › e2e/arena.spec.ts:507:1 › arena: un fallo al cargar el registro permite reconectar sin generar otro partido (2.2s)
+  ✓  225 [chromium] › e2e/definiciones.spec.ts:15:1 › la chilena: rótulo en el paso y en la pizarra, con su zona y su distancia (2.1s)
+  ✓  227 [chromium] › e2e/cronica-061.spec.ts:171:5 › 061 · misma identidad que la arena (§ 6.2.6 + v1.1 § V5) › (6) / y /arena comparten --bg, barra, marca y punto del emblema en claro (1.6s)
+  ✓  230 [chromium] › e2e/cronica-061.spec.ts:171:5 › 061 · misma identidad que la arena (§ 6.2.6 + v1.1 § V5) › (6) / y /arena comparten --bg, barra, marca y punto del emblema en oscuro (1.4s)
+  ✓  231 [chromium] › e2e/health.spec.ts:3:1 › el probe del hosting no depende del modelo y nunca se cachea (6ms)
+  ✓  229 [chromium] › e2e/definiciones.spec.ts:24:1 › media cancha (la portada, 246): la pizarra llega al medio campo y el balón recorre su distancia real hasta el palo (3.7s)
+  ✓  232 [chromium] › e2e/insolitos.spec.ts:6:1 › doble palo de liga (7/4): la línea lo dice, la tarjeta se abre y la pizarra rebota entre los dos palos (3.6s)
+  ✓  233 [chromium] › e2e/definiciones.spec.ts:35:1 › autogol de liga (2/1): la línea dice «Own goal», la crónica lo narra en propia puerta y la pizarra marca al autor (2.8s)
+  ✓  235 [chromium] › e2e/liga.spec.ts:5:1 › home → League mode → tabla → jornada → partido completo con breadcrumb → volver (2.0s)
+  ✓  234 [chromium] › e2e/juez.spec.ts:18:1 › el camino del juez: evidencia, inversa, idioma, caja de cristal y pizarra del gol (3.6s)
+  ✓  236 [chromium] › e2e/liga.spec.ts:57:1 › primer y último partido: sin anterior / sin siguiente; ruta inválida da 404 (1.5s)
+  ✓  117 [chromium] › e2e/arena-reservas.spec.ts:115:1 › voz: en 180 s con Speech fallido no se repite una reserva antes de agotar el catálogo (3.0m)
+  ✓  237 [chromium] › e2e/juez.spec.ts:128:1 › personalización (007): Aficionado ↔ Analista sin llamadas, y «mi equipo» cambia el orden, no los números (1.9s)
+  ✓  238 [chromium] › e2e/liga.spec.ts:73:1 › el replay de un partido de liga usa su propio overlay, y coincide con sus eventos (3.6s)
+  ✓  241 [chromium] › e2e/liga.spec.ts:95:1 › a 360 px: /liga y un partido de liga sin desborde; la tabla scrollea en su contenedor (652ms)
+  ✓  240 [chromium] › e2e/juez.spec.ts:172:1 › cargar la página NO pide de antemano las otras perspectivas (sin prefetch: cada una cuesta una crónica) (3.0s)
+  ✓  242 [chromium] › e2e/niveles.spec.ts:5:1 › partido de liga: cada jugador valorado muestra «Level N» con el rótulo de atributo generado; el suelto no (853ms)
+  ✓  243 [chromium] › e2e/juez.spec.ts:187:1 › simular otra semilla desde la barra superior abre su partido (1.0s)
+  ✓  245 [chromium] › e2e/juez.spec.ts:198:1 › una semilla inválida en la URL da 404, no un partido inventado (209ms)
+  ✓  228 [chromium] › e2e/grada.spec.ts:5:1 › vivo: la reacción entra en el ticker en su minuto, rotulada; clic ⇒ su evidencia resaltada (el rugido marca su gol; el olé, su racha) (18.0s)
+  ✓  247 [chromium] › e2e/grada.spec.ts:40:1 › vista normal: bloque «Crowd» en stats, rotulado; el olé abre su racha resaltada (631ms)
+  ✓  244 [chromium] › e2e/partido-completo.spec.ts:15:1 › partido completo: cada acción, páginas hasta el final, minuto, filtros y descarga íntegra sin API (3.3s)
+  ✓  249 [chromium] › e2e/partido-completo.spec.ts:60:1 › partido completo ES/EN, sin resultados de búsqueda, teclado y móvil de 360px (2.0s)
+  ✓  248 [chromium] › e2e/pizarra3d.spec.ts:50:1 › penal de la 246: three NO se descarga sin tocar «3D»; al tocarlo, canvas, transición completa y rótulo honesto (3.4s)
+  ✓  250 [chromium] › e2e/partido-completo.spec.ts:86:1 › la liga usa los equipos y eventos de su partido; el detalle no revela el futuro del replay (1.9s)
+  ✓  246 [chromium] › e2e/pizarra.spec.ts:63:1 › animación: corre, termina en el palo registrado con zona y palo rotulados, y Replay la repite (6.8s)
+  ✓  251 [chromium] › e2e/pizarra3d.spec.ts:86:1 › sin WebGL: «3D» deja la 2D visible con su aviso, sin errores de página (997ms)
+[021] chunk 3D 2m15olb-5ul9b.js: 133.2 KB gzip
+  ✓  254 [chromium] › e2e/pizarra3d.spec.ts:106:1 › presupuesto: el chunk de three pesa ≤ PRESUPUESTO_CHUNK_3D_KB gzip (build de producción) (21ms)
+  ✓  252 [chromium] › e2e/random.spec.ts:5:1 › Random match navega a un partido válido distinto de la portada (830ms)
+  ✓  255 [chromium] › e2e/pizarra3d.spec.ts:126:1 › a 360 px: la tarjeta con la 3D no desborda (850ms)
+  ✓  256 [chromium] › e2e/random.spec.ts:21:1 › a 360 px la barra superior con Random match no desborda (590ms)
+  ✓  257 [chromium] › e2e/ratings.spec.ts:14:1 › ratings: panel rotulado → clic en la nota de la figura → desglose con eventos → eventos resaltados (1.7s)
+  ✓  258 [chromium] › e2e/relato-formaciones.spec.ts:15:1 › relato conectado: frase→cancha, balón antes/después, cada acción y TXT completo con búsqueda activa (2.1s)
+  ✓  253 [chromium] › e2e/pizarra.spec.ts:94:1 › penal: el remate sale del punto penal registrado (3.9s)
+  ✓  260 [chromium] › e2e/relato-formaciones.spec.ts:52:1 › formaciones: 22 dorsales iniciales y distribución tras cambios/rojas, con cambio de arcos (1.8s)
+  ✓  261 [chromium] › e2e/pizarra.spec.ts:107:1 › prefers-reduced-motion: pizarra estática directa, sin animación (1.4s)
+  ✓  262 [chromium] › e2e/relato-formaciones.spec.ts:76:1 › un gol abre su elaboración completa y el relato conserva remate, gol y evidencia previa (1.3s)
+  ✓  264 [chromium] › e2e/relato-formaciones.spec.ts:90:1 › relato y formaciones ES en móvil: lectura, cancha desplegable, foco y sin desborde (1.6s)
+  ✓  263 [chromium] › e2e/pizarra.spec.ts:118:1 › a 360 px la tarjeta del gol con la pizarra no desborda (3.8s)
+  ✓  265 [chromium] › e2e/relato-formaciones.spec.ts:116:1 › el relato de liga usa sus alineaciones reales; no hay entradas al detalle completo durante replay (2.5s)
+  ✓  267 [chromium] › e2e/sanciones.spec.ts:8:1 › liga visible sin sanciones en la temporada: ni asterisco ni leyenda en la tabla, ni chips en la cabecera (681ms)
+  ✓  266 [chromium] › e2e/reproduccion.spec.ts:15:1 › reproducción: ficha y balón se mueven, pausa estable y selección manual detiene incluso en la misma frase (2.3s)
+  ✓  268 [chromium] › e2e/vitrina.spec.ts:5:1 › Match stats: rotulado, cifras clicables, evidencia jugada a jugada y desglose (1.0s)
+  ✓  270 [chromium] › e2e/vitrina.spec.ts:39:1 › Match stats en el replay: «so far», y crecen con el reloj (1.5s)
+  ✓  271 [chromium] › e2e/vitrina.spec.ts:54:1 › presets: cinco historias sin marcador, y elegir una abre su partido (686ms)
+  ✓  272 [chromium] › e2e/vitrina.spec.ts:68:1 › Simulate con la semilla VACÍA genera una al azar y navega; con una inválida sigue el error (959ms)
+  ✓  273 [chromium] › e2e/vitrina.spec.ts:85:1 › a 360 px el panel de stats y su evidencia no desbordan (529ms)
+  ✓  269 [chromium] › e2e/reproduccion.spec.ts:45:1 › la jugada se detiene en su último ID; reinicio y partido completo cruzan la posesión sincronizando texto (9.4s)
+  ✓  275 [chromium] › e2e/reproduccion.spec.ts:68:1 › fluido/detallado ES/EN, formaciones narradas y descarga con todos los IDs (2.1s)
+  ✓  259 [chromium] › e2e/ratings.spec.ts:52:1 › ratings en el replay: sin figura mientras corre, notas del prefijo; la figura aparece al final (20.5s)
+  ✓  276 [chromium] › e2e/reproduccion.spec.ts:95:1 › movimiento reducido mantiene pasos discretos y lectura sincronizada (1.6s)
+  ✓  239 [chromium] › e2e/arena-reservas.spec.ts:132:1 › voz: si fallan algunas reservas o tarda su descarga, las demás cubren el silencio (36.6s)
+  ✓  278 [chromium] › e2e/reproduccion.spec.ts:113:1 › móvil: cancha completa, pausa al volver al relato y Escape devuelve el foco (1.4s)
+  ✓  279 [chromium] › e2e/reproduccion.spec.ts:130:1 › ocultar la pestaña cancela la reproducción y no la reanuda sola (1.0s)
+  ✓  277 [chromium] › e2e/xg.spec.ts:14:1 › Aficionado: % de gol en la línea, la pizarra, el relato y el panel; Analista: xG (4.3s)
+  ✓  280 [chromium] › e2e/xg.spec.ts:68:1 › relato del panel con un remate (29, primer duelo): % de gol en Aficionado, xG en Analista (661ms)
+  ✓  274 [chromium] › e2e/vivo.spec.ts:18:1 › Watch live: updates en orden de minuto → clic resalta sus eventos → pausa → Skip a la crónica completa (13.1s)
+  ✓  281 [chromium] › e2e/xg.spec.ts:84:1 › a 360 px, con el % de gol, la página y la pizarra no desbordan (3.5s)
+  ✓  282 [chromium] › e2e/vivo.spec.ts:77:1 › overlay: GET /api/overlay/246 responde JSON válido (zod) y coincide con lo que muestra el ticker (19.4s)
+
+
+  1) [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('arena-clock')
+    Expected: "0:00 / 1:00"
+    Received: "0:10 / 1:00"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('arena-clock') with timeout 10000ms
+      - waiting for getByTestId('arena-clock')
+        - locator resolved to <output class="tnum" data-cursor-s="1.133" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.200" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.250" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.350" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.467" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.983" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="2.483" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.000" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.516" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.000" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.533" data-testid="arena-clock">…</output>
+        - unexpected value "0:04 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.050" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.550" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.067" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.567" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="7.100" data-testid="arena-clock">…</output>
+        - unexpected value "0:07 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="7.616" data-testid="arena-clock">…</output>
+        - unexpected value "0:07 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.116" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.616" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.133" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.633" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.133" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.650" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+
+
+      792 |   const reloj = await page.getByTestId("arena-clock").textContent();
+      793 |   await duracion.selectOption("30");
+    > 794 |   await expect(page.getByTestId("arena-clock")).toHaveText(reloj!);
+          |                                                 ^
+      795 |   await iniciar(page);
+      796 |   await expect.poll(() => cuerpos.length).toBe(2);
+      797 |   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
+        at /home/calusaca/cronista/e2e/arena-antesala.spec.ts:794:49
+
+    Error Context: test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+  281 passed (7.9m)
+exit=1

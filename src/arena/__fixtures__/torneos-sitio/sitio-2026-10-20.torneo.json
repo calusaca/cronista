@@ -1,0 +1,2436 @@
+{
+  "version": "062-v1",
+  "id": "sitio-2026-10-20",
+  "tipo": "ensayo",
+  "titulo": {
+    "es": "Torneo del sitio · 2026-10-20 · ensayo sin IA",
+    "en": "Site tournament · 2026-10-20 · rehearsal, no AI"
+  },
+  "inicioUtc": "2026-10-20T12:00:00.000Z",
+  "commit": "3ce08cebba12ee11901b42e6973dbf023c8c38f3",
+  "motor": {
+    "version": "arena-v3",
+    "reglas": "reinicios-v5"
+  },
+  "duracionS": 10,
+  "intervaloS": 30,
+  "semilla": 20261020,
+  "participantes": [
+    {
+      "id": "ensayo:a",
+      "nombre": "Ensayo A",
+      "corto": "Ensayo A",
+      "deployment": "ensayo-a",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:a",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:b",
+      "nombre": "Ensayo B",
+      "corto": "Ensayo B",
+      "deployment": "ensayo-b",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:b",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:c",
+      "nombre": "Ensayo C",
+      "corto": "Ensayo C",
+      "deployment": "ensayo-c",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:c",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:d",
+      "nombre": "Ensayo D",
+      "corto": "Ensayo D",
+      "deployment": "ensayo-d",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:d",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:e",
+      "nombre": "Ensayo E",
+      "corto": "Ensayo E",
+      "deployment": "ensayo-e",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:e",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:f",
+      "nombre": "Ensayo F",
+      "corto": "Ensayo F",
+      "deployment": "ensayo-f",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:f",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    }
+  ],
+  "pendientes": [],
+  "gasto": {
+    "conocidoMicroUsd": 0,
+    "tipicoMicroUsd": 0,
+    "topeMicroUsd": 8000000,
+    "reservaMaxPartidoMicroUsd": 0
+  },
+  "formato": "liga",
+  "origen": "sitio",
+  "lanzamiento": "publico",
+  "finUtc": "2026-10-20T12:01:27.000Z",
+  "estado": "completo",
+  "motivoFin": null,
+  "enCurso": null,
+  "encuentros": [
+    {
+      "n": 1,
+      "jornada": 1,
+      "cruce": 1,
+      "vuelta": false,
+      "seed": 2290261191,
+      "archivo": "e01.json.gz",
+      "archivoSha256": "b09549cb2a12717bad4603aff9c6544d34cc62a6bdcd24ed4280fce9bba11b42",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Unión Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            4.560231000000044
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Juventud Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            4.546440999999959
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 2,
+      "jornada": 1,
+      "cruce": 2,
+      "vuelta": false,
+      "seed": 1240901116,
+      "archivo": "e02.json.gz",
+      "archivoSha256": "072b7c3490351b145253959feb977f728f8a3dd8f94e597f297837550ae75a8e",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Racing Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 65,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.5704899999999498
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Olímpico Nebrisa",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 35,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.5738979999999856
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 3,
+      "jornada": 1,
+      "cruce": 3,
+      "vuelta": false,
+      "seed": 3632254092,
+      "archivo": "e03.json.gz",
+      "archivoSha256": "1ede563963e76fcc046e550c7edac9c4e542105aa937dcd2fd6c740915d6cb3f",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Sporting Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.6264189999999417
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Unión Valdecristal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.6177790000000414
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 4,
+      "jornada": 2,
+      "cruce": 4,
+      "vuelta": false,
+      "seed": 1243234284,
+      "archivo": "e04.json.gz",
+      "archivoSha256": "a9dac40df04c1f4cc25dca05a76b10eab90c2ce5c912f419327e6b5548aa67f6",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Juventud Nebrisa",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.22254999999995562
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Racing Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            7.374985000000152
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 5,
+      "jornada": 2,
+      "cruce": 5,
+      "vuelta": false,
+      "seed": 1849476017,
+      "archivo": "e05.json.gz",
+      "archivoSha256": "1365962671b1a6919b3e3f21ad2307ff9392abc454c6a3e296eb09ec0183bc3a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Racing Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 41,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.38625900000010915
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Olímpico Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 59,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3360490000000027
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 6,
+      "jornada": 2,
+      "cruce": 6,
+      "vuelta": false,
+      "seed": 1745902033,
+      "archivo": "e06.json.gz",
+      "archivoSha256": "775faec559561042a4733232bcd3d18290022bad0f3e8f74d652e0539b182a6d",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Deportivo Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3504299999999603
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Club Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.47224899999991976
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 7,
+      "jornada": 3,
+      "cruce": 7,
+      "vuelta": false,
+      "seed": 1303120954,
+      "archivo": "e07.json.gz",
+      "archivoSha256": "e8f2a4c499cd41515c2b51b68108521836c4a9c1c3b2af76472ab10181ec0e8a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Sporting Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3114189999998871
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Juventud Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2945200000001478
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 8,
+      "jornada": 3,
+      "cruce": 8,
+      "vuelta": false,
+      "seed": 3552108803,
+      "archivo": "e08.json.gz",
+      "archivoSha256": "fd1d6c208ccbcf2ca6daf041a0990cd6203d61be26df9cccf94353db02740de3",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Juventud Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1922300000001087
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Sporting Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.18121900000005553
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 9,
+      "jornada": 3,
+      "cruce": 9,
+      "vuelta": false,
+      "seed": 3282043911,
+      "archivo": "e09.json.gz",
+      "archivoSha256": "ebf3d64ce458dcdc6636d15ad85305a51c598bf22d6f1da304a5696a3f73eddf",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Atlético Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.28064900000003945
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Juventud Brezal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.238510000000133
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 10,
+      "jornada": 4,
+      "cruce": 10,
+      "vuelta": false,
+      "seed": 662972170,
+      "archivo": "e10.json.gz",
+      "archivoSha256": "5fd30ee01f928d39882cde5ce7faba5018fa9824b85880cc736b3132070bdcb1",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Club Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.22054900000011912
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Atlético Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19353899999987334
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 11,
+      "jornada": 4,
+      "cruce": 11,
+      "vuelta": false,
+      "seed": 3122694856,
+      "archivo": "e11.json.gz",
+      "archivoSha256": "203909b4009ed90e2a7d96209fbb3730532c5b73f6dd73f0d5e5d633b1a4a3a9",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Club Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.20782800000006318
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Atlético Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1702989999998863
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 12,
+      "jornada": 4,
+      "cruce": 12,
+      "vuelta": false,
+      "seed": 755233512,
+      "archivo": "e12.json.gz",
+      "archivoSha256": "6fa0b3377cf4c7768a4633f165737689c3881478272d20ea374c70e1617212f3",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Olímpico Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.36426799999981085
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Atlético Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3538499999999658
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 13,
+      "jornada": 5,
+      "cruce": 13,
+      "vuelta": false,
+      "seed": 1261878209,
+      "archivo": "e13.json.gz",
+      "archivoSha256": "1eb7545ae4c32f6e94d36f2a203b1f5ce580ddfd5ce79d08abae825d3256a6f5",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Unión Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 53,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3765979999998308
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Unión Ormidia",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 47,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.339038999999957
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 14,
+      "jornada": 5,
+      "cruce": 14,
+      "vuelta": false,
+      "seed": 566188216,
+      "archivo": "e14.json.gz",
+      "archivoSha256": "efc46985d04dc7af738aca701ecf85b98fcd55ce219d23e640452df77f6dd3bd",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Atlético Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 82,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17938999999978478
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Olímpico Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 18,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.16169899999977133
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 15,
+      "jornada": 5,
+      "cruce": 15,
+      "vuelta": false,
+      "seed": 1226930179,
+      "archivo": "e15.json.gz",
+      "archivoSha256": "6c21252821b6f7cce8154c9749c79d7680bb658131959631c8f89fce4157221e",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Atlético Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1771880000001147
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Sporting Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1629480000001422
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 16,
+      "jornada": 6,
+      "cruce": 1,
+      "vuelta": true,
+      "seed": 2290261191,
+      "archivo": "e16.json.gz",
+      "archivoSha256": "b1e682049ca95f4df0b48582be7cd2f139a5dc5c256a080e0488d0c5b7c0b199",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Unión Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.178621000000021
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Juventud Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.16516999999976179
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 17,
+      "jornada": 6,
+      "cruce": 2,
+      "vuelta": true,
+      "seed": 1240901116,
+      "archivo": "e17.json.gz",
+      "archivoSha256": "8d3c7a0b4e857eaac3b27ff02a7606aeab292c274fd16e2e60bfc3d0074dc25f",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Racing Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 65,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.20147899999983565
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Olímpico Nebrisa",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 35,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17105899999978647
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 18,
+      "jornada": 6,
+      "cruce": 3,
+      "vuelta": true,
+      "seed": 3632254092,
+      "archivo": "e18.json.gz",
+      "archivoSha256": "292ec566fc5080fdf85d962c14957a4567ccf852aa1f5a033b111ecd874592e4",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Sporting Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.23399900000003981
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Unión Valdecristal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.22796999999991385
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 19,
+      "jornada": 7,
+      "cruce": 4,
+      "vuelta": true,
+      "seed": 1243234284,
+      "archivo": "e19.json.gz",
+      "archivoSha256": "f9f8a8aa80bd4a7c8706cfcb2f5600142b74aa8b1c0b25dccbdc941dbf256de7",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Juventud Nebrisa",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3239589999998316
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Racing Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.29938899999979185
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 20,
+      "jornada": 7,
+      "cruce": 5,
+      "vuelta": true,
+      "seed": 1849476017,
+      "archivo": "e20.json.gz",
+      "archivoSha256": "d6b5b1f50f54574b4eab33f00f163f05333808992f65b4ffafefef842689475c",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Racing Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 41,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2020079999997506
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Olímpico Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 59,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17855899999995017
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 21,
+      "jornada": 7,
+      "cruce": 6,
+      "vuelta": true,
+      "seed": 1745902033,
+      "archivo": "e21.json.gz",
+      "archivoSha256": "e80b792eb157976ad9154f3a510eaa87f38559867ce34244d3f9cd34d00989d1",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Deportivo Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.5066790000000765
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Club Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.47555999999985943
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 22,
+      "jornada": 8,
+      "cruce": 7,
+      "vuelta": true,
+      "seed": 1303120954,
+      "archivo": "e22.json.gz",
+      "archivoSha256": "397128414eae86b2872974fa1f2079af8b44ab9666f0f63b51c4a0bc827c79e5",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Sporting Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.29306899999983216
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Juventud Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.37925899999981993
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 23,
+      "jornada": 8,
+      "cruce": 8,
+      "vuelta": true,
+      "seed": 3552108803,
+      "archivo": "e23.json.gz",
+      "archivoSha256": "df08d37ec853392c3c0f397b26babb697e8e67398a47fd46a2232ea4d12ef248",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Juventud Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2052800000001298
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Sporting Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.18128900000010617
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 24,
+      "jornada": 8,
+      "cruce": 9,
+      "vuelta": true,
+      "seed": 3282043911,
+      "archivo": "e24.json.gz",
+      "archivoSha256": "a0d667d5fc183745456337542c1c9ebb03cd938e2397bd3d882fc9ad62c10014",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Atlético Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.25503000000026077
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Juventud Brezal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.238119000000097
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 25,
+      "jornada": 9,
+      "cruce": 10,
+      "vuelta": true,
+      "seed": 662972170,
+      "archivo": "e25.json.gz",
+      "archivoSha256": "362f699c86d38c74969320ed42516ee4ffe65aa3a67228dfe735efadc95facc0",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Club Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.22163899999986825
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Atlético Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2016510000003109
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 26,
+      "jornada": 9,
+      "cruce": 11,
+      "vuelta": true,
+      "seed": 3122694856,
+      "archivo": "e26.json.gz",
+      "archivoSha256": "1f79f9c250bf8d2cd71f88450a1f8bcdf2bc731aedc6df122310ec465aa3407a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Club Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.20155000000022483
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Atlético Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.18044999999983702
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 27,
+      "jornada": 9,
+      "cruce": 12,
+      "vuelta": true,
+      "seed": 755233512,
+      "archivo": "e27.json.gz",
+      "archivoSha256": "3376e4fdfa3053245ee2113c2a2bf9fa44eaf2292722f6c2d0303a143f148d04",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Olímpico Montefrío Bajo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19633900000007998
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Atlético Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1772399999999834
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 28,
+      "jornada": 10,
+      "cruce": 13,
+      "vuelta": true,
+      "seed": 1261878209,
+      "archivo": "e28.json.gz",
+      "archivoSha256": "f461f75ee9e60fc44227d7a74cc698cda3b6e25cbec9f555cb08ec752f6246b3",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Unión Caleteo",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 53,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1615799999999581
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Unión Ormidia",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 47,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1492089999997006
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 29,
+      "jornada": 10,
+      "cruce": 14,
+      "vuelta": true,
+      "seed": 566188216,
+      "archivo": "e29.json.gz",
+      "archivoSha256": "2d49809d94399862e13cb2777928aa3762946ab3d2a57b3e33845e11e297c8a4",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Atlético Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 82,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2152499999997417
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Olímpico Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 18,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19291999999995824
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    },
+    {
+      "n": 30,
+      "jornada": 10,
+      "cruce": 15,
+      "vuelta": true,
+      "seed": 1226930179,
+      "archivo": "e30.json.gz",
+      "archivoSha256": "e2077541548bdc1f0021bf94af7767ed94e2bd4ea7b192774931a5d4b9f2d1a5",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Atlético Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.7581669999999576
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Sporting Arenablanca",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.7372980000000098
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "liga",
+      "desempate": false
+    }
+  ]
+}

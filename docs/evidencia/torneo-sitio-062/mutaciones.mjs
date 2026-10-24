@@ -12,6 +12,7 @@ const SITIO = "src/arena/torneo-sitio.ts", FORMATOS = "src/arena/torneo-formatos
 const T_SITIO = "src/arena/__tests__/torneo-sitio.test.ts", T_RUTAS = "src/arena/__tests__/torneo-sitio-rutas.test.ts", T_FORMATOS = "src/arena/__tests__/torneo-formatos.test.ts", T_ENTRADAS = "src/arena/__tests__/torneo-entradas.test.ts";
 const RUTA = "src/app/api/arena/torneos/sitio/route.ts";
 const T_GRUPOS = "src/arena/__tests__/torneo-grupos.test.ts";
+const T_U1 = "src/ui/__tests__/ArenaTorneoLanzar.test.tsx", LANZAR = "src/ui/ArenaTorneoLanzar.tsx", PAGINA_UI = "src/ui/ArenaTorneo.tsx";
 
 /** { id, prueba, descripcion, archivo, cambios: [[buscar, reemplazo]], test, patron } */
 const M = [
@@ -113,6 +114,29 @@ const M = [
     ["void Promise.resolve().then(() => lector.cancel()).catch(() => {}); throw error;", "await lector.cancel().catch(() => {}); throw error;"]] },
   { id: "C5", desc: "sin la segunda comprobación del torneo activo antes de ARM", archivo: "scripts/deploy-azure-arena.mjs", test: T_RUTAS, patron: "Codex #5", cambios: [
     ["  await comprobarTorneoActivo();\n  const d = az(", "  const d = az("]] },
+  // --- UI del P1-a (U1) ---------------------------------------------------------------------------------------------
+  { id: "U1-cifras", desc: "cifras fijas en el panel (no las de la Ficha)", archivo: LANZAR, test: T_U1, patron: "salen de la Ficha", cambios: [
+    ['return [`${rango(f.partidos)} ${es ? "partidos" : "matches"}`,', 'return [`30 ${es ? "partidos" : "matches"}`,']] },
+  { id: "U1-motivo", desc: "botón deshabilitado sin el motivo visible", archivo: LANZAR, test: T_U1, patron: "motivo «", cambios: [
+    ["        {motivo ? textoMotivo(motivo, idioma, estado?.proximoCupoUtc) : \"\"}\n", "        {\"\"}\n"]] },
+  { id: "U1-disabled", desc: "el botón nunca se deshabilita", archivo: LANZAR, test: T_U1, patron: "motivo «", cambios: [
+    ['className="btn btn-primary" disabled={deshabilitado}', 'className="btn btn-primary" disabled={false}']] },
+  { id: "U1-grupos", desc: "grupos habilitado en P1-a", archivo: LANZAR, test: T_U1, patron: "Grupos visible", cambios: [
+    ["disabled={!fi.disponible || v.enviando}", "disabled={v.enviando}"]] },
+  { id: "U1-rotulo", desc: "quitar el rótulo de origen", archivo: PAGINA_UI, test: T_U1, patron: "rótulos de origen", cambios: [
+    ['      <p className="arena-torneo-rotulo" data-testid="arena-torneo-rotulo">{rotuloOrigen(t, idioma)}</p>\n', ""]] },
+  { id: "U1-declarado", desc: "leyenda «†» del CLI también en los del sitio", archivo: PAGINA_UI, test: T_U1, patron: "rótulos de origen", cambios: [
+    ['const declarado = sitio ? TS.declaradoServidor[idioma] : tx("declarado")', 'const declarado = tx("declarado")']] },
+  { id: "U1-aria-live", desc: "aria-live anuncia todos los partidos, no solo los nuevos", archivo: PAGINA_UI, test: T_U1, patron: "aria-live solo anuncia", cambios: [
+    ["const nuevos = despues.encuentros.filter(e => !vistos.has(e.n)).map(", "void vistos; const nuevos = despues.encuentros.map("]] },
+  { id: "U1-mostrar", desc: "portada sin preferir los reales a los ensayos", archivo: "src/ui/torneo-lista.ts", test: T_U1, patron: "torneoAMostrar", cambios: [
+    ['?? orden.find(t => t.tipo === "real") ?? orden[0] ?? null;', "?? orden[0] ?? null;"]] },
+  { id: "U1-carga", desc: "repetición del sitio cargada desde /torneos (sin la base del prefijo)", archivo: "src/ui/torneo-carga.ts", test: "src/ui/__tests__/torneo-carga.test.ts", patron: "062", cambios: [
+    ["export const baseTorneo = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? `/api/arena/torneos/sitio/${id}` : `/torneos/${id}`;", "export const baseTorneo = (id: string) => `/torneos/${id}`; void TORNEO_SITIO;"]] },
+  { id: "U1-bundle", desc: "el cliente vuelve a importar el motor (arrastra la telemetría al navegador)", archivo: PAGINA_UI, test: T_U1, patron: "no arrastran", cambios: [
+    ['import { useEffect, useMemo, useRef, useState } from "react";', 'import { useEffect, useMemo, useRef, useState } from "react";\nimport { crearConfigArena } from "../arena/motor";\nvoid crearConfigArena;']] },
+  { id: "E2E-4-error", desc: "reconocer el ErrorSitio solo con instanceof (dos copias del módulo ⇒ 500)", archivo: SITIO, test: T_RUTAS, patron: "OTRA copia del módulo", cambios: [
+    ["  if (esErrorSitio(error)) {", "  if (error instanceof ErrorSitio) {"]] },
   // --- P1-b, funciones puras de grupos (sin exponer) ---------------------------------------------------------------
   { id: "G1-sin-barajar", desc: "sorteo de grupos sin barajar", archivo: FORMATOS, test: T_GRUPOS, patron: "G1", cambios: [
     ["  for (let i = orden.length - 1; i > 0; i--) { const j = rng.int(0, i); [orden[i], orden[j]] = [orden[j]!, orden[i]!]; }\n  return orden;", "  void rng;\n  return orden;"]] },

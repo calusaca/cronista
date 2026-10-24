@@ -126,3 +126,15 @@ describe("059 · rechazos de la validación compartida (M22, N11, N12, N16)", ()
     expect(LADOS_TORNEO).toEqual(["local", "visita"]);
   }, 60_000);
 });
+
+describe("062 · fixture del sitio (src/arena/__fixtures__/torneos-sitio)", () => {
+  const DS = "src/arena/__fixtures__/torneos-sitio", ID = "sitio-2026-10-20";
+  it("la liga de ensayo del sitio supera validarTorneo 062 (cada .gz contra su plan) y el almacén tiene exactamente sus archivos", async () => {
+    const { readdirSync } = await import("node:fs");
+    const crudo = JSON.parse(readFileSync(join(DS, `${ID}.torneo.json`), "utf8"));
+    const t = validarTorneo(crudo, archivo => readFileSync(join(DS, `${ID}.${archivo}`)));
+    expect([t.version, t.tipo, t.estado, t.encuentros.length]).toEqual(["062-v1", "ensayo", "completo", 30]);
+    const esperados = [`dia-${ID.slice(6)}.json`, `${ID}.torneo.json`, `${ID}.gasto.ndjson`, ...t.encuentros.flatMap(e => [`${ID}.${e.archivo}`, `${ID}.${e.archivo.replace(".json.gz", ".ejecutor.json")}`])].sort();
+    expect(readdirSync(DS).sort()).toEqual(esperados);
+  });
+});

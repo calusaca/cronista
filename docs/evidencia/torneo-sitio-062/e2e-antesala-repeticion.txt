@@ -1,0 +1,173 @@
+
+Running 4 tests using 4 workers
+
+  ✓  2 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (3.9s)
+  ✓  4 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (3.8s)
+  ✘  1 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (13.8s)
+  ✘  3 [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados (14.2s)
+
+
+  1) [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('arena-clock')
+    Expected: "0:00 / 1:00"
+    Received: "0:11 / 1:00"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('arena-clock') with timeout 10000ms
+      - waiting for getByTestId('arena-clock')
+        - locator resolved to <output class="tnum" data-cursor-s="1.183" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.217" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.283" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.383" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.483" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="2.017" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="2.517" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.017" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.517" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.016" data-testid="arena-clock">…</output>
+        - unexpected value "0:04 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.533" data-testid="arena-clock">…</output>
+        - unexpected value "0:04 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.050" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.550" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.067" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.567" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="7.083" data-testid="arena-clock">…</output>
+        - unexpected value "0:07 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="7.583" data-testid="arena-clock">…</output>
+        - unexpected value "0:07 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.100" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.600" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.100" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.616" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.116" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.616" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="11.116" data-testid="arena-clock">…</output>
+        - unexpected value "0:11 / 1:00"
+
+
+      792 |   const reloj = await page.getByTestId("arena-clock").textContent();
+      793 |   await duracion.selectOption("30");
+    > 794 |   await expect(page.getByTestId("arena-clock")).toHaveText(reloj!);
+          |                                                 ^
+      795 |   await iniciar(page);
+      796 |   await expect.poll(() => cuerpos.length).toBe(2);
+      797 |   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
+        at /home/calusaca/cronista/e2e/arena-antesala.spec.ts:794:49
+
+    Error Context: test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('arena-clock')
+    Expected: "0:00 / 1:00"
+    Received: "0:10 / 1:00"
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('arena-clock') with timeout 10000ms
+      - waiting for getByTestId('arena-clock')
+        - locator resolved to <output class="tnum" data-cursor-s="1.033" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.067" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.117" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.250" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.367" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="1.900" data-testid="arena-clock">…</output>
+        - unexpected value "0:01 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="2.417" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="2.917" data-testid="arena-clock">…</output>
+        - unexpected value "0:02 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.433" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="3.933" data-testid="arena-clock">…</output>
+        - unexpected value "0:03 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.433" data-testid="arena-clock">…</output>
+        - unexpected value "0:04 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="4.950" data-testid="arena-clock">…</output>
+        - unexpected value "0:04 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.450" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="5.950" data-testid="arena-clock">…</output>
+        - unexpected value "0:05 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.450" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="6.966" data-testid="arena-clock">…</output>
+        - unexpected value "0:06 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="7.466" data-testid="arena-clock">…</output>
+        - unexpected value "0:07 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.016" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="8.533" data-testid="arena-clock">…</output>
+        - unexpected value "0:08 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.033" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="9.583" data-testid="arena-clock">…</output>
+        - unexpected value "0:09 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.083" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+        - locator resolved to <output class="tnum" data-cursor-s="10.600" data-testid="arena-clock">…</output>
+        - unexpected value "0:10 / 1:00"
+
+
+      792 |   const reloj = await page.getByTestId("arena-clock").textContent();
+      793 |   await duracion.selectOption("30");
+    > 794 |   await expect(page.getByTestId("arena-clock")).toHaveText(reloj!);
+          |                                                 ^
+      795 |   await iniciar(page);
+      796 |   await expect.poll(() => cuerpos.length).toBe(2);
+      797 |   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
+        at /home/calusaca/cronista/e2e/arena-antesala.spec.ts:794:49
+
+    Error Context: test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium-repeat2/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium-repeat2/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/arena-antesala-defecto-rev-70add-ación-siguen-deshabilitados-chromium-repeat2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+    [chromium] › e2e/arena-antesala.spec.ts:764:1 › defecto rev. 0000029 · con el directo terminado (sin abrir la repetición) la duración y los ajustes se habilitan y el siguiente POST lleva segundos: 30; durante la generación siguen deshabilitados 
+  2 passed (29.9s)

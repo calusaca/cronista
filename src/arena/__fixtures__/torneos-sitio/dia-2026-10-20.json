@@ -1,0 +1,143 @@
+{
+  "version": "062-v1",
+  "id": "sitio-2026-10-20",
+  "formato": "liga",
+  "tipo": "ensayo",
+  "lanzamiento": "publico",
+  "participantes": [
+    {
+      "id": "ensayo:a",
+      "nombre": "Ensayo A",
+      "corto": "Ensayo A",
+      "deployment": "ensayo-a",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:a",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:b",
+      "nombre": "Ensayo B",
+      "corto": "Ensayo B",
+      "deployment": "ensayo-b",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:b",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:c",
+      "nombre": "Ensayo C",
+      "corto": "Ensayo C",
+      "deployment": "ensayo-c",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:c",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:d",
+      "nombre": "Ensayo D",
+      "corto": "Ensayo D",
+      "deployment": "ensayo-d",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:d",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:e",
+      "nombre": "Ensayo E",
+      "corto": "Ensayo E",
+      "deployment": "ensayo-e",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:e",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:f",
+      "nombre": "Ensayo F",
+      "corto": "Ensayo F",
+      "deployment": "ensayo-f",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:f",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    }
+  ],
+  "semilla": 20261020,
+  "duracionS": 10,
+  "intervaloS": 30,
+  "motor": {
+    "version": "arena-v3",
+    "reglas": "reinicios-v5"
+  },
+  "commit": "3ce08cebba12ee11901b42e6973dbf023c8c38f3",
+  "topeMicroUsd": 8000000,
+  "tipicoMicroUsd": 0,
+  "reservaMaxPartidoMicroUsd": 0,
+  "promptMax": 10231,
+  "operacion": "00000000-0000-4000-8000-000000000002",
+  "creadoUtc": "2026-10-20T12:00:00.000Z"
+}
