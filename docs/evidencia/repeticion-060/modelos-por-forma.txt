@@ -1,0 +1,12 @@
+# Qué muestra cada forma de carga (24 oct 2026, antes del 060). «antes» = tras cargar; «despues» = tras la pista.
+# assignment = arena-live-assignment; torneo = arena-torneo-origen; controladores = .arena-controller (panel plegable de decisiones)
+publico duelo EN (Saved matches → Load recorded model duel), tras la pista: assignment [] · torneo [] · controladores ["LLM · azure-openai:cronista-equilibrado:reasoning-low","LLM · azure-openai:cronista-rapido:reasoning-low"]
+publico ?partido=34c24e93-b292-48a1-ba30-bf41ea2384bc ES (sesión del servidor, manual rapido vs luna6, 30 s): assignment ["Local: GPT-5.4 mini · Visita: GPT-6 Luna"] · controladores ["LLM · azure-openai:cronista-rapido:reasoning-low","LLM · azure-openai:cronista-luna6:reasoning-low"]
+publico ?torneo=2026-10-24&encuentro=07 EN: torneo ["Match 7 of the October 24, 2026 tournament · Home: Unión Ventolera (GPT-5.6 Luna) · Away: Sporting Islaverde Sur (GPT-6 Astra) · Back to the tournament"] · assignment [] · controladores ["LLM · azure-openai:cronista-equilibrado:reasoning-low","LLM · azure-openai:cronista-astra6:reasoning-low"]
+publico ?torneo=2026-10-24&encuentro=7 (sin cero): no carga; queda la vista previa programada
+local ejemplo-v3 EN/ES: assignment [] · torneo [] · controladores ["LLM·azure-openai:gpt-6.1-sol:reasoning-low" ×2]
+local ejemplo (v1) EN/ES: assignment [] · torneo [] · controladores ["LLM·azure-openai:gpt-6.1-sol:reasoning-low" ×2]
+local crear (Create recording without AI, 30 s): assignment [] · controladores ["Programmed·programado:geometria-v3" ×2]
+local importar arena-duelo-v3.json: assignment [] · controladores ["LLM·azure-openai:cronista-equilibrado:reasoning-low","LLM·azure-openai:cronista-rapido:reasoning-low"]
+local ?torneo=2026-10-24&encuentro=07 ES: torneo ["Partido 7 del torneo del 24 de octubre de 2026 · Local: Unión Ventolera (GPT-5.6 Luna) · Visita: Sporting Islaverde Sur (GPT-6 Astra) · Volver al torneo"]
+torneo 2026-10-24: 30 encuentros, 0 lados con decisiones de respaldo.

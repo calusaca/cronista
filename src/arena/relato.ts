@@ -4,7 +4,7 @@ import { RELATO_INTERVALOS } from "./protocolo";
 import type { EstadoArena, EventoArena, RegistroArena } from "./tipos";
 import type { Lado } from "../sim/tipos";
 import { prngDerivado } from "../sim/prng";
-import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA } from "../sim/limites";
+import { ARENA, CANTO_GOL, MESA_ARENA, PRIORIDAD_EVENTO_ARENA, REPETICION_NARRADA } from "../sim/limites";
 import type { IntervencionArena, VarianteIntercambio } from "./protocolo";
 import { varianteEfectiva } from "./turnos";
 import { comentarioEditorial, elegirVarianteVoz, type RecuerdoVoz } from "./editorial";
@@ -193,7 +193,7 @@ function conducciones(registro: RegistroArena, hastaTick: number, idioma: "es" |
 }
 
 /** Cada frase usa únicamente hechos y estados anteriores o simultáneos a su tick. */
-export function construirRelato(registro: RegistroArena, desdeTick: number, hastaTick: number, modo: "vivo" | "completo" | "buffer", idioma: "es" | "en", opciones: { cierre?: boolean; entradaTick?: number; memoria?: readonly RecuerdoVoz[] } = {}) {
+export function construirRelato(registro: RegistroArena, desdeTick: number, hastaTick: number, modo: "vivo" | "completo" | "buffer", idioma: "es" | "en", opciones: { cierre?: boolean; entradaTick?: number; memoria?: readonly RecuerdoVoz[]; evento?: string } = {}) {
   const intervalo = RELATO_INTERVALOS[modo];
   // Compatibilidad con clientes anteriores que pedían ventanas vivas de 10 s.
   const legado = modo === "vivo" && desdeTick % 100 === 0 && hastaTick <= desdeTick + 100;
@@ -202,7 +202,9 @@ export function construirRelato(registro: RegistroArena, desdeTick: number, hast
   const hechos = hechosArena(registro, hastaTick), todos = hechos.filter(h => pertenece(h.tick));
   if (opciones.cierre && modo !== "buffer") throw new Error("El cierre selectivo requiere emisión en vivo");
   if (opciones.entradaTick !== undefined && (modo !== "buffer" || opciones.cierre || !Number.isInteger(opciones.entradaTick) || opciones.entradaTick < desdeTick || opciones.entradaTick > hastaTick)) throw new Error("Entrada de narración inválida");
-  if (modo === "buffer") return relatoBuffer(registro, desdeTick, hastaTick, idioma, todos, opciones.cierre, opciones.entradaTick, opciones.memoria);
+  // Brief 060 v1.1 (3) · `evento`: solo en la pista al ritmo (buffer), nunca con cierre ni entrada.
+  if (opciones.evento !== undefined && (modo !== "buffer" || opciones.cierre || opciones.entradaTick !== undefined)) throw new Error("El evento elegido solo se admite en buffer, sin cierre ni entrada");
+  if (modo === "buffer") return relatoBuffer(registro, desdeTick, hastaTick, idioma, todos, opciones.cierre, opciones.entradaTick, opciones.memoria, opciones.evento);
   const seleccion = modo === "completo" ? todos : todos.filter(h => importantes.has(h.tipo) || h === todos.at(-1));
   const ids = new Set(seleccion.map(h => h.id));
   const eventos = new Map(registro.eventos.filter(e => e.tick <= hastaTick).map(e => [e.id, e]));
@@ -233,11 +235,14 @@ export function construirRelato(registro: RegistroArena, desdeTick: number, hast
 
 /** Cada ventana ofrece una jugada seleccionada o un comentario del estado actual.
  * Todo el contexto de una intervención termina en su propio tick de publicación. */
-function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: number, idioma: "es" | "en", hechos: HechoArena[], cierre = false, entradaTick?: number, memoria: readonly RecuerdoVoz[] = []) {
+function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: number, idioma: "es" | "en", hechos: HechoArena[], cierre = false, entradaTick?: number, memoria: readonly RecuerdoVoz[] = [], elegido?: string) {
   const prioridadEvento = PRIORIDAD_EVENTO_ARENA;
   const candidatos = registro.eventos.filter(e => (e.tick > desdeTick || desdeTick === 0 && e.tick === 0) && e.tick <= hastaTick && prioridadEvento[e.tipo]);
   candidatos.sort((a, b) => prioridadEvento[b.tipo]! - prioridadEvento[a.tipo]! || b.tick - a.tick);
-  const evento = candidatos[0], hecho = evento && hechos.find(h => h.eventos.includes(evento.id));
+  // Brief 060 v1.1 (3) · Con `elegido`, la ventana narra ESE evento importante (de la ventana) en lugar de candidatos[0].
+  const forzado = elegido === undefined ? undefined : candidatos.find(e => e.id === elegido);
+  if (elegido !== undefined && (!forzado || prioridadEvento[forzado.tipo]! < REPETICION_NARRADA.prioridadEspera)) throw new Error("Evento fuera de la ventana o de prioridad insuficiente");
+  const evento = forzado ?? candidatos[0], hecho = evento && hechos.find(h => h.eventos.includes(evento.id));
   const fragmentos: FragmentoVoz[] = [];
   const es = idioma === "es";
   let prioridad = 10, eventosNarrados = 0;
@@ -264,10 +269,11 @@ function relatoBuffer(registro: RegistroArena, desdeTick: number, hastaTick: num
     claveVoz = `evento:${evento.id}`; temaVoz = evento.tipo;
     fragmentos.push({ tick: evento.tick, texto, ...expresionEvento(evento, estado, null, registro.config.duracionS), variante: varianteVoz(registro.config.partido.seed, evento.id), fuentes: [evento.id], fotogramas: [], ...canto ? { canto: { tramos: canto.tramos } } : {} });
     prioridad = prioridadEvento[evento.tipo]!; eventosNarrados = 1;
-  } else if (desdeTick === 0) {
+  } else if (desdeTick === 0 && !forzado) {
     fragmentos.push({ tick: 0, texto: es ? `Comienza el partido entre ${registro.config.partido.local.nombre} y ${registro.config.partido.visita.nombre}.` : `The match between ${registro.config.partido.local.nombre} and ${registro.config.partido.visita.nombre} begins.`, emocion: "serena", intensidad: .25, variante: 0, fuentes: [], fotogramas: [0] });
   }
-  if (!fragmentos.length) {
+  // 060 · Un evento elegido sin hecho narrable no se sustituye por un comentario: el clip queda vacío (silencio).
+  if (!fragmentos.length && !forzado) {
     const tick = entradaTick ?? hastaTick;
     const comentario = comentarioEditorial(registro, tick, idioma, memoria, entradaTick !== undefined);
     tipoRelato = entradaTick === undefined ? comentario?.firmaEstado ? "estado" : "comentario" : "entrada";

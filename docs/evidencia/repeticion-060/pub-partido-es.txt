@@ -1,0 +1,19 @@
+forma partido:34c24e93-b292-48a1-ba30-bf41ea2384bc es conmutador true prep ms 11179
+antes {"assignment":["Local: GPT-5.4 mini · Visita: GPT-6 Luna"],"torneo":[],"controladores":["LLM · azure-openai:cronista-rapido:reasoning-low","LLM · azure-openai:cronista-luna6:reasoning-low"]}
+despues {"assignment":["Local: GPT-5.4 mini · Visita: GPT-6 Luna"],"torneo":[],"controladores":["LLM · azure-openai:cronista-rapido:reasoning-low","LLM · azure-openai:cronista-luna6:reasoning-low"]}
+total audio s 227.1 piezas 9 omitidas 
+previa 42.1 s (0 s de cancha) | invitados 47.1 s (0 s de cancha) | narrador 137.9 s para 30 s de cancha → 0.218 s cancha / s audio
+previa:1-local:0 [0-0] 12.82 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 11 (chars)
+previa:2-visita:0 [0-0] 12.41 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 10 (chars)
+previa:3-condiciones:0 [0-0] 16.90 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 17 (chars)
+narrador [0-100] 55.80 s audio · 10 s cancha · 0.179 s/s · frags 11 inicios 53 (chars)
+comentarista:amarilla:69 [69-69] 11.57 s audio · 0 s cancha · 0.000 s/s · frags 3 inicios 12 (chars)
+narrador [100-200] 44.21 s audio · 10 s cancha · 0.226 s/s · frags 8 inicios 35 (chars)
+    t190 «Simón Mendeuz (17) remata hacia la portería rival.» voz a 134.2 s (char 134.2) · cancha en tick 156 · desfase partido 3.4 s · voz adelantada 15.1 s reales
+    t197 «¡Remate y gooool! ¡Simón Mendeuz, gol! Juventud So» voz a 138.8 s (char 138.8) · cancha en tick 166 · desfase partido 3.1 s · voz adelantada 13.6 s reales
+estadista:marcador+remates:200 [200-200] 19.27 s audio · 0 s cancha · 0.000 s/s · frags 3 inicios 22 (chars)
+narrador [200-300] 37.85 s audio · 10 s cancha · 0.264 s/s · frags 7 inicios 39 (chars)
+    t300 «Final del partido. Juventud Solcanto, 1; Olímpico » voz a 204.4 s (char 204.4) · cancha en tick 283 · desfase partido 1.7 s · voz adelantada 6.4 s reales
+estadista:atajadas+acciones:300 [300-300] 16.30 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 13 (chars)
+muestras 2272 error max |v - instanteNarrado| s 0.07
+audio/pared media 1.000

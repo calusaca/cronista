@@ -3361,3 +3361,13 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .volver-arena { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 var(--ar-s2, 8px); color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 /* En un inline-flex el espacio final de la flecha se pierde: se restituye con un margen. */
 .volver-arena > span { margin-inline-end: 0.3em; }
+
+/* Brief 060 · Línea de modelos que jugaron (bajo el reloj) y rótulo de la cancha detenida en la pista al ritmo.
+   Tokens del 047/055, sin hex, sin transition/animation/transform. */
+.arena-models { margin: 0 0 4px; color: var(--muted); font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+.arena-replay-hold { flex-basis: 100%; margin: 6px 0 0; }
+/* Brief 060 § 4.1/4.5 · Barra de transporte bajo la cancha (repetición o directo): se envuelve, botones de 44 px y el
+   hueco de «Pause broadcast» (portal) no crea caja propia. */
+.arena-playback[data-modo] { margin-top: 12px; }
+.arena-playback[data-modo] .btn { min-height: 44px; }
+.arena-playback[data-modo] > .arena-playback-ranura { display: contents; }

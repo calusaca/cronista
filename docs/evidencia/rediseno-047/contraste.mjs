@@ -26,6 +26,9 @@ const PARES = [
   ["nombre equipo / marcador", ".arena-score > span", "color", null, null, 4.5, true],
   ["reloj / fondo", "[data-testid=arena-clock]", "color", null, null, 4.5, true],
   ["botón primario", ".arena-playback .btn-primary", "color", [".arena-playback .btn-primary"], "background-color", 4.5, true],
+  // Brief 060: línea de modelos que jugaron (siempre con un registro) y rótulo de espera de la pista al ritmo (si la hay).
+  ["modelos que jugaron / tablero", "[data-testid=arena-models]", "color", null, null, 4.5, true],
+  ["cancha detenida / tablero", "[data-testid=arena-replay-hold]", "color", null, null, 4.5, false],
   ["pestaña activa", ".arena-source-tabs [aria-pressed=true]", "color", [".arena-source-tabs [aria-pressed=true]"], "background-color", 4.5, true],
   // Brief 055: el círculo base de la ficha es .arena-kit (los anillos nuevos se miden aparte).
   ["dorsal local / ficha", ".arena-local .arena-token > text", "fill", [".arena-local .arena-kit"], "fill", 4.5, true],

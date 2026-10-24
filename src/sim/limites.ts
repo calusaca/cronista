@@ -1228,6 +1228,21 @@ export const ANTESALA_ARENA = {
   bloquesRotulo: { es: { cabecera: "Formación", atras: "Portería y defensa", medio: "Medio", arriba: "Ataque" }, en: { cabecera: "Formation", atras: "Goal and defence", medio: "Midfield", arriba: "Attack" } },
 } as const;
 
+/** Brief 060 · Pista narrada al ritmo del partido (Reproducir). Medido el 24 oct: con el relato detallado la
+ * cancha iba a 0,13–0,29× y la voz se adelantaba hasta 16 s (docs/evidencia/repeticion-060). */
+export const REPETICION_NARRADA = {
+  /** s de partido mínimos entre que la cancha muestra el hecho y la voz empieza a contarlo (nunca delante). */
+  reaccionS: 0.3,
+  /** s de partido máximos de retraso de un clip del narrador; más allá se omite o, si es clave, la cancha espera. */
+  retrasoMaxS: 3,
+  /** Prioridad (PRIORIDAD_EVENTO_ARENA) desde la que un clip nunca se omite: remate (60) o más. */
+  prioridadEspera: 60,
+  /** s de silencio mínimo entre dos clips colocados. */
+  huecoS: 0.25,
+  /** Variante pedida a los invitados de la Mesa en esta pista (048: «breve» cae en «completa» si no hay). */
+  varianteInvitado: "breve",
+} as const;
+
 /** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
  * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
  * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por

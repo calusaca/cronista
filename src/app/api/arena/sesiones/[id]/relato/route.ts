@@ -23,9 +23,12 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       intervencion: z.string().min(1).max(120).optional(),
       // Brief 048: variante del intercambio (solo con `intervencion`); por defecto, la completa.
       variante: z.enum(["completa", "breve"]).optional(),
+      // Brief 060 v1.1 (3): evento importante elegido por la pista al ritmo (solo buffer del narrador).
+      evento: z.string().min(1).max(120).optional(),
       memoria: memoria.optional() }).parse(cuerpo);
     const { id } = await ctx.params, gestor = gestorSesiones();
     if (p.variante !== undefined && p.intervencion === undefined) throw new ErrorSesion("La variante solo se admite con una intervención", 400);
+    if (p.evento !== undefined && (p.modo !== "buffer" || p.intervencion !== undefined || p.cierre || p.entradaTick !== undefined)) throw new ErrorSesion("El evento solo se admite en buffer, sin intervención, cierre ni entrada", 400);
     if (p.intervencion !== undefined) {
       // Brief 056 § 5.3 · La previa no está en el diario: se re-deriva del prefijo publicado en el tick 0
       // (config + inicial); un id previa:* desconocido es 404 como cualquier intervención no publicada.
@@ -64,7 +67,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     // Brief 056 v1.1 § 1 · La rama del narrador exige una ventana no vacía (antes la rechazaba construirRelato).
     if (!(p.hastaTick > p.desdeTick)) throw new ErrorSesion("Ventana de relato vacía", 400);
     const registro = await gestor.vistaPublicada(id, p.hastaTick);
-    const relato = construirRelato(registro, p.desdeTick, p.hastaTick, p.modo, p.idioma, { cierre: p.cierre, entradaTick: p.entradaTick, memoria: p.memoria });
+    const relato = construirRelato(registro, p.desdeTick, p.hastaTick, p.modo, p.idioma, { cierre: p.cierre, entradaTick: p.entradaTick, memoria: p.memoria, ...p.evento === undefined ? {} : { evento: p.evento } });
     if (!relato.texto) return Response.json({ ...relato, audio: null }, { headers: { "cache-control": "no-store" } });
     const preparada = prepararVoz(relato.fragmentos, p.idioma);
     // Una síntesis compartida ya reservada termina y queda en caché aunque

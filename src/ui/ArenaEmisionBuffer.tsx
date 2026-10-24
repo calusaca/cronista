@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { BUFFER_ARENA, firmaEstadoVoz, golSuperado, planVozBuffer, RelojBuffer, VOZ_BUFFER } from "../arena/buffer";
 import { estadoVisual } from "../arena/vista";
 import type { RegistroArena } from "../arena/tipos";
@@ -77,9 +78,11 @@ async function cargarReservas(s: Sonido, semilla: number): Promise<number> {
 
 /** El partido tiene un reloj propio. La voz lee ese cursor, prepara contenido
  * por adelantado y solo reproduce hechos que ya alcanzó la presentación. */
-export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [] }: {
+/** Brief 060 § 4.1 · `ranura`: hueco de la barra de transporte bajo la cancha donde se pinta «Pause broadcast» (portal);
+ * mientras es null no se pinta en ningún sitio (nunca hay dos). La lógica de pausa no cambia. */
+export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [], ranura = null }: {
   sesion: string; registro: RegistroArena; hastaTick: number; terminada: boolean; inicioTick: number; idioma: "es" | "en"; intervenciones?: readonly IntervencionArena[];
-  alTiempo: (tick: number) => void; alRepeticion: () => void;
+  alTiempo: (tick: number) => void; alRepeticion: () => void; ranura?: HTMLElement | null;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const reloj = useRef(new RelojBuffer(inicioTick / 10));
@@ -663,11 +666,11 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     : t("Pre-match presentation · broadcast ready", "Presentación del partido · emisión lista");
   const textoEstado = vista.retenido && (vista.estado === "preparando" || vista.estado === "recuperando") ? presentacion : estados[vista.estado];
   return <section className="arena-intelligence" data-testid="arena-buffer" aria-label={t("Live playback and audio", "Reproducción en vivo y audio")}>
+    {ranura && createPortal(<button className="btn" data-estado={vista.estado} aria-keyshortcuts="Space" disabled={vista.estado === "final"} onClick={pausar}>{vista.estado === "pausada" ? t("Resume broadcast", "Continuar emisión") : t("Pause broadcast", "Pausar emisión")}</button>, ranura)}
     <h2>{t("Live match", "Partido en vivo")}</h2>
     <p className="arena-muted">{t("Continuous narration combines match action and commentary, with pauses under five seconds while audio is enabled.", "La narración continua combina jugadas y comentarios, con pausas de menos de cinco segundos mientras el audio está activado.")}</p>
     <p role="status" data-testid="arena-buffer-status" data-ready-seconds={vista.reserva.toFixed(2)}>{textoEstado}</p>
     <div className="arena-live-controls">
-      <button className="btn" disabled={vista.estado === "final"} onClick={pausar}>{vista.estado === "pausada" ? t("Resume broadcast", "Continuar emisión") : t("Pause broadcast", "Pausar emisión")}</button>
       {faseAntesala && <button className="btn" ref={saltarRef} data-testid="arena-antesala-skip" onClick={saltarAntesala}>{t("Skip to kick-off", "Saltar al saque")}</button>}
       <button className="btn" ref={vozBotonRef} disabled={!disponible || vista.estado === "final" && !voz} aria-pressed={voz} onClick={cambiarVoz}>{voz ? t("Turn narration off", "Desactivar narración") : t("Enable narration", "Activar narración")}</button>
       {pulsar && <button className="btn" onClick={habilitarAudio}>{t("Enable audio playback", "Habilitar reproducción de audio")}</button>}

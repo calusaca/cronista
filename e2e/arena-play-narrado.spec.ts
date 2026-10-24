@@ -2,6 +2,8 @@
 // arena-descargas.spec.ts: `herramientas` → voz; `grabaciones` → `{ id }` de una sesión programada real
 // creada con `crearSesion` (el servidor de e2e no tiene ARENA_VOZ); `relato` → `construirRelato` real + WAV
 // de silencio por ventana (las piezas de la previa responden 404 y se omiten, como en arena.spec.ts).
+// Brief 060 § 8.2: la barra usa la pista al ritmo (ventanas `buffer` con memoria, eventos importantes y cierre); los
+// tramos esperados salen de `planificarPista` sobre las duraciones servidas.
 // La grabación se crea con «Create recording without AI» (POST real a /api/arena).
 import { expect, test, type APIRequestContext, type Page, type Route } from "@playwright/test";
 import { readFile } from "node:fs/promises";
@@ -9,6 +11,8 @@ import { crearSesion } from "./sesiones";
 import { instanteAudio, instanteNarrado, wavMono, type TramoTemporal } from "../src/arena/pista-audio";
 import { RELATO_INTERVALOS } from "../src/arena/protocolo";
 import { construirRelato } from "../src/arena/relato";
+import { recordarVoz, type RecuerdoVoz } from "../src/arena/editorial";
+import { importantesVentana, planificarPista, type PiezaPlan } from "../src/arena/plan-pista";
 import type { RegistroArena } from "../src/arena/tipos";
 import { ARENA } from "../src/sim/limites";
 
@@ -17,7 +21,9 @@ test.describe.configure({ mode: "serial" });
 const reloj = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 const wav = async (segundos: number) => Buffer.from(await wavMono([new Float32Array(Math.round(segundos * 24000))], 24000).arrayBuffer()).toString("base64");
 const barrera = () => { let soltar!: () => void; const p = new Promise<void>(r => { soltar = r; }); return { p, soltar }; };
-type Pedido = { desdeTick: number; hastaTick: number; modo: string; idioma: "es" | "en"; intervencion?: string };
+type Pedido = { desdeTick: number; hastaTick: number; modo: string; idioma: "es" | "en"; intervencion?: string; cierre?: boolean; evento?: string; memoria?: RecuerdoVoz[] };
+/** Brief 060 § 8.2 (ii) · Respuesta servida del narrador con audio (para reconstruir el plan con sus duraciones). */
+type Servida = { pedido: Pedido; tick: number; prioridad: number };
 
 let idReal: string | undefined;
 /** Una sesión programada real (la misma para todo el archivo): `grabaciones` simulada devuelve su id. */
@@ -36,7 +42,7 @@ interface OpcionesVoz {
 }
 /** Simula voz, registro y relato. Devuelve los cuerpos de `grabaciones` y los pedidos de `relato`. */
 async function simularVoz(page: Page, o: OpcionesVoz) {
-  const grabaciones: unknown[] = [], relatos: (Pedido & { sesion: string })[] = [];
+  const grabaciones: unknown[] = [], relatos: (Pedido & { sesion: string })[] = [], servidas: Servida[] = [];
   let registro: RegistroArena | undefined = o.registro;
   const clip = await wav(o.clipS ?? 1);
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: o.voz ?? true, analista: false } }));
@@ -52,10 +58,15 @@ async function simularVoz(page: Page, o: OpcionesVoz) {
     const p = r.request().postDataJSON() as Pedido;
     if (p.intervencion) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     relatos.push({ ...p, sesion: r.request().url().split("/sesiones/")[1]!.split("/")[0]! });
-    const normal = () => r.fulfill({ json: { ...construirRelato(registro!, p.desdeTick, p.hastaTick, p.modo as "completo", p.idioma), audio: { base64: clip, tipo: "audio/wav" } } }).catch(() => {});
+    // 060 § 8.2 (i) · `buffer` con memoria, cierre y evento; sin texto, sin audio (como el servidor).
+    const normal = () => {
+      const relato = p.modo === "buffer" ? construirRelato(registro!, p.desdeTick, p.hastaTick, "buffer", p.idioma, { memoria: p.memoria, cierre: p.cierre, ...p.evento ? { evento: p.evento } : {} }) : construirRelato(registro!, p.desdeTick, p.hastaTick, p.modo as "completo", p.idioma);
+      if (relato.texto) servidas.push({ pedido: p, tick: relato.fragmentos[0]!.tick, prioridad: p.cierre ? Infinity : "prioridad" in relato ? relato.prioridad : 0 });
+      return r.fulfill({ json: { ...relato, audio: relato.texto ? { base64: clip, tipo: "audio/wav" } : null } }).catch(() => {});
+    };
     return o.tramo ? o.tramo(r, p, normal) : normal();
   });
-  return { grabaciones, relatos, registro: () => registro! };
+  return { grabaciones, relatos, servidas, registro: () => registro! };
 }
 /** «Saved matches» → 30 s → «Create recording without AI»: devuelve el registro creado por el servidor. */
 async function crearGrabacion(page: Page, es = false) {
@@ -68,12 +79,29 @@ async function crearGrabacion(page: Page, es = false) {
   await expect(page.getByTestId("arena-clock")).toHaveText(`0:00 / ${reloj(registro.final.tick * ARENA.pasoS)}`);
   return registro;
 }
-/** Tramos de la pista (la previa se omite): una ventana de RELATO_INTERVALOS.completo por clip de `clipS`. */
-const tramosDe = (registro: RegistroArena, clipS: number): TramoTemporal[] => {
-  const tramos: TramoTemporal[] = [];
-  for (let k = 0, desde = 0; desde < registro.final.tick; k++, desde += RELATO_INTERVALOS.completo) tramos.push({ inicioS: k * clipS, finS: (k + 1) * clipS, desdeTick: desde, hastaTick: Math.min(desde + RELATO_INTERVALOS.completo, registro.final.tick) });
-  return tramos;
-};
+/** 060 § 8.2 (ii) · Tramos de la pista (la previa se omite): `planificarPista` sobre las piezas servidas, cada una de `clipS`. */
+const piezasDe = (servidas: readonly Servida[], clipS: number): PiezaPlan[] => servidas.map((x, orden) => ({ id: `${x.pedido.desdeTick}:${x.pedido.evento ?? (x.pedido.cierre ? "cierre" : "")}`, tipo: x.pedido.cierre ? "cierre" : "narrador", tick: x.tick, duracionS: clipS, prioridad: x.prioridad, orden }));
+const tramosDe = (registro: RegistroArena, servidas: readonly Servida[], clipS: number): TramoTemporal[] => planificarPista(piezasDe(servidas, clipS), registro.final.tick).tramos;
+/** 060 v1.1 (6) · Duración del plan antes de pedir nada: los mismos pedidos que hará la barra (ventanas `buffer` con la
+ * memoria encadenada, eventos importantes y cierre), con `clipS` por clip. */
+function duracionPlanS(registro: RegistroArena, clipS: number, idioma: "es" | "en" = "en"): number {
+  const servidas: Servida[] = [], B = RELATO_INTERVALOS.buffer, fin = registro.final.tick;
+  let memoria: RecuerdoVoz[] = [], ultima = 0;
+  const pedir = (p: Pedido) => {
+    const x = construirRelato(registro, p.desdeTick, p.hastaTick, "buffer", idioma, { memoria, cierre: p.cierre, ...p.evento ? { evento: p.evento } : {} }) as Extract<ReturnType<typeof construirRelato>, { tipoRelato: unknown }>;
+    if (x.texto) { servidas.push({ pedido: p, tick: x.fragmentos[0]!.tick, prioridad: p.cierre ? Infinity : x.prioridad }); memoria = recordarVoz(memoria, { tick: x.fragmentos[0]!.tick, texto: x.texto.slice(0, 500), clave: x.claveVoz, tema: x.temaVoz }); }
+    return x;
+  };
+  for (let d = 0; d < fin; d += B) {
+    ultima = d; const h = Math.min(d + B, fin), x = pedir({ desdeTick: d, hastaTick: h, modo: "buffer", idioma });
+    const narrado = x.tipoRelato === "jugada" ? x.fuentes[0] : undefined;
+    for (const e of importantesVentana(registro, d, h)) if (e.id !== narrado) pedir({ desdeTick: d, hastaTick: h, modo: "buffer", idioma, evento: e.id });
+  }
+  pedir({ desdeTick: ultima, hastaTick: fin, modo: "buffer", idioma, cierre: true });
+  return planificarPista(piezasDe(servidas, clipS), fin).duracionS;
+}
+/** 060 v1.1 (6) · Margen de arranque (s) sobre la duración del plan para esperar el final de la pista. */
+const MARGEN_ARRANQUE_S = 10;
 const audio = (page: Page) => page.getByTestId("arena-narration").locator("audio");
 const lectura = (page: Page) => page.evaluate(() => {
   const a = document.querySelector<HTMLAudioElement>('[data-testid="arena-narration"] audio')!, s = document.querySelector<HTMLInputElement>("input.arena-seek")!;
@@ -110,9 +138,9 @@ test("057 · crear grabación sin IA → Reproducir sube el registro, prepara, s
   await expect(boton(page, "Pause")).toBeVisible({ timeout: 20_000 });
   await expect(page.getByTestId("arena-play-progress")).toHaveCount(0);
   await expect.poll(async () => (await lectura(page)).pausado).toBe(false);
-  expect(voz.relatos.every(p => p.sesion === id && p.modo === "completo")).toBe(true);
+  expect(voz.relatos.every(p => p.sesion === id && p.modo === "buffer")).toBe(true);
   // Un solo escritor: dos lecturas separadas 1 s, el cursor coincide con instanteNarrado(audio.currentTime) (± 0,3 s).
-  const tramos = tramosDe(registro, clipS);
+  const tramos = tramosDe(registro, voz.servidas, clipS);
   for (let k = 0; k < 2; k++) {
     if (k) await page.waitForTimeout(1000);
     const l = await lectura(page);
@@ -155,8 +183,11 @@ test("057 · fin del audio: Reproducir vuelve a sonar desde 0 sin pedir de nuevo
   const voz = await simularVoz(page, { id, clipS: 0.25 });
   await page.goto("/arena");
   const registro = await crearGrabacion(page);
+  // 060 v1.1 (6) · La pista dura ahora lo que el plan (≈ el partido a 1×): el plazo sale de él.
+  const plazo = (duracionPlanS(registro, 0.25) + MARGEN_ARRANQUE_S) * 1000;
+  test.setTimeout(60_000 + plazo);
   await boton(page, "Play").click();
-  await expect(page.getByTestId("arena-narration").getByRole("status")).toHaveText("End of narration", { timeout: 20_000 });
+  await expect(page.getByTestId("arena-narration").getByRole("status")).toHaveText("End of narration", { timeout: plazo });
   await expect(page.getByTestId("arena-clock")).toHaveText(`${reloj(registro.final.tick * ARENA.pasoS)} / ${reloj(registro.final.tick * ARENA.pasoS)}`);
   await expect(boton(page, "Play")).toBeEnabled();
   const pedidos = voz.relatos.length, sonadas = await page.evaluate(() => (window as unknown as { reproducciones: number }).reproducciones);
@@ -193,7 +224,7 @@ test("057 · ?partido= de una sesión borrada: se re-registra con una sola subid
   const voz = await simularVoz(page, { id: nueva, registro, tramo: async (r, p, normal) => {
     // El almacén ya no tiene la sesión compartida: su relato es 404 (como responde el servidor).
     if (r.request().url().includes(borrada)) return r.fulfill({ status: 404, json: { error: "Sesión inexistente o caducada" } });
-    expect(p.modo).toBe("completo"); await normal();
+    expect(p.modo).toBe("buffer"); await normal();
   } });
   await page.goto(`/arena?partido=${borrada}`);
   await expect(page.getByTestId("arena-live-status")).toContainText("Match ready", { timeout: 20_000 });
@@ -374,12 +405,13 @@ test("057 v1.1 (8) · autoplay bloqueado: fase «pulsar», el botón dice Play y
 });
 
 test("057 v1.1 (8) · error tardío: 200 en dos ventanas y 500 en la tercera → sin pista, aviso y cancha muda", async ({ page, request }) => {
-  const voz = await simularVoz(page, { id: await sesionReal(request), tramo: async (r, p, normal) => { if (p.desdeTick >= 2 * RELATO_INTERVALOS.completo) return r.fulfill({ status: 500, json: { error: "Fallo de prueba" } }); await normal(); } });
+  const voz = await simularVoz(page, { id: await sesionReal(request), tramo: async (r, p, normal) => { if (p.desdeTick >= 2 * RELATO_INTERVALOS.buffer) return r.fulfill({ status: 500, json: { error: "Fallo de prueba" } }); await normal(); } });
   await page.goto("/arena");
   await crearGrabacion(page);
   await boton(page, "Play").click();
   await expect(page.getByTestId("arena-play-fallback")).toHaveText("Narration unavailable (network error); playing without voice.", { timeout: 20_000 });
-  expect(voz.relatos.map(p => p.desdeTick)).toEqual([0, RELATO_INTERVALOS.completo, 2 * RELATO_INTERVALOS.completo]);
+  // 060 § 8.2 (iii) · Ventanas de RELATO_INTERVALOS.buffer (las peticiones extra con `evento` de v1.1 (3) no son ventanas).
+  expect(voz.relatos.filter(p => !p.evento).map(p => p.desdeTick)).toEqual([0, RELATO_INTERVALOS.buffer, 2 * RELATO_INTERVALOS.buffer]);
   await expect(audio(page)).not.toHaveAttribute("src", /blob:/);
   await seMueve(page);
 });

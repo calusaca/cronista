@@ -1,0 +1,17 @@
+{
+ "origen": "Brief 060 v1.1 (3): construirRelato(…, \"buffer\") de HEAD 73eb279 antes de añadir `evento` (ventanas de RELATO_INTERVALOS.buffer y cierre, memoria vacía y encadenada).",
+ "huellas": {
+  "arena-duelo-v3.json:es:vacia": "1bc2b38753343cc2a9e8309b57f292bc8f399ed4a5087b703cb8ddd88a9f37f6",
+  "arena-duelo-v3.json:es:encadenada": "2361389b63998a20316502ffa3df0465eb0f3559cf5fca37d8ae44eb6a7a57ec",
+  "arena-duelo-v3.json:en:vacia": "abfafbabd1d466b555c1f9727b53ba41b279d6da062c870c46b9057cc6073ec9",
+  "arena-duelo-v3.json:en:encadenada": "03b61be9469530bd6ce934c3bb6d901dc6246d3a34b956b2337297219b5bb88f",
+  "arena-llm-v3.json:es:vacia": "dfc32f3c691690285c778434576f7abfaa3216a17b7ff2f7ed013bba8191311f",
+  "arena-llm-v3.json:es:encadenada": "d4faa97ff1a787183ba1e32a1db2258a8f4a6cab3cca1918cef3dfaecb665423",
+  "arena-llm-v3.json:en:vacia": "ab0dcc824fee33877dae72014ad900a59ae8bb8c0c2bd7a017bbf718db3b1682",
+  "arena-llm-v3.json:en:encadenada": "cbaec881c082cab48a567ced718641d9d2fb48ee4ed4cd6f6be20788def88b46",
+  "arena-llm-v1.json:es:vacia": "acfe7c1b4b1fa764de7e4e8404fedf28829c34fe53a1c3b90043a51c95115e65",
+  "arena-llm-v1.json:es:encadenada": "acfe7c1b4b1fa764de7e4e8404fedf28829c34fe53a1c3b90043a51c95115e65",
+  "arena-llm-v1.json:en:vacia": "3e6a28c7eef7cc443163e3939ebb89d7011cfdbb3177d4cc2d503c0824993f95",
+  "arena-llm-v1.json:en:encadenada": "3e6a28c7eef7cc443163e3939ebb89d7011cfdbb3177d4cc2d503c0824993f95"
+ }
+}

@@ -1,0 +1,20 @@
+forma duelo en conmutador true prep ms 11254
+antes {"assignment":[],"torneo":[],"controladores":["Programmed · programado:geometria-v3","Programmed · programado:geometria-v3"]}
+despues {"assignment":[],"torneo":[],"controladores":["LLM · azure-openai:cronista-equilibrado:reasoning-low","LLM · azure-openai:cronista-rapido:reasoning-low"]}
+total audio s 247.9 piezas 9 omitidas 
+previa 43.9 s (0 s de cancha) | invitados 0.0 s (0 s de cancha) | narrador 204.0 s para 60 s de cancha → 0.294 s cancha / s audio
+previa:1-local:0 [0-0] 13.37 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 10 (chars)
+previa:2-visita:0 [0-0] 14.06 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 10 (chars)
+previa:3-condiciones:0 [0-0] 16.51 s audio · 0 s cancha · 0.000 s/s · frags 2 inicios 12 (chars)
+narrador [0-100] 45.41 s audio · 10 s cancha · 0.220 s/s · frags 9 inicios 36 (chars)
+narrador [100-200] 20.23 s audio · 10 s cancha · 0.494 s/s · frags 4 inicios 14 (chars)
+narrador [200-300] 38.71 s audio · 10 s cancha · 0.258 s/s · frags 7 inicios 38 (chars)
+    t222 «Joel Mendiuz (3) shoots towards the opposing goal.» voz a 113.1 s (char 113.1) · cancha en tick 209 · desfase partido 1.3 s · voz adelantada 5.0 s reales
+    t231 «What a goal! Joel Mendiuz scores! Juventud Islaver» voz a 117.7 s (char 117.7) · cancha en tick 221 · desfase partido 1.0 s · voz adelantada 3.9 s reales
+narrador [300-400] 35.86 s audio · 10 s cancha · 0.279 s/s · frags 5 inicios 28 (chars)
+    t301 «Mara Dorino reviews the formation: 4-4-2. Stated r» voz a 148.3 s (char 148.3) · cancha en tick 300 · desfase partido 0.1 s · voz adelantada 0.4 s reales
+narrador [400-500] 18.02 s audio · 10 s cancha · 0.555 s/s · frags 4 inicios 16 (chars)
+narrador [500-600] 45.77 s audio · 10 s cancha · 0.218 s/s · frags 9 inicios 44 (chars)
+    t600 «Full time. Juventud Islaverde Sur, 1; Atlético Mon» voz a 242.1 s (char 242.1) · cancha en tick 587 · desfase partido 1.3 s · voz adelantada 5.8 s reales
+muestras 2480 error max |v - instanteNarrado| s 0.05
+audio/pared media 1.000

@@ -1,0 +1,44 @@
+[0-100] 45.4 s · huecos ms 1110,1100,1130,1140,1100,1120,1100,1120
+   t0 silencios 0.2 s · caracteres 0.0 s · cancha llega 0.0 s · The match between Juventud Islaverde Sur
+   t1 silencios 5.8 s · caracteres 6.8 s · cancha llega 0.5 s · Benja Bareardi (16) attempts a 23 m pass
+   t10 silencios 11.9 s · caracteres 12.6 s · cancha llega 4.5 s · Emilio Quinelón (9) intercepts the ball'
+   t31 silencios 16.2 s · caracteres 16.8 s · cancha llega 14.1 s · Emilio Zaroánez (14) takes control of th
+   t50 silencios 20.6 s · caracteres 21.1 s · cancha llega 22.7 s · Emilio Zaroánez (14) attempts a 19 m pas
+   t57 silencios 26.4 s · caracteres 26.8 s · cancha llega 25.9 s · Mateo Dorinosa (8) intercepts the ball's
+   t76 silencios 30.8 s · caracteres 30.9 s · cancha llega 34.5 s · Mateo Dorinosa (8) attempts a 12 m pass 
+   t77 silencios 36.3 s · caracteres 36.4 s · cancha llega 35.0 s · Emilio Quinelón (9) receives the ball.
+   t96 silencios 40.0 s · caracteres 39.9 s · cancha llega 43.6 s · Emilio Quinelón (9) attempts a 11 m pass
+[100-200] 20.2 s · huecos ms 1100,1110,1100
+   t102 silencios 0.2 s · caracteres 0.0 s · cancha llega 0.4 s · Teo Lorelino (16) receives in an offside
+   t102 silencios 6.2 s · caracteres 6.2 s · cancha llega 0.4 s · Experimental restart from Aarón Celoón (
+   t122 silencios 11.5 s · caracteres 12.1 s · cancha llega 4.5 s · Aarón Celoón (1) attempts a 29 m pass to
+   t139 silencios 16.8 s · caracteres 17.2 s · cancha llega 7.9 s · Joel Mendiuz (3) receives the ball.
+[200-300] 38.7 s · huecos ms 1070,1250,1330,1130,1120,1130
+   t215 silencios 0.2 s · caracteres 0.0 s · cancha llega 5.8 s · Joel Mendiuz advances towards the box.
+   t222 silencios 7.3 s · caracteres 3.5 s · cancha llega 8.5 s · Joel Mendiuz (3) shoots towards the oppo
+   t231 silencios 9.7 s · caracteres 8.1 s · cancha llega 12.0 s · What a goal! Joel Mendiuz scores! Juvent
+   t231 silencios 17.8 s · caracteres 17.1 s · cancha llega 12.0 s · Experimental restart from Emilio Torelue
+   t250 silencios 23.4 s · caracteres 23.7 s · cancha llega 19.4 s · Emilio Torelueta (1) attempts a 32 m pas
+   t270 silencios 29.3 s · caracteres 29.7 s · cancha llega 27.1 s · Thiago Valoena (4) receives the ball.
+   t289 silencios 33.1 s · caracteres 33.1 s · cancha llega 34.5 s · Thiago Valoena (4) attempts a 38 m pass 
+[300-400] 35.9 s · huecos ms 1000,1120,1100,1100
+   t301 silencios 0.2 s · caracteres 0.0 s · cancha llega 0.4 s · Mara Dorino reviews the formation: 4-4-2
+   t301 silencios 4.3 s · caracteres 14.3 s · cancha llega 0.4 s · Elio Zarueta reviews the formation: 3-4-
+   t313 silencios 13.9 s · caracteres 25.7 s · cancha llega 4.7 s · Teo Lorelino (16) receives the ball.
+   t325 silencios 25.1 s · caracteres 28.8 s · cancha llega 9.0 s · Teo Lorelino advances towards the box.
+   t365 silencios 29.1 s · caracteres 32.0 s · cancha llega 23.3 s · Teo Lorelino carries the ball towards th
+[400-500] 18.0 s · huecos ms 1150,1150,1140
+   t428 silencios 0.2 s · caracteres 0.0 s · cancha llega 5.0 s · Bruno Quinoich (4) takes control of the 
+   t436 silencios 4.2 s · caracteres 4.1 s · cancha llega 6.5 s · Fabio Valinera (6) takes control of the 
+   t467 silencios 8.2 s · caracteres 8.2 s · cancha llega 12.1 s · Bruno Quinoich (4) takes control of the 
+   t486 silencios 12.2 s · caracteres 12.3 s · cancha llega 15.5 s · Bruno Quinoich (4) attempts a 35 m pass 
+[500-600] 45.8 s · huecos ms 1130,1170,1080,1130,1130,1130,1120,1180
+   t508 silencios 0.2 s · caracteres 0.0 s · cancha llega 3.7 s · Thiago Valoena (4) intercepts the ball's
+   t527 silencios 4.5 s · caracteres 4.1 s · cancha llega 12.4 s · Thiago Valoena (4) attempts a 6 m pass t
+   t530 silencios 9.9 s · caracteres 9.7 s · cancha llega 13.7 s · Fabio Valinera (6) receives in an offsid
+   t530 silencios 15.7 s · caracteres 16.2 s · cancha llega 13.7 s · Experimental restart from Aarón Celoón (
+   t549 silencios 20.8 s · caracteres 22.4 s · cancha llega 22.4 s · Aarón Celoón (1) attempts a 30 m pass to
+   t567 silencios 25.9 s · caracteres 27.8 s · cancha llega 30.7 s · Bruno Quinoich (4) receives the ball.
+   t586 silencios 29.6 s · caracteres 31.2 s · cancha llega 39.4 s · Bruno Quinoich (4) attempts a 17 m pass 
+   t596 silencios 35.0 s · caracteres 36.7 s · cancha llega 43.9 s · Dante Doraena (8) receives the ball.
+   t600 silencios 38.6 s · caracteres 40.0 s · cancha llega 45.8 s · Full time. Juventud Islaverde Sur, 1; At

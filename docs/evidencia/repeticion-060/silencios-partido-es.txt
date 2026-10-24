@@ -1,0 +1,29 @@
+[0-100] 55.8 s · huecos ms 1090,1060,1130,1110,1030,1140,1120,1090,1100,1110
+   t0 silencios 0.2 s · caracteres 0.0 s · cancha llega 0.0 s · Comienza el partido entre Juventud Solca
+   t0 silencios 4.9 s · caracteres 6.0 s · cancha llega 0.0 s · Saque de centro para Juventud Solcanto; 
+   t16 silencios 10.6 s · caracteres 12.2 s · cancha llega 8.9 s · Gael Mendoich (10) intenta un pase de 29
+   t32 silencios 16.8 s · caracteres 18.0 s · cancha llega 17.9 s · Simón Mendeuz (17) recibe el balón.
+   t53 silencios 20.9 s · caracteres 21.3 s · cancha llega 29.6 s · Simón Mendeuz (17) intenta un pase de 8 
+   t57 silencios 27.1 s · caracteres 27.0 s · cancha llega 31.8 s · Gael Mendoich (10) recibe el balón.
+   t69 silencios 31.0 s · caracteres 30.3 s · cancha llega 38.5 s · Falta de Hugo Baraino (9) sobre Gael Men
+   t69 silencios 36.6 s · caracteres 36.4 s · cancha llega 38.5 s · Tarjeta amarilla para Hugo Baraino (9).
+   t69 silencios 40.1 s · caracteres 40.1 s · cancha llega 38.5 s · Reinicio experimental desde Gael Mendoic
+   t90 silencios 45.7 s · caracteres 46.4 s · cancha llega 50.2 s · Gael Mendoich (10) intenta un pase de 3 
+   t91 silencios 51.8 s · caracteres 52.3 s · cancha llega 50.8 s · Thiago Soraánez (16) recibe el balón.
+[100-200] 44.2 s · huecos ms 1130,1150,1080,1100,1030,1240,1300
+   t112 silencios 0.2 s · caracteres 0.0 s · cancha llega 5.3 s · Thiago Soraánez (16) intenta un pase de 
+   t119 silencios 6.4 s · caracteres 5.9 s · cancha llega 8.4 s · Simón Mendeuz (17) recibe el balón.
+   t160 silencios 10.6 s · caracteres 9.1 s · cancha llega 26.5 s · Falta de Ramiro Bariosa (4) sobre Simón 
+   t160 silencios 16.3 s · caracteres 15.3 s · cancha llega 26.5 s · Reinicio experimental desde Simón Mendeu
+   t185 silencios 22.2 s · caracteres 21.5 s · cancha llega 37.6 s · Simón Mendeuz avanza hacia el área.
+   t190 silencios 29.0 s · caracteres 24.7 s · cancha llega 39.8 s · Simón Mendeuz (17) remata hacia la porte
+   t197 silencios 31.8 s · caracteres 29.3 s · cancha llega 42.9 s · ¡Remate y gooool! ¡Simón Mendeuz, gol! J
+   t197 silencios 38.9 s · caracteres 38.2 s · cancha llega 42.9 s · Saque de centro para Olímpico Torreluna;
+[200-300] 37.8 s · huecos ms 1120,1110,1070,1100,1130,1140
+   t213 silencios 0.2 s · caracteres 0.0 s · cancha llega 4.9 s · Hugo Baraino (9) intenta un pase de 18 m
+   t222 silencios 6.1 s · caracteres 6.2 s · cancha llega 8.3 s · Marco Zariido (8) recibe el balón.
+   t243 silencios 9.9 s · caracteres 9.7 s · cancha llega 16.3 s · Marco Zariido (8) intenta un pase de 33 
+   t258 silencios 16.0 s · caracteres 15.9 s · cancha llega 22.0 s · Gael Mendoich (10) intercepta la trayect
+   t279 silencios 20.9 s · caracteres 21.5 s · cancha llega 29.9 s · Gael Mendoich (10) intenta un pase de 16
+   t287 silencios 27.0 s · caracteres 27.9 s · cancha llega 32.9 s · Simón Mendeuz (17) recibe el balón.
+   t300 silencios 31.1 s · caracteres 31.5 s · cancha llega 37.8 s · Final del partido. Juventud Solcanto, 1;

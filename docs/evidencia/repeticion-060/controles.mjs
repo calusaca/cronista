@@ -1,0 +1,25 @@
+import { chromium } from "/home/calusaca/cronista/node_modules/@playwright/test/index.mjs";
+const [base, ancho = "1280"] = process.argv.slice(2);
+const nav = await chromium.launch(); const page = await nav.newPage({ viewport: { width: +ancho, height: 800 } });
+const caja = async (loc) => { const n = await loc.count(); if (!n) return null; const b = await loc.first().boundingBox(); return b ? { y: Math.round(b.y), x: Math.round(b.x), w: Math.round(b.width) } : "oculto"; };
+const b = n => page.getByRole("button", { name: n, exact: true });
+const reloj = () => page.getByTestId("arena-clock").textContent();
+const out = {};
+await page.goto(`${base}/arena`);
+await page.waitForTimeout(1500);
+const ref = async () => ({ pitch: await caja(page.locator(".arena-pitch-wrap svg")), clock: await caja(page.getByTestId("arena-clock")) });
+out.vivoInicial = { ...(await ref()), start: await caja(b("Start live match")), voz: await caja(page.getByTestId("arena-live-voice")) };
+await b("Start live match").click();
+await page.getByTestId("arena-buffer").waitFor({ timeout: 30000 });
+await page.waitForFunction(() => !/^0:00/.test(document.querySelector('[data-testid="arena-clock"]')?.textContent ?? "0:00"), null, { timeout: 90000 });
+out.vivo = { ...(await ref()), pausa: await caja(b("Pause broadcast")), narr: await caja(page.getByRole("button", { name: /narration/ })), cancelar: await caja(b("Cancel live match")), estado: await page.getByTestId("arena-buffer-status").textContent() };
+await b("Pause broadcast").click(); const r1 = await reloj(); await page.waitForTimeout(2500); const r2 = await reloj();
+out.pausa = { r1, r2, estado: await page.getByTestId("arena-buffer-status").textContent() };
+await b("Resume broadcast").click(); await page.waitForTimeout(2500); out.reanuda = await reloj();
+await b("Cancel live match").click(); await page.waitForTimeout(4000);
+out.trasCancelar = { reloj: await reloj(), live: await page.getByTestId("arena-live-status").textContent(), buffer: await page.getByTestId("arena-buffer").count(), play: await caja(page.locator(".arena-playback .btn-primary")), abrir: await caja(b("Open available replay")), start: await page.getByRole("button", { name: "Start live match" }).isEnabled().catch(() => null) };
+// repetición
+await b("Saved matches").click(); await b("Load recorded model duel").click(); await page.waitForTimeout(2500);
+out.repeticion = { ...(await ref()), play: await caja(page.locator(".arena-playback .btn-primary")), restart: await caja(b("Restart")), seek: await caja(page.locator("input.arena-seek")), escuchar: await caja(b("Listen from the start")), stop: await caja(b("Stop narration")), audio: await caja(page.getByTestId("arena-narration").locator("audio")), generar: await caja(b("Generate match")) };
+console.log(JSON.stringify(out, null, 0));
+await nav.close();

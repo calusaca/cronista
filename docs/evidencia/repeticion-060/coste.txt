@@ -1,0 +1,88 @@
+Brief 060 · coste por pista (SSML presupuestado, sin Speech). PRESUPUESTO_AUDIO_ENCUENTRO = 80 solicitudes / 24000 c (narrador + cierre; reserva del cierre 2 sol / 800 c). Invitados y previa cobran de sus bolsas.
+Escenarios por idioma y, al final, ES + EN. «directo» se aproxima con las ventanas buffer sin extras (memoria distinta: sin caché compartida).
+
+## arena-duelo-v3.json · 60 s
+es · pista ritmo                   narrador  13 sol/  4641 c · cierre 1/ 336 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 14/80 sol (18 %) y 4977/24000 c (21 %)
+es · pista detallada               narrador   6 sol/  7381 c · cierre 0/   0 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 7381/24000 c (31 %)
+es · directo (aprox.)              narrador  12 sol/  4272 c · cierre 1/ 336 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 4608/24000 c (19 %)
+es · solo ritmo                    narrador  13 sol/  4641 c · cierre 1/ 336 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 14/80 sol (18 %) y 4977/24000 c (21 %)
+es · detallada y después ritmo     narrador  19 sol/ 12022 c · cierre 1/ 336 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 20/80 sol (25 %) y 12358/24000 c (51 %)  ← supera el 50 %
+es · directo y después ritmo       narrador  25 sol/  8913 c · cierre 2/ 672 · invitado  0/    0 · previa 3/1682 · PRESUPUESTO narrador+cierre 27/80 sol (34 %) y 9585/24000 c (40 %)
+en · pista ritmo                   narrador  13 sol/  4608 c · cierre 1/ 328 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 14/80 sol (18 %) y 4936/24000 c (21 %)
+en · pista detallada               narrador   6 sol/  7359 c · cierre 0/   0 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 7359/24000 c (31 %)
+en · directo (aprox.)              narrador  12 sol/  4243 c · cierre 1/ 328 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 4571/24000 c (19 %)
+en · solo ritmo                    narrador  13 sol/  4608 c · cierre 1/ 328 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 14/80 sol (18 %) y 4936/24000 c (21 %)
+en · detallada y después ritmo     narrador  19 sol/ 11967 c · cierre 1/ 328 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 20/80 sol (25 %) y 12295/24000 c (51 %)  ← supera el 50 %
+en · directo y después ritmo       narrador  25 sol/  8851 c · cierre 2/ 656 · invitado  0/    0 · previa 3/1926 · PRESUPUESTO narrador+cierre 27/80 sol (34 %) y 9507/24000 c (40 %)
+es+en · solo ritmo                 narrador  26 sol/  9249 c · cierre 2/ 664 · invitado  0/    0 · previa 6/3608 · PRESUPUESTO narrador+cierre 28/80 sol (35 %) y 9913/24000 c (41 %)
+es+en · detallada y después ritmo  narrador  38 sol/ 23989 c · cierre 2/ 664 · invitado  0/    0 · previa 6/3608 · PRESUPUESTO narrador+cierre 40/80 sol (50 %) y 24653/24000 c (103 %)  ← supera el 50 %
+es+en · directo y después ritmo    narrador  50 sol/ 17764 c · cierre 4/1328 · invitado  0/    0 · previa 6/3608 · PRESUPUESTO narrador+cierre 54/80 sol (68 %) y 19092/24000 c (80 %)  ← supera el 50 %
+
+## arena-llm-v3.json · 60 s
+es · pista ritmo                   narrador  18 sol/  6913 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 19/80 sol (24 %) y 7242/24000 c (30 %)
+es · pista detallada               narrador   6 sol/ 10336 c · cierre 0/   0 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 10336/24000 c (43 %)
+es · directo (aprox.)              narrador  12 sol/  4731 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 5060/24000 c (21 %)
+es · solo ritmo                    narrador  18 sol/  6913 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 19/80 sol (24 %) y 7242/24000 c (30 %)
+es · detallada y después ritmo     narrador  24 sol/ 17249 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 25/80 sol (31 %) y 17578/24000 c (73 %)  ← supera el 50 %
+es · directo y después ritmo       narrador  30 sol/ 11644 c · cierre 2/ 658 · invitado  0/    0 · previa 3/1658 · PRESUPUESTO narrador+cierre 32/80 sol (40 %) y 12302/24000 c (51 %)  ← supera el 50 %
+en · pista ritmo                   narrador  18 sol/  6862 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 19/80 sol (24 %) y 7183/24000 c (30 %)
+en · pista detallada               narrador   6 sol/ 10315 c · cierre 0/   0 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 10315/24000 c (43 %)
+en · directo (aprox.)              narrador  12 sol/  4685 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 5006/24000 c (21 %)
+en · solo ritmo                    narrador  18 sol/  6862 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 19/80 sol (24 %) y 7183/24000 c (30 %)
+en · detallada y después ritmo     narrador  24 sol/ 17177 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 25/80 sol (31 %) y 17498/24000 c (73 %)  ← supera el 50 %
+en · directo y después ritmo       narrador  30 sol/ 11547 c · cierre 2/ 642 · invitado  0/    0 · previa 3/1914 · PRESUPUESTO narrador+cierre 32/80 sol (40 %) y 12189/24000 c (51 %)  ← supera el 50 %
+es+en · solo ritmo                 narrador  36 sol/ 13775 c · cierre 2/ 650 · invitado  0/    0 · previa 6/3572 · PRESUPUESTO narrador+cierre 38/80 sol (48 %) y 14425/24000 c (60 %)  ← supera el 50 %
+es+en · detallada y después ritmo  narrador  48 sol/ 34426 c · cierre 2/ 650 · invitado  0/    0 · previa 6/3572 · PRESUPUESTO narrador+cierre 50/80 sol (63 %) y 35076/24000 c (146 %)  ← supera el 50 %
+es+en · directo y después ritmo    narrador  60 sol/ 23191 c · cierre 4/1300 · invitado  0/    0 · previa 6/3572 · PRESUPUESTO narrador+cierre 64/80 sol (80 %) y 24491/24000 c (102 %)  ← supera el 50 %
+
+## arena-llm-v1.json · 10 s
+es · pista ritmo                   narrador   3 sol/  1065 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 4/80 sol (5 %) y 1394/24000 c (6 %)
+es · pista detallada               narrador   1 sol/  1853 c · cierre 0/   0 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 1/80 sol (1 %) y 1853/24000 c (8 %)
+es · directo (aprox.)              narrador   2 sol/   704 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 3/80 sol (4 %) y 1033/24000 c (4 %)
+es · solo ritmo                    narrador   3 sol/  1065 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 4/80 sol (5 %) y 1394/24000 c (6 %)
+es · detallada y después ritmo     narrador   4 sol/  2918 c · cierre 1/ 329 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 5/80 sol (6 %) y 3247/24000 c (14 %)
+es · directo y después ritmo       narrador   5 sol/  1769 c · cierre 2/ 658 · invitado  0/    0 · previa 3/1311 · PRESUPUESTO narrador+cierre 7/80 sol (9 %) y 2427/24000 c (10 %)
+en · pista ritmo                   narrador   3 sol/  1064 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 4/80 sol (5 %) y 1385/24000 c (6 %)
+en · pista detallada               narrador   1 sol/  1851 c · cierre 0/   0 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 1/80 sol (1 %) y 1851/24000 c (8 %)
+en · directo (aprox.)              narrador   2 sol/   705 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 3/80 sol (4 %) y 1026/24000 c (4 %)
+en · solo ritmo                    narrador   3 sol/  1064 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 4/80 sol (5 %) y 1385/24000 c (6 %)
+en · detallada y después ritmo     narrador   4 sol/  2915 c · cierre 1/ 321 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 5/80 sol (6 %) y 3236/24000 c (13 %)
+en · directo y después ritmo       narrador   5 sol/  1769 c · cierre 2/ 642 · invitado  0/    0 · previa 3/1568 · PRESUPUESTO narrador+cierre 7/80 sol (9 %) y 2411/24000 c (10 %)
+es+en · solo ritmo                 narrador   6 sol/  2129 c · cierre 2/ 650 · invitado  0/    0 · previa 6/2879 · PRESUPUESTO narrador+cierre 8/80 sol (10 %) y 2779/24000 c (12 %)
+es+en · detallada y después ritmo  narrador   8 sol/  5833 c · cierre 2/ 650 · invitado  0/    0 · previa 6/2879 · PRESUPUESTO narrador+cierre 10/80 sol (13 %) y 6483/24000 c (27 %)
+es+en · directo y después ritmo    narrador  10 sol/  3538 c · cierre 4/1300 · invitado  0/    0 · previa 6/2879 · PRESUPUESTO narrador+cierre 14/80 sol (18 %) y 4838/24000 c (20 %)
+
+## sesión con Mesa 60 s (semilla 42, 6 intervenciones) · 60 s
+es · pista ritmo                   narrador  16 sol/  5905 c · cierre 1/ 329 · invitado  6/ 2809 · previa 3/1652 · PRESUPUESTO narrador+cierre 17/80 sol (21 %) y 6234/24000 c (26 %)
+es · pista detallada               narrador   6 sol/  8412 c · cierre 0/   0 · invitado  6/ 4269 · previa 3/1652 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 8412/24000 c (35 %)
+es · directo (aprox.)              narrador  12 sol/  4445 c · cierre 1/ 329 · invitado  6/ 2809 · previa 3/1652 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 4774/24000 c (20 %)
+es · solo ritmo                    narrador  16 sol/  5905 c · cierre 1/ 329 · invitado  6/ 2809 · previa 3/1652 · PRESUPUESTO narrador+cierre 17/80 sol (21 %) y 6234/24000 c (26 %)
+es · detallada y después ritmo     narrador  22 sol/ 14317 c · cierre 1/ 329 · invitado 12/ 7078 · previa 3/1652 · PRESUPUESTO narrador+cierre 23/80 sol (29 %) y 14646/24000 c (61 %)  ← supera el 50 %
+es · directo y después ritmo       narrador  28 sol/ 10350 c · cierre 2/ 658 · invitado 12/ 5618 · previa 3/1652 · PRESUPUESTO narrador+cierre 30/80 sol (38 %) y 11008/24000 c (46 %)
+en · pista ritmo                   narrador  16 sol/  5906 c · cierre 1/ 321 · invitado  6/ 3239 · previa 3/1910 · PRESUPUESTO narrador+cierre 17/80 sol (21 %) y 6227/24000 c (26 %)
+en · pista detallada               narrador   6 sol/  8477 c · cierre 0/   0 · invitado  6/ 4893 · previa 3/1910 · PRESUPUESTO narrador+cierre 6/80 sol (8 %) y 8477/24000 c (35 %)
+en · directo (aprox.)              narrador  12 sol/  4446 c · cierre 1/ 321 · invitado  6/ 3239 · previa 3/1910 · PRESUPUESTO narrador+cierre 13/80 sol (16 %) y 4767/24000 c (20 %)
+en · solo ritmo                    narrador  16 sol/  5906 c · cierre 1/ 321 · invitado  6/ 3239 · previa 3/1910 · PRESUPUESTO narrador+cierre 17/80 sol (21 %) y 6227/24000 c (26 %)
+en · detallada y después ritmo     narrador  22 sol/ 14383 c · cierre 1/ 321 · invitado 12/ 8132 · previa 3/1910 · PRESUPUESTO narrador+cierre 23/80 sol (29 %) y 14704/24000 c (61 %)  ← supera el 50 %
+en · directo y después ritmo       narrador  28 sol/ 10352 c · cierre 2/ 642 · invitado 12/ 6478 · previa 3/1910 · PRESUPUESTO narrador+cierre 30/80 sol (38 %) y 10994/24000 c (46 %)
+es+en · solo ritmo                 narrador  32 sol/ 11811 c · cierre 2/ 650 · invitado 12/ 6048 · previa 6/3562 · PRESUPUESTO narrador+cierre 34/80 sol (43 %) y 12461/24000 c (52 %)  ← supera el 50 %
+es+en · detallada y después ritmo  narrador  44 sol/ 28700 c · cierre 2/ 650 · invitado 24/15210 · previa 6/3562 · PRESUPUESTO narrador+cierre 46/80 sol (58 %) y 29350/24000 c (122 %)  ← supera el 50 %
+es+en · directo y después ritmo    narrador  56 sol/ 20702 c · cierre 4/1300 · invitado 24/12096 · previa 6/3562 · PRESUPUESTO narrador+cierre 60/80 sol (75 %) y 22002/24000 c (92 %)  ← supera el 50 %
+
+## sesión con Mesa 180 s (semilla 42, 14 intervenciones) · 180 s
+es · pista ritmo                   narrador  47 sol/ 17666 c · cierre 1/ 329 · invitado 14/ 6733 · previa 3/1652 · PRESUPUESTO narrador+cierre 48/80 sol (60 %) y 17995/24000 c (75 %)  ← supera el 50 %
+es · pista detallada               narrador  18 sol/ 26789 c · cierre 0/   0 · invitado 14/ 9596 · previa 3/1652 · PRESUPUESTO narrador+cierre 18/80 sol (23 %) y 26789/24000 c (112 %)  ← supera el 50 %
+es · directo (aprox.)              narrador  36 sol/ 13648 c · cierre 1/ 329 · invitado 14/ 6733 · previa 3/1652 · PRESUPUESTO narrador+cierre 37/80 sol (46 %) y 13977/24000 c (58 %)  ← supera el 50 %
+es · solo ritmo                    narrador  47 sol/ 17666 c · cierre 1/ 329 · invitado 14/ 6733 · previa 3/1652 · PRESUPUESTO narrador+cierre 48/80 sol (60 %) y 17995/24000 c (75 %)  ← supera el 50 %
+es · detallada y después ritmo     narrador  65 sol/ 44455 c · cierre 1/ 329 · invitado 28/16329 · previa 3/1652 · PRESUPUESTO narrador+cierre 66/80 sol (83 %) y 44784/24000 c (187 %)  ← supera el 50 %
+es · directo y después ritmo       narrador  83 sol/ 31314 c · cierre 2/ 658 · invitado 28/13466 · previa 3/1652 · PRESUPUESTO narrador+cierre 85/80 sol (106 %) y 31972/24000 c (133 %)  ← supera el 50 %
+en · pista ritmo                   narrador  47 sol/ 17800 c · cierre 1/ 321 · invitado 14/ 7714 · previa 3/1910 · PRESUPUESTO narrador+cierre 48/80 sol (60 %) y 18121/24000 c (76 %)  ← supera el 50 %
+en · pista detallada               narrador  18 sol/ 26988 c · cierre 0/   0 · invitado 14/10906 · previa 3/1910 · PRESUPUESTO narrador+cierre 18/80 sol (23 %) y 26988/24000 c (112 %)  ← supera el 50 %
+en · directo (aprox.)              narrador  36 sol/ 13780 c · cierre 1/ 321 · invitado 14/ 7714 · previa 3/1910 · PRESUPUESTO narrador+cierre 37/80 sol (46 %) y 14101/24000 c (59 %)  ← supera el 50 %
+en · solo ritmo                    narrador  47 sol/ 17800 c · cierre 1/ 321 · invitado 14/ 7714 · previa 3/1910 · PRESUPUESTO narrador+cierre 48/80 sol (60 %) y 18121/24000 c (76 %)  ← supera el 50 %
+en · detallada y después ritmo     narrador  65 sol/ 44788 c · cierre 1/ 321 · invitado 28/18620 · previa 3/1910 · PRESUPUESTO narrador+cierre 66/80 sol (83 %) y 45109/24000 c (188 %)  ← supera el 50 %
+en · directo y después ritmo       narrador  83 sol/ 31580 c · cierre 2/ 642 · invitado 28/15428 · previa 3/1910 · PRESUPUESTO narrador+cierre 85/80 sol (106 %) y 32222/24000 c (134 %)  ← supera el 50 %
+es+en · solo ritmo                 narrador  94 sol/ 35466 c · cierre 2/ 650 · invitado 28/14447 · previa 6/3562 · PRESUPUESTO narrador+cierre 96/80 sol (120 %) y 36116/24000 c (150 %)  ← supera el 50 %
+es+en · detallada y después ritmo  narrador 130 sol/ 89243 c · cierre 2/ 650 · invitado 56/34949 · previa 6/3562 · PRESUPUESTO narrador+cierre 132/80 sol (165 %) y 89893/24000 c (375 %)  ← supera el 50 %
+es+en · directo y después ritmo    narrador 166 sol/ 62894 c · cierre 4/1300 · invitado 56/28894 · previa 6/3562 · PRESUPUESTO narrador+cierre 170/80 sol (213 %) y 64194/24000 c (267 %)  ← supera el 50 %
+

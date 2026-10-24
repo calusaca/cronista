@@ -37,6 +37,9 @@ import { memoAgregado } from "../arena/estadisticas";
 import { almacenFavoritos, alternarClub, alternarJugador, FAVORITOS_VACIOS, favoritosEn, guardarFavoritos, leerFavoritos, preseleccionFavorita, type FavoritosArena } from "../arena/favoritos";
 import type { IntervencionArena, PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
 import { cargarEncuentroTorneo, esPeticionTorneo, peticionDeUrl, SinDescompresion, type OrigenTorneo } from "./torneo-carga";
+import { lineaModelos, type ContextoModelos, type EntradaCatalogo } from "../arena/modelos-jugados";
+import { atajoPausa, cadenaFoco } from "./atajo-pausa";
+import catalogoModelos from "../../infra/modelos-arena.json";
 
 /** Brief 059 · Fecha (UTC) del torneo en la línea de procedencia. */
 const fechaTorneo = (iso: string, idioma: "es" | "en") => new Intl.DateTimeFormat(idioma, { dateStyle: "long", timeZone: "UTC" }).format(new Date(iso));
@@ -72,7 +75,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [preparandoPartido, setPreparandoPartido] = useState(false);
   // Brief 057 § 3.1 · La barra se gobierna por la fase de la pista (alActividadAudio sigue llegando, sin uso aquí).
   const [, setAudioActivo] = useState(false);
-  const [estadoVoz, setEstadoVoz] = useState<EstadoNarracion>({ fase: "inactiva", listos: 0, total: 0, vozDisponible: false });
+  const [estadoVoz, setEstadoVoz] = useState<EstadoNarracion>({ fase: "inactiva", listos: 0, total: 0, vozDisponible: false, previa: false, espera: null });
   const [conVoz, setConVoz] = useState(false), conVozIniciado = useRef(false);
   const [aviso, setAviso] = useState<{ motivo: MotivoNarracion; minutos?: number } | null>(null);
   /** v1.1 § 1 · Dueño del reloj: la cancha muda, la pista o nadie (la muda coincide con `reproduciendo`). */
@@ -91,6 +94,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   // fija si la solicitud sigue vigente y se limpia en cada ejecutar, recibirPreparado, actividadDirecto(true) y cargar.
   const [origenTorneo, setOrigenTorneo] = useState<OrigenTorneo | null>(null);
   const [errorTorneo, setErrorTorneo] = useState<"abrir" | "descompresion" | null>(null);
+  // Brief 060 § 5.3 · Forma de carga del registro en pantalla (para la línea de modelos): se fija en cada carga y se
+  // limpia en las mismas transiciones que origenTorneo. La vista previa inicial es una política programada.
+  const [contextoModelos, setContextoModelos] = useState<ContextoModelos | null>({ forma: "simulado" });
   const solicitud = useRef<AbortController | null>(null), cursor = useRef(0);
   const ultimaPeticion = useRef<unknown>(null);
   // Brief 049 (v1.1 § 10) · Favoritos: vacíos y sin hidratar en el primer render (SSR y cliente);
@@ -102,6 +108,16 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [soloFavorito, setSoloFavorito] = useState(false);
   // Brief 056 (v1.1 § 12) · Tarjeta de alineaciones plegada: se reinicia con cada carga y al salir del tick 0.
   const [plegada, setPlegada] = useState(false);
+  /** Brief 060 § 3.4 · Botón principal de la barra y «Saltar al saque»: al desaparecer este, el foco pasa al principal. */
+  const principal = useRef<HTMLButtonElement | null>(null), saltoConFoco = useRef(false);
+  /** Brief 060 § 4 · Hueco de la barra donde la emisión pinta «Pause broadcast» (portal), función de cancelar que
+   * registra ArenaEnDirecto (la misma de «Cancel live match») y pausa de la repetición muda pedida por el espectador. */
+  const [ranura, setRanura] = useState<HTMLElement | null>(null), [deteniendo, setDeteniendo] = useState(false);
+  const cancelarDirecto = useRef<(() => void) | null>(null);
+  const registrarCancelar = useRef((fn: () => void) => { cancelarDirecto.current = fn; }).current;
+  const pausadaPorUsuario = useRef(false);
+  /** v1.1 (4) · Registro y forma de carga antes de empezar el directo: un preparado detenido vuelve a ellos. */
+  const antesDelDirecto = useRef<{ registro: RegistroArena; contexto: ContextoModelos | null } | null>(null);
   const es = idioma === "es";
   const bloqueado = pendiente || enDirecto || bufferActivo;
   // Defecto rev. 0000029 (Carlos): los ajustes del PRÓXIMO partido (formaciones, duración, clima, superficie, césped,
@@ -157,6 +173,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (p.tipo === "fin" && presentacionActual.current === "buffer") setBufferTerminada(true);
     if (p.tipo === "terminada" && presentacionActual.current === "buffer") { setBufferTerminada(true); if (p.estado !== "completa") setBufferActivo(false); }
     if (p.tipo === "sesion" && p.id) setSesionActual(p.id);
+    if (p.tipo === "sesion") setContextoModelos({ forma: "sesion", asignacion: p.asignacion });
     if (p.tipo === "esperando" || p.tipo === "avance" || p.tipo === "fin") setEstadoDirecto(p.tipo === "avance" ? "jugando" : p.tipo === "fin" ? "finalizando" : "esperando");
     if (p.tipo === "inicio") { setCargaId(c => c + 1); setArchivoActual(null); setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null); setImportado(false); setComentarios([]); setIntervenciones([]); }
     if (p.tipo === "comentario") setComentarios(anteriores => [...anteriores, p.comentario]);
@@ -168,10 +185,11 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (presentacion) { presentacionActual.current = presentacion; setBufferActivo(presentacion === "buffer"); if (presentacion === "buffer") setVelocidad(1); }
     setPreparandoPartido(activa && presentacion === "preparada"); setEnDirecto(activa);
     if (!activa && !bufferRecibido.current) setBufferActivo(false);
-    if (activa) { setOrigenTorneo(null); bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
+    if (activa && !enDirecto) antesDelDirecto.current = { registro, contexto: contextoModelos };
+    if (activa) { setOrigenTorneo(null); setContextoModelos(null); bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
   const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
-    setOrigenTorneo(null);
+    setOrigenTorneo(null); setContextoModelos(resultado.asignacion ? { forma: "sesion", asignacion: resultado.asignacion } : null);
     setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id); setCargaId(c => c + 1);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
     setArchivoActual(null); setTiempo(inicio); cursor.current = inicio; setReproduciendo(false); setSeleccionado(null); setImportado(false);
@@ -183,7 +201,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   };
   const entornoElegido = entornoDeFormulario({ clima, temperatura, superficie, cesped, presion });
   const ejecutar = async (payload: unknown) => {
-    setSesionActual(null); setBufferActivo(false); setOrigenTorneo(null); setErrorTorneo(null);
+    setSesionActual(null); setBufferActivo(false); setOrigenTorneo(null); setContextoModelos(null); setErrorTorneo(null);
     solicitud.current?.abort();
     const controlador = new AbortController(); solicitud.current = controlador;
     ultimaPeticion.current = payload;
@@ -208,6 +226,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       setSeleccionado(null); setCargaId(c => c + 1);
       setImportado((cuerpo as { accion: string }).accion === "reproducir");
       setOrigenTorneo(origen);
+      setContextoModelos(esPeticionTorneo(payload) ? { forma: "torneo" } : payload === "duelo" || payload === "ejemplo-v3" || payload === "ejemplo" ? { forma: "ejemplo" } : (cuerpo as { accion: string }).accion === "reproducir" ? { forma: "importado" } : { forma: "simulado" });
     } catch (fallo) {
       if (!controlador.signal.aborted && solicitud.current === controlador && esPeticionTorneo(payload)) setErrorTorneo(fallo instanceof SinDescompresion ? "descompresion" : "abrir");
       else if (!controlador.signal.aborted && solicitud.current === controlador) setError(t("Could not validate or run this experiment. Your previous run is still available.", "No se pudo validar o ejecutar el experimento. El anterior sigue disponible."));
@@ -222,7 +241,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   };
   const cargar = async (archivo: File | undefined) => {
     if (!archivo || bloqueado) return;
-    setOrigenTorneo(null);
+    setOrigenTorneo(null); setContextoModelos(null);
     if (archivo.size > ARENA.archivoMaxBytes) { setError(t("The recording exceeds 8 MB.", "El registro supera los 8 MB.")); return; }
     try { await ejecutar({ accion: "reproducir", registro: JSON.parse(await archivo.text()) as unknown }); }
     catch { setError(t("Choose a valid JSON recording.", "Selecciona un registro JSON válido.")); }
@@ -250,6 +269,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const plantillaCompleta = [...estado.jugadores, ...estado.banco ?? [], ...estado.retirados ?? [], ...estado.expulsados ?? []];
   const jugadorActivo = plantillaCompleta.find(j => j.id === seleccionado) ?? estado.jugadores.find(j => j.lado === "local" && j.capitan) ?? estado.jugadores[0]!;
   const fase = estadoVoz.fase;
+  const modelos = useMemo(() => contextoModelos ? lineaModelos(registro, contextoModelos, catalogoModelos as readonly EntradaCatalogo[], idioma) : null, [registro, contextoModelos, idioma]);
   // § 3.1 · Con pista (sonando/pausada) saltar busca en el audio: el cursor queda en el tick que la pista mapea.
   const saltar = (s: number) => { if (enDirecto || bufferActivo) return; if (fasePista(fase)) { controlesVoz.current?.buscar(s / ARENA.pasoS); return; } setReproduciendo(false); setTiempo(s); cursor.current = s; };
   const vozVisible = estadoVoz.vozDisponible && !enDirecto && !bufferActivo, vozActiva = vozVisible && conVoz;
@@ -264,12 +284,59 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     return r;
   };
   const pulsarReproducir = () => {
-    setAviso(null);
+    setAviso(null); pausadaPorUsuario.current = reproduciendo;
     const r = transicionReloj(reproduciendo ? "mudo" : dueno.current === "mudo" ? null : dueno.current, { tipo: "pulsar", conVoz: vozActiva }, fase);
     const alFinal = tiempo >= finS;
     if (alFinal && (r.orden === "iniciar" || r.reproduciendo)) { setTiempo(0); cursor.current = 0; }
     aplicar({ tipo: "pulsar", conVoz: vozActiva }, alFinal ? 0 : tiempo / ARENA.pasoS);
   };
+  /** Brief 060 § 4.2 · Detener la repetición (con o sin voz): sin audio y en 0:00; la pista preparada se conserva. */
+  const detenerRepeticion = () => {
+    setAviso(null); pausadaPorUsuario.current = false;
+    dueno.current = null; setReproduciendo(false);
+    if (faseActiva(fase)) controlesVoz.current?.detener();
+    setTiempo(0); cursor.current = 0;
+    // Detener se deshabilita a sí mismo en 0:00: el foco pasa al botón principal.
+    principal.current?.focus();
+  };
+  /** § 4.2 + v1.1 (4) · «Stop match»: cancela la sesión en curso (la función de «Cancel live match»; sin DELETE si ya
+   * terminó) y limpia: cursor 0:00, sin audio, sin selección y sin emisión. Un preparado vuelve a la vista anterior. */
+  const detenerPartido = () => {
+    const enCurso = enDirecto;
+    if (enCurso) { setDeteniendo(true); cancelarDirecto.current?.(); }
+    pausadaPorUsuario.current = false; dueno.current = null; setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null);
+    const antes = antesDelDirecto.current;
+    if (enCurso && antes && antes.registro === registro) setContextoModelos(antes.contexto);
+    if (enCurso) setSesionActual(null);
+    setBufferActivo(false); setEstadoDirecto("esperando"); controlesVoz.current?.detener();
+  };
+  useEffect(() => { if (!enDirecto) setDeteniendo(false); }, [enDirecto]);
+  useEffect(() => { pausadaPorUsuario.current = false; }, [cargaId]);
+  useEffect(() => { if (tiempo >= finS) pausadaPorUsuario.current = false; }, [tiempo, finS]);
+  /** § 4.4 + v1.1 (9) · Acción del espacio según la fase (null = nada). */
+  const sinPartido = registro === inicial && !sesionActual && !enDirecto;
+  const accionEspacio = (): (() => void) | null => {
+    if (bufferActivo) {
+      const b = ranura?.querySelector<HTMLButtonElement>("button[data-estado]"), e = b?.dataset.estado;
+      return b && !b.disabled && (e === "reproduciendo" || e === "recuperando" || e === "pausada") ? () => b.click() : null;
+    }
+    if (enDirecto || sinPartido) return null;
+    if (reproduciendo || fase === "sonando" || fase === "pausada" || fase === "pulsar") return pulsarReproducir;
+    if (pausadaPorUsuario.current && !faseActiva(fase) && tiempo < finS) return () => { pausadaPorUsuario.current = false; setAviso(null); aplicar({ tipo: "pulsar", conVoz: false }); };
+    return null;
+  };
+  const espacio = useRef(accionEspacio); espacio.current = accionEspacio;
+  useEffect(() => {
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key !== " " || e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || !atajoPausa(cadenaFoco(e.target))) return;
+      const accion = espacio.current();
+      if (!accion) return;
+      e.preventDefault(); accion();
+    };
+    window.addEventListener("keydown", alTeclear);
+    return () => window.removeEventListener("keydown", alTeclear);
+  }, []);
+  const notaEspacio = <p className="arena-muted" data-testid="arena-space-note">{t("Space pauses or resumes when no control has focus", "Espacio pausa o reanuda si ningún control tiene el foco")}</p>;
   // v1.1 § 1 (c) · Un efecto único (de layout: antes del siguiente fotograma) reacciona a la fase de la pista:
   // activa → la cancha muda se apaga; error → degradación muda solo si la voz era la dueña; fin → sin dueño.
   useLayoutEffect(() => {
@@ -281,6 +348,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   // El conmutador arranca marcado la primera vez que hay voz; no se persiste (§ 11).
   useEffect(() => { if (estadoVoz.vozDisponible && !conVozIniciado.current) { conVozIniciado.current = true; setConVoz(true); } }, [estadoVoz.vozDisponible]);
   useEffect(() => { setAviso(null); }, [cargaId]);
+  // § 3.4 · Si «Saltar al saque» tenía el foco cuando desaparece (pulsado o fin de la previa), el foco va al botón principal.
+  useLayoutEffect(() => { if (!estadoVoz.previa && saltoConFoco.current) { saltoConFoco.current = false; principal.current?.focus(); } }, [estadoVoz.previa]);
   // Brief 049 · Cifras del prefijo ≤ tick entero del cursor: una agregación por (registro, tick),
   // compartida por el panel y la ficha (memoAgregado guarda la última).
   const tickCifras = Math.floor(tiempo / ARENA.pasoS + 1e-9);
@@ -315,7 +384,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
         <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
           {registro === inicial && !sesionActual && !enDirecto && <p className="arena-muted arena-empty">{t("Saved preview. Start a live match above or choose a recording.", "Vista previa guardada. Inicia un partido en vivo arriba o elige una grabación.")}</p>}
           <ArenaMarcador registro={registro} estado={estado} gol={gol} favorito={presentes.lado} estrella={estrellaClub} identidad={identidad} />
-          <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock">{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
+          <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock" data-cursor-s={tiempo.toFixed(3)}>{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
+          {/* Brief 060 § 5.4 · Modelos que jugaron, por lado y con su procedencia; sin role="status". */}
+          {modelos && <p className="arena-models" data-testid="arena-models" data-procedencia={modelos.procedencia}>{modelos.texto}</p>}
           <div className="arena-pitch-wrap"><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} identidad={identidad} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
             <rect className="arena-runoff" x="-5" y="-5" width="115" height="78" rx="1.5" aria-hidden="true" />
             <rect className="arena-grass" x="0" y="0" width="105" height="68" />
@@ -340,23 +411,37 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             </g>}
             <circle className="arena-ball" cx={balonVista.x} cy={balonVista.y} r="0.95" data-testid="arena-ball" data-reconstruccion={escena?.fase} />
           </svg>{/* Brief 057 § 5.2 · Vista frontal del arco batido mientras dura la celebración. */}<ArenaVistaArco registro={registro} gol={gol} tick={tiempo / ARENA.pasoS} idioma={idioma} identidad={identidad} reducido={reducido} /></div>
+          {/* Brief 060 § 4.1 · Barra de transporte justo bajo la cancha (antes de .arena-direction), en cualquier modo. */}
+          {enDirecto || bufferActivo ? <>
+            <div className="arena-playback" data-modo="directo">
+              {bufferActivo && <span className="arena-playback-ranura" ref={setRanura} />}
+              <button className="btn" data-testid="arena-stop" aria-describedby="arena-stop-nota" disabled={deteniendo} onClick={detenerPartido}>{t("Stop match", "Detener partido")}</button>
+            </div>
+            <p id="arena-stop-nota" className="arena-muted">{t("Stops the match: generation is cancelled and what was already generated stays in this tab as a partial replay, without a share link.", "Detiene el partido: se cancela la generación y lo ya generado queda en esta pestaña como repetición parcial, sin enlace para compartir.")}</p>
+            {bufferActivo && notaEspacio}
+          </> : <>
+          <div className="arena-playback" data-modo="repeticion"><button ref={principal} className="btn btn-primary" onClick={pulsarReproducir} aria-pressed={reproduciendo || fase === "sonando"} aria-keyshortcuts={accionEspacio() ? "Space" : undefined} disabled={bloqueado}>{reproduciendo || fase === "sonando" ? t("Pause", "Pausar") : faseEspera(fase) ? t("Play without narration", "Reproducir sin narración") : t("Play", "Reproducir")}</button>
+            {faseEspera(fase) && <span className="arena-play-progress" data-testid="arena-play-progress" aria-hidden="true">{fase === "registrando" ? t("Registering the recording…", "Registrando la grabación…") : t(`Preparing narration ${estadoVoz.listos}/${estadoVoz.total}`, `Preparando narración ${estadoVoz.listos}/${estadoVoz.total}`)}</span>}
+            <button className="btn" data-testid="arena-stop" disabled={!(faseActiva(fase) || reproduciendo || tiempo > 0)} onClick={detenerRepeticion}>{t("Stop", "Detener")}</button>
+            <button className="btn" onClick={() => { pausadaPorUsuario.current = false; if (fasePista(fase)) controlesVoz.current?.buscar(0); else saltar(0); }} disabled={enDirecto || faseEspera(fase)}>{t("Restart", "Volver al inicio")}</button>
+            {estadoVoz.previa && <button className="btn" data-testid="arena-replay-skip" onFocus={() => { saltoConFoco.current = true; }} onBlur={() => { saltoConFoco.current = false; }} onClick={() => { saltoConFoco.current = true; controlesVoz.current?.saltarPrevia(); }}>{t("Skip to kick-off", "Saltar al saque")}</button>}
+            <label>{t("Speed", "Velocidad")}<select className="field" value={faseActiva(fase) ? 1 : velocidad} disabled={faseActiva(fase)} onChange={e => setVelocidad(Number(e.target.value))}><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+            {vozVisible && <label className="arena-with-voice"><input type="checkbox" data-testid="arena-play-voice" checked={conVoz} onChange={e => { const marcado = e.target.checked; setConVoz(marcado); if (!marcado) aplicar({ tipo: "conmutador-off" }); }} />{t("With narration", "Con narración")}</label>}
+          </div>
+          {/* Brief 060 § 3.5 · Espera de la Mesa o de una jugada clave: rótulo sin role="status" (no se anuncia cada parada). */}
+          {estadoVoz.espera && <p className="arena-muted arena-replay-hold" data-testid="arena-replay-hold">{estadoVoz.espera === "invitado" ? t("Pitch held while the guest finishes", "Cancha detenida mientras termina el invitado") : t("Pitch held while the commentator finishes", "Cancha detenida mientras termina el narrador")}</p>}
+          <input className="arena-seek" type="range" min="0" max={finS} disabled={enDirecto || faseEspera(fase)} step="0.1" value={tiempo} onChange={e => saltar(Number(e.target.value))} aria-label={t("Match time", "Tiempo de juego")} />
+          {notaEspacio}
+          {aviso && <p role="status" className="arena-muted" data-testid="arena-play-fallback">{aviso.motivo === "ocupado"
+            ? t(`Too many uploaded recordings; narration returns in ${aviso.minutos ?? 1} min. Playing without voice.`, `Demasiadas grabaciones subidas; la narración vuelve en ${aviso.minutos ?? 1} min. Reproduciendo sin voz.`)
+            : t(`Narration unavailable (${MOTIVOS_NARRACION[aviso.motivo].en}); playing without voice.`, `Narración no disponible (${MOTIVOS_NARRACION[aviso.motivo].es}); reproduciendo sin voz.`)}</p>}
+          </>}
           <div className="arena-direction"><span>● {t("Home →", "Local →")}</span><span>{t("← Away", "← Visitante")} ○</span>{identidad.kits.visitaAlternativa && <span className="arena-kit-note">{t(`${nombres.visita.nombre} wears its change kit`, `${nombres.visita.nombre} viste su segunda equipación`)}</span>}</div>
           {previaVisible && <ArenaPrevia previa={previaCarta} identidad={identidad} idioma={idioma} plegada={plegada} alternar={() => setPlegada(p => !p)} seleccionado={seleccionado} seleccionar={setSeleccionado} />}
           {enDirecto && <p className="arena-muted" data-testid="arena-pitch-live-status">{bufferActivo ? t("The match is generating ahead of the broadcast.", "El partido se genera por delante de la emisión.") : preparandoPartido ? t("Preparing the complete match…", "Preparando el partido completo…") : estadoDirecto === "esperando" ? t("Coaches are deciding · simulation clock paused", "Los entrenadores están decidiendo · reloj simulado detenido") : estadoDirecto === "jugando" ? t("Live play · confirmed engine state", "Juego en vivo · estado confirmado por el motor") : t("Play finished · completing commentary", "Juego terminado · completando comentario")}</p>}
           {estado.saque && estado.pausa && estado.tick < estado.saque.hastaTick && escena?.fase !== "red" && <p role="status" data-testid="arena-restart">{({ centro: t("Kick-off", "Saque de centro"), banda: t("Throw-in", "Saque de banda"), esquina: t("Corner kick", "Saque de esquina"), meta: t("Goal kick", "Saque de meta") })[estado.saque.tipo]} · <Escudo identidad={identidad[estado.saque.lado]} size={IDENTIDAD_ARENA.escudoPx.reanudacion} />{registro.config.partido[estado.saque.lado].nombre}</p>}
           {estado.arbitro && <div className="arena-referee-info"><span className="arena-referee-swatch" aria-hidden="true" /><div><strong>{t("Referee", "Árbitro")}: {estado.arbitro.nombre}</strong><p>{estado.entrenadores ? t(`Contact criterion ${estado.arbitro.criterioContacto}/100. Calls synthetic contact fouls and cards; each restart appears in the description.`, `Criterio de contacto ${estado.arbitro.criterioContacto}/100. Sanciona contactos sintéticos con faltas y tarjetas; consulta cada reanudación en la descripción.`) : t("Follows play with its own movement. Visual official; fouls and cards are not simulated yet.", "Sigue la jugada con movimiento propio. Árbitro visual; todavía no se simulan faltas ni tarjetas.")}</p></div></div>}
-          {!bufferActivo && <><div className="arena-playback"><button className="btn btn-primary" onClick={pulsarReproducir} aria-pressed={reproduciendo || fase === "sonando"} disabled={bloqueado}>{reproduciendo || fase === "sonando" ? t("Pause", "Pausar") : faseEspera(fase) ? t("Play without narration", "Reproducir sin narración") : t("Play", "Reproducir")}</button>
-            {faseEspera(fase) && <span className="arena-play-progress" data-testid="arena-play-progress" aria-hidden="true">{fase === "registrando" ? t("Registering the recording…", "Registrando la grabación…") : t(`Preparing narration ${estadoVoz.listos}/${estadoVoz.total}`, `Preparando narración ${estadoVoz.listos}/${estadoVoz.total}`)}</span>}
-            <button className="btn" onClick={() => fasePista(fase) ? controlesVoz.current?.buscar(0) : saltar(0)} disabled={enDirecto || faseEspera(fase)}>{t("Restart", "Volver al inicio")}</button>
-            <label>{t("Speed", "Velocidad")}<select className="field" value={faseActiva(fase) ? 1 : velocidad} disabled={faseActiva(fase)} onChange={e => setVelocidad(Number(e.target.value))}><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
-            {vozVisible && <label className="arena-with-voice"><input type="checkbox" data-testid="arena-play-voice" checked={conVoz} onChange={e => { const marcado = e.target.checked; setConVoz(marcado); if (!marcado) aplicar({ tipo: "conmutador-off" }); }} />{t("With narration", "Con narración")}</label>}
-          </div>
-          <input className="arena-seek" type="range" min="0" max={finS} disabled={enDirecto || faseEspera(fase)} step="0.1" value={tiempo} onChange={e => saltar(Number(e.target.value))} aria-label={t("Match time", "Tiempo de juego")} />
-          {aviso && <p role="status" className="arena-muted" data-testid="arena-play-fallback">{aviso.motivo === "ocupado"
-            ? t(`Too many uploaded recordings; narration returns in ${aviso.minutos ?? 1} min. Playing without voice.`, `Demasiadas grabaciones subidas; la narración vuelve en ${aviso.minutos ?? 1} min. Reproduciendo sin voz.`)
-            : t(`Narration unavailable (${MOTIVOS_NARRACION[aviso.motivo].en}); playing without voice.`, `Narración no disponible (${MOTIVOS_NARRACION[aviso.motivo].es}); reproduciendo sin voz.`)}</p>}
-          </>}
-          <p className="arena-muted">{bufferActivo ? t("Live match at normal speed.", "Partido en vivo a velocidad normal.") : t("Continuous simulated movement; explicit ball cuts at simplified restarts. Playback starts paused.", "Movimiento continuo simulado; el balón se recoloca en reinicios simplificados. La reproducción empieza pausada.")}{reducido && t(" Reduced motion: discrete states.", " Movimiento reducido: estados discretos.")}{t(" After a goal the ball is drawn reaching the net and going in at the recorded crossing point, and the players hold still for a moment before returning to the centre: a visual reconstruction; the record places the kick-off at the goal tick.", " Tras un gol, el balón se dibuja llegando a la red y entrando en ella en el punto de cruce registrado, y los jugadores quedan quietos un instante antes de volver al centro: es una reconstrucción visual; el registro sitúa el saque en el mismo tick del gol.")}{vozActiva && t(" With narration, the audio sets the pace: speed is 1× and the slider seeks in the voice.", " Con narración, el audio marca el ritmo: la velocidad es 1× y el deslizador busca en la voz.")}</p>
+          <p className="arena-muted">{bufferActivo ? t("Live match at normal speed.", "Partido en vivo a velocidad normal.") : t("Continuous simulated movement; explicit ball cuts at simplified restarts. Playback starts paused.", "Movimiento continuo simulado; el balón se recoloca en reinicios simplificados. La reproducción empieza pausada.")}{reducido && t(" Reduced motion: discrete states.", " Movimiento reducido: estados discretos.")}{t(" After a goal the ball is drawn reaching the net and going in at the recorded crossing point, and the players hold still for a moment before returning to the centre: a visual reconstruction; the record places the kick-off at the goal tick.", " Tras un gol, el balón se dibuja llegando a la red y entrando en ella en el punto de cruce registrado, y los jugadores quedan quietos un instante antes de volver al centro: es una reconstrucción visual; el registro sitúa el saque en el mismo tick del gol.")}{vozActiva && t(" With narration, the audio sets the pace: the pitch plays at 1× and only stops for the pre-match presentation, a studio guest or to let a key play be called; the voice never comes before the play.", " Con narración, el audio marca el ritmo: la cancha va a 1× y solo se detiene en la presentación, ante un invitado de la Mesa o para cantar una jugada clave; la voz nunca se adelanta a la jugada.")}</p>
           <ArenaCifras registro={registro} tick={tickCifras} idioma={idioma} favorito={presentes.lado} identidad={identidad} />
         </section>
         <aside className="arena-companion" aria-label={t("Narration and commentary", "Narración y comentarios")} data-testid="arena-companion">
@@ -398,9 +483,9 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             <span className="arena-muted">{t("Programmed and recorded runs make no AI calls. Live model runs use the chosen controllers.", "Las ejecuciones programadas y grabadas no llaman a IA. Los partidos en vivo con modelos usan los controladores elegidos.")}</span>
           </div>
           </details>
-          <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} />
+          <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} alCancelar={registrarCancelar} />
           </div>
-          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} />}
+          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} ranura={ranura} />}
           {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} registro={registro} carga={cargaId} alEstado={setEstadoVoz} alControles={alControles} sinPartido={registro === inicial && !sesionActual && !enDirecto} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={mesa} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <ArenaMesa comentarios={comentarios} intervenciones={mesa} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}

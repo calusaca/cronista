@@ -1,0 +1,4 @@
+arena-duelo-v3.json es clips 13 omitidos 5 · esperas 8.1 s · pista narrador ≈ 76 s para 60 s · retrasos 0.3,0.3,0.3,0.3,1.8,0.3,0,0
+arena-duelo-v3.json en clips 13 omitidos 5 · esperas 7.3 s · pista narrador ≈ 74 s para 60 s · retrasos 0.3,0.3,0.3,0.3,0.3,2.7,0,0
+arena-llm-v3.json es clips 13 omitidos 3 · esperas 13.8 s · pista narrador ≈ 81 s para 60 s · retrasos 0.3,0.3,0.3,0.3,1.4,0.3,0.3,0.3,0,0
+arena-llm-v3.json en clips 13 omitidos 3 · esperas 12.1 s · pista narrador ≈ 78 s para 60 s · retrasos 0.3,0.3,0.3,0.3,1,0.3,0.3,0.3,0,0

@@ -2,21 +2,30 @@
 import { useEffect, useRef, useState } from "react";
 import type { construirRelato, relatoIntervencion } from "../arena/relato";
 import { RELATO_INTERVALOS, type IntervencionArena } from "../arena/protocolo";
-import { instanteAudio, instanteNarrado, PISTA_MAX_PCM_BYTES, wavMono, type TramoTemporal } from "../arena/pista-audio";
+import { ensamblarPista, instanteAudio, instanteNarrado, PISTA_MAX_PCM_BYTES, wavMono, type TramoTemporal } from "../arena/pista-audio";
+import { importantesVentana, planificarPista, segmentoEn, type PiezaPlan, type PlanPista, type TipoPieza } from "../arena/plan-pista";
+import { recordarVoz, type RecuerdoVoz } from "../arena/editorial";
+import { varianteEfectiva } from "../arena/turnos";
+import type { VarianteIntercambio } from "../arena/protocolo";
 import { nombreDescarga } from "../arena/transcripcion";
 import { descargarBlob } from "./ArenaDescargas";
 import { esperaReintentoInvitado, segmentoVozValido, type FalloInvitado } from "../arena/turnos";
 import { VOZ_BUFFER } from "../arena/buffer";
 import { esPrevia } from "../arena/previa";
 import type { RegistroArena } from "../arena/tipos";
-import { ARENA, PLAY_NARRADO } from "../sim/limites";
+import { ARENA, MESA_ARENA, PLAY_NARRADO, REPETICION_NARRADA } from "../sim/limites";
 import { consumirIntencion, decisionReintento429, motivoRelato, type ControlesNarracion, type EstadoNarracion, type FaseNarracion, type IntencionInicio, type MotivoNarracion } from "./play-narrado";
 
 export type { ControlesNarracion, EstadoNarracion, FaseNarracion, MotivoNarracion } from "./play-narrado";
 
 type Segmento = (ReturnType<typeof construirRelato> | ReturnType<typeof relatoIntervencion>) & { audio: { base64: string; tipo: string } | null };
 /** Brief 053 v1.1 § 9 · La pista guarda el `hastaTick` y el idioma con que se construyó: el WAV los usa. */
-type Pista = { clave: string; blob: Blob; segmentos: Segmento[]; tramos: TramoTemporal[]; hastaTick: number; idioma: "es" | "en" };
+type Pista = { clave: string; blob: Blob; segmentos: Segmento[]; tramos: TramoTemporal[]; hastaTick: number; idioma: "es" | "en"; plan?: PlanPista; fallidos?: string[] };
+/** Brief 060 § 3.1 · Modos con pista: el detallado del panel («Escuchar desde el inicio») y el de ritmo (Reproducir). */
+type ModoNarracion = "apagado" | "vivo" | "completo" | "ritmo";
+const conPista = (m: ModoNarracion): m is "completo" | "ritmo" => m === "completo" || m === "ritmo";
+/** § 3.3 · Segmento visible: en ritmo, la última colocada con inicioS ≤ t; en completo, 1:1 con los tramos. */
+const segmentoDe = (p: Pista, t: number): Segmento | null => p.plan ? p.segmentos[segmentoEn(p.plan.colocadas, t)] ?? null : p.segmentos[instanteNarrado(p.tramos, t).indice] ?? null;
 const rolDe = (s: Segmento) => "rol" in s ? s.rol : "narrador";
 /** Brief 057 § 3.2 · Fallo HTTP de un tramo del narrador: su estado decide el motivo (v1.1 § 8). */
 class FalloRelato extends Error { constructor(readonly status: number) { super("Relato"); } }
@@ -32,12 +41,16 @@ const registroCompleto = (r: RegistroArena) => r.final.tick >= Math.round(r.conf
  * botón de registro sobre la vista previa inicial de la página (no es un partido elegido por el espectador). */
 export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDirecto, idioma, seleccionarTiempo, alActividadAudio, intervenciones = [], seed, registro, carga = 0, alEstado, alControles, sinPartido = false }: { seed: number; sesion: string | null; archivo: "duelo" | "ejemplo-v3" | "ejemplo" | null; alRegistrar: (id: string) => void; hastaTick: number; enDirecto: boolean; idioma: "es" | "en"; seleccionarTiempo: (tick: number) => void; alActividadAudio: (activa: boolean) => void; intervenciones?: readonly IntervencionArena[]; registro?: RegistroArena; carga?: number; alEstado?: (e: EstadoNarracion) => void; alControles?: (c: ControlesNarracion) => void; sinPartido?: boolean }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
-  const [disponible, setDisponible] = useState(false), [modo, setModo] = useState<"apagado" | "vivo" | "completo">("apagado");
+  const [disponible, setDisponible] = useState(false), [modo, setModo] = useState<ModoNarracion>("apagado");
   const [segmento, setSegmento] = useState<Segmento | null>(null), [url, setUrl] = useState<string | null>(null), [version, setVersion] = useState(0), [estado, setEstado] = useState("listo");
   const [progreso, setProgreso] = useState({ listos: 0, total: 0 });
   // Brief 057 · Registro de la grabación en curso, motivo del último fallo y estado del <audio> (play/pause).
   const [registrando, setRegistrando] = useState(false), [motivo, setMotivo] = useState<MotivoNarracion | null>(null), [pausado, setPausado] = useState(true);
   const [reRegistro, setReRegistro] = useState(0), [minutos, setMinutos] = useState<number | undefined>(undefined);
+  /** Brief 060 § 3.4–3.5 · Posición de la pista al ritmo: antes del saque (previa) y espera rotulada en curso. */
+  const [marca, setMarca] = useState<{ previa: boolean; espera: "invitado" | "clave" | null }>({ previa: false, espera: null });
+  /** § 3.1 · Modo con que se pidió la pista (la barra pide «ritmo»; el panel, «completo»): lo adopta la intención pendiente. */
+  const modoPedido = useRef<"completo" | "ritmo">("ritmo");
   /** v1.3 (3) · Tick del cursor con que se pidió la pista y segundo de audio pendiente de buscar al cargarla. */
   const inicioTick = useRef(0), inicioAudio = useRef(0);
   const audio = useRef<HTMLAudioElement | null>(null), desde = useRef(0), ocupado = useRef(false), generacion = useRef(0), peticion = useRef<AbortController | null>(null);
@@ -110,9 +123,9 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     pista.current = null; setPistaLista(pista.current !== null); setSegmento(null); setEstado("listo"); setMotivo(null); setRegistrando(false);
     const intencion = consumirIntencion(inicioPendiente.current, carga, idioma); inicioPendiente.current = null;
     pistaPedida.current = intencion && sesion ? { carga, idioma } : null;
-    setModo(intencion && sesion ? "completo" : "apagado");
+    setModo(intencion && sesion ? modoPedido.current : "apagado");
   }, [sesion, archivo, idioma, carga]);
-  useEffect(() => { alActividadAudio(modo === "completo"); return () => alActividadAudio(false); }, [modo, alActividadAudio]);
+  useEffect(() => { alActividadAudio(conPista(modo)); return () => alActividadAudio(false); }, [modo, alActividadAudio]);
   useEffect(() => {
     generacion.current++; peticion.current?.abort(); ocupado.current = false; audio.current?.pause(); setUrl(null); if (modo !== "apagado") setSegmento(null);
     setProgreso({ listos: 0, total: 0 });
@@ -131,8 +144,8 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
   useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
   useEffect(() => {
     if (modo === "apagado" || !sesion || !disponible || ocupado.current || url) return;
-    if (modo === "completo" && (pistaPedida.current?.carga !== carga || pistaPedida.current.idioma !== idioma)) return;
-    const intervalo = RELATO_INTERVALOS[modo];
+    if (conPista(modo) && (pistaPedida.current?.carga !== carga || pistaPedida.current.idioma !== idioma)) return;
+    const intervalo = modo === "ritmo" ? RELATO_INTERVALOS.buffer : RELATO_INTERVALOS[modo];
     const fin = Math.min(desde.current + intervalo, hastaTick);
     if (fin <= desde.current || enDirecto && fin - desde.current < intervalo) { setEstado(enDirecto ? "esperando" : "final"); if (!enDirecto) setModo("apagado"); return; }
     ocupado.current = true; setEstado("preparando");
@@ -150,15 +163,18 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     // Corrección 045/048: un 429 (p. ej. otras síntesis en curso en el servidor) o un fallo de red se
     // reintenta con espera (esperaReintentoInvitado, sin caducidad: la pista se prepara antes de sonar);
     // un 4xx/5xx distinto o un segmento inválido es final y la intervención se omite como antes.
-    const solicitarInvitado = async (i: IntervencionArena): Promise<Segmento> => {
+    // Brief 060 § 3.1 · La pista al ritmo pide la variante «breve» (REPETICION_NARRADA.varianteInvitado); el servidor sirve
+    // la completa si no hay breve, y la respuesta se valida contra la variante efectiva del diario.
+    const solicitarInvitado = async (i: IntervencionArena, pedida: VarianteIntercambio = "completa"): Promise<Segmento> => {
+      const efectiva = varianteEfectiva(i, pedida);
       for (let reintentos = 0; ; reintentos++) {
         let fallo: FalloInvitado = { tipo: "invalida" };
         try {
-          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante: "completa" }) })
+          const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante: pedida }) })
             .catch((e: unknown) => { fallo = { tipo: "red" }; throw e; });
           if (!r.ok) { fallo = { tipo: "http", estado: r.status }; throw new Error("Intervención"); }
           const s = await r.json() as Segmento;
-          if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: "completa" } })) throw new Error("Intervención inconsistente");
+          if (!segmentoVozValido(s, { desde: i.tick, hasta: i.tick, idioma, intervencion: { id: i.id, tick: i.tick, variante: efectiva } })) throw new Error("Intervención inconsistente");
           return s;
         } catch (error) {
           const espera = vigente() ? esperaReintentoInvitado(fallo, reintentos, null, i.tema) : null;
@@ -170,9 +186,99 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     void (async () => {
       let decodificador: AudioContext | undefined;
       try {
-        if (modo === "completo") {
+        if (modo === "ritmo") {
           const invitados = diario.current.filter(i => i.tick <= hastaTick).sort((x, y) => x.tick - y.tick);
-          const clave = `${sesion}:${idioma}:${hastaTick}:${invitados.map(i => i.id).join(",")}`;
+          const clave = `${sesion}:${idioma}:${hastaTick}:${modo}:${invitados.map(i => i.id).join(",")}`;
+          let lista = pista.current?.clave === clave ? pista.current : null;
+          if (!lista) {
+            decodificador = new AudioContext({ sampleRate: 24000 });
+            const sr = decodificador.sampleRate, reg = actual.current.registro;
+            const previas = invitados.filter(i => esPrevia(i)), resto = invitados.filter(i => !esPrevia(i));
+            const ventanas: { desde: number; hasta: number }[] = [];
+            for (let inicio = 0; inicio < hastaTick; inicio += intervalo) ventanas.push({ desde: inicio, hasta: Math.min(inicio + intervalo, hastaTick) });
+            const conCierre = !!reg && registroCompleto(reg) && ventanas.length > 0;
+            let total = previas.length + ventanas.length + resto.length + (conCierre ? 1 : 0), listos = 0, orden = 0;
+            setProgreso({ listos, total });
+            const listo = () => { listos++; setProgreso({ listos, total }); };
+            const piezas: PiezaPlan[] = [], clips = new Map<string, { segmento: Segmento; muestras: Float32Array }>(), fallidos: string[] = [];
+            const agregar = (id: string, tipo: TipoPieza, segmento: Segmento, buffer: AudioBuffer, tick: number, prioridad: number) => {
+              piezas.push({ id, tipo, tick, duracionS: buffer.length / sr, prioridad, orden: orden++ });
+              clips.set(id, { segmento, muestras: buffer.getChannelData(0).slice() });
+            };
+            const decodificar = async (x: Segmento) => {
+              const bytes = Uint8Array.from(atob(x.audio!.base64), c => c.charCodeAt(0));
+              const buffer = await decodificador!.decodeAudioData(bytes.buffer);
+              if (!buffer.length || !Number.isFinite(buffer.duration) || buffer.duration <= 0 || buffer.numberOfChannels !== 1) throw new Error("Audio inválido");
+              return buffer;
+            };
+            // § 3.1 · Memoria encadenada de forma determinista (la misma para todos: la caché del servidor se comparte).
+            let memoria: RecuerdoVoz[] = [];
+            const recordar = (x: Segmento) => { if (x.texto && "claveVoz" in x) memoria = recordarVoz(memoria, { tick: x.fragmentos[0]!.tick, texto: x.texto.slice(0, 500), clave: x.claveVoz, tema: x.temaVoz }); };
+            const narrador = async (cuerpo: { desdeTick: number; hastaTick: number; cierre?: boolean; evento?: string }) => {
+              const r = await fetch(`/api/arena/sesiones/${sesion}/relato`, { method: "POST", headers: { "content-type": "application/json" }, signal: a.signal, body: JSON.stringify({ ...cuerpo, modo: "buffer", idioma, memoria }) });
+              if (!r.ok) throw new FalloRelato(r.status);
+              const x = await r.json() as Segmento;
+              if (x.desdeTick !== cuerpo.desdeTick || x.hastaTick !== cuerpo.hastaTick || x.idioma !== idioma || x.modo !== "buffer" || x.audio && !x.fragmentos.length) throw new Error("Tramo inconsistente");
+              return x;
+            };
+            /** Una intervención cuyo audio falle, no valide o dure más que duracionMaxS se omite sin romper la pista. */
+            const invitado = async (i: IntervencionArena, variante: VarianteIntercambio, tipo: TipoPieza) => {
+              try {
+                const x = await solicitarInvitado(i, variante); if (!vigente()) return;
+                const buffer = await decodificar(x);
+                if (buffer.duration > VOZ_BUFFER.duracionMaxS) throw new Error("Intervención demasiado larga");
+                if (!vigente()) return;
+                agregar(i.id, tipo, x, buffer, tipo === "previa" ? 0 : i.tick, tipo === "previa" ? 0 : MESA_ARENA.prioridadInvitado); listo();
+              } catch { if (!vigente()) return; total--; setProgreso({ listos, total }); }
+            };
+            // 1 · Previa (variante completa, como hoy).
+            for (const i of previas) { await invitado(i, "completa", "previa"); if (!vigente()) return; }
+            let k = 0;
+            for (const { desde, hasta } of ventanas) {
+              // 2 · Narrador: una ventana por cada RELATO_INTERVALOS.buffer; su fallo HTTP falla la pista.
+              const x = await narrador({ desdeTick: desde, hastaTick: hasta });
+              if (!vigente()) return;
+              if (x.audio) { const buffer = await decodificar(x); if (!vigente()) return; agregar(`ventana:${desde}`, "narrador", x, buffer, x.fragmentos[0]!.tick, "prioridad" in x ? x.prioridad : 0); }
+              recordar(x); listo();
+              // v1.1 (3) · Cada evento importante de la ventana distinto del narrado tiene su clip (petición con `evento`).
+              // Si falla (400, red o audio), se omite: silencio, la cancha sigue y queda en `fallidos`.
+              const narrado = "tipoRelato" in x && x.tipoRelato === "jugada" ? x.fuentes[0] : undefined;
+              for (const e of reg ? importantesVentana(reg, desde, hasta) : []) {
+                if (e.id === narrado) continue;
+                total++; setProgreso({ listos, total });
+                try {
+                  const y = await narrador({ desdeTick: desde, hastaTick: hasta, evento: e.id });
+                  if (!vigente()) return;
+                  if (y.audio) { const buffer = await decodificar(y); if (!vigente()) return; agregar(`evento:${e.id}`, "narrador", y, buffer, y.fragmentos[0]!.tick, "prioridad" in y ? y.prioridad : 0); }
+                  recordar(y); listo();
+                } catch { if (!vigente()) return; fallidos.push(e.id); total--; setProgreso({ listos, total }); }
+              }
+              // 3 · Invitados (no previa) tras la primera ventana con hastaTick ≥ tick, en su variante breve.
+              while (k < resto.length && resto[k]!.tick <= hasta) { await invitado(resto[k++]!, REPETICION_NARRADA.varianteInvitado, "invitado"); if (!vigente()) return; }
+            }
+            // 4 · Cierre, solo si el registro está completo.
+            if (conCierre) {
+              const x = await narrador({ desdeTick: ventanas.at(-1)!.desde, hastaTick, cierre: true });
+              if (!vigente()) return;
+              if (x.audio) { const buffer = await decodificar(x); if (!vigente()) return; agregar("cierre", "cierre", x, buffer, hastaTick, Infinity); }
+              listo();
+            }
+            const plan = planificarPista(piezas, hastaTick);
+            if (plan.duracionS * sr * 2 > PISTA_MAX_PCM_BYTES) throw new Error("Pista demasiado larga");
+            const segmentos = plan.colocadas.map(c => clips.get(c.id)!.segmento);
+            const blob = wavMono(ensamblarPista(plan.colocadas.map(c => ({ inicioS: c.inicioS, muestras: clips.get(c.id)!.muestras })), plan.duracionS, sr), sr);
+            lista = { clave, segmentos, tramos: plan.tramos, plan, fallidos, blob, hastaTick, idioma };
+            if (!vigente()) return;
+            pista.current = lista; setPistaLista(pista.current !== null);
+          }
+          // v1.3 (3) del 057 · La pista empieza en el instante del cursor (0 en el tick 0: previa incluida).
+          const inicio = instanteAudio(lista.tramos, inicioTick.current), instante = instanteNarrado(lista.tramos, inicio);
+          inicioAudio.current = inicio;
+          setSegmento(segmentoDe(lista, inicio)); seleccionar.current(instante.tick); marcar(lista, inicio);
+          setUrl(URL.createObjectURL(lista.blob)); setEstado("reproduciendo");
+        } else if (modo === "completo") {
+          const invitados = diario.current.filter(i => i.tick <= hastaTick).sort((x, y) => x.tick - y.tick);
+          const clave = `${sesion}:${idioma}:${hastaTick}:${modo}:${invitados.map(i => i.id).join(",")}`;
           let lista = pista.current?.clave === clave ? pista.current : null;
           if (!lista) {
             decodificador = new AudioContext({ sampleRate: 24000 });
@@ -238,8 +344,8 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
         const status = error instanceof FalloRelato ? error.status : null;
         // v1.1 § 8 · Un 404 de la sesión (caducada o borrada): un único re-registro por subida, que adopta la
         // sesión nueva y retoma la pista; si vuelve a fallar, `caducada`.
-        if (modo === "completo" && status === 404 && !reRegistrado.current && (actual.current.archivo || actual.current.registro)) {
-          reRegistrado.current = true; inicioPendiente.current = { carga: actual.current.carga, idioma };
+        if (conPista(modo) && status === 404 && !reRegistrado.current && (actual.current.archivo || actual.current.registro)) {
+          reRegistrado.current = true; inicioPendiente.current = { carga: actual.current.carga, idioma }; modoPedido.current = modo;
           setRegistrando(true); setModo("apagado"); setReRegistro(n => n + 1);
           return;
         }
@@ -263,13 +369,21 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
   const aplicarInicio = () => { const a = audio.current; if (a && inicioAudio.current > 0) { a.currentTime = inicioAudio.current; if (a.readyState >= 1) inicioAudio.current = 0; } };
   useEffect(() => { if (url) { aplicarInicio(); reproducirAudio(null); } else inicioAudio.current = 0; }, [url]);
   useEffect(() => { if (!url) setPausado(true); }, [url]);
+  /** Brief 060 § 3.4–3.5 · Previa y espera rotulada en el instante `t` de la pista (solo con plan, es decir, en ritmo). */
+  function marcar(p: Pista, t: number) {
+    const previa = !!p.plan && t < p.plan.inicioJuegoS - 1e-3;
+    const e = p.plan?.esperas.find(e => (e.tipo === "invitado" || e.tipo === "clave") && e.inicioS <= t && t < e.finS);
+    const espera = e ? e.tipo as "invitado" | "clave" : null;
+    setMarca(m => m.previa === previa && m.espera === espera ? m : { previa, espera });
+  }
   const sincronizar = () => {
-    if (modo !== "completo" || !pista.current || !audio.current) return;
-    const instante = instanteNarrado(pista.current.tramos, audio.current.currentTime);
-    setSegmento(pista.current.segmentos[instante.indice]!); seleccionar.current(instante.tick);
+    if (!conPista(modo) || !pista.current || !audio.current) return;
+    const t = audio.current.currentTime, instante = instanteNarrado(pista.current.tramos, t);
+    setSegmento(segmentoDe(pista.current, t)); seleccionar.current(instante.tick); marcar(pista.current, t);
   };
+  useEffect(() => { if (!url) setMarca(m => m.previa || m.espera ? { previa: false, espera: null } : m); }, [url]);
   useEffect(() => {
-    if (modo !== "completo" || !url) return;
+    if (!conPista(modo) || !url) return;
     let frame = 0;
     const avanzar = () => {
       if (audio.current && !audio.current.paused) sincronizar();
@@ -281,8 +395,8 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modo, url]);
   const terminar = () => {
-    if (modo === "completo" && pista.current) {
-      seleccionar.current(hastaTick); setSegmento(pista.current.segmentos.at(-1)!); setEstado("final"); setModo("apagado");
+    if (conPista(modo) && pista.current) {
+      seleccionar.current(hastaTick); setSegmento(pista.current.segmentos.at(-1) ?? null); setEstado("final"); setModo("apagado");
     } else if (segmento) { desde.current = segmento.hastaTick; setUrl(null); setVersion(v => v + 1); }
   };
   /** § 3.2 · `detener()`: cancela registro y peticiones en vuelo, pausa el <audio> y suelta la URL; nunca arranca nada. */
@@ -299,37 +413,48 @@ export function ArenaNarracion({ sesion, archivo, alRegistrar, hastaTick, enDire
       inicioTick.current = Number.isFinite(desdeTick) ? Math.max(0, desdeTick) : 0;
       reRegistrado.current = false; setMotivo(null);
       if (!disponible) { setEstado("error"); setMotivo("sin-voz"); return; }
+      modoPedido.current = "ritmo";
       if (!sesion) { inicioPendiente.current = { carga, idioma }; void impl.current.registrar(); return; }
-      pistaPedida.current = { carga, idioma }; setModo("completo");
+      // Brief 060 § 3.1 · La barra (Reproducir) usa la pista al ritmo del partido.
+      pistaPedida.current = { carga, idioma }; setModo("ritmo");
     },
     pausar: () => { audio.current?.pause(); },
     reanudar: () => impl.current.reproducirAudio(() => setEstado("reproduciendo")),
     buscar: tick => {
       const p = pista.current, a = audio.current;
-      if (actual.current.modo !== "completo" || !p || !a || !a.src) return;
+      if (!conPista(actual.current.modo) || !p || !a || !a.src) return;
       a.currentTime = instanteAudio(p.tramos, tick);
       impl.current.sincronizar();
     },
     detener: () => impl.current.detener(),
+    saltarPrevia: () => {
+      const p = pista.current, a = audio.current;
+      if (!conPista(actual.current.modo) || !p?.plan || !a || !a.src) return;
+      a.currentTime = p.plan.inicioJuegoS;
+      impl.current.sincronizar();
+    },
   });
   useEffect(() => { alControles?.(controles.current); }, [alControles]);
   // § 3.2 · Fase derivada de lo que ya existe: modo, estado, progreso y los eventos del <audio>.
   const fase: FaseNarracion = registrando ? "registrando"
-    : modo === "completo" ? estado === "reproduciendo" ? pausado ? "pausada" : "sonando" : estado === "pulsar" ? "pulsar" : "preparando"
+    : conPista(modo) ? estado === "reproduciendo" ? pausado ? "pausada" : "sonando" : estado === "pulsar" ? "pulsar" : "preparando"
     : estado === "error" ? "error" : estado === "final" ? "final" : "inactiva";
   const motivoVisible = fase === "error" ? motivo ?? undefined : undefined;
   const minutosVisibles = motivoVisible === "ocupado" ? minutos : undefined;
-  useEffect(() => { alEstado?.({ fase, listos: progreso.listos, total: progreso.total, motivo: motivoVisible, minutos: minutosVisibles, vozDisponible: disponible }); }, [alEstado, fase, progreso.listos, progreso.total, motivoVisible, minutosVisibles, disponible]);
+  // Brief 060 § 3.4–3.5 · Previa y espera solo cuentan con la pista lista (sonando, en pausa o pendiente de un clic).
+  const conPosicion = fase === "sonando" || fase === "pausada" || fase === "pulsar";
+  const previaVisible = conPosicion && marca.previa, esperaVisible = conPosicion ? marca.espera : null;
+  useEffect(() => { alEstado?.({ fase, listos: progreso.listos, total: progreso.total, motivo: motivoVisible, minutos: minutosVisibles, vozDisponible: disponible, previa: previaVisible, espera: esperaVisible }); }, [alEstado, fase, progreso.listos, progreso.total, motivoVisible, minutosVisibles, disponible, previaVisible, esperaVisible]);
   const completa = registro ? registroCompleto(registro) : false;
   const registrable = !sesion && disponible && (archivo !== null || (!!registro && completa && !sinPartido));
-  const textos: Record<string, string> = { listo: t("Audio off", "Audio desactivado"), esperando: t("Waiting for confirmed play…", "Esperando jugadas confirmadas…"), preparando: modo === "completo" && progreso.total ? t(`Preparing narration: ${progreso.listos}/${progreso.total} passages`, `Preparando narración: ${progreso.listos}/${progreso.total} tramos`) : t("Preparing the next passage…", "Preparando el siguiente tramo…"), reproduciendo: t("Narration playing", "Narración en reproducción"), pulsar: t("Press play to listen", "Pulsa reproducir para escuchar"), final: t("End of narration", "Fin de la narración"), error: t("Narration unavailable or request budget reached", "Narración no disponible o presupuesto de consultas agotado") };
+  const textos: Record<string, string> = { listo: t("Audio off", "Audio desactivado"), esperando: t("Waiting for confirmed play…", "Esperando jugadas confirmadas…"), preparando: conPista(modo) && progreso.total ? t(`Preparing narration: ${progreso.listos}/${progreso.total} passages`, `Preparando narración: ${progreso.listos}/${progreso.total} tramos`) : t("Preparing the next passage…", "Preparando el siguiente tramo…"), reproduciendo: t("Narration playing", "Narración en reproducción"), pulsar: t("Press play to listen", "Pulsa reproducir para escuchar"), final: t("End of narration", "Fin de la narración"), error: t("Narration unavailable or request budget reached", "Narración no disponible o presupuesto de consultas agotado") };
   return <section className="arena-intelligence" data-testid="arena-narration" aria-label={t("Match audio narration", "Narración del partido")}>
     <h2>{t("Listen to the match", "Escucha el partido")}</h2>
-    <p className="arena-muted">{t("Listen to a continuous account of this recording. The pitch follows the voice; the account may take longer than the match.", "Escucha un relato continuo de esta grabación. La cancha sigue la voz; el relato puede durar más que el partido.")}</p>
+    <p className="arena-muted">{t("Listen to a continuous account of this recording. This detailed account narrates every action in 10-second passages: it lasts several times the match and, within a passage, the voice can run ahead of the pitch. Play, under the pitch, uses the match-pace narration.", "Escucha un relato continuo de esta grabación. Este relato detallado narra cada acción en tramos de 10 s: dura varias veces el partido y, dentro de un tramo, la voz puede adelantarse a la cancha. Reproducir, bajo la cancha, usa la narración al ritmo del partido.")}</p>
     <div className="arena-live-controls">
       {registrable && <button className="btn" disabled={registrando} onClick={() => void registrar()}>{t("Enable narration for this recording", "Activar narración de esta grabación")}</button>}
       {enDirecto && <button className="btn" disabled={!sesion || !disponible} aria-pressed={modo === "vivo"} onClick={() => setModo(modo === "vivo" ? "apagado" : "vivo")}>{t("Live narration", "Narración en vivo")}</button>}
-      <button className="btn" disabled={!sesion || !disponible || enDirecto || modo === "completo"} aria-pressed={modo === "completo"} onClick={() => { inicioTick.current = 0; pistaPedida.current = { carga, idioma }; setModo("completo"); }}>{t("Listen from the start", "Escuchar desde el inicio")}</button>
+      <button className="btn" disabled={!sesion || !disponible || enDirecto || modo === "completo"} aria-pressed={modo === "completo"} onClick={() => { inicioTick.current = 0; modoPedido.current = "completo"; pistaPedida.current = { carga, idioma }; setModo("completo"); }}>{t("Listen from the start", "Escuchar desde el inicio")}</button>
       {(modo !== "apagado" || registrando) && <button className="btn" onClick={detener}>{t("Stop narration", "Detener narración")}</button>}
       {/* Brief 053 · El WAV es el mismo Blob de la pista: ninguna petición ni síntesis nueva. */}
       <button className="btn" data-testid="arena-narration-download" disabled={!pistaLista} onClick={() => { const p = pista.current; if (p) descargarBlob(nombreDescarga({ partido: { seed }, idioma: p.idioma, alcance: { hastaTick: p.hastaTick, parcial: false } }, "wav"), p.blob); }}>{t("Download audio (WAV)", "Descargar audio (WAV)")}</button>

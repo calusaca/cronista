@@ -4,9 +4,11 @@
 export type FaseNarracion = "inactiva" | "registrando" | "preparando" | "sonando" | "pausada" | "pulsar" | "final" | "error";
 /** v1.3 (1) · `ocupado`: cupo de subidas agotado (429 con retry-after mayor que reintentoMaxS); `minutos` dice cuándo vuelve. */
 export type MotivoNarracion = "sin-voz" | "sin-sesion" | "red" | "presupuesto" | "caducada" | "ocupado";
-export interface EstadoNarracion { fase: FaseNarracion; listos: number; total: number; motivo?: MotivoNarracion; minutos?: number; vozDisponible: boolean }
+/** Brief 060 § 3.4–3.5 · `previa`: la pista al ritmo suena o está en pausa antes de `plan.inicioJuegoS`; `espera`: la
+ * cancha está detenida por un invitado de la Mesa o para cantar una jugada clave (rótulo arena-replay-hold). */
+export interface EstadoNarracion { fase: FaseNarracion; listos: number; total: number; motivo?: MotivoNarracion; minutos?: number; vozDisponible: boolean; previa: boolean; espera: "invitado" | "clave" | null }
 /** v1.3 (3) · `iniciar(desdeTick)`: la pista empieza en el instante del cursor (`instanteAudio`); sin tick, en 0. */
-export interface ControlesNarracion { iniciar(desdeTick?: number): void; pausar(): void; reanudar(): void; buscar(tick: number): void; detener(): void }
+export interface ControlesNarracion { iniciar(desdeTick?: number): void; pausar(): void; reanudar(): void; buscar(tick: number): void; detener(): void; /** Brief 060 § 3.4 · Salta la previa de la pista al ritmo (audio en `plan.inicioJuegoS`). */ saltarPrevia(): void }
 
 /** v1.1 § 1 · Fases en que la pista (o su preparación) es dueña del reloj: la cancha muda no corre. */
 export const faseActiva = (fase: FaseNarracion): boolean => fase === "registrando" || fase === "preparando" || fase === "sonando" || fase === "pausada" || fase === "pulsar";
@@ -22,7 +24,7 @@ export type DuenoReloj = "mudo" | "voz" | null;
  * narración y su final o detención. */
 export type AccionReloj = { tipo: "pulsar"; conVoz: boolean } | { tipo: "conmutador-off" } | { tipo: "pista-activa" } | { tipo: "fallo" } | { tipo: "fin" };
 export type OrdenNarracion = keyof ControlesNarracion | null;
-export interface TransicionReloj { dueno: DuenoReloj; reproduciendo: boolean; orden: Exclude<OrdenNarracion, "buscar"> }
+export interface TransicionReloj { dueno: DuenoReloj; reproduciendo: boolean; orden: Exclude<OrdenNarracion, "buscar" | "saltarPrevia"> }
 
 /** v1.1 § 1 · Exclusión del reloj, decidida ANTES de registrar, preparar o reproducir: `reproduciendo` es la
  * cancha muda y nunca coincide con una orden que activa la pista; la muda solo arranca con la pista en
