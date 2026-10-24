@@ -788,10 +788,11 @@ test("defecto rev. 0000029 · con el directo terminado (sin abrir la repetición
   for (const etiqueta of ["Simulated duration", "Home formation", "Away formation", "Weather", "Surface", "Crowd pressure: home / away", "Match seed (optional)"]) await expect(control(etiqueta)).toBeEnabled();
   // Los botones que reemplazan el partido mostrado conservan su bloqueo.
   await expect(page.getByRole("button", { name: "Saved matches", exact: true })).toBeDisabled();
-  // Cambiar la duración no altera la emisión actual: el reloj sigue con la duración del registro.
-  const reloj = await page.getByTestId("arena-clock").textContent();
+  // Cambiar la duración no altera la emisión actual: el reloj sigue con la duración del registro. La emisión
+  // sigue avanzando mientras tanto, así que solo se compara el total («/ 1:00»), no el instante.
+  const total = (await page.getByTestId("arena-clock").textContent())!.split("/")[1]!.trim();
   await duracion.selectOption("30");
-  await expect(page.getByTestId("arena-clock")).toHaveText(reloj!);
+  await expect(page.getByTestId("arena-clock")).toHaveText(new RegExp(`/ ${total.replace(":", "\\:")}$`));
   await iniciar(page);
   await expect.poll(() => cuerpos.length).toBe(2);
   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
