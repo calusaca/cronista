@@ -88,6 +88,29 @@ describe("062 · H1 · origen completo y cuerpo lento", () => {
   });
 });
 
+describe("062 · Codex #4 · cancelación del cuerpo que no termina", () => {
+  it("vence el plazo con un flujo cuya cancelación nunca resuelve ⇒ 408 a tiempo y el limitador queda libre", async () => {
+    instalar();
+    const colgado = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(new TextEncoder().encode('{"formato":')); }, cancel: () => new Promise<void>(() => {}) });
+    const t0 = Date.now(), r = await Promise.race([post({ cuerpo: colgado, xff: "4.4.4.4" }), new Promise<never>((_, x) => setTimeout(() => x(new Error("la ruta no respondió")), S.cuerpoPlazoMs + 2_000))]);
+    expect(r.status).toBe(408);
+    expect(Date.now() - t0).toBeLessThan(S.cuerpoPlazoMs + 1_000);
+    expect((await post({ cuerpo: "{}", xff: "4.4.4.4" })).status).toBe(400);
+  });
+});
+
+describe("062 · Codex #5 · el despliegue vuelve a comprobar el torneo activo justo antes de ARM", () => {
+  it("una comprobación antes de compilar en ACR y otra inmediatamente antes de deployment group create", () => {
+    const script = readFileSync("scripts/deploy-azure-arena.mjs", "utf8");
+    const acr = script.indexOf('az(["acr", "build"'), arm = script.indexOf('az(["deployment", "group", "create"');
+    const llamadas = [...script.matchAll(/await comprobarTorneoActivo\(\);/g)].map(x => x.index!);
+    expect(llamadas.some(i => i < acr)).toBe(true);
+    const ultima = Math.max(...llamadas.filter(i => i < arm));
+    expect(ultima).toBeGreaterThan(acr);
+    expect(script.slice(ultima, arm).split("\n").length).toBeLessThanOrEqual(2);
+  });
+});
+
 describe("062 · rutas de lectura (R1) y estado", () => {
   it("GET estado: fichas de los dos formatos calculadas, motivo y no-store", async () => {
     const { g } = instalar();

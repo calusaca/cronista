@@ -108,3 +108,17 @@ El ensayo se rechaza (motivo `desactivado`) si `ARENA_BLOB_ENDPOINT` está defin
 - **Smoke y TPM**: no hay `az` en esta máquina; la capacidad real de TPM sigue sin verificar (§ 1).
 - **Barrera**: es una declaración por reloj (latido 10 s, silencio a 30 s, barrera a 45 s, plazo por operación de
   10 s), no una exclusión distribuida (§ 19.4). El plazo del SDK es del lado del cliente.
+
+## Revisión de Codex, iteración 1 (hallazgos 3–5)
+
+- **#3** · `intentarCierre` vuelve a leer y validar la instantánea (`leerInstantanea`) cuando la lectura anterior
+  falló, y limpia el error si ahora funciona; una instantánea que resulta ya cerrada deja de estar pendiente.
+  Pruebas «Codex #3» (un fallo único al recargar; dos fallos y cierre por reintento o por `/cerrar`); mutación C3.
+- **#4** · `leerCuerpoAcotado` lanza `lector.cancel()` sin esperarla: el 408/413 sale a tiempo y la ruta libera el
+  limitador en su `finally`. Prueba «Codex #4» (flujo cuya cancelación nunca resuelve); mutación C4.
+- **#5** · `deploy-azure-arena.mjs` comprueba el torneo activo antes de compilar en ACR y otra vez justo antes de
+  ARM. Prueba «Codex #5» (estática sobre el script, que no se puede importar sin desplegar); mutación C5. Límite
+  declarado: entre la segunda consulta y el cambio de revisión quedan segundos sin exclusión; con el interruptor
+  apagado no hay admisiones públicas y la barrera de mantenimiento completa queda para cuando se encienda.
+
+Tras los cambios: `npm test` 2695/2695 (122 archivos), `npm run typecheck` exit 0 y 64 de 64 mutaciones en rojo.

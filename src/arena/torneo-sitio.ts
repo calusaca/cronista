@@ -305,17 +305,22 @@ export class GestorTorneoSitio {
       const manifiesto = esquemaManifiesto.parse(JSON.parse(await a.leer(nombre)));
       if (nombreManifiesto(manifiesto) !== nombre) throw new Error(`${nombre}: id distinto del nombre`);
       const mem: TorneoMem = { manifiesto, instantanea: null, libro: null, error: null };
-      try {
-        const t = esquemaTorneoCualquiera.parse(JSON.parse(await a.leer(`${manifiesto.id}.torneo.json`)));
-        if (t.version !== S.version || t.id !== manifiesto.id || validarCoherencia(t).length) throw new Error("instantánea incoherente");
-        mem.instantanea = t;
-      } catch (error) { if (!noExiste(error)) mem.error = `instantánea ilegible (${mensaje(error)})`; }
+      Object.assign(mem, await this.leerInstantanea(a, manifiesto.id));
       mem.libro = await this.leerLibro(a, manifiesto.id);
       torneos.set(manifiesto.id, mem);
     }
     // El torneo que este proceso ejecuta conserva su estado en memoria (es la fuente de verdad mientras corre).
     if (this.activo) torneos.set(this.activo.id, this.activo.mem);
     this.torneos = torneos; this.recargado = true;
+  }
+/** La instantánea guardada de `id` (esquema 062, id y coherencia). Ausente ⇒ `instantanea: null` sin error;
+   * ilegible o incoherente ⇒ `error` (el cierre la vuelve a leer en cada intento: un fallo transitorio no la condena). */
+  private async leerInstantanea(a: AlmacenTorneos, id: string): Promise<{ instantanea: Torneo062 | null; error: string | null }> {
+    try {
+      const t = esquemaTorneoCualquiera.parse(JSON.parse(await a.leer(`${id}.torneo.json`)));
+      if (t.version !== S.version || t.id !== id || validarCoherencia(t).length) throw new Error("instantánea incoherente");
+      return { instantanea: t, error: null };
+    } catch (error) { return { instantanea: null, error: noExiste(error) ? null : `instantánea ilegible (${mensaje(error)})` }; }
   }
   private async leerLibro(a: AlmacenTorneos, id: string): Promise<MovimientoGasto[] | null> {
     let texto: string;
@@ -338,7 +343,12 @@ export class GestorTorneoSitio {
       try {
         let final = this.cierresEnMemoria.get(id);
         if (!final) {
-          if (t.error) throw new Error(t.error);
+          // Revisión Codex #3 · Un error de lectura anterior no se da por definitivo: se relee y se valida.
+          if (t.error) {
+            Object.assign(t, await this.leerInstantanea(await this.almacen(), id));
+            if (t.error) throw new Error(t.error);
+            if (t.instantanea && t.instantanea.estado !== "en_curso") continue; // ya estaba cerrada
+          }
           const libro = t.libro ?? await this.leerLibro(await this.almacen(), id);
           if (!libro) throw new Error("libro de gasto ilegible");
           t.libro = libro;
@@ -762,7 +772,9 @@ export async function leerCuerpoAcotado(req: Request, maxBytes: number, plazoMs:
       if (bytes > maxBytes) throw new ErrorSitio("Petición demasiado grande", 413);
       partes.push(value);
     }
-  } catch (error) { await lector.cancel().catch(() => {}); throw error; }
+  // Revisión Codex #4 · La cancelación se lanza sin esperarla: un flujo cuya cancelación no termina no retiene la
+  // respuesta (408/413) ni la plaza del limitador, que la ruta libera en su `finally`.
+  } catch (error) { void Promise.resolve().then(() => lector.cancel()).catch(() => {}); throw error; }
   finally { clearTimeout(temporizador); try { lector.releaseLock(); } catch { /* cancelado */ } }
   try { return JSON.parse(Buffer.concat(partes).toString("utf8")) as unknown; }
   catch { throw new ErrorSitio(bytes ? "JSON inválido" : "Petición vacía", 400); }

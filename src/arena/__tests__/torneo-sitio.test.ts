@@ -369,6 +369,29 @@ describe("062 · S7c · cierre de arranque con reintentos", () => {
     expect(instantanea(base, m.id).gasto.conocidoMicroUsd).toBe(1000);
     expect(g.estado().motivo).toBeNull();
   });
+  it("Codex #3 · una lectura de la instantánea que falla UNA vez (al recargar): el cierre la relee, la valida y cierra", async () => {
+    const { base, reloj, m } = sembrado();
+    let fallos = 0;
+    base.antes = (op, nombre) => { if (op === "leer" && nombre === `${m.id}.torneo.json` && fallos === 0) { fallos++; throw new Error("Blob 503 transitorio"); } };
+    const { g } = await preparado({ almacen: base, reloj });
+    expect(fallos).toBe(1);
+    expect(instantanea(base, m.id).estado).toBe("interrumpido");
+    expect(g.estado().motivo).toBeNull();
+  });
+  it("Codex #3 · si también falla el primer intento, el reintento o /cerrar la releen y cierran", async () => {
+    for (const via of ["reintento", "cerrar"] as const) {
+      const { base, reloj, m } = sembrado();
+      let fallos = 0;
+      base.antes = (op, nombre) => { if (op === "leer" && nombre === `${m.id}.torneo.json` && fallos < 2) { fallos++; throw new Error("Blob 503 transitorio"); } };
+      const { g } = await preparado({ almacen: base, reloj });
+      expect(fallos).toBe(2);
+      expect(instantanea(base, m.id).estado).toBe("en_curso");
+      expect(g.estado().motivo).toBe("activo");
+      if (via === "reintento") await reloj.avanzar(S.cierreReintentoMs); else expect(await g.cerrar()).toEqual({ pendientes: 0 });
+      expect(instantanea(base, m.id).estado).toBe("interrumpido");
+      expect(g.estado().motivo).toBeNull();
+    }
+  });
   it("con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta", async () => {
     const { base, reloj, m } = sembrado();
     let falla = true, intentos = 0;

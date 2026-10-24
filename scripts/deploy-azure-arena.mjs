@@ -40,14 +40,20 @@ try {
   const sucios = cambiosSinCache(git(["status", "--porcelain"]));
   if (sucios.length) { console.error(JSON.stringify({ error: "Árbol de git con cambios: el commit desplegado tiene que ser el código", cambios: sucios.slice(0, 20) })); process.exit(1); }
   const commit = git(["rev-parse", "HEAD"]).trim();
-  // Brief 062 § 17.2 · Aviso con un torneo activo.
+  // Brief 062 § 17.2 · Aviso con un torneo activo: antes de compilar y otra vez justo antes de ARM (revisión Codex #5),
+  // porque durante la compilación en ACR se puede admitir uno. Límite declarado: entre la segunda consulta y el cambio
+  // de revisión quedan unos segundos sin exclusión. Con el interruptor apagado (por defecto) no hay admisiones
+  // públicas; la barrera de mantenimiento completa (bloquear admisiones durante el despliegue) queda pendiente para
+  // cuando se encienda.
   const actual = az(["containerapp", "list", "-g", grupo]).find(a => a.name === "cronista-arena");
   const fqdn = actual?.properties?.configuration?.ingress?.fqdn;
-  if (fqdn) {
+  const comprobarTorneoActivo = async () => {
+    if (!fqdn) return;
     const activo = await torneoActivo(`https://${fqdn}`);
     if (activo && !process.argv.includes("--forzar")) { console.error(`El torneo ${activo} quedará interrumpido; el cupo de hoy queda consumido. Vuelve a ejecutar con --forzar para desplegar igualmente.`); process.exit(1); }
     if (activo) console.error(`--forzar: el torneo ${activo} quedará interrumpido (el cupo de hoy queda consumido).`);
-  }
+  };
+  await comprobarTorneoActivo();
   // Brief 062 § 17.6 · El secreto de administración NO se crea aquí (decisión del coordinador): solo se comprueba.
   // Cómo crearlo: docs/evidencia/torneo-sitio-062/README.md. Sin él, los lanzamientos quedan deshabilitados.
   const vault = JSON.parse((await import("node:fs")).readFileSync("docs/evidencia/azure-servicios.json", "utf8")).resources.vaultUri.replace(/^https:\/\//, "").split(".")[0];
@@ -64,6 +70,7 @@ try {
     blobEndpoint: process.env.ARENA_BLOB_ENDPOINT, vaultUri: servicios.resources.vaultUri, speechEndpoint: process.env.AZURE_SPEECH_ENDPOINT, agentVersion: process.env.ARENA_AGENTE_VERSION, insightsConnectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING, foundryEndpoint, modelos, commit, torneoSitio, adminTokenEnKeyVault };
   const file = join(temporal, "params.json");
   writeFileSync(file, JSON.stringify({ "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#", contentVersion: "1.0.0.0", parameters: Object.fromEntries(Object.entries(valores).map(([k, v]) => [k, { value: v }])) }), { mode: 0o600 });
+  await comprobarTorneoActivo();
   const d = az(["deployment", "group", "create", "-g", grupo, "-n", "cronista-arena-publicacion", "--template-file", "infra/arena-preview.bicep", "--parameters", `@${file}`]);
   const url = d.properties.outputs.url.value;
   writeFileSync("docs/evidencia/azure-arena-publicacion.json", JSON.stringify({ checkedUtc: new Date().toISOString(), phase: "deployed_pending_smoke", url, image: `${registro.loginServer}/cronista:${tag}`, sourceFiles: files, limits: { modelMatchesPerDay: 10, analystQuestionsPerDay: 20, speechCharactersPerDay: 120000 }, originalDemoUnchanged: true }, null, 2) + "\n");

@@ -106,6 +106,13 @@ const M = [
     ["const g = S.formatos.grupos, c = (g.porGrupo - 1) + Math.log2(g.grupos * g.pasanPorGrupo), p = pSignosBilateral(c, 0);", "const g = S.formatos.grupos, c = t.participantes.length - 1, p = pSignosBilateral(c, 0);"]] },
   { id: "G12", desc: "aceptar campos extra en el encuentro 059", archivo: TORNEO, test: T_FORMATOS, patron: "G12", cambios: [
     ["export const esquemaEncuentro = z.strictObject({", "export const esquemaEncuentro = z.object({"]] },
+  // --- Revisión Codex (iteración 1) ---------------------------------------------------------------------------------
+  { id: "C3", desc: "el cierre no relee una instantánea que falló al leerse", archivo: SITIO, test: T_SITIO, patron: "Codex #3", cambios: [
+    ["          if (t.error) {\n            Object.assign(t, await this.leerInstantanea(await this.almacen(), id));\n            if (t.error) throw new Error(t.error);", "          if (t.error) {\n            if (t.error) throw new Error(t.error);"]] },
+  { id: "C4", desc: "esperar la cancelación del cuerpo al vencer el plazo", archivo: SITIO, test: T_RUTAS, patron: "Codex #4", cambios: [
+    ["void Promise.resolve().then(() => lector.cancel()).catch(() => {}); throw error;", "await lector.cancel().catch(() => {}); throw error;"]] },
+  { id: "C5", desc: "sin la segunda comprobación del torneo activo antes de ARM", archivo: "scripts/deploy-azure-arena.mjs", test: T_RUTAS, patron: "Codex #5", cambios: [
+    ["  await comprobarTorneoActivo();\n  const d = az(", "  const d = az("]] },
   // --- P1-b, funciones puras de grupos (sin exponer) ---------------------------------------------------------------
   { id: "G1-sin-barajar", desc: "sorteo de grupos sin barajar", archivo: FORMATOS, test: T_GRUPOS, patron: "G1", cambios: [
     ["  for (let i = orden.length - 1; i > 0; i--) { const j = rng.int(0, i); [orden[i], orden[j]] = [orden[j]!, orden[i]!]; }\n  return orden;", "  void rng;\n  return orden;"]] },
