@@ -1,0 +1,11 @@
+{
+  "utc": "2026-10-24T01:36:35.626Z",
+  "casillaMarcadaPorDefecto": true,
+  "botonApagarVisibleMs": 25505,
+  "ariaPressed": "true",
+  "nota": "Narration started with the match. «Turn narration off» mutes it; this browser remembers your choice.",
+  "estadoBufer": "Live · 17 s ready",
+  "botonHabilitarAudioVisible": false,
+  "respuestasVoz": { "200": 46, "429": 1 },
+  "errores": []
+}

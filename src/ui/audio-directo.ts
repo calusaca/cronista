@@ -4,6 +4,7 @@
 // memoria del módulo, no de almacenamiento: una recarga lo borra. La preferencia por espectador vive en
 // localStorage y toda lectura o escritura va en try/catch.
 import { NARRACION_DIRECTO } from "../sim/limites";
+import type { AsignacionModelos } from "../arena/protocolo";
 
 let cebado: AudioContext | null = null;
 const propios = new Map<string, number>();
@@ -39,6 +40,23 @@ export function marcarArranquePropio(id: string, t0: number = typeof performance
 export function arranquePropio(id: string): boolean {
   return propios.has(id);
 }
+/** Brief 058 v1.1 § 2 · Instante (performance.now()) del clic de «Iniciar partido en vivo» de una sesión propia. */
+export function instanteArranquePropio(id: string): number | null {
+  return propios.get(id) ?? null;
+}
+
+// Brief 058 · B · Asignación pública de la sesión que muestra el directo (la publica ArenaEnDirecto al recibir el
+// POST, la instantánea o el mensaje `sesion`); la lee ArenaEmisionBuffer para derivar los ids de la antesala.
+// Memoria del módulo, por id de sesión.
+const asignaciones = new Map<string, AsignacionModelos>();
+const oyentes = new Set<() => void>();
+export function fijarAsignacionDirecto(id: string, asignacion: AsignacionModelos | null): void {
+  if (!asignacion || asignaciones.get(id) === asignacion) return;
+  asignaciones.set(id, asignacion);
+  for (const oyente of oyentes) oyente();
+}
+export function asignacionDirecto(id: string): AsignacionModelos | null { return asignaciones.get(id) ?? null; }
+export function suscribirAsignacionDirecto(oyente: () => void): () => void { oyentes.add(oyente); return () => { oyentes.delete(oyente); }; }
 
 /** § 3.1 · La narración se activa sola si se cumplen las tres condiciones: preferencia no desactivada, sesión
  * iniciada por este espectador en esta página (con la casilla marcada) y voz disponible en /herramientas. */

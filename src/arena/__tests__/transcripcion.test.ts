@@ -522,6 +522,8 @@ describe("056 · previa en la transcripción", () => {
       expect(md).toContain(`${R.conversacion} · ${R.formas.previa} · ${escaparMarkdown(previa[0]!.id)}`);
       expect(R.formas.previa).toBe(idioma === "es" ? "previa" : "pre-match");
       expect(md).toContain(idioma === "es" ? "La previa (alineaciones, técnicos y condiciones) se deriva del registro por plantilla determinista." : "The pre-match segment (line-ups, coaches and conditions) is derived from the match run by deterministic template.");
+      // Brief 058 § 6: la nota avisa de que la antesala del directo no está en la transcripción.
+      expect(md).toContain(idioma === "es" ? "En el directo, si la narración está activa antes del saque, la antesala lee las alineaciones por líneas (plantilla determinista); esta transcripción conserva la previa del registro." : "In the live view, if narration is on before kick-off, the pre-match presentation reads the line-ups by lines (deterministic template); this transcript keeps the pre-match segment from the run.");
       expect(md).toContain(R.clases["dato-determinista"]);
       const excepcion = idioma === "es" ? "salvo la previa, que va antes del primer tramo." : "except the pre-match segment, which comes before the first passage.";
       expect(R.orden).toContain(excepcion);

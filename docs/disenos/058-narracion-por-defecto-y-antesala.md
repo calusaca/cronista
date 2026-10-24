@@ -5,6 +5,9 @@
 Brief **cerrado** el 23 de octubre de 2026. Lo escribió Opus en el papel de diseñador, porque Fable no tiene
 cupo; no hay código de producción.
 
+**Versión 1.3 (24 de octubre), cerrada.** Dos correcciones antes del bloque B: hechos por clip e idioma, y la e2e
+B5 con clips de 20 s (≤ `VOZ_BUFFER.duracionMaxS`). Ver la [sección final](#versión-13-24-de-octubre-dos-correcciones-antes-del-bloque-b).
+
 **Versión 1.2 (23 de octubre), cerrada.** La segunda revisión de Codex cerró 11 de 12 hallazgos y encontró un
 error nuevo (N1): la transferencia de retención mezclaba `Date.now()` con `performance.now()` y segundos con
 milisegundos. Opus lo corrige en la decisión del cambio de idioma con `venceMs` monotónico, con prueba y mutación.
@@ -1406,3 +1409,24 @@ Reestimación con las decisiones 1–11:
 - «Controlador verificado» significa asignado por el servidor desde su catálogo, no la identidad comprobada
   del despliegue.
 - En el modo `topeS = 0` la antesala puede sonar a trozos entre noticias, como hoy la previa del 056.
+
+## Versión 1.3 (24 de octubre): dos correcciones antes del bloque B
+
+Las decide Opus. El implementador del bloque A detuvo B por dos defectos del brief. **Prevalecen** sobre el texto anterior.
+
+1. **Hechos por idioma (§ 7 de la v1.1).**
+   - Cada clip se genera en un solo idioma, así que sus `hechos` se construyen **por clip y por idioma** con
+     `antesalaPartido(registro, asignacion, idioma)`.
+   - En un clip en español, `formacion_hablada` y `hablado_k` guardan la forma española; en uno en inglés, la inglesa.
+     No hay claves con sufijo de idioma: un `datos` describe exactamente lo que dice **ese** clip.
+   - Las claves no cambian. Se sigue exigiendo que cada valor dicho esté en `datos` con su clave.
+   - El oráculo independiente (§ 8 de la v1.1) calcula la forma hablada esperada **para el idioma del clip**, a partir de
+     `config.formaciones` y de los nombres del registro. Lo hace con una tabla propia en la prueba, sin importar el
+     generador.
+   - Mutación obligatoria: generar `formacion_hablada` en el otro idioma tiene que dar rojo.
+2. **E2e B5 con clips válidos.**
+   - Un clip de más de `VOZ_BUFFER.duracionMaxS` (24 s) se invalida, así que la prueba no puede usar clips de 30 s.
+   - B5 usa clips simulados de **20 s**: con el `topeS` real de 75 s, el cuarto clip **atraviesa** el límite.
+   - Comprueba que la fuente se detiene y el reloj avanza entre `t0 + topeS` y `t0 + topeS + 1,5 s`.
+   - Las cifras se importan de `limites.ts`; ninguna se escribe a mano.
+   - Sigue marcada `@lento`, con `test.setTimeout(120_000)`.

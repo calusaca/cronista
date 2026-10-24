@@ -4,9 +4,14 @@
 // a false; el manejador de React corre entre ambos. Las cifras se leen de las constantes, nunca a mano.
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page, type Route } from "@playwright/test";
+import { antesalaPartido } from "../src/arena/antesala";
+import { BUFFER_ARENA, VOZ_BUFFER } from "../src/arena/buffer";
 import { wavMono } from "../src/arena/pista-audio";
+import { previaPartido } from "../src/arena/previa";
+import type { AsignacionModelos } from "../src/arena/protocolo";
+import { relatoIntervencion } from "../src/arena/relato";
 import type { RegistroArena } from "../src/arena/tipos";
-import { NARRACION_DIRECTO } from "../src/sim/limites";
+import { ANTESALA_ARENA, NARRACION_DIRECTO } from "../src/sim/limites";
 
 test.describe.configure({ mode: "serial" });
 
@@ -19,7 +24,7 @@ const wav = async (s: number) => Buffer.from(await wavMono([Float32Array.from({ 
 const leer = async (ruta: string) => JSON.parse(await readFile(ruta, "utf8")) as RegistroArena;
 const prefijo = (r: RegistroArena, t: number): RegistroArena => ({ ...r, eventos: r.eventos.filter(e => e.tick <= t), fotogramas: r.fotogramas.filter(f => f.tick <= t), rondas: r.rondas.filter(x => x.inicioTick < t), final: [...r.fotogramas].reverse().find(f => f.tick <= t)! });
 const esperar = (ms: number) => new Promise(r => setTimeout(r, ms));
-const asignacion = { modo: "programado", local: { id: "programado", nombre: "Programmed", controlador: "programado" }, visita: { id: "programado", nombre: "Programmed", controlador: "programado" } };
+const asignacionProgramada = { modo: "programado", local: { id: "programado", nombre: "Programmed", controlador: "programado" }, visita: { id: "programado", nombre: "Programmed", controlador: "programado" } };
 const clave = NARRACION_DIRECTO.clavePreferencia;
 
 /** Instrumenta el gesto, el AudioContext y las marcas de tiempo de los botones de voz. Con `bloquearAudio`,
@@ -55,10 +60,13 @@ const soloKeepalive = (r: Route) => r.fulfill({ headers: { "content-type": "text
 /** Directo simulado: POST que crea `id` (con `retrasoPostMs`), instantánea hasta `corte` y SSE que, con
  * `avanceMs`, entrega todo hasta el tick 300 a ese plazo. /relato: 404 a las intervenciones; tramos vacíos;
  * la entrada, 0,3 s de audio. */
-async function directo(page: Page, id: string, opciones: { voz?: boolean; retrasoPostMs?: number; avanceMs?: number; corte?: number } = {}) {
+async function directo(page: Page, id: string, opciones: { voz?: boolean; retrasoPostMs?: number; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
+  /** Manejador propio de /relato (antesala, previa…): devuelve true si respondió. */
+  relato?: (p: Pedido, r: Route) => Promise<boolean> } = {}) {
   const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = 300;
   const entrada = await wav(0.3);
-  const pedidos: Pedido[] = [], posts: number[] = [];
+  const pedidos: (Pedido & { t: number })[] = [], posts: number[] = [], enVuelo = { ahora: 0, maximo: 0 };
+  const asignacion = opciones.asignacion ?? asignacionProgramada;
   await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: opciones.voz ?? true, analista: false } }));
   await page.route("**/api/arena/sesiones", async r => {
     if (r.request().method() !== "POST") return r.fallback();
@@ -74,17 +82,22 @@ async function directo(page: Page, id: string, opciones: { voz?: boolean; retras
     { tipo: "avance", estado: final, fotogramas: registro.fotogramas.filter(f => f.tick > corte && f.tick <= hasta), eventos: registro.eventos.filter(e => e.tick > corte && e.tick <= hasta) },
   ];
   await page.route(`**/api/arena/sesiones/${id}/eventos*`, async r => {
-    if (llamadas++ > 0 || opciones.avanceMs === undefined) return soloKeepalive(r);
-    await esperar(opciones.avanceMs);
+    if (llamadas++ > 0 || opciones.avanceMs === undefined && !opciones.avance) return soloKeepalive(r);
+    if (opciones.avance) await opciones.avance; else await esperar(opciones.avanceMs!);
     await r.fulfill({ headers: { "content-type": "text/event-stream" }, body: publicaciones.map((publicacion, i) => `id: ${i + 2}\nevent: arena\ndata: ${JSON.stringify({ id: i + 2, publicacion })}\n\n`).join("") }).catch(() => {});
   });
   await page.route(`**/api/arena/sesiones/${id}/relato`, async r => {
-    const p = r.request().postDataJSON() as Pedido; pedidos.push(p);
+    const p = r.request().postDataJSON() as Pedido; pedidos.push({ ...p, t: performance.now() });
+    enVuelo.ahora++; enVuelo.maximo = Math.max(enVuelo.maximo, enVuelo.ahora);
+    try { await atender(p, r); } finally { enVuelo.ahora--; }
+  });
+  async function atender(p: Pedido, r: Route) {
+    if (opciones.relato && await opciones.relato(p, r)) return;
     if (p.intervencion) return r.fulfill({ status: 404, json: { error: "Sin invitados en esta prueba" } }).catch(() => {});
     if (p.entradaTick !== undefined) return r.fulfill({ json: { desdeTick: p.desdeTick, hastaTick: p.hastaTick, modo: "buffer", idioma: p.idioma, entradaTick: p.entradaTick, texto: "Apertura", fragmentos: [{ tick: p.entradaTick, texto: "Apertura", emocion: "serena", intensidad: .2, variante: 0, fuentes: [], fotogramas: [] }], fuentes: [], fotogramas: [], eventosDisponibles: 0, eventosNarrados: 1, conduccionesNarradas: 0, prioridad: 10, cierre: false, tipoRelato: "entrada", claveVoz: "prueba:entrada", audio: { base64: entrada, tipo: "audio/wav" } } }).catch(() => {});
     return r.fulfill({ json: { desdeTick: p.desdeTick, hastaTick: p.hastaTick, modo: "buffer", idioma: p.idioma, texto: "", fragmentos: [], fuentes: [], fotogramas: [], eventosDisponibles: 0, eventosNarrados: 0, conduccionesNarradas: 0, prioridad: 10, cierre: false, tipoRelato: "comentario", audio: null } }).catch(() => {});
-  });
-  return { pedidos, posts };
+  }
+  return { pedidos, posts, enVuelo, registro };
 }
 const iniciar = (page: Page) => page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
 const casilla = (page: Page) => page.getByTestId("arena-live-voice").getByRole("checkbox");
@@ -291,6 +304,376 @@ test("058 · A6 360 px y 1440 px, claro y oscuro, EN y ES: casilla y nota sin de
     await page.getByTestId("arena-buffer").scrollIntoViewIfNeeded();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(c.ancho);
     if (guardar) await page.getByTestId("arena-buffer").screenshot({ path: `${carpeta}/narracion-activa-${nombre}.png` });
+    await ctx.close();
+  }
+});
+
+// ——— Bloque B · Antesala (§ 9 y v1.1 §§ 2–5, 10; v1.3) ———
+type FuenteB = { inicio: number; fin: number; duracion: number; detenida: boolean; intervencion?: string; kind?: string; texto?: string; reloj: string };
+type MarcaB = { t: number; texto: string };
+type VentanaB = { __fuentes: FuenteB[]; __estados: MarcaB[]; __relojes: MarcaB[]; __ctx: AudioContext[] };
+/** Etiqueta cada fuente con la transcripción visible (intervención, tipo y texto) y registra el estado del búfer y
+ * el reloj en cada fotograma (requestAnimationFrame instrumentado). */
+async function instrumentarB(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as VentanaB & typeof window;
+    w.__fuentes = []; w.__estados = []; w.__relojes = []; w.__ctx = [];
+    const reloj = () => document.querySelector('[data-testid="arena-clock"]')?.textContent?.trim() ?? "";
+    const Base = window.AudioContext;
+    window.AudioContext = class extends Base {
+      constructor(o?: AudioContextOptions) { super(o); w.__ctx.push(this); }
+      override createBufferSource() {
+        const f = super.createBufferSource(), iniciar = f.start.bind(f), detener = f.stop.bind(f);
+        const dato: FuenteB = { inicio: 0, fin: 0, duracion: 0, detenida: false, reloj: "" };
+        f.start = (cuando = 0) => {
+          if (!f.buffer || f.buffer.length <= 1) return iniciar(cuando); // el cebado de una muestra
+          const retraso = Math.max(0, cuando - this.currentTime);
+          dato.inicio = performance.now() + retraso * 1000; dato.duracion = f.buffer.duration; dato.fin = dato.inicio + dato.duracion * 1000; dato.reloj = reloj();
+          w.__fuentes.push(dato); iniciar(cuando);
+        };
+        f.stop = (cuando = 0) => { if (dato.fin > performance.now() + 20) dato.detenida = true; dato.fin = Math.min(dato.fin, performance.now()); detener(cuando); };
+        f.addEventListener("ended", () => { dato.fin = Math.min(dato.fin, performance.now()); });
+        return f;
+      }
+    };
+    const raf = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb: FrameRequestCallback) => raf(t => { cb(t); w.__relojes.push({ t: performance.now(), texto: reloj() }); });
+    let previo = "", previoEstado = "";
+    document.addEventListener("DOMContentLoaded", () => new MutationObserver(() => {
+      const estado = document.querySelector('[data-testid="arena-buffer-status"]')?.textContent ?? "";
+      if (estado && estado !== previoEstado) { previoEstado = estado; w.__estados.push({ t: performance.now(), texto: estado }); }
+      const el = document.querySelector<HTMLElement>('[data-testid="arena-voice-transcript"]');
+      if (!el) return;
+      const d = { intervencion: el.dataset.narrationIntervention, kind: el.dataset.narrationKind, texto: el.querySelector("p")?.textContent ?? "" };
+      const clave = JSON.stringify(d); if (clave === previo) return; previo = clave;
+      const f = [...w.__fuentes].reverse().find(x => x.kind === undefined); if (f) Object.assign(f, d);
+    }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true }));
+  });
+}
+const datosB = (page: Page) => page.evaluate(() => { const w = window as unknown as VentanaB; return { fuentes: w.__fuentes, estados: w.__estados, relojes: w.__relojes, ctx: w.__ctx.map(c => c.state) }; });
+const asignacionModelos = { modo: "manual", local: { id: "equilibrado", nombre: "GPT-5.6 Luna", controlador: "azure-openai:equilibrado" }, visita: { id: "luna6", nombre: "GPT-6 Luna", controlador: "azure-openai:luna6" } } as const;
+/** Sirve los clips de la antesala derivados del mismo registro y asignación (hechos del idioma pedido). */
+function servirAntesala(registro: RegistroArena, asignacion: AsignacionModelos | null, opciones: { duracionS?: number; demoraMs?: (id: string, idioma: string) => number | Promise<unknown>; estado?: (id: string) => number | null } = {}) {
+  const audios = new Map<number, Promise<string>>();
+  const audio = (s: number) => { if (!audios.has(s)) audios.set(s, wav(s)); return audios.get(s)!; };
+  return async (p: Pedido, r: Route): Promise<boolean> => {
+    if (!p.intervencion?.startsWith("antesala:")) return false;
+    const demora = opciones.demoraMs?.(p.intervencion, p.idioma);
+    if (typeof demora === "number") await esperar(demora); else if (demora) await demora;
+    const estado = opciones.estado?.(p.intervencion) ?? null;
+    if (estado) { await r.fulfill({ status: estado, json: { error: "simulado" } }).catch(() => {}); return true; }
+    const i = antesalaPartido(prefijo(registro, 0), asignacion, p.idioma).find(x => x.id === p.intervencion);
+    if (!i) { await r.fulfill({ status: 404, json: { error: "Intervención no publicada" } }).catch(() => {}); return true; }
+    await r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma, "completa"), audio: { base64: await audio(opciones.duracionS ?? 0.6), tipo: "audio/wav" } } }).catch(() => {});
+    return true;
+  };
+}
+const idsGuion = (registro: RegistroArena, asignacion: AsignacionModelos | null) => antesalaPartido(prefijo(registro, 0), asignacion, "en").map(i => i.id);
+const saltar = (page: Page) => page.getByTestId("arena-antesala-skip");
+const deAntesala = (fuentes: FuenteB[]) => fuentes.filter(f => f.intervencion?.startsWith("antesala:")).sort((a, b) => a.inicio - b.inicio);
+
+test("058 · B1 antesala completa: orden, huecos, reloj retenido con «Pre-match presentation», entrada al final, saque en ≤ 1 s y sin previa", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005821";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const { pedidos } = await directo(page, id, { avanceMs: 2000, asignacion: asignacionModelos, relato: servirAntesala(registro, asignacionModelos as AsignacionModelos) });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect(saltar(page)).toBeVisible();
+  await expect(page.getByTestId("arena-buffer-status")).toContainText("Pre-match presentation");
+  const ids = idsGuion(registro, asignacionModelos as AsignacionModelos);
+  await expect.poll(async () => (await datosB(page)).estados.some(e => e.texto.startsWith("Live")), { timeout: 40_000 }).toBe(true);
+  await expect(saltar(page)).toHaveCount(0);
+  const { fuentes, estados, relojes } = await datosB(page);
+  const clips = deAntesala(fuentes);
+  expect(clips.map(f => f.intervencion)).toEqual(ids);
+  for (let k = 1; k < clips.length; k++) {
+    expect(clips[k]!.inicio, JSON.stringify([clips[k - 1], clips[k]])).toBeGreaterThanOrEqual(clips[k - 1]!.fin - 20);
+    expect(clips[k]!.inicio - clips[k - 1]!.fin).toBeLessThanOrEqual((ANTESALA_ARENA.huecoS + 0.2) * 1000);
+  }
+  // La cabecera local dice el modelo del POST simulado.
+  expect(clips.find(f => f.intervencion === "antesala:02-local-cabecera:0")!.texto).toContain(asignacionModelos.local.nombre);
+  // La entrada después del último clip; el reloj sale de 0:00 (estado «Live») en ≤ 1 s tras su fin.
+  const entrada = fuentes.find(f => f.kind === "entrada")!;
+  expect(entrada.inicio).toBeGreaterThanOrEqual(clips.at(-1)!.fin - 20);
+  const vivo = estados.find(e => e.texto.startsWith("Live"))!;
+  expect(vivo.t - entrada.fin).toBeLessThanOrEqual(1000);
+  // Durante todo el guion: reloj en 0:00 y la región viva con «Pre-match presentation».
+  for (const r of relojes.filter(x => x.t >= clips[0]!.inicio && x.t <= entrada.fin)) expect(r.texto, String(r.t)).toMatch(/^0:00 /);
+  const durante = estados.filter(e => e.t >= clips[0]!.inicio && e.t <= entrada.fin);
+  for (const e of durante) expect(e.texto).toContain("Pre-match presentation");
+  // Ninguna petición ni fuente de la previa del 056; una sola petición por clip.
+  expect(pedidos.filter(p => p.intervencion?.startsWith("previa:"))).toEqual([]);
+  expect(fuentes.filter(f => f.intervencion?.startsWith("previa:"))).toEqual([]);
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:")).map(p => p.intervencion)).toEqual(ids);
+});
+
+test("058 · B2 «Skip to kick-off» con el teclado: la fuente se detiene, el botón desaparece, el reloj sale en ≤ 1,5 s y el foco pasa al botón de narración", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005822";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  await directo(page, id, { avanceMs: 1000, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 3 }) });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 20_000 }).toBeGreaterThanOrEqual(2);
+  await saltar(page).focus();
+  const t = await page.evaluate(() => performance.now());
+  await page.keyboard.press("Enter");
+  await expect(saltar(page)).toHaveCount(0);
+  expect(await page.evaluate(() => document.activeElement?.textContent)).toBe("Turn narration off");
+  await expect.poll(async () => (await datosB(page)).estados.find(e => e.t >= t && e.texto.startsWith("Live"))?.t ?? null, { timeout: 5000 }).not.toBeNull();
+  const { fuentes, estados } = await datosB(page);
+  expect(estados.find(e => e.t >= t && e.texto.startsWith("Live"))!.t - t).toBeLessThanOrEqual(1500);
+  const cortada = deAntesala(fuentes).at(-1)!;
+  expect(cortada.detenida).toBe(true);
+  // Ninguna fuente de la antesala arranca después de saltar.
+  expect(deAntesala(fuentes).filter(f => f.inicio > t + 50)).toEqual([]);
+});
+
+test("058 · B3 fallos: con 404 en antesala:* la retención se suelta en ≤ 2 s, la previa del 056 suena y no vuelve «Pre-match presentation»", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005823";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = BUFFER_ARENA.tramoTicks;
+  const piezas = previaPartido(prefijo(registro, corte)), pieza = await wav(1.5);
+  const { pedidos } = await directo(page, id, { corte, relato: async (p, r) => {
+    if (p.intervencion?.startsWith("antesala:")) { await r.fulfill({ status: 404, json: { error: "Intervención no publicada" } }).catch(() => {}); return true; }
+    const i = piezas.find(x => x.id === p.intervencion);
+    if (!i) return false;
+    await r.fulfill({ json: { ...relatoIntervencion(i, registro.config.partido.seed, p.idioma, (p.variante ?? "completa") as "completa" | "breve"), audio: { base64: pieza, tipo: "audio/wav" } } }).catch(() => {});
+    return true;
+  } });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  const t = await page.evaluate(() => performance.now());
+  await iniciar(page);
+  await expect.poll(async () => (await datosB(page)).fuentes.filter(f => f.intervencion?.startsWith("previa:")).length, { timeout: 30_000 }).toBe(piezas.length);
+  const { estados } = await datosB(page);
+  const presentacion = estados.filter(e => e.texto.includes("Pre-match presentation"));
+  const suelta = estados.find(e => e.t > (presentacion.at(-1)?.t ?? t) && !e.texto.includes("Pre-match presentation"));
+  if (presentacion.length) {
+    expect(suelta).toBeDefined();
+    expect(suelta!.t - presentacion[0]!.t).toBeLessThanOrEqual(2000);
+    expect(estados.filter(e => e.t > suelta!.t && e.texto.includes("Pre-match presentation"))).toEqual([]);
+  }
+  await expect(saltar(page)).toHaveCount(0);
+  // Abandono tras maxFallosSeguidos: no se piden más clips (sin abandono se pedirían los nueve).
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toHaveLength(ANTESALA_ARENA.maxFallosSeguidos);
+});
+
+test("058 · B4 enlace compartido con el reloj en marcha: «Enable narration» no pide la antesala", async ({ page }) => {
+  const id = "00000000-0000-4000-8000-000000005824";
+  const { pedidos } = await directo(page, id, { corte: 300 });
+  await instrumentarB(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  await expect(page.getByTestId("arena-buffer-status")).toContainText("Live");
+  await vozActivar(page).click();
+  await page.waitForTimeout(1500);
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toEqual([]);
+  await expect(saltar(page)).toHaveCount(0);
+});
+
+test("058 · B5 @lento tope de pared: con clips de 20 s la fuente se corta y el reloj sale entre t0 + topeS y t0 + topeS + 1,5 s", async ({ page }) => {
+  test.setTimeout(120_000);
+  const id = "00000000-0000-4000-8000-000000005825";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const clipS = 20;
+  expect(clipS).toBeLessThanOrEqual(VOZ_BUFFER.duracionMaxS);
+  await directo(page, id, { avanceMs: 1000, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: clipS }) });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  const t0 = await page.evaluate(() => performance.now());
+  await iniciar(page);
+  const limite = t0 + ANTESALA_ARENA.topeS * 1000;
+  await expect.poll(async () => (await datosB(page)).estados.find(e => e.t >= limite - 500 && e.texto.startsWith("Live"))?.t ?? null, { timeout: (ANTESALA_ARENA.topeS + 15) * 1000, intervals: [1000] }).not.toBeNull();
+  const { fuentes, estados } = await datosB(page);
+  const vivo = estados.find(e => e.texto.startsWith("Live"))!;
+  expect(vivo.t).toBeGreaterThanOrEqual(limite);
+  expect(vivo.t).toBeLessThanOrEqual(limite + 1500);
+  const ultima = deAntesala(fuentes).at(-1)!;
+  expect(ultima.detenida).toBe(true);
+  expect(ultima.fin).toBeLessThanOrEqual(limite + 1500);
+});
+
+test("058 · B6 (a) activación a mano en pausa en 0:00: la antesala espera a «Resume broadcast»; (b) pausar a mitad la suspende y el reloj no se mueve", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005826";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const { pedidos } = await directo(page, id, { corte: BUFFER_ARENA.tramoTicks, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 2 }) });
+  await instrumentarB(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  await page.getByRole("button", { name: "Pause broadcast", exact: true }).click();
+  await vozActivar(page).click();
+  await page.waitForTimeout(1000);
+  expect(deAntesala((await datosB(page)).fuentes)).toEqual([]);
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toEqual([]);
+  await page.getByRole("button", { name: "Resume broadcast", exact: true }).click();
+  await expect(page.getByTestId("arena-buffer-status")).toContainText("Pre-match presentation");
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
+  // (b) Pausa a mitad: el contexto se suspende y el reloj sigue en 0:00; al continuar vuelve a «Pre-match presentation».
+  await page.getByRole("button", { name: "Pause broadcast", exact: true }).click();
+  await expect.poll(async () => (await datosB(page)).ctx.at(-1)).toBe("suspended");
+  await expect(page.getByTestId("arena-clock")).toContainText("0:00 /");
+  await page.getByRole("button", { name: "Resume broadcast", exact: true }).click();
+  await expect(page.getByTestId("arena-buffer-status")).toContainText("Pre-match presentation");
+  await expect.poll(async () => (await datosB(page)).ctx.at(-1)).toBe("running");
+  await expect(page.getByTestId("arena-clock")).toContainText("0:00 /");
+});
+
+test("058 · B6 (c) activación a mano y la reserva se llena justo después: el reloj sigue en 0:00 en todos los fotogramas", async ({ page }) => {
+  test.setTimeout(60_000);
+  const id = "00000000-0000-4000-8000-000000005827";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  let liberar!: () => void; const avance = new Promise<void>(r => { liberar = r; });
+  await directo(page, id, { corte: 150, avance, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 1 }) });
+  await instrumentarB(page);
+  await page.goto(`/arena?partido=${id}&vista=buffer`);
+  await expect(page.getByTestId("arena-buffer-status")).toContainText("Preparing broadcast");
+  await vozActivar(page).click();
+  const t = await page.evaluate(() => performance.now());
+  liberar();
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
+  const { relojes } = await datosB(page);
+  for (const r of relojes.filter(x => x.t >= t)) expect(r.texto).toMatch(/^0:00 /);
+});
+
+test("058 · B7 token: una respuesta retenida que llega después de saltar no arranca ninguna fuente ni pide más clips", async ({ page }) => {
+  test.setTimeout(60_000);
+  const id = "00000000-0000-4000-8000-000000005828";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  let liberar!: () => void; const retenida = new Promise<void>(r => { liberar = r; });
+  const ids = idsGuion(registro, asignacionProgramada as AsignacionModelos);
+  const { pedidos } = await directo(page, id, { avanceMs: 1000, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 1.5, demoraMs: x => x === ids[1] ? retenida : 0 }) });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect.poll(() => pedidos.some(p => p.intervencion === ids[1]), { timeout: 15_000 }).toBe(true);
+  await saltar(page).click();
+  const n = pedidos.filter(p => p.intervencion?.startsWith("antesala:")).length;
+  const antes = deAntesala((await datosB(page)).fuentes).length;
+  const foco = await page.evaluate(() => document.activeElement?.textContent ?? null);
+  liberar();
+  // Más que esperaClipS: un estado viejo que siguiera vivo saltaría el clip cortado y arrancaría el retenido.
+  await page.waitForTimeout((ANTESALA_ARENA.esperaClipS + 1.5) * 1000);
+  expect(deAntesala((await datosB(page)).fuentes)).toHaveLength(antes);
+  expect(await page.evaluate(() => document.activeElement?.textContent ?? null)).toBe(foco);
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toHaveLength(n);
+});
+
+test("058 · B8 cambio de idioma con la antesala sonando y la reserva completa: el reloj sigue en 0:00 en cada fotograma; el clip EN tardío se descarta y sigue en ES desde el clip 1", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005829";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  let liberar!: () => void; const retenida = new Promise<void>(r => { liberar = r; });
+  const ids = idsGuion(registro, asignacionProgramada as AsignacionModelos);
+  const { pedidos } = await directo(page, id, { avanceMs: 500, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 1.5, demoraMs: (x, idioma) => idioma === "en" && x === ids[2] ? retenida : 0 }) });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect.poll(() => pedidos.some(p => p.intervencion === ids[2] && p.idioma === "en"), { timeout: 15_000 }).toBe(true);
+  await expect(page.getByTestId("arena-buffer-status")).toHaveAttribute("data-ready-seconds", /^(2\d|[3-9]\d)\./);
+  const t = await page.evaluate(() => performance.now());
+  await page.getByRole("button", { name: "Switch to Spanish" }).click();
+  liberar();
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).filter(f => f.inicio > t).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
+  const { fuentes, relojes } = await datosB(page);
+  for (const r of relojes.filter(x => x.t >= t)) expect(r.texto, String(r.t)).toMatch(/^0:00 /);
+  const despues = deAntesala(fuentes).filter(f => f.inicio > t);
+  expect(despues[0]!.intervencion).toBe(ids[0]);
+  // El clip EN retenido nunca suena (las fuentes posteriores son de las peticiones en español).
+  const tras = pedidos.filter(p => p.t > 0 && p.intervencion?.startsWith("antesala:") && p.idioma === "es");
+  expect(tras[0]!.intervencion).toBe(ids[0]);
+  expect(despues.every(f => /Bienvenidos|sale en|En la portería|En el medio|Arriba/.test(f.texto ?? ""))).toBe(true);
+});
+
+test("058 · B9 Speech lento (2,5 s por respuesta): nunca más de 2 /relato en vuelo; con el último clip pendiente se pide la entrada y ningún invitado", async ({ page }) => {
+  test.setTimeout(120_000);
+  const id = "00000000-0000-4000-8000-000000005830";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const ids = idsGuion(registro, asignacionProgramada as AsignacionModelos);
+  const servir = servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 0.6 });
+  const { pedidos, enVuelo } = await directo(page, id, { avanceMs: 500, relato: async (p, r) => { await esperar(2500); return servir(p, r); } });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect.poll(() => pedidos.some(p => p.entradaTick !== undefined), { timeout: 60_000 }).toBe(true);
+  const entrada = pedidos.find(p => p.entradaTick !== undefined)!;
+  const ultimo = pedidos.find(p => p.intervencion === ids.at(-1))!;
+  expect(ultimo).toBeDefined();
+  // La entrada se pide con el último clip todavía en vuelo (pedido antes y respondido 2,5 s después).
+  expect(entrada.t).toBeGreaterThanOrEqual(ultimo.t);
+  expect(entrada.t - ultimo.t).toBeLessThan(2500);
+  await expect(saltar(page)).toHaveCount(0, { timeout: 60_000 });
+  expect(enVuelo.maximo).toBeLessThanOrEqual(VOZ_BUFFER.concurrencia);
+  expect(pedidos.filter(p => p.intervencion && !p.intervencion.startsWith("antesala:") && p.t < entrada.t)).toEqual([]);
+});
+
+test("058 · B10 dos espectadores en la misma sesión: cada uno ≤ 2 en vuelo y completa o abandona su antesala", async ({ browser }) => {
+  test.setTimeout(120_000);
+  const id = "00000000-0000-4000-8000-000000005831";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const ctx = await browser.newContext(), uno = await ctx.newPage(), otro = await ctx.newPage();
+  const servir = servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 0.6, demoraMs: () => 400 });
+  const a = await directo(uno, id, { relato: servir }), b = await directo(otro, id, { relato: servir });
+  await instrumentarB(uno); await instrumentarB(otro);
+  await uno.goto("/arena");
+  await iniciar(uno);
+  await otro.goto(`/arena?partido=${id}&vista=buffer`);
+  await vozActivar(otro).click();
+  for (const page of [uno, otro]) {
+    await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 30_000 }).toBeGreaterThan(0);
+    await expect(saltar(page)).toHaveCount(0, { timeout: 60_000 });
+  }
+  expect(a.enVuelo.maximo).toBeLessThanOrEqual(VOZ_BUFFER.concurrencia);
+  expect(b.enVuelo.maximo).toBeLessThanOrEqual(VOZ_BUFFER.concurrencia);
+  await ctx.close();
+});
+
+test("058 · A4b autoplay bloqueado y recuperado con el reloj en 0:00: la antesala empieza al habilitar el audio", async ({ page }) => {
+  test.setTimeout(60_000);
+  const id = "00000000-0000-4000-8000-000000005832";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const { pedidos } = await directo(page, id, { relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos) });
+  await instrumentar(page, { bloquearAudio: true });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  const pulsar = page.getByRole("button", { name: "Enable audio playback", exact: true });
+  await expect(pulsar).toBeVisible({ timeout: NARRACION_DIRECTO.desbloqueoMs + 5000 });
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toEqual([]);
+  await expect(page.getByTestId("arena-clock")).toContainText("0:00 /");
+  await page.evaluate(() => { (window as unknown as Ventana).__desbloquear = true; });
+  await pulsar.click();
+  await expect(saltar(page)).toBeVisible();
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThan(0);
+});
+
+test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso sin desbordar (capturas con CAPTURAS_058=1)", async ({ browser }) => {
+  test.setTimeout(120_000);
+  const guardar = process.env.CAPTURAS_058 === "1", carpeta = "docs/evidencia/narracion-058";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const casos = [
+    { ancho: 1440, alto: 900, tema: "light" as const, es: false }, { ancho: 1440, alto: 900, tema: "dark" as const, es: false },
+    { ancho: 360, alto: 740, tema: "light" as const, es: false }, { ancho: 360, alto: 740, tema: "dark" as const, es: false },
+    { ancho: 360, alto: 740, tema: "dark" as const, es: true },
+  ];
+  let n = 0;
+  for (const c of casos) {
+    const ctx = await browser.newContext({ viewport: { width: c.ancho, height: c.alto }, colorScheme: c.tema });
+    const page = await ctx.newPage();
+    await directo(page, `00000000-0000-4000-8000-0000000058${String(40 + n++)}`, { avanceMs: 500, asignacion: asignacionModelos, relato: servirAntesala(registro, asignacionModelos as AsignacionModelos, { duracionS: 6 }) });
+    await page.goto("/arena");
+    if (c.es) await page.getByRole("button", { name: "Switch to Spanish" }).click();
+    await page.getByTestId("arena-live").getByRole("button", { name: c.es ? "Iniciar partido en vivo" : "Start live match", exact: true }).click();
+    const boton = page.getByTestId("arena-antesala-skip");
+    await expect(boton).toHaveText(c.es ? "Saltar al saque" : "Skip to kick-off");
+    await expect(page.getByTestId("arena-buffer-status")).toContainText(c.es ? "Presentación del partido" : "Pre-match presentation");
+    await expect(page.getByTestId("arena-voice-transcript")).toHaveAttribute("data-narration-intervention", /^antesala:/);
+    await page.getByTestId("arena-buffer").scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(c.ancho);
+    const nombre = `${c.es ? "es" : "en"}-${c.tema === "dark" ? "oscuro" : "claro"}-${c.ancho}`;
+    if (guardar) await page.getByTestId("arena-buffer").screenshot({ path: `${carpeta}/antesala-${nombre}.png` });
     await ctx.close();
   }
 });

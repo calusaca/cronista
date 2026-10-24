@@ -18,7 +18,8 @@ export type RolMesa = "narrador" | "comentarista" | "estadista";
 /** Evidencia de un dato o una oración: eventos de la fórmula o, si el valor no procede
  * de eventos, el intervalo inspeccionado y su fuente (`inicial` o `fotograma:<tick>`).
  * Brief 056: la previa cita campos del registro (`config.partido`, `config.formaciones`,
- * `config.entrenadores`, `config.partido.condiciones`, `inicial.jugadores`, `inicial.arbitro`). */
+ * `config.entrenadores`, `config.partido.condiciones`, `inicial.jugadores`, `inicial.arbitro`). Brief 058: la antesala
+ * cita además `sesion.asignacion` (controlador asignado por el servidor desde su catálogo). */
 export interface EvidenciaMesa {
   eventos: string[]; intervalo?: [number, number]; fuente?: string;
   /** v3.1 · Una entrada por hecho citado por la oración (principal y apoyos) que sea un dato

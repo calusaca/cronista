@@ -255,3 +255,42 @@ describe("050 · canto de gol en planVozBuffer", () => {
     expect(planVozBuffer(60, 3, 70, finCanto + .01, finCanto, 0, GOL, true, golS)).toMatchObject({ interrumpirAnterior: false });
   });
 });
+
+describe("058 · RelojBuffer con la antesala (§ 4.5 y v1.1 § 3)", () => {
+  const reserva = BUFFER_ARENA.segundos + BUFFER_ARENA.recuperacionS;
+  it("retenido no avanza con la reserva de sobra; soltar arranca al momento", () => {
+    const r = new RelojBuffer();
+    expect(r.retener()).toBe(true);
+    for (let k = 0; k < 10; k++) expect(r.avanzar(.1, reserva, false)).toBe(0);
+    expect(r.estado).toBe("preparando");
+    r.soltar();
+    expect(r.avanzar(.1, reserva, false)).toBeGreaterThan(0);
+    expect(r.estado).toBe("reproduciendo");
+  });
+  it("retener con segundo > 0 o con el reloj en marcha no hace efecto", () => {
+    const r = new RelojBuffer();
+    r.avanzar(.1, reserva, false);
+    expect(r.retener()).toBe(false);
+    expect(r.avanzar(.1, reserva, false)).toBeGreaterThan(.1);
+    const otro = new RelojBuffer(BUFFER_ARENA.tramoTicks / 10);
+    expect(otro.retener()).toBe(false);
+  });
+  it("(a) en pausa en 0:00 retiene; continuar con retención vuelve a preparando y sigue sin avanzar", () => {
+    const r = new RelojBuffer();
+    r.pausar();
+    expect(r.retener()).toBe(true);
+    r.continuar();
+    expect(r.estado).toBe("preparando");
+    expect(r.avanzar(.1, reserva, false)).toBe(0);
+    // Sin retención, continuar vuelve a recuperando como siempre.
+    const s = new RelojBuffer(); s.pausar(); s.continuar();
+    expect(s.estado).toBe("recuperando");
+  });
+  it("(c) retenido en el mismo fotograma en que saldría de preparando: sigue en 0:00 en el siguiente", () => {
+    const r = new RelojBuffer();
+    expect(r.avanzar(.1, BUFFER_ARENA.segundos - 1, false)).toBe(0);
+    r.retener();
+    expect(r.avanzar(.1, reserva, false)).toBe(0);
+    expect(r.avanzar(.1, reserva, true)).toBe(0);
+  });
+});

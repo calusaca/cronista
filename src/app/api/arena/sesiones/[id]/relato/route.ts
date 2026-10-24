@@ -2,6 +2,7 @@ import { z } from "zod";
 import { leerJsonAcotado } from "../../../../../../arena/peticiones";
 import { construirRelato, relatoIntervencion } from "../../../../../../arena/relato";
 import { esPrevia, previaPartido } from "../../../../../../arena/previa";
+import { antesalaPartido, esAntesala } from "../../../../../../arena/antesala";
 import type { IntervencionArena } from "../../../../../../arena/protocolo";
 import { ErrorSesion, gestorSesiones, respuestaErrorSesion } from "../../../../../../arena/sesiones";
 import { asignarVoces, catalogoVoces, claveAudio, prepararVoz, sintetizarVoz, vocesDe } from "../../../../../../arena/voz";
@@ -28,9 +29,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (p.intervencion !== undefined) {
       // Brief 056 § 5.3 · La previa no está en el diario: se re-deriva del prefijo publicado en el tick 0
       // (config + inicial); un id previa:* desconocido es 404 como cualquier intervención no publicada.
-      const previa = esPrevia({ id: p.intervencion });
+      const previa = esPrevia({ id: p.intervencion }), antesala = esAntesala({ id: p.intervencion });
       let intervencion: IntervencionArena;
-      if (previa) {
+      if (antesala) {
+        // Brief 058 § 4.7 / v1.3 · La antesala tampoco está en el diario: se re-deriva del prefijo publicado en el
+        // tick 0 y de la asignación de la PROPIA sesión, con los hechos del idioma pedido. Sin reintento de 409 aquí
+        // (ese helper es del cliente); un id desconocido es 404.
+        const vista = await gestor.vistaPublicada(id, 0), asignacion = await gestor.asignacionPublicada(id);
+        let piezas: IntervencionArena[] = [];
+        try { piezas = antesalaPartido(vista, asignacion, p.idioma); } catch { /* Alineación inconsistente: no hay antesala. */ }
+        const encontrada = piezas.find(i => i.id === p.intervencion);
+        if (!encontrada) throw new ErrorSesion("Intervención no publicada", 404);
+        intervencion = encontrada;
+      } else if (previa) {
         const vista = await gestor.vistaPublicada(id, 0);
         let piezas: IntervencionArena[] = [];
         try { piezas = previaPartido(vista); } catch { /* Alineación inconsistente: no hay previa que servir. */ }
@@ -47,7 +58,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       const preparada = prepararVoz(relato.fragmentos, p.idioma, vocesDe(asignarVoces(p.idioma, await catalogoVoces())));
       // 048 v1.2 (2): la síntesis de un invitado respeta la cuota de invitados y la reserva del cierre (si no, 429).
       // Brief 056 § 5.4: la previa cobra solo de su bolsa propia (clase "previa").
-      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados, previa ? "previa" : "invitado");
+      const audio = await gestor.extra(id, "audio", claveAudio(preparada, intervencion.tick), () => sintetizarVoz(preparada, intervencion.tick), preparada.caracteresPresupuestados, antesala ? "antesala" : previa ? "previa" : "invitado");
       return Response.json({ ...relato, audio }, { headers: { "cache-control": "private, max-age=86400" } });
     }
     // Brief 056 v1.1 § 1 · La rama del narrador exige una ventana no vacía (antes la rechazaba construirRelato).

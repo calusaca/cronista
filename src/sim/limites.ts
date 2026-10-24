@@ -1174,6 +1174,60 @@ export const NARRACION_DIRECTO = {
  * 800 audios sin cambio. A ≈ 15,5 USD por millón, como máximo ≈ 3,1 USD al día. Revisar tras el fallo. */
 export const SPEECH_DIARIO = { audios: 800, caracteres: 200_000 } as const;
 
+/** Brief 058 · Bloque B · Antesala: nueve clips de plantilla, una sola voz (el narrador), antes del saque.
+ * Medido con Speech real el 23 oct: 52,3 s (ES) y 52,5 s (EN) de audio para dos 4-2-3-1; ≈ 327 c de SSML por
+ * clip. v1.1–v1.3: `topeS` es tiempo de PARED desde el clic que pidió la narración (0 = antesala sin retener
+ * el reloj); el máximo en vuelo es VOZ_BUFFER.concurrencia (se lee en antesala.ts: buffer.ts importa este
+ * archivo y no puede importarse aquí). */
+export const ANTESALA_ARENA = {
+  bloques: ["cabecera", "atras", "medio", "arriba"],
+  /** Silencio (s de audio) entre dos clips de la antesala. */
+  huecoS: 0.3,
+  /** Espera máxima (s de audio) de un clip aún no decodificado antes de saltarlo. */
+  esperaClipS: 4,
+  /** Tiempo máximo (s de reloj de pared desde el clic) de la retención del reloj; 0 = sin retención (C2). */
+  topeS: 75,
+  /** Duración estimada máxima del guion (estimarDuracionS + huecos); por encima, la escalera del guion. */
+  objetivoS: 66,
+  maxFallosSeguidos: 2, reintentoMs: 600, maxReintentos: 1,
+  /** v1.1 § 1: reintentos de un 409 (vista publicada aún sin `inicio`). */
+  maxReintentos409: 3,
+  /** v1.1 § 6: texto de un clip con los escapes de SSML (voz.ts) y cota del SSML de un clip (300 + 290 de marcas). */
+  maxTextoEscapadoC: 300,
+  maxSsmlClipC: 590,
+  /** Bolsa propia por encuentro: 9 clips × 2 idiomas; 18 × maxSsmlClipC = 10.620 ≤ 10.800. */
+  bolsaSpeech: { solicitudes: 18, caracteres: 10_800 },
+  /** Plantillas habladas (§ 4.2), ES/EN paralelas. `entrenador` es el sufijo de `arriba` (empieza por espacio); `lista` une el último elemento: «A, B y C». */
+  plantillas: {
+    es: {
+      apertura: "Bienvenidos a la arena: {local} contra {visita}.",
+      cabeceraModelo: "{equipo} sale en {formacion}, con {modelo} al mando.",
+      cabeceraProgramada: "{equipo} sale en {formacion}, con un plan programado.",
+      cabecera: "{equipo} sale en {formacion}.",
+      atras: "En la portería, {portero}; en defensa, {defensas}.",
+      medio: "En el medio, {medios}.",
+      arriba: "Arriba, {delanteros}.",
+      entrenador: " Dirige {entrenador}.",
+      lista: " y ",
+      dorsal: "el {n}",
+    },
+    en: {
+      apertura: "Welcome to the arena: {local} against {visita}.",
+      cabeceraModelo: "{equipo} line up in a {formacion}, with {modelo} in charge.",
+      cabeceraProgramada: "{equipo} line up in a {formacion}, on a programmed plan.",
+      cabecera: "{equipo} line up in a {formacion}.",
+      atras: "In goal, {portero}; at the back, {defensas}.",
+      medio: "In midfield, {medios}.",
+      arriba: "Up front, {delanteros}.",
+      entrenador: " {entrenador} is the coach.",
+      lista: " and ",
+      dorsal: "number {n}",
+    },
+  },
+  /** Rótulos de la tira «En voz» (§ 5, bloque C). */
+  bloquesRotulo: { es: { cabecera: "Formación", atras: "Portería y defensa", medio: "Medio", arriba: "Ataque" }, en: { cabecera: "Formation", atras: "Goal and defence", medio: "Midfield", arriba: "Attack" } },
+} as const;
+
 /** Brief 052 v1.1 §3–4 · Admisión de un modelo al catálogo público de la arena (smoke real,
  * `npm run arena:smoke-modelos`). No son parámetros del motor: son las cotas operativas con que
  * se decide si un deployment entra a ARENA_MODELOS. Presupuesto de tokens y solicitudes por

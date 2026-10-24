@@ -11,7 +11,9 @@ import { POST as relatoHttp } from "../../app/api/arena/sesiones/[id]/relato/rou
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { verificarUpdate, type HechoVerificable } from "../../cadena/verificador";
 import type { Llm } from "../../lib/llm";
-import { MESA_ARENA, PREVIA_ARENA } from "../../sim/limites";
+import { ANTESALA_ARENA, CANTO_GOL, MESA_ARENA, PREVIA_ARENA } from "../../sim/limites";
+import { antesalaPartido, controladorVerificado, longitudEscapada } from "../antesala";
+import type { AsignacionModelos } from "../protocolo";
 import { previaPartido } from "../previa";
 import { crearConfigArena, crearEstadoArena } from "../motor";
 import { datosEstadista, intervencionEstadista } from "../estadista";
@@ -577,5 +579,189 @@ describe("056 · previa en la ruta /relato y en el presupuesto de voz", () => {
     expect(con.invitados).toEqual(sin.invitados);
     expect(con.previa).toHaveLength(PREVIA_ARENA.piezas.length * 2 * idiomas.length);
     expect(con.previa.filter(([, s]) => s !== 200)).toEqual([]);
+  }, 120_000);
+});
+
+// Brief 058 · Bloque B (§ 4.7, § 8 y v1.1 §§ 6, 8) · Antesala: ruta /relato re-derivada con la asignación de la
+// propia sesión y los hechos del idioma pedido (v1.3), bolsa propia, cota con prepararVoz y aislamiento.
+describe("058 · antesala en la ruta /relato y en el presupuesto de voz", () => {
+  const rutas: string[] = [];
+  const compartido = globalThis as typeof globalThis & { __cronistaSesiones?: GestorSesiones };
+  let previo: GestorSesiones | undefined;
+  afterEach(async () => { compartido.__cronistaSesiones = previo; await Promise.all(rutas.splice(0).map(p => rm(p, { recursive: true, force: true }))); });
+  const A = ANTESALA_ARENA;
+  const llmDe = (completar: Llm["completar"]): Llm => ({ id: "modelo-prueba", completar });
+  const fielLlm = () => llmDe(async (_s, m) => { const c = JSON.parse(m[0]!.contenido) as { hechos: HechoVerificable[]; principal: string }, h = c.hechos.find(h => h.id === c.principal)!; return JSON.stringify({ oraciones: [{ texto_es: h.texto_es, texto_en: h.texto_en, hecho: h.id, apoyo: [] }] }); });
+  const planLlm = () => llmDe(async (_s, m) => JSON.stringify(planProgramado(JSON.parse(m[0]!.contenido))));
+  /** Catálogo simulado con los nombres públicos reales (infra/modelos-arena.json, publicar: true). */
+  const CATALOGO_REAL = (JSON.parse(readFileSync("infra/modelos-arena.json", "utf8")) as { id: string; nombrePublico: string; publicar?: boolean }[]).filter(m => m.publicar);
+  const catalogoSimulado = (): ModeloConfigurado[] => CATALOGO_REAL.map(m => ({ publico: { id: m.id, nombre: m.nombrePublico, controlador: `azure-openai:${m.id}` }, crear: planLlm }));
+  const entorno = async () => {
+    previo = compartido.__cronistaSesiones;
+    vi.stubEnv("ARENA_BLOB_ENDPOINT", ""); vi.stubEnv("ARENA_VOZ", "1");
+    vi.stubEnv("AZURE_SPEECH_ENDPOINT", "https://ejemplo.cognitiveservices.azure.com"); vi.stubEnv("AZURE_SPEECH_KEY", "prueba");
+    const directorio = await mkdtemp(join(tmpdir(), "cronista-antesala-058-")); rutas.push(directorio);
+    return directorio;
+  };
+  const speechSimulado = () => vi.stubGlobal("fetch", vi.fn<typeof fetch>(async url => String(url).includes("/voices/list") ? new Response("x", { status: 500 }) : new Response(new Uint8Array([1, 2, 3]))));
+  const pedir = (id: string, cuerpo: object) => relatoHttp(new Request("http://localhost/relato", { method: "POST", body: JSON.stringify(cuerpo) }), { params: Promise.resolve({ id }) });
+  const clip = (intervencion: string, idioma: "es" | "en" = "es") => ({ desdeTick: 0, hastaTick: 0, modo: "buffer", idioma, intervencion, variante: "completa" });
+  const reservas = (directorio: string, id: string) => Object.values(JSON.parse(readFileSync(join(directorio, `${id}.extras.json`), "utf8")) as Record<string, { tipo: string; clase?: string }>);
+  const sesion = async (seleccion: object, segundos = 3) => {
+    const directorio = await entorno();
+    const g = new GestorSesiones({ directorio, ritmoMsPorSegundo: 0, catalogo: catalogoSimulado, narrador: () => fielLlm() }); compartido.__cronistaSesiones = g;
+    const { id, asignacion } = await g.crear({ seed: 42, segundos, local: "auto", visita: "auto", seleccion, presentacion: "buffer" });
+    await g.esperarFinal(id); speechSimulado();
+    return { g, id, asignacion, directorio };
+  };
+
+  it("ruta: antesala:03-local-atras:0 sobre una sesión real da 200 (invitado, clase antesala); un id inventado 404; hastaTick 1 → 400; nunca en el diario", async () => {
+    const { g, id, directorio } = await sesion({ modo: "manual", local: CATALOGO_REAL[0]!.id, visita: CATALOGO_REAL.at(-1)!.id });
+    const respuesta = await pedir(id, clip("antesala:03-local-atras:0"));
+    expect(respuesta.status).toBe(200);
+    expect(await respuesta.json()).toMatchObject({ tipoRelato: "invitado", intervencion: "antesala:03-local-atras:0", desdeTick: 0, hastaTick: 0, variante: "completa" });
+    expect(reservas(directorio, id).filter(r => r.tipo === "audio").map(r => r.clase)).toEqual(["antesala"]);
+    for (const desconocido of ["antesala:99-local-atras:0", "antesala:x", "antesala:01-local-apertura:0"]) {
+      const r = await pedir(id, clip(desconocido));
+      expect([desconocido, r.status, (await r.json()).error]).toEqual([desconocido, 404, "Intervención no publicada"]);
+    }
+    const r = await pedir(id, { ...clip("antesala:03-local-atras:0"), hastaTick: 1 });
+    expect([r.status, (await r.json()).error]).toEqual([400, "Ventana de intervención inválida"]);
+    const diario = readFileSync(join(directorio, `${id}.ndjson`), "utf8").split("\n").filter(Boolean).map(l => JSON.parse(l) as { publicacion: { tipo: string; intervencion?: IntervencionArena } });
+    expect(diario.filter(m => m.publicacion.intervencion?.id.startsWith("antesala:"))).toEqual([]);
+    expect((await g.emision(id)).intervenciones.filter(i => i.id.startsWith("antesala:"))).toEqual([]);
+  }, 60_000);
+
+  it("cliente frente a ruta: cada clip ES y EN coincide con relatoIntervencion(antesalaPartido(registro, asignación de la sesión, idioma)[k])", async () => {
+    const { g, id } = await sesion({ modo: "manual", local: CATALOGO_REAL[1 % CATALOGO_REAL.length]!.id, visita: CATALOGO_REAL[0]!.id });
+    const vista = (await g.reproduccion(id)).registro, asignacion = await g.asignacionPublicada(id);
+    for (const idioma of ["es", "en"] as const) for (const i of antesalaPartido(vista, asignacion, idioma)) {
+      const respuesta = await pedir(id, clip(i.id, idioma));
+      expect([i.id, idioma, respuesta.status]).toEqual([i.id, idioma, 200]);
+      const datos = await respuesta.json(), esperado = relatoIntervencion(i, vista.config.partido.seed, idioma, "completa");
+      expect(datos.fragmentos).toEqual(esperado.fragmentos);
+      expect(datos.texto).toBe(esperado.texto);
+      expect(segmentoVozValido(datos, { desde: 0, hasta: 0, idioma, intervencion: { id: i.id, tick: 0, variante: "completa" } })).toBe(true);
+    }
+    // La cabecera nombra el modelo de cada lado de la sesión.
+    const cab = await (await pedir(id, clip("antesala:02-local-cabecera:0", "en"))).json();
+    expect(cab.texto).toContain(asignacion.local.nombre);
+  }, 60_000);
+
+  it("v1.1 § 8 (b) · crear en azar y manual: cláusula modelo con el nombre de cada lado; programado: plan programado; grabaciones (archivo y subida): ninguna", async () => {
+    for (const seleccion of [{ modo: "azar" }, { modo: "manual", local: CATALOGO_REAL[0]!.id, visita: CATALOGO_REAL[2 % CATALOGO_REAL.length]!.id }]) {
+      const { g, id } = await sesion(seleccion);
+      const a = await g.asignacionPublicada(id);
+      for (const lado of ["local", "visita"] as const) {
+        expect(controladorVerificado(a, lado)).toEqual({ clausula: "modelo", id: a[lado].id, nombre: a[lado].nombre });
+        expect(CATALOGO_REAL.map(m => m.nombrePublico)).toContain(a[lado].nombre);
+      }
+    }
+    const { g, id } = await sesion({ modo: "programado" });
+    for (const lado of ["local", "visita"] as const) expect(controladorVerificado(await g.asignacionPublicada(id), lado).clausula).toBe("programado");
+    const cab = await (await pedir(id, clip("antesala:06-visita-cabecera:0", "es"))).json();
+    expect(cab.texto).toContain("con un plan programado");
+    for (const procedencia of [undefined, "declarada"] as const) {
+      const directorio = await entorno();
+      const h = new GestorSesiones({ directorio }); compartido.__cronistaSesiones = h;
+      const grabada = await h.registrarGrabacion(registro, `antesala-058-${procedencia ?? "archivo"}`, procedencia);
+      speechSimulado();
+      const a = await h.asignacionPublicada(grabada.id);
+      for (const lado of ["local", "visita"] as const) expect(controladorVerificado(a, lado).clausula, String(procedencia)).toBe("ninguna");
+      const texto = (await (await pedir(grabada.id, clip("antesala:02-local-cabecera:0", "es"))).json()).texto as string;
+      expect(texto).toBe(`${registro.config.partido.local.nombre} sale en ${CANTO_GOL.plantillas.numeros.es[Number(registro.config.formaciones.local[0])]}${texto.slice(texto.indexOf("-"))}`);
+      expect(texto).not.toContain("al mando"); expect(texto).not.toContain("programado");
+    }
+    // Asignaciones sintéticas: manual declarada, programado con id de lado y null → ninguna.
+    const m = { id: "m", nombre: "M", controlador: "m" };
+    for (const a of [{ modo: "manual", local: m, visita: m, procedencia: "declarada" }, { modo: "programado", local: { ...m, id: "local" }, visita: { ...m, id: "visita" } }, null] as (AsignacionModelos | null)[])
+      expect(controladorVerificado(a, "local").clausula).toBe("ninguna");
+  }, 120_000);
+
+  it("rechazoCuotaVoz con clase antesala: llena su bolsa y rechaza, sin alterar narrador, cierre, invitados ni previa", () => {
+    const B = A.bolsaSpeech, P = PRESUPUESTO_AUDIO_ENCUENTRO, I = MESA_ARENA.dialogo.bolsaSpeechInvitados, V = PREVIA_ARENA.bolsaSpeech;
+    type Reserva = { tipo: string; caracteres: number; clase: "narrador" | "invitado" | "previa" | "cierre" | "antesala" };
+    const llenar = (r: Reserva[], clase: Reserva["clase"], n: number, c: number) => { for (let k = 0; k < n; k++) if (!rechazoCuotaVoz(r, c, clase)) r.push({ tipo: "audio", caracteres: c, clase }); return r; };
+    const conAntesala = llenar([], "antesala", B.solicitudes, Math.floor(B.caracteres / B.solicitudes));
+    expect(conAntesala).toHaveLength(B.solicitudes);
+    expect(rechazoCuotaVoz(conAntesala, 1, "antesala")).toBe("Bolsa de voz de la antesala agotada");
+    expect(rechazoCuotaVoz([], B.caracteres + 1, "antesala")).toBe("Bolsa de voz de la antesala agotada");
+    const admitidos = (base: Reserva[]) => {
+      const r = [...base];
+      const narrador = llenar(r, "narrador", P.solicitudes, 250).filter(x => x.clase === "narrador").length;
+      const invitados = llenar(r, "invitado", I.solicitudes + 2, Math.floor(I.caracteres / I.solicitudes)).filter(x => x.clase === "invitado").length;
+      const previa = llenar(r, "previa", V.solicitudes + 2, Math.floor(V.caracteres / V.solicitudes)).filter(x => x.clase === "previa").length;
+      return { narrador, invitados, previa, cierre: rechazoCuotaVoz(r, 335, "cierre") };
+    };
+    expect(admitidos(conAntesala)).toEqual(admitidos([]));
+    const lleno = llenar(llenar(llenar([], "narrador", P.solicitudes, 250), "invitado", I.solicitudes, Math.floor(I.caracteres / I.solicitudes)), "previa", V.solicitudes, Math.floor(V.caracteres / V.solicitudes));
+    expect(llenar(lleno, "antesala", B.solicitudes + 1, Math.floor(B.caracteres / B.solicitudes)).filter(x => x.clase === "antesala")).toHaveLength(B.solicitudes);
+  });
+
+  it("v1.1 § 6 · cota con prepararVoz: 18 síntesis con catálogo completo y degradado sobre fixtures, 60 semillas, nombres máximos y un registro adversario (80 «&» y 80 «'»): cada clip ≤ maxSsmlClipC, marcas ≤ maxSsmlClipC − maxTextoEscapadoC y la suma ≤ la bolsa", () => {
+    const leerPublico = (n: string) => JSON.parse(readFileSync(`public/experimentos/${n}`, "utf8")) as RegistroArena;
+    const conNombres = (f: (prefijo: string, largo: number) => string) => {
+      const r = structuredClone(registro);
+      r.config.partido.local.nombre = f("Club", 100); r.config.partido.visita.nombre = f("Unión", 100);
+      for (const lado of ["local", "visita"] as const) { r.inicial.jugadores.filter(j => j.lado === lado).forEach((j, k) => { j.nombre = f(`J${k}`, 80); }); r.config.entrenadores![lado].nombre = f("Técnica", 80); }
+      return r;
+    };
+    const largo = conNombres((p, n) => { const b = `${p} & <Lía> "Q" 'O' `; return (b + "Z".repeat(n)).slice(0, n); });
+    const semillas = Array.from({ length: 60 }, (_, i) => { const config = crearConfigArena({ seed: 1000 + i * 7919, duracionS: 60 }), inicial = crearEstadoArena(config); return { version: config.version!, config, inicial, rondas: [], eventos: [], fotogramas: [inicial], final: inicial } as RegistroArena; });
+    const registros = [registro, leerPublico("arena-llm-v1.json"), leerPublico("arena-llm-v3.json"), leerPublico("arena-duelo-v3.json"), largo, conNombres((_, n) => "&".repeat(n)), conNombres((_, n) => "'".repeat(n)), ...semillas];
+    const asignacion: AsignacionModelos = { modo: "manual", local: { id: "a", nombre: CATALOGO_REAL[0]!.nombrePublico, controlador: "a" }, visita: { id: "b", nombre: CATALOGO_REAL.at(-1)!.nombrePublico, controlador: "b" } };
+    for (const r of registros) for (const degradacion of ["completo", "sin-estadista", "solo-narrador"] as const) {
+      let caracteres = 0, solicitudes = 0;
+      for (const idioma of ["es", "en"] as const) {
+        const a = asignarVoces(idioma);
+        const catalogo = degradacion === "completo" ? null : new Set(degradacion === "sin-estadista" ? [a.narrador.voz, a.comentarista.voz] : [a.narrador.voz]);
+        const voces = vocesDe(asignarVoces(idioma, catalogo));
+        for (const i of antesalaPartido(r, asignacion, idioma)) {
+          const relato = relatoIntervencion(i, r.config.partido.seed, idioma, "completa");
+          const preparada = prepararVoz(relato.fragmentos, idioma, voces);
+          expect(preparada.caracteresPresupuestados, `${r.config.partido.seed} ${i.id}`).toBeLessThanOrEqual(A.maxSsmlClipC);
+          expect(preparada.caracteresPresupuestados - longitudEscapada(relato.texto)).toBeLessThanOrEqual(A.maxSsmlClipC - A.maxTextoEscapadoC);
+          caracteres += preparada.caracteresPresupuestados; solicitudes++;
+        }
+      }
+      expect(solicitudes).toBeLessThanOrEqual(A.bolsaSpeech.solicitudes);
+      expect(caracteres, `${r.config.partido.seed} ${degradacion}`).toBeLessThanOrEqual(A.bolsaSpeech.caracteres);
+    }
+  });
+
+  /** Recorrido del consumidor con o sin los clips de la antesala al principio (patrón del 056). */
+  const recorrido = async (segundos: number, idiomas: readonly ("es" | "en")[], conAntesala: boolean) => {
+    const directorio = await entorno();
+    const catalogo: ModeloConfigurado[] = [{ publico: { id: "p", nombre: "P", controlador: "p" }, crear: planLlm }];
+    const g = new GestorSesiones({ directorio, ritmoMsPorSegundo: 0, catalogo: () => catalogo, narrador: () => fielLlm() }); compartido.__cronistaSesiones = g;
+    const { id } = await g.crear({ seed: 42, segundos, local: "auto", visita: "auto", seleccion: { modo: "manual", local: "p", visita: "p" }, presentacion: "buffer" });
+    await g.esperarFinal(id); speechSimulado();
+    const r = await g.reproduccion(id), fin = r.registro.final.tick;
+    type Paso = { tick: number; orden: number; clave: string; tipo: "narrador" | "invitado" | "cierre" | "previa" | "antesala"; cuerpo: object };
+    const plan: Paso[] = [];
+    for (const idioma of idiomas) {
+      if (conAntesala) for (const i of antesalaPartido(r.registro, r.asignacion, idioma)) plan.push({ tick: 0, orden: -1, clave: `${idioma}:${i.id}`, tipo: "antesala", cuerpo: clip(i.id, idioma) });
+      plan.push({ tick: 0, orden: 0, clave: `${idioma}:entrada`, tipo: "narrador", cuerpo: { desdeTick: 0, hastaTick: Math.min(50, fin), modo: "buffer", idioma, entradaTick: 0 } });
+      for (const i of previaPartido(r.registro)) for (const variante of ["completa", "breve"] as const) plan.push({ tick: 0, orden: 0.5, clave: `${idioma}:${i.id}:${variante}`, tipo: "previa", cuerpo: { ...clip(i.id, idioma), variante } });
+      for (let desde = 0; desde < fin; desde += 50) plan.push({ tick: desde, orden: 1, clave: `${idioma}:${desde}`, tipo: "narrador", cuerpo: { desdeTick: desde, hastaTick: Math.min(desde + 50, fin), modo: "buffer", idioma } });
+      for (const i of r.intervenciones) for (const variante of ["breve", "completa"] as const) if (variante === "completa" || i.turnosBreve)
+        plan.push({ tick: i.tick, orden: 2, clave: `${idioma}:${i.id}:${variante}`, tipo: "invitado", cuerpo: { desdeTick: i.tick, hastaTick: i.tick, modo: "buffer", idioma, intervencion: i.id, variante } });
+      plan.push({ tick: fin + 1, orden: 3, clave: `${idioma}:cierre`, tipo: "cierre", cuerpo: { desdeTick: Math.floor((fin - 1) / 50) * 50, hastaTick: fin, modo: "buffer", idioma, cierre: true } });
+    }
+    plan.sort((a, b) => a.tick - b.tick || a.orden - b.orden);
+    const estado = new Map<string, number>();
+    for (const p of plan) estado.set(p.clave, (await pedir(id, p.cuerpo)).status);
+    const de = (tipo: Paso["tipo"]) => plan.filter(p => p.tipo === tipo).map(p => [p.clave, estado.get(p.clave)] as const);
+    return { narrador: de("narrador"), invitados: de("invitado"), cierres: de("cierre"), previa: de("previa"), antesala: de("antesala") };
+  };
+  const recorridos = [[60, ["es"]], [60, ["es", "en"]], [120, ["es"]], [120, ["es", "en"]], [180, ["es"]], [180, ["es", "en"]]] as const;
+  for (const [segundos, idiomas] of recorridos) it(`aislamiento ${segundos} s ${idiomas.join("+")}: narrador, cierres, invitados y previa idénticos con y sin antesala; la antesala entera cabe en su bolsa`, async () => {
+    const sin = await recorrido(segundos, idiomas, false), con = await recorrido(segundos, idiomas, true);
+    expect(con.narrador).toEqual(sin.narrador);
+    expect(con.cierres).toEqual(sin.cierres);
+    expect(con.invitados).toEqual(sin.invitados);
+    expect(con.previa).toEqual(sin.previa);
+    expect(con.antesala.length).toBeGreaterThan(0);
+    expect(con.antesala.filter(([, s]) => s !== 200)).toEqual([]);
   }, 120_000);
 });

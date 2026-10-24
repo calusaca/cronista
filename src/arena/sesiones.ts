@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { setTimeout as esperar } from "node:timers/promises";
-import { ARENA, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
+import { ANTESALA_ARENA, ARENA, MESA_ARENA, PREVIA_ARENA, SPEECH_DIARIO } from "../sim/limites";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { catalogoModelos, elegirModelos, type ModeloConfigurado } from "./modelos";
 import { crearConfigArena } from "./motor";
@@ -41,7 +41,7 @@ export const PRESUPUESTO_AUDIO_ENCUENTRO = { solicitudes: 80, caracteres: 24_000
  * bolsa propia `bolsaSpeechInvitados`. Ninguna de las dos se presta a la otra.
  * Brief 056 (v1.1 § 9): la previa hablada consume SOLO de PREVIA_ARENA.bolsaSpeech, y ni el narrador
  * ni los invitados la cuentan. */
-export type ClaseVoz = "narrador" | "cierre" | "invitado" | "previa";
+export type ClaseVoz = "narrador" | "cierre" | "invitado" | "previa" | "antesala";
 /** Rechazo de presupuesto de voz para una nueva síntesis (null si cabe). Pura. */
 export function rechazoCuotaVoz(reservas: readonly { tipo: string; caracteres?: number; clase?: ClaseVoz }[], caracteres: number, clase: ClaseVoz): string | null {
   const audio = reservas.filter(x => x.tipo === "audio"), suma = (xs: typeof audio) => xs.reduce((s, x) => s + (x.caracteres ?? 0), 0);
@@ -50,11 +50,16 @@ export function rechazoCuotaVoz(reservas: readonly { tipo: string; caracteres?: 
     const previa = audio.filter(x => x.clase === "previa"), B = PREVIA_ARENA.bolsaSpeech;
     return previa.length + 1 > B.solicitudes || suma(previa) + caracteres > B.caracteres ? "Bolsa de voz de la previa agotada" : null;
   }
+  // Brief 058 § 4.7: la antesala cobra solo de su bolsa; ninguna otra la cuenta ni le presta.
+  if (clase === "antesala") {
+    const antesala = audio.filter(x => x.clase === "antesala"), B = ANTESALA_ARENA.bolsaSpeech;
+    return antesala.length + 1 > B.solicitudes || suma(antesala) + caracteres > B.caracteres ? "Bolsa de voz de la antesala agotada" : null;
+  }
   if (clase === "invitado") {
     const invitados = audio.filter(x => x.clase === "invitado"), B = D.bolsaSpeechInvitados;
     return invitados.length + 1 > B.solicitudes || suma(invitados) + caracteres > B.caracteres ? "Bolsa de voz de los invitados agotada" : null;
   }
-  const narrador = audio.filter(x => x.clase !== "invitado" && x.clase !== "previa");
+  const narrador = audio.filter(x => x.clase !== "invitado" && x.clase !== "previa" && x.clase !== "antesala");
   if (narrador.length + 1 > P.solicitudes || suma(narrador) + caracteres > P.caracteres) return "Se alcanzó el límite de consultas de este encuentro";
   if (clase !== "cierre" && (narrador.length + 1 > P.solicitudes - D.reservaSpeechCierreSolicitudes || suma(narrador) + caracteres > P.caracteres - D.reservaSpeechCierreCaracteres)) return "Presupuesto de voz reservado para el cierre";
   return null;
@@ -369,6 +374,11 @@ export class GestorSesiones {
       await exclusiva(async (r, a) => { r[clave] = { tipo, estado: "error", caracteres, ...(clase ? { clase } : {}) }; await a.escribir(nombre, JSON.stringify(r)); }).catch(() => {});
       throw error;
     }
+  }
+  /** Brief 058 § 4.7 · Asignación de controladores de la propia sesión (memoria o meta.json); la ruta nunca
+   * acepta una que venga del cliente. */
+  async asignacionPublicada(id: string): Promise<AsignacionModelos> {
+    return (await this.obtener(id)).asignacion;
   }
   /** Brief 045: el audio de una intervención se construye desde el diario; nunca se regenera. */
   async intervencionPublicada(id: string, intervencionId: string): Promise<IntervencionArena> {

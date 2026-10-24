@@ -33,9 +33,12 @@ export class RitmoProduccionBuffer {
 export class RelojBuffer {
   segundo: number;
   estado: "preparando" | "reproduciendo" | "recuperando" | "pausada" | "final" = "preparando";
+  /** Brief 058 · Antesala: mientras está retenido, el reloj no sale de 0:00 aunque la reserva esté completa. */
+  retenido = false;
   constructor(inicioS = 0) { this.segundo = inicioS; }
   avanzar(deltaS: number, disponibleS: number, terminada: boolean): number {
     if (this.estado === "pausada" || this.estado === "final") return this.segundo;
+    if (this.retenido) return this.segundo;
     const reserva = Math.max(0, disponibleS - this.segundo);
     const objetivo = this.estado === "preparando" ? BUFFER_ARENA.segundos : BUFFER_ARENA.recuperacionS;
     if (this.estado !== "reproduciendo") {
@@ -47,7 +50,15 @@ export class RelojBuffer {
     return this.segundo;
   }
   pausar() { if (this.estado !== "final") this.estado = "pausada"; }
-  continuar() { if (this.estado === "pausada") this.estado = "recuperando"; }
+  /** v1.1 § 3: con la antesala retenida, continuar vuelve a `preparando` (no a `recuperando`). */
+  continuar() { if (this.estado === "pausada") this.estado = this.retenido ? "preparando" : "recuperando"; }
+  /** v1.1 § 3: solo actúa en 0:00 y con el reloj en `preparando` o `pausada`. Devuelve si quedó retenido. */
+  retener(): boolean {
+    if (this.segundo === 0 && (this.estado === "preparando" || this.estado === "pausada")) this.retenido = true;
+    return this.retenido;
+  }
+  /** Suelta la retención: rige la regla de siempre (arranca con la reserva en BUFFER_ARENA.segundos). */
+  soltar() { this.retenido = false; }
 }
 
 /** Evita mostrar planes de una ronda futura cuando el cursor aún no la alcanza. */

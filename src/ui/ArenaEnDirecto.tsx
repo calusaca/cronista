@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { AsignacionModelos, InstantaneaEmision, MensajeSesion, MetricasSesion, ModeloPublico, PublicacionSesion, SeleccionModelos, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
-import { cebarAudioDirecto, guardarPreferenciaNarracion, leerPreferenciaNarracion, marcarArranquePropio } from "./audio-directo";
+import { cebarAudioDirecto, fijarAsignacionDirecto, guardarPreferenciaNarracion, leerPreferenciaNarracion, marcarArranquePropio } from "./audio-directo";
 
 const claveSesion = "cronista:arena:sesion";
 const clavePresentacion = "cronista:arena:presentacion";
@@ -61,7 +61,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
         const instantanea = await respuesta.json() as InstantaneaEmision;
         if (carga.signal.aborted) return;
         ultimoId.current = instantanea.ultimoMensaje;
-        setAsignacion(instantanea.asignacion);
+        setAsignacion(instantanea.asignacion); fijarAsignacionDirecto(id, instantanea.asignacion);
         const inicioTick = Math.max(0, Math.floor((instantanea.registro.final.tick - 200) / 50) * 50);
         callbacks.current.alPreparado(id, instantanea, { inicioTick, terminada: instantanea.estado !== "ejecutando" });
         if (instantanea.estado !== "ejecutando") {
@@ -77,7 +77,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
         if (m.id <= ultimoId.current) return;
         if (m.id !== ultimoId.current + 1) throw new Error("Secuencia");
         ultimoId.current = m.id; const p = m.publicacion;
-        if (p.tipo === "sesion") setAsignacion(p.asignacion);
+        if (p.tipo === "sesion") { setAsignacion(p.asignacion); fijarAsignacionDirecto(id, p.asignacion); }
         if (p.tipo === "esperando") setEstado(presentacion === "preparada" ? "preparando" : "esperando");
         if (p.tipo === "avance") setEstado(presentacion === "preparada" ? "preparando" : presentacion === "buffer" ? "buffer" : "jugando");
         if (p.tipo === "fin") setEstado("finalizando");
@@ -125,6 +125,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       if (!r.ok) throw new Error("Inicio");
       const s = await r.json() as { id: string; asignacion: AsignacionModelos };
       if (narrada) marcarArranquePropio(s.id, t0);
+      fijarAsignacionDirecto(s.id, s.asignacion);
       sessionStorage.setItem(clavePresentacion, presentacion); sessionStorage.setItem(claveSesion, s.id); setAsignacion(s.asignacion); setId(s.id);
     } catch { if (!abort.signal.aborted) { setError(true); callbacks.current.alActividad(false); } }
     finally { if (solicitud.current === abort) solicitud.current = null; iniciandoRef.current = false; setIniciando(false); }
