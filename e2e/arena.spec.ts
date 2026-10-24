@@ -152,6 +152,9 @@ test("arena: cancelar en vivo y personalizar la inteligencia con evidencia", asy
     if (await iniciar.isEnabled()) await iniciar.click();
     await expect(page.getByTestId("arena-live-status")).toContainText(/Live|Coaches|Connecting/, { timeout: 2000 });
   }).toPass({ timeout: 45_000 });
+  // El prefijo en vivo ya está en pantalla (instantánea de /emision adoptada) antes de cancelar. Si se cancela aún en
+  // «Connecting», el 060 descarta la instantánea tardía y queda la vista anterior (la vista previa completa, descargable).
+  await expect(page.getByTestId("arena-buffer")).toBeVisible({ timeout: 20_000 });
   await page.getByRole("button", { name: "Cancel live match" }).click();
   await expect(page.getByTestId("arena-live-status")).toHaveText("Match cancelled");
   await guardados(page);
