@@ -3,6 +3,8 @@
 // uno «web» con la configuración publicada). Se evalúan SOLO las decisiones del candidato, por
 // identidad y lado. La evidencia guarda indicadores, nunca muestras crudas del modelo.
 import type { Llm, Mensaje } from "../lib/llm";
+import { crearLlmAzureOpenAI } from "../lib/llm-azure-openai";
+import { crearLlmFoundryModelos } from "../lib/llm-foundry-modelos";
 import { ARENA, SMOKE_MODELOS_ARENA as S } from "../sim/limites";
 import { contextoCompetitivo } from "./competencia";
 import { crearControladorLlm, esquemaRespuestaArena, planProgramado, SISTEMA_ARENA, validarOrdenes } from "./controladores";
@@ -17,6 +19,17 @@ export interface EspecLlm { tipo: "azure-openai" | "foundry-modelos"; deployment
 export interface CandidatoSmoke { id: string; nombrePublico: string; llm: EspecLlm["tipo"]; deployment: string; modelo: string; version: string; capacidad: number; formatoJson?: FormatoSonda; esfuerzoRazonamiento?: "low" | "minimal" }
 /** Crea un Llm real (o falso en pruebas) con el transporte instrumentado. */
 export type FabricaLlm = (espec: EspecLlm, transporte: typeof fetch) => Llm;
+
+/** Brief 059 § 3.2 · Fábrica real compartida por el smoke 052 y el torneo: `crearLlmAzureOpenAI` con
+ * `reasoningEffort: "low"` (como la publicación: AZURE_OPENAI_REASONING_EFFORT=low global para los
+ * deployments OpenAI) y `foundry-modelos` con su `formatoJson` y su esfuerzo. */
+export function fabricaLlmReal(cfg: { apiKey: string; endpointAzureOpenAI: string; baseFoundry: string | null }): FabricaLlm {
+  return (espec, transporte) => {
+    if (espec.tipo === "azure-openai") return crearLlmAzureOpenAI({ apiKey: cfg.apiKey, endpoint: cfg.endpointAzureOpenAI, deployment: espec.deployment, reasoningEffort: "low", fetch: transporte });
+    if (!cfg.baseFoundry) throw new Error("Falta FOUNDRY_BASE_URL para un deployment foundry-modelos");
+    return crearLlmFoundryModelos({ apiKey: cfg.apiKey, endpoint: new URL(cfg.baseFoundry).origin, deployment: espec.deployment, ...(espec.formatoJson ? { formatoJson: espec.formatoJson } : {}), ...(espec.esfuerzoRazonamiento ? { esfuerzoRazonamiento: espec.esfuerzoRazonamiento } : {}), fetch: transporte });
+  };
+}
 
 export interface Peticion { status: number; ms: number; finish: string | null; modelo: string | null; entrada: number | null; salida: number | null; razonamiento: number | null; cache: number | null; total: number | null; teniaThink: boolean; reasoningContentChars: number }
 

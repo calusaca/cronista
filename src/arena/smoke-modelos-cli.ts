@@ -4,10 +4,8 @@
 // crudas ni secretos) y regenera docs/evidencia/modelos-052/README.md con todos los resultados.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { crearLlmAzureOpenAI } from "../lib/llm-azure-openai";
-import { crearLlmFoundryModelos } from "../lib/llm-foundry-modelos";
 import { ARENA, MESA_ARENA, SMOKE_MODELOS_ARENA as S } from "../sim/limites";
-import { ejecutarSmokeModelo, PARTIDOS_SMOKE, serializarEvidencia, type CandidatoSmoke, type EspecLlm, type EvidenciaSmoke, type FabricaLlm, type FormatoSonda, type NombrePartido, type Precio } from "./smoke-modelos";
+import { ejecutarSmokeModelo, fabricaLlmReal, PARTIDOS_SMOKE, serializarEvidencia, type CandidatoSmoke, type EvidenciaSmoke, type FabricaLlm, type FormatoSonda, type NombrePartido, type Precio } from "./smoke-modelos";
 
 const DIR = "docs/evidencia/modelos-052";
 interface EntradaModelo { nombre: string; modelo: string; version: string; formato: string; capacidad: number; id: string; nombrePublico: string; llm: "azure-openai" | "foundry-modelos"; formatoJson?: FormatoSonda; esfuerzoRazonamiento?: "low" | "minimal"; publicar: boolean }
@@ -138,11 +136,8 @@ async function main() {
   if (!["auto", "json_schema", "json_object", "texto"].includes(values.formato)) throw new Error("--formato auto | json_schema | json_object | texto");
   const clave = process.env.AZURE_OPENAI_API_KEY, aoai = process.env.AZURE_OPENAI_ENDPOINT, base = process.env.FOUNDRY_BASE_URL;
   if (!clave || !aoai || !base) throw new Error("Faltan AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT o FOUNDRY_BASE_URL en .env");
-  const foundry = new URL(base).origin;
-  const fabrica: FabricaLlm = (espec: EspecLlm, transporte) => espec.tipo === "azure-openai"
-    // Como en la publicación: AZURE_OPENAI_REASONING_EFFORT=low global para los deployments OpenAI.
-    ? crearLlmAzureOpenAI({ apiKey: clave, endpoint: aoai, deployment: espec.deployment, reasoningEffort: "low", fetch: transporte })
-    : crearLlmFoundryModelos({ apiKey: clave, endpoint: foundry, deployment: espec.deployment, ...(espec.formatoJson ? { formatoJson: espec.formatoJson } : {}), ...(espec.esfuerzoRazonamiento ? { esfuerzoRazonamiento: espec.esfuerzoRazonamiento } : {}), fetch: transporte });
+  // Brief 059 § 3.2: la fábrica se extrajo a `fabricaLlmReal` (misma salida) para compartirla con el torneo.
+  const fabrica: FabricaLlm = fabricaLlmReal({ apiKey: clave, endpointAzureOpenAI: aoai, baseFoundry: base });
   const candidato: CandidatoSmoke = { id: entrada.id, nombrePublico: entrada.nombrePublico, llm: entrada.llm, deployment: entrada.nombre, modelo: entrada.modelo, version: entrada.version, capacidad: entrada.capacidad,
     ...(entrada.esfuerzoRazonamiento ? { esfuerzoRazonamiento: entrada.esfuerzoRazonamiento } : {}),
     ...(values.formato !== "auto" ? { formatoJson: values.formato as FormatoSonda } : {}) };

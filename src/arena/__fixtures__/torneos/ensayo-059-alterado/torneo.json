@@ -1,0 +1,571 @@
+{
+  "version": "059-v1.1",
+  "id": "ensayo-059",
+  "tipo": "ensayo",
+  "titulo": {
+    "es": "Torneo de ensayo · sin IA",
+    "en": "Rehearsal tournament · no AI"
+  },
+  "inicioUtc": "2026-10-24T00:08:45.892Z",
+  "finUtc": "2026-10-24T00:09:01.927Z",
+  "commit": "4afe3e98f1aa07bd4441f1acb68fcc38055fd6e9",
+  "motor": {
+    "version": "arena-v3",
+    "reglas": "reinicios-v5"
+  },
+  "duracionS": 20,
+  "intervaloS": 15,
+  "semilla": 59,
+  "participantes": [
+    {
+      "id": "ensayo:a",
+      "nombre": "Ensayo A",
+      "corto": "Ensayo A",
+      "deployment": "ensayo-a",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:a",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:b",
+      "nombre": "Ensayo B",
+      "corto": "Ensayo B",
+      "deployment": "ensayo-b",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:b",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:c",
+      "nombre": "Ensayo C",
+      "corto": "Ensayo C",
+      "deployment": "ensayo-c",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:c",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    }
+  ],
+  "encuentros": [
+    {
+      "n": 1,
+      "jornada": 1,
+      "cruce": 1,
+      "vuelta": false,
+      "seed": 1724111341,
+      "archivo": "e01.json.gz",
+      "archivoSha256": "9eafe99b575c5046a2a0196a692b178435488a41a0f9460b64634c0e34bbbc9a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Unión Quebralta",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 66,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            2.283050000000003,
+            0.9830860000000143
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Club Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 34,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            2.1532509999999547,
+            0.985005000000001
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    },
+    {
+      "n": 2,
+      "jornada": 2,
+      "cruce": 2,
+      "vuelta": false,
+      "seed": 716754581,
+      "archivo": "e02.json.gz",
+      "archivoSha256": "e5ea499cdf5dfbdb5690dda6f7f285c01b19ce2d7dd7d4876b3944e842728822",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Club Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.41008800000008705,
+            0.46744699999999284
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Sporting Ormidia",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.4402580000000853,
+            0.45265699999981734
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    },
+    {
+      "n": 3,
+      "jornada": 3,
+      "cruce": 3,
+      "vuelta": false,
+      "seed": 431478622,
+      "archivo": "e03.json.gz",
+      "archivoSha256": "d9a0411146c94664ff03f500e7dba6fc485391b98af8181e458c8b2d9df5f21a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Unión Valdecristal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 65,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.33396799999991345,
+            0.2763870000007955
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Club Nebrisa",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 35,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.30030900000019756,
+            0.2846270000000004
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    },
+    {
+      "n": 4,
+      "jornada": 4,
+      "cruce": 1,
+      "vuelta": true,
+      "seed": 1724111341,
+      "archivo": "e04.json.gz",
+      "archivoSha256": "99169e36afc73bfb66a1ca82f2cd0e2aed8da465da9b6208404e4dcaddea8ed9",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Unión Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 66,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.3190099999992526,
+            0.37617800000043644
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Club Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 34,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2857579999999871,
+            0.37351899999885063
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    },
+    {
+      "n": 5,
+      "jornada": 5,
+      "cruce": 2,
+      "vuelta": true,
+      "seed": 716754581,
+      "archivo": "e05.json.gz",
+      "archivoSha256": "407397d2b7c1d7abe2393a7457fc560f1263513ade5de6501ebbb398a45548f5",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Club Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 42,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 4,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19413899999926798,
+            0.22115900000062538
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Sporting Ormidia",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 58,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 2
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17692999999962922,
+            0.18695900000057009
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    },
+    {
+      "n": 6,
+      "jornada": 6,
+      "cruce": 3,
+      "vuelta": true,
+      "seed": 431478622,
+      "archivo": "e06.json.gz",
+      "archivoSha256": "6cb8631df3bda107e0262a2aee41e65579303d837be0ec172b50d475b80c170f",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Unión Valdecristal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 65,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.21719800000028044,
+            0.194749000000229
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Club Nebrisa",
+        "goles": 1,
+        "cifras": {
+          "posesionPct": 35,
+          "remates": 1,
+          "rematesDirectos": 1,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.20147999999971944,
+            0.19106900000042515
+          ],
+          "llamadas": [
+            0,
+            0
+          ],
+          "motivos": [
+            "valida",
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      }
+    }
+  ],
+  "pendientes": [],
+  "gasto": {
+    "conocidoMicroUsd": 0,
+    "tipicoMicroUsd": 0,
+    "topeMicroUsd": 1000000,
+    "reservaMaxPartidoMicroUsd": 0
+  },
+  "estado": "completo"
+}

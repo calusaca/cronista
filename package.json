@@ -14,6 +14,7 @@
     "arena:lote": "node --import tsx src/arena/lote-cli.ts",
     "arena:voz-muestras": "node --import tsx src/arena/voz-muestras-cli.ts",
     "arena:smoke-modelos": "node --import tsx src/arena/smoke-modelos-cli.ts",
+    "arena:torneo": "node --import tsx src/arena/torneo-cli.ts",
     "azure:servicios": "node scripts/prepare-azure-services.mjs",
     "azure:lotes": "node scripts/deploy-azure-jobs.mjs",
     "azure:arena": "node scripts/deploy-azure-arena.mjs",
