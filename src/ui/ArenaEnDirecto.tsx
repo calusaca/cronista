@@ -17,6 +17,10 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const [modelos, setModelos] = useState<ModeloPublico[]>([]), [modo, setModo] = useState<SeleccionModelos["modo"]>("programado");
   const [local, setLocal] = useState(""), [visita, setVisita] = useState("");
+  /** Smoke 0000031 (D1) · El catálogo de /api/arena/modelos solo fija el modo por defecto («Random models») si el
+   * espectador no eligió ninguno; un modo elegido que deja de ser válido (sin modelos) se convierte y se avisa. */
+  const modoElegido = useRef(false), [modoConvertido, setModoConvertido] = useState(false);
+  const modoActual = useRef(modo); modoActual.current = modo;
   const [estado, setEstado] = useState("lista"), [error, setError] = useState(false), [asignacion, setAsignacion] = useState<AsignacionModelos | null>(null);
   const [presentacion, setPresentacion] = useState<PresentacionArena>("buffer");
   const [grabacionLista, setGrabacionLista] = useState<string | null>(null);
@@ -44,7 +48,8 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     const abort = new AbortController();
     void fetch("/api/arena/modelos", { signal: abort.signal }).then(r => r.json()).then((r: { modelos: ModeloPublico[] }) => {
       setModelos(r.modelos); setLocal(r.modelos[0]?.id ?? ""); setVisita(r.modelos[1]?.id ?? r.modelos[0]?.id ?? "");
-      if (r.modelos.length) setModo("azar");
+      if (r.modelos.length && !modoElegido.current) setModo("azar");
+      if (!r.modelos.length && modoActual.current !== "programado") { setModo("programado"); setModoConvertido(true); }
     }).catch(() => {});
     void fetch("/api/arena/herramientas", { signal: abort.signal }).then(r => r.json()).then((r: { voz?: unknown }) => { setVozDisponible(r.voz === true); if (r.voz !== true) descartarAudioCebado(); }).catch(() => { if (!abort.signal.aborted) { setVozDisponible(false); descartarAudioCebado(); } });
     const compartido = new URLSearchParams(window.location.search).get("partido");
@@ -201,7 +206,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     <div><h2>{presentacionVista === "buffer" ? t("Live match", "Partido en vivo") : t("Create a saved match", "Crear un partido guardado")}</h2>
       <p>{presentacionVista === "buffer" ? t("Choose who manages each team, then start. Watch the match and its narration together below.", "Elige quién dirige cada equipo e inicia. Mira el partido y su narración juntos más abajo.") : t("Or generate a complete recording with the settings above, ready to replay and share.", "También puedes generar una grabación completa con los ajustes anteriores para reproducirla y compartirla.")}</p></div>
     <div className="arena-live-controls">
-      <label>{t("Controller selection", "Elección de controladores")}<select className="field" value={modo} disabled={bloqueado} onChange={e => setModo(e.target.value as typeof modo)}>
+      <label>{t("Controller selection", "Elección de controladores")}<select className="field" value={modo} disabled={bloqueado} onChange={e => { modoElegido.current = true; setModoConvertido(false); setModo(e.target.value as typeof modo); }}>
         <option value="azar" disabled={!modelos.length}>{t("Random models", "Modelos al azar")}</option><option value="manual" disabled={!modelos.length}>{t("Choose models", "Elegir modelos")}</option><option value="programado">{t("Programmed demonstration", "Demostración programada")}</option>
       </select></label>
       {modo === "manual" && <>{(["local", "visita"] as const).map(lado => <label key={lado}>{lado === "local" ? t("Home model", "Modelo local") : t("Away model", "Modelo visitante")}<select className="field" disabled={bloqueado} value={lado === "local" ? local : visita} onChange={e => (lado === "local" ? setLocal : setVisita)(e.target.value)}>{modelos.map(m => <option key={m.id} value={m.id}>{m.nombre}</option>)}</select></label>)}</>}
@@ -209,6 +214,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       {presentacionVista === "buffer" && vozDisponible === true && <label className="arena-live-voice" data-testid="arena-live-voice"><input type="checkbox" checked={narrar} disabled={bloqueado} onChange={e => { setNarrar(e.target.checked); guardarPreferenciaNarracion(e.target.checked); }} /> {t("Narrate the match", "Narrar el partido")}</label>}
       {id && <button className="btn" onClick={() => void cancelar()} disabled={estado === "cancelando"}>{t("Cancel live match", "Cancelar partido en vivo")}</button>}
     </div>
+    {modoConvertido && <p role="status" className="arena-muted" data-testid="arena-live-mode-note">{t("No models are available: the selection changed to the programmed demonstration.", "No hay modelos disponibles: la elección pasó a la demostración programada.")}</p>}
     {!modelos.length && <p className="arena-muted">{t("Model play is not enabled on this server. The live programmed demonstration is available.", "Los modelos no están habilitados en este servidor. Puedes ejecutar la demostración programada en vivo.")}</p>}
     {asignacion && <p data-testid="arena-live-assignment"><strong>{t("Home", "Local")}:</strong> {asignacion.local.nombre} · <strong>{t("Away", "Visita")}:</strong> {asignacion.visita.nombre}{asignacion.modo !== "programado" && asignacion.local.controlador === asignacion.visita.controlador && t(" · Two independent instances of the same model", " · Dos instancias independientes del mismo modelo")}{/* Brief 057 v1.1 § 4 (b) */}{asignacion.procedencia === "declarada" && ` · ${t("controllers declared by the file, not verified", "controladores declarados por el archivo, no verificados")}`}</p>}
     <p role="status" data-testid="arena-live-status">{textos[estado] ?? estado}</p>

@@ -205,8 +205,9 @@ test("060 E3 · saltar la previa: el botón aparece con la previa sonando, lleva
   const finPrevia = Math.max(...clips.filter(c => piezaDe(voz.servidas, c.amplitud).tipo === "previa").map(c => c.fin));
   await saltar.click();
   await expect(saltar).toHaveCount(0);
+  // El audio sigue sonando tras el salto: currentTime está en el saque o muy poco después (nunca antes).
   const l = await lectura(page);
-  expect(Math.abs(l.t - finPrevia)).toBeLessThan(0.05);
+  expect(l.t).toBeGreaterThanOrEqual(finPrevia - 0.05); expect(l.t).toBeLessThan(finPrevia + 0.5);
   await expect(boton(page, "Pausar")).toBeFocused();
 });
 
@@ -556,4 +557,29 @@ test("060 E7 · búfer: Detener con /emision en vuelo no reactiva la emisión ni
   expect(urls.filter(u => u.startsWith("DELETE /api/arena/sesiones/"))).toHaveLength(1);
   expect(urls.filter(u => u.endsWith("/eventos"))).toEqual([]);
   await expect(page.getByTestId("arena-clock")).toHaveText(antes!);
+});
+
+// Smoke 0000031 (D1) · El catálogo de modelos que llega tarde no pisa la elección del espectador.
+test("D1 · /modelos retenido: elegir «Programmed demonstration» antes de que llegue se respeta y el POST lleva modo programado", async ({ page }) => {
+  const retener = barreraLocal(), modelos = [{ id: "a", nombre: "Modelo A", controlador: "azure-openai:a" }, { id: "b", nombre: "Modelo B", controlador: "azure-openai:b" }];
+  const selecciones: unknown[] = [];
+  await page.route("**/api/arena/modelos", async r => { await retener.p; await r.fulfill({ json: { modelos } }).catch(() => {}); });
+  await page.route("**/api/arena/sesiones", async r => { if (r.request().method() !== "POST") return r.fallback(); selecciones.push((r.request().postDataJSON() as { seleccion: unknown }).seleccion); await r.fulfill({ status: 500, json: { error: "Prueba" } }); });
+  await page.goto("/arena");
+  const selector = page.getByTestId("arena-live").getByRole("combobox", { name: "Controller selection" });
+  await selector.selectOption("programado");
+  retener.soltar();
+  await expect(page.getByTestId("arena-live").getByRole("option", { name: "Random models" })).toBeEnabled();
+  await page.waitForTimeout(300);
+  await expect(selector).toHaveValue("programado");
+  await page.getByTestId("arena-live").getByRole("button", { name: "Start live match", exact: true }).click();
+  await expect.poll(() => selecciones.length).toBe(1);
+  expect(selecciones[0]).toEqual({ modo: "programado" });
+});
+
+test("D1 · sin elección del espectador, el catálogo sigue fijando «Random models» por defecto", async ({ page }) => {
+  await page.route("**/api/arena/modelos", r => r.fulfill({ json: { modelos: [{ id: "a", nombre: "Modelo A", controlador: "azure-openai:a" }] } }));
+  await page.goto("/arena");
+  await expect(page.getByTestId("arena-live").getByRole("combobox", { name: "Controller selection" })).toHaveValue("azar");
+  await expect(page.getByTestId("arena-live-mode-note")).toHaveCount(0);
 });
