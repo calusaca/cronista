@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-24T03:05:48.664Z",
+  "checkedUtc": "2026-10-24T03:38:19.720Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024030233",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024033534",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -581,8 +581,8 @@
     },
     {
       "path": "src/arena/__tests__/torneo-ejecucion.test.ts",
-      "bytes": 25248,
-      "sha256": "3806278cc21ab33e51d8ccc14efefe348bd4a8ba5bbb6c19522021e62f2eaa92"
+      "bytes": 26088,
+      "sha256": "eb64e20e89acddcf0f7cdbafbc1a0a14b10794a129484e7249f3560770853523"
     },
     {
       "path": "src/arena/__tests__/torneo.test.ts",
@@ -1546,8 +1546,8 @@
     },
     {
       "path": "src/ui/ArenaTorneo.tsx",
-      "bytes": 22094,
-      "sha256": "349f1011403030b06145acc7e984ddd4450568dce469deb9127cff7498833149"
+      "bytes": 22274,
+      "sha256": "8dde8abc9b55803aaaa6d259943e8faa844347abbaf2cf796d0451fbd39638ba"
     },
     {
       "path": "src/ui/CajaDeCristal.tsx",
