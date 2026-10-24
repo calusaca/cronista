@@ -2,7 +2,7 @@
 
 ## Estado
 
-Brief **cerrado v1.2**, sábado 24 de octubre de 2026 (v1.1 y v1.2 incorporan las dos revisiones de Codex, § 17 y § 18; la § 18 prevalece sobre la 17). Lo escribió Opus como diseñador porque Fable no tiene
+Brief **cerrado v1.3** (§ 19 añadida el 24 oct por el orquestador), sábado 24 de octubre de 2026 (v1.1 y v1.2 incorporan las dos revisiones de Codex, § 17 y § 18; la § 18 prevalece sobre la 17). Lo escribió Opus como diseñador porque Fable no tiene
 cupo (Carlos autorizó que Opus diseñe y Codex revise). No incluye código de producción. Lo implementa Opus
 (`opus-implementador`) bloque por bloque. La revisión adversaria de Codex se anota al final (§ 17); lo que
 allí se decida **prevalece** sobre el texto anterior.
@@ -1343,3 +1343,21 @@ Se retira la afirmación de equivalencia general (§ 7.1). B3 prueba:
 - Semántica de consumo del `tirar` imposible y prueba de varios ticks (18.5).
 - B3 por multiplicador (18.6).
 
+
+## 19. Versión 1.3 (24 oct): la banda de la entrada en v7 — PREVALECE
+
+Lo escribe el orquestador, que hace de diseñador suplente porque Fable sigue sin cupo.
+
+**Hecho.** En la implementación de la publicación 2, el experimento controlado de la entrada mide **0,17** robos hechos por partido en el lote 1–100 de v7. La banda pide ≥ 0,30. Antes del ajuste permitido de § 12.2, con 0,15, medía 0,22. La cifra de referencia de § 7.2 (0,59) se midió con v8: la identidad del club añade duelos, así que no sirve para comparar con v7. Las demás bandas de v7 cumplen.
+
+**Decisión.** No se baja la banda. Carlos pidió que los atributos «reflejen bastante en el campo», y esa banda es la que lo comprueba. Se aplica este ajuste adicional, fuera de la lista de § 12.2:
+
+1. `entradaDuelo` deja de ir atado a `aguanteDuelo`. `aguanteDuelo` se queda en 0,12, el valor del ajuste ya aplicado.
+2. Se prueba `entradaDuelo`, en este orden, con **0,18, 0,24 y 0,30**. Se adopta el primer valor que cumpla todo esto:
+   - entrada ≥ 0,30 en el experimento controlado 1–100;
+   - todas las demás bandas de v7 (046 recalibrado, 051 y su experimento controlado, A, B y C) en los lotes 1–30, 1–100 y 101–200;
+   - el resto de los experimentos controlados de atributos.
+3. Se documenta junto a la constante: valor, motivo y cifras de los tres lotes. La evidencia de cada intento se guarda en `docs/evidencia/motor-063/publicacion-2/`.
+4. Si ninguno de los tres valores cumple, se para y se escala a Carlos. No se amplían bandas ni se añaden mecanismos nuevos, como robos fuera del duelo.
+
+Esto consume la tercera iteración del hallazgo. Lo que falle después se escala.
