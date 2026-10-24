@@ -1,0 +1,2712 @@
+{
+ "brief": "062 §17.5/§18.3/§19 · smoke simultáneo de capacidad",
+ "produccion": {
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+  "revision": "cronista-arena--0000032",
+  "commit": "613d68e",
+  "replicas": {
+   "min": 1,
+   "max": 1
+  },
+  "recursos": {
+   "cpu": 0.5,
+   "memoria": "1Gi"
+  }
+ },
+ "ventanaUtc": {
+  "inicio": "2026-10-24T10:57:06.294Z",
+  "fin": "2026-10-24T11:31:05.444Z"
+ },
+ "umbrales": {
+  "huecoSseMaxMs": 20000,
+  "eventLoopP99Ms": 500,
+  "eventLoopMaxMs": 2000,
+  "http5xx": 0,
+  "respaldosInfraPublico": 0,
+  "anuladosTorneoMax": 1
+ },
+ "medido": {
+  "huecoSseMaxMs": 1248,
+  "huecoSsePorEspectador": [
+   742,
+   742,
+   1142,
+   1141,
+   1247,
+   1248
+  ],
+  "http5xx": {
+   "navegador": 0,
+   "sondas": 0,
+   "azureRequests5xx": 0,
+   "azureRequests4xx": 2,
+   "azureRequests2xx": 1543
+  },
+  "respaldosPublico": [
+   0,
+   0,
+   0
+  ],
+  "anuladosTorneo": 0,
+  "eventLoop": {
+   "medido": false,
+   "motivo": "el servidor no expone monitorEventLoopDelay en ninguna ruta ni métrica",
+   "proxyHealth": {
+    "n": 881,
+    "p50": 93,
+    "p99": 510,
+    "max": 1047,
+    "baseAntesDelTorneo": {
+     "n": 15,
+     "p50": 96,
+     "max": 390,
+     "no200": []
+    },
+    "muestrasMas500ms": [
+     [
+      "2026-10-24T10:59:44.007Z",
+      1047
+     ],
+     [
+      "2026-10-24T11:02:56.087Z",
+      817
+     ],
+     [
+      "2026-10-24T11:04:45.183Z",
+      719
+     ],
+     [
+      "2026-10-24T11:09:20.190Z",
+      523
+     ],
+     [
+      "2026-10-24T11:12:31.791Z",
+      510
+     ],
+     [
+      "2026-10-24T11:13:36.000Z",
+      716
+     ],
+     [
+      "2026-10-24T11:22:08.102Z",
+      882
+     ],
+     [
+      "2026-10-24T11:26:24.701Z",
+      683
+     ],
+     [
+      "2026-10-24T11:27:28.704Z",
+      808
+     ]
+    ]
+   }
+  },
+  "contenedorAzure": {
+   "cpuMaxNucleos": 0.126,
+   "cpuMediaNucleos": 0.025,
+   "memoriaMaxBytes": 428314624,
+   "reinicios": 0
+  }
+ },
+ "barrera": [
+  {
+   "t": "2026-10-24T10:57:06.797Z",
+   "status": 200,
+   "ms": 503,
+   "habilitado": true,
+   "motivo": null,
+   "activo": null,
+   "hoy": null,
+   "bolsa": {
+    "conocidoMicroUsd": 0,
+    "bolsaMicroUsd": 50000000
+   }
+  }
+ ],
+ "lanzamiento": {
+  "t": "2026-10-24T10:57:38.681Z",
+  "status": 202,
+  "ms": 141,
+  "cuerpo": {
+   "id": "sitio-prueba-a213fdf1c09f"
+  }
+ },
+ "torneo": {
+  "final": {
+   "t": "2026-10-24T11:29:46.722Z",
+   "status": 200,
+   "ms": 288,
+   "estado": "completo",
+   "motivoFin": null,
+   "enCurso": null,
+   "completados": 30,
+   "pendientes": [],
+   "reintentados": [],
+   "anuladosEstimados": 0,
+   "gastoConocidoUsd": 3.353857,
+   "topeUsd": 8,
+   "tipicoUsd": 3.53842,
+   "lanzamiento": "prueba",
+   "intervaloS": 30,
+   "duracionS": 60
+  },
+  "sondas": {
+   "health": {
+    "n": 881,
+    "p50": 93,
+    "p95": 96,
+    "p99": 510,
+    "max": 1047,
+    "no200": []
+   },
+   "sitio": {
+    "n": 112,
+    "p50": 364,
+    "p95": 434,
+    "p99": 503,
+    "max": 1452,
+    "no200": []
+   },
+   "torneo": {
+    "n": 89,
+    "p50": 447,
+    "p95": 528,
+    "p99": 1431,
+    "max": 1431,
+    "no200": []
+   }
+  },
+  "cancelacion": null,
+  "motivoFin": "terminado: completo"
+ },
+ "validacionLocal": {
+  "id": "sitio-prueba-a213fdf1c09f",
+  "inicioUtc": "2026-10-24T11:29:59.072Z",
+  "instantaneaStatus": 200,
+  "resumen": {
+   "estado": "completo",
+   "motivoFin": null,
+   "lanzamiento": "prueba",
+   "origen": "sitio",
+   "formato": "liga",
+   "titulo": {
+    "es": "Torneo de prueba del operador · 2026-10-24",
+    "en": "Operator test tournament · 2026-10-24"
+   },
+   "inicioUtc": "2026-10-24T10:57:38.596Z",
+   "finUtc": "2026-10-24T11:29:36.906Z",
+   "commit": "613d68e4662af77e8aa2cde18ba11f4da04bf54c",
+   "duracionS": 60,
+   "intervaloS": 30,
+   "participantes": [
+    "equilibrado",
+    "rapido",
+    "luna6",
+    "sol6",
+    "astra6",
+    "sol61"
+   ],
+   "encuentros": 30,
+   "pendientes": [],
+   "gasto": {
+    "conocidoMicroUsd": 3353857,
+    "tipicoMicroUsd": 3538420,
+    "topeMicroUsd": 8000000,
+    "reservaMaxPartidoMicroUsd": 3684816
+   }
+  },
+  "encuentros": [
+   {
+    "n": 1,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "sol61",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 46658,
+    "sinUso": 0
+   },
+   {
+    "n": 2,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "rapido",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 63710,
+    "sinUso": 0
+   },
+   {
+    "n": 3,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "astra6",
+    "marcador": "0-2",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 224835,
+    "sinUso": 0
+   },
+   {
+    "n": 4,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "astra6",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 268664,
+    "sinUso": 0
+   },
+   {
+    "n": 5,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "equilibrado",
+    "marcador": "0-3",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 24006,
+    "sinUso": 0
+   },
+   {
+    "n": 6,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "sol6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 48740,
+    "sinUso": 0
+   },
+   {
+    "n": 7,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "sol61",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 89650,
+    "sinUso": 0
+   },
+   {
+    "n": 8,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "luna6",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 7141,
+    "sinUso": 0
+   },
+   {
+    "n": 9,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "rapido",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 233103,
+    "sinUso": 0
+   },
+   {
+    "n": 10,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "rapido",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 63302,
+    "sinUso": 0
+   },
+   {
+    "n": 11,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 224386,
+    "sinUso": 0
+   },
+   {
+    "n": 12,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "equilibrado",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 49477,
+    "sinUso": 0
+   },
+   {
+    "n": 13,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "sol61",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 49876,
+    "sinUso": 0
+   },
+   {
+    "n": 14,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "sol6",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 261690,
+    "sinUso": 0
+   },
+   {
+    "n": 15,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "luna6",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 20089,
+    "sinUso": 0
+   },
+   {
+    "n": 16,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "luna6",
+    "marcador": "0-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 47473,
+    "sinUso": 0
+   },
+   {
+    "n": 17,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "sol6",
+    "marcador": "1-2",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 61942,
+    "sinUso": 0
+   },
+   {
+    "n": 18,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "equilibrado",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 223635,
+    "sinUso": 0
+   },
+   {
+    "n": 19,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "sol61",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 261598,
+    "sinUso": 0
+   },
+   {
+    "n": 20,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "rapido",
+    "marcador": "2-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 27453,
+    "sinUso": 0
+   },
+   {
+    "n": 21,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "luna6",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 48694,
+    "sinUso": 0
+   },
+   {
+    "n": 22,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "sol6",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 89180,
+    "sinUso": 0
+   },
+   {
+    "n": 23,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "equilibrado",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 7122,
+    "sinUso": 0
+   },
+   {
+    "n": 24,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 237800,
+    "sinUso": 0
+   },
+   {
+    "n": 25,
+    "intento": 1,
+    "local": "rapido",
+    "visita": "sol61",
+    "marcador": "1-1",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 63030,
+    "sinUso": 0
+   },
+   {
+    "n": 26,
+    "intento": 1,
+    "local": "astra6",
+    "visita": "luna6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 222417,
+    "sinUso": 0
+   },
+   {
+    "n": 27,
+    "intento": 1,
+    "local": "equilibrado",
+    "visita": "sol6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 50708,
+    "sinUso": 0
+   },
+   {
+    "n": 28,
+    "intento": 1,
+    "local": "sol61",
+    "visita": "equilibrado",
+    "marcador": "2-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 48771,
+    "sinUso": 0
+   },
+   {
+    "n": 29,
+    "intento": 1,
+    "local": "sol6",
+    "visita": "astra6",
+    "marcador": "1-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "valida",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 267050,
+    "sinUso": 0
+   },
+   {
+    "n": 30,
+    "intento": 1,
+    "local": "luna6",
+    "visita": "rapido",
+    "marcador": "0-0",
+    "status": 200,
+    "shaOk": true,
+    "golesOk": true,
+    "motivos": [
+     "error_controlador",
+     "valida",
+     "valida",
+     "valida"
+    ],
+    "estados": [
+     200,
+     200,
+     200,
+     200
+    ],
+    "costoMicroUsd": 21657,
+    "sinUso": 0
+   }
+  ],
+  "descargasOk": true,
+  "shaOk": true,
+  "golesOk": true,
+  "motivos": {
+   "valida": 119,
+   "error_controlador": 1
+  },
+  "estadosIntentos": {
+   "200": 121
+  },
+  "reintentados": [],
+  "costoSumaMicroUsd": 3353857,
+  "validarTorneo": "ok",
+  "finUtc": "2026-10-24T11:30:07.936Z"
+ },
+ "directos": [
+  {
+   "n": 1,
+   "inicioUtc": "2026-10-24T10:57:43.125Z",
+   "modelosStatus": 200,
+   "herramientas": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+     "es": {
+      "narrador": {
+       "voz": "es-MX-JorgeNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "es-MX-DaliaNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "es-MX-GerardoNeural",
+       "motivo": "predeterminada"
+      }
+     },
+     "en": {
+      "narrador": {
+       "voz": "en-US-JennyNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "en-US-DavisNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "en-US-GuyNeural",
+       "motivo": "predeterminada"
+      }
+     }
+    },
+    "catalogo": "consultado"
+   },
+   "seleccion": "programado",
+   "narrar": true,
+   "duracion": "60",
+   "post": {
+    "status": 201,
+    "ms": 963
+   },
+   "sesion": {
+    "id": "4a0c5888-4da4-4089-a3ef-cc7873bf5121",
+    "modo": "programado"
+   },
+   "liveTrasClickMs": 58614,
+   "relojMitad": "0:15 / 1:00",
+   "generacionTerminadaMs": 73712,
+   "emisionTerminadaMs": 118752,
+   "relojFinal": "1:00 / 1:00",
+   "estadoFinal": "Match complete · recording available",
+   "metricasTexto": "4 team decisions · 0 programmed fallbacks · 41.1 s elapsed",
+   "asignacion": "Home: Programmed policy / Política programada · Away: Programmed policy / Política programada",
+   "espectadores": [
+    {
+     "nombre": "A",
+     "status": 200,
+     "primerByteMs": 404,
+     "trozos": 343,
+     "mensajes": 142,
+     "keepalives": 2,
+     "huecoMaxMs": 742,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41090,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41121
+     }
+    },
+    {
+     "nombre": "B",
+     "status": 200,
+     "primerByteMs": 384,
+     "trozos": 349,
+     "mensajes": 142,
+     "keepalives": 2,
+     "huecoMaxMs": 742,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41075,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41121
+     }
+    }
+   ],
+   "latencias": {
+    "GET /_next/*": {
+     "n": 16,
+     "p50": 356,
+     "p95": 442,
+     "max": 442,
+     "estados": [
+      200
+     ]
+    },
+    "GET /arena": {
+     "n": 1,
+     "p50": 2417,
+     "p95": 2417,
+     "max": 2417,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/modelos": {
+     "n": 1,
+     "p50": 124,
+     "p95": 124,
+     "max": 124,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/herramientas": {
+     "n": 4,
+     "p50": 367,
+     "p95": 398,
+     "max": 398,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones": {
+     "n": 1,
+     "p50": 924,
+     "p95": 924,
+     "max": 924,
+     "estados": [
+      201
+     ]
+    },
+    "GET /api/arena/sesiones/:id/emision": {
+     "n": 1,
+     "p50": 280,
+     "p95": 280,
+     "max": 280,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/indice.json": {
+     "n": 1,
+     "p50": 242,
+     "p95": 242,
+     "max": 242,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/cierre.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/25.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/24.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/23.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones/:id/relato": {
+     "n": 30,
+     "p50": 516,
+     "p95": 1138,
+     "max": 1226,
+     "estados": [
+      200,
+      "fallida"
+     ]
+    },
+    "GET /voz-reserva/en/26.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/27.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/28.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/29.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/03.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/02.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/01.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/30.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/04.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/05.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/06.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/07.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/08.mp3": {
+     "n": 1,
+     "p50": 102,
+     "p95": 102,
+     "max": 102,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/11.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/10.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/09.mp3": {
+     "n": 1,
+     "p50": 103,
+     "p95": 103,
+     "max": 103,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/12.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/15.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/13.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/14.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/16.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/17.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/18.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/19.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/20.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/21.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/22.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/sesiones/:id/eventos": {
+     "n": 0,
+     "estados": [
+      "fallida"
+     ]
+    }
+   },
+   "relato": {
+    "n": 30,
+    "p50": 516,
+    "p95": 1138,
+    "max": 1226,
+    "ttfb": {
+     "n": 30,
+     "p50": 441,
+     "p95": 950,
+     "max": 1129
+    },
+    "estados": {
+     "200": 30
+    }
+   },
+   "http5xx": [],
+   "errores": [
+    "console: Failed to load resource: the server responded with a status of 429 ()"
+   ],
+   "sesionesBloqueadas": [],
+   "finUtc": "2026-10-24T10:59:52.442Z"
+  },
+  {
+   "n": 2,
+   "inicioUtc": "2026-10-24T11:04:43.445Z",
+   "modelosStatus": 200,
+   "herramientas": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+     "es": {
+      "narrador": {
+       "voz": "es-MX-JorgeNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "es-MX-DaliaNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "es-MX-GerardoNeural",
+       "motivo": "predeterminada"
+      }
+     },
+     "en": {
+      "narrador": {
+       "voz": "en-US-JennyNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "en-US-DavisNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "en-US-GuyNeural",
+       "motivo": "predeterminada"
+      }
+     }
+    },
+    "catalogo": "consultado"
+   },
+   "seleccion": "programado",
+   "narrar": true,
+   "duracion": "60",
+   "post": {
+    "status": 201,
+    "ms": 1076
+   },
+   "sesion": {
+    "id": "f7de1979-fa6a-47bf-bfd5-8a8f76678f77",
+    "modo": "programado"
+   },
+   "liveTrasClickMs": 58190,
+   "relojMitad": "0:15 / 1:00",
+   "vozMitad": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "generacionTerminadaMs": 73275,
+   "emisionTerminadaMs": 118314,
+   "relojFinal": "1:00 / 1:00",
+   "vozFinal": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "estadoFinal": "Match complete · recording available",
+   "metricasTexto": "4 team decisions · 0 programmed fallbacks · 41.7 s elapsed",
+   "asignacion": "Home: Programmed policy / Política programada · Away: Programmed policy / Política programada",
+   "espectadores": [
+    {
+     "nombre": "A",
+     "status": 200,
+     "primerByteMs": 380,
+     "trozos": 348,
+     "mensajes": 140,
+     "keepalives": 2,
+     "huecoMaxMs": 1142,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41778,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41652
+     }
+    },
+    {
+     "nombre": "B",
+     "status": 200,
+     "primerByteMs": 380,
+     "trozos": 346,
+     "mensajes": 140,
+     "keepalives": 2,
+     "huecoMaxMs": 1141,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41768,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41652
+     }
+    }
+   ],
+   "latencias": {
+    "GET /_next/*": {
+     "n": 16,
+     "p50": 274,
+     "p95": 358,
+     "max": 358,
+     "estados": [
+      200
+     ]
+    },
+    "GET /arena": {
+     "n": 1,
+     "p50": 1916,
+     "p95": 1916,
+     "max": 1916,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/modelos": {
+     "n": 1,
+     "p50": 115,
+     "p95": 115,
+     "max": 115,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/herramientas": {
+     "n": 4,
+     "p50": 122,
+     "p95": 267,
+     "max": 267,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones": {
+     "n": 1,
+     "p50": 1030,
+     "p95": 1030,
+     "max": 1030,
+     "estados": [
+      201
+     ]
+    },
+    "GET /api/arena/sesiones/:id/emision": {
+     "n": 1,
+     "p50": 280,
+     "p95": 280,
+     "max": 280,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/indice.json": {
+     "n": 1,
+     "p50": 192,
+     "p95": 192,
+     "max": 192,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/28.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/cierre.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/29.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/30.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/01.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/02.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/03.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/04.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/06.mp3": {
+     "n": 1,
+     "p50": 210,
+     "p95": 210,
+     "max": 210,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/08.mp3": {
+     "n": 1,
+     "p50": 205,
+     "p95": 205,
+     "max": 205,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/05.mp3": {
+     "n": 1,
+     "p50": 221,
+     "p95": 221,
+     "max": 221,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/07.mp3": {
+     "n": 1,
+     "p50": 207,
+     "p95": 207,
+     "max": 207,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones/:id/relato": {
+     "n": 30,
+     "p50": 554,
+     "p95": 774,
+     "max": 792,
+     "estados": [
+      200,
+      "fallida"
+     ]
+    },
+    "GET /voz-reserva/en/10.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/09.mp3": {
+     "n": 1,
+     "p50": 105,
+     "p95": 105,
+     "max": 105,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/11.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/12.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/15.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/14.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/16.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/13.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/17.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/20.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/19.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/18.mp3": {
+     "n": 1,
+     "p50": 102,
+     "p95": 102,
+     "max": 102,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/21.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/22.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/23.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/24.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/25.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/26.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/27.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/sesiones/:id/eventos": {
+     "n": 0,
+     "estados": [
+      "fallida"
+     ]
+    }
+   },
+   "relato": {
+    "n": 30,
+    "p50": 554,
+    "p95": 774,
+    "max": 792,
+    "ttfb": {
+     "n": 30,
+     "p50": 466,
+     "p95": 687,
+     "max": 702
+    },
+    "estados": {
+     "200": 30
+    }
+   },
+   "respuestas4xx": [
+    {
+     "s": 92.5,
+     "status": 429,
+     "metodo": "POST",
+     "url": "/api/arena/sesiones/:id/relato",
+     "reintentar": null
+    }
+   ],
+   "fallidas": [
+    {
+     "s": 47.2,
+     "metodo": "GET",
+     "url": "/api/arena/sesiones/:id/eventos",
+     "error": "net::ERR_ABORTED"
+    },
+    {
+     "s": 107.4,
+     "metodo": "POST",
+     "url": "/api/arena/sesiones/:id/relato",
+     "error": "net::ERR_ABORTED"
+    }
+   ],
+   "reservasVozDescargadas": 31,
+   "http5xx": [],
+   "errores": [
+    "console: Failed to load resource: the server responded with a status of 429 ()"
+   ],
+   "sesionesBloqueadas": [],
+   "finUtc": "2026-10-24T11:06:51.215Z"
+  },
+  {
+   "n": 3,
+   "inicioUtc": "2026-10-24T11:11:20.566Z",
+   "modelosStatus": 200,
+   "herramientas": {
+    "analista": true,
+    "voz": true,
+    "voces": {
+     "es": {
+      "narrador": {
+       "voz": "es-MX-JorgeNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "es-MX-DaliaNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "es-MX-GerardoNeural",
+       "motivo": "predeterminada"
+      }
+     },
+     "en": {
+      "narrador": {
+       "voz": "en-US-JennyNeural",
+       "motivo": "entorno"
+      },
+      "comentarista": {
+       "voz": "en-US-DavisNeural",
+       "motivo": "predeterminada"
+      },
+      "estadista": {
+       "voz": "en-US-GuyNeural",
+       "motivo": "predeterminada"
+      }
+     }
+    },
+    "catalogo": "consultado"
+   },
+   "seleccion": "programado",
+   "narrar": true,
+   "duracion": "60",
+   "post": {
+    "status": 201,
+    "ms": 937
+   },
+   "sesion": {
+    "id": "d1305322-e156-4b42-85f9-8b7c874450b4",
+    "modo": "programado"
+   },
+   "liveTrasClickMs": 60067,
+   "relojMitad": "0:15 / 1:00",
+   "vozMitad": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "generacionTerminadaMs": 75148,
+   "emisionTerminadaMs": 120187,
+   "relojFinal": "1:00 / 1:00",
+   "vozFinal": {
+    "estado": null,
+    "audio": null,
+    "avisos": []
+   },
+   "estadoFinal": "Match complete · recording available",
+   "metricasTexto": "4 team decisions · 0 programmed fallbacks · 41.1 s elapsed",
+   "asignacion": "Home: Programmed policy / Política programada · Away: Programmed policy / Política programada",
+   "espectadores": [
+    {
+     "nombre": "A",
+     "status": 200,
+     "primerByteMs": 481,
+     "trozos": 339,
+     "mensajes": 141,
+     "keepalives": 2,
+     "huecoMaxMs": 1247,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41112,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41137
+     }
+    },
+    {
+     "nombre": "B",
+     "status": 200,
+     "primerByteMs": 394,
+     "trozos": 362,
+     "mensajes": 141,
+     "keepalives": 2,
+     "huecoMaxMs": 1248,
+     "huecosMas5s": [],
+     "saltos": 0,
+     "finMs": 41098,
+     "error": null,
+     "terminada": {
+      "estado": "completa",
+      "decisiones": 4,
+      "respaldos": 0,
+      "duracionMs": 41137
+     }
+    }
+   ],
+   "latencias": {
+    "GET /_next/*": {
+     "n": 16,
+     "p50": 486,
+     "p95": 594,
+     "max": 594,
+     "estados": [
+      200
+     ]
+    },
+    "GET /arena": {
+     "n": 1,
+     "p50": 2088,
+     "p95": 2088,
+     "max": 2088,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/herramientas": {
+     "n": 4,
+     "p50": 119,
+     "p95": 286,
+     "max": 286,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/modelos": {
+     "n": 1,
+     "p50": 117,
+     "p95": 117,
+     "max": 117,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones": {
+     "n": 1,
+     "p50": 888,
+     "p95": 888,
+     "max": 888,
+     "estados": [
+      201
+     ]
+    },
+    "GET /api/arena/sesiones/:id/emision": {
+     "n": 1,
+     "p50": 378,
+     "p95": 378,
+     "max": 378,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/indice.json": {
+     "n": 1,
+     "p50": 118,
+     "p95": 118,
+     "max": 118,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/17.mp3": {
+     "n": 1,
+     "p50": 109,
+     "p95": 109,
+     "max": 109,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/19.mp3": {
+     "n": 1,
+     "p50": 109,
+     "p95": 109,
+     "max": 109,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/cierre.mp3": {
+     "n": 1,
+     "p50": 111,
+     "p95": 111,
+     "max": 111,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/18.mp3": {
+     "n": 1,
+     "p50": 109,
+     "p95": 109,
+     "max": 109,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/20.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/21.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/22.mp3": {
+     "n": 1,
+     "p50": 95,
+     "p95": 95,
+     "max": 95,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/23.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/24.mp3": {
+     "n": 1,
+     "p50": 94,
+     "p95": 94,
+     "max": 94,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/25.mp3": {
+     "n": 1,
+     "p50": 98,
+     "p95": 98,
+     "max": 98,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/26.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/27.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "POST /api/arena/sesiones/:id/relato": {
+     "n": 31,
+     "p50": 531,
+     "p95": 1222,
+     "max": 2060,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/28.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/29.mp3": {
+     "n": 1,
+     "p50": 96,
+     "p95": 96,
+     "max": 96,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/30.mp3": {
+     "n": 1,
+     "p50": 93,
+     "p95": 93,
+     "max": 93,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/01.mp3": {
+     "n": 1,
+     "p50": 92,
+     "p95": 92,
+     "max": 92,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/02.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/05.mp3": {
+     "n": 1,
+     "p50": 100,
+     "p95": 100,
+     "max": 100,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/03.mp3": {
+     "n": 1,
+     "p50": 101,
+     "p95": 101,
+     "max": 101,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/04.mp3": {
+     "n": 1,
+     "p50": 106,
+     "p95": 106,
+     "max": 106,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/07.mp3": {
+     "n": 1,
+     "p50": 688,
+     "p95": 688,
+     "max": 688,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/06.mp3": {
+     "n": 1,
+     "p50": 690,
+     "p95": 690,
+     "max": 690,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/09.mp3": {
+     "n": 1,
+     "p50": 686,
+     "p95": 686,
+     "max": 686,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/08.mp3": {
+     "n": 1,
+     "p50": 691,
+     "p95": 691,
+     "max": 691,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/10.mp3": {
+     "n": 1,
+     "p50": 298,
+     "p95": 298,
+     "max": 298,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/11.mp3": {
+     "n": 1,
+     "p50": 291,
+     "p95": 291,
+     "max": 291,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/12.mp3": {
+     "n": 1,
+     "p50": 293,
+     "p95": 293,
+     "max": 293,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/13.mp3": {
+     "n": 1,
+     "p50": 290,
+     "p95": 290,
+     "max": 290,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/14.mp3": {
+     "n": 1,
+     "p50": 99,
+     "p95": 99,
+     "max": 99,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/15.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /voz-reserva/en/16.mp3": {
+     "n": 1,
+     "p50": 97,
+     "p95": 97,
+     "max": 97,
+     "estados": [
+      200
+     ]
+    },
+    "GET /api/arena/sesiones/:id/eventos": {
+     "n": 0,
+     "estados": [
+      "fallida"
+     ]
+    }
+   },
+   "relato": {
+    "n": 31,
+    "p50": 531,
+    "p95": 1222,
+    "max": 2060,
+    "ttfb": {
+     "n": 31,
+     "p50": 471,
+     "p95": 1219,
+     "max": 1879
+    },
+    "estados": {
+     "200": 31
+    }
+   },
+   "respuestas4xx": [],
+   "fallidas": [
+    {
+     "s": 46.5,
+     "metodo": "GET",
+     "url": "/api/arena/sesiones/:id/eventos",
+     "error": "net::ERR_ABORTED"
+    }
+   ],
+   "reservasVozDescargadas": 31,
+   "http5xx": [],
+   "errores": [],
+   "sesionesBloqueadas": [],
+   "finUtc": "2026-10-24T11:13:30.232Z"
+  }
+ ],
+ "final": {
+  "id": "sitio-prueba-a213fdf1c09f",
+  "inicioUtc": "2026-10-24T11:30:19.444Z",
+  "pagina_es": {
+   "grupoPruebas": {
+    "titulo": "Torneos de prueba del operador",
+    "items": [
+     {
+      "id": "sitio-prueba-a213fdf1c09f",
+      "texto": "24 oct · Liga · completo · 1.º GPT-5.6 Luna"
+     }
+    ]
+   },
+   "enLanzados": 0,
+   "lanzar": [
+    {
+     "texto": "Lanzar un torneoComprobando el estado…Iniciar nuevo torneo",
+     "deshabilitado": null
+    }
+   ],
+   "botonesLanzar": [
+    {
+     "t": "Iniciar nuevo torneo",
+     "deshabilitado": true
+    }
+   ],
+   "pagina": {
+    "h1": "Torneo entre modelos",
+    "rotulo": "Lanzado en el sitio · validado en el servidor al terminar cada partido",
+    "banda": "Torneo de prueba del operador",
+    "filas": 6,
+    "partidos": 30,
+    "celdas": 30,
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "tabla": "Puntos 3/1/0; desempate por diferencia de goles, goles a favor y liguilla entre los empatados; «=» es posición compartida.\nPos\tModelo\tPJ\tG-E-P\tGoles\tDG\tPts\n1\tGPT-5.6 Luna\t10\t5-3-2\t10:7\t+3\t18\n2\tGPT-6 Luna\t10\t4-5-1\t6:3\t+3\t17\n3\tGPT-6 Astra\t10\t4-3-3\t7:5\t+2\t15\n4\tGPT-6 Sol\t10\t3-4-3\t8:8\t0\t13\n5\tGPT-5.4 mini\t10\t1-6-3\t5:9\t-4\t9\n6\tGPT-6.1 Sol\t10\t1-3-6\t4:8\t-4\t6"
+   }
+  },
+  "pagina_en": {
+   "grupoPruebas": {
+    "titulo": "Operator test tournaments",
+    "items": [
+     {
+      "id": "sitio-prueba-a213fdf1c09f",
+      "texto": "Oct 24 · League · complete · 1st GPT-5.6 Luna"
+     }
+    ]
+   },
+   "enLanzados": 0,
+   "lanzar": [
+    {
+     "texto": "Launch a tournamentChecking the status…Start new tournament",
+     "deshabilitado": null
+    }
+   ],
+   "botonesLanzar": [],
+   "pagina": {
+    "h1": "Model tournament",
+    "rotulo": "Launched on the site · validated on the server after each match",
+    "banda": "Operator test tournament",
+    "filas": 6,
+    "partidos": 30,
+    "celdas": 30,
+    "incoherente": 0,
+    "incompleto": 0,
+    "cancelado": 0,
+    "interrumpido": 0,
+    "tabla": "Points 3/1/0; ties broken by goal difference, goals for and a mini-league among the tied; “=” is a shared position.\nPos\tModel\tP\tW-D-L\tGoals\tGD\tPts\n1\tGPT-5.6 Luna\t10\t5-3-2\t10:7\t+3\t18\n2\tGPT-6 Luna\t10\t4-5-1\t6:3\t+3\t17\n3\tGPT-6 Astra\t10\t4-3-3\t7:5\t+2\t15\n4\tGPT-6 Sol\t10\t3-4-3\t8:8\t0\t13\n5\tGPT-5.4 mini\t10\t1-6-3\t5:9\t-4\t9\n6\tGPT-6.1 Sol\t10\t1-3-6\t4:8\t-4\t6"
+   }
+  },
+  "repeticion": {
+   "origen": "Partido 1 del torneo del 24 de octubre de 2026 · Local: Deportivo Ventolera (GPT-6 Luna) · Visita: Juventud Valdecristal (GPT-6.1 Sol) · Volver al torneo",
+   "modelos": "Local: GPT-6 Luna · Visita: GPT-6.1 Sol · declarada por el ejecutor del torneo, no verificada",
+   "vozVisible": true,
+   "conNarracion": true,
+   "botonAntes": "Reproducir",
+   "estados": [
+    {
+     "s": 0.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Registrando la grabación…",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 3.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 0/16",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 4.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 1/16",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 5.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 2/16",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 6.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 3/16",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 7.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 5/16",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 8.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 7/17",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 9.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 8/17",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 10.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 10/17",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 11.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 12/18",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 12.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 14/19",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 13.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 16/19",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 14.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparando narración 18/19",
+      "boton": "Reproducir sin narración",
+      "aviso": null
+     }
+    },
+    {
+     "s": 15.2,
+     "e": {
+      "src": true,
+      "pausado": false,
+      "progreso": null,
+      "boton": "Pausar",
+      "aviso": null
+     }
+    }
+   ],
+   "sonandoTrasMs": 15203,
+   "sonando": true,
+   "reloj": "0:00 / 1:00",
+   "relatoPrimeraPista": 19,
+   "relatoTrasSegundaReproduccion": 19,
+   "relato": {
+    "n": 19,
+    "estados": {
+     "200": 19
+    },
+    "msMax": 987,
+    "msP50": 534
+   }
+  },
+  "sitio": {
+   "status": 200,
+   "habilitado": true,
+   "motivo": null,
+   "diaUtc": "2026-10-24",
+   "activo": null,
+   "hoy": null,
+   "bolsa": {
+    "conocidoMicroUsd": 3353857,
+    "bolsaMicroUsd": 50000000
+   },
+   "proximoCupoUtc": "2026-10-25T00:00:00.000Z"
+  },
+  "cupoDisponible": true,
+  "panel": {
+   "lanzar": "Launch a tournament\nFormat\nLeague · double round robin\n30 matches · ≈ 3.5 USD typical · cap 8 USD · ≈ 33 min\nGroups + knockout\n15–18 matches · ≈ 1.5–2.0 USD (up to 2.7 with play-offs) typical · cap 7 USD · ≈ 16–20 min · Coming soon\nStart new tournament\n\nOne tournament per day (UTC) for the whole site. Period budget: 3.4 of 50 USD † († list-price estimate, not the invoice)",
+   "botones": [
+    {
+     "t": "Start new tournament",
+     "deshabilitado": false
+    }
+   ]
+  },
+  "http5xx": [],
+  "errores": [],
+  "postsBloqueados": [],
+  "finUtc": "2026-10-24T11:31:05.444Z"
+ }
+}
