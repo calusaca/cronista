@@ -1,0 +1,1043 @@
+{
+ "generado": "2026-10-24T22:24:26.174Z",
+ "commit": "a0d9e7b18e141c66ff5e5146252943aa633b4edb",
+ "arbolConCambios": true,
+ "reglas": "reinicios-v6",
+ "semillas": {
+  "desde": 1,
+  "hasta": 10
+ },
+ "duracionS": 120,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "escenas": [
+  {
+   "seed": 1,
+   "superados": [
+    {
+     "desdeS": 9.9,
+     "hastaS": 11.1,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-6",
+      "local-3",
+      "local-5",
+      "local-2"
+     ]
+    },
+    {
+     "desdeS": 11.5,
+     "hastaS": 13.3,
+     "poseedor": "visita-6",
+     "repliegue": [
+      "local-6",
+      "local-3",
+      "local-5",
+      "local-2"
+     ]
+    },
+    {
+     "desdeS": 23.9,
+     "hastaS": 25.9,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-5",
+      "visita-12",
+      "visita-3",
+      "visita-6"
+     ]
+    },
+    {
+     "desdeS": 78.5,
+     "hastaS": 80.3,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-13",
+      "visita-12",
+      "visita-3",
+      "visita-5"
+     ]
+    },
+    {
+     "desdeS": 88.2,
+     "hastaS": 91.8,
+     "poseedor": "local-7",
+     "repliegue": [
+      "visita-5",
+      "visita-2",
+      "visita-13"
+     ]
+    },
+    {
+     "desdeS": 94.8,
+     "hastaS": 95.5,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-2",
+      "visita-3",
+      "visita-5",
+      "visita-4"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-6",
+     "linea": "MED",
+     "desdeS": 7.1,
+     "hastaS": 11
+    },
+    {
+     "jugador": "visita-12",
+     "linea": "DEF",
+     "desdeS": 86.5,
+     "hastaS": 93.8
+    }
+   ]
+  },
+  {
+   "seed": 2,
+   "superados": [
+    {
+     "desdeS": 8.8,
+     "hastaS": 9.3,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-2",
+      "visita-4",
+      "visita-5",
+      "visita-7"
+     ]
+    },
+    {
+     "desdeS": 12.6,
+     "hastaS": 14.6,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-4",
+      "visita-2"
+     ]
+    },
+    {
+     "desdeS": 24.4,
+     "hastaS": 26.2,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-12",
+      "local-7",
+      "local-3"
+     ]
+    },
+    {
+     "desdeS": 36.5,
+     "hastaS": 38.3,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-12",
+      "local-7",
+      "local-13",
+      "local-5"
+     ]
+    },
+    {
+     "desdeS": 40.9,
+     "hastaS": 41.2,
+     "poseedor": "visita-8",
+     "repliegue": [
+      "local-4",
+      "local-7",
+      "local-12",
+      "local-5"
+     ]
+    },
+    {
+     "desdeS": 99.3,
+     "hastaS": 100.7,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-12",
+      "visita-2",
+      "visita-13",
+      "visita-5"
+     ]
+    },
+    {
+     "desdeS": 103.8,
+     "hastaS": 107,
+     "poseedor": "local-13",
+     "repliegue": [
+      "visita-13",
+      "visita-2"
+     ]
+    },
+    {
+     "desdeS": 110.1,
+     "hastaS": 110.8,
+     "poseedor": "local-8",
+     "repliegue": [
+      "visita-12",
+      "visita-13",
+      "visita-4"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-9",
+     "linea": "DEL",
+     "desdeS": 32.7,
+     "hastaS": 36.7
+    },
+    {
+     "jugador": "local-4",
+     "linea": "DEF",
+     "desdeS": 95,
+     "hastaS": 102.3
+    },
+    {
+     "jugador": "visita-2",
+     "linea": "DEF",
+     "desdeS": 96.5,
+     "hastaS": 103.9
+    }
+   ]
+  },
+  {
+   "seed": 3,
+   "superados": [
+    {
+     "desdeS": 9.9,
+     "hastaS": 10.5,
+     "poseedor": "local-13",
+     "repliegue": [
+      "visita-5",
+      "visita-12",
+      "visita-6"
+     ]
+    },
+    {
+     "desdeS": 11.7,
+     "hastaS": 13.5,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-6",
+      "visita-14",
+      "visita-2",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 16.7,
+     "hastaS": 16.7,
+     "poseedor": "local-13",
+     "repliegue": [
+      "visita-6",
+      "visita-12",
+      "visita-14",
+      "visita-5"
+     ]
+    },
+    {
+     "desdeS": 37.2,
+     "hastaS": 39.8,
+     "poseedor": "local-10",
+     "repliegue": [
+      "visita-4",
+      "visita-14",
+      "visita-7",
+      "visita-12"
+     ]
+    },
+    {
+     "desdeS": 53.1,
+     "hastaS": 53.3,
+     "poseedor": "local-8",
+     "repliegue": [
+      "visita-12",
+      "visita-13",
+      "visita-14"
+     ]
+    },
+    {
+     "desdeS": 54.4,
+     "hastaS": 56.9,
+     "poseedor": "local-10",
+     "repliegue": [
+      "visita-13",
+      "visita-4",
+      "visita-12",
+      "visita-14",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 61.1,
+     "hastaS": 62.9,
+     "poseedor": "local-10",
+     "repliegue": [
+      "visita-13",
+      "visita-4",
+      "visita-12",
+      "visita-14",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 101.7,
+     "hastaS": 101.7,
+     "poseedor": "local-14",
+     "repliegue": [
+      "visita-12",
+      "visita-14",
+      "visita-2"
+     ]
+    },
+    {
+     "desdeS": 110.5,
+     "hastaS": 114.4,
+     "poseedor": "visita-13",
+     "repliegue": [
+      "local-4",
+      "local-2",
+      "local-5",
+      "local-14"
+     ]
+    },
+    {
+     "desdeS": 119.1,
+     "hastaS": 120,
+     "poseedor": "visita-13",
+     "repliegue": [
+      "local-12",
+      "local-2"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "visita-13",
+     "linea": "MED",
+     "desdeS": 49,
+     "hastaS": 54.2
+    },
+    {
+     "jugador": "visita-13",
+     "linea": "MED",
+     "desdeS": 72.7,
+     "hastaS": 77.8
+    },
+    {
+     "jugador": "local-14",
+     "linea": "MED",
+     "desdeS": 80.9,
+     "hastaS": 84.9
+    },
+    {
+     "jugador": "visita-2",
+     "linea": "DEF",
+     "desdeS": 81.7,
+     "hastaS": 89.3
+    },
+    {
+     "jugador": "visita-13",
+     "linea": "MED",
+     "desdeS": 99.9,
+     "hastaS": 104.9
+    }
+   ]
+  },
+  {
+   "seed": 4,
+   "superados": [
+    {
+     "desdeS": 8.5,
+     "hastaS": 10.2,
+     "poseedor": "visita-8",
+     "repliegue": [
+      "local-13",
+      "local-2",
+      "local-1"
+     ]
+    },
+    {
+     "desdeS": 21.7,
+     "hastaS": 23,
+     "poseedor": "visita-8",
+     "repliegue": [
+      "local-2",
+      "local-1",
+      "local-7",
+      "local-13"
+     ]
+    },
+    {
+     "desdeS": 35.4,
+     "hastaS": 37.4,
+     "poseedor": "local-7",
+     "repliegue": [
+      "visita-12",
+      "visita-14",
+      "visita-4",
+      "visita-2"
+     ]
+    },
+    {
+     "desdeS": 47.8,
+     "hastaS": 52,
+     "poseedor": "visita-6",
+     "repliegue": [
+      "local-2",
+      "local-12"
+     ]
+    },
+    {
+     "desdeS": 53.1,
+     "hastaS": 55.1,
+     "poseedor": "visita-13",
+     "repliegue": [
+      "local-2"
+     ]
+    },
+    {
+     "desdeS": 75,
+     "hastaS": 78,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-2",
+      "local-13",
+      "local-4",
+      "local-5"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-7",
+     "linea": "MED",
+     "desdeS": 6,
+     "hastaS": 11
+    },
+    {
+     "jugador": "local-7",
+     "linea": "MED",
+     "desdeS": 18.4,
+     "hastaS": 23.3
+    },
+    {
+     "jugador": "local-14",
+     "linea": "MED",
+     "desdeS": 43.6,
+     "hastaS": 48
+    },
+    {
+     "jugador": "visita-4",
+     "linea": "DEF",
+     "desdeS": 113.8,
+     "hastaS": 119.6
+    }
+   ]
+  },
+  {
+   "seed": 5,
+   "superados": [
+    {
+     "desdeS": 10.6,
+     "hastaS": 11.8,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-2",
+      "visita-1",
+      "visita-5"
+     ]
+    },
+    {
+     "desdeS": 27.9,
+     "hastaS": 32.4,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-4",
+      "visita-7",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 36.2,
+     "hastaS": 36.2,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-1",
+      "visita-2",
+      "visita-4",
+      "visita-7"
+     ]
+    },
+    {
+     "desdeS": 69.5,
+     "hastaS": 70,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-1",
+      "visita-5",
+      "visita-4",
+      "visita-7"
+     ]
+    },
+    {
+     "desdeS": 94.1,
+     "hastaS": 94.2,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-1",
+      "visita-2",
+      "visita-4",
+      "visita-7"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-15",
+     "linea": "DEL",
+     "desdeS": 21.6,
+     "hastaS": 24.4
+    },
+    {
+     "jugador": "visita-14",
+     "linea": "DEF",
+     "desdeS": 22.6,
+     "hastaS": 28.6
+    },
+    {
+     "jugador": "visita-5",
+     "linea": "MED",
+     "desdeS": 50.4,
+     "hastaS": 54.3
+    },
+    {
+     "jugador": "local-7",
+     "linea": "MED",
+     "desdeS": 51.2,
+     "hastaS": 54.2
+    },
+    {
+     "jugador": "visita-5",
+     "linea": "MED",
+     "desdeS": 62,
+     "hastaS": 65.8
+    },
+    {
+     "jugador": "visita-5",
+     "linea": "MED",
+     "desdeS": 86.3,
+     "hastaS": 90
+    },
+    {
+     "jugador": "visita-5",
+     "linea": "MED",
+     "desdeS": 110.8,
+     "hastaS": 114.4
+    }
+   ]
+  },
+  {
+   "seed": 6,
+   "superados": [
+    {
+     "desdeS": 8.7,
+     "hastaS": 10.2,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-4",
+      "visita-7",
+      "visita-12"
+     ]
+    },
+    {
+     "desdeS": 20.2,
+     "hastaS": 20.5,
+     "poseedor": "visita-6",
+     "repliegue": [
+      "local-12",
+      "local-14",
+      "local-3",
+      "local-7"
+     ]
+    },
+    {
+     "desdeS": 32.4,
+     "hastaS": 32.6,
+     "poseedor": "local-10",
+     "repliegue": [
+      "visita-7",
+      "visita-2",
+      "visita-6",
+      "visita-3"
+     ]
+    },
+    {
+     "desdeS": 44.2,
+     "hastaS": 46.8,
+     "poseedor": "visita-7",
+     "repliegue": [
+      "local-2",
+      "local-7",
+      "local-14",
+      "local-1"
+     ]
+    },
+    {
+     "desdeS": 55.9,
+     "hastaS": 61.8,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-2",
+      "visita-6",
+      "visita-12"
+     ]
+    },
+    {
+     "desdeS": 66.8,
+     "hastaS": 68.3,
+     "poseedor": "local-9",
+     "repliegue": [
+      "visita-12",
+      "visita-4"
+     ]
+    },
+    {
+     "desdeS": 82.4,
+     "hastaS": 83.2,
+     "poseedor": "local-10",
+     "repliegue": [
+      "visita-4",
+      "visita-13"
+     ]
+    },
+    {
+     "desdeS": 109.5,
+     "hastaS": 111.3,
+     "poseedor": "visita-9",
+     "repliegue": [
+      "local-3"
+     ]
+    },
+    {
+     "desdeS": 112.1,
+     "hastaS": 112.1,
+     "poseedor": "visita-14",
+     "repliegue": [
+      "local-4",
+      "local-2"
+     ]
+    },
+    {
+     "desdeS": 113.8,
+     "hastaS": 113.9,
+     "poseedor": "visita-14",
+     "repliegue": [
+      "local-4",
+      "local-2"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "visita-2",
+     "linea": "DEF",
+     "desdeS": 66.5,
+     "hastaS": 71.8
+    }
+   ]
+  },
+  {
+   "seed": 7,
+   "superados": [
+    {
+     "desdeS": 19.7,
+     "hastaS": 20.6,
+     "poseedor": "visita-9",
+     "repliegue": [
+      "local-2",
+      "local-12",
+      "local-6",
+      "local-4"
+     ]
+    },
+    {
+     "desdeS": 73.1,
+     "hastaS": 74,
+     "poseedor": "visita-9",
+     "repliegue": [
+      "local-4",
+      "local-5",
+      "local-6",
+      "local-12"
+     ]
+    },
+    {
+     "desdeS": 75,
+     "hastaS": 76.8,
+     "poseedor": "visita-8",
+     "repliegue": [
+      "local-2",
+      "local-6",
+      "local-3",
+      "local-5"
+     ]
+    },
+    {
+     "desdeS": 91.6,
+     "hastaS": 93.4,
+     "poseedor": "visita-2",
+     "repliegue": [
+      "local-2",
+      "local-6"
+     ]
+    },
+    {
+     "desdeS": 98.7,
+     "hastaS": 100.5,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-3",
+      "local-12",
+      "local-7"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-13",
+     "linea": "MED",
+     "desdeS": 10.5,
+     "hastaS": 14.2
+    },
+    {
+     "jugador": "local-9",
+     "linea": "DEL",
+     "desdeS": 37.5,
+     "hastaS": 40.2
+    },
+    {
+     "jugador": "local-2",
+     "linea": "DEF",
+     "desdeS": 84.3,
+     "hastaS": 91.6
+    },
+    {
+     "jugador": "local-2",
+     "linea": "DEF",
+     "desdeS": 109.3,
+     "hastaS": 116.4
+    },
+    {
+     "jugador": "visita-13",
+     "linea": "MED",
+     "desdeS": 114.4,
+     "hastaS": 118
+    },
+    {
+     "jugador": "local-13",
+     "linea": "MED",
+     "desdeS": 120,
+     "hastaS": 123.8
+    }
+   ]
+  },
+  {
+   "seed": 8,
+   "superados": [
+    {
+     "desdeS": 25.6,
+     "hastaS": 25.9,
+     "poseedor": "visita-15",
+     "repliegue": [
+      "local-4",
+      "local-5",
+      "local-6",
+      "local-2"
+     ]
+    },
+    {
+     "desdeS": 52,
+     "hastaS": 55.5,
+     "poseedor": "visita-14",
+     "repliegue": [
+      "local-12",
+      "local-5",
+      "local-4"
+     ]
+    },
+    {
+     "desdeS": 64,
+     "hastaS": 65.7,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-1",
+      "visita-4",
+      "visita-14"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-6",
+     "linea": "MED",
+     "desdeS": 93.5,
+     "hastaS": 97.8
+    }
+   ]
+  },
+  {
+   "seed": 9,
+   "superados": [
+    {
+     "desdeS": 18.8,
+     "hastaS": 19.6,
+     "poseedor": "local-12",
+     "repliegue": [
+      "visita-1",
+      "visita-7",
+      "visita-12"
+     ]
+    },
+    {
+     "desdeS": 33.7,
+     "hastaS": 34.9,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-4",
+      "local-5",
+      "local-2",
+      "local-14"
+     ]
+    },
+    {
+     "desdeS": 63.8,
+     "hastaS": 65.1,
+     "poseedor": "visita-9",
+     "repliegue": [
+      "local-12",
+      "local-2",
+      "local-3",
+      "local-14"
+     ]
+    },
+    {
+     "desdeS": 92.5,
+     "hastaS": 92.6,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-7",
+      "visita-12",
+      "visita-5",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 93.1,
+     "hastaS": 95.5,
+     "poseedor": "local-13",
+     "repliegue": [
+      "visita-12",
+      "visita-7",
+      "visita-5",
+      "visita-4"
+     ]
+    },
+    {
+     "desdeS": 109.2,
+     "hastaS": 109.7,
+     "poseedor": "visita-15",
+     "repliegue": [
+      "local-2",
+      "local-4",
+      "local-13",
+      "local-5"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-12",
+     "linea": "DEF",
+     "desdeS": 52.2,
+     "hastaS": 57.5
+    },
+    {
+     "jugador": "visita-9",
+     "linea": "DEL",
+     "desdeS": 65.2,
+     "hastaS": 68.5
+    },
+    {
+     "jugador": "visita-6",
+     "linea": "MED",
+     "desdeS": 85.8,
+     "hastaS": 90.8
+    }
+   ]
+  },
+  {
+   "seed": 10,
+   "superados": [
+    {
+     "desdeS": 10.6,
+     "hastaS": 12.6,
+     "poseedor": "local-13",
+     "repliegue": [
+      "visita-3",
+      "visita-7",
+      "visita-1",
+      "visita-2",
+      "visita-4"
+     ]
+    },
+    {
+     "desdeS": 26.1,
+     "hastaS": 26.3,
+     "poseedor": "visita-10",
+     "repliegue": [
+      "local-13",
+      "local-1",
+      "local-7",
+      "local-3"
+     ]
+    },
+    {
+     "desdeS": 34.8,
+     "hastaS": 36.8,
+     "poseedor": "local-14",
+     "repliegue": [
+      "visita-4"
+     ]
+    },
+    {
+     "desdeS": 49,
+     "hastaS": 49,
+     "poseedor": "visita-14",
+     "repliegue": [
+      "local-7",
+      "local-4",
+      "local-2",
+      "local-14"
+     ]
+    },
+    {
+     "desdeS": 51.1,
+     "hastaS": 51.8,
+     "poseedor": "visita-13",
+     "repliegue": [
+      "local-7",
+      "local-1",
+      "local-14"
+     ]
+    },
+    {
+     "desdeS": 63.4,
+     "hastaS": 64.7,
+     "poseedor": "visita-5",
+     "repliegue": [
+      "local-7",
+      "local-3"
+     ]
+    },
+    {
+     "desdeS": 72.4,
+     "hastaS": 77,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-4",
+      "visita-13",
+      "visita-5",
+      "visita-14"
+     ]
+    },
+    {
+     "desdeS": 78.4,
+     "hastaS": 80.1,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-4",
+      "visita-5",
+      "visita-1",
+      "visita-2",
+      "visita-3"
+     ]
+    },
+    {
+     "desdeS": 81.7,
+     "hastaS": 82.2,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-3",
+      "visita-1",
+      "visita-5",
+      "visita-2"
+     ]
+    },
+    {
+     "desdeS": 93.5,
+     "hastaS": 95.5,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-4",
+      "visita-7"
+     ]
+    },
+    {
+     "desdeS": 97.1,
+     "hastaS": 99.1,
+     "poseedor": "local-15",
+     "repliegue": [
+      "visita-3",
+      "visita-4",
+      "visita-14",
+      "visita-1"
+     ]
+    },
+    {
+     "desdeS": 102.2,
+     "hastaS": 103.4,
+     "poseedor": "local-5",
+     "repliegue": [
+      "visita-4",
+      "visita-3"
+     ]
+    },
+    {
+     "desdeS": 112.9,
+     "hastaS": 114.9,
+     "poseedor": "local-7",
+     "repliegue": [
+      "visita-3",
+      "visita-4",
+      "visita-14",
+      "visita-1",
+      "visita-2",
+      "visita-7"
+     ]
+    }
+   ],
+   "persecuciones": [
+    {
+     "jugador": "local-2",
+     "linea": "DEF",
+     "desdeS": 61.7,
+     "hastaS": 68.9
+    },
+    {
+     "jugador": "visita-14",
+     "linea": "MED",
+     "desdeS": 89.4,
+     "hastaS": 94.2
+    },
+    {
+     "jugador": "visita-7",
+     "linea": "MED",
+     "desdeS": 110.7,
+     "hastaS": 114.9
+    }
+   ]
+  }
+ ]
+}

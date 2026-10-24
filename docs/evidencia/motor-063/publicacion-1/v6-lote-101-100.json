@@ -1,0 +1,220 @@
+{
+ "generado": "2026-10-24T22:25:43.979Z",
+ "commit": "a0d9e7b18e141c66ff5e5146252943aa633b4edb",
+ "arbolConCambios": true,
+ "reglas": "reinicios-v6",
+ "semillas": {
+  "desde": 101,
+  "hasta": 200
+ },
+ "duracionS": 120,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "banda": "completo",
+ "incumplimientos": [],
+ "segundos": 80.4,
+ "controlado": {
+  "niveles": {
+   "bajo": 40,
+   "alto": 90
+  },
+  "porteros": {
+   "diferencia": 0.30238621997471554,
+   "bajo": {
+    "remates": 506,
+    "porPartido": 5.06,
+    "desenlaces": {
+     "gol": 271,
+     "atrapada": 31,
+     "desvio": 37,
+     "ancho": 110,
+     "alto": 35,
+     "bloqueado": 14,
+     "otro": 8
+    },
+    "aPuerta": 0.6699604743083004,
+    "conversion": 0.5355731225296443,
+    "atajadasSobreAPuerta": 0.20058997050147492,
+    "desviosSobreAtajadas": 0.5441176470588235,
+    "fuera": 0.2865612648221344,
+    "altos": 35,
+    "altosSobreFuera": 0.2413793103448276,
+    "bloqueados": 0.02766798418972332,
+    "golesSinRemate": 1,
+    "golesSinRematePorPartido": 0.01,
+    "colocacionLados": 0.8292079207920792,
+    "desvioMedioM": 2.8927393839311324,
+    "discrepancias045": 0
+   },
+   "alto": {
+    "remates": 479,
+    "porPartido": 4.79,
+    "desenlaces": {
+     "gol": 167,
+     "atrapada": 85,
+     "desvio": 84,
+     "ancho": 86,
+     "alto": 32,
+     "bloqueado": 21,
+     "otro": 4
+    },
+    "aPuerta": 0.7014613778705637,
+    "conversion": 0.348643006263048,
+    "atajadasSobreAPuerta": 0.5029761904761905,
+    "desviosSobreAtajadas": 0.4970414201183432,
+    "fuera": 0.24634655532359082,
+    "altos": 32,
+    "altosSobreFuera": 0.2711864406779661,
+    "bloqueados": 0.04384133611691023,
+    "golesSinRemate": 0,
+    "golesSinRematePorPartido": 0,
+    "colocacionLados": 0.8471502590673575,
+    "desvioMedioM": 2.9096031830247684,
+    "discrepancias045": 0
+   }
+  },
+  "campo": {
+   "diferencia": 0.22488013341671875,
+   "bajo": {
+    "remates": 468,
+    "porPartido": 4.68,
+    "desenlaces": {
+     "gol": 163,
+     "atrapada": 84,
+     "desvio": 69,
+     "ancho": 97,
+     "alto": 35,
+     "bloqueado": 16,
+     "otro": 4
+    },
+    "aPuerta": 0.6752136752136753,
+    "conversion": 0.3482905982905983,
+    "atajadasSobreAPuerta": 0.48417721518987344,
+    "desviosSobreAtajadas": 0.45098039215686275,
+    "fuera": 0.28205128205128205,
+    "altos": 35,
+    "altosSobreFuera": 0.26515151515151514,
+    "bloqueados": 0.03418803418803419,
+    "golesSinRemate": 0,
+    "golesSinRematePorPartido": 0,
+    "colocacionLados": 0.5421348314606742,
+    "desvioMedioM": 2.5617988667594336,
+    "discrepancias045": 0
+   },
+   "alto": {
+    "remates": 492,
+    "porPartido": 4.92,
+    "desenlaces": {
+     "gol": 282,
+     "atrapada": 53,
+     "desvio": 54,
+     "ancho": 56,
+     "alto": 33,
+     "bloqueado": 9,
+     "otro": 5
+    },
+    "aPuerta": 0.790650406504065,
+    "conversion": 0.573170731707317,
+    "atajadasSobreAPuerta": 0.2750642673521851,
+    "desviosSobreAtajadas": 0.5046728971962616,
+    "fuera": 0.18089430894308944,
+    "altos": 33,
+    "altosSobreFuera": 0.3707865168539326,
+    "bloqueados": 0.018292682926829267,
+    "golesSinRemate": 1,
+    "golesSinRematePorPartido": 0.01,
+    "colocacionLados": 0.9978070175438597,
+    "desvioMedioM": 3.090106005337494,
+    "discrepancias045": 0
+   }
+  },
+  "incumplimientos": []
+ },
+ "metricas": {
+  "reglas": "reinicios-v6",
+  "semillas": {
+   "desde": 101,
+   "hasta": 200
+  },
+  "duracionS": 120,
+  "partidos": 100,
+  "golesPorPartido": 2.17,
+  "desviacionGoles": 1.442601816164113,
+  "tirosPorPartido": 5.01,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 69,
+  "perdidasTrasAtajada": 0,
+  "perdidasArea": 0,
+  "perdidasAreaPorPartido": 0,
+  "manoAMano": {
+   "episodios": 396,
+   "goles": 152,
+   "conversion": 0.3838383838383838,
+   "fraccionDeGoles": 0.7004608294930875,
+   "desplazamientoMedianaM": 1.3202161905521457,
+   "desplazamientoP75M": 3.335500005492889,
+   "fraccionDesplazado": 0.5833333333333334
+  },
+  "centros": {
+   "pasesBanda": 177,
+   "alArea": 73,
+   "proporcion": 0.4124293785310734,
+   "motivoCentro": 67,
+   "porPartido": 0.67
+  },
+  "saquesManos": 342,
+  "saquesPerdidos": 10,
+  "saquesPerdidosPorPartido": 0.1,
+  "intercepcionesInmediatas": 0,
+  "intercepcionesInmediatasPorPartido": 0,
+  "intercepcionesInmediatasCercanas": 0,
+  "remate": {
+   "remates": 501,
+   "porPartido": 5.01,
+   "desenlaces": {
+    "gol": 217,
+    "atrapada": 69,
+    "desvio": 67,
+    "ancho": 73,
+    "alto": 41,
+    "bloqueado": 26,
+    "otro": 8
+   },
+   "aPuerta": 0.7045908183632734,
+   "conversion": 0.43313373253493015,
+   "atajadasSobreAPuerta": 0.38526912181303113,
+   "desviosSobreAtajadas": 0.49264705882352944,
+   "fuera": 0.2275449101796407,
+   "altos": 41,
+   "altosSobreFuera": 0.35964912280701755,
+   "bloqueados": 0.05189620758483034,
+   "golesSinRemate": 0,
+   "golesSinRematePorPartido": 0,
+   "colocacionLados": 0.8254716981132075,
+   "desvioMedioM": 2.7694964686132217,
+   "discrepancias045": 0
+  },
+  "golesTrasSaque": 2,
+  "golesTrasSaquePorPartido": 0.02,
+  "metas": 114,
+  "metasConduccion": 0,
+  "metasConduccionPorPartido": 0,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 9985,
+   "frenados": 1329,
+   "fraccion": 0.13309964947421132
+  },
+  "fuerasDeJuego": 256,
+  "persecucion063": {
+   "repliegueCorren": 0.6891374223944344,
+   "repliegueSeleccion": 0.9697701371450647,
+   "persecucionPerdedor": 0.48286479250334674,
+   "muestras": {
+    "repliegue": 22711,
+    "seleccion": 10354,
+    "persecucion": 7470
+   }
+  }
+ }
+}
