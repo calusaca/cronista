@@ -1,0 +1,1794 @@
+{
+ "sitio": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
+ "revision": "cronista-arena--0000031 (indicada por el coordinador; sin az en esta máquina)",
+ "commit": "345e116",
+ "imagen": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024082343 (docs/evidencia/azure-arena-publicacion.json)",
+ "navegador": "Chromium (Playwright) --autoplay-policy=user-gesture-required --mute-audio",
+ "pistasConVoz": {
+  "duelo": {
+   "forma": "duelo",
+   "inicioUtc": "2026-10-24T08:49:14.829Z",
+   "registro": {
+    "finS": 60,
+    "golesTick": [
+     231
+    ]
+   },
+   "modelos": {
+    "texto": "Home: GPT-5.6 Luna · Away: GPT-5.4 mini · declared by the project's archived file, not verified",
+    "procedencia": "declarada",
+    "trasReloj": true
+   },
+   "conVozMarcado": true,
+   "estados": [
+    {
+     "s": 0,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": null,
+      "boton": "Play",
+      "aviso": null,
+      "estadoVoz": "Registering the recording…"
+     }
+    },
+    {
+     "s": 1,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 2/16",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 2/16 passages"
+     }
+    },
+    {
+     "s": 2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 8/17",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 8/17 passages"
+     }
+    },
+    {
+     "s": 3,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 15/17",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 15/17 passages"
+     }
+    },
+    {
+     "s": 4,
+     "e": {
+      "src": true,
+      "pausado": false,
+      "progreso": null,
+      "boton": "Pause",
+      "aviso": null,
+      "estadoVoz": "Narration playing"
+     }
+    }
+   ],
+   "preparacionMs": 4043,
+   "pedidosAlSonar": 17,
+   "skipVisibleAlInicio": true,
+   "duracionPistaS": 111.932,
+   "finalReloj": "1:00 / 1:00",
+   "pedidosTotales": 17,
+   "ritmo": {
+    "muestras": 1119,
+    "audioCorriendoS": 59.7,
+    "canchaCorridaS": 59.86,
+    "razonCorre": 1.003,
+    "ventanas1s": {
+     "n": 54,
+     "min": 0.989,
+     "max": 1.193,
+     "media": 1.004
+    },
+    "esperasS": {
+     "previa": 44.42,
+     "hold": 0,
+     "final": 7.4,
+     "sinRotulo": 0
+    },
+    "esperasSinRotuloMuestras": [],
+    "previaS": 44.44,
+    "pistaSinPreviaS": 67.49,
+    "razonPistaSinPreviaPartido": 1.125
+   },
+   "segundaReproduccionPedidosNuevos": 0,
+   "clips": [
+    {
+     "tipo": "previa",
+     "orden": 0,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 0,
+     "duracionS": 13.37,
+     "primeraVozS": 0.266,
+     "gol": false,
+     "texto": "Here is Juventud Islaverde Sur, in a four-four-two: Dante Doraena wears the armband. A sta"
+    },
+    {
+     "tipo": "previa",
+     "orden": 1,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 13.618,
+     "duracionS": 14.06,
+     "primeraVozS": 13.884,
+     "gol": false,
+     "texto": "Here is Atlético Montefrío Bajo, in a four-four-two: Lucio Castinido wears the armband. A "
+    },
+    {
+     "tipo": "previa",
+     "orden": 2,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 27.932,
+     "duracionS": 16.51,
+     "primeraVozS": 28.131,
+     "gol": false,
+     "texto": "Noa Brelosa is the referee. Clear skies and long natural grass. Team profiles: Juventud Is"
+    },
+    {
+     "tipo": "narrador",
+     "orden": 3,
+     "desde": 0,
+     "hasta": 50,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 10,
+     "A": 0,
+     "inicioS": 44.744,
+     "duracionS": 5.74,
+     "primeraVozS": 44.962,
+     "gol": false,
+     "texto": "The match between Juventud Islaverde Sur and Atlético Montefrío Bajo begins.",
+     "cursorBusqueda": 0.301,
+     "cursorNatural": 0.364,
+     "cursorNaturalInterp": 0.287,
+     "objetivo": 0.3,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.364,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 4,
+     "desde": 50,
+     "hasta": 100,
+     "evento": null,
+     "tick": 100,
+     "prioridad": 10,
+     "A": 10,
+     "inicioS": 54.744,
+     "duracionS": 4.25,
+     "primeraVozS": 54.944,
+     "gol": false,
+     "texto": "Mateo Dorinosa found Emilio Quinelón with that pass.",
+     "cursorBusqueda": 10.301,
+     "cursorNatural": 10.364,
+     "cursorNaturalInterp": 10.287,
+     "objetivo": 10.3,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.364,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 8,
+     "desde": 200,
+     "hasta": 250,
+     "evento": "a13",
+     "tick": 222,
+     "prioridad": 60,
+     "A": 22.200000000000003,
+     "inicioS": 66.944,
+     "duracionS": 2.64,
+     "primeraVozS": 67.126,
+     "gol": false,
+     "texto": "Joel Mendiuz takes the shot!",
+     "cursorBusqueda": 22.501,
+     "cursorNatural": 22.563,
+     "cursorNaturalInterp": 22.486,
+     "objetivo": 22.5,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.363,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 7,
+     "desde": 200,
+     "hasta": 250,
+     "evento": null,
+     "tick": 231,
+     "prioridad": 100,
+     "A": 23.1,
+     "inicioS": 69.834,
+     "duracionS": 10.7,
+     "primeraVozS": 70.118,
+     "gol": true,
+     "texto": "What a goal! Joel Mendiuz scores! Juventud Islaverde Sur take the lead, one–nil, after 23 ",
+     "cursorBusqueda": 25.391,
+     "cursorNatural": 25.464,
+     "cursorNaturalInterp": 25.376,
+     "objetivo": 23.4,
+     "reaccionBusquedaS": 2.291,
+     "reaccionNaturalS": 2.364,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 10,
+     "desde": 300,
+     "hasta": 350,
+     "evento": null,
+     "tick": 350,
+     "prioridad": 10,
+     "A": 35,
+     "inicioS": 80.788,
+     "duracionS": 5.28,
+     "primeraVozS": 80.994,
+     "gol": false,
+     "texto": "With Teo Lorelino on the ball, in the opposition half, near the touchline.",
+     "cursorBusqueda": 36.345,
+     "cursorNatural": 36.363,
+     "cursorNaturalInterp": 36.33,
+     "objetivo": 35.3,
+     "reaccionBusquedaS": 1.345,
+     "reaccionNaturalS": 1.363,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 11,
+     "desde": 350,
+     "hasta": 400,
+     "evento": null,
+     "tick": 400,
+     "prioridad": 10,
+     "A": 40,
+     "inicioS": 86.318,
+     "duracionS": 5.86,
+     "primeraVozS": 86.525,
+     "gol": false,
+     "texto": "Teo Lorelino made progress on the ball, in the opposition half, near the touchline.",
+     "cursorBusqueda": 41.875,
+     "cursorNatural": 41.862,
+     "cursorNaturalInterp": 41.859,
+     "objetivo": 40.3,
+     "reaccionBusquedaS": 1.875,
+     "reaccionNaturalS": 1.862,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 12,
+     "desde": 400,
+     "hasta": 450,
+     "evento": null,
+     "tick": 450,
+     "prioridad": 10,
+     "A": 45,
+     "inicioS": 92.424,
+     "duracionS": 5.62,
+     "primeraVozS": 92.686,
+     "gol": false,
+     "texto": "Fabio Valinera, of Atlético Montefrío Bajo, made that recent recovery.",
+     "cursorBusqueda": 47.981,
+     "cursorNatural": 48.062,
+     "cursorNaturalInterp": 47.965,
+     "objetivo": 45.3,
+     "reaccionBusquedaS": 2.981,
+     "reaccionNaturalS": 3.062,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 14,
+     "desde": 500,
+     "hasta": 550,
+     "evento": null,
+     "tick": 530,
+     "prioridad": 40,
+     "A": 53,
+     "inicioS": 98.29,
+     "duracionS": 2.95,
+     "primeraVozS": 98.492,
+     "gol": false,
+     "texto": "Offside against Fabio Valinera.",
+     "cursorBusqueda": 53.847,
+     "cursorNatural": 53.875,
+     "cursorNaturalInterp": 53.84,
+     "objetivo": 53.3,
+     "reaccionBusquedaS": 0.847,
+     "reaccionNaturalS": 0.875,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "cierre",
+     "orden": 16,
+     "desde": 550,
+     "hasta": 600,
+     "evento": null,
+     "tick": 600,
+     "prioridad": 0,
+     "A": 60,
+     "inicioS": 104.444,
+     "duracionS": 7.49,
+     "primeraVozS": 104.76,
+     "gol": false,
+     "texto": "Full time. Juventud Islaverde Sur, 1; Atlético Montefrío Bajo, 0.",
+     "cursorBusqueda": 60,
+     "cursorNatural": 60,
+     "cursorNaturalInterp": 59.971,
+     "objetivo": 60,
+     "reaccionBusquedaS": 0,
+     "reaccionNaturalS": 0,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 5,
+     "desde": 100,
+     "hasta": 150,
+     "evento": null,
+     "tick": 102,
+     "prioridad": 40,
+     "A": 10.200000000000001,
+     "inicioS": null,
+     "duracionS": 2.95,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Teo Lorelino was caught offside."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 6,
+     "desde": 150,
+     "hasta": 200,
+     "evento": null,
+     "tick": 200,
+     "prioridad": 10,
+     "A": 20,
+     "inicioS": null,
+     "duracionS": 4.66,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Joel Mendiuz made progress on the ball, in the opposition half."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 9,
+     "desde": 250,
+     "hasta": 300,
+     "evento": null,
+     "tick": 300,
+     "prioridad": 10,
+     "A": 30,
+     "inicioS": null,
+     "duracionS": 4.46,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Emilio Torelueta found Thiago Valoena with that pass."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 13,
+     "desde": 450,
+     "hasta": 500,
+     "evento": null,
+     "tick": 500,
+     "prioridad": 10,
+     "A": 50,
+     "inicioS": null,
+     "duracionS": 4.1,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "The ball is in flight in their own half, near the touchline."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 15,
+     "desde": 550,
+     "hasta": 600,
+     "evento": null,
+     "tick": 600,
+     "prioridad": 10,
+     "A": 60,
+     "inicioS": null,
+     "duracionS": 4.97,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Aarón Celoón found Bruno Quinoich, who then picked out Dante Doraena."
+    }
+   ],
+   "adelantoMaxS": 0,
+   "reaccionMinS": 0,
+   "clipsOmitidos": [
+    {
+     "tipo": "narrador",
+     "tick": 102,
+     "prioridad": 40
+    },
+    {
+     "tipo": "narrador",
+     "tick": 200,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 300,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 500,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 600,
+     "prioridad": 10
+    }
+   ],
+   "golYFinal": [
+    {
+     "tipo": "narrador",
+     "tick": 231,
+     "A": 23.1,
+     "inicioS": 69.834,
+     "cursorBusqueda": 25.391,
+     "cursorNatural": 25.464,
+     "reaccionBusquedaS": 2.291,
+     "reaccionNaturalS": 2.364,
+     "ok": true
+    },
+    {
+     "tipo": "cierre",
+     "tick": 600,
+     "A": 60,
+     "inicioS": 104.444,
+     "cursorBusqueda": 60,
+     "cursorNatural": 60,
+     "reaccionBusquedaS": 0,
+     "reaccionNaturalS": 0,
+     "ok": true
+    }
+   ],
+   "controles": {
+    "reanudado1": {
+     "dt": 1.502,
+     "dc": 1.5,
+     "pausado": false
+    },
+    "pausado": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "pausaAriaKeyshortcuts": "Space",
+    "reanudado2": {
+     "dt": 1.502,
+     "dc": 1.499,
+     "pausado": false
+    },
+    "espacioPausa": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "espacioReanuda": {
+     "dt": 1.503,
+     "dc": 1.517,
+     "pausado": false
+    },
+    "espacioEnSelector": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "stop": {
+     "t": 58.142481,
+     "pausado": true,
+     "src": null,
+     "cursor": 0,
+     "reloj": "0:00 / 1:00",
+     "srcBlob": false,
+     "quieto": true,
+     "playHabilitado": true,
+     "playConFoco": true,
+     "stopDeshabilitado": true
+    },
+    "ok": true
+   },
+   "pedidosTrasControles": 17,
+   "speech": {
+    "solicitudes": 17,
+    "ok": 17,
+    "conAudio": 17,
+    "estados": [
+     200
+    ],
+    "caracteresTexto": 1394,
+    "porTipo": {
+     "previa": 3,
+     "narrador": 13,
+     "cierre": 1
+    }
+   },
+   "errores": [],
+   "http5xx": [],
+   "finUtc": "2026-10-24T08:51:29.812Z"
+  },
+  "torneo": {
+   "forma": "torneo:2026-10-24:04",
+   "inicioUtc": "2026-10-24T08:51:44.013Z",
+   "registro": {
+    "finS": 60,
+    "golesTick": [
+     184,
+     455
+    ]
+   },
+   "modelos": {
+    "texto": "Home: GPT-6 Astra · Away: GPT-5.4 mini · declared by the tournament runner, not verified",
+    "procedencia": "declarada",
+    "trasReloj": true
+   },
+   "origenTorneo": "Match 4 of the October 24, 2026 tournament · Home: Sporting Pradoalto (GPT-6 Astra) · Away: Racing Arenablanca (GPT-5.4 mini) · Back to the tournament",
+   "conVozMarcado": true,
+   "estados": [
+    {
+     "s": 0.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Registering the recording…",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Registering the recording…"
+     }
+    },
+    {
+     "s": 2.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 1/16",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 1/16 passages"
+     }
+    },
+    {
+     "s": 3.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 4/16",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 4/16 passages"
+     }
+    },
+    {
+     "s": 4.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 6/17",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 6/17 passages"
+     }
+    },
+    {
+     "s": 5.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 8/18",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 8/18 passages"
+     }
+    },
+    {
+     "s": 6.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 10/18",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 10/18 passages"
+     }
+    },
+    {
+     "s": 7.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 12/18",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 12/18 passages"
+     }
+    },
+    {
+     "s": 8.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 14/18",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 14/18 passages"
+     }
+    },
+    {
+     "s": 9.2,
+     "e": {
+      "src": false,
+      "pausado": true,
+      "progreso": "Preparing narration 17/18",
+      "boton": "Play without narration",
+      "aviso": null,
+      "estadoVoz": "Preparing narration: 17/18 passages"
+     }
+    },
+    {
+     "s": 10.2,
+     "e": {
+      "src": true,
+      "pausado": false,
+      "progreso": null,
+      "boton": "Pause",
+      "aviso": null,
+      "estadoVoz": "Narration playing"
+     }
+    }
+   ],
+   "preparacionMs": 10186,
+   "pedidosAlSonar": 18,
+   "skipVisibleAlInicio": true,
+   "duracionPistaS": 113.212,
+   "finalReloj": "1:00 / 1:00",
+   "pedidosTotales": 18,
+   "ritmo": {
+    "muestras": 1133,
+    "audioCorriendoS": 60,
+    "canchaCorridaS": 59.92,
+    "razonCorre": 0.999,
+    "ventanas1s": {
+     "n": 55,
+     "min": 0.946,
+     "max": 1.03,
+     "media": 0.999
+    },
+    "esperasS": {
+     "previa": 43.36,
+     "hold": 2.7,
+     "final": 6.7,
+     "sinRotulo": 0
+    },
+    "esperasSinRotuloMuestras": [],
+    "previaS": 43.41,
+    "pistaSinPreviaS": 69.8,
+    "razonPistaSinPreviaPartido": 1.163
+   },
+   "segundaReproduccionPedidosNuevos": 0,
+   "clips": [
+    {
+     "tipo": "previa",
+     "orden": 0,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 0,
+     "duracionS": 12.74,
+     "primeraVozS": 0.266,
+     "gol": false,
+     "texto": "Here is Sporting Pradoalto, in a three-four-three: Ciro Ulvaueta wears the armband. A star"
+    },
+    {
+     "tipo": "previa",
+     "orden": 1,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 12.994,
+     "duracionS": 13.58,
+     "primeraVozS": 13.263,
+     "gol": false,
+     "texto": "Here is Racing Arenablanca, in a four-three-one-two: Fabio Sorinell wears the armband. A s"
+    },
+    {
+     "tipo": "previa",
+     "orden": 2,
+     "desde": 0,
+     "hasta": 0,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 20,
+     "A": 0,
+     "inicioS": 26.828,
+     "duracionS": 16.58,
+     "primeraVozS": 27.031,
+     "gol": false,
+     "texto": "Noa Ulvino is the referee. Heat, 30 degrees and long natural grass. Team profiles: Sportin"
+    },
+    {
+     "tipo": "narrador",
+     "orden": 3,
+     "desde": 0,
+     "hasta": 50,
+     "evento": null,
+     "tick": 0,
+     "prioridad": 35,
+     "A": 0,
+     "inicioS": 43.712,
+     "duracionS": 5.5,
+     "primeraVozS": 43.908,
+     "gol": false,
+     "texto": "Kick-off for Sporting Pradoalto; Tomás Bareido (16) takes it.",
+     "cursorBusqueda": 0.301,
+     "cursorNatural": 0.343,
+     "cursorNaturalInterp": 0.293,
+     "objetivo": 0.3,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.343,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 6,
+     "desde": 100,
+     "hasta": 150,
+     "evento": "a4",
+     "tick": 107,
+     "prioridad": 60,
+     "A": 10.700000000000001,
+     "inicioS": 54.412,
+     "duracionS": 2.9,
+     "primeraVozS": 54.585,
+     "gol": false,
+     "texto": "An attempt from Fabio Torelales!",
+     "cursorBusqueda": 11.001,
+     "cursorNatural": 11.043,
+     "cursorNaturalInterp": 10.991,
+     "objetivo": 11,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.343,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 5,
+     "desde": 100,
+     "hasta": 150,
+     "evento": null,
+     "tick": 111,
+     "prioridad": 80,
+     "A": 11.100000000000001,
+     "inicioS": 57.566,
+     "duracionS": 5.14,
+     "primeraVozS": 57.744,
+     "gol": false,
+     "texto": "Tomás Soraueta (13) deflects the shot; the ball stays in play.",
+     "cursorBusqueda": 14.101,
+     "cursorNatural": 14.189,
+     "cursorNaturalInterp": 14.103,
+     "objetivo": 11.4,
+     "reaccionBusquedaS": 3.001,
+     "reaccionNaturalS": 3.089,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 8,
+     "desde": 150,
+     "hasta": 200,
+     "evento": "a9",
+     "tick": 178,
+     "prioridad": 60,
+     "A": 17.8,
+     "inicioS": 62.952,
+     "duracionS": 2.83,
+     "primeraVozS": 63.176,
+     "gol": false,
+     "texto": "Fabio Torelales takes the shot!",
+     "cursorBusqueda": 19.487,
+     "cursorNatural": 19.489,
+     "cursorNaturalInterp": 19.479,
+     "objetivo": 18.1,
+     "reaccionBusquedaS": 1.687,
+     "reaccionNaturalS": 1.689,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 7,
+     "desde": 150,
+     "hasta": 200,
+     "evento": null,
+     "tick": 184,
+     "prioridad": 100,
+     "A": 18.400000000000002,
+     "inicioS": 66.034,
+     "duracionS": 10.56,
+     "primeraVozS": 66.346,
+     "gol": true,
+     "texto": "Goooooooal! Goal by Fabio Torelales! Sporting Pradoalto take the lead, one–nil, after 18 s",
+     "cursorBusqueda": 21.401,
+     "cursorNatural": 21.42,
+     "cursorNaturalInterp": 21.414,
+     "objetivo": 18.7,
+     "reaccionBusquedaS": 3.001,
+     "reaccionNaturalS": 3.02,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 10,
+     "desde": 250,
+     "hasta": 300,
+     "evento": null,
+     "tick": 274,
+     "prioridad": 85,
+     "A": 27.400000000000002,
+     "inicioS": 76.844,
+     "duracionS": 3.53,
+     "primeraVozS": 77.055,
+     "gol": false,
+     "texto": "Yellow card for Benja Lorioya (8).",
+     "cursorBusqueda": 30.401,
+     "cursorNatural": 30.41,
+     "cursorNaturalInterp": 30.408,
+     "objetivo": 27.7,
+     "reaccionBusquedaS": 3.001,
+     "reaccionNaturalS": 3.01,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 12,
+     "desde": 350,
+     "hasta": 400,
+     "evento": null,
+     "tick": 400,
+     "prioridad": 10,
+     "A": 40,
+     "inicioS": 86.744,
+     "duracionS": 4.61,
+     "primeraVozS": 86.955,
+     "gol": false,
+     "texto": "Emilio Mariueta received the delivery from Ulises Barinánez.",
+     "cursorBusqueda": 40.301,
+     "cursorNatural": 40.31,
+     "cursorNaturalInterp": 40.291,
+     "objetivo": 40.3,
+     "reaccionBusquedaS": 0.301,
+     "reaccionNaturalS": 0.31,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 13,
+     "desde": 400,
+     "hasta": 450,
+     "evento": null,
+     "tick": 447,
+     "prioridad": 60,
+     "A": 44.7,
+     "inicioS": 91.602,
+     "duracionS": 3.02,
+     "primeraVozS": 91.779,
+     "gol": false,
+     "texto": "An attempt from Emilio Mariueta!",
+     "cursorBusqueda": 45.159,
+     "cursorNatural": 45.209,
+     "cursorNaturalInterp": 45.149,
+     "objetivo": 45,
+     "reaccionBusquedaS": 0.459,
+     "reaccionNaturalS": 0.509,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 14,
+     "desde": 450,
+     "hasta": 500,
+     "evento": null,
+     "tick": 455,
+     "prioridad": 100,
+     "A": 45.5,
+     "inicioS": 94.876,
+     "duracionS": 10.68,
+     "primeraVozS": 95.159,
+     "gol": true,
+     "texto": "What a goal! Emilio Mariueta, goal! Sporting Pradoalto extend their lead, two–nil, after 4",
+     "cursorBusqueda": 48.433,
+     "cursorNatural": 48.509,
+     "cursorNaturalInterp": 48.423,
+     "objetivo": 45.8,
+     "reaccionBusquedaS": 2.933,
+     "reaccionNaturalS": 3.009,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "cierre",
+     "orden": 17,
+     "desde": 550,
+     "hasta": 600,
+     "evento": null,
+     "tick": 600,
+     "prioridad": 0,
+     "A": 60,
+     "inicioS": 106.444,
+     "duracionS": 6.77,
+     "primeraVozS": 106.76,
+     "gol": false,
+     "texto": "Full time. Sporting Pradoalto, 2; Racing Arenablanca, 0.",
+     "cursorBusqueda": 60,
+     "cursorNatural": 60,
+     "cursorNaturalInterp": 59.983,
+     "objetivo": 60,
+     "reaccionBusquedaS": 0,
+     "reaccionNaturalS": 0,
+     "okNuncaDelante": true,
+     "okRetrasoAcotado": true
+    },
+    {
+     "tipo": "narrador",
+     "orden": 4,
+     "desde": 50,
+     "hasta": 100,
+     "evento": null,
+     "tick": 100,
+     "prioridad": 10,
+     "A": 10,
+     "inicioS": null,
+     "duracionS": 4.1,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Fabio Torelales received the delivery from Tomás Bareido."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 9,
+     "desde": 200,
+     "hasta": 250,
+     "evento": null,
+     "tick": 250,
+     "prioridad": 10,
+     "A": 25,
+     "inicioS": null,
+     "duracionS": 2.9,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "The ball is in flight in midfield."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 11,
+     "desde": 300,
+     "hasta": 350,
+     "evento": null,
+     "tick": 308,
+     "prioridad": 40,
+     "A": 30.8,
+     "inicioS": null,
+     "duracionS": 2.9,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Simón Torardi was caught offside."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 15,
+     "desde": 500,
+     "hasta": 550,
+     "evento": null,
+     "tick": 550,
+     "prioridad": 10,
+     "A": 55,
+     "inicioS": null,
+     "duracionS": 5.38,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Lucio Valarosa made progress on the ball, in midfield, near the touchline."
+    },
+    {
+     "tipo": "narrador",
+     "orden": 16,
+     "desde": 550,
+     "hasta": 600,
+     "evento": null,
+     "tick": 570,
+     "prioridad": 40,
+     "A": 57,
+     "inicioS": null,
+     "duracionS": 2.69,
+     "primeraVozS": null,
+     "gol": false,
+     "texto": "Simón Torardi is offside."
+    }
+   ],
+   "adelantoMaxS": 0,
+   "reaccionMinS": 0,
+   "clipsOmitidos": [
+    {
+     "tipo": "narrador",
+     "tick": 100,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 250,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 308,
+     "prioridad": 40
+    },
+    {
+     "tipo": "narrador",
+     "tick": 550,
+     "prioridad": 10
+    },
+    {
+     "tipo": "narrador",
+     "tick": 570,
+     "prioridad": 40
+    }
+   ],
+   "golYFinal": [
+    {
+     "tipo": "narrador",
+     "tick": 184,
+     "A": 18.400000000000002,
+     "inicioS": 66.034,
+     "cursorBusqueda": 21.401,
+     "cursorNatural": 21.42,
+     "reaccionBusquedaS": 3.001,
+     "reaccionNaturalS": 3.02,
+     "ok": true
+    },
+    {
+     "tipo": "narrador",
+     "tick": 455,
+     "A": 45.5,
+     "inicioS": 94.876,
+     "cursorBusqueda": 48.433,
+     "cursorNatural": 48.509,
+     "reaccionBusquedaS": 2.933,
+     "reaccionNaturalS": 3.009,
+     "ok": true
+    },
+    {
+     "tipo": "cierre",
+     "tick": 600,
+     "A": 60,
+     "inicioS": 106.444,
+     "cursorBusqueda": 60,
+     "cursorNatural": 60,
+     "reaccionBusquedaS": 0,
+     "reaccionNaturalS": 0,
+     "ok": true
+    }
+   ],
+   "controles": {
+    "reanudado1": {
+     "dt": 1.503,
+     "dc": 1.501,
+     "pausado": false
+    },
+    "pausado": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "pausaAriaKeyshortcuts": "Space",
+    "reanudado2": {
+     "dt": 1.502,
+     "dc": 1.5,
+     "pausado": false
+    },
+    "espacioPausa": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "espacioReanuda": {
+     "dt": 1.506,
+     "dc": 1.463,
+     "pausado": false
+    },
+    "espacioEnSelector": {
+     "dt": 0,
+     "dc": 0,
+     "pausado": true
+    },
+    "stop": {
+     "t": 57.812714,
+     "pausado": true,
+     "src": null,
+     "cursor": 0,
+     "reloj": "0:00 / 1:00",
+     "srcBlob": false,
+     "quieto": true,
+     "playHabilitado": true,
+     "playConFoco": true,
+     "stopDeshabilitado": true
+    },
+    "ok": true
+   },
+   "pedidosTrasControles": 18,
+   "speech": {
+    "solicitudes": 18,
+    "ok": 18,
+    "conAudio": 18,
+    "estados": [
+     200
+    ],
+    "caracteresTexto": 1309,
+    "porTipo": {
+     "previa": 3,
+     "narrador": 14,
+     "cierre": 1
+    }
+   },
+   "errores": [],
+   "http5xx": [],
+   "finUtc": "2026-10-24T08:54:08.322Z"
+  }
+ },
+ "resto": {
+  "inicioUtc": "2026-10-24T08:39:34.845Z",
+  "modelos": {
+   "inicial": {
+    "texto": "Home: Programmed policy · Away: Programmed policy · programmed, no AI",
+    "procedencia": "programado",
+    "trasReloj": true,
+    "rol": null
+   },
+   "duelo": {
+    "texto": "Home: GPT-5.6 Luna · Away: GPT-5.4 mini · declared by the project's archived file, not verified",
+    "procedencia": "declarada",
+    "trasReloj": true,
+    "rol": null
+   },
+   "dueloES": {
+    "texto": "Local: GPT-5.6 Luna · Visita: GPT-5.4 mini · declarada por el archivo archivado del proyecto, no verificada",
+    "procedencia": "declarada",
+    "trasReloj": true,
+    "rol": null
+   },
+   "ejemploV3": {
+    "texto": "Home: GPT-6.1 Sol (deployment gpt-6.1-sol) · Away: GPT-6.1 Sol (deployment gpt-6.1-sol) · declared by the project's archived file, not verified",
+    "procedencia": "declarada",
+    "trasReloj": true,
+    "rol": null
+   },
+   "grabacionStatus": 200,
+   "sinIA": {
+    "texto": "Home: Programmed policy · Away: Programmed policy · programmed, no AI",
+    "procedencia": "programado",
+    "trasReloj": true,
+    "rol": null
+   },
+   "sinIAES": {
+    "texto": "Local: Política programada · Visita: Política programada · programado, sin IA",
+    "procedencia": "programado",
+    "trasReloj": true,
+    "rol": null
+   },
+   "torneo": {
+    "texto": "Home: GPT-6 Astra · Away: GPT-5.4 mini · declared by the tournament runner, not verified",
+    "procedencia": "declarada",
+    "trasReloj": true,
+    "rol": null
+   },
+   "torneoOrigen": "Match 4 of the October 24, 2026 tournament · Home: Sporting Pradoalto (GPT-6 Astra) · Away: Racing Arenablanca (GPT-5.4 mini) · Back to the tournament",
+   "torneoES": {
+    "texto": "Local: GPT-6 Astra · Visita: GPT-5.4 mini · declarada por el ejecutor del torneo, no verificada",
+    "procedencia": "declarada",
+    "trasReloj": true,
+    "rol": null
+   }
+  },
+  "barraRepeticion1440": {
+   "huecoInicial": 12,
+   "docInicial": {
+    "scroll": 1440,
+    "ancho": 1440
+   },
+   "botones": [
+    {
+     "t": "Play",
+     "h": 44,
+     "r": 233
+    },
+    {
+     "t": "Stop",
+     "h": 44,
+     "r": 307
+    },
+    {
+     "t": "Restart",
+     "h": 44,
+     "r": 401
+    }
+   ],
+   "notaEspacio": "Space pauses or resumes when no control has focus",
+   "stopInicialDeshabilitado": true,
+   "reproduce": {
+    "c1": 2.367,
+    "c2": 4.366
+   },
+   "huecoSonando": 12,
+   "docSonando": {
+    "scroll": 1440,
+    "ancho": 1440
+   },
+   "pausa": {
+    "p1": 4.766,
+    "p2": 4.766
+   },
+   "espacioReanuda": {
+    "antes": 4.766,
+    "despues": 7.133,
+    "boton": "Pause"
+   },
+   "espacioPausa": {
+    "e1": 7.133,
+    "e2": 7.133,
+    "boton": "Play"
+   },
+   "stop": {
+    "s1": 0,
+    "s2": 0,
+    "reloj": "0:00 / 0:30",
+    "focoPrincipal": true
+   },
+   "ok": true
+  },
+  "barraRepeticion360": {
+   "huecoInicial": 12,
+   "docInicial": {
+    "scroll": 360,
+    "ancho": 360
+   },
+   "botones": [
+    {
+     "t": "Play",
+     "h": 44,
+     "r": 141
+    },
+    {
+     "t": "Stop",
+     "h": 44,
+     "r": 215
+    },
+    {
+     "t": "Restart",
+     "h": 44,
+     "r": 309
+    }
+   ],
+   "notaEspacio": "Space pauses or resumes when no control has focus",
+   "stopInicialDeshabilitado": true,
+   "reproduce": {
+    "c1": 2.366,
+    "c2": 4.367
+   },
+   "huecoSonando": 12,
+   "docSonando": {
+    "scroll": 360,
+    "ancho": 360
+   },
+   "pausa": {
+    "p1": 4.667,
+    "p2": 4.667
+   },
+   "espacioReanuda": {
+    "antes": 4.667,
+    "despues": 7.066,
+    "boton": "Pause"
+   },
+   "espacioPausa": {
+    "e1": 7.066,
+    "e2": 7.066,
+    "boton": "Play"
+   },
+   "stop": {
+    "s1": 0,
+    "s2": 0,
+    "reloj": "0:00 / 0:30",
+    "focoPrincipal": true
+   },
+   "ok": true,
+   "botonesMin44": true
+  },
+  "directo1440": {
+   "narrarDesmarcado": true,
+   "seleccion": "programado",
+   "pausasEnPagina": 1,
+   "pausaBajoCancha": true,
+   "pausaKeyshortcuts": "Space",
+   "huecoBarra": 12,
+   "doc": {
+    "scroll": 1440,
+    "ancho": 1440
+   },
+   "modelos": {
+    "texto": "Home: Programmed policy · Away: Programmed policy · programmed, no AI",
+    "procedencia": "programado"
+   },
+   "corre": {
+    "a1": 2.833,
+    "a2": 4.333
+   },
+   "estadoPausa": "Broadcast paused · generation continues",
+   "pausa": {
+    "p1": 4.383,
+    "p2": 4.383
+   },
+   "espacioReanudaBoton": 1,
+   "reanuda": {
+    "r1": 4.7,
+    "r2": 6.2
+   },
+   "stopTexto": "Stop match",
+   "stopDescrito": "arena-stop-nota",
+   "trasStop": {
+    "estado": "Match cancelled",
+    "reloj": "0:00 / 0:28",
+    "cursor": 0,
+    "bufferMontado": 0,
+    "borrados": 1,
+    "playHabilitado": true,
+    "startHabilitado": true,
+    "enlaceCompartir": 0,
+    "audiosSonando": 0
+   },
+   "ok": true
+  },
+  "directo360": {
+   "narrarDesmarcado": true,
+   "seleccion": "programado",
+   "pausasEnPagina": 1,
+   "pausaBajoCancha": true,
+   "pausaKeyshortcuts": "Space",
+   "huecoBarra": 12,
+   "doc": {
+    "scroll": 360,
+    "ancho": 360
+   },
+   "modelos": {
+    "texto": "Home: Programmed policy · Away: Programmed policy · programmed, no AI",
+    "procedencia": "programado"
+   },
+   "corre": {
+    "a1": 3.117,
+    "a2": 4.633
+   },
+   "estadoPausa": "Broadcast paused · generation continues",
+   "pausa": {
+    "p1": 4.667,
+    "p2": 4.667
+   },
+   "espacioReanudaBoton": 1,
+   "reanuda": {
+    "r1": 4.983,
+    "r2": 6.483
+   },
+   "stopTexto": "Stop match",
+   "stopDescrito": "arena-stop-nota",
+   "trasStop": {
+    "estado": "Match cancelled",
+    "reloj": "0:00 / 0:28",
+    "cursor": 0,
+    "bufferMontado": 0,
+    "borrados": 1,
+    "playHabilitado": true,
+    "startHabilitado": true,
+    "enlaceCompartir": 0,
+    "audiosSonando": 0
+   },
+   "ok": true
+  },
+  "aspecto061": {
+   "match-246-1440-claro": {
+    "bg": "#eef1f6",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(209, 36, 47)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "portada-1440-claro": {
+    "bg": "#eef1f6",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(209, 36, 47)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "match-246-360-claro": {
+    "bg": "#eef1f6",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(209, 36, 47)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "portada-360-claro": {
+    "bg": "#eef1f6",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(209, 36, 47)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "match-246-1440-oscuro": {
+    "bg": "#0b1220",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(255, 90, 95)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "portada-1440-oscuro": {
+    "bg": "#0b1220",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(255, 90, 95)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "match-246-360-oscuro": {
+    "bg": "#0b1220",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(255, 90, 95)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "portada-360-oscuro": {
+    "bg": "#0b1220",
+    "barra": "rgb(11, 18, 32)",
+    "marca": "rgb(212, 255, 58)",
+    "punto": "rgb(255, 90, 95)",
+    "emblema": true,
+    "nav": [
+     "Match reports",
+     "League mode",
+     "Data",
+     "Arena"
+    ],
+    "luminanciaBarra": 0.006,
+    "igualQueArena": true,
+    "navArena": [
+     "Match reports",
+     "Tournament"
+    ],
+    "toArena": true
+   },
+   "ok": true
+  },
+  "volver061": {
+   "toArena": {
+    "texto": "←\nArena",
+    "nombre": "Arena",
+    "href": "/arena",
+    "destino": "/arena",
+    "atras": "/match/246"
+   },
+   "recorrido": {
+    "tras1": "/",
+    "h1": 1,
+    "tras2": "/match/834",
+    "h2": 2,
+    "tras4Perspectivas": "/match/834?perspectiva=local",
+    "h3": 2,
+    "atras1": "/",
+    "atras2": "/arena"
+   },
+   "precedente": {
+    "tras": "/?perspectiva=visita",
+    "mismoLargo": true,
+    "atras": "/datos"
+   },
+   "ok": true
+  },
+  "desborde061": {
+   "fallos": [],
+   "/match/246": {
+    "anchos": 113,
+    "excesoMaxPx": 0
+   },
+   "/match/246 con error": {
+    "anchos": 113,
+    "excesoMaxPx": 0
+   },
+   "/": {
+    "anchos": 113,
+    "excesoMaxPx": 0
+   },
+   "ok": true
+  },
+  "torneo062": {
+   "sitio": {
+    "status": 200,
+    "cuerpo": {
+     "habilitado": false,
+     "motivo": "desactivado",
+     "diaUtc": "2026-10-24",
+     "proximoCupoUtc": "2026-10-25T00:00:00.000Z",
+     "activo": null,
+     "hoy": null,
+     "bolsa": {
+      "conocidoMicroUsd": 0,
+      "bolsaMicroUsd": 50000000
+     },
+     "formatos": {
+      "liga": {
+       "disponible": true,
+       "partidos": {
+        "min": 30,
+        "max": 30
+       },
+       "tipicoMicroUsd": {
+        "min": 3538420,
+        "max": 3538420,
+        "maxConDesempates": 3538420
+       },
+       "topeMicroUsd": 8000000,
+       "reservaMaxPartidoMicroUsd": 3684816,
+       "duracionMin": {
+        "min": 33,
+        "max": 33
+       }
+      },
+      "grupos": {
+       "disponible": false,
+       "partidos": {
+        "min": 15,
+        "max": 18
+       },
+       "tipicoMicroUsd": {
+        "min": 1503152,
+        "max": 2035268,
+        "maxConDesempates": 2655168
+       },
+       "topeMicroUsd": 7000000,
+       "reservaMaxPartidoMicroUsd": 3684816,
+       "duracionMin": {
+        "min": 16,
+        "max": 20
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "status": 503,
+    "cuerpo": "{\"error\":\"Lanzar torneos no está disponible en este momento.\",\"motivo\":\"desactivado\"}"
+   },
+   "pagina1440": {
+    "h1": "Model tournament",
+    "titulo": "Model tournament — CRONISTA",
+    "filas": 6,
+    "texto2410": 0,
+    "repeticiones": 60,
+    "botonesLanzar": [],
+    "avisoNoLanzar": 0,
+    "doc": {
+     "scroll": 1440,
+     "ancho": 1440
+    }
+   },
+   "pagina360": {
+    "h1": "Model tournament",
+    "titulo": "Model tournament — CRONISTA",
+    "filas": 6,
+    "texto2410": 0,
+    "repeticiones": 60,
+    "botonesLanzar": [],
+    "avisoNoLanzar": 0,
+    "doc": {
+     "scroll": 360,
+     "ancho": 360
+    }
+   },
+   "ok": true
+  },
+  "rutas": {
+   "/": 200,
+   "/match/246": 200,
+   "/liga": 200,
+   "/datos": 200,
+   "/arena": 200,
+   "/arena/torneo": 200,
+   "/arena/torneo/2026-10-24": 200,
+   "/api/arena/modelos": 200,
+   "/api/arena/herramientas": 200,
+   "/api/health": 200,
+   "/torneos/indice.json": 200,
+   "/experimentos/arena-duelo-v3.json": 200
+  },
+  "http5xx": [],
+  "errores": [],
+  "relatoBloqueado": 0,
+  "sesionesCreadas": [
+   {
+    "seleccion": "azar",
+    "presentacion": "buffer",
+    "local": "auto",
+    "visita": "auto"
+   },
+   {
+    "seleccion": "azar",
+    "presentacion": "buffer",
+    "local": "auto",
+    "visita": "auto"
+   }
+  ],
+  "finUtc": "2026-10-24T08:41:33.821Z",
+  "sesionesCreadasDirectoValido": [
+   {
+    "seleccion": "programado",
+    "presentacion": "buffer",
+    "local": "auto",
+    "visita": "auto"
+   },
+   {
+    "seleccion": "programado",
+    "presentacion": "buffer",
+    "local": "auto",
+    "visita": "auto"
+   }
+  ],
+  "nota": "directo1440/360 proceden de la reejecución con barrera (SOLO=^directo, 2026-10-24T08:44:00.756Z); la ejecución anterior lanzó por error 2 sesiones con modelos al azar (defecto D1), canceladas a los ~7 s."
+ },
+ "defectoSelector": {
+  "eleccionUsuario": "programado",
+  "trasLlegarCatalogo": "azar",
+  "botonStart": true
+ }
+}
