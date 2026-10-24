@@ -5,7 +5,7 @@
 import Link from "./Enlace";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState, useTransition } from "react";
-import type { Preset } from "../vista/servidor";
+import type { Perspectiva, Preset } from "../vista/servidor";
 import { IconoDado } from "./Iconos";
 import { useAvisoCarga } from "./Actividad";
 import { EmblemaCronista } from "./Emblema";
@@ -15,8 +15,22 @@ const AZAR_MAX = 99999;
 
 const SEED_MAX = 4294967295;
 
-/** Brief 016: `semillaActual` es opcional — en la liga el campo arranca vacío (su semilla no es un /match). */
-export function Simulador({ presets, semillaActual }: { presets: Preset[]; semillaActual?: number }) {
+/** Brief 061 § 3 D4: sección del marco de las crónicas que marca `aria-current="page"` en la barra. */
+export type SeccionCronicas = "cronicas" | "liga" | "datos";
+
+/** Brief 016: `semillaActual` es opcional — en la liga el campo arranca vacío (su semilla no es un /match).
+ *  Brief 061 v1.1 § V2: `perspectivaActual` (por defecto neutral) evita reabrir la crónica que ya se ve. */
+export function Simulador({
+  presets,
+  semillaActual,
+  seccion,
+  perspectivaActual = "neutral",
+}: {
+  presets: Preset[];
+  semillaActual?: number;
+  seccion?: SeccionCronicas;
+  perspectivaActual?: Perspectiva;
+}) {
   const router = useRouter();
   const [semilla, setSemilla] = useState(semillaActual === undefined ? "" : String(semillaActual));
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +40,9 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
   const abrirPartido = (seed: number) => {
     if (pendiente) return;
     setError(null);
+    // Brief 061 v1.1 § V2: si ya se ve la crónica neutral de esta semilla, no se apila otra entrada
+    // idéntica (/ → /match/246). Desde local o visita sí se navega a la neutral, como antes.
+    if (seed === semillaActual && perspectivaActual === "neutral") return;
     // La transición permanece pendiente hasta que el partido del servidor está listo.
     // No simulamos porcentajes ni etapas de una generación que no observamos aquí.
     iniciarTransicion(() => router.push(`/match/${seed}`));
@@ -48,7 +65,8 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
   };
 
   return (
-    <header className="topbar">
+    // Brief 061 § 3 D3: la misma barra de rótulo que la arena (reglas Z1 del 047), ajustes propios en .topbar-cronicas.
+    <header className="topbar arena-topbar topbar-cronicas">
       <Link href="/" className="brand" prefetch={false}>
         <EmblemaCronista />
         <span className="brand-mark">CRONISTA</span>
@@ -56,16 +74,20 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
       </Link>
       <div className="topbar-acciones">
       <nav className="topbar-links" aria-label="Sections">
+        {/* Brief 061 § 3 D4: las crónicas, con el mismo nombre que en la barra de la arena. */}
+        <Link href="/" className="league-link" prefetch={false} data-testid="reports-link" aria-current={seccion === "cronicas" ? "page" : undefined}>
+          Match reports
+        </Link>
         {/* Brief 016: la liga ficticia completa. */}
-        <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode">
+        <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode" aria-current={seccion === "liga" ? "page" : undefined}>
           League mode
         </Link>
         {/* Brief 028: el dataset descargable. */}
-        <Link href="/datos" className="league-link" prefetch={false} data-testid="data-link">
+        <Link href="/datos" className="league-link" prefetch={false} data-testid="data-link" aria-current={seccion === "datos" ? "page" : undefined}>
           Data
         </Link>
         <Link href="/arena" className="league-link" prefetch={false} data-testid="arena-link">
-          Team agents lab
+          Arena
         </Link>
       </nav>
       <form className="sim-form" onSubmit={simular} aria-label="Simulate a match" aria-busy={pendiente}>
@@ -109,7 +131,7 @@ export function Simulador({ presets, semillaActual }: { presets: Preset[]; semil
           Random match
         </button>
         {error && (
-          <span role="alert" style={{ color: "var(--danger)", fontSize: 14 }}>
+          <span role="alert" className="sim-error">
             {error}
           </span>
         )}

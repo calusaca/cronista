@@ -27,7 +27,7 @@ export default async function PartidoDeLiga({
   const ruta = rutaPartidoLiga(ref);
   return (
     <>
-      <Simulador presets={presets()} />
+      <Simulador presets={presets()} seccion="liga" />
       <main>
         <nav className="breadcrumb" aria-label="League" data-testid="league-breadcrumb">
           <Link href={`/liga?j=${c.jornada}`} className="breadcrumb-back" data-testid="league-back" prefetch={false}>

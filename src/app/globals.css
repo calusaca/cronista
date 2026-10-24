@@ -1,73 +1,88 @@
-/* CRONISTA — sistema visual (brief 010, skill diseno-profesional).
-   La voz de la maqueta aprobada: clara, editorial, verde. Tema claro por defecto y oscuro
-   automático (prefers-color-scheme). Un solo acento (el verde); el rojo es SEÑAL (roja,
-   rechazo del Verificador), no acento. Colores SOLO aquí, como tokens. Dos familias:
-   Archivo (titulares, marcador, equipos) y Source Sans 3 (todo lo demás). */
+/* CRONISTA — sistema visual (brief 010, skill diseno-profesional; paleta del brief 061).
+   Desde el 061 todo el sitio usa la paleta de la arena (047): gris frío y azul noche, acento
+   oliva en claro y lima en oscuro, y la barra superior como rótulo de TV. Tema claro por defecto
+   y oscuro automático (prefers-color-scheme). Un solo acento; el rojo es SEÑAL (roja, rechazo
+   del Verificador), no acento. Colores SOLO aquí, como tokens. Dos familias: Archivo
+   (titulares, marcador, equipos) y Source Sans 3 (todo lo demás). */
 
 :root {
-  /* Tokens del brief 010 (valores exactos de la maqueta). */
-  --bg: #f6f5f1;
+  /* Tokens del brief 010 con los valores del bloque 047 (brief 061 § 3 D1; una prueba impide que
+     se separen). Se conservan del 010 --card-yellow, --scrim, --pitch-line y los radios. */
+  --bg: #eef1f6;
   --surface: #ffffff;
-  --ink: #20281f;
-  --muted: #647062;
-  --line: #e3e1d6;
-  --accent: #1c7a48;
+  --ink: #0f172a;
+  --muted: #4f5d78;
+  --line: #d9dfe9;
+  --accent: #3f6a00;
   --accent-ink: #ffffff;
-  --hl: #dff0e5;
-  --hl-line: #8cc9a6;
-  --danger: #b0392e;
-  --danger-soft: #f7e4e1;
-  --chip: #eceae2;
+  --hl: #eef5dc;
+  --hl-line: #b7cf7a;
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --chip: #e6eaf2;
   /* Señal de amarilla, apagada (permitida por el brief; nunca como acento). */
   --card-yellow: #a8871f;
   /* Derivados neutros (no son colores de marca): velo de capas, sombra y cancha. */
   --scrim: rgba(32, 40, 31, 0.32);
-  --shadow: 0 10px 30px rgba(32, 40, 31, 0.12);
+  --shadow: 0 10px 30px rgba(15, 23, 42, .10);
   --pitch-line: #b9b7aa;
   --radius: 8px;
   --radius-board: 12px;
+  /* Brief 061 § 3 D2 (+ v1.1 § V5) · Rótulo de TV de la barra compartida: mismos valores que el
+     bloque 047 de la arena. Constantes en los dos temas, salvo --ar-live, que cambia en oscuro. */
+  --ar-bug: #0b1220;
+  --ar-bug-2: #18233a;
+  --ar-bug-ink: #ffffff;
+  --ar-bug-muted: #a9b8d0;
+  --ar-score-bg: #d4ff3a;
+  --ar-score-ink: #0b1220;
+  --ar-live: #d1242f;
+  --ar-select: #d4ff3a;
+  --ar-card-red-bug: #ff8a80;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #131715;
-    --surface: #1b211d;
-    --ink: #e7ebe6;
-    --muted: #97a397;
-    --line: #2a332c;
-    --accent: #4cb178;
-    --accent-ink: #0e1410;
-    --hl: #1e3a2a;
-    --hl-line: #3f7c59;
-    --danger: #d96b5f;
-    --danger-soft: #3a231f;
-    --chip: #242c26;
+    --bg: #0b1220;
+    --surface: #131c2e;
+    --ink: #eef2f8;
+    --muted: #9fb0c9;
+    --line: #26324a;
+    --accent: #d4ff3a;
+    --accent-ink: #0b1220;
+    --hl: #1a2540;
+    --hl-line: #3b4d75;
+    --danger: #ff8a80;
+    --danger-soft: #3a1d24;
+    --chip: #1f2a44;
     --card-yellow: #c2a24a;
     --scrim: rgba(0, 0, 0, 0.55);
-    --shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    --shadow: 0 12px 36px rgba(0, 0, 0, .5);
     --pitch-line: #4a554c;
+    --ar-live: #ff5a5f;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg: #131715;
-  --surface: #1b211d;
-  --ink: #e7ebe6;
-  --muted: #97a397;
-  --line: #2a332c;
-  --accent: #4cb178;
-  --accent-ink: #0e1410;
-  --hl: #1e3a2a;
-  --hl-line: #3f7c59;
-  --danger: #d96b5f;
-  --danger-soft: #3a231f;
-  --chip: #242c26;
+  --bg: #0b1220;
+  --surface: #131c2e;
+  --ink: #eef2f8;
+  --muted: #9fb0c9;
+  --line: #26324a;
+  --accent: #d4ff3a;
+  --accent-ink: #0b1220;
+  --hl: #1a2540;
+  --hl-line: #3b4d75;
+  --danger: #ff8a80;
+  --danger-soft: #3a1d24;
+  --chip: #1f2a44;
   --card-yellow: #c2a24a;
   --scrim: rgba(0, 0, 0, 0.55);
-  --shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+  --shadow: 0 12px 36px rgba(0, 0, 0, .5);
   --pitch-line: #4a554c;
+  --ar-live: #ff5a5f;
   color-scheme: dark;
 }
 
@@ -3320,3 +3335,29 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
   .arena-torneo-largo { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
   .arena-torneo-corto { display: inline; }
 }
+
+/* ==========================================================================
+   Brief 061 · Crónicas con la barra de la arena.
+   El header del Simulador lleva .topbar.arena-topbar.topbar-cronicas: reutiliza las reglas Z1
+   del 047/055 (rótulo --ar-bug, marca lima, .btn transparente, foco lima, lema oculto ≤ 480 px)
+   y aquí solo se ajusta lo propio de las crónicas. Tokens --ar-* de la barra: :root del 010.
+   ========================================================================== */
+.topbar-cronicas .topbar-links a { color: var(--ar-bug-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.topbar-cronicas .topbar-links a[aria-current="page"] { color: var(--ar-score-bg); text-decoration: none; }
+.sim-error { font-size: 14px; }
+/* --danger claro sobre --ar-bug no llega a 4,5: el error de la barra usa el rojo del rótulo. */
+.topbar-cronicas .sim-form [role="alert"] { color: var(--ar-card-red-bug); }
+/* v1.1 § V1 · Siempre: la navegación puede partirse en filas. */
+.topbar-cronicas .topbar-links { flex-wrap: wrap; column-gap: 16px; row-gap: 4px; }
+/* v1.1 § V1 · 901–1279 px: dos filas. Fila 1 = marca + navegación; fila 2 = formulario completo, a la derecha. */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .topbar-cronicas { flex-wrap: wrap; row-gap: 8px; }
+  .topbar-cronicas .brand-tag { display: none; }
+  .topbar-cronicas .topbar-acciones { display: contents; }
+  .topbar-cronicas .topbar-links { margin-left: auto; }
+  .topbar-cronicas .sim-form { flex: 1 1 100%; flex-wrap: wrap; justify-content: flex-end; }
+}
+/* v1.1 § V3 · «← Arena»: enlace simple a la arena, primer hijo de main en / y /match/[seed]. */
+.volver-arena { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 var(--ar-s2, 8px); color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+/* En un inline-flex el espacio final de la flecha se pierde: se restituye con un margen. */
+.volver-arena > span { margin-inline-end: 0.3em; }

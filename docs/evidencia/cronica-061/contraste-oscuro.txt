@@ -1,0 +1,52 @@
+Contraste 061 · http://127.0.0.1:3417/match/246 · 2026-10-24T06:59:59.693Z
+
+| Tema | Ancho | Par | Primer plano | Fondo | Ratio | Mínimo | Estado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| oscuro | 1440 | marca / barra | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | punto del emblema (--ar-live) / barra | rgb(255,90,95) | rgb(11,18,32) | 6.13 | 3 | OK |
+| oscuro | 1440 | enlace de la barra / barra | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | 1440 | [aria-current=page] / barra | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | texto de «Simulate match» / barra | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | 1440 | .sim-error / barra (semilla «abc») | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 1440 | .volver-arena / --bg | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | frase / superficie | rgb(238,242,248) | rgb(19,28,46) | 15.16 | 4.5 | OK |
+| oscuro | 1440 | frase seleccionada / --hl | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | 1440 | texto atenuado (.overline) / superficie | rgb(159,176,201) | rgb(19,28,46) | 7.73 | 4.5 | OK |
+| oscuro | 1440 | chip neutro (--ink / --chip) | rgb(238,242,248) | rgb(31,42,68) | 12.69 | 4.5 | OK |
+| oscuro | 1440 | chip de gol (--accent-ink / --accent) | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | chip de roja (--surface / --danger) | rgb(19,28,46) | rgb(255,138,128) | 7.46 | 4.5 | OK |
+| oscuro | 1440 | perspectiva activa | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | idioma activo | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | «Watch live» (.btn-primary) | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 1440 | foco (--accent) / superficie | rgb(212,255,58) | rgb(19,28,46) | 14.73 | 3 | OK |
+| oscuro | 1440 | icono de amarilla (--card-yellow) / superficie | rgb(194,162,74) | rgb(19,28,46) | 6.94 | 3 | OK |
+| oscuro | 1440 | .verdict.rejected / intento | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 1440 | .rule-tag / intento | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 1440 | .rule-note / intento | rgb(159,176,201) | rgb(11,18,32) | 8.49 | 4.5 | OK |
+| oscuro | 1440 | .attempt-text.struck / intento | rgb(159,176,201) | rgb(11,18,32) | 8.49 | 4.5 | OK |
+| oscuro | 1440 | .verdict.ok / intento | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 360 | marca / barra | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 360 | punto del emblema (--ar-live) / barra | rgb(255,90,95) | rgb(11,18,32) | 6.13 | 3 | OK |
+| oscuro | 360 | enlace de la barra / barra | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | 360 | [aria-current=page] / barra | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 360 | texto de «Simulate match» / barra | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | 360 | .sim-error / barra (semilla «abc») | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 360 | .volver-arena / --bg | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | 360 | frase / superficie | rgb(238,242,248) | rgb(19,28,46) | 15.16 | 4.5 | OK |
+| oscuro | 360 | frase seleccionada / --hl | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | 360 | texto atenuado (.overline) / superficie | rgb(159,176,201) | rgb(19,28,46) | 7.73 | 4.5 | OK |
+| oscuro | 360 | chip neutro (--ink / --chip) | rgb(238,242,248) | rgb(31,42,68) | 12.69 | 4.5 | OK |
+| oscuro | 360 | chip de gol (--accent-ink / --accent) | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 360 | chip de roja (--surface / --danger) | rgb(19,28,46) | rgb(255,138,128) | 7.46 | 4.5 | OK |
+| oscuro | 360 | perspectiva activa | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 360 | idioma activo | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 360 | «Watch live» (.btn-primary) | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | 360 | foco (--accent) / superficie | rgb(212,255,58) | rgb(19,28,46) | 14.73 | 3 | OK |
+| oscuro | 360 | icono de amarilla (--card-yellow) / superficie | rgb(194,162,74) | rgb(19,28,46) | 6.94 | 3 | OK |
+| oscuro | 360 | .verdict.rejected / intento | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 360 | .rule-tag / intento | rgb(255,138,128) | rgb(11,18,32) | 8.2 | 4.5 | OK |
+| oscuro | 360 | .rule-note / intento | rgb(159,176,201) | rgb(11,18,32) | 8.49 | 4.5 | OK |
+| oscuro | 360 | .attempt-text.struck / intento | rgb(159,176,201) | rgb(11,18,32) | 8.49 | 4.5 | OK |
+| oscuro | 360 | .verdict.ok / intento | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+
+Pares fuera de criterio (falla o ausente obligatorio): 0

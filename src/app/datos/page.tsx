@@ -21,7 +21,7 @@ export default function PaginaDatos() {
   const b = f.bandasCorrida;
   return (
     <>
-      <Simulador presets={presets()} />
+      <Simulador presets={presets()} seccion="datos" />
       <main className="liga datos" data-testid="data-page">
         <header className="liga-head">
           <div className="overline">Dataset · Synthetic, reproducible, validated</div>

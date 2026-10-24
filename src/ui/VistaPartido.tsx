@@ -355,6 +355,8 @@ export function VistaPartido({
                 aria-current={datos.perspectiva === p ? "true" : undefined}
                 data-perspective={p}
                 scroll={false}
+                // Brief 061 § 3 D6: la perspectiva es un conmutador de vista; Atrás vuelve a la página anterior.
+                replace
                 // Sin prefetch: cada perspectiva es una crónica que el server calcula (y con un LLM
                 // real, una llamada que cuesta). Solo se pide si el usuario la elige.
                 prefetch={false}

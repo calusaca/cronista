@@ -2,6 +2,7 @@
 // Brief 007: ?perspectiva=local|visita cuenta el partido para esa afición.
 import { notFound } from "next/navigation";
 import { validarSeedTexto } from "../../../sim/cli-args";
+import Link from "../../../ui/Enlace";
 import { Pie } from "../../../ui/Pie";
 import { Simulador } from "../../../ui/Simulador";
 import { VistaPartido } from "../../../ui/VistaPartido";
@@ -24,8 +25,10 @@ export default async function Partido({
   const historia = presets().find((p) => p.seed === v.seed)?.historia;
   return (
     <>
-      <Simulador key={v.seed} presets={presets()} semillaActual={v.seed} />
+      <Simulador key={v.seed} presets={presets()} semillaActual={v.seed} seccion="cronicas" perspectivaActual={perspectiva} />
       <main>
+        {/* Brief 061 v1.1 § V3: enlace simple a la arena (push), no un «volver»; para eso está Atrás. */}
+        <Link href="/arena" prefetch={false} className="volver-arena" data-testid="to-arena"><span aria-hidden="true">← </span>Arena</Link>
         <VistaPartido key={`${v.seed}:${perspectiva}`} datos={datos} etiqueta={historia ?? "Match"} ruta={`/match/${v.seed}`} />
       </main>
       <Pie datos={datos} />

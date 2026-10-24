@@ -28,7 +28,7 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <Simulador presets={presets()} />
+      <Simulador presets={presets()} seccion="liga" />
       <main className="liga" data-testid="league-page">
         <header className="liga-head">
           <div className="overline">League mode · A fully simulated fictional league</div>
