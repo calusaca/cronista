@@ -17,7 +17,9 @@ const EVIDENCIA = "docs/evidencia/motor-063/smoke-a";
 const FRASE = { en: "Beaten defenders run back towards their goal", es: "Los defensores superados corren hacia su arco" };
 /** Valores propios del smoke: semillas de la búsqueda, margen del balón por debajo de la mitad y
  * holgura (m) del delantero respecto de su límite. */
-const BUSQUEDA = { semillas: 60, balonPorDebajoM: 8, holguraM: 1.5, avanceMinM: 1 };
+const BUSQUEDA = { semillas: 60, balonPorDebajoM: 8, holguraM: 1.5, avanceMinM: 1, sinGolPrevioS: 10, sigueS: 1 };
+/** Ventana alta: la cancha entera queda visible bajo la cabecera fija del sitio. */
+const VENTANA = { width: 1440, height: 1600 };
 
 const cursor = async (page: Page, segundos: number) => { await page.getByRole("slider", { name: "Match time" }).fill(String(Math.round(segundos * 10) / 10)); };
 const fichas = (page: Page) => page.getByTestId("arena-player").evaluateAll(els => Object.fromEntries(els.map(el => {
@@ -25,6 +27,7 @@ const fichas = (page: Page) => page.getByTestId("arena-player").evaluateAll(els 
   return [el.getAttribute("data-player")!, { x: Number(m[1]), y: Number(m[2]) }];
 })) as Record<string, { x: number; y: number }>);
 async function importar(page: Page, nombre: string, datos: Buffer, local: string) {
+  await page.setViewportSize(VENTANA);
   await page.goto("/arena");
   await page.getByRole("button", { name: "Saved matches", exact: true }).click();
   const respuesta = page.waitForResponse(r => new URL(r.url()).pathname === "/api/arena" && r.request().method() === "POST");
@@ -55,7 +58,7 @@ test("063 A · repliegue en tres fotogramas consecutivos y texto de límites ES/
   for (const k of [0, 1, 2]) {
     await cursor(page, (escena!.tick + k * paso) * ARENA.pasoS);
     posiciones.push(await fichas(page));
-    await page.locator(".arena-board").screenshot({ path: `${EVIDENCIA}/repliegue-${k + 1}.png` });
+    await page.getByTestId("arena-pitch").screenshot({ path: `${EVIDENCIA}/repliegue-${k + 1}.png` });
   }
   // Cada defensa en repliegue se desplaza hacia su arco del primer al tercer fotograma.
   for (const id of escena!.ids) {
@@ -79,26 +82,37 @@ test("063 A · un delantero que pierde el balón lo persigue y se detiene en la 
   test.setTimeout(180_000);
   await mkdir(EVIDENCIA, { recursive: true });
   // Busca, en partidos programados nuevos, un fotograma con un delantero perseguidor en su límite y el balón
-  // del rival bastante por debajo de la mitad de su campo.
+  // del rival bastante por debajo de la mitad de su campo; un segundo después sigue en su límite y persiguiendo,
+  // y no hubo gol en los segundos previos (el rótulo del gol taparía la escena).
   let hallado: { registro: RegistroArena; tick: number; id: string; lado: "local" | "visita"; limite: number } | undefined;
   for (let seed = 1; seed <= BUSQUEDA.semillas && !hallado; seed++) {
     const registro = await ejecutarArena(crearConfigArena({ seed, duracionS: L.duracionS }), { local: crearControladorProgramado(), visita: crearControladorProgramado() });
-    for (const f of registro.fotogramas) {
-      const p = f.persecucion, j = p ? f.jugadores.find(x => x.id === p.jugador) : undefined;
-      const poseedor = f.jugadores.find(x => x.id === f.balon.poseedor);
-      if (!p || !j || lineaDePuesto(j.puesto) !== "DEL" || !poseedor || poseedor.lado === j.lado || !enJuego(f)) continue;
+    const enLimite = (f: EstadoArena | undefined, id: string) => {
+      const p = f?.persecucion, j = f && p?.jugador === id ? f.jugadores.find(x => x.id === id) : undefined;
+      const poseedor = f?.jugadores.find(x => x.id === f.balon.poseedor);
+      if (!f || !p || !j || lineaDePuesto(j.puesto) !== "DEL" || !poseedor || poseedor.lado === j.lado || !enJuego(f)) return null;
       const limite = limiteXPersecucion(j), xj = transformar(j.posicion, j.lado).x, xb = transformar(f.balon.posicion, j.lado).x;
-      if (xb < limite - BUSQUEDA.balonPorDebajoM && Math.abs(xj - limite) <= BUSQUEDA.holguraM && f.tick % Math.round(ARENA.fotogramaS / ARENA.pasoS) === 0) { hallado = { registro, tick: f.tick, id: j.id, lado: j.lado, limite }; break; }
+      return xb < limite - BUSQUEDA.balonPorDebajoM && Math.abs(xj - limite) <= BUSQUEDA.holguraM ? { lado: j.lado, limite } : null;
+    };
+    const golReciente = (tick: number) => registro.eventos.some(e => e.tipo === "gol" && e.tick <= tick && e.tick > tick - BUSQUEDA.sinGolPrevioS / ARENA.pasoS);
+    for (const f of registro.fotogramas) {
+      const id = f.persecucion?.jugador, a = id ? enLimite(f, id) : null;
+      const despues = registro.fotogramas.find(g => g.tick === f.tick + Math.round(BUSQUEDA.sigueS / ARENA.pasoS));
+      if (!id || !a || f.tick % Math.round(ARENA.fotogramaS / ARENA.pasoS) !== 0 || !enLimite(despues, id) || golReciente(despues!.tick)) continue;
+      hallado = { registro, tick: f.tick, id, lado: a.lado, limite: a.limite }; break;
     }
   }
   expect(hallado).toBeDefined();
   const { registro, tick, id, lado, limite } = hallado!;
+  const x0 = transformar(registro.fotogramas.find(f => f.tick === tick)!.jugadores.find(j => j.id === id)!.posicion, lado).x;
   for (const ronda of registro.rondas) for (const d of Object.values(ronda.decisiones)) d.tiempoMs = 0;
   await importar(page, `arena-persecucion-${registro.config.partido.seed}.json`, Buffer.from(JSON.stringify(registro)), registro.config.partido.local.nombre);
   await page.getByTestId("arena-player").and(page.locator(`[data-player="${id}"]`)).click();
-  await cursor(page, tick * ARENA.pasoS);
-  const x = transformar((await fichas(page))[id]!, lado).x;
-  expect(Math.abs(x - limite)).toBeLessThanOrEqual(BUSQUEDA.holguraM);
-  await page.locator(".arena-board").screenshot({ path: `${EVIDENCIA}/delantero-en-la-mitad.png` });
-  console.log("[063 smoke delantero]", JSON.stringify({ seed: registro.config.partido.seed, segundo: tick * ARENA.pasoS, jugador: id, xOrientada: x, limite }));
+  for (const [k, s] of [tick * ARENA.pasoS, tick * ARENA.pasoS + BUSQUEDA.sigueS].entries()) {
+    await cursor(page, s);
+    const x = transformar((await fichas(page))[id]!, lado).x;
+    expect(Math.abs(x - limite)).toBeLessThanOrEqual(BUSQUEDA.holguraM);
+    await page.getByTestId("arena-pitch").screenshot({ path: `${EVIDENCIA}/delantero-en-la-mitad-${k + 1}.png` });
+  }
+  console.log("[063 smoke delantero]", JSON.stringify({ seed: registro.config.partido.seed, segundo: tick * ARENA.pasoS, jugador: id, xOrientada: x0, limite }));
 });
