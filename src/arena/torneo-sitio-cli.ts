@@ -8,8 +8,9 @@
 // El token SOLO se lee de la variable de entorno `ARENA_ADMIN_TOKEN` (nunca de un argumento: quedaría en el historial
 // del intérprete). Cómo crearlo y leerlo, sin imprimirlo: docs/evidencia/torneo-sitio-062/README.md.
 //
-// Fixture del sitio (§ 9, e2e): una liga de ENSAYO (participantes a–f programados, 10 s por partido, sin ritmo ni
-// IA) jugada por el gestor real sobre un almacén local, con el reloj fijado en un día pasado:
+// Fixture del sitio (§ 9, e2e): torneos de ENSAYO (participantes a–f programados, 10 s por partido, sin ritmo ni IA)
+// jugados por el gestor real sobre un almacén local, con el reloj fijado en días pasados: una liga pública (20 oct) y
+// unos grupos + eliminatoria como liga de prueba del operador (21 oct):
 //   rm -rf src/arena/__fixtures__/torneos-sitio && npm run arena:torneo-sitio -- --fixture src/arena/__fixtures__/torneos-sitio
 // Es determinista salvo el commit (el de HEAD al generarlo). `scripts/e2e-torneos.mjs` lo copia al almacén del e2e.
 import { execFileSync } from "node:child_process";
@@ -19,13 +20,13 @@ import { TORNEO_ARENA as T, TORNEO_SITIO as S } from "../sim/limites";
 import { almacenTorneosLocal } from "./almacen-torneos";
 import { GestorTorneoSitio } from "./torneo-sitio";
 
-/** Día del fixture (pasado: el e2e lanza el de hoy) y su hora de inicio. */
+/** Días de los fixtures (pasados: el e2e lanza el de hoy) y su hora de inicio. */
 export const INICIO_FIXTURE_SITIO = "2026-10-20T12:00:00.000Z";
+export const INICIO_FIXTURE_GRUPOS = "2026-10-21T12:00:00.000Z";
 
-export async function generarFixtureSitio(dir: string, commit: string): Promise<string> {
-  if (existsSync(dir) && readdirSync(dir).length) throw new Error(`${dir} no está vacío: bórralo antes de regenerar el fixture`);
-  let t = Date.parse(INICIO_FIXTURE_SITIO), n = 0;
-  const uuid = () => `00000000-0000-4000-8000-${String(++n).padStart(12, "0")}`;
+export async function generarFixtureSitio(dir: string, commit: string, o: { formato?: "liga" | "grupos"; prueba?: boolean; inicioUtc?: string; uuidBase?: number } = {}): Promise<string> {
+  let t = Date.parse(o.inicioUtc ?? INICIO_FIXTURE_SITIO), n = o.uuidBase ?? 0;
+  const uuid = () => { const k = ++n; return `${k.toString(16).padStart(8, "a")}-0000-4000-8000-${String(k).padStart(12, "0")}`; };
   const g = new GestorTorneoSitio({
     almacen: almacenTorneosLocal(dir), uuid, ahora: () => t, log: () => {}, registrarSigterm: () => {},
     // El reloj solo avanza con las pausas; el latido se renueva en tiempo real para seguir vigente.
@@ -36,7 +37,7 @@ export async function generarFixtureSitio(dir: string, commit: string): Promise<
   });
   g.iniciar();
   for (let i = 0; i < 1000 && g.barrera; i++) await new Promise(r => setTimeout(r, 5));
-  const { id } = await g.lanzar({ formato: "liga", prueba: false });
+  const { id } = await g.lanzar({ formato: o.formato ?? "liga", prueba: o.prueba ?? false });
   await g.esperarActivo();
   g.alSigterm();
   await new Promise(r => setTimeout(r, 100)); // deja terminar un latido en vuelo
@@ -52,7 +53,9 @@ export async function principalSitio(d: DepsCliSitio): Promise<number> {
   } });
   if (v.fixture) {
     const commit = execFileSync("git", ["-c", `safe.directory=${process.cwd()}`, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    if (existsSync(v.fixture) && readdirSync(v.fixture).length) { d.err(`${v.fixture} no está vacío: bórralo antes de regenerar el fixture`); return 1; }
     d.out(`Fixture del sitio: ${await generarFixtureSitio(v.fixture, commit)} en ${v.fixture}`);
+    d.out(`Fixture del sitio: ${await generarFixtureSitio(v.fixture, commit, { formato: "grupos", prueba: true, inicioUtc: INICIO_FIXTURE_GRUPOS, uuidBase: 100 })} en ${v.fixture}`);
     return 0;
   }
   const acciones = [v.estado, v.cancelar, v.cerrar].filter(Boolean).length;

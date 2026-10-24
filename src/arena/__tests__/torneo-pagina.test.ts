@@ -15,7 +15,7 @@ describe("062 · datos de la página del torneo", () => {
     const archivos = readdirSync(DS).sort();
     const d = (await datosPaginaTorneo(null))!;
     expect(d.lectura?.estado === "ok" && d.lectura.torneo.id).toBe("2026-10-24");
-    expect(d.lista.map(r => [r.id, r.origen])).toEqual([["2026-10-24", "repositorio"], ["sitio-2026-10-20", "sitio"]]);
+    expect(d.lista.map(r => [r.id, r.origen, r.lanzamiento])).toEqual([["2026-10-24", "repositorio", "publico"], ["sitio-prueba-aaaaaa660000", "sitio", "prueba"], ["sitio-2026-10-20", "sitio", "publico"]]);
     expect(readdirSync(DS).sort()).toEqual(archivos);
   });
   it("[id]: un torneo del sitio se lee del almacén; un id del sitio inexistente o inválido es 404", async () => {

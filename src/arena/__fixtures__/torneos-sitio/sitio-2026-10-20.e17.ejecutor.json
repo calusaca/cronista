@@ -1,10 +1,10 @@
 {
   "n": 17,
   "intento": 1,
-  "archivoSha256": "8d3c7a0b4e857eaac3b27ff02a7606aeab292c274fd16e2e60bfc3d0074dc25f",
+  "archivoSha256": "26947c94068ae7add639ade6cd5aaf69d0e0ab90d26eb1a0c731bf3ea81837f1",
   "local": {
     "tiemposMs": [
-      0.20147899999983565
+      0.19585899999992762
     ],
     "llamadas": [
       0
@@ -23,7 +23,7 @@
   },
   "visita": {
     "tiemposMs": [
-      0.17105899999978647
+      0.18566800000007788
     ],
     "llamadas": [
       0

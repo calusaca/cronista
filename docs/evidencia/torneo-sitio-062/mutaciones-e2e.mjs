@@ -14,10 +14,16 @@ const M = [
     ['      <p className="arena-torneo-rotulo" data-testid="arena-torneo-rotulo">{rotuloOrigen(t, idioma)}</p>\n', ""]] },
   { id: "E3-base", desc: "repetición del sitio pedida a /torneos (sin la base del prefijo)", archivo: "src/ui/torneo-carga.ts", patron: "3 · «Watch replay»", cambios: [
     ["export const baseTorneo = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? `/api/arena/torneos/sitio/${id}` : `/torneos/${id}`;", "export const baseTorneo = (id: string) => `/torneos/${id}`; void TORNEO_SITIO;"]] },
-  { id: "E4-cupo", desc: "el motivo «cupo» no se muestra", archivo: "src/ui/ArenaTorneoLanzar.tsx", patron: "4 · lanzar una liga", cambios: [
+  { id: "E4-cupo", desc: "el motivo «cupo» no se muestra", archivo: "src/ui/ArenaTorneoLanzar.tsx", patron: "2 · lanzar grupos|4 · al recargar", cambios: [
     ['    case "cupo": return es ?', '    case "cupo": return ""; return es ?']] },
   { id: "E5-origen", desc: "sin la comprobación del Origin", archivo: "src/app/api/arena/torneos/sitio/route.ts", patron: "5 · un POST con un Origin ajeno", cambios: [
     ['  if (!origenCoincide(req.headers.get("origin"), cfg.origen)) return', '  if (false && !origenCoincide(req.headers.get("origin"), cfg.origen)) return']] },
+  { id: "E2-pasa", desc: "«Advances» sin texto en las tablas de grupo", archivo: "src/ui/ArenaTorneoGrupos.tsx", patron: "2 · lanzar grupos", cambios: [
+    ['<td data-testid="arena-torneo-pasa">{!completo ? T.porDecidir[idioma] : i < 2 ? T.pasaSi[idioma](i + 1) : T.pasaNo[idioma]}</td>', '<td data-testid="arena-torneo-pasa">{""}</td>']] },
+  { id: "E3c-prueba", desc: "la repetición de una prueba no lo dice en su procedencia", archivo: "src/ui/torneo-carga.ts", patron: "3c · una semifinal", cambios: [
+    ['...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ', ""]] },
+  { id: "E7-cuadro", desc: "el cuadro en dos columnas también a 360 px", archivo: "src/app/globals.css", patron: "7 · 360 px \\(light, en\\)", cambios: [
+    [".arena-torneo-cuadro { display: grid; grid-template-columns: minmax(0, 1fr);", ".arena-torneo-cuadro { display: grid; grid-template-columns: repeat(2, 200px);"]] },
   { id: "E7-360", desc: "las cifras del panel sin envolver a 360 px", archivo: "src/app/globals.css", patron: "7 · 360 px \\(light, en\\)", cambios: [
     [".arena-torneo-cifras { display: block; color: var(--muted); font-size: 14px; }", ".arena-torneo-cifras { display: block; color: var(--muted); font-size: 14px; white-space: nowrap; }"]] },
 ];
@@ -34,7 +40,7 @@ for (const m of M) {
   let estado = "verde (NO detectada)", salida = "";
   try {
     writeFileSync(m.archivo, mutado);
-    try { salida = execFileSync("npx", ["playwright", "test", SPEC, "-g", m.patron], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 900_000 }); }
+    try { salida = execFileSync("npx", ["playwright", "test", SPEC, "--project", "torneo-sitio", "--no-deps", "-g", m.patron], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 900_000 }); }
     catch (error) { estado = "ROJO (detectada)"; salida = `${error.stdout ?? ""}${error.stderr ?? ""}`; }
   } finally { writeFileSync(m.archivo, original); }
   if (md5(readFileSync(m.archivo, "utf8")) !== md5Original) throw new Error(`${m.id}: el archivo no volvió al original`);

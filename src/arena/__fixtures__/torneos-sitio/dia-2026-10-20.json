@@ -133,11 +133,11 @@
     "version": "arena-v3",
     "reglas": "reinicios-v5"
   },
-  "commit": "3ce08cebba12ee11901b42e6973dbf023c8c38f3",
+  "commit": "c71badfdbc3f336c744fb6627290f9730b3a6c40",
   "topeMicroUsd": 8000000,
   "tipicoMicroUsd": 0,
   "reservaMaxPartidoMicroUsd": 0,
   "promptMax": 10231,
-  "operacion": "00000000-0000-4000-8000-000000000002",
+  "operacion": "aaaaaaa2-0000-4000-8000-000000000002",
   "creadoUtc": "2026-10-20T12:00:00.000Z"
 }

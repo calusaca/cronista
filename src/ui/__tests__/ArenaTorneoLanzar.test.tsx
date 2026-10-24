@@ -43,8 +43,13 @@ describe("062 · U1 · panel «Lanzar un torneo»", () => {
     expect(es).toContain("31 partidos · ≈ 4,4 USD típicos · tope 8 USD · ≈ 37 min");
     expect(es).toContain("hasta 2,7 con desempates");
   });
-  it("Grupos visible pero deshabilitado con «Disponible pronto»; la liga, elegida y habilitada; el botón habilitado sin motivo", () => {
-    const h = panel();
+  it("P1-b · Grupos habilitado (la ficha lo declara disponible); si la ficha no lo estuviera: deshabilitado con «Disponible pronto»", () => {
+    const habil = panel(), entrada = (h: string, v: string) => new RegExp(`<input type="radio"[^>]*value="${v}"[^>]*/>`).exec(h)?.[0] ?? "";
+    expect(entrada(habil, "grupos")).not.toContain("disabled");
+    expect(habil).not.toContain(`· ${T.pronto.en}`);
+    expect(boton(panel({ formato: "grupos" }))).not.toContain("disabled");
+    expect(panel({ formato: "grupos", confirmando: true })).toContain("You are about to launch today's tournament for the whole site: Groups + knockout, 15–18 matches");
+    const h = panel({ estado: estadoBase({ formatos: { ...estadoBase().formatos, grupos: ficha("grupos", { disponible: false }) } }) });
     const input = (v: string) => new RegExp(`<input type="radio"[^>]*value="${v}"[^>]*/>`).exec(h)?.[0] ?? "";
     expect(input("grupos")).toContain('disabled=""'); expect(input("grupos")).not.toContain("checked");
     expect(input("liga")).toContain('checked=""'); expect(input("liga")).not.toContain("disabled");
@@ -68,7 +73,7 @@ describe("062 · U1 · panel «Lanzar un torneo»", () => {
     expect(boton(h)).toContain('disabled=""');
     expect(motivoVisible(h)).toContain("Could not check the status.");
     expect(h).toContain(">Retry</button>");
-    expect(boton(panel({ formato: "grupos" }))).toContain('disabled=""');
+    expect(boton(panel({ formato: "grupos", estado: estadoBase({ formatos: { ...estadoBase().formatos, grupos: ficha("grupos", { disponible: false }) } }) }))).toContain('disabled=""');
   });
   it("confirmación en la misma página: h3, el texto con las cifras de la Ficha y los dos botones; sin el botón de iniciar", () => {
     const h = panel({ confirmando: true });
@@ -138,7 +143,9 @@ describe("062 · U1 · página con torneos del sitio", () => {
   });
   it("torneoAMostrar: el activo primero; si no, el más reciente real antes que un ensayo; la lista no duplica un promovido", () => {
     const x = (id: string, inicioUtc: string, estado: string, tipo: "real" | "ensayo") => ({ id, inicioUtc, estado, tipo });
-    expect(torneoAMostrar([x("a", "2026-10-24", "completo", "real"), x("b", "2026-10-26", "completo", "ensayo"), x("c", "2026-10-20", "en_curso", "ensayo")])?.id).toBe("c");
+    expect(torneoAMostrar([x("a", "2026-10-24", "completo", "real"), x("b", "2026-10-26", "completo", "ensayo"), x("c", "2026-10-20", "en_curso", "real")])?.id).toBe("c");
+    expect(torneoAMostrar([x("a", "2026-10-24", "completo", "real"), x("c", "2026-10-26", "en_curso", "ensayo")])?.id).toBe("a");
+    expect(torneoAMostrar([x("b", "2026-10-26", "completo", "ensayo"), x("c", "2026-10-25", "en_curso", "ensayo")])?.id).toBe("c");
     expect(torneoAMostrar([x("a", "2026-10-24", "completo", "real"), x("b", "2026-10-26", "cancelado", "ensayo")])?.id).toBe("a");
     expect(torneoAMostrar([x("b", "2026-10-26", "cancelado", "ensayo")])?.id).toBe("b");
     expect(torneoAMostrar([])).toBeNull();
@@ -153,5 +160,50 @@ describe("062 · los componentes de cliente no arrastran módulos de servidor al
       const valor = readFileSync(archivo, "utf8").split("\n").filter(l => /^import (?!type )/.test(l));
       expect(valor.filter(l => prohibidos.test(l)), archivo).toEqual([]);
     }
+  });
+});
+
+const GRUPOS = esquemaTorneo062.parse(JSON.parse(readFileSync("src/arena/__fixtures__/torneos-sitio/sitio-prueba-aaaaaa660000.torneo.json", "utf8")));
+describe("062 · U1 (P1-b) · grupos + eliminatoria", () => {
+  const h = pagina(GRUPOS), es = pagina(GRUPOS, "es");
+  const sinEtiquetas = (x: string) => x.replace(/<[^>]+>/g, "");
+  it("dos tablas de grupo con «Advances» EN TEXTO (Yes (1st) / Yes (2nd) / No) y la línea del criterio del corte", () => {
+    for (const G of ["A", "B"]) {
+      const tabla = new RegExp(`<table class="arena-torneo-tabla arena-torneo-tabla-grupo" data-testid="arena-torneo-tabla-${G}"[\\s\\S]*?</table>`).exec(h)![0];
+      expect(tabla).toContain("<th scope=\"col\">Advances</th>");
+      expect([...tabla.matchAll(/data-testid="arena-torneo-pasa">([^<]+)</g)].map(m => m[1])).toEqual(["Yes (1st)", "Yes (2nd)", "No"]);
+    }
+    expect(es).toContain("<th scope=\"col\">Pasa</th>");
+    expect(es).toMatch(/data-testid="arena-torneo-pasa">Sí \(1\.º\)</);
+    // Todos los partidos del ensayo de 10 s acaban 0–0: el corte lo decide un criterio del torneo, escrito en texto.
+    const criterios = [...h.matchAll(/data-testid="arena-torneo-criterio-grupo">([^<]+)</g)].map(m => m[1]!);
+    expect(criterios.length).toBeGreaterThan(0);
+    for (const c of criterios) expect(c).toMatch(/Advances as (1st|2nd) on (shots on target \(\d+ to \d+\)|shots \(\d+ to \d+\)|draw \(seed\)) · tournament criterion, not a football rule/);
+  });
+  it("matrices 3 × 3 por grupo con los 6 partidos del grupo enlazados", () => {
+    for (const G of ["A", "B"]) {
+      const m = new RegExp(`data-testid="arena-torneo-matriz-${G}"[\\s\\S]*?</table>`).exec(h)![0];
+      expect(m.match(/data-testid="arena-torneo-celda"/g)).toHaveLength(6);
+    }
+  });
+  it("cuadro: semifinales y final con su desempate de lados invertidos y el criterio rotulado; «Wins this tournament» junto a la frase de significación", () => {
+    for (const fase of ["semifinal-1", "semifinal-2", "final"]) {
+      const card = new RegExp(`data-testid="arena-torneo-llave-${fase}">[\\s\\S]*?</li>`).exec(h)![0];
+      expect(card).toContain("Play-off, sides swapped: ");
+      expect(sinEtiquetas(card)).toMatch(/advances on (shots on target \(\d+–\d+\)|shots \(\d+–\d+\)|group coefficient \(pts, GD, GF: [^)]+\)|draw \(seed\)) · tournament criterion, not a football rule/);
+    }
+    const c = /data-testid="arena-torneo-campeon">([\s\S]*?)<\/p>/.exec(h)![1]!;
+    expect(sinEtiquetas(c)).toMatch(/^Wins this tournament: Ensayo [A-F] In an illustrative sign test .* \(p = 0\.125\)\. This bracket describes this tournament; it does not rank the models by quality\.$/);
+    expect(es).toContain("Desempate, lados invertidos: ");
+    expect(es).toContain("criterio del torneo, no reglamentario");
+  });
+  it("prueba del operador: banda en la página, sección propia en la lista y «campeón» en el resumen", () => {
+    expect(h).toContain('data-testid="arena-torneo-prueba"><strong>Operator test tournament</strong>');
+    const lista = decodificar(renderToStaticMarkup(<ArenaTorneo lectura={{ estado: "ok", torneo: SITIO }} lista={listaTorneos([REPO], [SITIO, GRUPOS])} idiomaInicial="en" />));
+    expect(lista).toMatch(/<h3 id="arena-torneo-h-pruebas">Operator test tournaments<\/h3><ul aria-labelledby="arena-torneo-h-pruebas"><li data-testid="arena-torneo-lista-item" data-id="sitio-prueba-aaaaaa660000"><a [^>]*>Oct 21 · Groups \+ knockout · complete · champion Ensayo [A-F] · rehearsal · no AI</);
+  });
+  it("la significación de grupos (p = 0,125) y el resumen del formato en la cabecera", () => {
+    expect(h).toContain("6 AI coaches: 2 groups of 3, home and away, then a knockout (semi-finals and final), 10 s per match");
+    expect(h).toContain("15–18");
   });
 });

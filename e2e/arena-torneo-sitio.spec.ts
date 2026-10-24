@@ -1,15 +1,16 @@
 // Brief 062 § 10 (P1-a: e2e 1, 3, 4, 5 y 7) · Torneo lanzable desde el sitio, sin IA. El servidor del e2e corre con
 // ARENA_TORNEO_SITIO=1 en ENSAYO (participantes a–f programados, 10 s por partido, sin ritmo) y un almacén local que
 // scripts/e2e-torneos.mjs vacía y siembra con el fixture del sitio (src/arena/__fixtures__/torneos-sitio: una liga de
-// ensayo del 2026-10-20). El lanzamiento real (prueba 4) va al final: consume el cupo de hoy y se cancela con el token
-// de administración del e2e para no dejar un torneo activo.
+// ensayo del 2026-10-20 y unos grupos de prueba del 2026-10-21). El lanzamiento real (prueba 2, grupos) va al final y
+// termina: consume el cupo de hoy, que comprueba la prueba 4.
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { expect, test, type Page } from "@playwright/test";
 import { TOKEN_ADMIN_E2E } from "../playwright.config";
+import { campeon, clasificarGrupo, ordenGrupo } from "../src/arena/torneo-formatos";
 
 test.describe.configure({ mode: "serial" });
-const FIXTURE = "sitio-2026-10-20", DIR = "src/arena/__fixtures__/torneos-sitio";
+const FIXTURE = "sitio-2026-10-20", GRUPOS = "sitio-prueba-aaaaaa660000", DIR = "src/arena/__fixtures__/torneos-sitio";
 const fixture = JSON.parse(readFileSync(`${DIR}/${FIXTURE}.torneo.json`, "utf8")) as { encuentros: { n: number; local: { goles: number }; visita: { goles: number } }[] };
 type Ficha = { disponible: boolean; partidos: { min: number; max: number }; topeMicroUsd: number; duracionMin: { min: number; max: number } };
 const rango = (r: { min: number; max: number }) => (r.min === r.max ? String(r.min) : `${r.min}–${r.max}`);
@@ -29,8 +30,10 @@ test("1 · lista con los dos orígenes, rótulo del sitio y cifras del panel igu
     await expect(cifras).toContainText(`cap ${ficha.topeMicroUsd / 1_000_000} USD`);
     await expect(cifras).toContainText(`≈ ${rango(ficha.duracionMin)} min`);
   }
-  await expect(page.getByRole("radio", { name: /Groups \+ knockout/ })).toBeDisabled();
-  await expect(page.getByTestId("arena-torneo-cifras-grupos")).toContainText("Coming soon");
+  // P1-b · Grupos habilitado (la ficha del servidor lo declara disponible).
+  await expect(page.getByRole("radio", { name: /Groups \+ knockout/ })).toBeEnabled();
+  await expect(page.getByTestId("arena-torneo-cifras-grupos")).not.toContainText("Coming soon");
+  await expect(page.getByTestId("arena-torneo-lista-pruebas").locator(`[data-id="${GRUPOS}"]`)).toHaveCount(1);
   await expect(page.getByRole("radio", { name: /League · double round robin/ })).toBeChecked();
   await page.getByTestId("arena-torneo-lista-lanzados").locator(`[data-id="${FIXTURE}"] a`).click();
   await expect(page).toHaveURL(new RegExp(`/arena/torneo/${FIXTURE}$`));
@@ -53,6 +56,16 @@ test("3 · «Watch replay» de un partido del sitio abre /arena con su marcador,
   const balon = page.getByTestId("arena-ball"), antes = await balon.getAttribute("cx");
   await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect.poll(async () => await balon.getAttribute("cx"), { timeout: 10_000 }).not.toBe(antes);
+});
+
+test("3c · una semifinal de los grupos de prueba abre /arena con «(operator test tournament)» y su fase", async ({ page }) => {
+  await page.goto(`/arena/torneo/${GRUPOS}`);
+  await expect(page.getByTestId("arena-torneo-prueba")).toHaveText("Operator test tournament");
+  await page.getByTestId("arena-torneo-llave-semifinal-1").getByRole("link", { name: "Watch replay of match 13", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/arena\\?torneo=${GRUPOS}&encuentro=13$`));
+  const origen = page.getByTestId("arena-torneo-origen");
+  await expect(origen).toContainText("tournament (operator test tournament) · Semi-final 1 · Home:");
+  await expect(origen.getByRole("link", { name: "Back to the tournament" })).toHaveAttribute("href", `/arena/torneo/${GRUPOS}`);
 });
 
 test("3b · el registro del sitio se sirve por la ruta del manifiesto con su huella; fuera del manifiesto, 404", async ({ request }) => {
@@ -82,31 +95,52 @@ for (const tema of ["light", "dark"] as const) for (const idioma of ["en", "es"]
       expect((await page.getByTestId(id).boundingBox())!.width).toBeLessThanOrEqual(328);
       expect(await fueraDeScroll(page, id)).toBe(true);
     }
+    await page.goto(`/arena/torneo/${GRUPOS}${q}`);
+    await expect(page.getByTestId("arena-torneo-cuadro")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+    for (const id of ["arena-torneo-tabla-A", "arena-torneo-tabla-B", "arena-torneo-matriz-A", "arena-torneo-matriz-B", "arena-torneo-llaves"]) {
+      expect((await page.getByTestId(id).boundingBox())!.width).toBeLessThanOrEqual(328);
+      expect(await fueraDeScroll(page, id)).toBe(true);
+    }
     await ctx.close();
   });
 }
 
-test("4 · lanzar una liga: confirmación, 202 y «In play»; al recargar, el botón está deshabilitado por el cupo y un POST directo da 409", async ({ page, request, baseURL }) => {
+test("2 · lanzar grupos + eliminatoria: confirmación, 202 e «In play»; termina con dos tablas «Advances», el cuadro y «Wins this tournament» (filas iguales a clasificarGrupo/ordenGrupo)", async ({ page, request }) => {
+  test.setTimeout(180_000);
   await page.goto("/arena/torneo");
-  const iniciar = page.getByRole("button", { name: "Start new tournament" });
-  await expect(iniciar).toBeEnabled();
-  await iniciar.click();
+  await page.getByRole("radio", { name: /Groups \+ knockout/ }).check();
+  await page.getByRole("button", { name: "Start new tournament" }).click();
   await expect(page.getByRole("heading", { level: 3, name: "Confirm today's tournament" })).toBeFocused();
-  await expect(page.getByTestId("arena-torneo-confirmar")).toContainText("You are about to launch today's tournament for the whole site: League");
+  await expect(page.getByTestId("arena-torneo-confirmar")).toContainText("Groups + knockout, 15–18 matches");
   const respuesta = page.waitForResponse(r => r.url().endsWith("/api/arena/torneos/sitio") && r.request().method() === "POST");
   await page.getByRole("button", { name: "Confirm and start" }).click();
   expect((await respuesta).status()).toBe(202);
-  // El cuerpo de la respuesta ya no está disponible tras la navegación: el id sale de la URL a la que lleva el panel.
   const id = `sitio-${new Date().toISOString().slice(0, 10)}`;
   await expect(page).toHaveURL(new RegExp(`/arena/torneo/${id}#arena-torneo-estado$`));
   await expect(page.getByRole("heading", { level: 2, name: "In play" })).toBeVisible();
-  // Se cancela con el token del e2e: el cupo de hoy queda consumido y no queda un torneo activo para el resto de la suite.
-  const cancelar = await request.post("/api/arena/torneos/sitio/cancelar", { headers: { authorization: `Bearer ${TOKEN_ADMIN_E2E}` } });
-  expect(cancelar.status()).toBe(200);
+  // 15–18 partidos de 10 s sin ritmo: deben bastar 90 s.
+  await expect.poll(async () => (await (await request.get(`/api/arena/torneos/sitio/${id}`)).json()).estado, { timeout: 90_000, intervals: [2_000] }).toBe("completo");
+  const t = await (await request.get(`/api/arena/torneos/sitio/${id}`)).json();
+  await page.reload();
+  for (const G of ["A", "B"] as const) {
+    const filas = page.getByTestId(`arena-torneo-tabla-${G}`).getByTestId("arena-torneo-fila-grupo");
+    expect(await filas.evaluateAll(fs => fs.map(f => f.getAttribute("data-participante")))).toEqual(ordenGrupo(t, G).map(x => x.id));
+    expect(await page.getByTestId(`arena-torneo-tabla-${G}`).getByTestId("arena-torneo-pasa").allTextContents()).toEqual(["Yes (1st)", "Yes (2nd)", "No"]);
+    expect(clasificarGrupo(t, G)).toHaveLength(3);
+  }
+  await expect(page.getByRole("columnheader", { name: "Advances" })).toHaveCount(2);
+  for (const fase of ["semifinal-1", "semifinal-2", "final"]) await expect(page.getByTestId(`arena-torneo-llave-${fase}`)).toBeVisible();
+  await expect(page.getByTestId("arena-torneo-campeon")).toContainText(`Wins this tournament: ${t.participantes.find((p: { id: string }) => p.id === campeon(t))!.nombre}`);
+  await expect(page.getByTestId("arena-torneo-campeon")).toContainText("(p = 0.125)");
+});
+
+test("4 · al recargar, el botón está deshabilitado por el cupo y un POST directo da 409", async ({ page, request, baseURL }) => {
   await page.goto("/arena/torneo");
   await expect(page.getByRole("button", { name: "Start new tournament" })).toBeDisabled();
   await expect(page.getByTestId("arena-torneo-motivo")).toContainText("Today's tournament (UTC) has already been launched.");
   const directo = await request.post("/api/arena/torneos/sitio", { headers: { origin: new URL(baseURL!).origin, "content-type": "application/json" }, data: { formato: "liga" } });
   expect(directo.status()).toBe(409);
   expect((await directo.json()).motivo).toBe("cupo");
+  void TOKEN_ADMIN_E2E;
 });

@@ -86,3 +86,20 @@ describe("062 · § 7.6 · un torneo lanzado en el sitio se carga por /api/arena
     expect(peticionDeUrl(new URLSearchParams(`torneo=${ID}&encuentro=03`))).toEqual({ torneo: ID, encuentro: "03" });
   });
 });
+
+describe("062 · P1-b · la repetición de una liga de prueba y de un partido de grupos lo dice en su procedencia", () => {
+  const ID = "sitio-prueba-aaaaaa660000", DS = "src/arena/__fixtures__/torneos-sitio";
+  const sitio = vi.fn(async (url: string | URL | Request) => {
+    const ruta = String(url);
+    if (ruta === `/api/arena/torneos/sitio/${ID}`) return new Response(readFileSync(`${DS}/${ID}.torneo.json`));
+    const m = ruta.match(/\/(e\d{2}\.json\.gz)$/);
+    return m ? new Response(readFileSync(`${DS}/${ID}.${m[1]}`)) : new Response("no", { status: 404 });
+  }) as unknown as typeof fetch;
+  it("origen.prueba y la fase (semifinal 1, desempate)", async () => {
+    const r13 = await cargarEncuentroTorneo({ torneo: ID, encuentro: "13" }, new AbortController().signal, sitio);
+    expect(r13.origen.prueba).toBe(true);
+    expect(r13.origen.fase).toEqual({ es: "Semifinal 1", en: "Semi-final 1", desempate: false });
+    expect((await cargarEncuentroTorneo({ torneo: ID, encuentro: "14" }, new AbortController().signal, sitio)).origen.fase?.desempate).toBe(true);
+    expect((await cargarEncuentroTorneo({ torneo: ID, encuentro: "01" }, new AbortController().signal, sitio)).origen.fase).toEqual({ es: "Grupo A", en: "Group A", desempate: false });
+  });
+});

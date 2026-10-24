@@ -13,7 +13,7 @@ import { planProgramado } from "../controladores";
 import type { ModeloConfigurado } from "../modelos";
 import { GestorSesiones } from "../sesiones";
 import { esquemaTorneo062, gastoConocido, esquemaMovimiento, reservaPartido, rondasPartido, validarCoherencia, type ParticipanteTorneo, type Torneo062 } from "../torneo";
-import { diaUtc, idDelDia, partidosFormato, planTorneo, semillaDelDia, topeFormatoMicroUsd, tipicoPorDecision } from "../torneo-formatos";
+import { campeon, diaUtc, idDelDia, partidosFormato, planTorneo, semillaDelDia, topeFormatoMicroUsd, tipicoPorDecision } from "../torneo-formatos";
 import { participantesEnsayo } from "../torneo-ejecucion";
 import { configuracionSitio, ErrorSitio, esquemaManifiesto, type GestorTorneoSitio, type Manifiesto } from "../torneo-sitio";
 import { principal, type DepsCli } from "../torneo-cli";
@@ -109,6 +109,48 @@ describe("062 · S17 · liga completa en ensayo", () => {
 });
 
 // =====================================================================================================================
+describe("062 · S17 · grupos + eliminatoria completo en ensayo", () => {
+  it("12 de grupos intercalados, semifinales 1A–2B y 1B–2A, desempates con los lados invertidos y la misma semilla, final; instantánea final coherente y validarTorneo", async () => {
+    const { g, almacen, reloj } = await preparado();
+    expect(g.estado().formatos.grupos.disponible).toBe(true);
+    const parar = reloj.auto();
+    try {
+      const { id } = await g.lanzar({ formato: "grupos", prueba: false });
+      await g.esperarActivo();
+      const t = instantanea(almacen, id);
+      expect([t.formato, t.estado, t.motivoFin]).toEqual(["grupos", "completo", null]);
+      const rango = partidosFormato("grupos");
+      expect(t.encuentros.length).toBeGreaterThanOrEqual(rango.min);
+      expect(t.encuentros.length).toBeLessThanOrEqual(rango.max);
+      expect(validarCoherencia(t)).toEqual([]);
+      expect(t.encuentros.slice(0, 12).map(e => e.fase)).toEqual(["grupo-A", "grupo-B", "grupo-A", "grupo-B", "grupo-A", "grupo-B", "grupo-A", "grupo-B", "grupo-A", "grupo-B", "grupo-A", "grupo-B"]);
+      const ko = t.encuentros.slice(12);
+      expect(ko.filter(e => !e.desempate).map(e => e.fase)).toEqual(["semifinal-1", "semifinal-2", "final"]);
+      for (const d of ko.filter(e => e.desempate)) {
+        const llave = ko.find(e => e.fase === d.fase && !e.desempate)!;
+        expect(llave.local.goles).toBe(llave.visita.goles);
+        expect([d.seed, d.local.participante, d.visita.participante, d.n]).toEqual([llave.seed, llave.visita.participante, llave.local.participante, llave.n + 1]);
+      }
+      expect(campeon(t)).not.toBeNull();
+      const leer = (archivo: string) => almacen.archivos.get(`${id}.${archivo}`) as Uint8Array;
+      expect(validarTorneo(JSON.parse(almacen.texto(`${id}.torneo.json`)!), leer).id).toBe(id);
+    } finally { parar(); }
+  });
+  it("empate forzado en la semifinal 1 (partidos de ensayo de 10 s: sin goles) ⇒ su desempate con los lados invertidos, y nunca un segundo", async () => {
+    const { g, almacen, reloj } = await preparado();
+    const parar = reloj.auto();
+    try {
+      const { id } = await g.lanzar({ formato: "grupos", prueba: false });
+      await g.esperarActivo();
+      const t = instantanea(almacen, id), sf1 = t.encuentros.filter(e => e.fase === "semifinal-1");
+      expect(sf1.map(e => [e.desempate, e.local.goles, e.visita.goles])).toEqual([[false, 0, 0], [true, 0, 0]]);
+      expect([sf1[1]!.local.participante, sf1[1]!.visita.participante, sf1[1]!.seed]).toEqual([sf1[0]!.visita.participante, sf1[0]!.local.participante, sf1[0]!.seed]);
+      expect(t.encuentros).toHaveLength(partidosFormato("grupos").max);
+      expect(validarCoherencia(t)).toEqual([]);
+    } finally { parar(); }
+  });
+});
+
 describe("062 · S1/S3 · admisión concurrente y torneo activo de ayer", () => {
   it("(a) dos lanzar simultáneos con todo libre ⇒ 1 admitido y 1 × 409", async () => {
     const { g } = await preparado();
@@ -637,11 +679,6 @@ describe("062 · S12 · réplica única e interruptor", () => {
     const { g } = await preparado({ env: envReal({ ARENA_SOL61_AZURE_OPENAI_DEPLOYMENT: "otro" }) });
     expect(g.estado().motivo).toBe("catalogo");
     expect(await motivo(g.lanzar({ formato: "liga", prueba: false }))).toBe("422 catalogo");
-  });
-  it("el formato grupos no se admite en P1-a", async () => {
-    const { g } = await preparado();
-    expect(await motivo(g.lanzar({ formato: "grupos", prueba: false }))).toBe("422 formato");
-    expect(g.estado().formatos.grupos.disponible).toBe(false);
   });
 });
 

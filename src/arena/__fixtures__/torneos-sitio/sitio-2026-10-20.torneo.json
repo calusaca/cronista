@@ -7,7 +7,7 @@
     "en": "Site tournament · 2026-10-20 · rehearsal, no AI"
   },
   "inicioUtc": "2026-10-20T12:00:00.000Z",
-  "commit": "3ce08cebba12ee11901b42e6973dbf023c8c38f3",
+  "commit": "c71badfdbc3f336c744fb6627290f9730b3a6c40",
   "motor": {
     "version": "arena-v3",
     "reglas": "reinicios-v5"
@@ -159,7 +159,7 @@
       "vuelta": false,
       "seed": 2290261191,
       "archivo": "e01.json.gz",
-      "archivoSha256": "b09549cb2a12717bad4603aff9c6544d34cc62a6bdcd24ed4280fce9bba11b42",
+      "archivoSha256": "e99d0647f2d461536b4825ca82b7f4935cf0a093fe5d72e83bf4076e8717ec90",
       "intento": 1,
       "local": {
         "participante": "ensayo:d",
@@ -175,7 +175,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            4.560231000000044
+            1.9345429999999624
           ],
           "llamadas": [
             0
@@ -207,7 +207,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            4.546440999999959
+            1.9384330000000318
           ],
           "llamadas": [
             0
@@ -235,7 +235,7 @@
       "vuelta": false,
       "seed": 1240901116,
       "archivo": "e02.json.gz",
-      "archivoSha256": "072b7c3490351b145253959feb977f728f8a3dd8f94e597f297837550ae75a8e",
+      "archivoSha256": "9424e4b8fd404ef2d540599b67da02468a5edfd8fffd4f4ed39827650dc17a85",
       "intento": 1,
       "local": {
         "participante": "ensayo:a",
@@ -251,7 +251,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.5704899999999498
+            0.4341779999999744
           ],
           "llamadas": [
             0
@@ -283,7 +283,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.5738979999999856
+            0.4342589999999973
           ],
           "llamadas": [
             0
@@ -311,7 +311,7 @@
       "vuelta": false,
       "seed": 3632254092,
       "archivo": "e03.json.gz",
-      "archivoSha256": "1ede563963e76fcc046e550c7edac9c4e542105aa937dcd2fd6c740915d6cb3f",
+      "archivoSha256": "227700cde0e55beb0d5793cddea0d792ecd30904065701ad5c19f888f7dd0444",
       "intento": 1,
       "local": {
         "participante": "ensayo:c",
@@ -327,7 +327,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.6264189999999417
+            0.28744800000004034
           ],
           "llamadas": [
             0
@@ -359,7 +359,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.6177790000000414
+            0.2606590000000324
           ],
           "llamadas": [
             0
@@ -387,7 +387,7 @@
       "vuelta": false,
       "seed": 1243234284,
       "archivo": "e04.json.gz",
-      "archivoSha256": "a9dac40df04c1f4cc25dca05a76b10eab90c2ce5c912f419327e6b5548aa67f6",
+      "archivoSha256": "52c74b88ff02076430561938175a6548ddac3cebe7eda576c783b9ffb0f50a8c",
       "intento": 1,
       "local": {
         "participante": "ensayo:f",
@@ -403,7 +403,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.22254999999995562
+            0.2387300000000323
           ],
           "llamadas": [
             0
@@ -435,7 +435,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            7.374985000000152
+            0.2248299999999972
           ],
           "llamadas": [
             0
@@ -463,7 +463,7 @@
       "vuelta": false,
       "seed": 1849476017,
       "archivo": "e05.json.gz",
-      "archivoSha256": "1365962671b1a6919b3e3f21ad2307ff9392abc454c6a3e296eb09ec0183bc3a",
+      "archivoSha256": "b6bda3ff11fbda67fcc57b1b6b6314b61cabe5accabb575c7c4a3d1e22f57c81",
       "intento": 1,
       "local": {
         "participante": "ensayo:e",
@@ -479,7 +479,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.38625900000010915
+            0.22944700000005014
           ],
           "llamadas": [
             0
@@ -511,7 +511,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3360490000000027
+            0.2247300000000223
           ],
           "llamadas": [
             0
@@ -539,7 +539,7 @@
       "vuelta": false,
       "seed": 1745902033,
       "archivo": "e06.json.gz",
-      "archivoSha256": "775faec559561042a4733232bcd3d18290022bad0f3e8f74d652e0539b182a6d",
+      "archivoSha256": "c7f4e78e2cd97586a9b6fc6a7240f7afd2025fba5206cfe60b4815b7f6d06bdc",
       "intento": 1,
       "local": {
         "participante": "ensayo:d",
@@ -555,7 +555,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3504299999999603
+            0.332129000000009
           ],
           "llamadas": [
             0
@@ -587,7 +587,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.47224899999991976
+            0.34407899999996516
           ],
           "llamadas": [
             0
@@ -615,7 +615,7 @@
       "vuelta": false,
       "seed": 1303120954,
       "archivo": "e07.json.gz",
-      "archivoSha256": "e8f2a4c499cd41515c2b51b68108521836c4a9c1c3b2af76472ab10181ec0e8a",
+      "archivoSha256": "f9e8939298a386a62546d14ac4e9d2147bf1cd2b880847d4da05933d1f848387",
       "intento": 1,
       "local": {
         "participante": "ensayo:a",
@@ -631,7 +631,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3114189999998871
+            0.25934699999993427
           ],
           "llamadas": [
             0
@@ -663,7 +663,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.2945200000001478
+            0.26582699999994475
           ],
           "llamadas": [
             0
@@ -691,7 +691,7 @@
       "vuelta": false,
       "seed": 3552108803,
       "archivo": "e08.json.gz",
-      "archivoSha256": "fd1d6c208ccbcf2ca6daf041a0990cd6203d61be26df9cccf94353db02740de3",
+      "archivoSha256": "e1464ffcf26b8614b26a97027178fd49fdecf19256fa79a499537d8acfa1a7dd",
       "intento": 1,
       "local": {
         "participante": "ensayo:c",
@@ -707,7 +707,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1922300000001087
+            0.1806500000000142
           ],
           "llamadas": [
             0
@@ -739,7 +739,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.18121900000005553
+            0.16551899999990383
           ],
           "llamadas": [
             0
@@ -767,7 +767,7 @@
       "vuelta": false,
       "seed": 3282043911,
       "archivo": "e09.json.gz",
-      "archivoSha256": "ebf3d64ce458dcdc6636d15ad85305a51c598bf22d6f1da304a5696a3f73eddf",
+      "archivoSha256": "71a4d99b0ca21ab71c4302afaf4e3fd7242b2d9e31c50e6a190e7ecd9f6ea425",
       "intento": 1,
       "local": {
         "participante": "ensayo:b",
@@ -783,7 +783,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.28064900000003945
+            0.19430899999997564
           ],
           "llamadas": [
             0
@@ -815,7 +815,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.238510000000133
+            0.17957899999987603
           ],
           "llamadas": [
             0
@@ -843,7 +843,7 @@
       "vuelta": false,
       "seed": 662972170,
       "archivo": "e10.json.gz",
-      "archivoSha256": "5fd30ee01f928d39882cde5ce7faba5018fa9824b85880cc736b3132070bdcb1",
+      "archivoSha256": "3a158fe60646f086b2a3813f8fd95cdf921da3f99a8339d3635cddd2dcbcdb47",
       "intento": 1,
       "local": {
         "participante": "ensayo:f",
@@ -859,7 +859,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.22054900000011912
+            0.21337900000003174
           ],
           "llamadas": [
             0
@@ -891,7 +891,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.19353899999987334
+            0.19677899999987858
           ],
           "llamadas": [
             0
@@ -919,7 +919,7 @@
       "vuelta": false,
       "seed": 3122694856,
       "archivo": "e11.json.gz",
-      "archivoSha256": "203909b4009ed90e2a7d96209fbb3730532c5b73f6dd73f0d5e5d633b1a4a3a9",
+      "archivoSha256": "e32d7637e2db04d7b5aef72be561cd6e69fb5b75246b183fd742ae36c29ed6f1",
       "intento": 1,
       "local": {
         "participante": "ensayo:d",
@@ -935,7 +935,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.20782800000006318
+            0.21486000000004424
           ],
           "llamadas": [
             0
@@ -967,7 +967,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1702989999998863
+            0.16269999999985885
           ],
           "llamadas": [
             0
@@ -995,7 +995,7 @@
       "vuelta": false,
       "seed": 755233512,
       "archivo": "e12.json.gz",
-      "archivoSha256": "6fa0b3377cf4c7768a4633f165737689c3881478272d20ea374c70e1617212f3",
+      "archivoSha256": "51affb98a56dee4be4dd9f885d19a349e9cead8f91cb9a4dc62e9279e38aafd3",
       "intento": 1,
       "local": {
         "participante": "ensayo:a",
@@ -1011,7 +1011,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.36426799999981085
+            0.19715900000005604
           ],
           "llamadas": [
             0
@@ -1043,7 +1043,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3538499999999658
+            0.17683899999997266
           ],
           "llamadas": [
             0
@@ -1071,7 +1071,7 @@
       "vuelta": false,
       "seed": 1261878209,
       "archivo": "e13.json.gz",
-      "archivoSha256": "1eb7545ae4c32f6e94d36f2a203b1f5ce580ddfd5ce79d08abae825d3256a6f5",
+      "archivoSha256": "cfc13760786d788e193423217ec659c897acd5d946008dd3f8253a76342cdcde",
       "intento": 1,
       "local": {
         "participante": "ensayo:c",
@@ -1087,7 +1087,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3765979999998308
+            0.239029999999957
           ],
           "llamadas": [
             0
@@ -1119,7 +1119,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.339038999999957
+            0.21794899999986228
           ],
           "llamadas": [
             0
@@ -1147,7 +1147,7 @@
       "vuelta": false,
       "seed": 566188216,
       "archivo": "e14.json.gz",
-      "archivoSha256": "efc46985d04dc7af738aca701ecf85b98fcd55ce219d23e640452df77f6dd3bd",
+      "archivoSha256": "c00f8b9e4d602b9abfcdfc27fb82d8ccb074bada7273bae7dad4babad5c78c7d",
       "intento": 1,
       "local": {
         "participante": "ensayo:b",
@@ -1163,7 +1163,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.17938999999978478
+            0.22500900000000001
           ],
           "llamadas": [
             0
@@ -1195,7 +1195,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.16169899999977133
+            0.18841999999995096
           ],
           "llamadas": [
             0
@@ -1223,7 +1223,7 @@
       "vuelta": false,
       "seed": 1226930179,
       "archivo": "e15.json.gz",
-      "archivoSha256": "6c21252821b6f7cce8154c9749c79d7680bb658131959631c8f89fce4157221e",
+      "archivoSha256": "84f53c0d1752328435f8dfb1717f4ec85f72fe0dac37b54a769d3aedaa4da2a3",
       "intento": 1,
       "local": {
         "participante": "ensayo:e",
@@ -1239,7 +1239,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1771880000001147
+            0.17356900000004316
           ],
           "llamadas": [
             0
@@ -1271,7 +1271,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1629480000001422
+            0.16139899999984664
           ],
           "llamadas": [
             0
@@ -1299,7 +1299,7 @@
       "vuelta": true,
       "seed": 2290261191,
       "archivo": "e16.json.gz",
-      "archivoSha256": "b1e682049ca95f4df0b48582be7cd2f139a5dc5c256a080e0488d0c5b7c0b199",
+      "archivoSha256": "5759f37aad7906ec9db8e853b465eecd3559552ab82d25657cecb7bd6b76173a",
       "intento": 1,
       "local": {
         "participante": "ensayo:f",
@@ -1315,7 +1315,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.178621000000021
+            0.18766999999979816
           ],
           "llamadas": [
             0
@@ -1347,7 +1347,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.16516999999976179
+            0.16333000000008724
           ],
           "llamadas": [
             0
@@ -1375,7 +1375,7 @@
       "vuelta": true,
       "seed": 1240901116,
       "archivo": "e17.json.gz",
-      "archivoSha256": "8d3c7a0b4e857eaac3b27ff02a7606aeab292c274fd16e2e60bfc3d0074dc25f",
+      "archivoSha256": "26947c94068ae7add639ade6cd5aaf69d0e0ab90d26eb1a0c731bf3ea81837f1",
       "intento": 1,
       "local": {
         "participante": "ensayo:e",
@@ -1391,7 +1391,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.20147899999983565
+            0.19585899999992762
           ],
           "llamadas": [
             0
@@ -1423,7 +1423,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.17105899999978647
+            0.18566800000007788
           ],
           "llamadas": [
             0
@@ -1451,7 +1451,7 @@
       "vuelta": true,
       "seed": 3632254092,
       "archivo": "e18.json.gz",
-      "archivoSha256": "292ec566fc5080fdf85d962c14957a4567ccf852aa1f5a033b111ecd874592e4",
+      "archivoSha256": "571782fecf070aa9ab1558bffb22324c6403a9c2a3dec8a2a54b05a8c406cc80",
       "intento": 1,
       "local": {
         "participante": "ensayo:b",
@@ -1467,7 +1467,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.23399900000003981
+            0.18486800000005132
           ],
           "llamadas": [
             0
@@ -1499,7 +1499,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.22796999999991385
+            0.15004899999985355
           ],
           "llamadas": [
             0
@@ -1527,7 +1527,7 @@
       "vuelta": true,
       "seed": 1243234284,
       "archivo": "e19.json.gz",
-      "archivoSha256": "f9f8a8aa80bd4a7c8706cfcb2f5600142b74aa8b1c0b25dccbdc941dbf256de7",
+      "archivoSha256": "77a7202d63302a45832eaaca0ea17f57d7d39ee2cb0c32984b1c66a7454dc343",
       "intento": 1,
       "local": {
         "participante": "ensayo:b",
@@ -1543,7 +1543,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.3239589999998316
+            0.15008999999963635
           ],
           "llamadas": [
             0
@@ -1575,7 +1575,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.29938899999979185
+            0.139611000000059
           ],
           "llamadas": [
             0
@@ -1603,7 +1603,7 @@
       "vuelta": true,
       "seed": 1849476017,
       "archivo": "e20.json.gz",
-      "archivoSha256": "d6b5b1f50f54574b4eab33f00f163f05333808992f65b4ffafefef842689475c",
+      "archivoSha256": "0dc98579d7898bf5bb1192adbd38815805b00498fbf0848bc2f6673bc0f70201",
       "intento": 1,
       "local": {
         "participante": "ensayo:c",
@@ -1619,7 +1619,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.2020079999997506
+            0.19499899999982517
           ],
           "llamadas": [
             0
@@ -1651,7 +1651,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.17855899999995017
+            0.17128999999977168
           ],
           "llamadas": [
             0
@@ -1679,7 +1679,7 @@
       "vuelta": true,
       "seed": 1745902033,
       "archivo": "e21.json.gz",
-      "archivoSha256": "e80b792eb157976ad9154f3a510eaa87f38559867ce34244d3f9cd34d00989d1",
+      "archivoSha256": "0638e03df644b36de7887f87d44abb956dfff4f6be5861f55b680055837e2189",
       "intento": 1,
       "local": {
         "participante": "ensayo:a",
@@ -1695,7 +1695,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.5066790000000765
+            0.17397900000014488
           ],
           "llamadas": [
             0
@@ -1727,7 +1727,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.47555999999985943
+            0.15123099999982514
           ],
           "llamadas": [
             0
@@ -1755,7 +1755,7 @@
       "vuelta": true,
       "seed": 1303120954,
       "archivo": "e22.json.gz",
-      "archivoSha256": "397128414eae86b2872974fa1f2079af8b44ab9666f0f63b51c4a0bc827c79e5",
+      "archivoSha256": "9893a9b565f12cd4f34b3e4bf2657858e63b521ea989fe7f14bf3c533e4c1135",
       "intento": 1,
       "local": {
         "participante": "ensayo:f",
@@ -1771,7 +1771,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.29306899999983216
+            0.17259899999999107
           ],
           "llamadas": [
             0
@@ -1803,7 +1803,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.37925899999981993
+            0.15020999999978812
           ],
           "llamadas": [
             0
@@ -1831,7 +1831,7 @@
       "vuelta": true,
       "seed": 3552108803,
       "archivo": "e23.json.gz",
-      "archivoSha256": "df08d37ec853392c3c0f397b26babb697e8e67398a47fd46a2232ea4d12ef248",
+      "archivoSha256": "55602b49c417853e61fc2a42a618b6cb264bf8fc0c327f510a59a504241fbfaf",
       "intento": 1,
       "local": {
         "participante": "ensayo:d",
@@ -1847,7 +1847,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.2052800000001298
+            0.18574000000035085
           ],
           "llamadas": [
             0
@@ -1879,7 +1879,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.18128900000010617
+            0.16798999999991793
           ],
           "llamadas": [
             0
@@ -1907,7 +1907,7 @@
       "vuelta": true,
       "seed": 3282043911,
       "archivo": "e24.json.gz",
-      "archivoSha256": "a0d667d5fc183745456337542c1c9ebb03cd938e2397bd3d882fc9ad62c10014",
+      "archivoSha256": "8132f6465da478e0f6b44f81ac3e4e1c5261e003e054c5cf218ce6e02234805a",
       "intento": 1,
       "local": {
         "participante": "ensayo:e",
@@ -1923,7 +1923,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.25503000000026077
+            0.1814790000003086
           ],
           "llamadas": [
             0
@@ -1955,7 +1955,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.238119000000097
+            0.16618900000003123
           ],
           "llamadas": [
             0
@@ -1983,7 +1983,7 @@
       "vuelta": true,
       "seed": 662972170,
       "archivo": "e25.json.gz",
-      "archivoSha256": "362f699c86d38c74969320ed42516ee4ffe65aa3a67228dfe735efadc95facc0",
+      "archivoSha256": "aa6b25ec9ff9bad8cfcd918911f1b2876fa6b4d46e0b96953c047f7d8c7ef80c",
       "intento": 1,
       "local": {
         "participante": "ensayo:e",
@@ -1999,7 +1999,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.22163899999986825
+            0.15580899999986286
           ],
           "llamadas": [
             0
@@ -2031,7 +2031,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.2016510000003109
+            0.1424099999999271
           ],
           "llamadas": [
             0
@@ -2059,7 +2059,7 @@
       "vuelta": true,
       "seed": 3122694856,
       "archivo": "e26.json.gz",
-      "archivoSha256": "1f79f9c250bf8d2cd71f88450a1f8bcdf2bc731aedc6df122310ec465aa3407a",
+      "archivoSha256": "1051bd05b9aab9fb20f25d980e482545992b4cbfc1d35b674de7e93552eda3fa",
       "intento": 1,
       "local": {
         "participante": "ensayo:b",
@@ -2075,7 +2075,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.20155000000022483
+            0.16049900000007256
           ],
           "llamadas": [
             0
@@ -2107,7 +2107,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.18044999999983702
+            0.14206899999999223
           ],
           "llamadas": [
             0
@@ -2135,7 +2135,7 @@
       "vuelta": true,
       "seed": 755233512,
       "archivo": "e27.json.gz",
-      "archivoSha256": "3376e4fdfa3053245ee2113c2a2bf9fa44eaf2292722f6c2d0303a143f148d04",
+      "archivoSha256": "6673b62e0fe095414aacdcb626405c2cb0623a29ac577137fc88295a4d8bc466",
       "intento": 1,
       "local": {
         "participante": "ensayo:c",
@@ -2151,7 +2151,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.19633900000007998
+            0.19673899999997957
           ],
           "llamadas": [
             0
@@ -2183,7 +2183,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1772399999999834
+            0.17388900000014473
           ],
           "llamadas": [
             0
@@ -2211,7 +2211,7 @@
       "vuelta": true,
       "seed": 1261878209,
       "archivo": "e28.json.gz",
-      "archivoSha256": "f461f75ee9e60fc44227d7a74cc698cda3b6e25cbec9f555cb08ec752f6246b3",
+      "archivoSha256": "86b9c8ac28c834ff95f0d28f5cf6f2f4fa6267c114166b52752312e36d7f71f7",
       "intento": 1,
       "local": {
         "participante": "ensayo:f",
@@ -2227,7 +2227,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1615799999999581
+            0.1848280000003797
           ],
           "llamadas": [
             0
@@ -2259,7 +2259,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.1492089999997006
+            0.17558800000006158
           ],
           "llamadas": [
             0
@@ -2287,7 +2287,7 @@
       "vuelta": true,
       "seed": 566188216,
       "archivo": "e29.json.gz",
-      "archivoSha256": "2d49809d94399862e13cb2777928aa3762946ab3d2a57b3e33845e11e297c8a4",
+      "archivoSha256": "babc216427e3137e7c6a565416c973b304824dc683e534e03da7f51a734e9944",
       "intento": 1,
       "local": {
         "participante": "ensayo:a",
@@ -2303,7 +2303,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.2152499999997417
+            0.15480899999965914
           ],
           "llamadas": [
             0
@@ -2335,7 +2335,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.19291999999995824
+            0.13827900000023874
           ],
           "llamadas": [
             0
@@ -2363,7 +2363,7 @@
       "vuelta": true,
       "seed": 1226930179,
       "archivo": "e30.json.gz",
-      "archivoSha256": "e2077541548bdc1f0021bf94af7767ed94e2bd4ea7b192774931a5d4b9f2d1a5",
+      "archivoSha256": "e2dfb7abe863e28f5c0a76ec4f7948e9c3e88d3e2a2f2b988fc27790688b6a91",
       "intento": 1,
       "local": {
         "participante": "ensayo:d",
@@ -2379,7 +2379,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.7581669999999576
+            0.14469000000008236
           ],
           "llamadas": [
             0
@@ -2411,7 +2411,7 @@
         },
         "declarado": {
           "tiemposMs": [
-            0.7372980000000098
+            0.13339999999971042
           ],
           "llamadas": [
             0

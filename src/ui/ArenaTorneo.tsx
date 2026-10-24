@@ -7,7 +7,8 @@
 // está `en_curso` (solo con la pestaña visible) y la lista «Torneos» separada por origen.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { esquemaTorneoCualquiera, rondasPartido, validarCoherencia, type TorneoCualquiera } from "../arena/torneo";
-import { planTorneo, textoSignificacionFormato } from "../arena/torneo-formatos";
+import { partidosFormato, planTorneo, textoSignificacionFormato } from "../arena/torneo-formatos";
+import { ArenaTorneoGrupos } from "./ArenaTorneoGrupos";
 import { TORNEO_SITIO } from "../sim/limites";
 import { ArenaTorneoLanzar } from "./ArenaTorneoLanzar";
 import { baseTorneo } from "./torneo-carga";
@@ -153,8 +154,10 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
   const estadoRef = useRef<HTMLElement>(null);
   useEffect(() => { if (enCurso && typeof location !== "undefined" && location.hash === "#arena-torneo-estado") estadoRef.current?.focus(); }, [enCurso]);
   const part = useMemo(() => new Map(t.participantes.map(p => [p.id, p])), [t]);
-  const filas = useMemo(() => clasificar(t), [t]), matriz = useMemo(() => matrizResultados(t), [t]);
-  const plan = useMemo((): (EncuentroPlan & { fase?: string })[] => t.version !== "059-v1.1" ? planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t) : calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => cruces(t), [t]);
+  const grupos = t.version !== "059-v1.1" && t.formato === "grupos";
+  // La matriz y los cruces de ida y vuelta son de la liga (calendario Berger de 6); en grupos los calcula ArenaTorneoGrupos.
+  const filas = useMemo(() => clasificar(t), [t]), matriz = useMemo(() => (grupos ? { ids: [], celdas: [] } : matrizResultados(t)), [t, grupos]);
+  const plan = useMemo((): (EncuentroPlan & { fase?: string })[] => t.version !== "059-v1.1" ? planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t) : calendarioTorneo(t.participantes.map(p => p.id), t.semilla), [t]), globales = useMemo(() => (grupos ? [] : cruces(t)), [t, grupos]);
   const porN = new Map(t.encuentros.map(e => [e.n, e]));
   const p = (id: string) => part.get(id)!;
   const jornadas = [...new Set(plan.map(x => x.jornada))];
@@ -171,11 +174,11 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
       <p className="overline">{tx("overline")}</p>
       <h1 id="arena-torneo-h1">{tx("titulo")}</h1>
       <p className="arena-torneo-rotulo" data-testid="arena-torneo-rotulo">{rotuloOrigen(t, idioma)}</p>
-      <p>{TEXTOS_TORNEO.resumen[idioma](t.participantes.length, t.duracionS)}{t062 ? ` · ${TS.decisiones[idioma](rondasPartido(t.duracionS, t.intervaloS))}` : ""}</p>
+      <p>{grupos ? TS.resumenGrupos[idioma](t.participantes.length, t.duracionS) : TEXTOS_TORNEO.resumen[idioma](t.participantes.length, t.duracionS)}{t062 ? ` · ${TS.decisiones[idioma](rondasPartido(t.duracionS, t.intervaloS))}` : ""}</p>
       <dl className="arena-torneo-datos">
         <div><dt>{es ? "Fecha (UTC)" : "Date (UTC)"}</dt><dd>{fechaDe(t.inicioUtc, idioma)}</dd></div>
         <div><dt>{es ? "Modelos" : "Models"}</dt><dd className="tnum">{t.participantes.length}</dd></div>
-        <div><dt>{es ? "Partidos jugados" : "Matches played"}</dt><dd className="tnum">{t.encuentros.length} / {plan.length}</dd></div>
+        <div><dt>{es ? "Partidos jugados" : "Matches played"}</dt><dd className="tnum">{t.encuentros.length} / {grupos ? `${partidosFormato("grupos").min}–${partidosFormato("grupos").max}` : plan.length}</dd></div>
         <div><dt>{es ? "Coste total" : "Total cost"}</dt><dd className="tnum">{usd(t.gasto.conocidoMicroUsd, idioma)} †</dd></div>
       </dl>
       {t.tipo === "ensayo" && <p className="arena-torneo-banda" data-testid="arena-torneo-ensayo"><strong>{tx("ensayo")}</strong>{es ? ": entrenadores programados con nombre de prueba." : ": programmed coaches with test names."}</p>}
@@ -190,10 +193,11 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
     {enCurso && <section className="arena-torneo-panel arena-torneo-enjuego" aria-labelledby="arena-torneo-h-enjuego" id="arena-torneo-estado" tabIndex={-1} ref={estadoRef} data-testid="arena-torneo-enjuego">
       <h2 id="arena-torneo-h-enjuego">{TS.enJuego[idioma]}</h2>
       <p>{enJuego && t062?.enCurso ? <>P{enJuego.n} · {TS.fases[(enJuego.fase ?? "liga") as keyof typeof TS.fases]?.[idioma] ?? TS.fases.liga[idioma]} · {clubesEnJuego ? `${clubesEnJuego.local} (${p(enJuego.local).corto}) – ${clubesEnJuego.visita} (${p(enJuego.visita).corto})` : `${p(enJuego.local).corto} – ${p(enJuego.visita).corto}`} · {TS.empezo[idioma](hora(t062.enCurso.inicioUtc))}</> : TS.preparando[idioma]}</p>
-      <p className="arena-muted">{es ? `Partidos jugados: ${t.encuentros.length} de ${plan.length}. La página se actualiza sola mientras el torneo está en curso.` : `Matches played: ${t.encuentros.length} of ${plan.length}. This page updates itself while the tournament is in progress.`}</p>
+      <p className="arena-muted">{es ? `Partidos jugados: ${t.encuentros.length} de ${grupos ? `${partidosFormato("grupos").min}–${partidosFormato("grupos").max}` : plan.length}. La página se actualiza sola mientras el torneo está en curso.` : `Matches played: ${t.encuentros.length} of ${grupos ? `${partidosFormato("grupos").min}–${partidosFormato("grupos").max}` : plan.length}. This page updates itself while the tournament is in progress.`}</p>
     </section>}
     <p className="arena-torneo-oculto" aria-live="polite" data-testid="arena-torneo-anuncio">{anuncio}</p>
 
+    {grupos && t062 ? <ArenaTorneoGrupos t={t062} idioma={idioma} enlace={n => enlaceRepeticion(t.id, n, idioma)} descarga={a => `${baseTorneo(t.id)}/${a}`} enCursoN={t062.enCurso?.n ?? null} /> : <>
     <section className="arena-torneo-panel" aria-labelledby="arena-torneo-h-tabla">
       <h2 id="arena-torneo-h-tabla">{tx("tabla")}</h2>
       <table className="arena-torneo-tabla" data-testid="arena-torneo-tabla">
@@ -242,6 +246,7 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
           </li>;
         })}</ol></div>)}
     </section>
+    </>}
 
     <section className="arena-torneo-panel" aria-labelledby="arena-torneo-h-metricas">
       <h2 id="arena-torneo-h-metricas">{tx("metricas")}</h2>
@@ -288,13 +293,13 @@ function Contenido({ torneo: inicial, idioma, clubes }: { torneo: TorneoCualquie
     <section className="arena-torneo-panel" aria-labelledby="arena-torneo-h-limites">
       <h2 id="arena-torneo-h-limites">{tx("limites")}</h2>
       <ul>{(es ? [
-        `Pocos partidos: ${t.encuentros.length} partidos de ${t.duracionS} s y ${t.participantes.length - 1} cruces por modelo; la tabla describe este torneo.`,
+        grupos ? `Pocos partidos: ${t.encuentros.length} partidos de ${t.duracionS} s y como mucho 4 cruces y llaves por modelo; el cuadro describe este torneo. Remates directos, remates, coeficiente y sorteo son criterios del torneo, no reglamento.` : `Pocos partidos: ${t.encuentros.length} partidos de ${t.duracionS} s y ${t.participantes.length - 1} cruces por modelo; la tabla describe este torneo.`,
         "La semilla fija clubes, niveles, condiciones y grada, no la suerte de cada jugada: con órdenes distintas, el azar del motor diverge.",
         "Motor 2D sintético con parámetros por calibrar y reglas simplificadas; no es un partido reglamentario y los goles no son la única medida de calidad.",
         `La reproducción prueba que las órdenes archivadas producen el registro, no quién las escribió: la identidad del modelo, los tokens y el coste los declara ${quien}.`,
         "Mismo prompt y esfuerzo «low» para todos; las latencias dependen de la carga de deployments compartidos con la arena pública.",
       ] : [
-        `Few matches: ${t.encuentros.length} matches of ${t.duracionS} s and ${t.participantes.length - 1} pairings per model; the table describes this tournament.`,
+        grupos ? `Few matches: ${t.encuentros.length} matches of ${t.duracionS} s and at most 4 pairings and ties per model; the bracket describes this tournament. Shots on target, shots, coefficient and draw are tournament criteria, not football rules.` : `Few matches: ${t.encuentros.length} matches of ${t.duracionS} s and ${t.participantes.length - 1} pairings per model; the table describes this tournament.`,
         "The seed fixes clubs, levels, conditions and crowd, not the luck of each play: with different orders, the engine's randomness diverges.",
         "Synthetic 2D engine with uncalibrated parameters and simplified rules; not a regulation match, and goals are not the only measure of quality.",
         `Replay proves that the archived orders produce the record, not who wrote them: model identity, tokens and cost are declared by ${quien}.`,
@@ -309,7 +314,7 @@ function ListaTorneos({ lista, idioma }: { lista: ResumenTorneo[]; idioma: Idiom
   const T = TEXTOS_TORNEO_SITIO, es = idioma === "es";
   const fecha = (iso: string) => new Intl.DateTimeFormat(idioma, { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(iso));
   const item = (r: ResumenTorneo) => <li key={r.id} data-testid="arena-torneo-lista-item" data-id={r.id}>
-    <Link href={`/arena/torneo/${r.id}${es ? "?lang=es" : ""}`} prefetch={false}>{[fecha(r.inicioUtc), T.formatosCorto[r.formato][idioma], T.estados[r.estado][idioma], r.primero ? `${es ? "1.º" : "1st"}${r.primeroCompartido ? "=" : ""} ${r.primero}` : null, r.tipo === "ensayo" ? (es ? "ensayo · sin IA" : "rehearsal · no AI") : null].filter(Boolean).join(" · ")}</Link>
+    <Link href={`/arena/torneo/${r.id}${es ? "?lang=es" : ""}`} prefetch={false}>{[fecha(r.inicioUtc), T.formatosCorto[r.formato][idioma], T.estados[r.estado][idioma], r.formato === "grupos" ? (r.campeon ? `${T.campeon[idioma]} ${r.campeon}` : null) : r.primero ? `${es ? "1.º" : "1st"}${r.primeroCompartido ? "=" : ""} ${r.primero}` : null, r.tipo === "ensayo" ? (es ? "ensayo · sin IA" : "rehearsal · no AI") : null].filter(Boolean).join(" · ")}</Link>
   </li>;
   const grupos: [string, string, ResumenTorneo[]][] = [
     ["archivados", T.archivados[idioma], lista.filter(r => r.origen === "repositorio")],

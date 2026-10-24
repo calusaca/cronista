@@ -6,10 +6,8 @@
 // importa `coherencia062` de aquí: el ciclo es seguro porque este módulo SOLO usa lo de `torneo.ts` dentro de
 // funciones (nunca al evaluarse).
 //
-// P1-a (esta entrega): la liga, que es lo único que el servidor admite lanzar (FORMATOS_DISPONIBLES). El formato
-// `grupos` tiene ya sus funciones puras (§ 3 y § 17.4: sorteo, plan intercalado, orden de grupo, cuadro, desempates y
-// semillas de las llaves), con sus pruebas, pero NO se expone: la ficha del panel lo muestra deshabilitado y la
-// admisión lo rechaza hasta P1-b (UI de grupos y cuadro, e2e 2 y un torneo real).
+// P1-a: la liga. P1-b: grupos + eliminatoria (§ 3 y § 17.4: sorteo, plan intercalado, orden de grupo, cuadro,
+// desempates y semillas de las llaves). Los dos formatos están en FORMATOS_DISPONIBLES.
 import { TORNEO_ARENA as T, TORNEO_SITIO as S } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import {
@@ -29,8 +27,8 @@ export interface DetallePase { criterio: CriterioPase; a: number[]; b: number[] 
 export interface Llave { fase: FaseLlave; local: string; visita: string; partidos: number[]; ganador: string | null; criterio: CriterioPase | null; detalle: DetallePase | null }
 export type Grupo = "A" | "B";
 
-/** Formatos que este servidor admite lanzar (P1-a: solo la liga; grupos se activa con P1-b). */
-export const FORMATOS_DISPONIBLES: readonly FormatoTorneo[] = ["liga"];
+/** Formatos que este servidor admite lanzar (P1-a la liga; P1-b añade grupos + eliminatoria). */
+export const FORMATOS_DISPONIBLES: readonly FormatoTorneo[] = ["liga", "grupos"];
 
 // ---------------------------------------------------------------------------------------------------
 // § 3.2 · Plan: todos los partidos que los resultados ya determinan, en orden de ejecución, numerados 1…k.
@@ -102,6 +100,10 @@ function sumaCifra(partidos: readonly PartidoResultado[], id: string, clave: Cla
   for (const m of partidos) for (const lado of LADOS_TORNEO) if (m[lado].participante === id) { const v = m[lado].cifras[clave]; if (v === null) return null; suma += v; }
   return suma;
 }
+/** Suma de una cifra de `id` en los partidos de su grupo (null si alguna es null), para el texto del criterio. */
+export const cifraEnGrupo = (t: TorneoGrupos, G: Grupo, id: string, clave: ClaveCifra) => sumaCifra(deFase(t, `grupo-${G}`), id, clave);
+/** El grupo jugó todos sus partidos (ida y vuelta). */
+export const grupoCompleto = (t: TorneoGrupos, G: Grupo) => deFase(t, `grupo-${G}`).length === S.formatos.grupos.porGrupo * (S.formatos.grupos.porGrupo - 1);
 /** § 17.4 · Orden estricto de un grupo por refinamiento de particiones: clases de clasificarGrupo; después remates
  * directos, remates y sorteo del subconjunto. Criterio por posición: el ÚLTIMO que la separó. */
 export function ordenGrupo(t: TorneoGrupos, G: Grupo): { id: string; criterio: CriterioPase }[] {

@@ -121,8 +121,8 @@ const M = [
     ["        {motivo ? textoMotivo(motivo, idioma, estado?.proximoCupoUtc) : \"\"}\n", "        {\"\"}\n"]] },
   { id: "U1-disabled", desc: "el botón nunca se deshabilita", archivo: LANZAR, test: T_U1, patron: "motivo «", cambios: [
     ['className="btn btn-primary" disabled={deshabilitado}', 'className="btn btn-primary" disabled={false}']] },
-  { id: "U1-grupos", desc: "grupos habilitado en P1-a", archivo: LANZAR, test: T_U1, patron: "Grupos visible", cambios: [
-    ["disabled={!fi.disponible || v.enviando}", "disabled={v.enviando}"]] },
+  { id: "U1-grupos", desc: "el radio ignora la ficha (grupos siempre deshabilitado)", archivo: LANZAR, test: T_U1, patron: "Grupos habilitado", cambios: [
+    ["disabled={!fi.disponible || v.enviando}", "disabled={f === \"grupos\" || v.enviando}"]] },
   { id: "U1-rotulo", desc: "quitar el rótulo de origen", archivo: PAGINA_UI, test: T_U1, patron: "rótulos de origen", cambios: [
     ['      <p className="arena-torneo-rotulo" data-testid="arena-torneo-rotulo">{rotuloOrigen(t, idioma)}</p>\n', ""]] },
   { id: "U1-declarado", desc: "leyenda «†» del CLI también en los del sitio", archivo: PAGINA_UI, test: T_U1, patron: "rótulos de origen", cambios: [
@@ -130,13 +130,28 @@ const M = [
   { id: "U1-aria-live", desc: "aria-live anuncia todos los partidos, no solo los nuevos", archivo: PAGINA_UI, test: T_U1, patron: "aria-live solo anuncia", cambios: [
     ["const nuevos = despues.encuentros.filter(e => !vistos.has(e.n)).map(", "void vistos; const nuevos = despues.encuentros.map("]] },
   { id: "U1-mostrar", desc: "portada sin preferir los reales a los ensayos", archivo: "src/ui/torneo-lista.ts", test: T_U1, patron: "torneoAMostrar", cambios: [
-    ['?? orden.find(t => t.tipo === "real") ?? orden[0] ?? null;', "?? orden[0] ?? null;"]] },
+    ["  return elegir(reales) ?? elegir(orden) ?? null;", "  void reales; return elegir(orden) ?? null;"]] },
   { id: "U1-carga", desc: "repetición del sitio cargada desde /torneos (sin la base del prefijo)", archivo: "src/ui/torneo-carga.ts", test: "src/ui/__tests__/torneo-carga.test.ts", patron: "062", cambios: [
     ["export const baseTorneo = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? `/api/arena/torneos/sitio/${id}` : `/torneos/${id}`;", "export const baseTorneo = (id: string) => `/torneos/${id}`; void TORNEO_SITIO;"]] },
   { id: "U1-bundle", desc: "el cliente vuelve a importar el motor (arrastra la telemetría al navegador)", archivo: PAGINA_UI, test: T_U1, patron: "no arrastran", cambios: [
     ['import { useEffect, useMemo, useRef, useState } from "react";', 'import { useEffect, useMemo, useRef, useState } from "react";\nimport { crearConfigArena } from "../arena/motor";\nvoid crearConfigArena;']] },
   { id: "E2E-4-error", desc: "reconocer el ErrorSitio solo con instanceof (dos copias del módulo ⇒ 500)", archivo: SITIO, test: T_RUTAS, patron: "OTRA copia del módulo", cambios: [
     ["  if (esErrorSitio(error)) {", "  if (error instanceof ErrorSitio) {"]] },
+  // --- P1-b expuesto: gestor y UI de grupos -----------------------------------------------------------------------
+  { id: "S17g-formato", desc: "grupos fuera de los formatos disponibles", archivo: FORMATOS, test: T_SITIO, patron: "S17 · grupos", cambios: [
+    ['export const FORMATOS_DISPONIBLES: readonly FormatoTorneo[] = ["liga", "grupos"];', 'export const FORMATOS_DISPONIBLES: readonly FormatoTorneo[] = ["liga"];']] },
+  { id: "S17g-desempate", desc: "desempate desactivado en el plan", archivo: FORMATOS, test: T_SITIO, patron: "empate forzado en la semifinal 1", cambios: [
+    ["    if (m1.local.goles === m1.visita.goles) {\n      const p2", "    if (false) {\n      const p2"]] },
+  { id: "U1g-pasa", desc: "«Pasa» sin texto (solo se vería por color)", archivo: "src/ui/ArenaTorneoGrupos.tsx", test: T_U1, patron: "dos tablas de grupo", cambios: [
+    ['<td data-testid="arena-torneo-pasa">{!completo ? T.porDecidir[idioma] : i < 2 ? T.pasaSi[idioma](i + 1) : T.pasaNo[idioma]}</td>', '<td data-testid="arena-torneo-pasa">{""}</td>']] },
+  { id: "U1g-criterio", desc: "sin la línea del criterio del corte de grupo", archivo: "src/ui/ArenaTorneoGrupos.tsx", test: T_U1, patron: "dos tablas de grupo", cambios: [
+    ['      {lineas.map(l => <p key={l} className="arena-muted" data-testid="arena-torneo-criterio-grupo">{l}</p>)}\n', ""]] },
+  { id: "U1g-desempate", desc: "desempate sin rotular «lados invertidos»", archivo: "src/ui/ArenaTorneoGrupos.tsx", test: T_U1, patron: "cuadro: semifinales", cambios: [
+    ['{x2 && <p data-testid="arena-torneo-desempate">{T.desempate[idioma]}: {lineaPartido(x2, e2)}</p>}', '{x2 && <p data-testid="arena-torneo-desempate">{lineaPartido(x2, e2)}</p>}']] },
+  { id: "U1g-campeon", desc: "«Gana este torneo» sin la frase de significación al lado", archivo: "src/ui/ArenaTorneoGrupos.tsx", test: T_U1, patron: "cuadro: semifinales", cambios: [
+    ["<strong>{T.gana[idioma](p(ganador).nombre)}</strong> {textoSignificacionFormato(t, idioma)}</p>", "<strong>{T.gana[idioma](p(ganador).nombre)}</strong></p>"]] },
+  { id: "U1g-carga-prueba", desc: "la repetición de una prueba no lo declara", archivo: "src/ui/torneo-carga.ts", test: "src/ui/__tests__/torneo-carga.test.ts", patron: "P1-b", cambios: [
+    ['...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ', ""]] },
   // --- P1-b, funciones puras de grupos (sin exponer) ---------------------------------------------------------------
   { id: "G1-sin-barajar", desc: "sorteo de grupos sin barajar", archivo: FORMATOS, test: T_GRUPOS, patron: "G1", cambios: [
     ["  for (let i = orden.length - 1; i > 0; i--) { const j = rng.int(0, i); [orden[i], orden[j]] = [orden[j]!, orden[i]!]; }\n  return orden;", "  void rng;\n  return orden;"]] },

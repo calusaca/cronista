@@ -96,7 +96,7 @@ describe("062 · G9 · estimación por formato con las entradas reales", () => {
     expect(estimarFormato("liga", ENTRADAS).tipicoMicroUsd).toEqual({ min: 3_538_420, max: 3_538_420, maxConDesempates: 3_538_420 });
     expect(estimarFormato("grupos", ENTRADAS).tipicoMicroUsd).toEqual({ min: 1_503_152, max: 2_035_268, maxConDesempates: 2_655_168 });
   });
-  it("en los dos formatos: tope ≥ típicoMáx − último partido + reservaMáx; tope ≤ topeMaxUsd; la liga está disponible y grupos no (P1-a)", () => {
+  it("en los dos formatos: tope ≥ típicoMáx − último partido + reservaMáx; tope ≤ topeMaxUsd; los dos formatos están disponibles (P1-b)", () => {
     for (const f of ["liga", "grupos"] as const) {
       const ficha = estimarFormato(f, ENTRADAS);
       expect(ficha.topeMicroUsd).toBe(S.formatos[f].topeUsd * 1_000_000);
@@ -104,7 +104,7 @@ describe("062 · G9 · estimación por formato con las entradas reales", () => {
       expect(ficha.topeMicroUsd).toBeLessThanOrEqual(T.topeMaxUsd * 1_000_000);
       expect(ficha.partidos).toEqual(partidosFormato(f));
     }
-    expect([estimarFormato("liga", ENTRADAS).disponible, estimarFormato("grupos", ENTRADAS).disponible]).toEqual([true, false]);
+    expect([estimarFormato("liga", ENTRADAS).disponible, estimarFormato("grupos", ENTRADAS).disponible]).toEqual([true, true]);
   });
 });
 

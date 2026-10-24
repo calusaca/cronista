@@ -505,7 +505,8 @@ export class GestorTorneoSitio {
       const manifiesto = esquemaManifiesto.parse({
         version: S.version, id, formato: p.formato, tipo: cfg.ensayo ? "ensayo" : "real", lanzamiento: p.prueba ? "prueba" : "publico", participantes, semilla,
         duracionS: cfg.duracionS, intervaloS: S.intervaloS, motor: { version: ARENA.version, reglas: ARENA.reglas }, commit: cfg.commit!,
-        topeMicroUsd: ficha.topeMicroUsd, tipicoMicroUsd: ficha.tipicoMicroUsd.max, reservaMaxPartidoMicroUsd: Math.max(...plan.map(x => reservaPartido({ local: precio(x.local), visita: precio(x.visita) }, entradas.promptMax.tokens, rondas))),
+        topeMicroUsd: ficha.topeMicroUsd, tipicoMicroUsd: ficha.tipicoMicroUsd.max, // En grupos las llaves dependen de los resultados: la reserva máxima es la de cualquier pareja (la de la ficha).
+        reservaMaxPartidoMicroUsd: Math.max(ficha.reservaMaxPartidoMicroUsd, ...plan.map(x => reservaPartido({ local: precio(x.local), visita: precio(x.visita) }, entradas.promptMax.tokens, rondas))),
         promptMax: entradas.promptMax.tokens, operacion: (this.deps.uuid ?? randomUUID)(), creadoUtc: iso(ahora),
       } satisfies Manifiesto);
       // 1. Punto de confirmación (§ 17.2): el manifiesto con `nuevo: true`. Respuesta perdida ⇒ se relee.

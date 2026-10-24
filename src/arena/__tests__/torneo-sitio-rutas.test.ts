@@ -120,7 +120,7 @@ describe("062 · rutas de lectura (R1) y estado", () => {
     const e = await r.json();
     expect(e.motivo).toBeNull();
     expect(e.formatos.liga.partidos).toEqual({ min: 30, max: 30 });
-    expect(e.formatos.grupos.disponible).toBe(false);
+    expect(e.formatos.grupos.disponible).toBe(true);
     expect(e.bolsa.bolsaMicroUsd).toBe(S.bolsaUsd * 1_000_000);
   });
   it("R1 · [archivo] fuera del manifiesto ⇒ 404; bytes con la huella; [id] inválido o inexistente ⇒ 404; caché según el estado", async () => {

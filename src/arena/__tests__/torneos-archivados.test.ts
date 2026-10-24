@@ -128,13 +128,15 @@ describe("059 · rechazos de la validación compartida (M22, N11, N12, N16)", ()
 });
 
 describe("062 · fixture del sitio (src/arena/__fixtures__/torneos-sitio)", () => {
-  const DS = "src/arena/__fixtures__/torneos-sitio", ID = "sitio-2026-10-20";
-  it("la liga de ensayo del sitio supera validarTorneo 062 (cada .gz contra su plan) y el almacén tiene exactamente sus archivos", async () => {
+  const DS = "src/arena/__fixtures__/torneos-sitio";
+  it("la liga (20 oct) y los grupos de prueba (21 oct) superan validarTorneo 062 y el almacén tiene exactamente sus archivos", async () => {
     const { readdirSync } = await import("node:fs");
-    const crudo = JSON.parse(readFileSync(join(DS, `${ID}.torneo.json`), "utf8"));
-    const t = validarTorneo(crudo, archivo => readFileSync(join(DS, `${ID}.${archivo}`)));
-    expect([t.version, t.tipo, t.estado, t.encuentros.length]).toEqual(["062-v1", "ensayo", "completo", 30]);
-    const esperados = [`dia-${ID.slice(6)}.json`, `${ID}.torneo.json`, `${ID}.gasto.ndjson`, ...t.encuentros.flatMap(e => [`${ID}.${e.archivo}`, `${ID}.${e.archivo.replace(".json.gz", ".ejecutor.json")}`])].sort();
-    expect(readdirSync(DS).sort()).toEqual(esperados);
+    const esperados: string[] = [];
+    for (const [id, manifiesto, formato, n] of [["sitio-2026-10-20", "dia-2026-10-20.json", "liga", 30], ["sitio-prueba-aaaaaa660000", "prueba-aaaaaa660000.json", "grupos", 18]] as const) {
+      const t = validarTorneo(JSON.parse(readFileSync(join(DS, `${id}.torneo.json`), "utf8")), archivo => readFileSync(join(DS, `${id}.${archivo}`)));
+      expect([t.version, t.tipo, t.estado, t.encuentros.length, t.version !== "059-v1.1" && t.formato]).toEqual(["062-v1", "ensayo", "completo", n, formato]);
+      esperados.push(manifiesto, `${id}.torneo.json`, `${id}.gasto.ndjson`, ...t.encuentros.flatMap(e => [`${id}.${e.archivo}`, `${id}.${e.archivo.replace(".json.gz", ".ejecutor.json")}`]));
+    }
+    expect(readdirSync(DS).sort()).toEqual(esperados.sort());
   });
 });

@@ -1,0 +1,1524 @@
+{
+  "version": "062-v1",
+  "id": "sitio-prueba-aaaaaa660000",
+  "tipo": "ensayo",
+  "titulo": {
+    "es": "Torneo de prueba del operador · 2026-10-21 · ensayo sin IA",
+    "en": "Operator test tournament · 2026-10-21 · rehearsal, no AI"
+  },
+  "inicioUtc": "2026-10-21T12:00:00.000Z",
+  "commit": "c71badfdbc3f336c744fb6627290f9730b3a6c40",
+  "motor": {
+    "version": "arena-v3",
+    "reglas": "reinicios-v5"
+  },
+  "duracionS": 10,
+  "intervaloS": 30,
+  "semilla": 20261021,
+  "participantes": [
+    {
+      "id": "ensayo:a",
+      "nombre": "Ensayo A",
+      "corto": "Ensayo A",
+      "deployment": "ensayo-a",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:a",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:b",
+      "nombre": "Ensayo B",
+      "corto": "Ensayo B",
+      "deployment": "ensayo-b",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:b",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:c",
+      "nombre": "Ensayo C",
+      "corto": "Ensayo C",
+      "deployment": "ensayo-c",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:c",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:d",
+      "nombre": "Ensayo D",
+      "corto": "Ensayo D",
+      "deployment": "ensayo-d",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:d",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:e",
+      "nombre": "Ensayo E",
+      "corto": "Ensayo E",
+      "deployment": "ensayo-e",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:e",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    },
+    {
+      "id": "ensayo:f",
+      "nombre": "Ensayo F",
+      "corto": "Ensayo F",
+      "deployment": "ensayo-f",
+      "modelo": "política programada",
+      "version": "arena-v3",
+      "llm": "ensayo",
+      "controlador": "ensayo:f",
+      "formatoJson": null,
+      "esfuerzo": null,
+      "precio": {
+        "entrada": 0,
+        "salida": 0,
+        "cache": 0,
+        "fuente": "ensayo: sin inferencia ni coste",
+        "consultadoUtc": "1970-01-01T00:00:00.000Z",
+        "estimadoDe": null
+      }
+    }
+  ],
+  "pendientes": [],
+  "gasto": {
+    "conocidoMicroUsd": 0,
+    "tipicoMicroUsd": 0,
+    "topeMicroUsd": 7000000,
+    "reservaMaxPartidoMicroUsd": 0
+  },
+  "formato": "grupos",
+  "origen": "sitio",
+  "lanzamiento": "prueba",
+  "finUtc": "2026-10-21T12:00:51.000Z",
+  "estado": "completo",
+  "motivoFin": null,
+  "enCurso": null,
+  "encuentros": [
+    {
+      "n": 1,
+      "jornada": 1,
+      "cruce": 1,
+      "vuelta": false,
+      "seed": 1438754863,
+      "archivo": "e01.json.gz",
+      "archivoSha256": "861da8b37062c3a26dfbe8029c0b2d75e655891ca02f7da03989b2322cc51d90",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Club Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.27508899999975256
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Racing Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2670290000000932
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 2,
+      "jornada": 1,
+      "cruce": 4,
+      "vuelta": false,
+      "seed": 2505302520,
+      "archivo": "e02.json.gz",
+      "archivoSha256": "916a1a08c3499f8e800e0c0d0f8f1e4f5337f4ffaf5c2c769dae27d229a7f016",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Olímpico Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 47,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.16125000000010914
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Sporting Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 53,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15140900000005786
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 3,
+      "jornada": 2,
+      "cruce": 2,
+      "vuelta": false,
+      "seed": 1922508657,
+      "archivo": "e03.json.gz",
+      "archivoSha256": "7c8c5cffdf20ff54896647a00e2056191b5d0316a57bc57095b4f4caffa443a2",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Deportivo Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15374000000019805
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Deportivo Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.13059999999995853
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 4,
+      "jornada": 2,
+      "cruce": 5,
+      "vuelta": false,
+      "seed": 3860765071,
+      "archivo": "e04.json.gz",
+      "archivoSha256": "a3e63e489bea603f8eb8c3336bd25428fe78966097edd93460df118212798eec",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Club Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.14816000000018903
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Deportivo Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.13643000000001848
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 5,
+      "jornada": 3,
+      "cruce": 3,
+      "vuelta": false,
+      "seed": 2941200762,
+      "archivo": "e05.json.gz",
+      "archivoSha256": "600407c489e889848f009b26358f7317e5c29ac66e0922fc1b4245627363a3e7",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Deportivo Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1117300000000796
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Atlético Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.10713900000018839
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 6,
+      "jornada": 3,
+      "cruce": 6,
+      "vuelta": false,
+      "seed": 1753175473,
+      "archivo": "e06.json.gz",
+      "archivoSha256": "6e443e7b256255100d5436f35e45e5526dd4784b390296de62e68f4064a880e6",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Juventud Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 88,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.24690899999995963
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Unión Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 12,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.23285900000018955
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 7,
+      "jornada": 4,
+      "cruce": 1,
+      "vuelta": true,
+      "seed": 1438754863,
+      "archivo": "e07.json.gz",
+      "archivoSha256": "1757f63214c71c36db2f98e0b7a73879b4a85fce8192ef12396efa8916c19d87",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Club Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 1,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.23095999999986816
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Racing Ventolera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.2053990000003978
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 8,
+      "jornada": 4,
+      "cruce": 4,
+      "vuelta": true,
+      "seed": 2505302520,
+      "archivo": "e08.json.gz",
+      "archivoSha256": "88ca9fe94e33720c3955ce0d9225fb8c0fabe2126d24954753268a6690d8329a",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Olímpico Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 47,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17282999999997628
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:b",
+        "club": "Sporting Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 53,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15610000000015134
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 9,
+      "jornada": 5,
+      "cruce": 2,
+      "vuelta": true,
+      "seed": 1922508657,
+      "archivo": "e09.json.gz",
+      "archivoSha256": "e949dcc417b12fbd7a121592a607bf71787e81f59f7066a53777a23a422b6a20",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Deportivo Islaverde Sur",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 3,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19245900000032634
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:f",
+        "club": "Deportivo Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.16875900000013644
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 10,
+      "jornada": 5,
+      "cruce": 5,
+      "vuelta": true,
+      "seed": 3860765071,
+      "archivo": "e10.json.gz",
+      "archivoSha256": "3af833cc9046b01ddd50ec22e0e8008452cef658565931beb52c2d764a125cc2",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:b",
+        "club": "Club Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19475899999997637
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Deportivo Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17283900000029462
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 11,
+      "jornada": 6,
+      "cruce": 3,
+      "vuelta": true,
+      "seed": 2941200762,
+      "archivo": "e11.json.gz",
+      "archivoSha256": "2100030d36b6838588565b7c191916789370542c94b427fd03c9ff9cfd45976c",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:f",
+        "club": "Deportivo Marisal",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1762189999999464
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Atlético Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15919899999971676
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-A",
+      "desempate": false
+    },
+    {
+      "n": 12,
+      "jornada": 6,
+      "cruce": 6,
+      "vuelta": true,
+      "seed": 1753175473,
+      "archivo": "e12.json.gz",
+      "archivoSha256": "56a2f92c79ad1ad2089cf79eb4af1c0f0af03e257082aedae20d843402a69b68",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Juventud Quebralta",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 88,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 2,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.1942189999999755
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Unión Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 12,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17134900000019115
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "grupo-B",
+      "desempate": false
+    },
+    {
+      "n": 13,
+      "jornada": 7,
+      "cruce": 7,
+      "vuelta": false,
+      "seed": 1718320912,
+      "archivo": "e13.json.gz",
+      "archivoSha256": "95d40904b23c9c00270328412bb529422d29698fec755d28778b4e81381c07dc",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Unión Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 71,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.17198999999982334
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:d",
+        "club": "Juventud Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 29,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.14992000000029293
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "semifinal-1",
+      "desempate": false
+    },
+    {
+      "n": 14,
+      "jornada": 7,
+      "cruce": 7,
+      "vuelta": false,
+      "seed": 1718320912,
+      "archivo": "e14.json.gz",
+      "archivoSha256": "23cb9ee2b097f1d37198cb674a7f419bfed5991a489c6b4edaabc921c5c2c306",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:d",
+        "club": "Unión Torreluna",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 71,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15622000000075786
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Juventud Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 29,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 1
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.14237999999932072
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "semifinal-1",
+      "desempate": true
+    },
+    {
+      "n": 15,
+      "jornada": 7,
+      "cruce": 8,
+      "vuelta": false,
+      "seed": 1129178634,
+      "archivo": "e15.json.gz",
+      "archivoSha256": "bfa85182ea47eb0c19be2bf6cbdd4e762bde23ccd54ea2a9a5e1184adf0b414e",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:c",
+        "club": "Deportivo Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.18055900000035763
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Olímpico Puertoscuro",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15605000000050495
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "semifinal-2",
+      "desempate": false
+    },
+    {
+      "n": 16,
+      "jornada": 7,
+      "cruce": 8,
+      "vuelta": false,
+      "seed": 1129178634,
+      "archivo": "e16.json.gz",
+      "archivoSha256": "05e352b93cffeacd193b31f9feb403ef0f2685acc9c02614ae2d5b3fcb6a8f37",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Deportivo Lumbrera",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 1,
+          "pasesIntentados": 1,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.18500899999980902
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:c",
+        "club": "Olímpico Puertoscuro",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15911899999991874
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "semifinal-2",
+      "desempate": true
+    },
+    {
+      "n": 17,
+      "jornada": 8,
+      "cruce": 9,
+      "vuelta": false,
+      "seed": 3820099458,
+      "archivo": "e17.json.gz",
+      "archivoSha256": "89dbb74bc5ba4ce7a4acd3eca09a45ce7a24aeb36c7f60d7f3a4241b81b0b07f",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:e",
+        "club": "Club Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.19230900000002293
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:a",
+        "club": "Sporting Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.16759999999976571
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "final",
+      "desempate": false
+    },
+    {
+      "n": 18,
+      "jornada": 8,
+      "cruce": 9,
+      "vuelta": false,
+      "seed": 3820099458,
+      "archivo": "e18.json.gz",
+      "archivoSha256": "cfff0392546f5bc21cdafce23fa24e91327f19b92128a82aa4df3fa491b1aa3c",
+      "intento": 1,
+      "local": {
+        "participante": "ensayo:a",
+        "club": "Club Solcanto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 100,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 2,
+          "pasesIntentados": 3,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.15967900000032387
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "visita": {
+        "participante": "ensayo:e",
+        "club": "Sporting Pradoalto",
+        "goles": 0,
+        "cifras": {
+          "posesionPct": 0,
+          "remates": 0,
+          "rematesDirectos": 0,
+          "pasesCompletados": 0,
+          "pasesIntentados": 0,
+          "recuperaciones": 0
+        },
+        "declarado": {
+          "tiemposMs": [
+            0.14075899999988906
+          ],
+          "llamadas": [
+            0
+          ],
+          "motivos": [
+            "valida"
+          ],
+          "intentos": [],
+          "esperas": [],
+          "entrada": 0,
+          "salida": 0,
+          "cache": 0,
+          "sinUso": 0,
+          "costoMicroUsd": 0,
+          "modelosDevueltos": []
+        }
+      },
+      "fase": "final",
+      "desempate": true
+    }
+  ]
+}

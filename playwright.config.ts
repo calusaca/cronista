@@ -23,7 +23,12 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     trace: "retain-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } }],
+  // Brief 062 · El spec del torneo del sitio lanza un torneo (estado global del servidor: cupo, torneo activo y carga de
+  // CPU durante ≈ 1 min): corre en un proyecto propio DESPUÉS de todos los demás para no interferir con ellos.
+  projects: [
+    { name: "chromium", testIgnore: /arena-torneo-sitio\.spec\.ts$/, use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
+    { name: "torneo-sitio", testMatch: /arena-torneo-sitio\.spec\.ts$/, dependencies: ["chromium"], use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
+  ],
   webServer: {
     // Brief 059 § 8: el fixture del torneo de ensayo se sirve como estático solo en el build del e2e.
     command: "npm run build && npm run package:standalone && node scripts/e2e-torneos.mjs && node .next/standalone/server.js",

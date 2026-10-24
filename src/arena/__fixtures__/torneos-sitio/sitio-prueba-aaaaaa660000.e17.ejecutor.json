@@ -1,0 +1,43 @@
+{
+  "n": 17,
+  "intento": 1,
+  "archivoSha256": "89dbb74bc5ba4ce7a4acd3eca09a45ce7a24aeb36c7f60d7f3a4241b81b0b07f",
+  "local": {
+    "tiemposMs": [
+      0.19230900000002293
+    ],
+    "llamadas": [
+      0
+    ],
+    "motivos": [
+      "valida"
+    ],
+    "intentos": [],
+    "esperas": [],
+    "entrada": 0,
+    "salida": 0,
+    "cache": 0,
+    "sinUso": 0,
+    "costoMicroUsd": 0,
+    "modelosDevueltos": []
+  },
+  "visita": {
+    "tiemposMs": [
+      0.16759999999976571
+    ],
+    "llamadas": [
+      0
+    ],
+    "motivos": [
+      "valida"
+    ],
+    "intentos": [],
+    "esperas": [],
+    "entrada": 0,
+    "salida": 0,
+    "cache": 0,
+    "sinUso": 0,
+    "costoMicroUsd": 0,
+    "modelosDevueltos": []
+  }
+}

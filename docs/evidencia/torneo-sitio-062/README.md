@@ -140,3 +140,12 @@ Tras los cambios: `npm test` 2695/2695 (122 archivos), `npm run typecheck` exit 
 - `npm run build` en verde (`build.txt`; hubo que borrar `.next/cache`, que daba un pánico interno de Turbopack).
 - Decisión: la portada muestra el torneo activo y, si no hay, el más reciente **real** antes que uno de ensayo
   (en producción no hay ensayos); evita que el ensayo lanzado por el e2e desplace al archivado del 24 oct.
+
+## P1-b · grupos + eliminatoria (expuesto)
+
+- `FORMATOS_DISPONIBLES = ["liga", "grupos"]`; S17 de grupos en el gestor (completo y con el empate forzado de la
+  semifinal 1: los partidos de ensayo de 10 s acaban 0–0, así que siempre hay desempate y criterio).
+- UI `src/ui/ArenaTorneoGrupos.tsx`; repetición con «(operator test tournament)» y la fase (`torneo-carga.ts` +
+  una línea en `Arena.tsx`); fixture de grupos de prueba `sitio-prueba-aaaaaa660000` (21 oct).
+- Visto correr: `npm test` 2732/2732, typecheck 0, e2e completa 284/284 (`e2e-completa.txt`), mutaciones de unidad
+  82/82 (`mutaciones.md`) y e2e 8/8 (`mutaciones-e2e.md`).
