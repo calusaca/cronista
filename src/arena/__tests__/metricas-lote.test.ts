@@ -1,7 +1,7 @@
 // Brief 046 v1.1 · 12: el helper de métricas muestrea todos los ticks (pausas incluidas), mide la
 // continuidad de los episodios por diferencia de ticks y trata un denominador cero como «sin muestra».
 import { describe, expect, it } from "vitest";
-import { ARENA, LOTE_ARENA_046 as L, TECNICA_ARENA as T } from "../../sim/limites";
+import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_063 as L63, TECNICA_ARENA as T } from "../../sim/limites";
 import { agregarLote, analizarPartido, incumplimientos, muestrasPartido, type MuestraTick } from "../metricas-lote";
 import { MotorArena } from "../motor";
 import type { EventoArena, Punto } from "../tipos";
@@ -98,5 +98,28 @@ describe("046 · helper de métricas de lote", () => {
     for (const nombre of ["perdidasTrasAtajada", "desplazamientoMedianaM", "fraccionDesplazado", "conversion", "proporcionCentros", "conducirFrenado", "saquesManos"]) {
       expect(fallos.some(f => f.startsWith(`${nombre}=sin muestra`))).toBe(true);
     }
+  });
+});
+
+describe("063 · persecucionPerdedor: robo en duelo contrastado con los eventos del paso (revisión de Codex sobre la publicación 1, P2)", () => {
+  // A (local) tiene el balón en la muestra del tick 10 sin vuelo; en la del 11 lo tiene un rival. Solo cuenta
+  // como robo en duelo si el único evento no neutro del paso es la `recuperacion` del nuevo poseedor.
+  const ventana = Math.round(L63.persecucion.hastaS / ARENA.pasoS), desde = Math.round(L63.persecucion.desdeS / ARENA.pasoS);
+  const serie = (nuevo: string, eventosPaso: number) => [muestra(10, { poseedor: ATACANTE, eventos: 0 }),
+    ...Array.from({ length: ventana }, (_, k) => muestra(11 + k, { poseedor: nuevo, eventos: eventosPaso }))];
+  const muestrasPersecucion = (nuevo: string, eventos: EventoArena[]) => analizarPartido(1, serie(nuevo, eventos.length), eventos).persecucionPerdedor.muestras;
+  it("un robo en duelo (solo la recuperación del defensor) abre la ventana de desdeS a hastaS", () => {
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "recuperacion", DEFENSOR, "visita")])).toBe(ventana - desde);
+    // Un evento neutro (plan_equipo) en el paso no lo impide.
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "plan_equipo", "visita-2", "visita"), evento("a2", 11, "recuperacion", DEFENSOR, "visita")])).toBe(ventana - desde);
+  });
+  it("pase interceptado en el mismo paso, atajada, reinicio o falta no son un robo en duelo", () => {
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "pase", ATACANTE, "local", { receptor: "local-1" }), evento("a2", 11, "intercepcion", DEFENSOR, "visita", { receptor: ATACANTE })])).toBe(0);
+    expect(muestrasPersecucion(PORTERO, [evento("a1", 11, "tiro", ATACANTE, "local"), evento("a2", 11, "atajada", PORTERO, "visita", { receptor: ATACANTE })])).toBe(0);
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "reinicio", DEFENSOR, "visita")])).toBe(0);
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "falta", ATACANTE, "local", { receptor: DEFENSOR }), evento("a2", 11, "reinicio", DEFENSOR, "visita", { motivo: "falta" })])).toBe(0);
+    // Una recuperación de otro jugador (o con pasador) tampoco.
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "recuperacion", PORTERO, "visita")])).toBe(0);
+    expect(muestrasPersecucion(DEFENSOR, [evento("a1", 11, "recuperacion", DEFENSOR, "visita", { receptor: ATACANTE })])).toBe(0);
   });
 });

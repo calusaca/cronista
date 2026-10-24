@@ -288,7 +288,7 @@ export function analizarPartido(seed: number, muestras: readonly MuestraTick[], 
     else { cerrar(); if (s.manoAMano) tramo = [s]; }
   }
   cerrar();
-  medirPersecucion(m, muestras);
+  medirPersecucion(m, muestras, eventos);
   return m;
 }
 
@@ -299,8 +299,17 @@ function coseno(j: JugadorMuestra, hacia: Punto): number | null {
   const dx = hacia.x - j.x, dy = hacia.y - j.y, v = Math.hypot(j.vx, j.vy), d = Math.hypot(dx, dy);
   return v && d ? (j.vx * dx + j.vy * dy) / (v * d) : null;
 }
+/** Brief 063 § 11.1 · ¿el paso que empieza en la muestra `a` es un robo en duelo de `nuevo`? Revisión de Codex
+ * sobre la publicación 1 (P2): el cambio de poseedor sin vuelo previo no basta, porque un pase o un remate
+ * soltado y tocado por un rival en ese mismo paso (intercepción, atajada) da la misma transición. Los eventos
+ * del paso, sin los neutros, deben ser exactamente una `recuperacion` sin pasador del nuevo poseedor: quedan
+ * fuera pases, tiros, intercepciones, atajadas, reinicios, faltas y fueras de juego. */
+export function roboEnDuelo(eventos: readonly EventoArena[], desde: number, hasta: number, nuevo: string): boolean {
+  const paso = eventos.slice(desde, hasta).filter(x => !neutro.has(x.tipo));
+  return paso.length === 1 && paso[0]!.tipo === "recuperacion" && paso[0]!.jugador === nuevo && paso[0]!.receptor === null;
+}
 /** Brief 063 § 11.1 y v1.1 § 17.7 · `repliegueCorren`, `repliegueSeleccion` y `persecucionPerdedor` (puro). */
-function medirPersecucion(m: MetricasPartido, muestras: readonly MuestraTick[]): void {
+function medirPersecucion(m: MetricasPartido, muestras: readonly MuestraTick[], eventos: readonly EventoArena[]): void {
   const edadRepliegue = Math.round(L63.repliegue.edadMinS / ARENA.pasoS), edadSeleccion = Math.round(L63.seleccion.edadMinS / ARENA.pasoS);
   const lineas: readonly string[] = PE.repliegue.lineas;
   let inicio = -1;
@@ -322,13 +331,15 @@ function medirPersecucion(m: MetricasPartido, muestras: readonly MuestraTick[]):
       if (Math.hypot(j.vx, j.vy) >= L63.seleccion.velocidadMinMps && c !== null && c >= L63.seleccion.cosenoMin) m.repliegueSeleccion.corren++;
     }
   });
-  // Robo en duelo: entre dos muestras consecutivas el poseedor de campo pasa a un rival y la primera no tiene vuelo.
+  // Robo en duelo: entre dos muestras consecutivas el poseedor de campo pasa a un rival, la primera no tiene
+  // vuelo y el único evento no neutro del paso es la `recuperacion` del nuevo poseedor (`roboEnDuelo`).
   const desde = Math.round(L63.persecucion.desdeS / ARENA.pasoS), hasta = Math.round(L63.persecucion.hastaS / ARENA.pasoS);
   for (let i = 1; i < muestras.length; i++) {
     const a = muestras[i - 1]!, b = muestras[i]!;
     if (b.tick !== a.tick + 1 || a.vuelo || !a.poseedor || !b.poseedor) continue;
     const perdedor = a.jugadores.find(j => j.id === a.poseedor), nuevo = b.jugadores.find(j => j.id === b.poseedor);
     if (!perdedor || !nuevo || perdedor.puesto === "POR" || nuevo.lado === perdedor.lado) continue;
+    if (!roboEnDuelo(eventos, a.eventos, b.eventos, nuevo.id)) continue;
     for (let k = i; k < muestras.length; k++) {
       const s = muestras[k]!, edad = s.tick - b.tick;
       if (edad >= hasta || s.tick !== b.tick + (k - i)) break;
