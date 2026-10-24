@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-24T15:59:29.513Z",
+  "checkedUtc": "2026-10-24T17:11:28.646Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024155612",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024170844",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -251,8 +251,8 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 136498,
-      "sha256": "cb09b2bae4625b54860bb9ecde9dfc2851faf6cb130af23d93061f39cea656c2"
+      "bytes": 137980,
+      "sha256": "d52d3ee1baba56d081f4c33379d6b5c877ad31e4b82e6bde0568fc49781264dc"
     },
     {
       "path": "src/app/icon.svg",
@@ -941,8 +941,8 @@
     },
     {
       "path": "src/arena/__tests__/antesala.test.ts",
-      "bytes": 40453,
-      "sha256": "760ac66c2f46cf3f0f44b70586fd919679a1989a2780976db0acddc29f1205f8"
+      "bytes": 41841,
+      "sha256": "f387c87cf5db1483f6fa65c114d8be76112f598eba226377586c40d348073f56"
     },
     {
       "path": "src/arena/__tests__/arena.test.ts",
@@ -1241,8 +1241,8 @@
     },
     {
       "path": "src/arena/antesala.ts",
-      "bytes": 32384,
-      "sha256": "23371a3d27fa5138104bd9303dd2e2d40d07b5d65ec2c6041d0b3287ff02ed52"
+      "bytes": 33665,
+      "sha256": "ef606023d8f0f93363c707920c9f5e0f6018ea91b68b49fb617b8754eeda1d01"
     },
     {
       "path": "src/arena/arbitro.ts",
@@ -2116,8 +2116,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 66920,
-      "sha256": "84ee5fb88ae1864d12b28245561637a8c82940bd80aaa572972180e382c838a0"
+      "bytes": 67241,
+      "sha256": "caf2f16ecf6d8df416ab4d3d91a2b2081b7b8c3a0bfffd1f2f79661f92a9b149"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -2156,8 +2156,8 @@
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
-      "bytes": 59955,
-      "sha256": "4caf9e321a231dafd044890d234d8a737f5ae98ade132b31895aa2598660b38e"
+      "bytes": 61128,
+      "sha256": "1d55752e44e14e2516e5a46b2a69a3a525683b711f32af8b5ff8bf6f4f76845b"
     },
     {
       "path": "src/ui/ArenaEnDirecto.tsx",
@@ -2191,8 +2191,8 @@
     },
     {
       "path": "src/ui/ArenaPrevia.tsx",
-      "bytes": 7771,
-      "sha256": "a3f20c6a59696acc9226788563254318c50ef2adb101f6d51d23347d33dc7828"
+      "bytes": 10770,
+      "sha256": "07763316af1d31e79ea16c67eeff2c14c44db73c3db658ead3136a16f13d55f9"
     },
     {
       "path": "src/ui/ArenaTorneo.tsx",
@@ -2371,8 +2371,8 @@
     },
     {
       "path": "src/ui/__tests__/arena-previa.test.tsx",
-      "bytes": 6691,
-      "sha256": "dc5a6f3438e5ccd6781693c553d8d012008f39bba0b7b517a123c4c7b5b5c208"
+      "bytes": 12505,
+      "sha256": "69c9f6be9fee4ecdf11eda18a79d431a19b8079f89747c5779e0a7a81c404e2f"
     },
     {
       "path": "src/ui/__tests__/atajo-pausa.test.ts",
