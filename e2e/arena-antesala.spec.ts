@@ -29,8 +29,8 @@ const clave = NARRACION_DIRECTO.clavePreferencia;
 
 /** Instrumenta el gesto, el AudioContext y las marcas de tiempo de los botones de voz. Con `bloquearAudio`,
  * `resume()` no se resuelve nunca y el estado es `suspended` hasta que la prueba ponga `__desbloquear`. */
-async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; bloquearAlmacen?: boolean } = {}) {
-  await page.addInitScript(({ bloquearAudio, bloquearAlmacen }) => {
+async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; bloquearAlmacen?: boolean; bloquearNuevos?: boolean } = {}) {
+  await page.addInitScript(({ bloquearAudio, bloquearAlmacen, bloquearNuevos }) => {
     const w = window as unknown as Ventana & typeof window;
     w.__llamadas = []; w.__clic = []; w.__contextos = []; w.__marcas = {}; w.__desbloquear = false;
     let enGesto = false;
@@ -40,9 +40,12 @@ async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; blo
     const Base = window.AudioContext;
     window.AudioContext = class extends Base {
       // La marca se toma al LLAMAR al constructor (antes de super): crear el primer contexto puede tardar en una máquina cargada.
-      constructor(o?: AudioContextOptions) { const t = performance.now(), dentro = enGesto; super(o); w.__llamadas.push({ tipo: "ctor", enGesto: dentro, t }); w.__contextos.push(this); }
-      override get state(): AudioContextState { const real = super.state; return bloquearAudio && !w.__desbloquear && real !== "closed" ? "suspended" : real; }
-      override resume() { w.__llamadas.push({ tipo: "resume", enGesto, t: performance.now() }); return bloquearAudio && !w.__desbloquear ? new Promise<void>(() => {}) : super.resume(); }
+      /** Codex 058 #3 · Política estricta (`bloquearNuevos`): solo se desbloquea el contexto creado en el gesto de
+       * «Start live match»; cualquier contexto creado después queda suspendido y su resume() no se resuelve. */
+      bloqueado = false;
+      constructor(o?: AudioContextOptions) { const t = performance.now(), dentro = enGesto, previos = w.__contextos.length; super(o); this.bloqueado = !!bloquearNuevos && previos > 0; w.__llamadas.push({ tipo: "ctor", enGesto: dentro, t }); w.__contextos.push(this); }
+      override get state(): AudioContextState { const real = super.state; return (bloquearAudio && !w.__desbloquear || this.bloqueado) && real !== "closed" ? "suspended" : real; }
+      override resume() { w.__llamadas.push({ tipo: "resume", enGesto, t: performance.now() }); return bloquearAudio && !w.__desbloquear || this.bloqueado ? new Promise<void>(() => {}) : super.resume(); }
     };
     const iniciar = AudioBufferSourceNode.prototype.start;
     AudioBufferSourceNode.prototype.start = function (this: AudioBufferSourceNode, ...a: Parameters<AudioBufferSourceNode["start"]>) { w.__llamadas.push({ tipo: "start", enGesto, t: performance.now() }); return iniciar.apply(this, a); };
@@ -51,7 +54,7 @@ async function instrumentar(page: Page, opciones: { bloquearAudio?: boolean; blo
         if (w.__marcas[texto] === undefined && [...document.querySelectorAll("button")].some(b => b.textContent === texto)) w.__marcas[texto] = performance.now();
       }
     }).observe(document.body, { subtree: true, childList: true, characterData: true }));
-  }, { bloquearAudio: opciones.bloquearAudio ?? false, bloquearAlmacen: opciones.bloquearAlmacen ?? false });
+  }, { bloquearAudio: opciones.bloquearAudio ?? false, bloquearAlmacen: opciones.bloquearAlmacen ?? false, bloquearNuevos: opciones.bloquearNuevos ?? false });
 }
 const ventana = (page: Page) => page.evaluate(() => { const w = window as unknown as Ventana; return { llamadas: w.__llamadas, clic: w.__clic, estados: w.__contextos.map(c => c.state), marcas: w.__marcas }; });
 
@@ -60,14 +63,14 @@ const soloKeepalive = (r: Route) => r.fulfill({ headers: { "content-type": "text
 /** Directo simulado: POST que crea `id` (con `retrasoPostMs`), instantánea hasta `corte` y SSE que, con
  * `avanceMs`, entrega todo hasta el tick 300 a ese plazo. /relato: 404 a las intervenciones; tramos vacíos;
  * la entrada, 0,3 s de audio. */
-async function directo(page: Page, id: string, opciones: { voz?: boolean; retrasoPostMs?: number; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
+async function directo(page: Page, id: string, opciones: { voz?: boolean; herramientas?: Promise<unknown>; retrasoPostMs?: number; avanceMs?: number; avance?: Promise<unknown>; corte?: number; asignacion?: object;
   /** Manejador propio de /relato (antesala, previa…): devuelve true si respondió. */
   relato?: (p: Pedido, r: Route) => Promise<boolean> } = {}) {
   const registro = await leer("public/experimentos/arena-duelo-v3.json"), corte = opciones.corte ?? 0, hasta = 300;
   const entrada = await wav(0.3);
   const pedidos: (Pedido & { t: number })[] = [], posts: number[] = [], enVuelo = { ahora: 0, maximo: 0 };
   const asignacion = opciones.asignacion ?? asignacionProgramada;
-  await page.route("**/api/arena/herramientas", r => r.fulfill({ json: { voz: opciones.voz ?? true, analista: false } }));
+  await page.route("**/api/arena/herramientas", async r => { if (opciones.herramientas) await opciones.herramientas; await r.fulfill({ json: { voz: opciones.voz ?? true, analista: false } }).catch(() => {}); });
   await page.route("**/api/arena/sesiones", async r => {
     if (r.request().method() !== "POST") return r.fallback();
     posts.push(Date.now());
@@ -311,13 +314,13 @@ test("058 · A6 360 px y 1440 px, claro y oscuro, EN y ES: casilla y nota sin de
 // ——— Bloque B · Antesala (§ 9 y v1.1 §§ 2–5, 10; v1.3) ———
 type FuenteB = { inicio: number; fin: number; duracion: number; detenida: boolean; intervencion?: string; kind?: string; texto?: string; reloj: string };
 type MarcaB = { t: number; texto: string };
-type VentanaB = { __fuentes: FuenteB[]; __estados: MarcaB[]; __relojes: MarcaB[]; __ctx: AudioContext[] };
+type VentanaB = { __fuentes: FuenteB[]; __estados: MarcaB[]; __relojes: MarcaB[]; __ctx: AudioContext[]; __vivas: number[] };
 /** Etiqueta cada fuente con la transcripción visible (intervención, tipo y texto) y registra el estado del búfer y
  * el reloj en cada fotograma (requestAnimationFrame instrumentado). */
 async function instrumentarB(page: Page) {
   await page.addInitScript(() => {
     const w = window as unknown as VentanaB & typeof window;
-    w.__fuentes = []; w.__estados = []; w.__relojes = []; w.__ctx = [];
+    w.__fuentes = []; w.__estados = []; w.__relojes = []; w.__ctx = []; w.__vivas = [];
     const reloj = () => document.querySelector('[data-testid="arena-clock"]')?.textContent?.trim() ?? "";
     const Base = window.AudioContext;
     window.AudioContext = class extends Base {
@@ -342,6 +345,8 @@ async function instrumentarB(page: Page) {
     document.addEventListener("DOMContentLoaded", () => new MutationObserver(() => {
       const estado = document.querySelector('[data-testid="arena-buffer-status"]')?.textContent ?? "";
       if (estado && estado !== previoEstado) { previoEstado = estado; w.__estados.push({ t: performance.now(), texto: estado }); }
+      // Codex 058 #4: regiones vivas del búfer en cada mutación mientras dura la presentación.
+      if (/Pre-match presentation|Presentación del partido/.test(estado)) w.__vivas.push(document.querySelectorAll('[data-testid="arena-buffer"] [role="status"], [data-testid="arena-buffer"] [aria-live]').length);
       const el = document.querySelector<HTMLElement>('[data-testid="arena-voice-transcript"]');
       if (!el) return;
       const d = { intervencion: el.dataset.narrationIntervention, kind: el.dataset.narrationKind, texto: el.querySelector("p")?.textContent ?? "" };
@@ -350,7 +355,7 @@ async function instrumentarB(page: Page) {
     }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true }));
   });
 }
-const datosB = (page: Page) => page.evaluate(() => { const w = window as unknown as VentanaB; return { fuentes: w.__fuentes, estados: w.__estados, relojes: w.__relojes, ctx: w.__ctx.map(c => c.state) }; });
+const datosB = (page: Page) => page.evaluate(() => { const w = window as unknown as VentanaB; return { fuentes: w.__fuentes, estados: w.__estados, relojes: w.__relojes, ctx: w.__ctx.map(c => c.state), vivas: w.__vivas }; });
 const asignacionModelos = { modo: "manual", local: { id: "equilibrado", nombre: "GPT-5.6 Luna", controlador: "azure-openai:equilibrado" }, visita: { id: "luna6", nombre: "GPT-6 Luna", controlador: "azure-openai:luna6" } } as const;
 /** Sirve los clips de la antesala derivados del mismo registro y asignación (hechos del idioma pedido). */
 function servirAntesala(registro: RegistroArena, asignacion: AsignacionModelos | null, opciones: { duracionS?: number; demoraMs?: (id: string, idioma: string) => number | Promise<unknown>; estado?: (id: string) => number | null } = {}) {
@@ -385,9 +390,12 @@ test("058 · B1 antesala completa: orden, huecos, reloj retenido con «Pre-match
   const ids = idsGuion(registro, asignacionModelos as AsignacionModelos);
   await expect.poll(async () => (await datosB(page)).estados.some(e => e.texto.startsWith("Live")), { timeout: 40_000 }).toBe(true);
   await expect(saltar(page)).toHaveCount(0);
-  const { fuentes, estados, relojes } = await datosB(page);
+  const { fuentes, estados, relojes, vivas } = await datosB(page);
   const clips = deAntesala(fuentes);
   expect(clips.map(f => f.intervencion)).toEqual(ids);
+  // Codex 058 #4: una sola región viva en el búfer durante toda la presentación, también entre clips.
+  expect(vivas.length).toBeGreaterThan(ids.length);
+  expect(Math.max(...vivas)).toBe(1);
   for (let k = 1; k < clips.length; k++) {
     expect(clips[k]!.inicio, JSON.stringify([clips[k - 1], clips[k]])).toBeGreaterThanOrEqual(clips[k - 1]!.fin - 20);
     expect(clips[k]!.inicio - clips[k - 1]!.fin).toBeLessThanOrEqual((ANTESALA_ARENA.huecoS + 0.2) * 1000);
@@ -675,5 +683,71 @@ test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso si
     const nombre = `${c.es ? "es" : "en"}-${c.tema === "dark" ? "oscuro" : "claro"}-${c.ancho}`;
     if (guardar) await page.getByTestId("arena-buffer").screenshot({ path: `${carpeta}/antesala-${nombre}.png` });
     await ctx.close();
+  }
+});
+
+test("058 · B12 (Codex #3) con una política que bloquea contextos creados fuera del gesto, cambiar de idioma no pide otro clic y transfiere la retención", async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = "00000000-0000-4000-8000-000000005833";
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  const ids = idsGuion(registro, asignacionProgramada as AsignacionModelos);
+  const { pedidos } = await directo(page, id, { avanceMs: 500, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos, { duracionS: 1.5 }) });
+  await instrumentar(page, { bloquearNuevos: true });
+  await instrumentarB(page);
+  await page.goto("/arena");
+  await iniciar(page);
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
+  await expect(page.getByTestId("arena-buffer-status")).toHaveAttribute("data-ready-seconds", /^(2\d|[3-9]\d)\./);
+  const t = await page.evaluate(() => performance.now());
+  await page.getByRole("button", { name: "Switch to Spanish" }).click();
+  await expect(page.getByRole("button", { name: "Desactivar narración", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(async () => deAntesala((await datosB(page)).fuentes).filter(f => f.inicio > t).length, { timeout: 15_000 }).toBeGreaterThanOrEqual(2);
+  await page.waitForTimeout(NARRACION_DIRECTO.desbloqueoMs + 500);
+  // Sin otro clic: nunca aparece «Habilitar reproducción de audio» y sigue habiendo un solo contexto, en marcha.
+  await expect(page.getByRole("button", { name: "Habilitar reproducción de audio", exact: true })).toHaveCount(0);
+  expect((await ventana(page)).estados).toEqual(["running"]);
+  const { fuentes, relojes, vivas } = await datosB(page);
+  // La retención se transfiere: 0:00 en cada fotograma tras el cambio, y la antesala vuelve a empezar en español.
+  for (const r of relojes.filter(x => x.t >= t && x.t <= deAntesala(fuentes).filter(f => f.inicio > t)[1]!.inicio)) expect(r.texto, String(r.t)).toMatch(/^0:00 /);
+  expect(deAntesala(fuentes).filter(f => f.inicio > t)[0]!.intervencion).toBe(ids[0]);
+  expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:") && p.idioma === "es")[0]!.intervencion).toBe(ids[0]);
+  expect(Math.max(...vivas)).toBe(1);
+});
+
+for (const voz of [true, false]) test(`058 · B13 (smoke rev. 0000027) «Start live match» antes de que responda /herramientas (voz: ${voz}): cebado en el gesto, reloj retenido hasta la respuesta y ${voz ? "antesala sin otro clic" : "contexto cerrado sin efectos"}`, async ({ page }) => {
+  test.setTimeout(90_000);
+  const id = `00000000-0000-4000-8000-00000000583${voz ? 4 : 5}`;
+  const registro = await leer("public/experimentos/arena-duelo-v3.json");
+  let liberar!: () => void; const barrera = new Promise<void>(r => { liberar = r; });
+  const { pedidos } = await directo(page, id, { voz, herramientas: barrera, avanceMs: 300, relato: servirAntesala(registro, asignacionProgramada as AsignacionModelos) });
+  await instrumentar(page);
+  await instrumentarB(page);
+  await page.goto("/arena");
+  // La casilla aún no aparece (sin respuesta de /herramientas); su valor por defecto es marcar.
+  await expect(page.getByTestId("arena-live-voice")).toHaveCount(0);
+  await iniciar(page);
+  await expect(page.getByTestId("arena-buffer")).toBeVisible();
+  // Con la reserva ya completa, el reloj sigue retenido más allá de esperaHerramientasMs mientras /herramientas no responde.
+  await expect(page.getByTestId("arena-buffer-status")).toHaveAttribute("data-ready-seconds", /^(2\d|[3-9]\d)\./);
+  await page.waitForTimeout(NARRACION_DIRECTO.esperaHerramientasMs + 1000);
+  await expect(page.getByTestId("arena-clock")).toContainText("0:00 /");
+  const t = await page.evaluate(() => performance.now());
+  liberar();
+  const { llamadas } = await ventana(page);
+  expect(llamadas.find(l => l.tipo === "ctor"), JSON.stringify(llamadas)).toMatchObject({ enGesto: true });
+  if (voz) {
+    await expect(vozApagar(page)).toHaveAttribute("aria-pressed", "true");
+    await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThan(0);
+    const { fuentes, relojes } = await datosB(page);
+    for (const r of relojes.filter(x => x.t <= deAntesala(fuentes)[0]!.inicio)) expect(r.texto, String(r.t)).toMatch(/^0:00 /);
+    expect((await ventana(page)).estados).toEqual(["running"]);
+    expect(pedidos.some(p => p.intervencion === idsGuion(registro, asignacionProgramada as AsignacionModelos)[0])).toBe(true);
+  } else {
+    await expect.poll(async () => (await ventana(page)).estados).toEqual(["closed"]);
+    await expect(page.getByTestId("arena-clock")).toContainText("0:01 /", { timeout: 5000 });
+    expect(pedidos.filter(p => p.intervencion?.startsWith("antesala:"))).toEqual([]);
+    await expect(vozApagar(page)).toHaveCount(0);
+    const despues = (await datosB(page)).estados.filter(e => e.t > t);
+    expect(despues.some(e => e.texto.includes("Pre-match presentation"))).toBe(false);
   }
 });

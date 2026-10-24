@@ -12,7 +12,7 @@ import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo"
 import { esPrevia } from "../arena/previa";
 import { ANTESALA_ARENA, ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
 import { activarAntesala, antesalaPartido, elegirSolicitud, iniciarAntesala, pasoAntesala, siguientePedidoAntesala, todosPedidosAntesala, vencimientoAntesalaMs, type ClaseSolicitud, type EstadoAntesala, type RespuestaClip, type SalidaAntesala } from "../arena/antesala";
-import { arranquePropio, asignacionDirecto, guardarPreferenciaNarracion, instanteArranquePropio, leerPreferenciaNarracion, narracionAutomatica, suscribirAsignacionDirecto, tomarAudioCebado } from "./audio-directo";
+import { arranquePropio, asignacionDirecto, descartarAudioCebado, guardarPreferenciaNarracion, instanteArranquePropio, leerPreferenciaNarracion, narracionAutomatica, suscribirAsignacionDirecto, tomarAudioCebado } from "./audio-directo";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
@@ -86,7 +86,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   // Brief 058 § 4.5 · Retención inicial: si la narración automática puede llegar a activarse (preferencia, arranque
   // propio y tick 0), el reloj se retiene desde el primer fotograma; se suelta a los esperaHerramientasMs si no
   // empieza la antesala.
-  const retencionInicial = useRef<boolean | null>(null);
+  const retencionInicial = useRef<boolean | null>(null), plazoInicialVencido = useRef(false), herramientas = useRef<"pendiente" | "voz" | "sin-voz">("pendiente");
   if (retencionInicial.current === null) {
     retencionInicial.current = inicioTick === 0 && arranquePropio(sesion) && leerPreferenciaNarracion() && ANTESALA_ARENA.topeS > 0;
     if (retencionInicial.current) reloj.current.retener();
@@ -109,7 +109,11 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   const [faseAntesala, setFaseAntesala] = useState(false);
   const saltarRef = useRef<HTMLButtonElement | null>(null), vozBotonRef = useRef<HTMLButtonElement | null>(null);
   const actual = useRef({ hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma }); actual.current = { hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma };
-  const limpiar = () => {
+  /** Codex 058 #3 · Contexto desbloqueado que sobrevive al cambio de idioma: la limpieza del efecto
+   * [sesion, idioma] lo deja aquí en lugar de cerrarlo; si nadie lo adopta en el mismo vaciado de efectos (la
+   * reactivación en el idioma nuevo), se cierra en la siguiente microtarea (desmontaje o voz apagada). */
+  const contextoPrevio = useRef<AudioContext | null>(null);
+  const limpiar = (conservarContexto = false) => {
     generacion.current++; reanudando.current = false;
     const s = sonido.current; sonido.current = null;
     if (s?.antesala) {
@@ -124,12 +128,17 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       for (const a of s.peticionesInvitado.values()) a.abort();
       s.cargaReservas.abort();
       try { s.activa?.fuente.stop(); } catch { /* Ya terminó. */ }
-      void s.contexto.close().catch(() => {});
+      if (conservarContexto && s.contexto.state !== "closed") {
+        const c = s.contexto; contextoPrevio.current = c;
+        queueMicrotask(() => { if (contextoPrevio.current === c) { contextoPrevio.current = null; void c.close().catch(() => {}); } });
+      } else void s.contexto.close().catch(() => {});
     }
   };
   useEffect(() => {
     const a = new AbortController();
-    void fetch("/api/arena/herramientas", { signal: a.signal }).then(r => r.json()).then(r => setDisponible(r.voz === true)).catch(() => {});
+    // Smoke 058 (rev. 0000027): la retención inicial espera la respuesta; sin voz se suelta y el contexto cebado se cierra.
+    const sinVoz = () => { herramientas.current = "sin-voz"; if (arranquePropio(sesion)) descartarAudioCebado(); if (retencionInicial.current && !retencionAntesala.current) reloj.current.soltar(); };
+    void fetch("/api/arena/herramientas", { signal: a.signal }).then(r => r.json()).then(r => { if (r.voz === true) { herramientas.current = "voz"; setDisponible(true); } else sinVoz(); }).catch(() => { if (!a.signal.aborted) sinVoz(); });
     return () => a.abort();
   }, []);
   useEffect(() => {
@@ -145,7 +154,8 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     if (transferir) antesalaEjecutada.current = false;
     else if (habiaRetencion) { retencionAntesala.current = false; reloj.current.soltar(); }
     if (reactivar) activarVoz(true, t0Antesala.current ?? undefined);
-    return limpiar;
+    // Se cancelan fuentes y solicitudes; el contexto desbloqueado queda para el idioma nuevo (Codex 058 #3).
+    return () => limpiar(true);
     // La sesión tiene una key propia; los datos entrantes no reinician la voz.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sesion, idioma]);
@@ -184,7 +194,9 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     const tick = Math.floor(reloj.current.segundo * 10);
     if (!s) {
       // Brief 058 § 3.2: se adopta el contexto cebado en el clic de «Iniciar partido en vivo», si lo hay.
-      const contexto = tomarAudioCebado() ?? new AudioContext({ sampleRate: 24000 });
+      // Codex 058 #3: al cambiar de idioma se reutiliza el contexto ya desbloqueado (nunca uno nuevo fuera del gesto).
+      const previo = contextoPrevio.current; contextoPrevio.current = null;
+      const contexto = previo ?? tomarAudioCebado() ?? new AudioContext({ sampleRate: 24000 });
       const desde = Math.floor(tick / BUFFER_ARENA.tramoTicks) * BUFFER_ARENA.tramoTicks;
       s = { silenciada: false, activacion: 0, activadoTick: tick, entradaPendiente: true, idioma, contexto, clips: new Map(), peticiones: new Map(), desde, cierrePedido: false, cierreFallido: false, cerrando: false, ultimoFin: contexto.currentTime, reservas: [], memoria: [], reservasOidas: [], cargaReservas: new AbortController(), totalReservas: 0,
         invitados: new Map(), peticionesInvitado: new Map(), pedidas: new Set(), sonadas: new Set(), finUltimaNoticia: null, finUltimoInvitado: null, ultimoInvitado: null };
@@ -333,14 +345,22 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     if (!disponible || autoIntentada.current || sonido.current) return;
     autoIntentada.current = true;
     if (reloj.current.estado !== "final" && narracionAutomatica(sesion, disponible)) activarVoz(true, instanteArranquePropio(sesion) ?? undefined);
+    // La retención inicial que esperaba a /herramientas se suelta si la antesala no la tomó y el plazo ya venció.
+    if (retencionInicial.current && !retencionAntesala.current && plazoInicialVencido.current) reloj.current.soltar();
     // Una sola vez por montaje, cuando /herramientas confirma la voz.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disponible]);
   useEffect(() => {
     if (!retencionInicial.current) return;
-    // § 4.5: la retención inicial se suelta a los esperaHerramientasMs si la antesala no está en curso ni en espera.
-    const plazo = window.setTimeout(() => { if (!retencionAntesala.current) reloj.current.soltar(); }, NARRACION_DIRECTO.esperaHerramientasMs);
-    return () => window.clearTimeout(plazo);
+    // § 4.5: la retención inicial se suelta a los esperaHerramientasMs si la antesala no está en curso ni en espera y
+    // /herramientas ya respondió; si aún no respondió, espera su respuesta (smoke 058, rev. 0000027) con el tope
+    // topeS como salvaguarda.
+    const plazo = window.setTimeout(() => {
+      plazoInicialVencido.current = true;
+      if (herramientas.current !== "pendiente" && !retencionAntesala.current) reloj.current.soltar();
+    }, NARRACION_DIRECTO.esperaHerramientasMs);
+    const tope = window.setTimeout(() => { if (!retencionAntesala.current) reloj.current.soltar(); }, ANTESALA_ARENA.topeS * 1000);
+    return () => { window.clearTimeout(plazo); window.clearTimeout(tope); };
   }, []);
 
   const bloque = Math.floor(vista.segundo / 5);
@@ -646,7 +666,9 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       {terminada && <button className="btn" onClick={alRepeticion}>{t("Open available replay", "Abrir repetición disponible")}</button>}
     </div>
     {voz && automatica && <p className="arena-muted" data-testid="arena-voice-default-note">{t("Narration started with the match. «Turn narration off» mutes it; this browser remembers your choice.", "La narración empezó con el partido. «Desactivar narración» la silencia; este navegador recuerda tu elección.")}</p>}
-    {voz && <p role="status" data-testid="arena-voice-status">{hablando ? pasaje?.cierre ? t("Closing commentary", "Comentario de cierre") : t("Narration playing", "Narración en reproducción") : pasaje?.cierre ? t("End of narration", "Fin de la narración") : t("Preparing the next passage", "Preparando la siguiente intervención")}</p>}
+    {/* Codex 058 #4: durante la retención de la antesala la única región viva es arena-buffer-status; el estado de
+        voz sigue visible, sin anuncios. */}
+    {voz && <p role={vista.retenido || faseAntesala ? undefined : "status"} data-testid="arena-voice-status">{hablando ? pasaje?.cierre ? t("Closing commentary", "Comentario de cierre") : t("Narration playing", "Narración en reproducción") : pasaje?.cierre ? t("End of narration", "Fin de la narración") : t("Preparing the next passage", "Preparando la siguiente intervención")}</p>}
     {pasaje && <details data-testid="arena-voice-transcript" data-narration-tick={pasaje.fragmentos[0]?.tick} data-narration-kind={"tipoRelato" in pasaje ? pasaje.tipoRelato : "comentario"} data-narration-role={pasaje.rol ?? "narrador"} data-narration-variant={pasaje.variante} data-narration-intervention={pasaje.intervencion}><summary>{t("Narration transcript and evidence", "Transcripción y evidencia de la narración")}</summary>{pasaje.fragmentos.map((f, k) => <p key={k} data-narration-role={f.rol ?? "narrador"}>{f.texto}</p>)}<p className="arena-muted">{pasaje.fuentes.join(" · ")}</p></details>}
     {voz && error && <p role="alert">{t("A passage was unavailable. Backup commentary covers the wait while narration retries.", "Una intervención no estuvo disponible. Los comentarios de respaldo cubren la espera mientras la narración reintenta.")}</p>}
     {!disponible && <p className="arena-muted">{t("Audio is unavailable on this server. Follow the text description below.", "El audio no está disponible en este servidor. Sigue la descripción de texto abajo.")}</p>}

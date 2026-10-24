@@ -32,6 +32,14 @@ export function tomarAudioCebado(): AudioContext | null {
   return contexto && contexto.state !== "closed" ? contexto : null;
 }
 
+/** Smoke 058 (rev. 0000027) · /herramientas respondió sin voz tras un clic que cebó a ciegas: se cierra el contexto
+ * cebado sin más efectos. */
+export function descartarAudioCebado(): void {
+  const contexto = cebado;
+  cebado = null;
+  if (contexto && contexto.state !== "closed") void contexto.close().catch(() => {});
+}
+
 /** Marca la sesión como iniciada por este espectador en esta página; `t0` (performance.now() del manejador)
  * es el instante del clic que pidió la narración. */
 export function marcarArranquePropio(id: string, t0: number = typeof performance === "undefined" ? 0 : performance.now()): void {
