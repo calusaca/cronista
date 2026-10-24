@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-24T03:38:19.720Z",
+  "checkedUtc": "2026-10-24T04:58:17.702Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024033534",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261024045530",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -1466,8 +1466,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 57477,
-      "sha256": "39c947200605fee6fc745dac3b6924e4c4a3eab33bce5368f75421e7fe015ba9"
+      "bytes": 58081,
+      "sha256": "97110d35dae26b29ace60d308f45e9cacf6bb9b43d564cbfc599af17e5812ab6"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -1506,8 +1506,8 @@
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
-      "bytes": 58026,
-      "sha256": "378d85621407c3adccb0111f04e8e99e925ad8658878864fb79df8754472a41c"
+      "bytes": 58944,
+      "sha256": "3e88a35b421fd68cc1e1401debc7a2c9de86c61feda0b66ae6b12b7573c2bbf9"
     },
     {
       "path": "src/ui/ArenaEnDirecto.tsx",
