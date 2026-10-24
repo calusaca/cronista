@@ -300,6 +300,50 @@
         }
       },
       "nota": "Medidor por 1K tokens (0,00015 / 0,0006 USD) convertido a 1M. Sin medidor de caché: se aplica el precio de entrada."
+    },
+    {
+      "deployment": "cronista-sol61",
+      "modelo": "gpt-6.1-sol",
+      "entrada": 2.0,
+      "salida": 10.0,
+      "cache": 0.1,
+      "tipo": "precio de lista (Retail Prices API)",
+      "meters": {
+        "entrada": {
+          "meterName": "6.1-sol ShortCo Inp Std Gl 1M Tokens",
+          "meterId": "d8110d00-d41f-55d6-9cf6-e6b5dac84f8b",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6.1-sol ShortCo Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 2.0,
+          "usdPorMillon": 2.0,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        },
+        "salida": {
+          "meterName": "6.1-sol ShortCo Opt Std Gl 1M Tokens",
+          "meterId": "d516ff90-5ef3-5751-bf31-59ad3f46619e",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6.1-sol ShortCo Opt Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 10.0,
+          "usdPorMillon": 10.0,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        },
+        "cache": {
+          "meterName": "6.1-sol ShortCo Cd Inp Std Gl 1M Tokens",
+          "meterId": "159dfdfe-3f92-5492-9acf-60236b9ac44b",
+          "productName": "Azure OpenAI GPT6",
+          "skuName": "6.1-sol ShortCo Cd Inp Std Gl",
+          "region": "northcentralus",
+          "unitOfMeasure": "1M",
+          "retailPrice": 0.1,
+          "usdPorMillon": 0.1,
+          "effectiveStartDate": "2026-10-01T00:00:00Z"
+        }
+      },
+      "nota": "Consultado el 2026-10-24 en la Retail Prices API (armRegionName northcentralus, contains(meterName,'6.1')). El costo y la admisión de sol61.json se recalcularon con este precio sin nueva inferencia (.cache/recalcular-sol61.mts)."
     }
   ],
   "presupuesto": {

@@ -766,15 +766,17 @@
     "razonamientoFueraDeCompletion": false
   },
   "costo": {
-    "precio": null,
-    "smokeUsd": null,
-    "ladoWebUsd": null,
+    "precio": {
+      "entrada": 2,
+      "salida": 10,
+      "cache": 0.1
+    },
+    "smokeUsd": 0.4698,
+    "ladoWebUsd": 0.547,
     "nota": "ladoWebUsd = 12 solicitudes × (promptMax_web × 1.25 × entrada + 2048 × salida) / 1e6 (§5)."
   },
   "admision": {
-    "admitido": false,
-    "causas": [
-      "sin precio anotado en precios.json (§5)"
-    ]
+    "admitido": true,
+    "causas": []
   }
 }

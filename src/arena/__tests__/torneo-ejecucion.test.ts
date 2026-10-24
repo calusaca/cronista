@@ -148,11 +148,19 @@ describe("059 · un partido (N15) y participantes (§ 3.2)", () => {
     expect(() => participantesReales(["x", "y"], CATALOGO, sinPrecio, id)).toThrow(/no tiene precio/);
     const catalogo = JSON.parse(readFileSync("infra/modelos-arena.json", "utf8")) as EntradaCatalogo[];
     const precios = JSON.parse(readFileSync("docs/evidencia/modelos-052/precios.json", "utf8")) as PreciosJson;
-    const [sol61, sol6] = participantesReales(["sol61", "sol6"], catalogo, precios, espec => fabrica(espec, fetch).id) as [ParticipanteTorneo, ParticipanteTorneo];
+    // Respaldo § 9 con un precios.json inyectado SIN la fila de cronista-sol61 (el real ya trae su precio de lista).
+    const sinSol61 = { ...precios, modelos: precios.modelos.filter(m => m.deployment !== "cronista-sol61") };
+    const [sol61, sol6] = participantesReales(["sol61", "sol6"], catalogo, sinSol61, espec => fabrica(espec, fetch).id) as [ParticipanteTorneo, ParticipanteTorneo];
     expect(sol61.precio.estimadoDe).toBe("cronista-sol6");
     expect([sol61.precio.entrada, sol61.precio.salida, sol61.precio.cache]).toEqual([sol6.precio.entrada, sol6.precio.salida, sol6.precio.cache]);
     expect(sol6.precio.estimadoDe).toBeNull();
     expect([sol61.controlador, sol61.esfuerzo, sol61.corto, sol61.nombre, sol61.deployment]).toEqual(["azure-openai:cronista-sol61:reasoning-low", "low", "6.1 Sol", "GPT-6.1 Sol", "cronista-sol61"]);
+    // Con su propio precio de lista en precios.json, se usa ese y la marca desaparece.
+    const propio = precios.modelos.find(m => m.deployment === "cronista-sol61");
+    if (propio) {
+      const [real] = participantesReales(["sol61"], catalogo, precios, espec => fabrica(espec, fetch).id) as [ParticipanteTorneo];
+      expect([real.precio.entrada, real.precio.salida, real.precio.cache, real.precio.estimadoDe]).toEqual([propio.entrada, propio.salida, propio.cache, null]);
+    }
   });
 });
 
@@ -280,7 +288,9 @@ describe("059 · CLI (M19)", () => {
     expect(f).not.toHaveBeenCalled();
     const texto = out.join("\n");
     expect(texto).toMatch(/6 participantes, 30 partidos/);
-    expect(texto).toMatch(/GPT-6\.1 Sol \(† precio estimado con el de cronista-sol6\)/);
+    // precios.json ya trae el precio de lista de gpt-6.1-sol: sin la marca «precio estimado».
+    expect(texto).toMatch(/^\| GPT-6\.1 Sol \| cronista-sol61 \|/m);
+    expect(texto).not.toMatch(/precio estimado/);
     expect(texto).toMatch(/Ensayo en seco/);
     expect(texto.match(/^ {2}J.*· P\d\d/gm)).toHaveLength(30);
     expect(existsSync(join(base, "cache"))).toBe(false);
