@@ -1,0 +1,398 @@
+{
+ "generado": "2026-10-24T23:45:12.104Z",
+ "commit": "57741f4ebcf86185f188e57eef7711c13b8dd10f",
+ "arbolConCambios": false,
+ "reglas": "reinicios-v7",
+ "semillas": {
+  "desde": 1,
+  "hasta": 100
+ },
+ "duracionS": 120,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "banda": "completo",
+ "incumplimientos": [],
+ "segundos": 282.8,
+ "controladoAtributos": {
+  "valores": {
+   "bajo": 30,
+   "alto": 80
+  },
+  "sobreUmbral": {
+   "vision": {
+    "bajo": 60,
+    "alto": 90,
+    "cocienteMax": 0.95
+   },
+   "potencia": {
+    "bajo": 65,
+    "alto": 90,
+    "cocienteMax": 0.985
+   }
+  },
+  "diferencias": {
+   "velocidad": 0.6458879520793888,
+   "resistencia": 0.05912517204129453,
+   "aguante": 0.41966132455690763,
+   "entrada": 0.42000000000000004,
+   "vision": 1.48,
+   "potencia": 0.88
+  },
+  "cocientes": {
+   "vision": 0.8208956490523286,
+   "potencia": 0.9199596827099846
+  },
+  "incumplimientos": [],
+  "detalle": {
+   "velocidad": {
+    "diferencia": 0.6458879520793888,
+    "cociente": null,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 6.7626727126246635,
+      "energiaFinalMedia": 0.8454675865076463,
+      "robosSufridosPorMin": 1.840720325243808,
+      "robosHechosPorPartido": 0.91,
+      "largosPorPartido": 0.44,
+      "lejanosPorPartido": 0.27,
+      "errorPaseCortoMedioM": 0.3989768700002761,
+      "ticksPorMRemate": 0.30672082027997705
+     },
+     "goles": 1.96
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.408560664704052,
+      "energiaFinalMedia": 0.8386912254882859,
+      "robosSufridosPorMin": 1.8785416720573394,
+      "robosHechosPorPartido": 0.97,
+      "largosPorPartido": 0.37,
+      "lejanosPorPartido": 0.33,
+      "errorPaseCortoMedioM": 0.40760576351556727,
+      "ticksPorMRemate": 0.2983547841796389
+     },
+     "goles": 1.83
+    }
+   },
+   "resistencia": {
+    "diferencia": 0.05912517204129453,
+    "cociente": null,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 7.013954407202041,
+      "energiaFinalMedia": 0.8138531280451434,
+      "robosSufridosPorMin": 1.8052184466019416,
+      "robosHechosPorPartido": 1,
+      "largosPorPartido": 0.26,
+      "lejanosPorPartido": 0.34,
+      "errorPaseCortoMedioM": 0.40005831130139263,
+      "ticksPorMRemate": 0.310759731539188
+     },
+     "goles": 1.92
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.012307734728949,
+      "energiaFinalMedia": 0.872978300086438,
+      "robosSufridosPorMin": 1.8969771745835904,
+      "robosHechosPorPartido": 1.03,
+      "largosPorPartido": 0.29,
+      "lejanosPorPartido": 0.3,
+      "errorPaseCortoMedioM": 0.397912714259165,
+      "ticksPorMRemate": 0.3092362616019017
+     },
+     "goles": 2.02
+    }
+   },
+   "aguante": {
+    "diferencia": 0.41966132455690763,
+    "cociente": null,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 6.996513921386164,
+      "energiaFinalMedia": 0.8397378631772849,
+      "robosSufridosPorMin": 1.934418494928049,
+      "robosHechosPorPartido": 1.12,
+      "largosPorPartido": 0.32,
+      "lejanosPorPartido": 0.29,
+      "errorPaseCortoMedioM": 0.41025452244033284,
+      "ticksPorMRemate": 0.31363201112770495
+     },
+     "goles": 1.91
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.0062208017085785,
+      "energiaFinalMedia": 0.8427073586014433,
+      "robosSufridosPorMin": 1.5147571703711413,
+      "robosHechosPorPartido": 0.94,
+      "largosPorPartido": 0.3,
+      "lejanosPorPartido": 0.36,
+      "errorPaseCortoMedioM": 0.39882119614477374,
+      "ticksPorMRemate": 0.30468365554681526
+     },
+     "goles": 1.98
+    }
+   },
+   "entrada": {
+    "diferencia": 0.42000000000000004,
+    "cociente": null,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 7.017006516405987,
+      "energiaFinalMedia": 0.8408518543345833,
+      "robosSufridosPorMin": 2.092373219752429,
+      "robosHechosPorPartido": 0.84,
+      "largosPorPartido": 0.33,
+      "lejanosPorPartido": 0.25,
+      "errorPaseCortoMedioM": 0.40229588140612965,
+      "ticksPorMRemate": 0.3078911411692982
+     },
+     "goles": 2.01
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 6.997448922759609,
+      "energiaFinalMedia": 0.8409799935529645,
+      "robosSufridosPorMin": 1.9141442499106731,
+      "robosHechosPorPartido": 1.26,
+      "largosPorPartido": 0.28,
+      "lejanosPorPartido": 0.4,
+      "errorPaseCortoMedioM": 0.4136036939703634,
+      "ticksPorMRemate": 0.3066919015245471
+     },
+     "goles": 1.91
+    }
+   },
+   "vision": {
+    "diferencia": 1.48,
+    "cociente": 0.8581520280466031,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 7.006117113168684,
+      "energiaFinalMedia": 0.8417974674240383,
+      "robosSufridosPorMin": 1.9925344317157936,
+      "robosHechosPorPartido": 0.99,
+      "largosPorPartido": 0,
+      "lejanosPorPartido": 0.34,
+      "errorPaseCortoMedioM": 0.4160771769502896,
+      "ticksPorMRemate": 0.30870355419962847
+     },
+     "goles": 1.97
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 6.971399053055128,
+      "energiaFinalMedia": 0.8390448708607545,
+      "robosSufridosPorMin": 1.9987105093488071,
+      "robosHechosPorPartido": 1.05,
+      "largosPorPartido": 1.48,
+      "lejanosPorPartido": 0.29,
+      "errorPaseCortoMedioM": 0.3570574732237964,
+      "ticksPorMRemate": 0.30786903178924935
+     },
+     "goles": 2.02
+    }
+   },
+   "potencia": {
+    "diferencia": 0.88,
+    "cociente": 0.9458073947285167,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 6.979759744332805,
+      "energiaFinalMedia": 0.8411813705383637,
+      "robosSufridosPorMin": 1.8784666584494023,
+      "robosHechosPorPartido": 1.14,
+      "largosPorPartido": 0.36,
+      "lejanosPorPartido": 0,
+      "errorPaseCortoMedioM": 0.3977798355677657,
+      "ticksPorMRemate": 0.3135497082173425
+     },
+     "goles": 2.03
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.014630601909387,
+      "energiaFinalMedia": 0.840223090842376,
+      "robosSufridosPorMin": 1.7758215071715866,
+      "robosHechosPorPartido": 0.97,
+      "largosPorPartido": 0.36,
+      "lejanosPorPartido": 0.88,
+      "errorPaseCortoMedioM": 0.41190679135443137,
+      "ticksPorMRemate": 0.2965576326469313
+     },
+     "goles": 1.92
+    }
+   },
+   "visionSobreUmbral": {
+    "diferencia": 0.96,
+    "cociente": 0.8208956490523286,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 6.987720171666036,
+      "energiaFinalMedia": 0.8379751741907205,
+      "robosSufridosPorMin": 1.9971693662525554,
+      "robosHechosPorPartido": 1.11,
+      "largosPorPartido": 0.73,
+      "lejanosPorPartido": 0.28,
+      "errorPaseCortoMedioM": 0.4075240190396666,
+      "ticksPorMRemate": 0.30364337818593934
+     },
+     "goles": 1.97
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.0006999612555445,
+      "energiaFinalMedia": 0.8403460138153231,
+      "robosSufridosPorMin": 1.9768271923562681,
+      "robosHechosPorPartido": 1.02,
+      "largosPorPartido": 1.69,
+      "lejanosPorPartido": 0.27,
+      "errorPaseCortoMedioM": 0.3345346941139806,
+      "ticksPorMRemate": 0.30053823063110474
+     },
+     "goles": 1.99
+    }
+   },
+   "potenciaSobreUmbral": {
+    "diferencia": -0.08000000000000007,
+    "cociente": 0.9199596827099846,
+    "bajo": {
+     "local": {
+      "vmaxMedia": 6.966137060417686,
+      "energiaFinalMedia": 0.841646982009268,
+      "robosSufridosPorMin": 1.715073247919963,
+      "robosHechosPorPartido": 1.21,
+      "largosPorPartido": 0.36,
+      "lejanosPorPartido": 0.9,
+      "errorPaseCortoMedioM": 0.3902325956932502,
+      "ticksPorMRemate": 0.3089671601836742
+     },
+     "goles": 1.84
+    },
+    "alto": {
+     "local": {
+      "vmaxMedia": 7.033940071995415,
+      "energiaFinalMedia": 0.8376794101817256,
+      "robosSufridosPorMin": 1.6627748838880192,
+      "robosHechosPorPartido": 1.05,
+      "largosPorPartido": 0.37,
+      "lejanosPorPartido": 0.82,
+      "errorPaseCortoMedioM": 0.4066885154996447,
+      "ticksPorMRemate": 0.28423733065037793
+     },
+     "goles": 2
+    }
+   }
+  }
+ },
+ "metricas": {
+  "reglas": "reinicios-v7",
+  "semillas": {
+   "desde": 1,
+   "hasta": 100
+  },
+  "duracionS": 120,
+  "partidos": 100,
+  "golesPorPartido": 1.93,
+  "desviacionGoles": 1.2021231218140689,
+  "tirosPorPartido": 4.94,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 69,
+  "perdidasTrasAtajada": 0,
+  "perdidasArea": 0,
+  "perdidasAreaPorPartido": 0,
+  "manoAMano": {
+   "episodios": 331,
+   "goles": 136,
+   "conversion": 0.4108761329305136,
+   "fraccionDeGoles": 0.7046632124352331,
+   "desplazamientoMedianaM": 1.5961938325606786,
+   "desplazamientoP75M": 3.298022286937228,
+   "fraccionDesplazado": 0.6042296072507553
+  },
+  "centros": {
+   "pasesBanda": 142,
+   "alArea": 66,
+   "proporcion": 0.4647887323943662,
+   "motivoCentro": 62,
+   "porPartido": 0.62
+  },
+  "saquesManos": 354,
+  "saquesPerdidos": 7,
+  "saquesPerdidosPorPartido": 0.07,
+  "intercepcionesInmediatas": 0,
+  "intercepcionesInmediatasPorPartido": 0,
+  "intercepcionesInmediatasCercanas": 0,
+  "remate": {
+   "remates": 494,
+   "porPartido": 4.94,
+   "desenlaces": {
+    "gol": 190,
+    "atrapada": 69,
+    "desvio": 68,
+    "ancho": 90,
+    "alto": 50,
+    "bloqueado": 21,
+    "otro": 6
+   },
+   "aPuerta": 0.6639676113360324,
+   "conversion": 0.38461538461538464,
+   "atajadasSobreAPuerta": 0.4176829268292683,
+   "desviosSobreAtajadas": 0.49635036496350365,
+   "fuera": 0.2834008097165992,
+   "altos": 50,
+   "altosSobreFuera": 0.35714285714285715,
+   "bloqueados": 0.04251012145748988,
+   "golesSinRemate": 3,
+   "golesSinRematePorPartido": 0.03,
+   "colocacionLados": 0.8179551122194514,
+   "desvioMedioM": 2.915112122572546,
+   "discrepancias045": 1
+  },
+  "golesTrasSaque": 2,
+  "golesTrasSaquePorPartido": 0.02,
+  "metas": 140,
+  "metasConduccion": 0,
+  "metasConduccionPorPartido": 0,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 10107,
+   "frenados": 1365,
+   "fraccion": 0.1350549124369249
+  },
+  "fuerasDeJuego": 281,
+  "persecucion063": {
+   "repliegueCorren": 0.6709866017052375,
+   "repliegueSeleccion": 0.9746821448313986,
+   "persecucionPerdedor": 0.5277966101694915,
+   "muestras": {
+    "repliegue": 20525,
+    "seleccion": 9045,
+    "persecucion": 5900
+   }
+  },
+  "largoLejano063": {
+   "largos": 68,
+   "largosPorPartido": 0.68,
+   "exitoLargos": 0.45588235294117646,
+   "lejanos": 69,
+   "lejanosPorPartido": 0.69,
+   "conversionLejanos": 0.15942028985507245,
+   "aPuertaLejanos": 0.4492753623188406,
+   "remateDistanciaMedianaM": 19.374947963720572,
+   "remateDistanciaP90M": 27.147469058428317,
+   "remateDistanciaMaxM": 32.88326484273383
+  },
+  "local063": {
+   "vmaxMedia": 7.0064167446238255,
+   "energiaFinalMedia": 0.8395001268256027,
+   "robosSufridosPorMin": 1.884735202492212,
+   "robosHechosPorPartido": 1.08,
+   "largosPorPartido": 0.28,
+   "lejanosPorPartido": 0.34,
+   "errorPaseCortoMedioM": 0.4055561671589666,
+   "ticksPorMRemate": 0.3028346849325983
+  }
+ }
+}

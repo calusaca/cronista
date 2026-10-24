@@ -15,8 +15,9 @@ constante cambiada en una copia, por eso `arbolConCambios: true`).
 Con 0,24 (adoptado): goles 1,70 / 1,93 / 2,03; conversión del mano a mano 0,460 / 0,411 / 0,414; centros 0,77 / 0,62 /
 0,71; repliegueCorren 0,676 / 0,671 / 0,660; persecucionPerdedor 0,516 / 0,528 / 0,505; repliegueSeleccion 0,991 /
 0,975 / 0,970; largos 0,40 / 0,68 / 0,78 por partido (éxito 0,50 / 0,46 / 0,60); lejanos 0,67 / 0,69 / 0,61 por partido
-(conversión 0 / 0,16 / 0,16; a puerta 0,40 / 0,45 / 0,43). El 0,30 no se probó. Los JSON de la carpeta raíz se vuelven
-a medir en un árbol limpio con el commit final (`*-final`).
+(conversión 0 / 0,16 / 0,16; a puerta 0,40 / 0,45 / 0,43). El 0,30 no se probó. Los JSON `*-final` de la carpeta raíz
+se midieron en un árbol limpio en el commit `57741f4` (`arbolConCambios: false`) y dan exactamente las mismas cifras.
+`v6-contraste-1-100.json` (0 largos y 0 lejanos) sigue valiendo: v6 no cambia.
 
 ## Estado anterior (entradaDuelo 0,12): bloqueado
 
@@ -24,8 +25,8 @@ a medir en un árbol limpio con el commit final (`*-final`).
 atributos sigue fuera: `entrada` (robos hechos por partido del `local`, 80 − 30) = **0,17 < 0,30** en las semillas
 1–100. Se para y se reporta, sin ampliar la banda.
 
-Programados, 120 s. Los JSON de esta carpeta salen de `src/arena/metricas-lote-cli.ts` en un árbol limpio en el
-commit `047ae16` (rama `brief-063-publicacion-2`, `arbolConCambios: false`).
+Programados, 120 s. Los JSON de ese estado están en `intentos-entrada/entrada-012/`, medidos con
+`src/arena/metricas-lote-cli.ts` en un árbol limpio en el commit `047ae16` (antes del rebase; `arbolConCambios: false`).
 
 ## Lotes completos y rápido (todas las bandas: 046 recalibradas, 051, bloque A, bloques B y C)
 
