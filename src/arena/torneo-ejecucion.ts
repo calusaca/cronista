@@ -21,10 +21,10 @@ import {
   esquemaConfigTorneo, esquemaEjecutor, esquemaIndice, esquemaMovimiento, gastoConocido, LADOS_TORNEO, microMaxIntento, microTipicoDecision, rondasPartido,
   reservaPartido, resumenTorneo, VERSION_TORNEO,
   type DeclaradoLado, type EjecutorEncuentro, type EncuentroPlan, type EncuentroTorneo, type EsperaHttp, type IntentoHttp, type MarcoTorneo, type MovimientoGasto,
-  type ParticipanteTorneo, type TorneoArchivado,
+  type ParticipanteTorneo, type TorneoArchivado, type TorneoCualquiera,
 } from "./torneo";
 import { configDelPlan, constaEnArchivo, descomprimirRegistro, encuentroDesdeEjecutor, sha256, validarEncuentro, validarTorneo } from "./torneo-validacion";
-import type { ControladorEquipo, RegistroArena } from "./tipos";
+import type { ControladorEquipo, PublicacionArena, RegistroArena } from "./tipos";
 
 /** Error con el código de salida del CLI (1 por defecto). */
 export class ErrorTorneo extends Error {
@@ -154,6 +154,8 @@ export interface EntradaEncuentro {
   plan: EncuentroPlan; participantes: readonly ParticipanteTorneo[]; marco: MarcoTorneo; intento: number;
   crearControlador: CrearControlador; fetch: typeof fetch; promptMax: number; secretos: readonly string[];
   esperaMs?: number; signal?: AbortSignal; ahora?: () => number;
+  /** Brief 062 (D12) · Opcional y aditiva: el servidor la usa para el ritmo de reloj; el CLI no la pasa. */
+  alPublicar?: (publicacion: PublicacionArena) => Promise<void>;
 }
 export type ResultadoEncuentro =
   | { resultado: "valido"; costoMicroUsd: number; encuentro: EncuentroTorneo; ejecutor: EjecutorEncuentro; gz: Buffer; registro: RegistroArena }
@@ -171,7 +173,7 @@ export async function jugarEncuentro(o: EntradaEncuentro): Promise<ResultadoEncu
   try {
     // La MISMA llamada que la validación (§ 16.1): CLI y CI no pueden divergir.
     registro = await ejecutarArena(configDelPlan(o.plan, o.marco), controladores, {
-      esperaMs: o.esperaMs ?? ARENA.esperaMs, ...(o.signal ? { signal: o.signal } : {}),
+      esperaMs: o.esperaMs ?? ARENA.esperaMs, ...(o.signal ? { signal: o.signal } : {}), ...(o.alPublicar ? { alPublicar: o.alPublicar } : {}),
       alProgreso: () => { regs.local.ronda++; regs.visita.ronda++; },
     });
   } catch (error) {
@@ -289,7 +291,7 @@ export interface OpcionesTorneo {
   crearControlador: CrearControlador; fetch: typeof fetch; secretos: readonly string[];
   esperaMs?: number; dormir?: (ms: number, signal?: AbortSignal) => Promise<void>; ahora?: () => Date; signal?: AbortSignal; log?: (s: string) => void; pid?: number;
 }
-export interface ResultadoTorneo { codigo: 0 | 2 | 3 | 130; mensaje: string; torneo: TorneoArchivado | null }
+export interface ResultadoTorneo { codigo: 0 | 2 | 3 | 130; mensaje: string; torneo: TorneoCualquiera | null }
 
 export async function ejecutarTorneo(o: OpcionesTorneo): Promise<ResultadoTorneo> {
   const ahora = o.ahora ?? (() => new Date());
@@ -463,18 +465,21 @@ export interface EstimacionTorneo {
 }
 const mediana = (xs: number[]) => { const v = [...xs].sort((a, b) => a - b); return v.length ? v[Math.floor(v.length / 2)]! : null; };
 
-export function estimarTorneo(o: { participantes: readonly ParticipanteTorneo[]; evidencias: readonly EvidenciaArchivo[]; duracionS: number; intervaloS: number; semilla: number; topeMicroUsd: number; topeUsd: number }): EstimacionTorneo {
+/** Brief 062 § 6.2 · Lo que la estimación toma de la evidencia 052, extraído de `estimarTorneo` sin cambiar su
+ * salida: el prompt máximo de los partidos de 60 s y, por participante, las medias de entrada y salida (la mayor
+ * media observada si no hay medición propia) y la mediana de latencia. Lo usa también `torneo-entradas-cli.ts`. */
+export interface MedidaEstimacion { id: string; entradaMedia: number; salidaMedia: number; medicionPropia: boolean; medianaMs: number | null; latenciaPropia: boolean }
+export function entradasEstimacion(participantes: readonly Pick<ParticipanteTorneo, "id" | "controlador">[], evidencias: readonly EvidenciaArchivo[]): { promptMax: EstimacionTorneo["promptMax"]; medidas: MedidaEstimacion[] } {
   // P: el mayor promptMax de cualquier partido de 60 s de la evidencia 052.
   let promptMax: EstimacionTorneo["promptMax"] | null = null;
-  for (const { archivo, evidencia } of o.evidencias) for (const p of evidencia.partidos) {
+  for (const { archivo, evidencia } of evidencias) for (const p of evidencia.partidos) {
     if (p.duracionS !== S.cortoS) continue;
     for (const l of p.lados) if (l.promptMax !== null && (!promptMax || l.promptMax > promptMax.tokens)) promptMax = { tokens: l.promptMax, archivo, partido: p.nombre };
   }
   if (!promptMax) throw new ErrorTorneo("Sin evidencia 052 de partidos de 60 s: no se puede estimar el máximo por intento");
-  const P = promptMax.tokens;
   // Medias por llamada con usage, por controlador (como candidato o como rival), y medianas de latencia.
-  const lados = o.evidencias.flatMap(x => x.evidencia.partidos.flatMap(p => p.lados));
-  const decisiones = o.evidencias.flatMap(x => [...x.evidencia.decisionesCandidato, ...x.evidencia.decisionesRival]);
+  const lados = evidencias.flatMap(x => x.evidencia.partidos.flatMap(p => p.lados));
+  const decisiones = evidencias.flatMap(x => [...x.evidencia.decisionesCandidato, ...x.evidencia.decisionesRival]);
   const medias = (controlador: string) => {
     const us = lados.filter(l => l.controlador === controlador && l.uso && l.uso.respuestasConUso > 0).map(l => l.uso!);
     const n = us.reduce((s, u) => s + u.respuestasConUso, 0);
@@ -484,19 +489,29 @@ export function estimarTorneo(o: { participantes: readonly ParticipanteTorneo[];
   const todas = controladores.map(medias).filter((x): x is { entrada: number; salida: number } => !!x);
   const mayor = { entrada: Math.max(0, ...todas.map(x => x.entrada)), salida: Math.max(0, ...todas.map(x => x.salida)) };
   const medianas = controladores.map(c => mediana(decisiones.filter(d => d.controlador === c).map(d => d.tiempoMs))).filter((x): x is number => x !== null);
+  const medidas = participantes.map((p): MedidaEstimacion => {
+    const propia = medias(p.controlador), m = propia ?? mayor;
+    const lat = mediana(decisiones.filter(d => d.controlador === p.controlador).map(d => d.tiempoMs));
+    return { id: p.id, entradaMedia: m.entrada, salidaMedia: m.salida, medicionPropia: !!propia, medianaMs: lat ?? (medianas.length ? Math.max(...medianas) : null), latenciaPropia: lat !== null };
+  });
+  return { promptMax, medidas };
+}
+
+export function estimarTorneo(o: { participantes: readonly ParticipanteTorneo[]; evidencias: readonly EvidenciaArchivo[]; duracionS: number; intervaloS: number; semilla: number; topeMicroUsd: number; topeUsd: number }): EstimacionTorneo {
+  const { promptMax, medidas } = entradasEstimacion(o.participantes, o.evidencias);
+  const P = promptMax.tokens;
   const rondas = rondasPartido(o.duracionS, o.intervaloS), n = o.participantes.length;
   const D = 2 * (n - 1) * rondas;
   const plan = calendarioTorneo(o.participantes.map(p => p.id), o.semilla);
   const reservaDe = (pl: EncuentroPlan) => reservaPartido({ local: buscar(pl.local).precio, visita: buscar(pl.visita).precio }, P, rondas);
   function buscar(id: string) { return o.participantes.find(p => p.id === id)!; }
-  const participantes = o.participantes.map((p): EstimacionParticipante => {
-    const propia = medias(p.controlador), m = propia ?? mayor, tipicoDecision = microTipicoDecision(m.entrada, m.salida, p.precio);
-    const lat = mediana(decisiones.filter(d => d.controlador === p.controlador).map(d => d.tiempoMs));
+  const participantes = o.participantes.map((p, i): EstimacionParticipante => {
+    const m = medidas[i]!, tipicoDecision = microTipicoDecision(m.entradaMedia, m.salidaMedia, p.precio);
     const maxIntento = microMaxIntento(p.precio, P);
-    return { id: p.id, nombre: p.nombre, deployment: p.deployment, controlador: p.controlador, decisiones: D, medicionPropia: !!propia, entradaMedia: m.entrada, salidaMedia: m.salida,
+    return { id: p.id, nombre: p.nombre, deployment: p.deployment, controlador: p.controlador, decisiones: D, medicionPropia: m.medicionPropia, entradaMedia: m.entradaMedia, salidaMedia: m.salidaMedia,
       tipicoDecisionMicroUsd: tipicoDecision, tipicoMicroUsd: D * tipicoDecision, maxIntentoMicroUsd: maxIntento,
       reservaMicroUsd: plan.filter(x => x.local === p.id || x.visita === p.id).length * rondas * ARENA.intentosOrdenes * (1 + T.http.reintentos) * maxIntento,
-      medianaMs: lat ?? (medianas.length ? Math.max(...medianas) : null), latenciaPropia: lat !== null, precioEstimadoDe: p.precio.estimadoDe };
+      medianaMs: m.medianaMs, latenciaPropia: m.latenciaPropia, precioEstimadoDe: p.precio.estimadoDe };
   });
   const latencia = (id: string) => participantes.find(x => x.id === id)!.medianaMs ?? 0;
   const partidos = plan.map(pl => ({ n: pl.n, jornada: pl.jornada, vuelta: pl.vuelta, local: pl.local, visita: pl.visita, seed: pl.seed, reservaMicroUsd: reservaDe(pl),

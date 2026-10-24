@@ -7,10 +7,12 @@
 // Sin dependencias de Node: lo importan también la página (cliente) y Arena.tsx. La validación contra los archivos
 // (`node:zlib`, `node:crypto`, motor) vive en `torneo-validacion.ts` (servidor, CLI y CI).
 import { z } from "zod";
-import { ARENA, SMOKE_MODELOS_ARENA, TORNEO_ARENA as T } from "../sim/limites";
+import { ARENA, SMOKE_MODELOS_ARENA, TORNEO_ARENA as T, TORNEO_SITIO } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import type { Lado } from "../sim/tipos";
 import type { DecisionArena } from "./tipos";
+// Ciclo de importación deliberado y seguro: torneo-formatos.ts solo usa lo de aquí dentro de funciones.
+import { coherencia062 } from "./torneo-formatos";
 
 export const VERSION_TORNEO = T.version;
 export const LADOS_TORNEO = ["local", "visita"] as const satisfies readonly Lado[];
@@ -68,13 +70,42 @@ export const esquemaEncuentro = z.strictObject({
   local: esquemaLado, visita: esquemaLado,
 });
 export const esquemaGasto = z.strictObject({ conocidoMicroUsd: microUsd, tipicoMicroUsd: microUsd, topeMicroUsd: microUsd, reservaMaxPartidoMicroUsd: microUsd });
-export const esquemaTorneo = z.strictObject({
-  version: z.literal(T.version), id: z.string().regex(ID_TORNEO), tipo: z.enum(["real", "ensayo"]), titulo: z.strictObject({ es: texto(), en: texto() }),
-  inicioUtc: fechaUtc, finUtc: fechaUtc, commit: z.string().regex(/^[0-9a-f]{7,40}$/),
+const camposTorneo = {
+  id: z.string().regex(ID_TORNEO), tipo: z.enum(["real", "ensayo"]), titulo: z.strictObject({ es: texto(), en: texto() }),
+  inicioUtc: fechaUtc, commit: z.string().regex(/^[0-9a-f]{7,40}$/),
   motor: z.strictObject({ version: texto(40), reglas: texto(40) }), duracionS: z.number().int().min(1), intervaloS: z.number().int().min(1), semilla: z.number().int().min(0).max(0xffffffff),
-  participantes: z.array(esquemaParticipante).min(T.participantes.min).max(T.participantes.max), encuentros: z.array(esquemaEncuentro), pendientes: z.array(z.number().int().min(1)),
-  gasto: esquemaGasto, estado: z.enum(["completo", "incompleto"]),
+  participantes: z.array(esquemaParticipante).min(T.participantes.min).max(T.participantes.max), pendientes: z.array(z.number().int().min(1)),
+  gasto: esquemaGasto,
+};
+/** El archivo 059 (`059-v1.1`), sin cambios: el del 24 oct sigue siendo válido byte a byte. Conserva el nombre
+ * `esquemaTorneo` (lo usan la página y la carga de repeticiones, fuera de esta entrega); la unión 059 | 062 es
+ * `esquemaTorneoCualquiera`. */
+export const esquemaTorneo059 = z.strictObject({
+  version: z.literal(T.version), ...camposTorneo, finUtc: fechaUtc, encuentros: z.array(esquemaEncuentro), estado: z.enum(["completo", "incompleto"]),
 });
+
+// ---------------------------------------------------------------------------------------------------
+// Brief 062 § 4 + § 17.10 + § 18.4 · Esquema 062 (torneo del sitio o archivado con formato). Vive aquí, junto al
+// 059, porque `esquemaTorneo` es la unión de los dos; las funciones de formato están en `torneo-formatos.ts`.
+// ---------------------------------------------------------------------------------------------------
+export const FORMATOS_TORNEO = ["liga", "grupos"] as const;
+export const FASES_ENCUENTRO = ["liga", "grupo-A", "grupo-B", "semifinal-1", "semifinal-2", "final"] as const;
+export const ESTADOS_062 = ["completo", "incompleto", "en_curso", "cancelado", "interrumpido"] as const;
+export const MOTIVOS_FIN_062 = ["tope", "infraestructura", "plazo", "cancelado", "reinicio", "almacen"] as const;
+/** Un encuentro 062: el 059 más `fase` y `desempate` (estricto: el esquema 059 sigue rechazando ambos). */
+export const esquemaEncuentro062 = z.strictObject({ ...esquemaEncuentro.shape, fase: z.enum(FASES_ENCUENTRO), desempate: z.boolean() });
+export const esquemaEnCurso = z.strictObject({ n: z.number().int().min(1), local: texto(40), visita: texto(40), inicioUtc: fechaUtc });
+export const esquemaTorneo062 = z.strictObject({
+  version: z.literal(TORNEO_SITIO.version), ...camposTorneo,
+  formato: z.enum(FORMATOS_TORNEO), origen: z.enum(["repositorio", "sitio"]), lanzamiento: z.enum(["publico", "prueba"]),
+  /** null mientras el torneo está `en_curso` (validarCoherencia lo exige). */
+  finUtc: fechaUtc.nullable(),
+  estado: z.enum(ESTADOS_062), motivoFin: z.enum(MOTIVOS_FIN_062).nullable(), enCurso: esquemaEnCurso.nullable(),
+  encuentros: z.array(esquemaEncuentro062),
+});
+export const esquemaTorneo = esquemaTorneo059;
+/** Brief 062 § 4 · Unión discriminada por `version` (servidor, validación de CI y, cuando se integre la UI, la carga). */
+export const esquemaTorneoCualquiera = z.discriminatedUnion("version", [esquemaTorneo059, esquemaTorneo062]);
 /** `eNN.ejecutor.json` (§ 15.4): lo declarado por el ejecutor para ese partido. */
 export const esquemaEjecutor = z.strictObject({ n: z.number().int().min(1), intento: z.number().int().min(1), archivoSha256: z.string().regex(/^[0-9a-f]{64}$/), local: esquemaDeclarado, visita: esquemaDeclarado });
 /** `config.json` del directorio de trabajo: `--reanudar` exige que sea idéntico. */
@@ -99,13 +130,17 @@ export type DeclaradoLado = z.infer<typeof esquemaDeclarado>;
 export type CifrasLado = z.infer<typeof esquemaCifras>;
 export type LadoEncuentro = z.infer<typeof esquemaLado>;
 export type EncuentroTorneo = z.infer<typeof esquemaEncuentro>;
-export type TorneoArchivado = z.infer<typeof esquemaTorneo>;
+export type EncuentroTorneo062 = z.infer<typeof esquemaEncuentro062>;
+export type Torneo059 = z.infer<typeof esquemaTorneo059>;
+export type Torneo062 = z.infer<typeof esquemaTorneo062>;
+export type TorneoArchivado = Torneo059;
+export type TorneoCualquiera = z.infer<typeof esquemaTorneoCualquiera>;
 export type EjecutorEncuentro = z.infer<typeof esquemaEjecutor>;
 export type ConfigTorneo = z.infer<typeof esquemaConfigTorneo>;
 export type MovimientoGasto = z.infer<typeof esquemaMovimiento>;
 export type IndiceTorneos = z.infer<typeof esquemaIndice>;
 /** Lo que un partido necesita del torneo para validarse (§ 16.1). */
-export type MarcoTorneo = Pick<TorneoArchivado, "duracionS" | "intervaloS" | "motor">;
+export type MarcoTorneo = Pick<TorneoCualquiera, "duracionS" | "intervaloS" | "motor">;
 
 export const archivoEncuentro = (n: number) => `e${String(n).padStart(2, "0")}.json.gz`;
 
@@ -383,21 +418,28 @@ export function causaTerminal(motivo: DecisionArena["motivo"], intentos: readonl
 // ---------------------------------------------------------------------------------------------------
 // Coherencia interna (página, CI y CLI) y validación completa del torneo (CLI y CI).
 // ---------------------------------------------------------------------------------------------------
-export function validarCoherencia(t: TorneoArchivado): string[] {
+export function validarCoherencia(t: TorneoCualquiera): string[] {
   const errores: string[] = [];
   const ids = t.participantes.map(p => p.id);
   if (new Set(ids).size !== ids.length) errores.push("participantes repetidos");
   if (t.participantes.some(p => (p.llm === "ensayo") !== (t.tipo === "ensayo"))) errores.push("controladores de ensayo fuera de un torneo de ensayo (o al revés)");
   if (t.tipo === "real" && (t.duracionS !== T.duracionS || !(T.intervalosS as readonly number[]).includes(t.intervaloS))) errores.push("duración o intervalo fuera de lo admitido para un torneo real");
   if (t.tipo === "ensayo" && (t.duracionS < T.ensayoSegundos.min || t.duracionS > T.ensayoSegundos.max)) errores.push("duración de ensayo fuera de límites");
-  let plan: EncuentroPlan[] = [];
-  try { plan = calendarioTorneo(ids, t.semilla); } catch (error) { errores.push(`calendario: ${error instanceof Error ? error.message : "inválido"}`); }
   const ns = [...t.encuentros.map(e => e.n), ...t.pendientes];
   if (new Set(ns).size !== ns.length) errores.push("partidos repetidos entre encuentros y pendientes");
-  if (plan.length && (ns.length !== plan.length || !plan.every(p => ns.includes(p.n)))) errores.push("encuentros y pendientes no cubren el calendario");
+  // Brief 062 § 4: la rama 062 compara con el plan del formato reconstruido (prefijo), no con el calendario completo.
+  if (t.version === TORNEO_SITIO.version) errores.push(...coherencia062(t));
+  else {
+    let plan: EncuentroPlan[] = [];
+    try { plan = calendarioTorneo(ids, t.semilla); } catch (error) { errores.push(`calendario: ${error instanceof Error ? error.message : "inválido"}`); }
+    if (plan.length && (ns.length !== plan.length || !plan.every(p => ns.includes(p.n)))) errores.push("encuentros y pendientes no cubren el calendario");
+    for (const e of t.encuentros) {
+      const p = plan.find(x => x.n === e.n);
+      if (plan.length && (!p || e.jornada !== p.jornada || e.cruce !== p.cruce || e.vuelta !== p.vuelta || e.seed !== p.seed || e.local.participante !== p.local || e.visita.participante !== p.visita)) errores.push(`P${e.n}: no coincide con calendarioTorneo`);
+    }
+    if ((t.estado === "completo") !== (t.pendientes.length === 0)) errores.push("estado incoherente con los pendientes");
+  }
   for (const e of t.encuentros) {
-    const p = plan.find(x => x.n === e.n);
-    if (plan.length && (!p || e.jornada !== p.jornada || e.cruce !== p.cruce || e.vuelta !== p.vuelta || e.seed !== p.seed || e.local.participante !== p.local || e.visita.participante !== p.visita)) errores.push(`P${e.n}: no coincide con calendarioTorneo`);
     if (e.archivo !== archivoEncuentro(e.n)) errores.push(`P${e.n}: archivo ${e.archivo}`);
     for (const lado of LADOS_TORNEO) {
       const l = e[lado], d = l.declarado;
@@ -413,7 +455,6 @@ export function validarCoherencia(t: TorneoArchivado): string[] {
   const costos = t.encuentros.reduce((s, e) => s + e.local.declarado.costoMicroUsd + e.visita.declarado.costoMicroUsd, 0);
   // Los anulados y las reservas sin cierre suman al gasto conocido pero no están en `encuentros`.
   if (costos > t.gasto.conocidoMicroUsd) errores.push("el gasto conocido es menor que la suma de los partidos");
-  if ((t.estado === "completo") !== (t.pendientes.length === 0)) errores.push("estado incoherente con los pendientes");
   return errores;
 }
 
@@ -422,7 +463,7 @@ export function validarCoherencia(t: TorneoArchivado): string[] {
 // CI lo regenera y exige igualdad byte a byte.
 // ---------------------------------------------------------------------------------------------------
 const usd = (micro: number) => `${usdDeMicro(micro).toFixed(4)} USD`;
-export function resumenTorneo(t: TorneoArchivado): string {
+export function resumenTorneo(t: TorneoCualquiera): string {
   const nombre = new Map(t.participantes.map(p => [p.id, p.nombre]));
   const filas = clasificar(t), m = matrizResultados(t), porN = new Map(t.encuentros.map(e => [e.n, e]));
   const plan = calendarioTorneo(t.participantes.map(p => p.id), t.semilla);

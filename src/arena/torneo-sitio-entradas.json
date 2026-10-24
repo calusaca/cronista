@@ -1,0 +1,181 @@
+{
+  "version": "062-v1",
+  "torneoOrigen": "2026-10-24",
+  "participantes": [
+    {
+      "id": "equilibrado",
+      "nombre": "GPT-5.6 Luna",
+      "corto": "5.6 Luna",
+      "deployment": "cronista-equilibrado",
+      "modelo": "gpt-5.6-luna",
+      "version": "2026-07-09",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.2,
+        "salida": 1.2,
+        "cache": 0.02,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-equilibrado:reasoning-low"
+    },
+    {
+      "id": "rapido",
+      "nombre": "GPT-5.4 mini",
+      "corto": "5.4 mini",
+      "deployment": "cronista-rapido",
+      "modelo": "gpt-5.4-mini",
+      "version": "2026-03-17",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.75,
+        "salida": 4.5,
+        "cache": 0.075,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-rapido:reasoning-low"
+    },
+    {
+      "id": "luna6",
+      "nombre": "GPT-6 Luna",
+      "corto": "6 Luna",
+      "deployment": "cronista-luna6",
+      "modelo": "gpt-6-luna",
+      "version": "2026-09-22",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 0.1,
+        "salida": 0.5,
+        "cache": 0.01,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-luna6:reasoning-low"
+    },
+    {
+      "id": "sol6",
+      "nombre": "GPT-6 Sol",
+      "corto": "6 Sol",
+      "deployment": "cronista-sol6",
+      "modelo": "gpt-6-sol",
+      "version": "2026-09-22",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 2,
+        "salida": 10,
+        "cache": 0.2,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-sol6:reasoning-low"
+    },
+    {
+      "id": "astra6",
+      "nombre": "GPT-6 Astra",
+      "corto": "6 Astra",
+      "deployment": "cronista-astra6",
+      "modelo": "gpt-6-astra",
+      "version": "2026-09-03",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 10,
+        "salida": 50,
+        "cache": 1,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-astra6:reasoning-low"
+    },
+    {
+      "id": "sol61",
+      "nombre": "GPT-6.1 Sol",
+      "corto": "6.1 Sol",
+      "deployment": "cronista-sol61",
+      "modelo": "gpt-6.1-sol",
+      "version": "2026-09-29",
+      "llm": "azure-openai",
+      "formatoJson": null,
+      "esfuerzo": "low",
+      "precio": {
+        "entrada": 2,
+        "salida": 10,
+        "cache": 0.1,
+        "fuente": "https://prices.azure.com/api/retail/prices?currencyCode=USD&$filter=serviceName eq 'Foundry Models' (API pública, sin credenciales)",
+        "consultadoUtc": "2026-10-22T05:39:56.892Z",
+        "estimadoDe": null
+      },
+      "controlador": "azure-openai:cronista-sol61:reasoning-low"
+    }
+  ],
+  "promptMax": {
+    "tokens": 10231,
+    "archivo": "docs/evidencia/modelos-052/grok.json",
+    "partido": "espejo"
+  },
+  "medidas": [
+    {
+      "id": "equilibrado",
+      "entradaMedia": 9545,
+      "salidaMedia": 1817.4857142857143,
+      "medicionPropia": false,
+      "medianaMs": 32173,
+      "latenciaPropia": false
+    },
+    {
+      "id": "rapido",
+      "entradaMedia": 9326.565217391304,
+      "salidaMedia": 643.75,
+      "medicionPropia": true,
+      "medianaMs": 4406,
+      "latenciaPropia": true
+    },
+    {
+      "id": "luna6",
+      "entradaMedia": 9308.363636363636,
+      "salidaMedia": 594.0909090909091,
+      "medicionPropia": true,
+      "medianaMs": 6084,
+      "latenciaPropia": true
+    },
+    {
+      "id": "sol6",
+      "entradaMedia": 9304.739130434782,
+      "salidaMedia": 527.5217391304348,
+      "medicionPropia": true,
+      "medianaMs": 6521,
+      "latenciaPropia": true
+    },
+    {
+      "id": "astra6",
+      "entradaMedia": 9240.454545454546,
+      "salidaMedia": 441.1363636363636,
+      "medicionPropia": true,
+      "medianaMs": 9393,
+      "latenciaPropia": true
+    },
+    {
+      "id": "sol61",
+      "entradaMedia": 9296.5,
+      "salidaMedia": 477.09090909090907,
+      "medicionPropia": true,
+      "medianaMs": 8417,
+      "latenciaPropia": true
+    }
+  ]
+}

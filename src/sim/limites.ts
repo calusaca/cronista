@@ -1274,3 +1274,56 @@ export const TORNEO_ARENA = {
   /** Ensayo sin inferencia (fixtures): duraciones admitidas en segundos. */
   ensayoSegundos: { min: 10, max: 60 },
 } as const;
+
+/** Brief 062 v1.3 · Torneo lanzable desde el sitio (cualquier visitante): un cupo global por día UTC, un torneo
+ * activo a la vez, tope por estimación por formato y una bolsa del periodo. Reutiliza las reservas del 059
+ * (`TORNEO_ARENA`). Las § 17, 18 y 19 del brief prevalecen sobre su § 8: intervalo de 30 s, topes 8/7 USD, sin
+ * *lease* ni reanudación (mutex en proceso, latido de presencia, barrera de relevo y autosilencio). Toda cifra
+ * monetaria es una estimación con precio de lista, no la factura. */
+export const TORNEO_SITIO = {
+  version: "062-v1",
+  /** Espacio de nombres de los ids del sitio (`sitio-AAAA-MM-DD`, `sitio-prueba-<hex12>`); el CLI lo rechaza. */
+  prefijoId: "sitio-",
+  /** Un lanzamiento por día UTC en todo el sitio, sea cual sea el formato (la liga de prueba no lo consume). */
+  cupoDiario: 1,
+  formatos: {
+    /** Liga = 059 (Berger de 6, ida y vuelta). § 17.5: típico ≈ 3,54 USD a 30 s + reserva del más caro ≤ 8. */
+    liga: { topeUsd: 8 },
+    /** 2 grupos de 3 a ida y vuelta, pasan 2, llaves a partido único y como mucho 1 desempate por llave (P1-b). */
+    grupos: { grupos: 2, porGrupo: 3, pasanPorGrupo: 2, desempatesPorLlave: 1, topeUsd: 7 },
+  },
+  /** Salvaguarda del crédito (§ 5.3): conocido acumulado de los torneos reales + tope del formato ≤ bolsa. */
+  bolsaUsd: 50,
+  /** Admisión en memoria (clase del 057): por IP (último salto de x-forwarded-for) y global; solo protege la
+   * carga de la ruta, lo económico lo protegen el cupo y la bolsa persistidos (§ 17.7). */
+  admision: { porIpPorHora: 3, globalPorHora: 20, enCurso: 1, ventanaMs: 3_600_000, cuerpoMaxBytes: 1_024 },
+  /** § 17.7 · Plazo de lectura del cuerpo de la petición de lanzamiento (408 si se pasa). */
+  cuerpoPlazoMs: 2_000,
+  /** § 17.5 · Intervalo de decisión del torneo del sitio (2 decisiones por entrenador y partido de 60 s). */
+  intervaloS: 30,
+  /** D12 · Cada ronda dura al menos su intervalo de reloj de pared. */
+  ritmoReal: true,
+  /** Plazo total desde `inicioUtc`: pasado, el torneo termina `incompleto` con `motivoFin: "plazo"`. */
+  plazoTotalMs: 10_800_000,
+  /** Con `TORNEO_ARENA.anuladosSeguidosMax` anulados seguidos se espera esto UNA vez; si se repite, termina. */
+  enfriamientoLargoMs: 600_000,
+  /** Sondeo de la página mientras el torneo está `en_curso` (solo con la pestaña visible). */
+  sondeoUiMs: 15_000,
+  /** Solo para la duración mostrada: segundos por partido además de la duración y la pausa. */
+  margenValidacionS: 2,
+  /** § 18.1 · Latido de presencia de CADA proceso (`latido-<proceso>.json`), reescrito con este periodo. */
+  latidoMs: 10_000,
+  /** § 18.1 · Un latido ajeno más reciente que esto mantiene la barrera de relevo del proceso nuevo. */
+  latidoCaducoMs: 45_000,
+  /** § 19 · El proceso deja de escribir si su última renovación correcta tiene esta edad (< latidoCaducoMs). */
+  latidoSilencioS: 30,
+  /** § 18.1 · Periodo con el que el proceso nuevo vuelve a mirar los latidos ajenos. */
+  relevoSondeoMs: 5_000,
+  /** § 18.1 · Plazo de cada operación del almacén de torneos (`AbortSignal.timeout`). */
+  opPlazoMs: 10_000,
+  /** § 18.2 · Reintento del cierre de arranque mientras quede algún pendiente, y plazo total de reintentos. */
+  cierreReintentoMs: 30_000,
+  cierrePlazoMs: 600_000,
+  /** § 17.6 · Token de administración (cancelación, cierre y liga de prueba): fallos por hora y longitud mínima. */
+  admin: { fallosPorHora: 10, tokenMinCaracteres: 32 },
+} as const;

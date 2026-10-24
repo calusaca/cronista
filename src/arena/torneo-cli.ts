@@ -17,7 +17,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { TORNEO_ARENA as T } from "../sim/limites";
+import { TORNEO_ARENA as T, TORNEO_SITIO } from "../sim/limites";
 import { crearControladorLlm, planProgramado } from "./controladores";
 import { fabricaLlmReal, type EvidenciaSmoke } from "./smoke-modelos";
 import { calendarioTorneo, ID_TORNEO } from "./torneo";
@@ -52,7 +52,7 @@ export function cambiosSinCache(porcelana: string): string[] {
   return porcelana.split("\n").filter(l => l.trim()).filter(l => { const ruta = l.slice(3).replace(/^"|"$/g, ""); return !ruta.startsWith(".cache/") && ruta !== ".cache"; });
 }
 
-function leerEvidencias(raiz: string): EvidenciaArchivo[] {
+export function leerEvidencias(raiz: string): EvidenciaArchivo[] {
   const dir = join(raiz, DIR_EVIDENCIA_052);
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter(f => f.endsWith(".json") && !NO_EVIDENCIA.includes(f)).sort()
@@ -78,6 +78,8 @@ async function principalSinCaptura(d: DepsCli): Promise<number> {
     },
   });
   if (!v.id || !ID_TORNEO.test(v.id)) throw new ErrorTorneo("--id obligatorio, ^[a-z0-9-]{1,30}$");
+  // Brief 062 D2 · `sitio-` es el espacio de nombres de los torneos lanzados desde el sitio.
+  if (v.id.startsWith(TORNEO_SITIO.prefijoId)) throw new ErrorTorneo(`--id no puede empezar por ${TORNEO_SITIO.prefijoId}: es el espacio de nombres del sitio`);
   const base = d.dirTrabajoBase ?? join(d.raiz, ".cache", "arena-torneos"), dirTrabajo = join(base, v.id);
   if (v["liberar-cerrojo"]) { d.out(liberarCerrojo(dirTrabajo, d.matar)); return 0; }
 

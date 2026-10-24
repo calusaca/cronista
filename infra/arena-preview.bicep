@@ -18,6 +18,16 @@ param insightsConnectionString string
 param foundryEndpoint string
 @description('Brief 052: catálogo publicado, derivado por deploy-azure-arena.mjs de infra/modelos-arena.json (solo entradas con publicar: true). Cada elemento: { id, nombre, prefijo, llm, deployment, formatoJson, esfuerzoRazonamiento }.')
 param modelos array
+@description('Brief 062: sha del commit desplegado (CRONISTA_COMMIT). Lo pasa deploy-azure-arena.mjs desde git rev-parse HEAD; se niega con el árbol sucio.')
+param commit string
+@description('Brief 062: interruptor del torneo lanzable desde el sitio (ARENA_TORNEO_SITIO). Apagado por defecto hasta superar el smoke simultáneo de capacidad (§ 17.5); deploy-azure-arena.mjs lo enciende solo con --torneo-sitio 1.')
+@allowed(['0', '1'])
+param torneoSitio string = '0'
+@description('Brief 062 § 17.6: true solo si el secreto cronista-arena-admin existe en Key Vault (deploy-azure-arena.mjs lo comprueba; no lo crea). Sin él no hay ARENA_ADMIN_TOKEN y los lanzamientos quedan deshabilitados (motivo cancelacion).')
+param adminTokenEnKeyVault bool = false
+
+// Brief 062 § 17.1: una sola variable alimenta a la vez scale.maxReplicas y ARENA_MAX_REPLICAS (no pueden divergir).
+var maxReplicas = 1
 
 // Brief 052: variables por modelo. La clave de Foundry Models es el mismo secreto
 // `inferencia` (clave del recurso); nada nuevo en Key Vault.
@@ -50,10 +60,12 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
       activeRevisionsMode: 'Single'
       ingress: { external: true, targetPort: 3000, allowInsecure: false, transport: 'auto' }
       registries: [{ server: registry.properties.loginServer, identity: identity.id }]
-      secrets: [
+      secrets: concat([
         { name: 'inferencia', keyVaultUrl: '${vaultUri}secrets/cronista-inferencia', identity: identity.id }
         { name: 'insights', value: insightsConnectionString }
-      ]
+      ], adminTokenEnKeyVault ? [
+        { name: 'arena-admin', keyVaultUrl: '${vaultUri}secrets/cronista-arena-admin', identity: identity.id }
+      ] : [])
     }
     template: {
       containers: [{ name: 'cronista', image: '${registry.properties.loginServer}/cronista:${imageTag}', resources: { cpu: json('0.5'), memory: '1Gi' }, env: concat([
@@ -80,12 +92,21 @@ resource preview 'Microsoft.App/containerApps@2025-01-01' = {
         { name: 'CRONISTA_TELEMETRIA', value: '1' }
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', secretRef: 'insights' }
         { name: 'OTEL_SERVICE_NAME', value: 'cronista-arena' }
-      ], envModelos), probes: [
+        // Brief 062: torneo lanzable desde el sitio (réplica única, commit, origen completo y token de administración).
+        { name: 'ARENA_TORNEO_SITIO', value: torneoSitio }
+        { name: 'CRONISTA_COMMIT', value: commit }
+        { name: 'ARENA_MAX_REPLICAS', value: string(maxReplicas) }
+        { name: 'ARENA_ORIGEN_PUBLICO', value: 'https://cronista-arena.${environment.properties.defaultDomain}' }
+      ], adminTokenEnKeyVault ? [
+        { name: 'ARENA_ADMIN_TOKEN', secretRef: 'arena-admin' }
+      ] : [], envModelos), probes: [
         { type: 'Startup', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 2, failureThreshold: 90 }
         { type: 'Readiness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 10, failureThreshold: 3 }
         { type: 'Liveness', httpGet: { path: '/api/health', port: 3000 }, periodSeconds: 20, failureThreshold: 3 }
       ] }]
-      scale: { minReplicas: minReplicas, maxReplicas: 1 }
+      // Brief 062 § 17.1: gracia explícita para el SIGTERM del cambio de revisión.
+      terminationGracePeriodSeconds: 30
+      scale: { minReplicas: minReplicas, maxReplicas: maxReplicas }
     }
   }
 }

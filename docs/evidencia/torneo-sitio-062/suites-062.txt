@@ -1,0 +1,263 @@
+
+ RUN  v5.0.3 /home/calusaca/cronista
+
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G1 · sorteo de grupos (D1, § 17.4) > vectores literales de § 17.4 con las semillas 20261025, 20261026 y 0 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G1 · sorteo de grupos (D1, § 17.4) > 3 + 3, los 6 usados, determinista e independiente del orden de entrada; las 10 particiones aparecen con 0–999 14ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G1 · sorteo de grupos (D1, § 17.4) > sorteo de un subconjunto: vectores de § 17.4, igual con la entrada permutada; u32 y semillasCruce 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G2 · plan de la fase de grupos (D4, D8) > la tabla intercalada literal de D4 (fase, local y visita por índice), jornadas, cruces y vuelta 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G2 · plan de la fase de grupos (D4, D8) > cada pareja juega dos veces con los lados invertidos y la MISMA semilla (la de semillasCruce sobre los 6); semillas únicas 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G2 · plan de la fase de grupos (D4, D8) > colisión inyectada: dos cruces de grupos distintos con la misma semilla derivada ⇒ siguen siendo únicas (semillasCruce sobre los 6) 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G3 · clasificarGrupo usa solo los partidos de su grupo > con las llaves ya jugadas, cada miembro sigue con 4 partidos y los puntos del grupo 12ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G4 · orden estricto de un grupo (D6, § 17.4) > sin empates: el orden de clasificar y el criterio «resultado» 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G4 · orden estricto de un grupo (D6, § 17.4) > tres 0–0: remates directos separan a uno; los otros dos, iguales en remates, van al sorteo del subconjunto 9ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G4 · orden estricto de un grupo (D6, § 17.4) > tres 0–0 sin nada que los separe ⇒ sorteo de los tres (vector de § 17.4) 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G4 · orden estricto de un grupo (D6, § 17.4) > remates directos iguales y remates distintos ⇒ «remates»; una cifra null salta el criterio 2ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G5 · cuadro (D7) > semifinal 1 = 1A–2B y semifinal 2 = 1B–2A con el 1.º de local; la final con el ganador de la semifinal 1 de local 2ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > empate ⇒ desempate con la MISMA semilla y los lados invertidos; si se gana, pasa; nunca un segundo desempate 15ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > 0–0 y 1–1 ⇒ remates directos sumados sobre los DOS partidos con los lados invertidos 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > remates directos iguales ⇒ remates 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > remates directos y remates iguales ⇒ coeficiente de grupo (pts, DG, GF) 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > todo igual (coeficiente incluido) ⇒ sorteo por semilla, rotulado 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > una cifra null en un partido salta ese criterio 0ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G6 · desempate de una llave (D5, § 17.4) > las semillas de las llaves: u32 de la fase y la pareja; el desempate la comparte 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G7 · plan de grupos y siguiente partido > sin resultados: los 12 de grupos; con los grupos completos: 13 = semifinal 1; numeración 15–18 33ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G7 · plan de grupos y siguiente partido > un pendiente en la fase de grupos ⇒ sin cuadro: el torneo termina al acabar los 12 1ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G7 · plan de grupos y siguiente partido > un pendiente en una llave ⇒ el plan se detiene ahí 2ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G8 (grupos) · coherencia contra el plan reconstruido > un torneo de grupos completo (18 partidos, tres desempates) es coherente 33ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G8 (grupos) · coherencia contra el plan reconstruido > una semifinal que contradice los grupos (2A en vez de 2B) o un desempate ausente tras un empate ⇒ incoherente 15ms
+ ✓ src/arena/__tests__/torneo-grupos.test.ts > 062 · G8 (grupos) · coherencia contra el plan reconstruido > grupos con un pendiente en la fase de grupos ⇒ incompleto sin cuadro es coherente; «completo» no 8ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > descomprime el registro archivado y devuelve la procedencia de torneo.json 234ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > un encuentro que no está en torneo.json, un torneo incoherente o inexistente fallan antes de pedir el registro 17ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > sin DecompressionStream: error propio, sin descargar el registro 6ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > revisión Codex #2 · intercambiar dos registros válidos se rechaza: por la huella, y con las huellas también intercambiadas, por semilla, clubes o lados 30ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > un registro servido ya descomprimido (Content-Encoding) no supera la huella del archivo íntegro 4ms
+ ✓ src/ui/__tests__/torneo-carga.test.ts > 059 · carga de un partido del torneo (§ 15.8) > precedencia: partido gana sobre torneo; torneo sin encuentro de dos dígitos se ignora 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > M1 · cada par juega 2 veces, una de local cada uno, con la misma semilla en ida y vuelta y semillas distintas entre cruces 4ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > M2 · nadie juega dos veces por jornada; ida con locales [3,3,3,2,2,2] por índice y 5/5 en el torneo; con 3, 1/1 y un descanso por jornada 2ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > M2 · determinista por semilla; estable ante el orden de ids, también la semilla de cada cruce 3ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > M3 · la ida (1…N/2) es un todos contra todos simple; la vuelta (N/2+1…N) repite jornadas y orden con los lados invertidos 3ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > N1 · tablas literales de 6 y de 3 (local–visita) aplicadas sobre el orden barajado 2ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > 4 o 5 participantes: «sin tabla» (P2) 1ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · calendario Berger (§ 15.2) > nombre corto: sin «GPT-» y 8 caracteres como máximo 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > M4–M6 · seis participantes: puntos, DG y GF; el visitante también suma sus goles 1ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > M7 · cuatro participantes: liguilla de 3 que se separa en 1 + 2 y se reaplica a los 2 1ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > M8 · posición compartida (1, 2, 2, 4) con `empatada`; alfabético por nombre (es) solo para mostrar 18ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > tres participantes: empate irreducible, los tres en 1=, en orden alfabético español (N < Ñ < O) 1ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > M9 · solo cuentan los encuentros: los pendientes no suman PJ 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · clasificación (§ 4.2, § 15.9) > M10 · cruces: global de ida y vuelta sin gol de visitante doble; ganador null en empate global 5ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · prueba de signos ilustrativa (§ 4.4, § 15.7) > M11 · binomial exacta bilateral con tope 1; empates fuera 3ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · prueba de signos ilustrativa (§ 4.4, § 15.7) > la frase de § 15.7 lleva la p calculada y el alfa de TORNEO_ARENA en ES y EN 9ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > Astra con 9.240 de entrada y 441 de salida sin caché: 92.400 + 22.050 = 114.450 µUSD 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > con caché: 10.000 de entrada (2.000 en caché) y 500 de salida a precio de Sol: 8.000×2 + 2.000×0,2 + 500×10 = 21.400 µUSD 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > N6 · redondeo al alza: 1 token de entrada a 0,2 USD/1M es 0,2 µUSD → 1 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > N4 · un intento sin usage vale microMaxIntento: Astra con P = 9.928 → (ceil(9.928×1,25) + 2.048 + 512)×10 + 2.048×50 = 252.100 µUSD 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > N5 · reserva del partido Astra–Sol con los reintentos HTTP: (252.100 + 50.420) × 4 rondas × 2 × 3 = 7.260.480 µUSD 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · micro-USD y reservas (§ 15.1, § 15.9) > N7 · libro: por intento cuenta el cierre; una reserva sin cierre cuenta entera 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · causa terminal exhaustiva (§ 16.2) > las 3 × 6 combinaciones tienen el resultado esperado, escrito literalmente 4ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · causa terminal exhaustiva (§ 16.2) > N2 · 429 → 200 inválido: el último intento es ok, así que la causa es el modelo 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · causa terminal exhaustiva (§ 16.2) > N3/N17 · plazo agotado: abortado sin 429 ni red ni esperas = modelo (lento); con 429 previo o espera = infraestructura 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · esquema estricto y coherencia (§ 15.6, M20, M21) > el fixture de ensayo cumple el esquema y es coherente 10ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · esquema estricto y coherencia (§ 15.6, M20, M21) > M20 · rechaza `clasificacion`, `tabla`, `totales` o cualquier campo agregado, también anidado 8ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · esquema estricto y coherencia (§ 15.6, M20, M21) > M21 · plan distinto de calendarioTorneo, huella repetida o gasto menor que la suma → incoherente 1ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · métricas por participante (§ 4.3, M12) > latencia sin las decisiones con reintento HTTP (contadas aparte); solicitudes y respaldos declarados 8ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · métricas por participante (§ 4.3, M12) > precisión de pase = Σ completados / Σ intentados (no la media de porcentajes); medias por partido recalculadas 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · métricas por participante (§ 4.3, M12) > un null en algún partido deja la media en null (nunca una media parcial) 0ms
+ ✓ src/arena/__tests__/torneo.test.ts > 059 · torneo.ts apto para el cliente > no importa módulos de Node ni el motor (la validación con archivos vive en torneo-validacion.ts) 0ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G7 (liga) · plan y siguiente partido > liga = calendarioTorneo con fase «liga» y desempate false; siguientePartido avanza y termina en null 10ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G7 (liga) · plan y siguiente partido > partidosFormato calculado: liga 30/30 y grupos 15/18; grupos exige 6 participantes 10ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G7 (liga) · plan y siguiente partido > D2 · día UTC, id, semilla y próximo cupo 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G7 (liga) · plan y siguiente partido > § 5.4 · duración mostrada: liga ≈ 33 min; grupos ≈ 16–20 min 0ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G8 · coherencia de la rama 062 (liga) > el fixture como 062 es coherente; el archivo 059-v1.1 del 24 oct sigue válido con el esquema y la unión 48ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G8 · coherencia de la rama 062 (liga) > fase o desempate cambiados, hueco en el prefijo, enCurso con un estado final, completo con partidos por jugar ⇒ incoherente 23ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G8 · coherencia de la rama 062 (liga) > `sitio-` con origen repositorio (y al revés), o una prueba sin su prefijo ⇒ incoherente 6ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G8 · coherencia de la rama 062 (liga) > el esquema 059 rechaza `formato` (y cualquier campo 062); la unión exige la versión correcta 23ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G9 · estimación por formato con las entradas reales > a 15 s reproduce § 5.1: liga 7.076.840 µUSD y grupos 3.006.304 / 4.070.536 / 5.310.336 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G9 · estimación por formato con las entradas reales > a 30 s (§ 17.5) la mitad: liga 3.538.420; grupos 1.503.152 / 2.035.268 / 2.655.168 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G9 · estimación por formato con las entradas reales > en los dos formatos: tope ≥ típicoMáx − último partido + reservaMáx; tope ≤ topeMaxUsd; la liga está disponible y grupos no (P1-a) 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G10 · frase de significación por formato > liga p = 0,0625 (5 cruces) y grupos p = 0,125 (4 cruces y llaves), calculadas 99ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > interruptor apagado ⇒ 503 y 0 operaciones de almacén 124ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > sin CRONISTA_COMMIT ⇒ 503 y 0 operaciones de almacén 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > sin ARENA_ORIGEN_PUBLICO ⇒ 503 y 0 operaciones de almacén 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > origen ajeno ⇒ 403 y 0 operaciones de almacén 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > sin Origin ⇒ 403 y 0 operaciones de almacén 0ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > sin JSON ⇒ 415 y 0 operaciones de almacén 6ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > cuerpo > 1 KB ⇒ 413 y 0 operaciones de almacén 13ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > cuerpo con otro formato ⇒ 400 y 0 operaciones de almacén 13ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > cuerpo con un campo extra ⇒ 400 y 0 operaciones de almacén 0ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S5 · orden de las comprobaciones: ninguna de las previas toca el almacén > cuerpo vacío ⇒ 400 y 0 operaciones de almacén 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S4 · limitador con el ÚLTIMO salto de x-forwarded-for > claveLimitador toma el último salto (el que añade el ingreso) o «desconocida» 0ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · S4 · limitador con el ÚLTIMO salto de x-forwarded-for > un primer salto falsificado no cambia la clave: el 4.º intento por hora ⇒ 429 con retry-after 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · H1 · origen completo y cuerpo lento > otro esquema u otro puerto ⇒ 403 0ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > cabecera, banda de ensayo, frase de significación calculada y pareo; sin banda de incompleto en un torneo completo 130ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > incompleto: banda con k partidos sin disputar y «s/d» en la matriz 10ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > tabla en el orden de clasificar; matriz con n(n−1) enlaces a /arena?torneo=…&encuentro=NN y la lista con el mismo número de repeticiones 12ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > «—» para null (nunca 0) y «†» en todas las cifras declaradas 12ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > posición compartida «2=» con texto accesible 7ms
+ ✓ src/ui/__tests__/ArenaTorneo.test.tsx > 059 · página del torneo (M25) > incoherente: el mensaje y ninguna cifra; vacío: el estado vacío 2ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · transporte del torneo (M14, § 16.2) > respeta retry-after-ms, después retry-after (s) y la tabla; nunca más de esperaMaxMs 115ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · transporte del torneo (M14, § 16.2) > reintenta un 429 tras la espera y registra intentos y esperas; el 200 con usage cuenta tokens 51ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · transporte del torneo (M14, § 16.2) > como mucho http.reintentos reintentos; un 400 no se reintenta; un error de red sí 2ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · transporte del torneo (M14, § 16.2) > se detiene con el AbortSignal durante la espera: AbortError, espera interrumpida y ningún fetch más 23ms
+ ✓ src/arena/__tests__/torneo-archivo.test.ts > 059 · lector de torneos archivados > lee el índice y el torneo del fixture 41ms
+ ✓ src/arena/__tests__/torneo-archivo.test.ts > 059 · lector de torneos archivados > ids fuera de la regex o sin archivo → null (404) 2ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G12 · metadatos 062 frente al plan > un 062 coherente devuelve su base 059, que validarEncuentro acepta 579ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G12 · metadatos 062 frente al plan > un encuentro 059 con `fase` añadida: el esquema estricto 059 y validarEncuentro lo siguen rechazando 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G12 · metadatos 062 frente al plan > un 062 con fase, desempate, semilla o lados distintos del plan ⇒ rechazo 1ms
+ ✓ src/arena/__tests__/torneo-formatos.test.ts > 062 · G12 · metadatos 062 frente al plan > el registro del fixture es un .gz legible (control del fixture) 19ms
+ ✓ src/arena/__tests__/torneo-archivo.test.ts > 059 · lector de torneos archivados > esquema, JSON o coherencia fallidos, o id distinto del directorio → «incoherente» 293ms
+ ✓ src/arena/__tests__/torneo-entradas.test.ts > 062 · R2 · entradas generadas > `npm run arena:torneo-entradas` regenera el JSON idéntico byte a byte 21ms
+ ✓ src/arena/__tests__/torneo-entradas.test.ts > 062 · R2 · entradas generadas > los participantes son los 6 del torneo del 24 oct, con precio de lista propio (sin estimadoDe) 3ms
+ ✓ src/arena/__tests__/torneo-entradas.test.ts > 062 · R2 · entradas generadas > estimarTorneo, tras la extracción, reproduce la estimación archivada del 24 oct 4ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · transporte del torneo (M14, § 16.2) > § 16.2 · 429 → espera → plazo: 1 intento reintentable, 1 espera interrumpida, ningún segundo fetch, plazo_agotado por infraestructura y partido anulado 552ms
+ ✓ src/arena/__tests__/torneo-archivo.test.ts > 059 · lector de torneos archivados > revisión Codex #1 · un directorio huérfano (coherente pero fuera de indice.json) no se sirve 424ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · H1 · origen completo y cuerpo lento > un cuerpo lento ⇒ 408 a los cuerpoPlazoMs y la petición siguiente se admite (el limitador quedó libre) 2004ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · rutas de lectura (R1) y estado > GET estado: fichas de los dos formatos calculadas, motivo y no-store 6ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · rutas de lectura (R1) y estado > R1 · [archivo] fuera del manifiesto ⇒ 404; bytes con la huella; [id] inválido o inexistente ⇒ 404; caché según el estado 3603ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · rutas de lectura (R1) y estado > una instantánea que no supera la coherencia ⇒ 409 sin cifras 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · cancelación y cierre con token (§ 17.6, § 18.2) y S10b (a) > sin token o con uno incorrecto ⇒ 401; sin torneo ⇒ 404; con torneo ⇒ 200 cancelado; los fallos se limitan por hora 18ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · cancelación y cierre con token (§ 17.6, § 18.2) y S10b (a) > sin ARENA_ADMIN_TOKEN configurado ⇒ la ruta responde 503 cancelacion y los lanzamientos se deshabilitan 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · cancelación y cierre con token (§ 17.6, § 18.2) y S10b (a) > POST …/cerrar con token responde los pendientes 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · cancelación y cierre con token (§ 17.6, § 18.2) y S10b (a) > S10b (a) · sin token, ?prueba=1 se ignora: lanzamiento público con el cupo consumido; con token incorrecto ⇒ 401 8ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · R5 · bicep: réplica única, gracia e interruptor apagado por defecto > una sola `var maxReplicas` alimenta scale.maxReplicas y ARENA_MAX_REPLICAS; gracia de 30 s 1ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · R5 · bicep: réplica única, gracia e interruptor apagado por defecto > ninguna variable de ensayo ni de e2e; ARENA_TORNEO_SITIO sale de un parámetro con '0' por defecto; commit y origen completos 0ms
+ ✓ src/arena/__tests__/torneo-sitio-rutas.test.ts > 062 · R5 · bicep: réplica única, gracia e interruptor apagado por defecto > el ensayo de e2e queda dentro de los límites del 059 6ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S17 · liga completa en ensayo > 30 encuentros (partidosFormato), instantánea final completa y coherente, pares en el almacén 5457ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S1/S3 · admisión concurrente y torneo activo de ayer > (a) dos lanzar simultáneos con todo libre ⇒ 1 admitido y 1 × 409 12ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S1/S3 · admisión concurrente y torneo activo de ayer > (a') dos gestores (dos réplicas) sobre el mismo almacén ⇒ exactamente un torneo y un dia- 16ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S1/S3 · admisión concurrente y torneo activo de ayer > (b) S3 · un torneo activo de AYER (reloj pasada la medianoche) ⇒ 409 activo y NO existe dia-<hoy> 26ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S2 · día UTC > 23:59:59Z y 00:00:01Z del día siguiente ⇒ admitidos; un segundo lanzamiento el mismo día, aunque el primero terminó ⇒ 409 cupo 16ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · torneos archivados (CI) > hay al menos el fixture de ensayo 6ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · torneos archivados (CI) > public/torneos: directorios = indice.json, solo los archivos de cada torneo, y cada registro se reproduce y coincide con torneo.json 6975ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · torneos archivados (CI) > src/arena/__fixtures__/torneos: directorios = indice.json, solo los archivos de cada torneo, y cada registro se reproduce y coincide con torneo.json 543ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · torneos archivados (CI) > revisión Codex #1 · un torneo huérfano (directorio sin entrada en el índice), una entrada sin directorio o un archivo de más se rechazan 611ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > M22 · el fixture alterado no pasa: gol cambiado en torneo.json y orden cambiada dentro de e03.json.gz 282ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > M22 · intercambiar lados en torneo.json se rechaza 5ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > N11 · una cifra del 049 alterada en torneo.json; controladores, solicitudes y tiempos alterados 393ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > N12 · tiemposMs alterado en el archivo (y en torneo.json, coherente) sin cambiar archivoSha256 se rechaza por la huella 10ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > un .gz cuyo descomprimido supera ARENA.archivoMaxBytes se rechaza sin agotar memoria 24ms
+ ✓ src/arena/__tests__/torneos-archivados.test.ts > 059 · rechazos de la validación compartida (M22, N11, N12, N16) > N16 · nivel, clima o formación alterados y rejugados se rechazan; el caso de control pasa 548ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6 · arranque tras una caída en P7 > el gestor nuevo espera la barrera, cierra «interrumpido» con P1–P6 y la reserva de P7 entera, sin llamar a fetch 3871ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6b · cortes entre escrituras > tras crear dia- y antes de la primera instantánea ⇒ el arranque cierra con 0 partidos y el cupo queda consumido 2ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6b · cortes entre escrituras > una creación de dia- que persiste pero lanza ⇒ se relee con la misma operación y el torneo sigue 11ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6b · cortes entre escrituras > la misma creación con OTRA operación en el almacén ⇒ 409 cupo 2ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6b · cortes entre escrituras > un anexo del libro que lanza ⇒ el torneo se detiene: interrumpido / almacen 3ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S6c · SIGTERM en el solapamiento > el viejo no escribe nada después de SIGTERM; el nuevo cierra cuando su latido caduca 151ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7 · exclusión directa del mutex (sin pasar por el cupo) > la sección 2 (admisión de prueba) no toca el almacén mientras la 1 (admisión del día) está suspendida 13ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7b · barrera de relevo > con un latido ajeno fresco: motivo relevo, sin cierre ni escrituras salvo el propio latido; al caducar relee los libros y rechaza la bolsa 11ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · un partido (N15) y participantes (§ 3.2) > N15 · un registro con un secreto aborta sin redactarlo 307ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · un partido (N15) y participantes (§ 3.2) > un id fuera del catálogo, sin publicar o sin precio aborta; gpt-6.1-sol recibe el precio de gpt-6-sol declarado 1ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7b · barrera de relevo > § 19 · una renovación que FALLA silencia al escritor: nada después; la revisión nueva libera la barrera a los 45 s 141ms
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > el primer intento falla; a los cierreReintentoMs se reintenta y cierra
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+stderr | src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta
+[torneo-sitio] cierre de sitio-prueba-00000000aaaa falló: Blob 503
+
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7b · barrera de relevo > § 19 · una renovación que se CUELGA: el escritor deja de escribir antes de latidoSilencioS y no escribe nada después 217ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > el primer intento falla; a los cierreReintentoMs se reintenta y cierra 10ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7c · cierre de arranque con reintentos > con fallos durante más de cierrePlazoMs ⇒ motivo cierre y sin más reintentos; POST …/cerrar con token reintenta 19ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S7d · sin el primer latido confirmado > motivo iniciando, lanzamiento rechazado y ninguna otra escritura 1ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S8 · tope por estimación > el partido cuya reserva no cabe NO empieza (fetch = 0 en ese partido): incompleto / tope 653ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S9 · bolsa > conocido acumulado + tope > bolsa ⇒ 422 bolsa 8ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S9 · bolsa > justo en la bolsa se admite, y los ensayos no cuentan 28ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S9b · carrera de la bolsa con el cierre > una admisión que empieza mientras el cierre de A escribe el libro lee el gasto FINAL de A ⇒ 422 bolsa 148ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S9c · libro ilegible > ⇒ 503 sin lanzamiento (nunca equivale a gasto cero) 2ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > durante el ritmo de reloj 91ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > durante la pausa entre partidos 94ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > durante el enfriamiento largo de 10 min (anulados seguidos) 132ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > durante una espera del transporte (429 con retry-after largo, reloj real) 205ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > durante una decisión que no termina 9ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10 · cancelación en cada espera > sin token configurado ⇒ lanzamientos deshabilitados (cancelacion) 2ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10b · liga de prueba con identidad propia > (b) prueba cancelada y después liga pública el mismo día: ids distintos, archivos disjuntos, cupo libre y la bolsa suma los dos 1226ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10b · liga de prueba con identidad propia > (c) caída durante la prueba: el gestor nuevo la cierra con la reserva abierta; después se admite la pública y los dos gastos cuentan 473ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S10b · liga de prueba con identidad propia > (d) una prueba con un torneo público activo ⇒ 409 activo 7ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S12 · réplica única e interruptor > ARENA_MAX_REPLICAS ≠ "1" con Blob ⇒ motivo replicas; con "1" no; con el almacén local no aplica 1ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S12 · réplica única e interruptor > interruptor apagado ⇒ desactivado 0ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S12 · réplica única e interruptor > catálogo: si falta un participante o cambia su deployment ⇒ catalogo 0ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S12 · réplica única e interruptor > el formato grupos no se admite en P1-a 0ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S13 · intentos por partido y plazo total > un partido se intenta 1 + repeticionesMax veces y queda pendiente 157ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S13 · intentos por partido y plazo total > pasado plazoTotalMs ⇒ incompleto / plazo 102ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S14 · ritmo de reloj > cada ronda dura ≥ intervaloS de reloj y tiempoMs es la latencia del controlador, sin la espera 485ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · S15 · convivencia con las sesiones públicas > con el torneo jugando, GestorSesiones.crear con modelos se admite; ambos terminan; sesiones/ no recibe nada del torneo 2164ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · R3 · ensayo nunca con Blob; R4 · el CLI rechaza sitio- > R3 · ARENA_TORNEO_SITIO_ENSAYO con ARENA_BLOB_ENDPOINT ⇒ desactivado 1ms
+ ✓ src/arena/__tests__/torneo-sitio.test.ts > 062 · R3 · ensayo nunca con Blob; R4 · el CLI rechaza sitio- > R4 · torneo-cli --id sitio-x ⇒ rechazo antes de nada 1ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · torneo completo con reanudación (M17, N7, N9, N10) > se interrumpe tras 2 partidos; config distinto aborta; reanuda sin rejugar completos, rejuega un par incompleto y cuenta la reserva sin cierre 9678ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · anulación, repeticiones y tope (M15, M16) > M16 · un partido que cabe en el típico pero no en la reserva no empieza: código 3 y cero llamadas 2ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · anulación, repeticiones y tope (M15, M16) > M15 · el último partido anulado por infraestructura se repite con la misma semilla y lados y queda pendiente; torneo incompleto 6627ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · anulación, repeticiones y tope (M15, M16) > con anuladosSeguidosMax seguidos y trabajo pendiente se detiene con código 2 448ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · anulación, repeticiones y tope (M15, M16) > Ctrl+C dentro de un partido: cierre «interrumpido» con el uso conocido más el máximo del intento cortado, y código 130 652ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · cerrojo (M18, N8) > un segundo proceso aborta; se libera solo con ESRCH; EPERM, vivo o contenido inválido rechazan 1ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · CLI (M19) > sin --confirmar imprime la estimación y el calendario de los 6 publicados y no llama a fetch 16ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · CLI (M19) > rechaza un tope mayor que topeMaxUsd, un tope menor que el típico, ids desconocidos y 4 participantes 9ms
+ ✓ src/arena/__tests__/torneo-ejecucion.test.ts > 059 · CLI (M19) > un torneo real con el árbol sucio aborta antes de crear controladores; el ensayo no exige árbol limpio 2266ms
+
+ Test Files  11 passed (11)
+      Tests  183 passed (183)
+   Start at  07:41:24
+   Duration  24.58s (tests 69%, transform 27%, import 4%)
+
+  Transform  transforming modules took 21.45s · 27% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns
+
+exit=0

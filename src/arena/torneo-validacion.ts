@@ -7,14 +7,15 @@ import { isDeepStrictEqual } from "node:util";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
-import { ARENA } from "../sim/limites";
+import { ARENA, TORNEO_SITIO } from "../sim/limites";
+import { planTorneo, validarMetadatos062 } from "./torneo-formatos";
 import type { Lado } from "../sim/tipos";
 import { reproducirArena } from "./coordinador";
 import { cifrasEquipos, pasesIntentados, type ClaveCifraEquipo } from "./estadisticas";
 import { crearConfigArena } from "./motor";
-import { archivoEncuentro, calendarioTorneo, esquemaEncuentro, esquemaIndice, esquemaTorneo, LADOS_TORNEO, validarCoherencia,
+import { archivoEncuentro, calendarioTorneo, esquemaEncuentro, esquemaIndice, esquemaTorneoCualquiera, LADOS_TORNEO, validarCoherencia,
   type CifrasLado, type DeclaradoLado, type EjecutorEncuentro, type EncuentroPlan, type EncuentroTorneo, type LadoEncuentro, type MarcoTorneo,
-  type ParticipanteTorneo, type TorneoArchivado } from "./torneo";
+  type ParticipanteTorneo, type TorneoCualquiera } from "./torneo";
 import type { ConfigArena, RegistroArena, ReglasArena, VersionArena } from "./tipos";
 
 export const sha256 = (datos: Uint8Array | string) => createHash("sha256").update(datos).digest("hex");
@@ -92,10 +93,16 @@ export function validarEncuentro(e: EncuentroTorneo, plan: EncuentroPlan, partic
 }
 
 /** Valida el esquema, la coherencia y cada partido contra su `.gz` (leído con `leer(archivo)`). */
-export function validarTorneo(raw: unknown, leer: (archivo: string) => Uint8Array): TorneoArchivado {
-  const t = esquemaTorneo.parse(raw);
+export function validarTorneo(raw: unknown, leer: (archivo: string) => Uint8Array): TorneoCualquiera {
+  const t = esquemaTorneoCualquiera.parse(raw);
   const errores = validarCoherencia(t);
   if (errores.length) throw new Error(`Torneo ${t.id} incoherente: ${errores.join("; ")}`);
+  if (t.version === TORNEO_SITIO.version) {
+    // Brief 062 § 17.3 · `plan[e.n − 1]` sale de planTorneo reconstruido; por encuentro, metadatos (puro) y base.
+    const plan = planTorneo(t.formato, t.participantes.map(p => p.id), t.semilla, t);
+    for (const e of t.encuentros) validarEncuentro(validarMetadatos062(e, plan[e.n - 1]!), plan[e.n - 1]!, t.participantes, leer(e.archivo), t);
+    return t;
+  }
   const plan = calendarioTorneo(t.participantes.map(p => p.id), t.semilla);
   if (t.encuentros.length + t.pendientes.length !== plan.length) throw new Error("Encuentros más pendientes distintos del plan");
   if (t.tipo === "real" && plan.length !== t.participantes.length * (t.participantes.length - 1)) throw new Error("Un torneo real juega ida y vuelta completa");
@@ -107,7 +114,7 @@ export function validarTorneo(raw: unknown, leer: (archivo: string) => Uint8Arra
  * coinciden EXACTAMENTE con `indice.json` (ni huérfanos ni entradas sin directorio), cada directorio contiene solo
  * `torneo.json` y los `eNN.json.gz` de sus encuentros, y cada torneo supera `validarTorneo` con su id, fecha y
  * título iguales a los del índice. Lanza ante el primer desajuste; devuelve los torneos en el orden del índice. */
-export function validarRaizTorneos(raiz: string): TorneoArchivado[] {
+export function validarRaizTorneos(raiz: string): TorneoCualquiera[] {
   const entradas = existsSync(raiz) ? readdirSync(raiz, { withFileTypes: true }) : [];
   const dirs = entradas.filter(x => x.isDirectory()).map(x => x.name).sort();
   const sueltos = entradas.filter(x => !x.isDirectory() && x.name !== "indice.json").map(x => x.name);
