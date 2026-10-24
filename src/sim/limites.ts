@@ -741,8 +741,13 @@ export const ATRIBUTOS_ARENA = {
   /** Ajuste 1 de § 12.2 (24 oct): aguanteDuelo y entradaDuelo 0,15 → 0,12. Con 0,15 el lote 1–100 de reinicios-v7
    * incumplía la conversión del mano a mano del 046 (0,4202 > 0,42); con 0,12 los tres lotes cumplen todas las bandas del
    * 046, del 051 y de los bloques A, B y C (docs/evidencia/motor-063/publicacion-2). El primer ajuste de la lista
-   * (probabilidad del lejano y penalización del largo) no aplicaba: lejanos y largos estaban dentro de banda. */
-  aguanteDuelo: 0.12, entradaDuelo: 0.12, visionError: 0.2, potenciaVelocidad: 0.08,
+   * (probabilidad del lejano y penalización del largo) no aplicaba: lejanos y largos estaban dentro de banda.
+   * v1.3 § 19 (24 oct): entradaDuelo se desacopla de aguanteDuelo (que queda en 0,12) y se prueba 0,18, 0,24 y 0,30 hasta
+   * cumplir la entrada del experimento controlado (≥ 0,30). Con 0,12 medía 0,17; con 0,18, 0,2999… (30 robos más en 100
+   * partidos: en la frontera exacta e incumplida por la comparación en coma flotante de la prueba); con 0,24, 0,42, y
+   * todas las demás bandas de v7 cumplen en 1–30, 1–100 y 101–200 (goles 1,70 / 1,93 / 2,03; conversión del mano a mano
+   * 0,46 / 0,411 / 0,414) y en los demás experimentos controlados (docs/evidencia/motor-063/publicacion-2/intentos-entrada). */
+  aguanteDuelo: 0.12, entradaDuelo: 0.24, visionError: 0.2, potenciaVelocidad: 0.08,
   /** Rasgo distintivo mostrado en la UI: el atributo mayor (en empate, el primero) si alcanza este valor. */
   distintivoMin: 70,
   /** § 9.1 · Textos de la ficha y de la tira «En voz». */

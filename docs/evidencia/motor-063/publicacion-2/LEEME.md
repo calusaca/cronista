@@ -1,6 +1,26 @@
 # Brief 063 · publicación 2 (`reinicios-v7`) · lotes y experimento controlado
 
-**Estado: no publicable.** Tras el ajuste permitido de § 12.2, una banda obligatoria del experimento controlado de
+## v1.3 § 19 (24 oct): entradaDuelo desacoplado; valor adoptado 0,24
+
+Tras el bloqueo de abajo, el brief v1.3 § 19 desacopla `entradaDuelo` de `aguanteDuelo` (que queda en 0,12) y prueba
+0,18, 0,24 y 0,30 en ese orden. Evidencia de cada intento en `intentos-entrada/` (lotes medidos sobre `7fb0a6f` con la
+constante cambiada en una copia, por eso `arbolConCambios: true`).
+
+| entradaDuelo | entrada (≥ 0,30) | aguante | velocidad / resistencia / visión / potencia | cocientes visión / potencia | Lotes 1–30 / 1–100 (+051) / 101–200 |
+| --- | --- | --- | --- | --- | --- |
+| 0,12 | **0,17** | 0,51 | 0,66 / 0,059 / 1,39 / 0,90 | 0,826 / 0,942 | sin incumplimientos |
+| 0,18 | **0,2999…** (30 robos más en 100 partidos; la comparación en coma flotante de la prueba lo da por debajo) | 0,48 | 0,66 / 0,059 / 1,43 / 0,87 | 0,812 / 0,942 | sin incumplimientos |
+| **0,24** | **0,42** | 0,42 | 0,65 / 0,059 / 1,48 / 0,88 | 0,821 / 0,920 | sin incumplimientos |
+
+Con 0,24 (adoptado): goles 1,70 / 1,93 / 2,03; conversión del mano a mano 0,460 / 0,411 / 0,414; centros 0,77 / 0,62 /
+0,71; repliegueCorren 0,676 / 0,671 / 0,660; persecucionPerdedor 0,516 / 0,528 / 0,505; repliegueSeleccion 0,991 /
+0,975 / 0,970; largos 0,40 / 0,68 / 0,78 por partido (éxito 0,50 / 0,46 / 0,60); lejanos 0,67 / 0,69 / 0,61 por partido
+(conversión 0 / 0,16 / 0,16; a puerta 0,40 / 0,45 / 0,43). El 0,30 no se probó. Los JSON de la carpeta raíz se vuelven
+a medir en un árbol limpio con el commit final (`*-final`).
+
+## Estado anterior (entradaDuelo 0,12): bloqueado
+
+**Estado (con 0,12): no publicable.** Tras el ajuste permitido de § 12.2, una banda obligatoria del experimento controlado de
 atributos sigue fuera: `entrada` (robos hechos por partido del `local`, 80 − 30) = **0,17 < 0,30** en las semillas
 1–100. Se para y se reporta, sin ampliar la banda.
 
