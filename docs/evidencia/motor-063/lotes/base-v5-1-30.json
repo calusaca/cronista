@@ -1,0 +1,93 @@
+{
+ "generado": "2026-10-24T19:29:39.910Z",
+ "commit": "a5a7fb81d9e5774b72f92c31142b12aead7d7f2a",
+ "arbolConCambios": true,
+ "reglas": "reinicios-v5",
+ "semillas": {
+  "desde": 1,
+  "hasta": 30
+ },
+ "duracionS": 120,
+ "controladores": "programado:geometria-v3 (ambos lados)",
+ "banda": "rapido",
+ "incumplimientos": [],
+ "segundos": 4.6,
+ "metricas": {
+  "reglas": "reinicios-v5",
+  "semillas": {
+   "desde": 1,
+   "hasta": 30
+  },
+  "duracionS": 120,
+  "partidos": 30,
+  "golesPorPartido": 2.2666666666666666,
+  "desviacionGoles": 1.7307673314329555,
+  "tirosPorPartido": 4.6,
+  "robosEnManos": 0,
+  "atajadasConPosesion": 25,
+  "perdidasTrasAtajada": 0,
+  "perdidasArea": 0,
+  "perdidasAreaPorPartido": 0,
+  "manoAMano": {
+   "episodios": 106,
+   "goles": 42,
+   "conversion": 0.39622641509433965,
+   "fraccionDeGoles": 0.6176470588235294,
+   "desplazamientoMedianaM": 1.3027563888753622,
+   "desplazamientoP75M": 2.815787893338448,
+   "fraccionDesplazado": 0.5849056603773585
+  },
+  "centros": {
+   "pasesBanda": 52,
+   "alArea": 24,
+   "proporcion": 0.46153846153846156,
+   "motivoCentro": 21,
+   "porPartido": 0.7
+  },
+  "saquesManos": 123,
+  "saquesPerdidos": 4,
+  "saquesPerdidosPorPartido": 0.13333333333333333,
+  "intercepcionesInmediatas": 1,
+  "intercepcionesInmediatasPorPartido": 0.03333333333333333,
+  "intercepcionesInmediatasCercanas": 0,
+  "remate": {
+   "remates": 138,
+   "porPartido": 4.6,
+   "desenlaces": {
+    "gol": 68,
+    "atrapada": 25,
+    "desvio": 16,
+    "ancho": 18,
+    "alto": 5,
+    "bloqueado": 4,
+    "otro": 2
+   },
+   "aPuerta": 0.7898550724637681,
+   "conversion": 0.4927536231884058,
+   "atajadasSobreAPuerta": 0.3761467889908257,
+   "desviosSobreAtajadas": 0.3902439024390244,
+   "fuera": 0.16666666666666666,
+   "altos": 5,
+   "altosSobreFuera": 0.21739130434782608,
+   "bloqueados": 0.028985507246376812,
+   "golesSinRemate": 0,
+   "golesSinRematePorPartido": 0,
+   "colocacionLados": 0.8916666666666667,
+   "desvioMedioM": 2.818245496153159,
+   "discrepancias045": 0
+  },
+  "golesTrasSaque": 1,
+  "golesTrasSaquePorPartido": 0.03333333333333333,
+  "metas": 23,
+  "metasConduccion": 0,
+  "metasConduccionPorPartido": 0,
+  "tiroFueraTrasDesvio": 0,
+  "recepcionPorteroRechace": 0,
+  "conducir": {
+   "ticks": 3264,
+   "frenados": 526,
+   "fraccion": 0.16115196078431374
+  },
+  "fuerasDeJuego": 91
+ }
+}

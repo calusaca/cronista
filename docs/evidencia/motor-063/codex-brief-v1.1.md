@@ -1,0 +1,36 @@
+**No encontré P0. No daría por cerrado el brief:** cuatro hallazgos anteriores quedan cerrados en diseño, tres parcialmente y uno sigue abierto. Además, encuentro **dos hallazgos nuevos: un P1 y un P2**.
+
+“Cerrado” significa que la especificación resuelve el problema; todavía no acredita una implementación.
+
+| Hallazgo anterior | Estado | Resultado de la segunda revisión |
+|---|---|---|
+| **1. P1 — `presionar`/repliegue eluden el límite** | **Cerrado** | El límite se aplica después de cualquier rama de destino y A6 cubre las intersecciones. [Brief:490](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:490), [A6:963](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:963). |
+| **2. P1 — Remates explícitos fuera del dominio acotado** | **Cerrado** | Se fija un máximo de 33 m y pruebas en el borde y fuera de él. El error queda acotado por construcción. Hay otro problema con la persistencia de esa orden, descrito abajo. [Brief:565](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:565). |
+| **3. P1 — Pruebas de estado incompatibles** | **Parcial** | Se corrigen presencia/null y atajadas, pero A4 todavía exige «recuperación propia → `null`». La regla manda borrar la persecución anterior **antes de crear la nueva**: si A perseguía a B y A roba a un jugador de campo de B, debe terminar con una persecución nueva de B, no con `null`. Hay que distinguir cancelación de la anterior y estado final. [Regla:455](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:455), [A4:961](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:961). |
+| **4. P1 — Reservas económicas antiguas** | **Parcial** | Ahora exige regeneración y margen antes de publicar. Pero la prueba compara longitud JSON de observaciones, mientras la reserva usa **tokens del prompt completo**. No comprueba el crecimiento de `SISTEMA_ARENA`, que también cambia, ni que bytes y tokens crezcan en la misma proporción. Debe validar el presupuesto sobre la petición completa con un criterio conservador de tokens. [§17.4:1187](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:1187), [petición real:211](/home/calusaca/cronista/src/arena/controladores.ts:211), [reserva:370](/home/calusaca/cronista/src/arena/torneo.ts:370). |
+| **5. P2 — Oráculo tautológico de pases** | **Cerrado** | Guardar resultados antes del refactor proporciona un oráculo independiente. [0.4:951](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:951). |
+| **6. P2 — Visión/potencia solo prueban acceso** | **Abierto** | Se añaden parejas sobre el umbral, pero sus resultados son informativos y **sin banda** al publicar v7. B4 acredita fórmulas puntuales, no efecto estadístico material. Además, la publicación 3 puede recortarse: la banda puede no llegar nunca. [§17.6:1205](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:1205), [recortes:1106](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:1106). |
+| **7. P2 — Métrica de repliegue sobre población equivocada** | **Cerrado** | Se incorpora una métrica del conjunto seleccionado y de su dirección al destino, con banda obligatoria. A2 sigue aportando la comprobación independiente de la selección. [§17.7:1215](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:1215), [A2:959](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:959). |
+| **8. P2 — Tamaño probado en un solo caso** | **Parcial** | Hay más casos, pero la cota propuesta no cuadra y se pierde la comprobación absoluta contra 8 MB. Detalle a continuación. [A10:967](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:967). |
+
+En el **hallazgo 8**, la cuenta de §17.8 infravalora la serialización. Con un ID válido generado por el motor, `"persecucion":{"jugador":"visita-15","lado":"visita","desdeTick":1799,"hastaTick":1879}` ocupa **87 bytes**, sin contar la coma que lo añade al estado. Su propia cota de 1.801 fotogramas da **158.488 bytes**, o **161.788** sumando los 3.300 de atributos: ya supera 150.000 antes de contar `inicial`, `final`, `lejano` y motivos. No demuestra que los archivos reales excedan el límite: demuestra que **esa fórmula no puede acreditar la cota exigida**. Además, pesar menos que «v5 + incremento» no garantiza pesar menos que `ARENA.archivoMaxBytes`. [Cálculo propuesto:1224](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:1224), [IDs:86](/home/calusaca/cronista/src/arena/motor.ts:86), [límite:472](/home/calusaca/cronista/src/sim/limites.ts:472).
+
+**Hallazgos nuevos**
+
+1. **P1 — La decisión local puede consumir el `tirar` imposible que debe seguir pendiente.**
+
+   El brief exige que un `tirar` desde más de 33 m permita decidir localmente y permanezca pendiente. C3 solo describe el tick inicial; no exige demostrar su ejecución posterior. [Regla:565](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:565), [C3:986](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:986).
+
+   Copiar la mecánica actual de `pasarImposible` no conserva esa propiedad: un pase o centro local llama a `ejecutadas.add(j.id)`, y `usarOrden` depende de ese mismo conjunto. Se marca al **jugador**, sin distinguir qué acción consumió la orden. [Motor:313](/home/calusaca/cronista/src/arena/motor.ts:313), [centro local:334](/home/calusaca/cronista/src/arena/motor.ts:334), [pase local:343](/home/calusaca/cronista/src/arena/motor.ts:343).
+
+   **Contraejemplo:** recibe `tirar` a 40 m, ejecuta un pase local, recupera el balón a 30 m dentro de la misma ronda. La orden ya figura ejecutada y no dispara explícitamente. Hay que separar consumo de orden y acción local, y exigir una prueba de varios ticks con recuperación dentro del alcance.
+
+2. **P2 — B3 atribuye a los atributos una equivalencia entre versiones que el bloque C rompe.**
+
+   Se afirma que seis atributos a 50 equivalen exactamente a v6 y B3 compara eventos y fotogramas completos entre v7 y v6 en tres semillas. [Afirmación:531](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:531), [B3:975](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:975).
+
+   Sin embargo, un `tirar` explícito a 30 m se ejecuta con potencia 50 y en v7 recibe error adicional, probabilidad adicional de alto y reacción nueva del portero. Desde más de 33 m también cambia su admisión. Son diferencias obligatorias de C aunque todos los atributos sean neutros. [Ejecución:571](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:571), [portero:580](/home/calusaca/cronista/docs/disenos/063-persecucion-atributos-e-identidad.md:580).
+
+   B3 puede pasar porque esas semillas no ejercitan las diferencias, pero no prueba la equivalencia anunciada. Debe comprobar **neutralidad de cada multiplicador** con escenarios controlados y limitar cualquier comparación v6/v7 a escenarios donde C no intervenga.
+
+Revisión estática del brief y del código actual. No modifiqué archivos ni ejecuté escenarios todavía no implementados; no encontré una ruptura nueva concreta de reproducción v1–v5.

@@ -1,0 +1,28 @@
+{
+ "semillas": [
+  1,
+  100
+ ],
+ "repliegue": {
+  "muestras": 19295,
+  "fraccionCorrenHaciaSuArco3mps": 0.687121015807204
+ },
+ "persecucion": {
+  "muestras": 6008,
+  "fraccionPersigue": 0.49250998668442075,
+  "delanterosTrasMedio": 29,
+  "muestrasDelantero": 2198
+ },
+ "atributos": {
+  "vmaxVelocidadAlta70": 7.32398601020468,
+  "vmaxVelocidadBaja35": 6.435106543887361,
+  "robosAguanteAlto65": {
+   "robosPorMinutoDePosesion": 2.7995631887223267,
+   "minutos": 16.788333333333334
+  },
+  "robosAguanteBajo40": {
+   "robosPorMinutoDePosesion": 2.055712796067332,
+   "minutos": 11.188333333333334
+  }
+ }
+}

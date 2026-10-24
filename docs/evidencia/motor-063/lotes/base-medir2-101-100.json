@@ -1,0 +1,17 @@
+{
+ "semillas": [
+  101,
+  200
+ ],
+ "repliegue": {
+  "muestras": 18844,
+  "fraccionCorrenHaciaSuArco3mps": 0.3717894289959669
+ },
+ "persecucion": {
+  "muestras": 6638,
+  "fraccionPersigue": 0.31681229285929496,
+  "delanterosTrasMedio": 157,
+  "muestrasDelantero": 2448
+ },
+ "atributos": null
+}

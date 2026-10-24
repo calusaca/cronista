@@ -1,0 +1,64 @@
+{
+ "reglas": "reinicios-v6",
+ "semillas": {
+  "desde": 1,
+  "hasta": 100
+ },
+ "duracionS": 120,
+ "golesPorPartido": 1.82,
+ "tirosPorPartido": 4.72,
+ "superado": {
+  "episodiosPorPartido": 6.59,
+  "segundosPorPartido": 10.257,
+  "duracionMediana": 1.5,
+  "duracionP90": 2.9000000000000004,
+  "fraccionConTiro": 0.575113808801214,
+  "fraccionConGol": 0.2534142640364188,
+  "golesEnSuperadoSobreGoles": 0.9175824175824175,
+  "velocidadMediaDefensas": 3.039881198480353,
+  "fraccionDefensasBajo2mps": 0.38866757171789107,
+  "velocidadMediaPoseedor": 5.259635504374357
+ },
+ "perdidas": {
+  "porPartido": 4.65,
+  "porLinea": {
+   "DEF": 104,
+   "MED": 186,
+   "DEL": 146,
+   "POR": 29
+  },
+  "perdedorSeAcerca2s": 0.39956331877729256,
+  "velocidadMediaPerdedor2s": 2.928087881655256
+ },
+ "largos": {
+  "porPartido": 0.98,
+  "fraccionDePases": 0.06599326599326599,
+  "exito": 0.47959183673469385
+ },
+ "lejanos": {
+  "porPartido": 0.67,
+  "fraccionDeTiros": 0.1419491525423729,
+  "conversion": 0.13432835820895522,
+  "aPuerta": 0.44776119402985076
+ },
+ "pases": {
+  "porPartido": 14.85,
+  "mediana": 23.679587088496426,
+  "p90": 35.9874420968034,
+  "max": 45.21548795079614,
+  "fraccion25": 0.45185185185185184
+ },
+ "tiros": {
+  "distanciaMediana": 20.023151986719178,
+  "p90": 28.096451149132513,
+  "max": 32.99209087696273,
+  "fraccion20": 0.5021186440677966,
+  "fraccion25": 0.1419491525423729
+ },
+ "oportunidades": {
+  "muestrasPoseedorPorPartido": 65.6,
+  "espacioLejano25a33PorPartido": 3.34,
+  "sinPaseCortoPorPartido": 12.11,
+  "sinPaseCortoConLargo50PorPartido": 0.95
+ }
+}

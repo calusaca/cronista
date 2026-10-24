@@ -1,0 +1,469 @@
+--- src/arena/motor.ts	2026-10-22 05:56:29.200820891 +0000
++++ src/arena/motor.ts	2026-10-24 20:33:14.327580248 +0000
+@@ -12,13 +12,14 @@
+ import { capacidadEfectiva, efectosEntorno, prepararPartido, reaccionarAficion, resumir } from "./entorno";
+ import { anclas, puestos, transformar } from "./catalogo";
+ import { crearArbitro, moverArbitro } from "./arbitro";
+-import { opcionPase, planProgramado } from "./controladores";
++import { opcionPase, planProgramado, puntuacionPase } from "./controladores";
+ import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } from "./personalidades";
+ import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
+ import { distancia, enCancha, limitar, proyeccion } from "./geometria";
+ import { despejeManos, destinoSalida, enAreaPropia, limitarAreaPropia, manoAMano, radioAtajada, respetarManos, saqueAdmisible, saqueForzado, ticksManos } from "./portero";
+ import { alcancePortero, balonCercaDelArco, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, REMATE_NEUTRO, velocidadRemate } from "./remate";
+ import { conduccionPorDefecto, destinosLlegada, enZonaCentro, limitarConduccion, lineaFueraDeJuego, opcionCentro, puedeCentrar, receptorCentro } from "./ataque";
++import * as J from "./juego063";
+ import { formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
+ 
+ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones>; reglas?: ReglasArena } = {}): ConfigArena {
+@@ -49,6 +50,7 @@
+     formaciones: { local: forma("local"), visita: forma("visita") },
+     ...(version === ARENA.version ? { entrenadores, aficiones: { local: aficionDe(partido.local.nombre), visita: aficionDe(partido.visita.nombre) } } : {}),
+   };
++  if (reglasDesde(config, "reinicios-v6" as never)) config.estilosJuego = { local: (process.env.FORZAR_ESTILO as never) ?? J.estiloJuegoDe(partido.local, entrenadores.local), visita: J.estiloJuegoDe(partido.visita, entrenadores.visita) };
+   validarConfigArena(config);
+   return config;
+ }
+@@ -81,19 +83,24 @@
+   }
+ }
+ 
+-function plantillaArena(partido: SimConfig, lado: Lado, completa: boolean): JugadorArena[] {
+-  return partido[lado].jugadores.slice(0, completa ? ARENA.plantillaArena : 11).map((j, n) => ({
++function forzar(lado: Lado, pos: string, a: J.Atributos): J.Atributos {
++  const f = process.env.FORZAR; if (!f || lado !== "local" || pos === "POR") return a;
++  const [k, v] = f.split(":"); return { ...a, [k!]: Number(v) };
++}
++function plantillaArena(partido: SimConfig, lado: Lado, completa: boolean, v6 = false): JugadorArena[] {
++  return partido[lado].jugadores.slice(0, completa ? ARENA.plantillaArena : 11).map((j, n) => { const personalidad = personalidadDe(partido[lado].nombre, j.nombre, j.posicion); return {
+     id: `${lado}-${n}`, lado, nombre: j.nombre, dorsal: j.dorsal, puesto: j.posicion,
+     nivel: partido.variantes?.niveles && j.nivel !== undefined ? j.nivel : (partido[lado].ataque + partido[lado].defensa) / 2,
+     posicion: { x: ARENA.largoM / 2, y: lado === "local" ? 0 : ARENA.anchoM }, velocidad: { x: 0, y: 0 }, energia: 1,
+     personalidad: personalidadDe(partido[lado].nombre, j.nombre, j.posicion), capitan: false,
+     posicionNatural: j.posicion, amarillas: 0,
+-  }));
++    ...(v6 && process.env.SIN_ATRIBUTOS !== "1" ? { atributos: forzar(lado, j.posicion, J.atributosDe(partido[lado].nombre, j.nombre, j.posicion, personalidad.perfil)) } : {}),
++  }; });
+ }
+ export function crearEstadoArena(config: ConfigArena): EstadoArena {
+   validarConfigArena(config);
+   if (config.version === ARENA.version) {
+-    const plantilla = lados.flatMap(lado => plantillaArena(config.partido, lado, true));
++    const plantilla = lados.flatMap(lado => plantillaArena(config.partido, lado, true, reglasDesde(config, "reinicios-v6" as never)));
+     const jugadores = lados.flatMap(lado => asignarPuestos(plantilla.filter(j => j.lado === lado), config.formaciones[lado]).map(j => ({ ...j, posicion: { ...anclas(config.formaciones[lado], lado, "base")[j.puesto]! } })));
+     const activos = new Set(jugadores.map(j => j.id)); designarCapitanes(jugadores);
+     const portador = jugadores.find(j => j.lado === "local" && j.posicionNatural === "MED") ?? jugadores.find(j => j.lado === "local" && j.puesto !== "POR")!;
+@@ -165,6 +172,8 @@
+   /** Todo el comportamiento del brief 051 (remate colocado, potencia, alto, alcance y desvío por
+    * nivel, posicionamiento del portero) vive tras esta condición. */
+   private get v5() { return reglasDesde(this.config, "reinicios-v5"); }
++  private get v6() { return reglasDesde(this.config, "reinicios-v6" as never); }
++  private estiloDe(lado: Lado) { return process.env.SIN_ESTILO === "1" ? undefined : this.config.estilosJuego?.[lado]; }
+   constructor(readonly config: ConfigArena, inicial: EstadoArena = crearEstadoArena(config)) {
+     validarConfigArena(config);
+     this.estado = structuredClone(inicial);
+@@ -286,19 +295,26 @@
+     // Brief 051 (v5): el remate apunta dentro del arco al lado libre del portero, con potencia según la
+     // distancia, error triangular (dos extracciones de `arena:golpe`) y un posible balón por encima
+     // (PRNG `arena:remate`). Pases y centros no cambian.
++    if (this.v6 && tipo === "pase" && j.atributos) {
++      error *= 1 - J.P.visionError * J.efecto(j.atributos.vision);
++      const d = distancia(desde, destino);
++      if ((extra.motivo as string) === "largo") error += J.P.largoErrorM * Math.max(0, d - ARENA.paseMaxM) / (J.P.largoMaxM - ARENA.paseMaxM) * (1.5 - j.atributos.vision / 100);
++    }
+     let remate5: { potencia: number; alto: boolean } | null = null;
+     if (this.v5 && tipo === "tiro") {
+       const portero = this.estado.jugadores.find(p => p.lado !== j.lado && p.puesto === "POR");
+       const d = distancia(desde, destino), potencia = potenciaRemate(d);
+       destino = transformar({ x: ARENA.largoM, y: objetivoRemate(desde, portero?.posicion ?? null, nivel, j.personalidad?.remate ?? REMATE_NEUTRO, j.lado).y }, j.lado);
+-      error = errorRemate(nivel, d, potencia) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
+-      remate5 = { potencia, alto: prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`).chance(probabilidadAlto(nivel, potencia)) };
++      const lejos = this.v6 ? Math.max(0, d - ARENA.radioTiroM) : 0;
++      if (lejos > 0) extra = { ...extra, motivo: "lejano" as never };
++      error = errorRemate(nivel, d, potencia) * (1 + J.P.lejanoErrorPorM * lejos) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
++      remate5 = { potencia, alto: prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`).chance(probabilidadAlto(nivel, potencia) + J.P.lejanoAltoPorM * lejos) };
+     }
+     const lateral = remate5 ? rng.next() + rng.next() - 1 : rng.next() * 2 - 1;
+     const bruto = { x: destino.x + (this.conReinicios && tipo === "tiro" ? (j.lado === "local" ? ARENA.remateTrasLineaM : -ARENA.remateTrasLineaM) : 0), y: destino.y + lateral * error };
+     const objetivo = this.conReinicios ? bruto : enCancha(bruto);
+     const fuera = adelantados(this.estado, j.lado);
+-    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}),
++    this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}), ...((extra.motivo as string) === "lejano" ? { lejano: true } : {}),
+       ...(remate5 ? { potencia: remate5.potencia, ...(remate5.alto ? { alto: true as const } : {}) } : {}) } };
+     this.evento(tipo, j, desde, objetivo, receptor, extra.motivo ? { motivo: extra.motivo } : {});
+     this.ultimaAccion = this.estado.tick;
+@@ -328,6 +344,11 @@
+     if ((usarOrden && orden.accion === "tirar") || tiroLocal) {
+       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
+     }
++    if (this.v6 && !accionExplicita && process.env.SIN_LEJANO !== "1" && J.puedeRematarLejos(j, this.estado, this.estiloDe(j.lado))) {
++      const e = this.estiloDe(j.lado);
++      const prob = J.P.lejanoProb * (e ? J.EFECTOS[e].lejano : 1) * (0.5 + (j.personalidad?.remate ?? 50) / 100) * (0.5 + J.efecto(j.atributos!.potencia));
++      if (prngDerivado(this.config.partido.seed, `arena:lejano:${this.estado.tick}:${j.id}`).chance(Math.min(1, prob))) { this.sacarBalon(j, "tiro", arco, null, { motivo: "lejano" as never }); ejecutadas.add(j.id); return; }
++    }
+     if (this.v4 && usarOrden && orden.accion === "centrar") { this.centrarOrden(j, orden, ejecutadas); return; }
+     if (this.v4 && !accionExplicita && j.puesto !== "POR" && enZonaCentro(transformar(j.posicion, j.lado)) && puedeCentrar(j)) {
+       const centro = opcionCentro(j, this.estado);
+@@ -336,6 +357,11 @@
+     if (usarOrden && orden.accion === "conducir") { ejecutadas.add(j.id); this.ultimaAccion = this.estado.tick; return; }
+     const receptor = usarOrden && orden.accion === "pasar" && !pasarImposible ? receptorOrden
+       : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : opcionPase(j, this.observar(j.lado));
++    if (this.v6 && !(usarOrden && orden.accion === "pasar" && !pasarImposible) && !prefiereConducir(j) && process.env.SIN_LARGO !== "1") {
++      const largo = J.opcionPaseLargo(j, this.estado, this.estiloDe(j.lado));
++      const corto = receptor ? puntuacionPase(j, receptor, this.observar(j.lado)) : -Infinity;
++      if (largo && largo.puntuacion > corto) { this.sacarBalon(j, "pase", largo.destino, largo.receptor.id, { motivo: "largo" as never, aereo: true }); ejecutadas.add(j.id); return; }
++    }
+     if (receptor && distancia(j.posicion, receptor.posicion) <= ARENA.paseMaxM) {
+       // Extrapolación de velocidad actual, no consulta a una posición futura.
+       const viaje = distancia(j.posicion, receptor.posicion) / ARENA.velocidadBalonMps;
+@@ -401,6 +427,26 @@
+     const salida = v4 ? { local: manoAMano(this.estado, "local", PO.manoAManoRadioM), visita: manoAMano(this.estado, "visita", PO.manoAManoRadioM) } : null;
+     const manos = v4 ? balon.manos : undefined, porteroManos = manos ? antes.find(j => j.id === manos.portero) : undefined;
+     const llegada = v4 && ladoBalon ? destinosLlegada(this.estado, ladoBalon, planes[ladoBalon].ordenes, ladoBalon !== posesionInicial) : null;
++    const v6 = this.v6, enJuego = !(this.estado.pausa && this.estado.tick < this.estado.pausa.hastaTick) && !this.estado.saque;
++    const repliegue = new Set<string>(), persiguen = new Set<string>();
++    if (v6 && enJuego && process.env.SIN_REPLIEGUE !== "1") {
++      const sup = J.superado(this.estado);
++      if (sup) {
++        const def = rival(sup.lado), e = this.estiloDe(def);
++        const max = J.P.repliegueMax + (e ? J.EFECTOS[e].repliegue : 0);
++        antes.filter(j => j.lado === def && j.puesto !== "POR" && j.id !== perseguidores[def] && ["DEF", "MED"].includes(J.lineaDePuesto(j.puesto)) && distancia(j.posicion, balon.posicion) <= J.P.repliegueRadioM)
++          .sort((a, b) => distancia(a.posicion, balon.posicion) - distancia(b.posicion, balon.posicion) || a.id.localeCompare(b.id)).slice(0, max).forEach(j => repliegue.add(j.id));
++      }
++    }
++    const pers = this.estado.persecucion;
++    if (v6 && enJuego && pers && this.estado.tick < pers.hastaTick && process.env.SIN_PERSECUCION !== "1") {
++      if (antes.some(j => j.id === pers.jugador)) persiguen.add(pers.jugador);
++      const e = this.estiloDe(pers.lado);
++      if (e && J.EFECTOS[e].extra) {
++        const otro = antes.filter(j => j.lado === pers.lado && j.puesto !== "POR" && j.id !== pers.jugador && j.id !== perseguidores[pers.lado]).sort((a, b) => distancia(a.posicion, balon.posicion) - distancia(b.posicion, balon.posicion) || a.id.localeCompare(b.id))[0];
++        if (otro) persiguen.add(otro.id);
++      }
++    }
+     for (const j of this.estado.jugadores) {
+       const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
+       let destino = { ...orden.destino };
+@@ -408,7 +454,7 @@
+       if (j.puesto !== "POR") {
+         const nominal = transformar(destino, j.lado);
+         nominal.y = ARENA.anchoM / 2 + (nominal.y - ARENA.anchoM / 2) * ARENA.amplitud[planes[j.lado].amplitud];
+-        if (ladoBalon !== j.lado) nominal.x += ARENA.alturaBloqueM[planes[j.lado].bloque];
++        if (ladoBalon !== j.lado) nominal.x += ARENA.alturaBloqueM[planes[j.lado].bloque] + (v6 && this.estiloDe(j.lado) ? J.EFECTOS[this.estiloDe(j.lado)!].bloqueM : 0);
+         destino = enCancha(transformar(nominal, j.lado));
+       }
+       const llega = llegada?.get(j.id);
+@@ -416,6 +462,8 @@
+       if (j.id === balon.vuelo?.receptor) destino = { ...balon.vuelo.destino };
+       if ((ladoBalon !== j.lado || balon.poseedor === null && balon.vuelo === null) && perseguidores[j.lado] === j.id) destino = { ...balon.posicion };
+       if (orden.accion === "presionar" && ladoBalon !== j.lado && j.puesto !== "POR") destino = { ...balon.posicion };
++      else if (repliegue.has(j.id)) destino = J.destinoRepliegue(balon.posicion, j.lado);
++      else if (persiguen.has(j.id) && ladoBalon !== j.lado) destino = J.limitarPersecucion(balon.posicion, j);
+       if (j.id === balon.poseedor) {
+         // Los pases/tiros ya ejecutados no arrastran al portador a su propio
+         // receptor: al conducir, el control local busca progresar.
+@@ -427,6 +475,11 @@
+       // Brief 051 (v5): fuera del mano a mano, con el balón de un rival (poseedor o vuelo) cerca de su
+       // arco y sin saque, el portero se coloca sobre la línea balón–centro del arco.
+       else if (this.v5 && j.puesto === "POR" && j.id !== balon.poseedor && ladoBalon !== undefined && ladoBalon !== j.lado && !this.estado.saque && balonCercaDelArco(balon.posicion, j.lado)) destino = destinoPosicionamiento(balon.posicion, j.lado);
++      if (v6 && j.puesto === "POR" && balon.vuelo?.tipo === "tiro" && balon.vuelo.lado !== j.lado && (process.env.PORTERO_TODOS === "1" || (balon.vuelo as any).lejano) && process.env.SIN_TRAYECTORIA !== "1") {
++        const o = transformar(balon.vuelo.origen, j.lado), dd = transformar(balon.vuelo.destino, j.lado), px = transformar(j.posicion, j.lado).x;
++        const t = dd.x !== o.x ? limitar((px - o.x) / (dd.x - o.x), 0, 1) : 1;
++        destino = transformar({ x: px, y: o.y + (dd.y - o.y) * t }, j.lado);
++      }
+       // Ningún rival se dirige a menos de distanciaManosM del portero con el balón en las manos.
+       if (porteroManos && j.lado !== porteroManos.lado) destino = respetarManos(destino, j.posicion, porteroManos.posicion);
+       const porteroEnArea = v4 && j.puesto === "POR" && j.id === balon.poseedor && enAreaPropia(j.posicion, j.lado);
+@@ -447,11 +500,15 @@
+       const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado) : null;
+       const ritmo = this.estado.entrenadores ? T.ritmo[this.estado.entrenadores[j.lado].plan.ritmo] : 1;
+       const nivel = entorno ? capacidadEfectiva(j, compatibilidadPuesto(j, j.puesto)) : j.nivel;
+-      const max = ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor * nivel / 100) * (ARENA.factorEnergiaMin + (1 - ARENA.factorEnergiaMin) * j.energia) * ritmo * (entorno?.velocidadJugador ?? 1);
+-      const rapidez = Math.min(max, Math.sqrt(2 * ARENA.aceleracionMps2 * Math.max(0, d - ARENA.toleranciaM)));
++      const at = v6 ? j.atributos : undefined;
++      const acel = ARENA.aceleracionMps2 * (at ? 1 + J.P.aceleracion * J.efecto(at.velocidad) : 1);
++      const max = (at ? 1 + J.P.velocidadMax * J.efecto(at.velocidad) : 1) * ARENA.velocidadMps * (ARENA.velocidadMinFactor + ARENA.velocidadNivelFactor * nivel / 100) * (ARENA.factorEnergiaMin + (1 - ARENA.factorEnergiaMin) * j.energia) * ritmo * (entorno?.velocidadJugador ?? 1);
++      const rapidez = Math.min(max, Math.sqrt(2 * acel * Math.max(0, d - ARENA.toleranciaM)));
+       const deseada = { x: d ? dx / d * rapidez : 0, y: d ? dy / d * rapidez : 0 };
+       const ax = deseada.x - j.velocidad.x, ay = deseada.y - j.velocidad.y;
+-      const delta = Math.hypot(ax, ay), factor = delta ? Math.min(1, ARENA.aceleracionMps2 * ARENA.pasoS / delta) : 0;
++      const rap0 = Math.hypot(j.velocidad.x, j.velocidad.y), frena = v6 && (repliegue.has(j.id) || persiguen.has(j.id)) && rap0 > 0 && (deseada.x * j.velocidad.x + deseada.y * j.velocidad.y) / rap0 < rap0;
++      const limiteAcel = frena ? Number(process.env.FRENADO ?? 5) : acel;
++      const delta = Math.hypot(ax, ay), factor = delta ? Math.min(1, limiteAcel * ARENA.pasoS / delta) : 0;
+       const velocidad = { x: j.velocidad.x + ax * factor, y: j.velocidad.y + ay * factor };
+       let bruto = { x: j.posicion.x + velocidad.x * ARENA.pasoS, y: j.posicion.y + velocidad.y * ARENA.pasoS };
+       // La posición, no solo el destino: ninguna separación lo empuja fuera del área ni tras su línea.
+@@ -462,7 +519,7 @@
+       j.velocidad = { x: (siguiente.x - j.posicion.x) / ARENA.pasoS, y: (siguiente.y - j.posicion.y) / ARENA.pasoS };
+       j.posicion = siguiente;
+       const calor = entorno?.desgaste ?? (this.config.partido.condiciones?.clima === "calor" ? ARENA.factorCalor : 1);
+-      j.energia = limitar(j.energia - recorrido * (entorno ? T.energiaPorMetro * (1 + Math.max(0, ritmo - 1) * T.desgasteRitmo) : ARENA.energiaPorMetro) * calor + (recorrido < ARENA.toleranciaM ? ARENA.recuperacionEnergiaS * ARENA.pasoS : 0), ARENA.energiaMin, 1);
++      j.energia = limitar(j.energia - recorrido * (entorno ? T.energiaPorMetro * (1 + Math.max(0, ritmo - 1) * T.desgasteRitmo) : ARENA.energiaPorMetro) * calor * (at ? 1 - J.P.resistenciaDesgaste * J.efecto(at.resistencia) : 1) + (recorrido < ARENA.toleranciaM ? ARENA.recuperacionEnergiaS * ARENA.pasoS : 0), ARENA.energiaMin, 1);
+     }
+   }
+   /** Brief 046 (v4): destino del poseedor. El de campo conduce hacia el área (sin cruzar la línea)
+@@ -474,6 +531,7 @@
+     return conduce ? limitado : conduccionPorDefecto(j);
+   }
+   private prepararSaque(tipo: TipoReinicioArena, lado: Lado, punto: Punto, ultimoToque?: string): void {
++    if (this.v6) this.estado.persecucion = null;
+     this.realizarCambios();
+     const propios = this.estado.jugadores.filter(j => j.lado === lado);
+     const centroNuevo = tipo === "centro" && centroReglamentario(this.config);
+@@ -536,6 +594,7 @@
+     return true;
+   }
+   private reiniciar(lado: Lado): void {
++    if (this.v6) this.estado.persecucion = null;
+     // Reanudación experimental explícita desde el portero donde se encuentra.
+     // No se representa como saque de centro o de meta reglamentario.
+     this.realizarCambios();
+@@ -583,11 +642,24 @@
+     if (this.v4 && receptor.puesto === "POR" && enAreaPropia(receptor.posicion, receptor.lado)) this.darManos(receptor, finPausa, finPausa + ticksManos());
+     this.evento("reinicio", receptor, portador.posicion, receptor.posicion, null, { motivo: "falta", fuentes: [falta.id] });
+     this.estado.pausa = { hastaTick: finPausa, lado: receptor.lado, punto: { ...receptor.posicion }, motivo: "falta" };
++    if (this.v6) this.estado.persecucion = null;
+     this.ultimaAccion = this.estado.tick; this.ultimaDisputa = this.estado.tick;
+     return true;
+   }
+-  private recibir(j: JugadorArena): void {
++  private recibir(j: JugadorArena, perdedorDuelo?: JugadorArena): void {
+     const vuelo = this.estado.balon.vuelo;
++    if (this.v6) {
++      const previo = this.estado.balon.ultimoToque;
++      const perdedorId = perdedorDuelo?.id ?? (vuelo && vuelo.tipo !== "rechace" && vuelo.lado !== j.lado ? vuelo.autor : previo && previo.lado !== j.lado ? previo.jugador : undefined);
++      const perdedor = this.estado.jugadores.find(p => p.id === perdedorId);
++      if (this.estado.persecucion && this.estado.persecucion.lado === j.lado) this.estado.persecucion = null;
++      if (perdedor && perdedor.lado !== j.lado && perdedor.puesto !== "POR" && !(j.puesto === "POR" && enAreaPropia(j.posicion, j.lado))) {
++        const l = J.lineaDePuesto(perdedor.puesto) as "DEF" | "MED" | "DEL";
++        const e = this.estiloDe(perdedor.lado), bloque = this.estado.entrenadores?.[perdedor.lado].plan.bloque ?? "medio";
++        const s = limitar(J.P.perseguirS[l] * (0.75 + 0.5 * (perdedor.personalidad?.agresividad ?? 50) / 100) * (e ? J.EFECTOS[e].persecucion : 1) * ({ bajo: 0.85, medio: 1, alto: 1.15 }[bloque]) * (0.5 + 0.5 * perdedor.energia), J.P.perseguirMinS, J.P.perseguirMaxS);
++        this.estado.persecucion = { jugador: perdedor.id, lado: perdedor.lado, desdeTick: this.estado.tick, hastaTick: this.estado.tick + Math.round(s / ARENA.pasoS) };
++      }
++    }
+     const desde = vuelo?.origen ?? this.estado.balon.posicion;
+     if (vuelo?.adelantados.includes(j.id) && j.lado === vuelo.lado) {
+       this.evento("fuera_juego", j, desde, j.posicion);
+@@ -621,8 +693,9 @@
+       if (defensor) {
+         this.ultimaDisputa = this.estado.tick;
+         if (this.resolverFalta(defensor, portador)) return;
+-        const p = limitar(ARENA.dueloBase + (defensor.nivel - portador.nivel) * ARENA.dueloNivel + (this.config.partido[defensor.lado].defensa - this.config.partido[portador.lado].ataque) * ARENA.dueloFuerza, ARENA.dueloMin, ARENA.dueloMax);
+-        if (prngDerivado(this.config.partido.seed, `arena:duelo:${this.estado.tick}:${defensor.id}`).chance(p)) this.recibir(defensor);
++        const extra = this.v6 && defensor.atributos && portador.atributos ? J.P.entradaDuelo * J.efecto(defensor.atributos.entrada) - J.P.aguanteDuelo * J.efecto(portador.atributos.aguante) : 0;
++        const p = limitar(ARENA.dueloBase + (defensor.nivel - portador.nivel) * ARENA.dueloNivel + (this.config.partido[defensor.lado].defensa - this.config.partido[portador.lado].ataque) * ARENA.dueloFuerza + extra, ARENA.dueloMin, ARENA.dueloMax);
++        if (prngDerivado(this.config.partido.seed, `arena:duelo:${this.estado.tick}:${defensor.id}`).chance(p)) this.recibir(defensor, portador);
+       }
+       return;
+     }
+@@ -633,7 +706,8 @@
+     const remate5 = this.v5 && vuelo?.tipo === "tiro" && vuelo.potencia !== undefined ? { potencia: vuelo.potencia, alto: vuelo.alto === true } : null;
+     let velocidadEfectiva = 0;
+     if (vuelo) {
+-      const d = distancia(desde, vuelo.destino), velocidad = (vuelo.tipo !== "pase" ? (remate5 ? velocidadRemate(remate5.potencia) : ARENA.velocidadTiroMps) : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
++      const autorAt = this.v6 && remate5 ? this.estado.jugadores.find(p => p.id === vuelo.autor)?.atributos : undefined;
++      const d = distancia(desde, vuelo.destino), velocidad = (autorAt ? 1 + J.P.potenciaVelocidad * J.efecto(autorAt.potencia) : 1) * (vuelo.tipo !== "pase" ? (remate5 ? velocidadRemate(remate5.potencia) : ARENA.velocidadTiroMps) : ARENA.velocidadBalonMps) * (this.estado.entrenadores ? efectosEntorno(this.config, this.estado, vuelo.lado).velocidadBalon : 1);
+       velocidadEfectiva = velocidad;
+       const factor = d ? Math.min(1, velocidad * ARENA.pasoS / d) : 1;
+       balon.posicion = factor === 1 ? { ...vuelo.destino } : { x: desde.x + (vuelo.destino.x - desde.x) * factor, y: desde.y + (vuelo.destino.y - desde.y) * factor };
+--- src/arena/tipos.ts	2026-10-22 05:37:00.447408102 +0000
++++ src/arena/tipos.ts	2026-10-24 19:36:02.381043909 +0000
+@@ -9,7 +9,7 @@
+ /** Las reglas archivadas se siguen aceptando y reproduciendo sin cambios; las nuevas usan ARENA.reglas. */
+ /** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`).
+  * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5. */
+-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", ARENA.reglas] as const;
++export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", ARENA.reglas] as const;
+ export type ReglasArena = (typeof reglasArena)[number];
+ export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
+ export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
+@@ -60,7 +60,7 @@
+   nivel: number; posicion: Punto; velocidad: Punto; energia: number;
+   /** Desde arena-v2; la capitanía es un rol independiente del perfil. */
+   personalidad?: PersonalidadJugador; capitan?: boolean;
+-  posicionNatural?: Posicion; amarillas?: number;
++  posicionNatural?: Posicion; amarillas?: number; atributos?: import("./juego063").Atributos;
+ }
+ export interface ArbitroArena {
+   id: "arbitro"; nombre: string; posicion: Punto; velocidad: Punto;
+@@ -101,6 +101,7 @@
+   aficion?: Record<Lado, EstadoAficion>;
+   pausa?: { hastaTick: number; lado: Lado; punto: Punto; motivo: "falta" | "reinicio" } | null;
+   finalizado?: { tick: number; motivo: "menos_de_siete" } | null;
++  persecucion?: { jugador: string; lado: Lado; desdeTick: number; hastaTick: number } | null;
+ }
+ export interface ConfigArena {
+   /** Ausente en archivos arena-v1; nunca se actualizan al reproducirlos. */
+@@ -109,7 +110,7 @@
+   partido: SimConfig;
+   formaciones: Record<Lado, FormacionArena>;
+   entrenadores?: Record<Lado, EntrenadorArena>;
+-  aficiones?: Record<Lado, AficionArena>;
++  aficiones?: Record<Lado, AficionArena>; estilosJuego?: Record<Lado, import("./juego063").EstiloJuego>;
+   duracionS: number; intervaloS: number;
+ }
+ export type TipoEventoArena = "pase" | "recepcion" | "intercepcion" | "recuperacion" | "tiro" | "gol" | "atajada" | "tiro_fuera" | "fuera_juego" | "reinicio" | "plan_equipo" | "cambio" | "falta" | "amarilla" | "roja" | "final_anticipado";
+--- src/arena/controladores.ts	2026-10-21 17:15:10.865716211 +0000
++++ src/arena/controladores.ts	2026-10-24 19:36:03.101039963 +0000
+@@ -85,6 +85,21 @@
+   return candidatos[0]?.p;
+ }
+ 
++export function puntuacionPase(j: JugadorArena, p: JugadorArena, obs: ObservacionArena): number {
++  const origen = transformar(j.posicion, j.lado);
++  const adversarios = obs.estado.jugadores.filter(x => x.lado !== j.lado);
++  const d = distancia(j.posicion, p.posicion);
++  const avance = transformar(p.posicion, j.lado).x - origen.x;
++  const margen = Math.min(...adversarios.map(a => proyeccion(a.posicion, j.posicion, p.posicion).distancia));
++  const estilo = obs.equipos[j.lado].estilo, personalidad = j.personalidad;
++  const verticalidad = personalidad ? P.avanceMinFactor + P.avanceRangoFactor * personalidad.ofensiva / P.max : 1;
++  const seguridad = personalidad ? P.margenMinFactor + personalidad.pase / P.max : 1;
++  const cautela = personalidad ? P.distanciaMinFactor + P.distanciaRangoFactor * personalidad.compostura / P.max : 1;
++  const entrenador = obs.equipos[j.lado].entrenador;
++  const direccion = entrenador ? T.direccionPaseBase + entrenador.verticalidad / 100 : 1;
++  return avance * (estilo === "contragolpe" ? ARENA.pesoAvanceDirecto : 1) * verticalidad * direccion + Math.min(margen, ARENA.margenUtilM) * seguridad - d * ARENA.pesoDistanciaPase * cautela;
++}
++
+ export function planProgramado(obs: ObservacionArena): OrdenesEquipo {
+   const { lado, estado } = obs;
+   const gestion = gestionarProgramado(obs);
+--- src/sim/limites.ts	2026-10-24 18:44:31.900986153 +0000
++++ src/sim/limites.ts	2026-10-24 19:36:02.275044490 +0000
+@@ -483,7 +483,7 @@
+   /** Brief 044: reglas que el motor declara en cada configuración nueva (`ConfigArena.reglas`).
+    * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros).
+    * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel). */
+-  reglas: "reinicios-v5",
++  reglas: "reinicios-v6",
+   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
+   plantillaArena: 16,
+   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
+--- /dev/null	2026-10-21 20:09:56.866000000 +0000
++++ src/arena/juego063.ts	2026-10-24 20:42:07.967781364 +0000
+@@ -0,0 +1,127 @@
++// PROTOTIPO del brief 063 (scratchpad, no es código del repo). Constantes locales aquí para iterar; el
++// brief las pasa a limites.ts.
++import { ARENA } from "../sim/limites";
++import { prngDerivado } from "../sim/prng";
++import type { Lado, Posicion } from "../sim/tipos";
++import { transformar } from "./catalogo";
++import { distancia, enCancha, limitar, proyeccion } from "./geometria";
++import type { EntrenadorArena, EstadoArena, JugadorArena, PerfilJugador, Punto } from "./tipos";
++
++export const P = {
++  semilla: 0x61747231,
++  min: 20, max: 95, variacion: 12, distintivo: 12,
++  base: {
++    POR: { velocidad: 40, resistencia: 46, aguante: 38, entrada: 28, vision: 48, potencia: 50 },
++    DEF: { velocidad: 43, resistencia: 48, aguante: 44, entrada: 60, vision: 40, potencia: 38 },
++    MED: { velocidad: 46, resistencia: 56, aguante: 48, entrada: 48, vision: 56, potencia: 46 },
++    DEL: { velocidad: 56, resistencia: 42, aguante: 52, entrada: 30, vision: 44, potencia: 59 },
++  },
++  perfil: {
++    defensivo: { entrada: 8, potencia: -5, vision: -3 },
++    ofensivo: { velocidad: 7, potencia: 5, entrada: -7 },
++    pasador: { vision: 12, aguante: 3, velocidad: -4, potencia: -4 },
++    conductor: { aguante: 9, velocidad: 7, vision: -4 },
++    rematador: { potencia: 11, resistencia: -5, vision: -6 },
++    equilibrado: { resistencia: 5 },
++  } as Record<PerfilJugador, Partial<Record<Atributo, number>>>,
++  // efectos centrados en 50
++  velocidadMax: Number(process.env.K_VEL ?? 0.10), aceleracion: 0.15, resistenciaDesgaste: 0.35,
++  aguanteDuelo: Number(process.env.K_DUELO ?? 0.15), entradaDuelo: Number(process.env.K_DUELO ?? 0.15), visionError: 0.2, potenciaVelocidad: 0.08, aereoRadio: 0.3,
++  // persecución
++  repliegueRadioM: 30, repliegueMax: 4, repliegueAdelantoM: Number(process.env.ADELANTO ?? 4),
++  perseguirS: { DEL: 3, MED: 4, DEF: 6 }, perseguirMinS: 1.5, perseguirMaxS: 8,
++  limiteX: { DEL: ARENA.largoM / 2, MED: ARENA.largoM / 3, DEF: 0 },
++  // remate lejano
++  lejanoUmbral: 60, lejanoMaxM: 33, lejanoEspacioM: 5, lejanoLineaM: 2, lejanoProb: Number(process.env.P_LEJANO ?? 0.35), lejanoErrorPorM: Number(process.env.ERR_LEJ ?? 0.3), lejanoAltoPorM: Number(process.env.ALTO_LEJ ?? 0.03),
++  // pase largo
++  largoUmbral: Number(process.env.U_LARGO ?? 50), largoMaxM: 55, largoPenal: Number(process.env.P_LARGO ?? 0.7), largoAvanceMinM: 10, largoErrorM: 3, largoCaidaM: 5,
++};
++export const atributos = ["velocidad", "resistencia", "aguante", "entrada", "vision", "potencia"] as const;
++export type Atributo = (typeof atributos)[number];
++export type Atributos = Record<Atributo, number>;
++export const efecto = (a: number) => (a - 50) / 50;
++
++export function atributosDe(equipo: string, jugador: string, posicion: Posicion, perfil: PerfilJugador): Atributos {
++  const rng = prngDerivado(P.semilla, `atributos:arena-v6:${equipo}:${jugador}`);
++  const base = P.base[posicion], d = P.perfil[perfil];
++  const r = {} as Atributos;
++  for (const a of atributos) r[a] = base[a] + (d[a] ?? 0) + rng.int(-P.variacion, P.variacion);
++  const candidatos = posicion === "POR" ? ["velocidad", "vision"] as const : atributos;
++  r[rng.pick(candidatos)] += P.distintivo;
++  for (const a of atributos) r[a] = limitar(Math.round(r[a]), P.min, P.max);
++  return r;
++}
++
++export const estilosJuego = ["defensivo", "ofensivo", "posesion", "contragolpe", "directo", "presion"] as const;
++export type EstiloJuego = (typeof estilosJuego)[number];
++export const EFECTOS: Record<EstiloJuego, { bloqueM: number; persecucion: number; extra: number; repliegue: number; largo: number; lejano: number; umbralLargo: number; umbralLejano: number }> = {
++  defensivo: { bloqueM: -5, persecucion: 0.8, extra: 0, repliegue: 1, largo: 1.2, lejano: 0.8, umbralLargo: -5, umbralLejano: 5 },
++  ofensivo: { bloqueM: 3, persecucion: 1.15, extra: 0, repliegue: -1, largo: 1, lejano: 1.25, umbralLargo: 0, umbralLejano: -10 },
++  posesion: { bloqueM: 0, persecucion: 1.15, extra: 1, repliegue: 0, largo: 0.6, lejano: 0.8, umbralLargo: 20, umbralLejano: 10 },
++  contragolpe: { bloqueM: -3, persecucion: 0.9, extra: 0, repliegue: 1, largo: 1.5, lejano: 1, umbralLargo: -10, umbralLejano: 0 },
++  directo: { bloqueM: 0, persecucion: 1, extra: 0, repliegue: 0, largo: 1.5, lejano: 1.2, umbralLargo: -15, umbralLejano: -10 },
++  presion: { bloqueM: 5, persecucion: 1.3, extra: 1, repliegue: 0, largo: 1, lejano: 1, umbralLargo: 0, umbralLejano: 0 },
++};
++export function estiloJuegoDe(equipo: { nombre: string; estilo: string }, _e?: EntrenadorArena): EstiloJuego {
++  return prngDerivado(P.semilla, `estilo-juego:arena-v8:${equipo.nombre.normalize("NFC").trim().toLowerCase()}`).pick(estilosJuego);
++}
++
++export const lineaDePuesto = (p: string): "POR" | "DEF" | "MED" | "DEL" => p === "POR" ? "POR" : p.startsWith("DFC") || p === "LI" || p === "LD" || p.startsWith("CAR") ? "DEF" : p.startsWith("DC") || p === "EI" || p === "ED" ? "DEL" : "MED";
++
++/** Poseedor de campo más allá del último defensor de campo rival (x orientada del poseedor). */
++export function superado(estado: EstadoArena): JugadorArena | null {
++  const p = estado.jugadores.find(j => j.id === estado.balon.poseedor);
++  if (!p || p.puesto === "POR" || estado.balon.manos) return null;
++  const px = transformar(p.posicion, p.lado).x;
++  const defs = estado.jugadores.filter(j => j.lado !== p.lado && j.puesto !== "POR");
++  if (!defs.length) return null;
++  return px > Math.max(...defs.map(j => transformar(j.posicion, p.lado).x)) ? p : null;
++}
++export function destinoRepliegue(balon: Punto, lado: Lado): Punto {
++  const g = transformar({ x: 0, y: ARENA.anchoM / 2 }, lado);
++  const dx = g.x - balon.x, dy = g.y - balon.y, d = Math.hypot(dx, dy);
++  if (!d) return { ...g };
++  const k = Math.min(P.repliegueAdelantoM, d) / d;
++  return enCancha({ x: balon.x + dx * k, y: balon.y + dy * k });
++}
++export function limitarPersecucion(destino: Punto, j: JugadorArena): Punto {
++  const l = lineaDePuesto(j.puesto); if (l === "POR") return destino;
++  const o = transformar(destino, j.lado); o.x = Math.max(o.x, P.limiteX[l]);
++  return transformar(o, j.lado);
++}
++
++/** Candidato de remate lejano (sin PRNG). */
++export function puedeRematarLejos(j: JugadorArena, estado: EstadoArena, estilo?: EstiloJuego): boolean {
++  const a = j.atributos; if (!a || j.puesto === "POR" || a.potencia < P.lejanoUmbral + (estilo ? EFECTOS[estilo].umbralLejano : 0)) return false;
++  const o = transformar(j.posicion, j.lado), arco = { x: ARENA.largoM, y: ARENA.anchoM / 2 };
++  const d = distancia(o, arco);
++  if (d <= ARENA.radioTiroM || d > P.lejanoMaxM || Math.abs(o.y - ARENA.anchoM / 2) > ARENA.areaAnchoM / 2) return false;
++  const rivales = estado.jugadores.filter(r => r.lado !== j.lado);
++  if (rivales.some(r => distancia(r.posicion, j.posicion) < P.lejanoEspacioM)) return false;
++  const g = transformar(arco, j.lado);
++  return !rivales.filter(r => r.puesto !== "POR").some(r => proyeccion(r.posicion, j.posicion, g).distancia < P.lejanoLineaM);
++}
++
++/** Pase largo: receptor a (paseMaxM, alcance(vision)] con avance y ventaja en la caída. */
++export function opcionPaseLargo(j: JugadorArena, estado: EstadoArena, estilo: EstiloJuego | undefined): { receptor: JugadorArena; destino: Punto; puntuacion: number } | undefined {
++  const umbral = P.largoUmbral + (estilo ? EFECTOS[estilo].umbralLargo : 0);
++  const a = j.atributos; if (!a || j.puesto === "POR" || a.vision < umbral) return undefined;
++  const alcance = ARENA.paseMaxM + (P.largoMaxM - ARENA.paseMaxM) * Math.min(1, (a.vision - umbral) / (100 - P.largoUmbral));
++  const o = transformar(j.posicion, j.lado);
++  const rivales = estado.jugadores.filter(r => r.lado !== j.lado && r.puesto !== "POR");
++  let mejor: { receptor: JugadorArena; destino: Punto; puntuacion: number } | undefined;
++  for (const r of estado.jugadores.filter(p => p.lado === j.lado && p.id !== j.id && p.puesto !== "POR")) {
++    const d = distancia(j.posicion, r.posicion);
++    if (d <= ARENA.paseMaxM || d > alcance) continue;
++    const ro = transformar(r.posicion, j.lado), avance = ro.x - o.x;
++    const cambio = Math.abs(ro.y - o.y) >= ARENA.anchoM * 0.4;
++    if (avance < P.largoAvanceMinM && !cambio) continue;
++    const viaje = d / ARENA.velocidadBalonMps;
++    const destino = enCancha({ x: r.posicion.x + r.velocidad.x * viaje, y: r.posicion.y + r.velocidad.y * viaje });
++    const ventaja = Math.min(...rivales.map(x => distancia(x.posicion, destino))) - distancia(r.posicion, destino);
++    if (ventaja <= 0) continue;
++    const puntuacion = avance + Math.min(ventaja, ARENA.margenUtilM) - d * ARENA.pesoDistanciaPase * P.largoPenal / (estilo ? EFECTOS[estilo].largo : 1);
++    if (!mejor || puntuacion > mejor.puntuacion) mejor = { receptor: r, destino, puntuacion };
++  }
++  return mejor;
++}

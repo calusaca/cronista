@@ -1,0 +1,70 @@
+{
+ "jugadoresCampo": 5600,
+ "media": {
+  "velocidad": 50.7,
+  "resistencia": 51,
+  "aguante": 51.5,
+  "entrada": 49.5,
+  "vision": 50.4,
+  "potencia": 49
+ },
+ "min": {
+  "velocidad": 27,
+  "resistencia": 25,
+  "aguante": 32,
+  "entrada": 20,
+  "vision": 25,
+  "potencia": 21
+ },
+ "max": {
+  "velocidad": 87,
+  "resistencia": 84,
+  "aguante": 85,
+  "entrada": 92,
+  "vision": 92,
+  "potencia": 94
+ },
+ "porPosicion": {
+  "DEF": {
+   "velocidad": 45.3,
+   "resistencia": 50.7,
+   "aguante": 46.9,
+   "entrada": 63.9,
+   "vision": 43.6,
+   "potencia": 37.9
+  },
+  "MED": {
+   "velocidad": 48.7,
+   "resistencia": 58.5,
+   "aguante": 52.7,
+   "entrada": 49.9,
+   "vision": 61,
+   "potencia": 46.6
+  },
+  "DEL": {
+   "velocidad": 59.9,
+   "resistencia": 41.9,
+   "aguante": 55.9,
+   "entrada": 30.8,
+   "vision": 45.6,
+   "potencia": 66
+  }
+ },
+ "atributoMaximo": {
+  "vision": 990,
+  "entrada": 1538,
+  "resistencia": 813,
+  "potencia": 967,
+  "velocidad": 705,
+  "aguante": 587
+ },
+ "fraccionConRasgo75": 0.22303571428571428,
+ "estilos": {
+  "directo": 62,
+  "ofensivo": 82,
+  "presion": 74,
+  "posesion": 80,
+  "contragolpe": 42,
+  "defensivo": 60
+ }
+}
