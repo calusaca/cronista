@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import huellasTranscripts from "../__fixtures__/huellas-transcripts.json";
 import { conjuntoHuellas, huellaTramo, normalizarTramo } from "../__fixtures__/huellas-transcripts";
 import {
-  activarAntesala, antesalaPartido, bloqueAntesala, comprobarAntesala, controladorVerificado, duracionEstimadaAntesalaS, elegirSolicitud, esAntesala,
+  activarAntesala, antesalaPartido, bloqueAntesala, comprobarAntesala, controladorVerificado, duracionEstimadaAntesalaS, elegirSolicitud, esAntesala, focoDeAntesala,
   guionAntesala, iniciarAntesala, jugadoresDelBloque, longitudEscapada, MAX_EN_VUELO_ANTESALA, pasoAntesala, siguientePedidoAntesala, todosPedidosAntesala,
   vencimientoAntesalaMs, type EntradaAntesala, type EstadoAntesala, type SalidaAntesala,
 } from "../antesala";
@@ -582,5 +582,22 @@ describe("058 · bloqueAntesala", () => {
     expect(bloqueAntesala("antesala:01-apertura:0")).toEqual({ lado: null, bloque: "apertura" });
     expect(bloqueAntesala("antesala:07-visita-atras:0")).toEqual({ lado: "visita", bloque: "atras" });
     for (const malo of ["antesala:03-visita-atras:0", "antesala:01-local-apertura:0", "previa:1-local:0", "antesala:02-local-cabecera:1"]) expect(bloqueAntesala(malo)).toBeNull();
+  });
+});
+
+describe("058 · bloque C · focoDeAntesala (§ 5 y v1.1 § 10)", () => {
+  it("jugadores de los jugador_k del hecho de línea (= jugadoresDelBloque), entrenador solo si la pieza lo cita, cabecera sin jugadores y apertura sin lado", () => {
+    for (const [nombre, r] of [...Object.entries(FIXTURES), ["largo", registroLargo()] as [string, RegistroArena]]) for (const idioma of IDIOMAS) for (const p of antesalaPartido(r, asignaciones.manual!, idioma)) {
+      const foco = focoDeAntesala(p)!, b = bloqueAntesala(p.id)!;
+      expect(foco.lado).toBe(b.lado); expect(foco.bloque).toBe(b.bloque);
+      if (b.bloque === "apertura" || b.bloque === "cabecera") { expect(foco.jugadores).toEqual([]); expect(foco.entrenador).toBe(false); continue; }
+      expect(foco.jugadores, `${nombre} ${p.id}`).toEqual(jugadoresDelBloque(r, b.lado!, b.bloque).map(j => j.id));
+      expect(foco.entrenador).toBe(p.hechos.some(h => h.id === `antesala:entrenador:${b.lado}`));
+    }
+    // Con la escalera que quita el sufijo del entrenador, el foco no lo nombra.
+    const largo = antesalaPartido(registroLargo("&"), null, "es").find(p => p.id.includes("local-arriba"))!;
+    expect(largo.auditDialogo!.escalones).toContain("sin-entrenador");
+    expect(focoDeAntesala(largo)!.entrenador).toBe(false);
+    expect(focoDeAntesala({ ...largo, id: "previa:1-local:0" })).toBeNull();
   });
 });

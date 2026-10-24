@@ -12,7 +12,7 @@ import { caducidadInvitadoS, calmaEnFotograma, candidatasAlReactivar, descartesT
 import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo";
 import { esPrevia } from "../arena/previa";
 import { ANTESALA_ARENA, ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
-import { activarAntesala, antesalaPartido, elegirSolicitud, iniciarAntesala, pasoAntesala, siguientePedidoAntesala, todosPedidosAntesala, vencimientoAntesalaMs, type ClaseSolicitud, type EstadoAntesala, type RespuestaClip, type SalidaAntesala } from "../arena/antesala";
+import { activarAntesala, antesalaPartido, elegirSolicitud, focoDeAntesala, iniciarAntesala, type FocoAntesala, pasoAntesala, siguientePedidoAntesala, todosPedidosAntesala, vencimientoAntesalaMs, type ClaseSolicitud, type EstadoAntesala, type RespuestaClip, type SalidaAntesala } from "../arena/antesala";
 import { arranquePropio, asignacionDirecto, descartarAudioCebado, guardarPreferenciaNarracion, instanteArranquePropio, leerPreferenciaNarracion, narracionAutomatica, suscribirAsignacionDirecto, tomarAudioCebado } from "./audio-directo";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
@@ -80,9 +80,11 @@ async function cargarReservas(s: Sonido, semilla: number): Promise<number> {
  * por adelantado y solo reproduce hechos que ya alcanzó la presentación. */
 /** Brief 060 § 4.1 · `ranura`: hueco de la barra de transporte bajo la cancha donde se pinta «Pause broadcast» (portal);
  * mientras es null no se pinta en ningún sitio (nunca hay dos). La lógica de pausa no cambia. */
-export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [], ranura = null }: {
+export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [], ranura = null, alAntesala }: {
   sesion: string; registro: RegistroArena; hastaTick: number; terminada: boolean; inicioTick: number; idioma: "es" | "en"; intervenciones?: readonly IntervencionArena[];
   alTiempo: (tick: number) => void; alRepeticion: () => void; ranura?: HTMLElement | null;
+  /** Brief 058 · C: foco del clip de la antesala que suena (null en huecos, esperas, reintentos y al terminar). */
+  alAntesala?: (foco: FocoAntesala | null) => void;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
   const reloj = useRef(new RelojBuffer(inicioTick / 10));
@@ -104,14 +106,17 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   const disponibleRef = useRef(disponible); disponibleRef.current = disponible;
   // Brief 058 · B: ids de la antesala derivados del registro y de la asignación pública de la sesión.
   const asignacion = useSyncExternalStore(suscribirAsignacionDirecto, () => asignacionDirecto(sesion), () => null);
-  const idsAntesala = useMemo(() => { try { return antesalaPartido(registro, asignacion, idioma).map(i => i.id); } catch { return []; } },
+  const piezasAntesala = useMemo(() => { try { return antesalaPartido(registro, asignacion, idioma); } catch { return []; } },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [registro.config, registro.inicial, asignacion, idioma]);
+  const idsAntesala = useMemo(() => piezasAntesala.map(i => i.id), [piezasAntesala]);
+  /** Brief 058 · C · Fuente cuyo foco se muestra; al terminar ESA fuente (onended o stop) el foco vuelve a null. */
+  const focoFuente = useRef<AudioBufferSourceNode | null>(null);
   /** Token de ejecución de la antesala (v1.1 § 4): sobrevive a limpiar(); cualquier final lo invalida. */
   const ejecucion = useRef(0), antesalaEjecutada = useRef(false), t0Antesala = useRef<number | null>(null), retencionAntesala = useRef(false);
   const [faseAntesala, setFaseAntesala] = useState(false);
   const saltarRef = useRef<HTMLButtonElement | null>(null), vozBotonRef = useRef<HTMLButtonElement | null>(null);
-  const actual = useRef({ hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma }); actual.current = { hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma };
+  const actual = useRef({ hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma, piezasAntesala, alAntesala }); actual.current = { hastaTick, terminada, registro, alTiempo, intervenciones, idsAntesala, idioma, piezasAntesala, alAntesala };
   /** Codex 058 #3 · Contexto desbloqueado que sobrevive al cambio de idioma: la limpieza del efecto
    * [sesion, idioma] lo deja aquí en lugar de cerrarlo; si nadie lo adopta en el mismo vaciado de efectos (la
    * reactivación en el idioma nuevo), se cierra en la siguiente microtarea (desmontaje o voz apagada). */
@@ -127,6 +132,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       ejecucion.current++;
       for (const a of s.antesala.peticiones.values()) a.abort();
       s.antesala = undefined; setFaseAntesala(false);
+      focoFuente.current = null; actual.current.alAntesala?.(null);
     }
     if (s) {
       for (const a of s.peticiones.values()) a.abort();
@@ -279,6 +285,7 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       // v1.1 § 10: el foco nunca queda en <body> al desaparecer «Saltar al saque».
       if (typeof document !== "undefined" && document.activeElement === saltarRef.current) vozBotonRef.current?.focus();
       setFaseAntesala(false);
+      focoFuente.current = null; actual.current.alAntesala?.(null);
     }
     setVersion(v => v + 1);
   };
@@ -301,12 +308,17 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     fuente.onended = () => {
       const interrumpida = recuerdo.estado === "interrumpida";
       if (recuerdo.estado === "iniciada") recuerdo.estado = "completa"; fuente.disconnect();
+      // Brief 058 · C (v1.1 § 10): durante huecos, esperas y reintentos no hay foco.
+      if (focoFuente.current === fuente) { focoFuente.current = null; actual.current.alAntesala?.(null); }
       if (sonido.current === s && s.activa === activa) { s.activa = undefined; s.ultimoFin = s.contexto.currentTime; setHablando(false); }
       // v1.1 § 4: tras cada operación asíncrona se comprueba el token; una fuente vieja no toca el estado.
       const actualA = s.antesala;
       if (sonido.current === s && actualA && actualA.estado.token === token) aplicarAntesala(s, pasoAntesala(actualA.estado, { tipo: "fin-fuente", token, id, audioS: s.contexto.currentTime, interrumpida }));
     };
     fuente.start(); setPasaje(segmento); setHablando(true);
+    // Brief 058 · C: el foco sale de la pieza efectiva que acaba de arrancar (la entrada no tiene bloque).
+    const pieza = id === "entrada" ? undefined : actual.current.piezasAntesala.find(p => p.id === id);
+    focoFuente.current = fuente; actual.current.alAntesala?.(pieza ? focoDeAntesala(pieza) : null);
   };
   /** Un fotograma de la antesala: tope de pared, huecos, clips tardíos, entrada final (§ 4.6, v1.1 § 2). */
   const fotogramaAntesala = (s: Sonido, corre: boolean, cursorS: number) => {

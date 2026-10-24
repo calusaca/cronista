@@ -427,3 +427,19 @@ export function elegirSolicitud<P extends { clase: ClaseSolicitud }>(pendientes:
   const validas = pendientes.filter(p => p.clase !== "invitado" && !(p.clase === "antesala" && antesalaEnVuelo));
   return [...validas].sort((a, b) => PRIORIDAD_SOLICITUD[a.clase] - PRIORIDAD_SOLICITUD[b.clase])[0] ?? null;
 }
+
+// ——— Bloque C · Foco del clip que suena (§ 5 y v1.1 § 10) ———
+/** Lo que la pantalla resalta mientras suena un clip: el lado, el bloque, los jugadores nombrados (en el orden de la
+ * voz) y si el clip nombró al entrenador. */
+export interface FocoAntesala { lado: Lado | null; bloque: BloqueAntesala; jugadores: string[]; entrenador: boolean }
+/** v1.1 § 10 · El foco sale de la pieza EFECTIVA: `jugadores` de los `jugador_k` de su hecho `antesala:linea` (no se
+ * recalcula) y `entrenador` solo si alguna oración cita `antesala:entrenador:{lado}` (la escalera pudo quitarlo). */
+export function focoDeAntesala(i: IntervencionArena): FocoAntesala | null {
+  const b = bloqueAntesala(i.id);
+  if (!b) return null;
+  const linea = b.lado ? i.hechos.find(h => h.id === `antesala:linea:${b.lado}:${b.bloque}`) : undefined;
+  const n = linea ? Number(linea.datos.n) : 0;
+  const jugadores = Array.from({ length: Number.isInteger(n) && n > 0 ? n : 0 }, (_, k) => String(linea!.datos[`jugador_${k + 1}`]));
+  const citaEntrenador = b.lado !== null && i.oraciones.some(o => o.hecho === `antesala:entrenador:${b.lado}` || (o.apoyo ?? []).includes(`antesala:entrenador:${b.lado}`));
+  return { lado: b.lado, bloque: b.bloque, jugadores, entrenador: citaEntrenador };
+}

@@ -36,6 +36,7 @@ import { AvisosFavoritos, EstrellaFavorito } from "./ArenaFavoritos";
 import { memoAgregado } from "../arena/estadisticas";
 import { almacenFavoritos, alternarClub, alternarJugador, FAVORITOS_VACIOS, favoritosEn, guardarFavoritos, leerFavoritos, preseleccionFavorita, type FavoritosArena } from "../arena/favoritos";
 import type { IntervencionArena, PublicacionSesion, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
+import type { FocoAntesala } from "../arena/antesala";
 import { cargarEncuentroTorneo, esPeticionTorneo, peticionDeUrl, SinDescompresion, type OrigenTorneo } from "./torneo-carga";
 import { lineaModelos, type ContextoModelos, type EntradaCatalogo } from "../arena/modelos-jugados";
 import { atajoPausa, cadenaFoco } from "./atajo-pausa";
@@ -109,6 +110,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [soloFavorito, setSoloFavorito] = useState(false);
   // Brief 056 (v1.1 § 12) · Tarjeta de alineaciones plegada: se reinicia con cada carga y al salir del tick 0.
   const [plegada, setPlegada] = useState(false);
+  // Brief 058 · C · Clip de la antesala que suena en el directo (lo emite ArenaEmisionBuffer; null entre clips).
+  const [focoAntesala, setFocoAntesala] = useState<FocoAntesala | null>(null);
   /** Brief 060 § 3.4 · Botón principal de la barra y «Saltar al saque»: al desaparecer este, el foco pasa al principal. */
   const principal = useRef<HTMLButtonElement | null>(null), saltoConFoco = useRef(false);
   /** Brief 060 § 4 · Hueco de la barra donde la emisión pinta «Pause broadcast» (portal), función de cancelar que
@@ -438,7 +441,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
             : t(`Narration unavailable (${MOTIVOS_NARRACION[aviso.motivo].en}); playing without voice.`, `Narración no disponible (${MOTIVOS_NARRACION[aviso.motivo].es}); reproduciendo sin voz.`)}</p>}
           </>}
           <div className="arena-direction"><span>● {t("Home →", "Local →")}</span><span>{t("← Away", "← Visitante")} ○</span>{identidad.kits.visitaAlternativa && <span className="arena-kit-note">{t(`${nombres.visita.nombre} wears its change kit`, `${nombres.visita.nombre} viste su segunda equipación`)}</span>}</div>
-          {previaVisible && <ArenaPrevia previa={previaCarta} identidad={identidad} idioma={idioma} plegada={plegada} alternar={() => setPlegada(p => !p)} seleccionado={seleccionado} seleccionar={setSeleccionado} />}
+          {previaVisible && <ArenaPrevia previa={previaCarta} identidad={identidad} idioma={idioma} plegada={plegada} alternar={() => setPlegada(p => !p)} seleccionado={seleccionado} seleccionar={setSeleccionado} foco={bufferActivo ? focoAntesala : null} />}
           {enDirecto && <p className="arena-muted" data-testid="arena-pitch-live-status">{bufferActivo ? t("The match is generating ahead of the broadcast.", "El partido se genera por delante de la emisión.") : preparandoPartido ? t("Preparing the complete match…", "Preparando el partido completo…") : estadoDirecto === "esperando" ? t("Coaches are deciding · simulation clock paused", "Los entrenadores están decidiendo · reloj simulado detenido") : estadoDirecto === "jugando" ? t("Live play · confirmed engine state", "Juego en vivo · estado confirmado por el motor") : t("Play finished · completing commentary", "Juego terminado · completando comentario")}</p>}
           {estado.saque && estado.pausa && estado.tick < estado.saque.hastaTick && escena?.fase !== "red" && <p role="status" data-testid="arena-restart">{({ centro: t("Kick-off", "Saque de centro"), banda: t("Throw-in", "Saque de banda"), esquina: t("Corner kick", "Saque de esquina"), meta: t("Goal kick", "Saque de meta") })[estado.saque.tipo]} · <Escudo identidad={identidad[estado.saque.lado]} size={IDENTIDAD_ARENA.escudoPx.reanudacion} />{registro.config.partido[estado.saque.lado].nombre}</p>}
           {estado.arbitro && <div className="arena-referee-info"><span className="arena-referee-swatch" aria-hidden="true" /><div><strong>{t("Referee", "Árbitro")}: {estado.arbitro.nombre}</strong><p>{estado.entrenadores ? t(`Contact criterion ${estado.arbitro.criterioContacto}/100. Calls synthetic contact fouls and cards; each restart appears in the description.`, `Criterio de contacto ${estado.arbitro.criterioContacto}/100. Sanciona contactos sintéticos con faltas y tarjetas; consulta cada reanudación en la descripción.`) : t("Follows play with its own movement. Visual official; fouls and cards are not simulated yet.", "Sigue la jugada con movimiento propio. Árbitro visual; todavía no se simulan faltas ni tarjetas.")}</p></div></div>}
@@ -486,7 +489,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           </details>
           <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} alCancelar={registrarCancelar} />
           </div>
-          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} ranura={ranura} />}
+          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} ranura={ranura} alAntesala={setFocoAntesala} />}
           {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} registro={registro} carga={cargaId} alEstado={setEstadoVoz} alControles={alControles} sinPartido={registro === inicial && !sesionActual && !enDirecto} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={mesa} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <ArenaMesa comentarios={comentarios} intervenciones={mesa} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}

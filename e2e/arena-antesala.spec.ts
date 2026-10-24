@@ -4,7 +4,7 @@
 // a false; el manejador de React corre entre ambos. Las cifras se leen de las constantes, nunca a mano.
 import { readFile } from "node:fs/promises";
 import { expect, test, type Page, type Route } from "@playwright/test";
-import { antesalaPartido } from "../src/arena/antesala";
+import { antesalaPartido, bloqueAntesala, jugadoresDelBloque } from "../src/arena/antesala";
 import { BUFFER_ARENA, VOZ_BUFFER } from "../src/arena/buffer";
 import { wavMono } from "../src/arena/pista-audio";
 import { previaPartido } from "../src/arena/previa";
@@ -320,13 +320,15 @@ test("058 · A6 360 px y 1440 px, claro y oscuro, EN y ES: casilla y nota sin de
 // ——— Bloque B · Antesala (§ 9 y v1.1 §§ 2–5, 10; v1.3) ———
 type FuenteB = { inicio: number; fin: number; duracion: number; detenida: boolean; intervencion?: string; kind?: string; texto?: string; reloj: string };
 type MarcaB = { t: number; texto: string };
-type VentanaB = { __fuentes: FuenteB[]; __estados: MarcaB[]; __relojes: MarcaB[]; __ctx: AudioContext[]; __vivas: number[] };
+type FocoB = { t: number; jugadores: string[]; slots: string[]; articulo: string[]; tira: string };
+type VentanaB = { __fuentes: FuenteB[]; __estados: MarcaB[]; __relojes: MarcaB[]; __ctx: AudioContext[]; __vivas: number[]; __focos: FocoB[] };
 /** Etiqueta cada fuente con la transcripción visible (intervención, tipo y texto) y registra el estado del búfer y
  * el reloj en cada fotograma (requestAnimationFrame instrumentado). */
 async function instrumentarB(page: Page) {
   await page.addInitScript(() => {
     const w = window as unknown as VentanaB & typeof window;
-    w.__fuentes = []; w.__estados = []; w.__relojes = []; w.__ctx = []; w.__vivas = [];
+    w.__fuentes = []; w.__estados = []; w.__relojes = []; w.__ctx = []; w.__vivas = []; w.__focos = [];
+    let previoFoco = "";
     const reloj = () => document.querySelector('[data-testid="arena-clock"]')?.textContent?.trim() ?? "";
     const Base = window.AudioContext;
     window.AudioContext = class extends Base {
@@ -353,6 +355,13 @@ async function instrumentarB(page: Page) {
       if (estado && estado !== previoEstado) { previoEstado = estado; w.__estados.push({ t: performance.now(), texto: estado }); }
       // Codex 058 #4: regiones vivas del búfer en cada mutación mientras dura la presentación.
       if (/Pre-match presentation|Presentación del partido/.test(estado)) w.__vivas.push(document.querySelectorAll('[data-testid="arena-buffer"] [role="status"], [data-testid="arena-buffer"] [aria-live]').length);
+      // Brief 058 · C: estado del resaltado (botones, fichas, artículo y tira) en cada cambio.
+      const foco = { jugadores: [...document.querySelectorAll<HTMLElement>('[data-testid="arena-lineup-player"][data-speaking]')].map(e => e.dataset.lineupPlayer ?? ""),
+        slots: [...document.querySelectorAll<SVGGElement>(".arena-lineup-slot[data-speaking]")].map(e => e.dataset.lineupPlayer ?? ""),
+        articulo: [...document.querySelectorAll<HTMLElement>("article.arena-lineup[data-speaking]")].map(e => e.dataset.side ?? ""),
+        tira: document.querySelector('[data-testid="arena-lineups-now"]')?.textContent ?? "" };
+      const claveFoco = JSON.stringify(foco);
+      if (claveFoco !== previoFoco) { previoFoco = claveFoco; w.__focos.push({ t: performance.now(), ...foco }); }
       const el = document.querySelector<HTMLElement>('[data-testid="arena-voice-transcript"]');
       if (!el) return;
       const d = { intervencion: el.dataset.narrationIntervention, kind: el.dataset.narrationKind, texto: el.querySelector("p")?.textContent ?? "" };
@@ -361,7 +370,9 @@ async function instrumentarB(page: Page) {
     }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true }));
   });
 }
-const datosB = (page: Page) => page.evaluate(() => { const w = window as unknown as VentanaB; return { fuentes: w.__fuentes, estados: w.__estados, relojes: w.__relojes, ctx: w.__ctx.map(c => c.state), vivas: w.__vivas }; });
+const datosB = (page: Page) => page.evaluate(() => { const w = window as unknown as VentanaB; return { fuentes: w.__fuentes, estados: w.__estados, relojes: w.__relojes, ctx: w.__ctx.map(c => c.state), vivas: w.__vivas, focos: w.__focos }; });
+/** Estado del resaltado vigente en el instante t (el último registrado antes). */
+const focoEn = (focos: FocoB[], t: number) => [...focos].reverse().find(f => f.t <= t) ?? { t: 0, jugadores: [], slots: [], articulo: [], tira: "" };
 const asignacionModelos = { modo: "manual", local: { id: "equilibrado", nombre: "GPT-5.6 Luna", controlador: "azure-openai:equilibrado" }, visita: { id: "luna6", nombre: "GPT-6 Luna", controlador: "azure-openai:luna6" } } as const;
 /** Sirve los clips de la antesala derivados del mismo registro y asignación (hechos del idioma pedido). */
 function servirAntesala(registro: RegistroArena, asignacion: AsignacionModelos | null, opciones: { duracionS?: number; demoraMs?: (id: string, idioma: string) => number | Promise<unknown>; estado?: (id: string) => number | null } = {}) {
@@ -396,9 +407,24 @@ test("058 · B1 antesala completa: orden, huecos, reloj retenido con «Pre-match
   const ids = idsGuion(registro, asignacionModelos as AsignacionModelos);
   await expect.poll(async () => (await datosB(page)).estados.some(e => e.texto.startsWith("Live")), { timeout: 40_000 }).toBe(true);
   await expect(saltar(page)).toHaveCount(0);
-  const { fuentes, estados, relojes, vivas } = await datosB(page);
+  const { fuentes, estados, relojes, vivas, focos } = await datosB(page);
   const clips = deAntesala(fuentes);
   expect(clips.map(f => f.intervencion)).toEqual(ids);
+  // Bloque C: a mitad de cada clip, data-speaking exactamente en los jugadores de jugadoresDelBloque (botones y
+  // fichas), el artículo del lado en la cabecera y la tira con el rótulo del bloque; a mitad de cada hueco, sin foco.
+  const inicial = prefijo(registro, 0);
+  clips.forEach((f, k) => {
+    const b = bloqueAntesala(f.intervencion!)!, mitad = focoEn(focos, (f.inicio + f.fin) / 2);
+    const esperados = b.lado && b.bloque !== "cabecera" && b.bloque !== "apertura" ? jugadoresDelBloque(inicial, b.lado, b.bloque).map(j => j.id) : [];
+    expect([...mitad.jugadores].sort(), f.intervencion).toEqual([...esperados].sort());
+    expect([...mitad.slots].sort(), f.intervencion).toEqual([...esperados].sort());
+    expect(mitad.articulo, f.intervencion).toEqual(b.bloque === "cabecera" ? [b.lado] : []);
+    if (b.lado) expect(mitad.tira, f.intervencion).toContain(ANTESALA_ARENA.bloquesRotulo.en[b.bloque as "atras"]);
+    else expect(mitad.tira).toBe("");
+    const siguiente = clips[k + 1];
+    if (siguiente) { const hueco = focoEn(focos, (f.fin + siguiente.inicio) / 2); expect([hueco.jugadores, hueco.articulo, hueco.tira], `hueco tras ${f.intervencion}`).toEqual([[], [], ""]); }
+  });
+  expect(focoEn(focos, Number.POSITIVE_INFINITY)).toMatchObject({ jugadores: [], articulo: [], tira: "" });
   // Codex 058 #4: una sola región viva en el búfer durante toda la presentación, también entre clips.
   expect(vivas.length).toBeGreaterThan(ids.length);
   expect(Math.max(...vivas)).toBe(1);
@@ -666,8 +692,8 @@ test("058 · A4b autoplay bloqueado y recuperado con el reloj en 0:00: la antesa
   await expect.poll(async () => deAntesala((await datosB(page)).fuentes).length, { timeout: 15_000 }).toBeGreaterThan(0);
 });
 
-test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso sin desbordar (capturas con CAPTURAS_058=1)", async ({ browser }) => {
-  test.setTimeout(120_000);
+test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso, resaltado de «atrás» y tira «En voz» sin desbordar y con contraste (capturas con CAPTURAS_058=1)", async ({ browser }) => {
+  test.setTimeout(240_000);
   const guardar = process.env.CAPTURAS_058 === "1", carpeta = "docs/evidencia/narracion-058";
   const registro = await leer("public/experimentos/arena-duelo-v3.json");
   const casos = [
@@ -679,7 +705,7 @@ test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso si
   for (const c of casos) {
     const ctx = await browser.newContext({ viewport: { width: c.ancho, height: c.alto }, colorScheme: c.tema });
     const page = await ctx.newPage();
-    await directo(page, `00000000-0000-4000-8000-0000000058${String(40 + n++)}`, { avanceMs: 500, asignacion: asignacionModelos, relato: servirAntesala(registro, asignacionModelos as AsignacionModelos, { duracionS: 6 }) });
+    await directo(page, `00000000-0000-4000-8000-0000000058${String(40 + n++)}`, { avanceMs: 500, asignacion: asignacionModelos, relato: servirAntesala(registro, asignacionModelos as AsignacionModelos, { duracionS: 4 }) });
     await page.goto("/arena");
     if (c.es) await page.getByRole("button", { name: "Switch to Spanish" }).click();
     await page.getByTestId("arena-live").getByRole("button", { name: c.es ? "Iniciar partido en vivo" : "Start live match", exact: true }).click();
@@ -691,6 +717,34 @@ test("058 · B11 360 px y 1440 px, claro y oscuro, EN y ES: antesala en curso si
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(c.ancho);
     const nombre = `${c.es ? "es" : "en"}-${c.tema === "dark" ? "oscuro" : "claro"}-${c.ancho}`;
     if (guardar) await page.getByTestId("arena-buffer").screenshot({ path: `${carpeta}/antesala-${nombre}.png` });
+    // Bloque C: durante el clip de «atrás» local, la tira y el resaltado (360 px: filas ≥ 44 px, sin desborde).
+    const tira = page.getByTestId("arena-lineups-now");
+    await expect(tira).toContainText(ANTESALA_ARENA.bloquesRotulo[c.es ? "es" : "en"].atras, { timeout: 30_000 });
+    await expect(page.locator('[data-testid="arena-lineup-player"][data-speaking]')).toHaveCount(jugadoresDelBloque(prefijo(registro, 0), "local", "atras").length);
+    expect(await tira.evaluate(e => e.closest("[role=status], [aria-live]") === null && !e.querySelector("[role=status], [aria-live]"))).toBe(true);
+    for (const alto of await page.locator(".arena-lineups-now-row").evaluateAll(es => es.map(e => e.getBoundingClientRect().height))) expect(alto).toBeGreaterThanOrEqual(44);
+    await page.getByTestId("arena-lineups").scrollIntoViewIfNeeded();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(c.ancho);
+    // Contraste sobre estilos calculados (regla de contraste.mjs): texto de la tira ≥ 4,5; contorno de la fila y ficha ≥ 3.
+    const ratios = await page.evaluate(() => {
+      const rgb = (s: string) => { const m = s.match(/rgba?\(([^)]+)\)/); const srgb = s.match(/color\(srgb ([^)]+)\)/); const p = (srgb ? srgb[1]! : m![1]!).split(/[ ,/]+/).filter(Boolean).map(Number); return srgb ? { r: p[0]! * 255, g: p[1]! * 255, b: p[2]! * 255, a: p[3] ?? 1 } : { r: p[0]!, g: p[1]!, b: p[2]!, a: p[3] ?? 1 }; };
+      const lum = (c: { r: number; g: number; b: number }) => { const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+      const ratio = (a: string, b: string) => { const [x, y] = [lum(rgb(a)), lum(rgb(b))].sort((p, q) => q - p); return (x! + 0.05) / (y! + 0.05); };
+      const opaco = (el: Element) => { for (let e: Element | null = el; e; e = e.parentElement) { const c = getComputedStyle(e).backgroundColor; if (rgb(c).a > 0.5) return c; } return getComputedStyle(document.body).backgroundColor; };
+      const q = (s: string) => document.querySelector(s)!;
+      const fila = q(".arena-lineup-player[data-speaking]");
+      return {
+        nombre: ratio(getComputedStyle(q(".arena-lineups-now strong")).color, opaco(q(".arena-lineups-now"))),
+        nota: ratio(getComputedStyle(q(".arena-lineups-now-note")).color, opaco(q(".arena-lineups-now"))),
+        titulo: ratio(getComputedStyle(q(".arena-lineups-now-title")).color, opaco(q(".arena-lineups-now"))),
+        contorno: ratio(getComputedStyle(fila).outlineColor, opaco(fila.parentElement!)),
+        ficha: ratio(getComputedStyle(q(".arena-lineup-slot[data-speaking] .arena-kit")).stroke, getComputedStyle(q(".arena-lineup-pitch .arena-grass")).fill),
+      };
+    });
+    for (const k of ["nombre", "nota", "titulo"] as const) expect(ratios[k], `${nombre} ${k}`).toBeGreaterThanOrEqual(4.5);
+    for (const k of ["contorno", "ficha"] as const) expect(ratios[k], `${nombre} ${k}`).toBeGreaterThanOrEqual(3);
+    if (guardar) await page.getByTestId("arena-lineups").screenshot({ path: `${carpeta}/resaltado-atras-${nombre}.png` });
+    if (guardar) console.log(`contraste ${nombre}: ${JSON.stringify(Object.fromEntries(Object.entries(ratios).map(([k, v]) => [k, Math.round(v * 100) / 100])))}`);
     await ctx.close();
   }
 });

@@ -3416,3 +3416,16 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
    su propio margen interior para no quedar pegadas. */
 .arena-torneo-paren { display: inline; white-space: nowrap; }
 .arena-torneo-grupo .arena-torneo-matriz thead th { padding: 0 var(--ar-s2); }
+
+/* Brief 058 · C · Resaltado de la antesala: la línea que se nombra se marca en la tarjeta de alineaciones y la tira
+   «En voz» muestra el perfil previo. Solo tokens; sin transition, animation ni transform (regla 047): el resaltado
+   es un cambio de atributo, igual con movimiento reducido. El contorno de la fila usa --accent (≥ 3:1 sobre la
+   tarjeta en claro y en oscuro; --ar-select es para el césped). */
+.arena-lineup-slot[data-speaking] .arena-kit { stroke: var(--ar-select); stroke-width: .9; }
+.arena-lineup-player[data-speaking] { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--ar-surface-3, var(--ar-surface-2)); }
+.arena-lineup[data-speaking] .arena-lineup-head h3, .arena-lineup-coach[data-speaking] { text-decoration: underline 2px var(--accent); text-underline-offset: 3px; }
+.arena-lineups-now { flex: 1 1 100%; order: 3; min-width: 0; margin: 0; padding: var(--ar-s2) var(--ar-s3); border: 1px solid var(--line); border-radius: var(--ar-r-sm); background: var(--surface); color: var(--ink); font-size: 14px; }
+.arena-lineups-now-title { margin: 0 0 var(--ar-s1); font-weight: 700; overflow-wrap: anywhere; }
+.arena-lineups-now-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--ar-s1); }
+.arena-lineups-now-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ar-s1); min-height: 44px; overflow-wrap: anywhere; }
+.arena-lineups-now-note { margin: var(--ar-s1) 0 0; font-size: 12px; }

@@ -1,0 +1,150 @@
+| claro | texto principal / fondo | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| claro | texto atenuado / tarjeta | rgb(79,93,120) | rgb(255,255,255) | 6.63 | 4.5 | OK |
+| claro | marcador / caja del marcador | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 3 | OK |
+| claro | nombre equipo / marcador | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| claro | reloj / fondo | rgb(255,255,255) | rgb(24,35,58) | 15.67 | 4.5 | OK |
+| claro | botón primario | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| claro | modelos que jugaron / tablero | rgb(79,93,120) | rgb(255,255,255) | 6.63 | 4.5 | OK |
+| claro | cancha detenida / tablero | — | — | — | — | AUSENTE |
+| claro | pestaña activa | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| claro | dorsal local / ficha | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| claro | dorsal visita / ficha | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| claro | ficha local / césped | rgb(166,214,255) | rgb(47,125,71) y rgb(42,115,65) | 3.3 | 3 | OK |
+| claro | anillo local / césped | rgb(11,18,32) | rgb(47,125,71) y rgb(42,115,65) | 3.23 | 3 | OK |
+| claro | ficha visita / césped | rgb(46,6,18) | rgb(47,125,71) y rgb(42,115,65) | 3.15 | 3 | OK |
+| claro | anillo visita / césped | rgb(255,255,255) | rgb(47,125,71) y rgb(42,115,65) | 5.07 | 3 | OK |
+| claro | balón / césped | rgb(255,255,255) | rgb(47,125,71) y rgb(42,115,65) | 5.07 | 3 | OK |
+| claro | líneas / césped | rgb(232,242,234) | rgb(47,125,71) y rgb(42,115,65) | 4.42 | 3 | OK |
+| claro | nombre mesa / tarjeta | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | rótulo narrador / tarjeta | rgb(63,106,0) | rgb(244,246,250) | 5.93 | 4.5 | OK |
+| claro | rótulo comentarista / tarjeta | rgb(180,68,27) | rgb(244,246,250) | 5.13 | 4.5 | OK |
+| claro | rótulo estadista / tarjeta | rgb(11,114,104) | rgb(244,246,250) | 5.36 | 4.5 | OK |
+| claro | avatar narrador | rgb(255,255,255) | rgb(63,106,0) | 6.42 | 4.5 | OK |
+| claro | avatar comentarista | rgb(255,255,255) | rgb(180,68,27) | 5.55 | 4.5 | OK |
+| claro | avatar estadista | rgb(255,255,255) | rgb(11,114,104) | 5.8 | 4.5 | OK |
+| claro | hora acción / tarjeta | — | — | — | — | AUSENTE |
+| claro | barra superior | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| claro | enlace barra superior | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| claro | rótulo cabecera / chip | rgb(169,184,208) | rgb(24,35,58) | 7.8 | 4.5 | OK |
+| claro | párrafo cabecera / banda | rgb(169,184,208) | rgb(11,18,32) | 9.32 | 4.5 | OK |
+| claro | pestaña inactiva / fondo | rgb(15,23,42) | rgb(255,255,255) | 17.85 | 4.5 | OK |
+| claro | enlace a la cancha / fondo | rgb(63,106,0) | rgb(255,255,255) | 6.42 | 4.5 | OK |
+| claro | estado del directo / píldora | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | enlace compartir / botón | — | — | — | — | AUSENTE |
+| claro | dirección local / tablero | rgb(11,79,138) | rgb(255,255,255) | 8.4 | 4.5 | OK |
+| claro | dirección visita / tablero | rgb(79,93,120) | rgb(255,255,255) | 6.63 | 4.5 | OK |
+| claro | botón fantasma / transporte | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | árbitro / ficha informativa | rgb(79,93,120) | rgb(244,246,250) | 6.12 | 4.5 | OK |
+| claro | instante y modo / chip | rgb(79,93,120) | rgb(230,234,242) | 5.49 | 4.5 | OK |
+| claro | resumen de evidencia / tarjeta | rgb(63,106,0) | rgb(244,246,250) | 5.93 | 4.5 | OK |
+| claro | oración mesa / tarjeta | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | estado vacío mesa / tarjeta | rgb(79,93,120) | rgb(244,246,250) | 6.12 | 4.5 | OK |
+| claro | estado vacío / fondo | rgb(255,255,255) | rgb(24,35,58) | 15.67 | 4.5 | OK |
+| claro | rótulo panel / chip | rgb(79,93,120) | rgb(230,234,242) | 5.49 | 4.5 | OK |
+| claro | enlace evidencia / chip | — | — | — | — | AUSENTE |
+| claro | resumen desplegable / panel | rgb(15,23,42) | rgb(255,255,255) | 17.85 | 4.5 | OK |
+| claro | rótulo de gol / fondo | — | — | — | — | AUSENTE |
+| claro | anillo del goleador / césped | — | — | — | — | AUSENTE |
+| claro | iniciales escudo local / campo | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| claro | iniciales escudo visita / campo | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| claro | silueta escudo local / marcador | rgb(166,214,255) | rgb(11,18,32) | 12.2 | 3 | OK |
+| claro | silueta escudo visita / marcador | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 3 | OK |
+| claro | anillo de selección / césped | rgb(212,255,58) | rgb(47,125,71) y rgb(42,115,65) | 4.38 | 3 | OK |
+| claro | anillo favorito / césped | — | — | — | — | AUSENTE |
+| claro | nota de equipación / tablero | — | — | — | — | AUSENTE |
+| claro | emblema / barra superior | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 3 | OK |
+| claro | pastilla líder local | — | — | — | — | AUSENTE |
+| claro | pastilla líder visita | — | — | — | — | AUSENTE |
+| claro | CTA de la cabecera | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| claro | icono del feed / tarjeta | — | — | — | — | AUSENTE |
+| claro | icono de cifras / rótulo | — | — | — | — | AUSENTE |
+| claro | tarjeta amarilla de cifras / rótulo | — | — | — | — | AUSENTE |
+| claro | tarjeta roja de cifras / rótulo | — | — | — | — | AUSENTE |
+| claro | tarjeta amarilla del feed / tarjeta | — | — | — | — | AUSENTE |
+| claro | tarjeta roja del feed / tarjeta | — | — | — | — | AUSENTE |
+| claro | vista del arco: rótulo / caja | — | — | — | — | AUSENTE |
+| claro | vista del arco: palos / caja | — | — | — | — | AUSENTE |
+| claro | líneas alineación / césped tarjeta | rgb(232,242,234) | rgb(47,125,71) | 4.42 | 3 | OK |
+| claro | dorsal alineación local / ficha | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| claro | dorsal alineación visita / ficha | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| claro | jugador alineación / tarjeta | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | puesto alineación / tarjeta | rgb(79,93,120) | rgb(244,246,250) | 6.12 | 4.5 | OK |
+| claro | rasgos alineación / tarjeta | rgb(15,23,42) | rgb(244,246,250) | 16.5 | 4.5 | OK |
+| claro | chip de condiciones | rgb(15,23,42) | rgb(230,234,242) | 14.81 | 4.5 | OK |
+| claro | formación / chip | rgb(15,23,42) | rgb(230,234,242) | 14.81 | 4.5 | OK |
+| oscuro | texto principal / fondo | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | texto atenuado / tarjeta | rgb(159,176,201) | rgb(19,28,46) | 7.73 | 4.5 | OK |
+| oscuro | marcador / caja del marcador | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 3 | OK |
+| oscuro | nombre equipo / marcador | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | reloj / fondo | rgb(255,255,255) | rgb(24,35,58) | 15.67 | 4.5 | OK |
+| oscuro | botón primario | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | modelos que jugaron / tablero | rgb(159,176,201) | rgb(19,28,46) | 7.73 | 4.5 | OK |
+| oscuro | cancha detenida / tablero | — | — | — | — | AUSENTE |
+| oscuro | pestaña activa | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | dorsal local / ficha | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| oscuro | dorsal visita / ficha | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| oscuro | ficha local / césped | rgb(166,214,255) | rgb(47,125,71) y rgb(42,115,65) | 3.3 | 3 | OK |
+| oscuro | anillo local / césped | rgb(11,18,32) | rgb(47,125,71) y rgb(42,115,65) | 3.23 | 3 | OK |
+| oscuro | ficha visita / césped | rgb(46,6,18) | rgb(47,125,71) y rgb(42,115,65) | 3.15 | 3 | OK |
+| oscuro | anillo visita / césped | rgb(255,255,255) | rgb(47,125,71) y rgb(42,115,65) | 5.07 | 3 | OK |
+| oscuro | balón / césped | rgb(255,255,255) | rgb(47,125,71) y rgb(42,115,65) | 5.07 | 3 | OK |
+| oscuro | líneas / césped | rgb(232,242,234) | rgb(47,125,71) y rgb(42,115,65) | 4.42 | 3 | OK |
+| oscuro | nombre mesa / tarjeta | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | rótulo narrador / tarjeta | rgb(212,255,58) | rgb(26,37,64) | 13.14 | 4.5 | OK |
+| oscuro | rótulo comentarista / tarjeta | rgb(255,154,107) | rgb(26,37,64) | 7.3 | 4.5 | OK |
+| oscuro | rótulo estadista / tarjeta | rgb(94,224,208) | rgb(26,37,64) | 9.44 | 4.5 | OK |
+| oscuro | avatar narrador | rgb(11,18,32) | rgb(212,255,58) | 16.2 | 4.5 | OK |
+| oscuro | avatar comentarista | rgb(11,18,32) | rgb(255,154,107) | 8.99 | 4.5 | OK |
+| oscuro | avatar estadista | rgb(11,18,32) | rgb(94,224,208) | 11.63 | 4.5 | OK |
+| oscuro | hora acción / tarjeta | — | — | — | — | AUSENTE |
+| oscuro | barra superior | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 4.5 | OK |
+| oscuro | enlace barra superior | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | rótulo cabecera / chip | rgb(169,184,208) | rgb(24,35,58) | 7.8 | 4.5 | OK |
+| oscuro | párrafo cabecera / banda | rgb(169,184,208) | rgb(11,18,32) | 9.32 | 4.5 | OK |
+| oscuro | pestaña inactiva / fondo | rgb(238,242,248) | rgb(19,28,46) | 15.16 | 4.5 | OK |
+| oscuro | enlace a la cancha / fondo | rgb(212,255,58) | rgb(19,28,46) | 14.73 | 4.5 | OK |
+| oscuro | estado del directo / píldora | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | enlace compartir / botón | — | — | — | — | AUSENTE |
+| oscuro | dirección local / tablero | rgb(166,214,255) | rgb(19,28,46) | 11.1 | 4.5 | OK |
+| oscuro | dirección visita / tablero | rgb(159,176,201) | rgb(19,28,46) | 7.73 | 4.5 | OK |
+| oscuro | botón fantasma / transporte | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | árbitro / ficha informativa | rgb(159,176,201) | rgb(26,37,64) | 6.89 | 4.5 | OK |
+| oscuro | instante y modo / chip | rgb(159,176,201) | rgb(31,42,68) | 6.47 | 4.5 | OK |
+| oscuro | resumen de evidencia / tarjeta | rgb(212,255,58) | rgb(26,37,64) | 13.14 | 4.5 | OK |
+| oscuro | oración mesa / tarjeta | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | estado vacío mesa / tarjeta | rgb(159,176,201) | rgb(26,37,64) | 6.89 | 4.5 | OK |
+| oscuro | estado vacío / fondo | rgb(255,255,255) | rgb(24,35,58) | 15.67 | 4.5 | OK |
+| oscuro | rótulo panel / chip | rgb(159,176,201) | rgb(31,42,68) | 6.47 | 4.5 | OK |
+| oscuro | enlace evidencia / chip | — | — | — | — | AUSENTE |
+| oscuro | resumen desplegable / panel | rgb(238,242,248) | rgb(19,28,46) | 15.16 | 4.5 | OK |
+| oscuro | rótulo de gol / fondo | — | — | — | — | AUSENTE |
+| oscuro | anillo del goleador / césped | — | — | — | — | AUSENTE |
+| oscuro | iniciales escudo local / campo | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| oscuro | iniciales escudo visita / campo | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| oscuro | silueta escudo local / marcador | rgb(166,214,255) | rgb(11,18,32) | 12.2 | 3 | OK |
+| oscuro | silueta escudo visita / marcador | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 3 | OK |
+| oscuro | anillo de selección / césped | rgb(212,255,58) | rgb(47,125,71) y rgb(42,115,65) | 4.38 | 3 | OK |
+| oscuro | anillo favorito / césped | — | — | — | — | AUSENTE |
+| oscuro | nota de equipación / tablero | — | — | — | — | AUSENTE |
+| oscuro | emblema / barra superior | rgb(212,255,58) | rgb(11,18,32) | 16.2 | 3 | OK |
+| oscuro | pastilla líder local | — | — | — | — | AUSENTE |
+| oscuro | pastilla líder visita | — | — | — | — | AUSENTE |
+| oscuro | CTA de la cabecera | rgb(255,255,255) | rgb(11,18,32) | 18.72 | 4.5 | OK |
+| oscuro | icono del feed / tarjeta | — | — | — | — | AUSENTE |
+| oscuro | icono de cifras / rótulo | — | — | — | — | AUSENTE |
+| oscuro | tarjeta amarilla de cifras / rótulo | — | — | — | — | AUSENTE |
+| oscuro | tarjeta roja de cifras / rótulo | — | — | — | — | AUSENTE |
+| oscuro | tarjeta amarilla del feed / tarjeta | — | — | — | — | AUSENTE |
+| oscuro | tarjeta roja del feed / tarjeta | — | — | — | — | AUSENTE |
+| oscuro | vista del arco: rótulo / caja | — | — | — | — | AUSENTE |
+| oscuro | vista del arco: palos / caja | — | — | — | — | AUSENTE |
+| oscuro | líneas alineación / césped tarjeta | rgb(232,242,234) | rgb(47,125,71) | 4.42 | 3 | OK |
+| oscuro | dorsal alineación local / ficha | rgb(11,18,32) | rgb(166,214,255) | 12.2 | 4.5 | OK |
+| oscuro | dorsal alineación visita / ficha | rgb(255,255,255) | rgb(46,6,18) | 18.25 | 4.5 | OK |
+| oscuro | jugador alineación / tarjeta | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | puesto alineación / tarjeta | rgb(159,176,201) | rgb(26,37,64) | 6.89 | 4.5 | OK |
+| oscuro | rasgos alineación / tarjeta | rgb(238,242,248) | rgb(26,37,64) | 13.52 | 4.5 | OK |
+| oscuro | chip de condiciones | rgb(238,242,248) | rgb(31,42,68) | 12.69 | 4.5 | OK |
+| oscuro | formación / chip | rgb(238,242,248) | rgb(31,42,68) | 12.69 | 4.5 | OK |
+
+Pares fuera de criterio (falla o ausente obligatorio): 0

@@ -47,3 +47,21 @@ el último clip en vuelo; sin invitados), B10 (dos espectadores) y A4b (habilita
 
 Pendiente: smoke con Speech real (duración por clip, caracteres de la bolsa `antesala`, segundo del saque, escucha
 de «GPT-6 Sol» y de las formaciones) y el bloque C (resaltado).
+
+## Bloque C · Resaltado sincronizado (24 oct 2026)
+
+Mientras suena cada clip de la antesala, la tarjeta de alineaciones marca la línea que se nombra (`data-speaking` en
+las fichas y en las filas de esos jugadores; en el artículo del equipo durante la cabecera; en el DT si el clip lo
+nombró) y la tira «En voz» / «On air» muestra el perfil previo de esos jugadores: dorsal, nombre, puesto, nivel y,
+si el registro lo trae, perfil, temperamento, rol natural y capitanía, con la nota «Perfil previo: índices sintéticos
+del registro; aún no hay estadísticas de juego». La sincronía es por clip (Speech REST no da marcas por palabra); el
+foco sale de la pieza efectiva y vuelve a null en cada hueco, espera y final.
+
+- `resaltado-atras-{en,es}-{claro,oscuro}-{1440,360}.png`: la tarjeta durante el clip de «atrás» local (B11,
+  `CAPTURAS_058=1`). B11 mide además, sobre estilos calculados, el contraste de la tira (nombre 17,85 / 15,16;
+  nota 6,63 / 7,73), del contorno de la fila (5,93 / 13,14, con `--accent`) y del aro de la ficha sobre el césped
+  (4,38), en claro / oscuro, y que cada fila de la tira mide ≥ 44 px sin desborde a 360 px.
+- `contraste-058.txt`: `contraste.mjs` contra el build local en el tick 0 (`--previa --cargar=ejemplo-v3`): 0 pares
+  fuera de criterio y la regla 047 sin violaciones.
+- B1 comprueba, a mitad de cada clip, el resaltado exacto contra `jugadoresDelBloque` (botones y fichas), el artículo
+  en la cabecera y el rótulo de la tira; y a mitad de cada hueco, que no hay foco.
