@@ -62,7 +62,7 @@ export function ArenaPlantilla({ estado, registro, seleccionado, seleccionar, id
         <dl className="arena-player-metrics"><div><dt>{t("Ability", "Nivel")}</dt><dd>{j.nivel}<small>/100</small></dd></div><div><dt>{t("Current energy", "Energía actual")}</dt><dd>{Math.round(j.energia * 100)}<small>%</small></dd></div></dl>
         {/* Brief 063 § 9.1: los seis atributos de `registro.config.atributos` (reinicios-v7); sin ellos, la nota de grabación anterior. */}
         {registro.config.atributos?.[j.id] ? <section className="arena-player-attributes" data-testid="arena-player-attributes" aria-label={t("Player attributes", "Atributos del jugador")}>
-          <h4 className="overline">{t("Attributes", "Atributos")}</h4>
+          <p className="overline">{t("Attributes", "Atributos")}</p>
           <div className="arena-traits">{atributosJugador.map(a => <div className="arena-trait" key={a} data-atributo={a}>
             <label htmlFor={`atributo-${j.id}-${a}`}>{ATRIBUTOS_ARENA.etiquetas[idioma][a]}<span className="tnum">{registro.config.atributos![j.id]![a]}</span></label><meter id={`atributo-${j.id}-${a}`} min="0" max="100" value={registro.config.atributos![j.id]![a]} />
           </div>)}</div>

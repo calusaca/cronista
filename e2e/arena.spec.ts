@@ -4,7 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { crearSesion } from "./sesiones";
 import { contextoNarradorArena } from "../src/arena/narrador";
 import { construirRelato } from "../src/arena/relato";
-import type { RegistroArena } from "../src/arena/tipos";
+import { atributosJugador, type RegistroArena } from "../src/arena/tipos";
 
 async function guardados(page: Page) {
   await page.getByRole("button", { name: "Saved matches", exact: true }).click();
@@ -251,7 +251,10 @@ test("arena: móvil oscuro, español y movimiento reducido sin desborde", async 
   await expect(page.getByTestId("arena-player")).toHaveCount(22);
   await expect(page.getByTestId("arena-referee")).toHaveCount(1);
   await page.getByTestId("arena-roster-person").last().click();
-  await expect(page.getByTestId("arena-player-card").getByRole("meter")).toHaveCount(9);
+  // Brief 063 § 13: la página abre un partido nuevo (reinicios-v7, con atributos): nueve rasgos de personalidad más
+  // los seis atributos de config.atributos.
+  await expect(page.getByTestId("arena-player-card").getByRole("meter")).toHaveCount(9 + atributosJugador.length);
+  await expect(page.getByTestId("arena-player-attributes").getByRole("meter")).toHaveCount(atributosJugador.length);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   await page.screenshot({ path: ".cache/arena-v3-movil.png", fullPage: true });
 });
@@ -285,7 +288,10 @@ test("arena: perfiles, capitanes y selección accesible desde la cancha y la pla
   await expect(destino).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("arena-player-card").getByRole("heading")).toContainText(nombre);
   await expect(page.getByTestId("arena-roster-person").first()).toHaveAttribute("data-person", /^visita-/);
-  await expect(page.getByTestId("arena-player-card").getByRole("meter")).toHaveCount(9);
+  // Brief 063 § 13: la página abre un partido nuevo (reinicios-v7, con atributos): nueve rasgos de personalidad más
+  // los seis atributos de config.atributos.
+  await expect(page.getByTestId("arena-player-card").getByRole("meter")).toHaveCount(9 + atributosJugador.length);
+  await expect(page.getByTestId("arena-player-attributes").getByRole("meter")).toHaveCount(atributosJugador.length);
   await page.getByTestId("arena-roster-person").first().click();
   const primerId = await page.getByTestId("arena-roster-person").first().getAttribute("data-person");
   await expect(page.locator(`[data-player="${primerId}"]`)).toHaveAttribute("aria-pressed", "true");
