@@ -2,7 +2,7 @@
 
 import { etiquetasEntrenador } from "../arena/entrenadores";
 import { efectosEntorno, resumir } from "../arena/entorno";
-import { ARENA, IDENTIDAD_ARENA, TECNICA_ARENA } from "../sim/limites";
+import { ARENA, ESTILO_JUEGO_ARENA, IDENTIDAD_ARENA, TECNICA_ARENA } from "../sim/limites";
 import type { IdentidadPartido } from "../arena/identidad";
 import { Escudo } from "./Escudo";
 import { explicarMotivo } from "../arena/vista";
@@ -50,6 +50,8 @@ export function ArenaContexto({ registro, estado, idioma, seleccionar, saltar, i
       const pendientes = paresSustitucion(s.pendiente).map(p => `${nombreDe(p.entra)} ↑ · ${nombreDe(p.sale)} ↓`).join(" · ");
       return <article className="arena-coach" key={lado} data-testid={`arena-coach-${lado}`}>
         <p className="overline">{identidad && <Escudo identidad={identidad[lado]} size={IDENTIDAD_ARENA.escudoPx.entrenador} />}{registro.config.partido[lado].nombre}</p><h3>{e.nombre}</h3><p className="arena-coach-profile">{etiquetasEntrenador[e.perfil][idioma]}</p>
+        {/* Brief 063 § 9.3 (reinicios-v8): la identidad del club, que se suma al plan de este entrenador. */}
+        {registro.config.estilosJuego && <p className="arena-coach-identity" data-testid="arena-coach-identity" data-estilo={registro.config.estilosJuego[lado]}>{t("Club identity", "Identidad del club")}: {ESTILO_JUEGO_ARENA.etiquetas[idioma][registro.config.estilosJuego[lado]]}</p>}
         <dl className="arena-factors"><div><dt>{t("Formation", "Formación")}</dt><dd>{s.formacion}</dd></div><div><dt>{t("Intent", "Intención")}</dt><dd>{mentalidades[s.plan.mentalidad]}</dd></div><div><dt>{t("Block / pace", "Bloque / ritmo")}</dt><dd>{bloques[s.plan.bloque]} · {ritmos[s.plan.ritmo]}</dd></div><div><dt>{t("Substitutions / windows", "Cambios / ventanas")}</dt><dd>{s.cambios}/{TECNICA_ARENA.maxCambios} · {s.ventanas}/{TECNICA_ARENA.maxVentanas}</dd></div></dl>
         <p className="arena-muted">{t("Style", "Estilo")}: {t("Attack", "Ataque")} {e.ofensiva} · {t("Risk", "Riesgo")} {e.riesgo} · {t("Adaptability", "Adaptabilidad")} {e.adaptabilidad}</p>
         <div className="arena-coach-mood"><span>{t("Confidence", "Confianza")} <strong>{s.confianza}</strong></span><span>{t("Frustration", "Frustración")} <strong>{s.frustracion}</strong></span><span>{t("Urgency", "Urgencia")} <strong>{s.urgencia}</strong></span></div>

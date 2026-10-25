@@ -2,11 +2,13 @@
 // (reinicios-v6): la línea de un puesto (§ 4.6), que usan el repliegue y la persecución. Publicación 2
 // (reinicios-v7): los seis atributos de jugador (§ 4.4), su rasgo distintivo (§ 9.1) y las funciones de efecto
 // de § 7.1, centradas: con el atributo en ATRIBUTOS_ARENA.neutro cada una vale exactamente 1 (o 0 en el duelo).
+// Publicación 3 (reinicios-v8): la identidad de juego del club (§ 4.5), derivada del nombre normalizado.
 // Las cifras salen de ATRIBUTOS_ARENA; no consume el azar del generador histórico.
 import { ATRIBUTOS_ARENA as AT } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import type { Posicion } from "../sim/tipos";
-import { atributosJugador, type AtributoJugador, type AtributosJugador, type LineaArena, type PerfilJugador } from "./tipos";
+import { claveClub } from "./identidad";
+import { atributosJugador, estilosJuego, type AtributoJugador, type AtributosJugador, type EstiloJuego, type LineaArena, type PerfilJugador } from "./tipos";
 
 /** Línea del puesto ACTUAL (un medio natural que juega de extremo persigue como delantero). */
 export function lineaDePuesto(puesto: string): LineaArena {
@@ -54,3 +56,10 @@ export const ajusteDuelo = (entradaDefensor: number, aguantePortador: number): n
 export const factorErrorPase = (vision: number): number => 1 - AT.visionError * efectoAtributo(vision);
 /** Potencia: factor de la velocidad del remate del autor (y del tiempo de reacción del portero). */
 export const factorPotencia = (potencia: number): number => 1 + AT.potenciaVelocidad * efectoAtributo(potencia);
+
+/** § 4.5 · Identidad de juego del club: PRNG `estilo-juego:arena-v8:{claveClub(nombre)}` con ATRIBUTOS_ARENA.semilla,
+ * una extracción `pick` entre `estilosJuego`. Solo depende del nombre normalizado (como la equipación del 055): el
+ * mismo club tiene la misma identidad en todos sus partidos, con cualquier semilla, lado o entrenador. */
+export function estiloJuegoDe(nombre: string): EstiloJuego {
+  return prngDerivado(AT.semilla, `estilo-juego:arena-v8:${claveClub(nombre)}`).pick(estilosJuego);
+}

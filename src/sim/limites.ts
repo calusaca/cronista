@@ -484,8 +484,9 @@ export const ARENA = {
    * Brief 046: reinicios-v4 (portero con el balón en las manos, salida a achicar y centros).
    * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel).
    * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida).
-   * Brief 063 (publicación 2): reinicios-v7 (atributos de jugador, balones largos y remates lejanos). */
-  reglas: "reinicios-v7",
+   * Brief 063 (publicación 2): reinicios-v7 (atributos de jugador, balones largos y remates lejanos).
+   * Brief 063 (publicación 3): reinicios-v8 (identidad de juego del club). */
+  reglas: "reinicios-v8",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -782,6 +783,37 @@ export const LARGO_ARENA = {
     errorM: 3, errorVisionBase: 1.5 },
 } as const;
 
+/** Brief 063 · Bloque D (reinicios-v8): identidad de juego del club, derivada del nombre normalizado (`estiloJuegoDe`,
+ * PRNG `estilo-juego:arena-v8:{clave}` con ATRIBUTOS_ARENA.semilla) y guardada en `config.estilosJuego`. Cifras del
+ * prototipo del 24 oct (docs/evidencia/motor-063). Efectos, todos del lado de esa identidad:
+ *   - bloqueM (m): se suma a ARENA.alturaBloqueM[bloque] en el destino sin balón;
+ *   - persecucion: factor de la duración de la persecución tras pérdida; extra (0 o 1): un perseguidor de apoyo;
+ *   - repliegue: suma al máximo del repliegue de emergencia (PERSECUCION_ARENA.repliegue.max) del lado que defiende;
+ *   - largo: divisor de la penalización por distancia del balón largo local; umbralLargo: suma al umbral de visión
+ *     (LARGO_ARENA.pase.visionMin) del balón largo local;
+ *   - lejano: factor de la probabilidad del remate lejano local; umbralLejano: suma al umbral de potencia
+ *     (LARGO_ARENA.remate.potenciaMin) del remate lejano local.
+ * Las órdenes `pasar` y `tirar` del LLM no los usan (§ 8.1 y § 8.2: «por su cuenta»). */
+export const ESTILO_JUEGO_ARENA = {
+  efectos: {
+    defensivo:   { bloqueM: -5, persecucion: 0.8,  extra: 0, repliegue: 1,  largo: 1.2, lejano: 0.8,  umbralLargo: -5,  umbralLejano: 5 },
+    ofensivo:    { bloqueM: 3,  persecucion: 1.15, extra: 0, repliegue: -1, largo: 1,   lejano: 1.25, umbralLargo: 0,   umbralLejano: -10 },
+    posesion:    { bloqueM: 0,  persecucion: 1.15, extra: 1, repliegue: 0,  largo: 0.6, lejano: 0.8,  umbralLargo: 20,  umbralLejano: 10 },
+    contragolpe: { bloqueM: -3, persecucion: 0.9,  extra: 0, repliegue: 1,  largo: 1.5, lejano: 1,    umbralLargo: -10, umbralLejano: 0 },
+    directo:     { bloqueM: 0,  persecucion: 1,    extra: 0, repliegue: 0,  largo: 1.5, lejano: 1.2,  umbralLargo: -15, umbralLejano: -10 },
+    presion:     { bloqueM: 5,  persecucion: 1.3,  extra: 1, repliegue: 0,  largo: 1,   lejano: 1,    umbralLargo: 0,   umbralLejano: 0 },
+  },
+  /** § 9.3 · Textos de la tarjeta de alineaciones y de la del entrenador. */
+  etiquetas: {
+    es: { defensivo: "Defensivo", ofensivo: "Ofensivo", posesion: "Posesión", contragolpe: "Contragolpe", directo: "Juego directo", presion: "Presión alta" },
+    en: { defensivo: "Defensive", ofensivo: "Attacking", posesion: "Possession", contragolpe: "Counter-attacking", directo: "Direct play", presion: "High press" },
+  },
+  descripciones: {
+    es: { defensivo: "Bloque más bajo y repliegue con más jugadores.", ofensivo: "Bloque más alto, más remates lejanos y menos repliegue.", posesion: "Pocos balones largos; tras perderlo presiona un jugador más.", contragolpe: "Bloque bajo y más balones largos al espacio.", directo: "Muchos balones largos y remates lejanos.", presion: "Bloque alto y persecución más larga tras perderlo; un jugador más presiona." },
+    en: { defensivo: "Deeper block and more players tracking back.", ofensivo: "Higher block, more long-range shots, fewer players tracking back.", posesion: "Few long balls; one extra player presses after losing it.", contragolpe: "Deep block and more long balls into space.", directo: "Many long balls and long-range shots.", presion: "High block and longer chase after losing it; one extra presser." },
+  },
+} as const;
+
 /**
  * Brief 063 · Métricas de lote del bloque A (`src/arena/metricas-lote.ts`, en la misma pasada que las del
  * 046 y el 051: programados, LOTE_ARENA_046.duracionS, todos los ticks; denominador cero = «sin muestra»,
@@ -840,6 +872,19 @@ export const LOTE_ARENA_063 = {
   sobreUmbral: {
     vision: { bajo: 60, alto: 90, cocienteMax: 0.95 },
     potencia: { bajo: 65, alto: 90, cocienteMax: 0.985 },
+  },
+  /** Bloque D (§ 11.2): versión desde la que existe la identidad de juego (`config.estilosJuego`). */
+  desdeD: "reinicios-v8",
+  /** § 11.2 · Experimento controlado de identidad (v8, `completo.semillas` desde `completo.semillaDesde`): la identidad
+   * del `local` forzada; diferencia mínima `alto` − `bajo` de su métrica, medida solo en el `local`:
+   *   - xSinBalon: x orientada media de los de campo con el balón en poder del rival, fuera de pausa (m);
+   *   - largos: balones largos por partido; lejanos: remates lejanos por partido;
+   *   - persecucionS: segundos por partido con una persecución del `local` activa. */
+  identidad: {
+    xSinBalon: { alto: "presion", bajo: "defensivo", min: 3 },
+    largos: { alto: "directo", bajo: "posesion", min: 0.6 },
+    lejanos: { alto: "ofensivo", bajo: "posesion", min: 0.2 },
+    persecucionS: { alto: "presion", bajo: "defensivo", min: 1 },
   },
 } as const;
 
@@ -1517,6 +1562,8 @@ export const TORNEO_SITIO = {
    * grande medida (tick 0 con banco) pasa de 16,8 a ≈ 19,5 KB (×1,16); el factor cubre la petición completa con un 10 %
    * de margen de tokens (la prueba exige factor ≥ 1,1 × el mayor cociente de caracteres v7/v5, semillas 1–50). v1.2 § 18.2:
    * 1,3 no bastaba (mayor cociente medido de la petición completa 1,1924 → 1,1 × 1,1924 = 1,3117); se sube a 1,32 y los
-   * dos formatos siguen cabiendo en su tope. */
-  factorObservacion063: 1.32,
+   * dos formatos siguen cabiendo en su tope. Publicación 3 (reinicios-v8, § 18.2): la petición lleva además
+   * `equipos[lado].estiloJuego` y frasesIdentidad(); mayor cociente medido 1,2143 (v8/v5; v7/v5 1,2050 con el sistema
+   * nuevo) → 1,1 × 1,2143 = 1,3357; se sube a 1,34 y se rehace la comprobación de topes (la prueba la repite). */
+  factorObservacion063: 1.34,
 } as const;

@@ -3,12 +3,13 @@
 // Brief 063: las bandas del bloque A (LOTE_ARENA_063, desde reinicios-v6) y, con --escenas, la lista por
 // semilla de los episodios superados con repliegue y de cada persecución (en segundos), para el smoke. Desde
 // reinicios-v7, las bandas de los bloques B y C (con la recalibración del 046), los balones largos y remates lejanos
-// en --escenas y, con --atributos, el experimento controlado de atributos (§ 11.2 y v1.2 § 18.3).
-// `node --import tsx src/arena/metricas-lote-cli.ts --desde 1 --semillas 100 [--reglas reinicios-v4] [--controlado] [--atributos] [--escenas] [--salida archivo.json]`
+// en --escenas y, con --atributos, el experimento controlado de atributos (§ 11.2 y v1.2 § 18.3). Desde reinicios-v8,
+// las identidades de juego en --escenas y, con --identidad, el experimento controlado de identidad (§ 11.2).
+// `node --import tsx src/arena/metricas-lote-cli.ts --desde 1 --semillas 100 [--reglas reinicios-v4] [--controlado] [--atributos] [--identidad] [--escenas] [--salida archivo.json]`
 import { execFileSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63 } from "../sim/limites";
-import { bandasLote, escenasLote, incumplimientos, incumplimientos063, incumplimientosBC, incumplimientosControlado, incumplimientosControladoAtributos, medirControlado, medirControladoAtributo, medirLote } from "./metricas-lote";
+import { bandasLote, escenasLote, incumplimientos, incumplimientos063, incumplimientosBC, incumplimientosControlado, incumplimientosControladoAtributos, incumplimientosIdentidad, medirControlado, medirControladoAtributo, medirControladoIdentidad, medirLote } from "./metricas-lote";
 import { atributosJugador, reglasArena, type ReglasArena } from "./tipos";
 
 const arg = (nombre: string) => { const i = process.argv.indexOf(`--${nombre}`); return i > 0 ? process.argv[i + 1] : undefined; };
@@ -30,6 +31,7 @@ if (process.argv.includes("--escenas")) {
     persecuciones: e.persecuciones.map(x => ({ jugador: x.jugador, linea: x.linea, desdeS: s(x.desdeTick), hastaS: s(x.hastaTick) })),
     ...(e.largos.length || e.lejanos.length ? { largos: e.largos.map(x => ({ s: s(x.tick), jugador: x.jugador, receptor: x.receptor, metros: x.metros, exito: x.exito })),
       lejanos: e.lejanos.map(x => ({ s: s(x.tick), jugador: x.jugador, metros: x.metros, desenlace: x.desenlace })) } : {}),
+    ...(e.identidades ? { identidades: e.identidades } : {}),
   }));
   escribir({ ...metadatos(), duracionS: L.duracionS, controladores: "programado:geometria-v3 (ambos lados)", escenas });
 } else {
@@ -58,10 +60,16 @@ if (process.argv.includes("--escenas")) {
     }
     atributos = { valores: L63.controlado.valores, sobreUmbral: L63.sobreUmbral, diferencias, cocientes, incumplimientos: incumplimientosControladoAtributos({ diferencias, cocientes }), detalle };
   }
+  let identidad: Record<string, unknown> | undefined;
+  if (process.argv.includes("--identidad")) {
+    const r = await medirControladoIdentidad({ desde, semillas, reglas });
+    identidad = { bandas: L63.identidad, diferencias: r.diferencias, incumplimientos: incumplimientosIdentidad(r.diferencias),
+      porIdentidad: Object.fromEntries(Object.entries(r.lotes).map(([k, m]) => [k, { local: m!.local063, goles: m!.golesPorPartido }])) };
+  }
   escribir({
     ...metadatos(), duracionS: metricas.duracionS,
     controladores: "programado:geometria-v3 (ambos lados)", banda: rapido ? "rapido" : "completo",
     incumplimientos: [...incumplimientos(metricas, banda, banda051), ...(b063 ? incumplimientos063(metricas, b063) : []), ...(bBC ? incumplimientosBC(metricas, bBC) : [])], segundos: Math.round((performance.now() - inicio) / 100) / 10,
-    ...(experimento ? { controlado: experimento } : {}), ...(atributos ? { controladoAtributos: atributos } : {}), metricas,
+    ...(experimento ? { controlado: experimento } : {}), ...(atributos ? { controladoAtributos: atributos } : {}), ...(identidad ? { controladoIdentidad: identidad } : {}), metricas,
   });
 }

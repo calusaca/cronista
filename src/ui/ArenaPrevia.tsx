@@ -9,7 +9,7 @@ import type { IdentidadPartido } from "../arena/identidad";
 import { etiquetasPerfil, etiquetaTemperamento } from "../arena/personalidades";
 import type { FocoAntesala } from "../arena/antesala";
 import { claveSuperficie, GEOMETRIA_PREVIA, mayusculaInicial, type PreviaVisual } from "../arena/previa";
-import { ANTESALA_ARENA, ARENA, ATRIBUTOS_ARENA, IDENTIDAD_ARENA, PREVIA_ARENA } from "../sim/limites";
+import { ANTESALA_ARENA, ARENA, ATRIBUTOS_ARENA, ESTILO_JUEGO_ARENA, IDENTIDAD_ARENA, PREVIA_ARENA } from "../sim/limites";
 import { rasgoDistintivo } from "../arena/atributos";
 import { Escudo } from "./Escudo";
 
@@ -107,6 +107,15 @@ export function ArenaPrevia({ previa, identidad, idioma, plegada, alternar, sele
         const e = previa.equipos[lado];
         return <article className={`arena-lineup arena-${lado}`} data-testid="arena-lineup" data-side={lado} key={lado} data-speaking={foco?.lado === lado && foco.bloque === "cabecera" || undefined}>
           <div className="arena-lineup-head"><Escudo identidad={identidad[lado]} size={IDENTIDAD_ARENA.escudoPx.plan} /><h3>{e.nombre}</h3><span className="arena-lineup-shape tnum">{e.formacion}</span></div>
+          {/* Brief 063 § 9.3 (reinicios-v8): la identidad de juego del club, de `config.estilosJuego`; la descripción es texto
+              legible en un <details>, no solo un title. */}
+          {e.estiloJuego && <div className="arena-lineup-identity">
+            <p className="arena-lineup-identity-pill"><span className="arena-lineup-chip" data-testid="arena-lineup-identity" data-estilo={e.estiloJuego}>{t("Identity", "Identidad")}: {ESTILO_JUEGO_ARENA.etiquetas[idioma][e.estiloJuego]}</span></p>
+            <details className="arena-lineup-identity-details" data-testid="arena-lineup-identity-details"><summary>{t("What this identity changes", "Qué cambia esta identidad")}</summary>
+              <p>{ESTILO_JUEGO_ARENA.descripciones[idioma][e.estiloJuego]}</p>
+              <p className="arena-muted">{t("Derived from the club name, so it is the same in every match. It adds to the coach's plan and to the simulator's style, which may contradict it.", "Se deriva del nombre del club, así que es la misma en todos sus partidos. Se suma al plan del entrenador y al estilo del simulador, que pueden contradecirla.")}</p>
+            </details>
+          </div>}
           <MediaCancha equipo={e} enVoz={foco?.lado === lado ? enVoz : new Set()} />
           <ol className="arena-lineup-list">{e.puestos.map(p => <li key={p.jugador.id}>
             <button type="button" className="arena-lineup-player" data-testid="arena-lineup-player" data-lineup-player={p.jugador.id} data-speaking={foco?.lado === lado && enVoz.has(p.jugador.id) || undefined} aria-pressed={seleccionado === p.jugador.id} onClick={() => seleccionar(p.jugador.id)}>

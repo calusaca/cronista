@@ -1,7 +1,7 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -18,11 +18,11 @@ import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
 import { despejeManos, destinoSalida, enAreaPropia, limitarAreaPropia, manoAMano, radioAtajada, respetarManos, saqueAdmisible, saqueForzado, ticksManos } from "./portero";
 import { alcancePortero, balonCercaDelArco, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, REMATE_NEUTRO, velocidadRemate } from "./remate";
-import { ajusteDuelo, atributosDe, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax } from "./atributos";
+import { ajusteDuelo, atributosDe, estiloJuegoDe, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax } from "./atributos";
 import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "./largo";
-import { destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, perseguidoresDe, seleccionRepliegue } from "./persecucion";
+import { apoyoPersecucion, destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, perseguidoresDe, seleccionRepliegue, superadoPor } from "./persecucion";
 import { conduccionPorDefecto, destinosLlegada, enZonaCentro, limitarConduccion, lineaFueraDeJuego, opcionCentro, puedeCentrar, receptorCentro } from "./ataque";
-import { atributosJugador, formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type AtributosJugador, type ConfigArena, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
+import { atributosJugador, estilosJuego, formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type AtributosJugador, type ConfigArena, type EstiloJuego, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
 
 export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones>; reglas?: ReglasArena } = {}): ConfigArena {
   const version = opciones.version ?? ARENA.version;
@@ -54,8 +54,14 @@ export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig;
   };
   // Brief 063 § 4.3 (reinicios-v7): los atributos de toda la plantilla de arena de los dos lados, una sola vez.
   if (reglasDesde(config, "reinicios-v7")) config.atributos = atributosPlantillas(partido);
+  // Brief 063 § 4.3 (reinicios-v8): la identidad de juego de cada club, derivada de su nombre.
+  if (reglasDesde(config, "reinicios-v8")) config.estilosJuego = estilosPartido(partido);
   validarConfigArena(config);
   return config;
+}
+/** Brief 063 § 4.3 · `estiloJuegoDe` del nombre de cada club. */
+export function estilosPartido(partido: SimConfig): Record<Lado, EstiloJuego> {
+  return { local: estiloJuegoDe(partido.local.nombre), visita: estiloJuegoDe(partido.visita.nombre) };
 }
 /** Brief 063 § 4.3 · `atributosDe` para cada jugador de `plantillaArena(partido, lado, true)` de los dos lados. */
 export function atributosPlantillas(partido: SimConfig): Record<string, AtributosJugador> {
@@ -64,13 +70,15 @@ export function atributosPlantillas(partido: SimConfig): Record<string, Atributo
 export function validarConfigArena(config: ConfigArena): void {
   if (config.version !== undefined && ![ARENA.version, ARENA.versionPersonalidades, ARENA.versionLegado].includes(config.version)) throw new Error("Versión de motor de arena desconocida");
   if (config.reglas !== undefined && (!(reglasArena as readonly string[]).includes(config.reglas) || config.version !== ARENA.version)) throw new Error("Reglas de reinicio desconocidas");
-  // Brief 063 § 4.3: los atributos existen si y solo si las reglas son ≥ reinicios-v7; la identidad de juego
-  // (reinicios-v8) no existe todavía en ninguna versión publicada y se rechaza.
+  // Brief 063 § 4.3: los atributos existen si y solo si las reglas son ≥ reinicios-v7; la identidad de juego, si y
+  // solo si son ≥ reinicios-v8.
   const extra = config as unknown as Record<string, unknown>;
-  const v7 = reglasDesde(config, "reinicios-v7");
+  const v7 = reglasDesde(config, "reinicios-v7"), v8 = reglasDesde(config, "reinicios-v8");
   if (extra.atributos !== undefined && !v7) throw new Error("Atributos fuera de su versión");
   if (extra.atributos === undefined && v7) throw new Error("Faltan los atributos de jugador");
-  if (extra.estilosJuego !== undefined) throw new Error("Identidad de juego fuera de su versión");
+  if (extra.estilosJuego !== undefined && !v8) throw new Error("Identidad de juego fuera de su versión");
+  if (extra.estilosJuego === undefined && v8) throw new Error("Falta la identidad de juego");
+  if (v8) z.strictObject({ local: z.enum(estilosJuego), visita: z.enum(estilosJuego) }).parse(extra.estilosJuego);
   validarConfig(config.partido);
   if (v7) {
     const valor = z.number().int().min(AT.min).max(AT.max);
@@ -161,6 +169,8 @@ export function datosEquipos(config: ConfigArena, estado?: EstadoArena): Observa
     ...(config.entrenadores ? { entrenador: config.entrenadores[lado] } : {}),
     // Brief 063 § 4.3 (reinicios-v7): solo los IDs de ese lado (titulares y banco).
     ...(config.atributos ? { atributos: Object.fromEntries(Object.entries(config.atributos).filter(([id]) => id.startsWith(`${lado}-`))) } : {}),
+    // Brief 063 § 4.3 (reinicios-v8): la identidad de juego de ese club.
+    ...(config.estilosJuego ? { estiloJuego: config.estilosJuego[lado] } : {}),
   }])) as ObservacionArena["equipos"];
 }
 
@@ -197,8 +207,12 @@ export class MotorArena {
   /** Todo el comportamiento de los bloques B y C del brief 063 (atributos, remate lejano, portero a la
    * trayectoria y balón largo) vive tras esta condición. */
   private get v7() { return reglasDesde(this.config, "reinicios-v7"); }
+  /** Todo el comportamiento del bloque D del brief 063 (identidad de juego del club) vive tras esta condición. */
+  private get v8() { return reglasDesde(this.config, "reinicios-v8"); }
   /** Brief 063 § 4.2: los atributos guardados en la configuración (bajo v7; undefined en otro caso). */
   private atributos(id: string): AtributosJugador | undefined { return this.v7 ? this.config.atributos?.[id] : undefined; }
+  /** Brief 063 § 9.2: la identidad de juego guardada en la configuración (bajo v8; undefined en otro caso). */
+  private estiloJuego(lado: Lado): EstiloJuego | undefined { return this.v8 ? this.config.estilosJuego?.[lado] : undefined; }
   constructor(readonly config: ConfigArena, inicial: EstadoArena = crearEstadoArena(config)) {
     validarConfigArena(config);
     this.estado = structuredClone(inicial);
@@ -385,9 +399,11 @@ export class MotorArena {
     if ((usarOrden && orden.accion === "tirar" && !tirarImposible) || tiroLocal) {
       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
     }
-    // Brief 063 § 8.1 (v7): remate lejano local, tras `tiroLocal` falso y sin acción explícita, antes del centro.
-    if (v7 && !accionExplicita && puedeRematarLejos(j, a7, this.estado)
-      && prngDerivado(this.config.partido.seed, `arena:lejano:${this.estado.tick}:${j.id}`).chance(Math.min(1, probabilidadLejano(j.personalidad?.remate ?? REMATE_NEUTRO, a7!.potencia)))) {
+    // Brief 063 § 8.1 (v7): remate lejano local, tras `tiroLocal` falso y sin acción explícita, antes del centro. Bloque D
+    // (v8): el umbral de potencia y la probabilidad según la identidad del club.
+    const estilo = this.estiloJuego(j.lado);
+    if (v7 && !accionExplicita && puedeRematarLejos(j, a7, this.estado, estilo)
+      && prngDerivado(this.config.partido.seed, `arena:lejano:${this.estado.tick}:${j.id}`).chance(Math.min(1, probabilidadLejano(j.personalidad?.remate ?? REMATE_NEUTRO, a7!.potencia, estilo)))) {
       this.sacarBalon(j, "tiro", arco, null); ejecutadas.add(j.id); return;
     }
     if (this.v4 && usarOrden && orden.accion === "centrar") { this.centrarOrden(j, orden, ejecutadas); return; }
@@ -402,7 +418,8 @@ export class MotorArena {
       this.sacarBalon(j, "pase", this.destinoPase(j, receptorOrden!), receptorOrden!.id, { motivo: "largo", aereo: true }); ejecutadas.add(j.id); return;
     }
     if (v7 && !(usarOrden && orden.accion === "pasar" && !pasarImposible) && !prefiereConducir(j) && j.puesto !== "POR") {
-      const largo = opcionPaseLargo(j, a7, this.estado);
+      // Bloque D (v8): el umbral de visión y la penalización por distancia según la identidad del club.
+      const largo = opcionPaseLargo(j, a7, this.estado, estilo);
       if (largo && largo.puntuacion > ((candidatosLocal ?? evaluarPases(j, this.observar(j.lado)))[0]?.puntuacion ?? -Infinity)) {
         this.sacarBalon(j, "pase", largo.destino, largo.receptor.id, { motivo: "largo", aereo: true }); ejecutadas.add(j.id); return;
       }
@@ -479,9 +496,17 @@ export class MotorArena {
     const v7 = this.v7;
     const v6 = this.v6, enJuego = !this.estado.saque && !(this.estado.pausa && this.estado.tick < this.estado.pausa.hastaTick);
     if (v6 && this.estado.persecucion && this.estado.tick >= this.estado.persecucion.hastaTick) this.estado.persecucion = null;
-    const repliegue = new Set(v6 && enJuego ? seleccionRepliegue(this.estado, perseguidores).map(j => j.id) : []);
+    // Bloque D (v8): la identidad del lado que defiende suma al máximo del repliegue.
+    const superado = this.v8 && v6 && enJuego ? superadoPor(this.estado) : null;
+    const estiloDefensa = superado ? this.estiloJuego(rival(superado.lado)) : undefined;
+    const repliegue = new Set(v6 && enJuego ? seleccionRepliegue(this.estado, perseguidores, estiloDefensa ? EJ.efectos[estiloDefensa].repliegue : 0).map(j => j.id) : []);
     const persecucion = v6 && enJuego ? this.estado.persecucion : null, persiguen = new Set<string>();
-    if (persecucion && ladoBalon !== persecucion.lado && antes.some(j => j.id === persecucion.jugador)) persiguen.add(persecucion.jugador);
+    if (persecucion && ladoBalon !== persecucion.lado && antes.some(j => j.id === persecucion.jugador)) {
+      persiguen.add(persecucion.jugador);
+      // Bloque D (v8): una identidad con `extra` añade un perseguidor de apoyo (el más cercano al balón).
+      const estiloPersigue = this.estiloJuego(persecucion.lado), apoyo = estiloPersigue && EJ.efectos[estiloPersigue].extra ? apoyoPersecucion(antes, balon.posicion, persecucion, perseguidores) : undefined;
+      if (apoyo) persiguen.add(apoyo.id);
+    }
     for (const j of this.estado.jugadores) {
       const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
       let destino = { ...orden.destino };
@@ -489,7 +514,9 @@ export class MotorArena {
       if (j.puesto !== "POR") {
         const nominal = transformar(destino, j.lado);
         nominal.y = ARENA.anchoM / 2 + (nominal.y - ARENA.anchoM / 2) * ARENA.amplitud[planes[j.lado].amplitud];
-        if (ladoBalon !== j.lado) nominal.x += ARENA.alturaBloqueM[planes[j.lado].bloque];
+        // Bloque D (v8): la identidad del club se suma a la altura del bloque del plan.
+        const estiloBloque = this.estiloJuego(j.lado);
+        if (ladoBalon !== j.lado) nominal.x += estiloBloque ? ARENA.alturaBloqueM[planes[j.lado].bloque] + EJ.efectos[estiloBloque].bloqueM : ARENA.alturaBloqueM[planes[j.lado].bloque];
         destino = enCancha(transformar(nominal, j.lado));
       }
       const llega = llegada?.get(j.id);
@@ -718,7 +745,8 @@ export class MotorArena {
     const id = perdedorDuelo?.id ?? (vuelo && (vuelo.tipo === "pase" || vuelo.tipo === "tiro") && vuelo.lado !== j.lado ? vuelo.autor : ultimoToque && ultimoToque.lado !== j.lado ? ultimoToque.jugador : undefined);
     const perdedor = id === undefined ? undefined : this.estado.jugadores.find(p => p.id === id);
     if (!perdedor || perdedor.lado === j.lado || perdedor.puesto === "POR") return;
-    const segundos = duracionPersecucionS(perdedor, this.estado.entrenadores?.[perdedor.lado].plan.bloque);
+    // Bloque D (v8): el factor de la identidad del club del perdedor.
+    const segundos = duracionPersecucionS(perdedor, this.estado.entrenadores?.[perdedor.lado].plan.bloque, this.estiloJuego(perdedor.lado));
     this.estado.persecucion = { jugador: perdedor.id, lado: perdedor.lado, desdeTick: this.estado.tick, hastaTick: hastaTickPersecucion(this.estado.tick, segundos) };
   }
   /** Nivel con el que actúa un jugador: el efectivo por puesto con entrenadores, si no el nominal. */

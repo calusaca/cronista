@@ -3240,6 +3240,13 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-lineup-player .arena-muted { font-size: 12px; }
 .arena-lineup-coach, .arena-lineup-traits { margin: var(--ar-s2) 0 0; font-size: 14px; overflow-wrap: anywhere; }
 .arena-lineup-coach .overline, .arena-lineup-traits .overline { margin-inline-end: var(--ar-s1); font-size: 11px; }
+/* Brief 063 § 9.3: identidad de juego del club bajo la cabecera (cabe a 360 px; sin transform ni transition). */
+.arena-lineup-identity { margin: 0 0 var(--ar-s2); min-width: 0; }
+.arena-lineup-identity-pill { margin: 0; }
+.arena-lineup-identity-details { margin-top: var(--ar-s1); font-size: 14px; }
+.arena-lineup-identity-details summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 600; }
+.arena-lineup-identity-details p { margin: 0 0 var(--ar-s1); overflow-wrap: anywhere; }
+.arena-coach-identity { margin: 0 0 var(--ar-s2); font-weight: 600; overflow-wrap: anywhere; }
 .arena-lineup-bench { margin-top: var(--ar-s2); }
 .arena-lineup-bench summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
 .arena-lineup-bench ul { display: grid; gap: var(--ar-s1); margin: 0; padding: 0; list-style: none; }

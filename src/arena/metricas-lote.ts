@@ -10,8 +10,10 @@
 // con las bandas de LOTE_ARENA_063, y las escenas para el smoke (`escenasPartido`). Bloques B y C (§ 11.1–11.2,
 // v1.2 § 18.3): balones largos y remates lejanos con sus bandas desde reinicios-v7, la recalibración de dos bandas
 // del 046 (`bandasLote`), las métricas del `local` para el experimento controlado de atributos
-// (`configConAtributos`, `medirControladoAtributo`) y las dos de visión y potencia por encima del umbral.
-import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE } from "../sim/limites";
+// (`configConAtributos`, `medirControladoAtributo`) y las dos de visión y potencia por encima del umbral. Bloque D
+// (§ 11.2, reinicios-v8): las métricas del `local` del experimento controlado de identidad (`configConEstilo`,
+// `medirControladoIdentidad`) y las identidades en las escenas.
+import { ARENA, ESTILO_JUEGO_ARENA as EJ, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE } from "../sim/limites";
 import { configDeSemilla } from "../sim/plantillas";
 import type { Lado, SimConfig } from "../sim/tipos";
 import { enAreaRival } from "./ataque";
@@ -24,7 +26,7 @@ import { crearConfigArena, MotorArena } from "./motor";
 import { lineaDePuesto } from "./atributos";
 import { destinoRepliegue, perseguidoresDe, seleccionRepliegue, superadoPor } from "./persecucion";
 import { enAreaPropia, manoAMano } from "./portero";
-import { lados, reglasArena, rival, type AtributoJugador, type ConfigArena, type EstadoArena, type EventoArena, type OrdenesEquipo, type PersecucionArena, type Punto, type ReglasArena } from "./tipos";
+import { lados, reglasArena, rival, type AtributoJugador, type ConfigArena, type EstadoArena, type EstiloJuego, type EventoArena, type OrdenesEquipo, type PersecucionArena, type Punto, type ReglasArena } from "./tipos";
 
 /** Brief 063 § 11.1: con la velocidad (vx, vy) de cada jugador. */
 interface JugadorMuestra { id: string; lado: Lado; puesto: string; x: number; y: number; vx: number; vy: number;
@@ -97,6 +99,9 @@ export interface MetricasLocal063 {
   errorPaseSuma: number; errorPaseN: number;
   /** Ticks de vuelo por metro de sus remates que terminan sin contacto o en el portero: suma y número. */
   ticksPorMSuma: number; ticksPorMN: number;
+  /** Bloque D (§ 11.2): x orientada de sus jugadores de campo con el balón en un rival, fuera de pausa (suma y número),
+   * y ticks con una persecución suya activa (tick < hastaTick). */
+  xSinBalonSuma: number; xSinBalonN: number; ticksPersecucion: number;
 }
 
 const tipoPosesion = new Set<EventoArena["tipo"]>(["tiro", "pase", "recuperacion", "intercepcion", "falta", "fuera_juego", "reinicio", "gol"]);
@@ -162,14 +167,17 @@ export function esSaqueManos(eventos: readonly EventoArena[], i: number, portero
 }
 const enBandaMetrica = (o: Punto) => o.x >= L.bandaMetricaXM && Math.abs(o.y - ARENA.anchoM / 2) > ARENA.areaAnchoM / 2;
 
-function muestrear(estado: EstadoArena, eventos: number, planes?: Record<Lado, OrdenesEquipo>): MuestraTick {
+function muestrear(estado: EstadoArena, eventos: number, planes?: Record<Lado, OrdenesEquipo>, config?: ConfigArena): MuestraTick {
   const balon = estado.balon, poseedor = estado.jugadores.find(j => j.id === balon.poseedor);
   const pausado = !!(estado.pausa && estado.tick < estado.pausa.hastaTick);
   const mam = poseedor ? manoAMano(estado, rival(poseedor.lado), ARENA.radioTiroM) : null;
   const orden = poseedor && planes ? planes[poseedor.lado].ordenes.find(o => o.jugador === poseedor.id) : undefined;
   const conducir = poseedor && poseedor.puesto !== "POR" && !pausado && !estado.saque && orden?.accion === "conducir" ? Math.hypot(poseedor.velocidad.x, poseedor.velocidad.y) : null;
   const superado = !pausado && !estado.saque ? superadoPor(estado) : null;
-  const ids = superado ? seleccionRepliegue(estado, perseguidoresDe(estado.jugadores, balon.posicion)).map(j => j.id) : [];
+  // Bloque D (reinicios-v8): el conjunto con el máximo de la identidad del lado que defiende (`estilosJuego` solo existe
+  // desde v8; antes, sin cambio).
+  const estiloDefensa = superado ? config?.estilosJuego?.[rival(superado.lado)] : undefined;
+  const ids = superado ? seleccionRepliegue(estado, perseguidoresDe(estado.jugadores, balon.posicion), estiloDefensa ? EJ.efectos[estiloDefensa].repliegue : 0).map(j => j.id) : [];
   return { tick: estado.tick, eventos, poseedor: balon.poseedor, balon: { ...balon.posicion }, manos: balon.manos?.portero ?? null, pausado, manoAMano: mam?.id ?? null, conducir,
     jugadores: estado.jugadores.map(j => ({ id: j.id, lado: j.lado, puesto: j.puesto, x: j.posicion.x, y: j.posicion.y, vx: j.velocidad.x, vy: j.velocidad.y, e: j.energia })),
     vuelo: balon.vuelo !== null, vueloInicioTick: balon.vuelo?.inicioTick ?? null, superado: superado?.id ?? null, seleccion: superado ? { ids, destino: destinoRepliegue(balon.posicion, rival(superado.lado)) } : null,
@@ -190,19 +198,19 @@ export function partidoConNiveles(seed: number, nivelPortero: number | null, niv
 export interface NivelesForzados { portero: number | null; campo: number | null }
 
 /** Ejecuta un partido programado y devuelve las muestras de todos los ticks y los eventos. */
-export async function muestrasPartido(seed: number, duracionS: number, reglas?: ReglasArena, niveles?: NivelesForzados, configurar?: (config: ConfigArena) => ConfigArena): Promise<{ muestras: MuestraTick[]; eventos: EventoArena[] }> {
+export async function muestrasPartido(seed: number, duracionS: number, reglas?: ReglasArena, niveles?: NivelesForzados, configurar?: (config: ConfigArena) => ConfigArena): Promise<{ muestras: MuestraTick[]; eventos: EventoArena[]; config: ConfigArena }> {
   const proto = MotorArena.prototype as unknown as { planesActivos: (this: MotorArena, planes: Record<Lado, OrdenesEquipo>) => Record<Lado, OrdenesEquipo> };
   const original = proto.planesActivos, muestras: MuestraTick[] = [];
   proto.planesActivos = function (planes) {
     const activos = original.call(this, planes);
-    muestras.push(muestrear(this.estado, this.eventos.length, activos));
+    muestras.push(muestrear(this.estado, this.eventos.length, activos, this.config));
     return activos;
   };
   try {
     const config = crearConfigArena({ seed, duracionS, ...(reglas ? { reglas } : {}), ...(niveles ? { partido: partidoConNiveles(seed, niveles.portero, niveles.campo) } : {}) });
     const registro = await ejecutarArena(configurar ? configurar(config) : config, { local: crearControladorProgramado(), visita: crearControladorProgramado() });
-    muestras.push(muestrear(registro.final, registro.eventos.length));
-    return { muestras, eventos: registro.eventos };
+    muestras.push(muestrear(registro.final, registro.eventos.length, undefined, registro.config));
+    return { muestras, eventos: registro.eventos, config: registro.config };
   } finally { proto.planesActivos = original; }
 }
 
@@ -215,7 +223,7 @@ export function analizarPartido(seed: number, muestras: readonly MuestraTick[], 
     ticksConducir: 0, ticksConducirFrenado: 0, fuerasDeJuego: 0,
     repliegueCorren: { corren: 0, muestras: 0 }, repliegueSeleccion: { corren: 0, muestras: 0 }, persecucionPerdedor: { persigue: 0, muestras: 0 },
     largos: 0, largosExito: 0, lejanos: 0, lejanosGol: 0, lejanosAPuerta: 0, distanciasRemate: [],
-    local063: { vmaxSuma: 0, vmaxN: 0, energiaFinal: null, robosSufridos: 0, robosHechos: 0, ticksPosesion: 0, largos: 0, lejanos: 0, errorPaseSuma: 0, errorPaseN: 0, ticksPorMSuma: 0, ticksPorMN: 0 } };
+    local063: { vmaxSuma: 0, vmaxN: 0, energiaFinal: null, robosSufridos: 0, robosHechos: 0, ticksPosesion: 0, largos: 0, lejanos: 0, errorPaseSuma: 0, errorPaseN: 0, ticksPorMSuma: 0, ticksPorMN: 0, xSinBalonSuma: 0, xSinBalonN: 0, ticksPersecucion: 0 } };
   const porteros = new Set(muestras.flatMap(s => s.jugadores.filter(j => j.puesto === "POR").map(j => j.id)));
   const ladoDe = (id: string) => muestras.find(s => s.jugadores.some(j => j.id === id))?.jugadores.find(j => j.id === id)?.lado;
   const porTick = new Map(muestras.map(s => [s.tick, s]));
@@ -370,6 +378,9 @@ function medirLargoLejano(m: MetricasPartido, muestras: readonly MuestraTick[], 
     for (const j of s.jugadores) if (j.lado === "local" && j.puesto !== "POR") vmax.set(j.id, Math.max(vmax.get(j.id) ?? 0, Math.hypot(j.vx, j.vy)));
     const p = s.jugadores.find(j => j.id === s.poseedor);
     if (p && p.lado === "local" && p.puesto !== "POR") l.ticksPosesion++;
+    // Bloque D (§ 11.2): el bloque del `local` con el balón en un rival, fuera de pausa, y su persecución activa.
+    if (p && p.lado === "visita" && !s.pausado) for (const j of s.jugadores) if (j.lado === "local" && j.puesto !== "POR") { l.xSinBalonSuma += transformar(j, "local").x; l.xSinBalonN++; }
+    if (s.persecucion && s.persecucion.lado === "local" && s.tick < s.persecucion.hastaTick) l.ticksPersecucion++;
   }
   for (const v of vmax.values()) { l.vmaxSuma += v; l.vmaxN++; }
   const final = muestras.at(-1)?.jugadores.filter(j => j.lado === "local" && j.puesto !== "POR" && j.e !== undefined) ?? [];
@@ -454,8 +465,10 @@ export interface EscenasPartido {
   /** Desde reinicios-v7: cada balón largo y cada remate lejano (tick del evento, jugador, metros y desenlace). */
   largos: { tick: number; jugador: string; receptor: string | null; metros: number; exito: boolean }[];
   lejanos: { tick: number; jugador: string; metros: number; desenlace: DesenlaceRemate }[];
+  /** Desde reinicios-v8: la identidad de juego de cada club (`config.estilosJuego`). */
+  identidades?: Record<Lado, EstiloJuego>;
 }
-export function escenasPartido(seed: number, muestras: readonly MuestraTick[], eventos: readonly EventoArena[] = []): EscenasPartido {
+export function escenasPartido(seed: number, muestras: readonly MuestraTick[], eventos: readonly EventoArena[] = [], config?: ConfigArena): EscenasPartido {
   const superados: EscenasPartido["superados"] = [], persecuciones: EscenasPartido["persecuciones"] = [];
   const linea = (id: string) => lineaDePuesto(muestras.flatMap(s => s.jugadores).find(j => j.id === id)?.puesto ?? "");
   muestras.forEach((s, i) => {
@@ -475,7 +488,7 @@ export function escenasPartido(seed: number, muestras: readonly MuestraTick[], e
     }
     if (e.tipo === "tiro" && e.motivo === "lejano") lejanos.push({ tick: e.tick, jugador: e.jugador, metros: Math.round(distancia(transformar(e.desde, e.lado), centroArco) * 10) / 10, desenlace: desenlaceFisico(eventos, i) });
   });
-  return { seed, superados: superados.filter(e => e.repliegue.length), persecuciones, largos, lejanos };
+  return { seed, superados: superados.filter(e => e.repliegue.length), persecuciones, largos, lejanos, ...(config?.estilosJuego ? { identidades: { ...config.estilosJuego } } : {}) };
 }
 
 const cociente = (a: number, b: number): number | null => b > 0 ? a / b : null;
@@ -510,7 +523,9 @@ export interface MetricasLote {
     remateDistanciaMedianaM: number | null; remateDistanciaP90M: number | null; remateDistanciaMaxM: number | null };
   /** Brief 063 § 11.2 y v1.2 § 18.3 · métricas del `local` (null = sin muestra). */
   local063: { vmaxMedia: number | null; energiaFinalMedia: number | null; robosSufridosPorMin: number | null; robosHechosPorPartido: number; largosPorPartido: number; lejanosPorPartido: number;
-    errorPaseCortoMedioM: number | null; ticksPorMRemate: number | null };
+    errorPaseCortoMedioM: number | null; ticksPorMRemate: number | null;
+    /** Bloque D (§ 11.2): x orientada media sin balón (m; null sin muestra) y segundos de persecución por partido. */
+    xMediaSinBalon: number | null; persecucionSPorPartido: number };
 }
 
 export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: readonly MetricasPartido[]): MetricasLote {
@@ -550,7 +565,8 @@ export function agregarLote(reglas: ReglasArena, duracionS: number, partidos: re
       return { vmaxMedia: cociente(l(x => x.vmaxSuma), l(x => x.vmaxN)), energiaFinalMedia: energias.length ? energias.reduce((a, b) => a + b, 0) / energias.length : null,
         robosSufridosPorMin: cociente(l(x => x.robosSufridos) * 60, l(x => x.ticksPosesion) * ARENA.pasoS), robosHechosPorPartido: l(x => x.robosHechos) / n,
         largosPorPartido: l(x => x.largos) / n, lejanosPorPartido: l(x => x.lejanos) / n,
-        errorPaseCortoMedioM: cociente(l(x => x.errorPaseSuma), l(x => x.errorPaseN)), ticksPorMRemate: cociente(l(x => x.ticksPorMSuma), l(x => x.ticksPorMN)) };
+        errorPaseCortoMedioM: cociente(l(x => x.errorPaseSuma), l(x => x.errorPaseN)), ticksPorMRemate: cociente(l(x => x.ticksPorMSuma), l(x => x.ticksPorMN)),
+        xMediaSinBalon: cociente(l(x => x.xSinBalonSuma), l(x => x.xSinBalonN)), persecucionSPorPartido: l(x => x.ticksPersecucion) * ARENA.pasoS / n };
     })(),
   };
 }
@@ -573,16 +589,17 @@ function agregarRemates(partidos: readonly MetricasPartido[]): MetricasLote["rem
 /** Brief 063 § 14 · escenas de `semillas` partidos programados desde `desde` (smoke). */
 export async function escenasLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number }): Promise<EscenasPartido[]> {
   const duracionS = opciones.duracionS ?? L.duracionS, reglas = opciones.reglas ?? ARENA.reglas, escenas: EscenasPartido[] = [];
-  for (let seed = opciones.desde; seed < opciones.desde + opciones.semillas; seed++) { const { muestras, eventos } = await muestrasPartido(seed, duracionS, reglas); escenas.push(escenasPartido(seed, muestras, eventos)); }
+  for (let seed = opciones.desde; seed < opciones.desde + opciones.semillas; seed++) { const { muestras, eventos, config } = await muestrasPartido(seed, duracionS, reglas); escenas.push(escenasPartido(seed, muestras, eventos, config)); }
   return escenas;
 }
 
 /** Lote de `semillas` partidos programados desde `desde` (siempre LOTE_ARENA_046.duracionS salvo prueba). */
-export async function medirLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number; niveles?: NivelesForzados; atributo?: { atributo: AtributoJugador; valor: number } }): Promise<MetricasLote> {
+export async function medirLote(opciones: { desde: number; semillas: number; reglas?: ReglasArena; duracionS?: number; niveles?: NivelesForzados; atributo?: { atributo: AtributoJugador; valor: number }; estilo?: EstiloJuego }): Promise<MetricasLote> {
   const duracionS = opciones.duracionS ?? L.duracionS, reglas = opciones.reglas ?? ARENA.reglas, partidos: MetricasPartido[] = [];
-  const forzado = opciones.atributo;
+  const forzado = opciones.atributo, estilo = opciones.estilo;
+  const configurar = forzado || estilo ? (c: ConfigArena) => { const a = forzado ? forzarAtributo(c, forzado.atributo, forzado.valor) : c; return estilo ? forzarEstilo(a, estilo) : a; } : undefined;
   for (let seed = opciones.desde; seed < opciones.desde + opciones.semillas; seed++) {
-    const { muestras, eventos } = await muestrasPartido(seed, duracionS, reglas, opciones.niveles, forzado ? c => forzarAtributo(c, forzado.atributo, forzado.valor) : undefined);
+    const { muestras, eventos } = await muestrasPartido(seed, duracionS, reglas, opciones.niveles, configurar);
     partidos.push(analizarPartido(seed, muestras, eventos));
   }
   return agregarLote(reglas, duracionS, partidos);
@@ -656,6 +673,39 @@ function forzarAtributo(config: ConfigArena, atributo: AtributoJugador, valor: n
   const campo = new Set(config.partido.local.jugadores.slice(0, ARENA.plantillaArena).flatMap((j, n) => j.posicion === "POR" ? [] : [`local-${n}`]));
   const atributos = Object.fromEntries(Object.entries(config.atributos).map(([id, a]) => [id, campo.has(id) ? { ...a, [atributo]: valor } : a]));
   return { ...config, atributos };
+}
+/** Brief 063 § 11.2 · `configConEstilo`: la configuración de la semilla (reinicios-v8 o posterior) con la identidad del
+ * `local` forzada a `estilo`. Pasa `validarConfigArena`. */
+export function configConEstilo(seed: number, estilo: EstiloJuego, reglas: ReglasArena = ARENA.reglas, duracionS: number = L.duracionS): ConfigArena {
+  return forzarEstilo(crearConfigArena({ seed, duracionS, reglas }), estilo);
+}
+function forzarEstilo(config: ConfigArena, estilo: EstiloJuego): ConfigArena {
+  if (!config.estilosJuego) throw new Error("Configuración sin identidad de juego (reglas anteriores a reinicios-v8)");
+  return { ...config, estilosJuego: { ...config.estilosJuego, local: estilo } };
+}
+/** Métrica del `local` de cada diferencia del experimento controlado de identidad (§ 11.2). */
+const METRICA_IDENTIDAD: Record<keyof (typeof L63)["identidad"], (m: MetricasLote) => number | null> = {
+  xSinBalon: m => m.local063.xMediaSinBalon, largos: m => m.local063.largosPorPartido,
+  lejanos: m => m.local063.lejanosPorPartido, persecucionS: m => m.local063.persecucionSPorPartido,
+};
+export type DiferenciaIdentidad = keyof (typeof L63)["identidad"];
+/** Brief 063 § 11.2 · experimento controlado de identidad: un lote por cada identidad que nombra LOTE_ARENA_063.identidad
+ * (la del `local` forzada) y, por diferencia, `alto` − `bajo` de su métrica (null sin muestra). */
+export async function medirControladoIdentidad(opciones: { desde: number; semillas: number; reglas?: ReglasArena }): Promise<{ lotes: Partial<Record<EstiloJuego, MetricasLote>>; diferencias: Record<DiferenciaIdentidad, number | null> }> {
+  const necesarias = [...new Set(Object.values(L63.identidad).flatMap(d => [d.alto, d.bajo]))] as EstiloJuego[];
+  const lotes: Partial<Record<EstiloJuego, MetricasLote>> = {};
+  for (const estilo of necesarias) lotes[estilo] = await medirLote({ ...opciones, estilo });
+  const diferencias = Object.fromEntries((Object.entries(L63.identidad) as [DiferenciaIdentidad, (typeof L63)["identidad"][DiferenciaIdentidad]][]).map(([k, d]) => {
+    const a = METRICA_IDENTIDAD[k](lotes[d.alto as EstiloJuego]!), b = METRICA_IDENTIDAD[k](lotes[d.bajo as EstiloJuego]!);
+    return [k, a === null || b === null ? null : a - b];
+  })) as Record<DiferenciaIdentidad, number | null>;
+  return { lotes, diferencias };
+}
+/** Brief 063 § 11.2 · bandas del experimento controlado de identidad (sin muestra = incumple). */
+export function incumplimientosIdentidad(diferencias: Partial<Record<DiferenciaIdentidad, number | null>>): string[] {
+  const fallos: string[] = [], { min } = comprobar(fallos);
+  for (const [k, v] of Object.entries(diferencias) as [DiferenciaIdentidad, number | null][]) min(`identidad.${k}`, v, L63.identidad[k].min);
+  return fallos;
 }
 /** Métrica del `local` de cada atributo en el experimento controlado y su signo (diferencia esperada positiva). */
 const METRICA_ATRIBUTO: Record<AtributoJugador, { valor: (m: MetricasLote) => number | null; signo: 1 | -1 }> = {

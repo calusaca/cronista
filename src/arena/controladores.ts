@@ -9,7 +9,7 @@ import { ajusteApoyo, prefiereConducir, prefiereTirar } from "./personalidades";
 import { contextoCompetitivo } from "./competencia";
 import { trazar } from "../lib/telemetria";
 import { z } from "zod";
-import { esquemaOrdenes, formaciones, paresSustitucion, rival, type ControladorEquipo, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto } from "./tipos";
+import { esquemaOrdenes, estilosJuego, formaciones, paresSustitucion, rival, type ControladorEquipo, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type Punto } from "./tipos";
 
 /** También se usa al reproducir: un archivo JSON no se considera una orden válida
  * por cumplir solo su forma. IDs, lado y observación deben coincidir. */
@@ -170,6 +170,12 @@ export function frasesLargo(c: { paseMaxM: number; largoMaxM: number; radioTiroM
   return `Un pasar a un compañero de campo entre ${c.paseMaxM} m y el alcance de visión del pasador (hasta ${c.largoMaxM} m) sale como balón largo por arriba; un tirar desde más de ${c.radioTiroM} m es un remate lejano, con más error, más probabilidad de irse alto y un portero que va a la trayectoria; un tirar desde más de ${c.remateMaxM} m no se ejecuta: el jugador decide por su cuenta.`;
 }
 
+/** Brief 063 § 9.2: la frase de la identidad de juego (reinicios-v8), construida con la lista de identidades (la prueba
+ * la construye también con otra lista). */
+export function frasesIdentidad(estilos: readonly string[] = estilosJuego): string {
+  return `equipos[lado].estiloJuego es la identidad del club (${estilos.join(", ")}); mueve el bloque y la persecución y cambia cuántos balones largos y remates lejanos intentan tus jugadores por su cuenta; tus órdenes pueden ir contra ella.`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -185,6 +191,7 @@ ${frasesCentroPortero()}
 ${frasesPersecucion()}
 ${frasesAtributos()}
 ${frasesLargo()}
+${frasesIdentidad()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad

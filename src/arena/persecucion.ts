@@ -1,11 +1,12 @@
 // Brief 063 · Bloque A (reinicios-v6): repliegue de emergencia y persecución tras pérdida. Funciones
-// puras; el motor las llama solo bajo reinicios-v6. Las cifras salen de PERSECUCION_ARENA.
-import { ARENA, PERSECUCION_ARENA as PE } from "../sim/limites";
+// puras; el motor las llama solo bajo reinicios-v6 (y con la identidad del bloque D solo bajo reinicios-v8).
+// Las cifras salen de PERSECUCION_ARENA y ESTILO_JUEGO_ARENA.
+import { ARENA, ESTILO_JUEGO_ARENA as EJ, PERSECUCION_ARENA as PE } from "../sim/limites";
 import type { Lado } from "../sim/tipos";
 import { lineaDePuesto } from "./atributos";
 import { transformar } from "./catalogo";
 import { distancia, enCancha, limitar } from "./geometria";
-import { lados, rival, type EstadoArena, type JugadorArena, type PlanTecnico, type Punto } from "./tipos";
+import { lados, rival, type EstadoArena, type EstiloJuego, type JugadorArena, type PersecucionArena, type PlanTecnico, type Punto } from "./tipos";
 
 /** § 6.1 · El poseedor de campo (sin balón en las manos) cuya x orientada supera estrictamente la de todos
  * los rivales de campo (sin el portero), en su propio marco. Sin rivales de campo, null. */
@@ -60,12 +61,20 @@ export function limitarPersecucion(destino: Punto, j: Pick<JugadorArena, "puesto
 export const destinoPersecucion = (balon: Punto, j: Pick<JugadorArena, "puesto" | "lado">): Punto => limitarPersecucion({ ...balon }, j);
 
 /** § 6.3 · Duración (s) de la persecución del perdedor de campo: segundos de su línea por agresividad
- * (50 si falta), bloque del plan (medio si falta) y energía, acotada a [minS, maxS]. */
-export function duracionPersecucionS(perdedor: Pick<JugadorArena, "puesto" | "energia" | "personalidad">, bloque: PlanTecnico["bloque"] = "medio"): number {
+ * (50 si falta), factor de la identidad de su club (bloque D, reinicios-v8; 1 sin identidad), bloque del plan
+ * (medio si falta) y energía, acotada a [minS, maxS]. */
+export function duracionPersecucionS(perdedor: Pick<JugadorArena, "puesto" | "energia" | "personalidad">, bloque: PlanTecnico["bloque"] = "medio", estilo?: EstiloJuego): number {
   const linea = lineaDePuesto(perdedor.puesto);
   if (linea === "POR") throw new Error("El portero no persigue");
   const agresividad = perdedor.personalidad?.agresividad ?? 50;
-  return limitar(PE.segundos[linea] * (PE.agresividadMin + PE.agresividadRango * agresividad / 100) * PE.bloque[bloque] * (PE.energiaMin + (1 - PE.energiaMin) * perdedor.energia), PE.minS, PE.maxS);
+  const factorEstilo = estilo ? EJ.efectos[estilo].persecucion : 1;
+  return limitar(PE.segundos[linea] * (PE.agresividadMin + PE.agresividadRango * agresividad / 100) * factorEstilo * PE.bloque[bloque] * (PE.energiaMin + (1 - PE.energiaMin) * perdedor.energia), PE.minS, PE.maxS);
+}
+/** § 6.3 (bloque D, reinicios-v8) · Perseguidor de apoyo de una identidad con `extra` = 1: el jugador de campo del
+ * lado que persigue más cercano al balón (en empate, el id menor), sin contar al perdedor ni a su perseguidor. */
+export function apoyoPersecucion(jugadores: readonly JugadorArena[], balon: Punto, persecucion: Pick<PersecucionArena, "jugador" | "lado">, perseguidores: Record<Lado, string | undefined>): JugadorArena | undefined {
+  return jugadores.filter(j => j.lado === persecucion.lado && j.puesto !== "POR" && j.id !== persecucion.jugador && j.id !== perseguidores[persecucion.lado])
+    .sort((a, b) => distancia(a.posicion, balon) - distancia(b.posicion, balon) || a.id.localeCompare(b.id))[0];
 }
 /** § 6.3 · Tick en que vence una persecución creada en `tick`. */
 export const hastaTickPersecucion = (tick: number, segundos: number): number => tick + Math.round(segundos / ARENA.pasoS);

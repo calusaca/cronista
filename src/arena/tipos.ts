@@ -10,8 +10,9 @@ export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalid
 /** Brief 046: "reinicios-v3" es literal; el orden de la lista es el de las versiones (`reglasDesde`).
  * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5.
  * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6.
- * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", ARENA.reglas] as const;
+ * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7.
+ * Brief 063 (publicación 3): "reinicios-v7" también es literal; ARENA.reglas es reinicios-v8. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -59,7 +60,7 @@ export interface PersecucionArena { jugador: string; lado: Lado; desdeTick: numb
 export const atributosJugador = ["velocidad", "resistencia", "aguante", "entrada", "vision", "potencia"] as const;
 export type AtributoJugador = (typeof atributosJugador)[number];
 export type AtributosJugador = Record<AtributoJugador, number>;
-/** Brief 063 § 4.1 (reinicios-v8, todavía no publicada): identidad de juego del club. */
+/** Brief 063 § 4.1 (reinicios-v8): identidad de juego del club, derivada de su nombre. */
 export const estilosJuego = ["defensivo", "ofensivo", "posesion", "contragolpe", "directo", "presion"] as const;
 export type EstiloJuego = (typeof estilosJuego)[number];
 export const perfilesJugador = ["defensivo", "ofensivo", "pasador", "conductor", "rematador", "equilibrado"] as const;
@@ -130,7 +131,7 @@ export interface ConfigArena {
   aficiones?: Record<Lado, AficionArena>;
   /** Brief 063 § 4.2 (desde reinicios-v7, y solo entonces): los atributos de los 2 × min(16, plantilla) IDs, por ID. */
   atributos?: Record<string, AtributosJugador>;
-  /** Brief 063 (desde reinicios-v8, todavía no publicada): se rechaza en cualquier versión actual. */
+  /** Brief 063 § 4.3 (desde reinicios-v8, y solo entonces): la identidad de juego de cada club. */
   estilosJuego?: Record<Lado, EstiloJuego>;
   duracionS: number; intervaloS: number;
 }
@@ -173,8 +174,8 @@ export interface ObservacionArena {
   id: string; lado: Lado; tiempoS: number; horizonteS: number;
   duracionS?: number;
   estado: EstadoArena;
-  /** Brief 063 (reinicios-v7): `atributos` con los IDs de ese lado (titulares y banco). */
-  equipos: Record<Lado, { nombre: string; ataque: number; defensa: number; estilo: string; formacion: FormacionArena; entrenador?: EntrenadorArena; atributos?: Record<string, AtributosJugador> }>;
+  /** Brief 063 (reinicios-v7): `atributos` con los IDs de ese lado (titulares y banco); (reinicios-v8) `estiloJuego`. */
+  equipos: Record<Lado, { nombre: string; ataque: number; defensa: number; estilo: string; formacion: FormacionArena; entrenador?: EntrenadorArena; atributos?: Record<string, AtributosJugador>; estiloJuego?: EstiloJuego }>;
   condiciones: SimConfig["condiciones"] | null;
   recientes: EventoArena[];
   resumen?: Record<Lado, ResumenEquipo>;
