@@ -4,7 +4,8 @@
 //   - los 6 participantes del torneo archivado `2026-10-24` («los mismos modelos»), con el precio de lista vigente de
 //     `precios.json` (`estimadoDe: null` cuando el modelo ya tiene precio propio);
 //   - el prompt máximo de los partidos de 60 s y su origen; brief 063 (v1.1 § 17.4): `tokens` es el medido por
-//     TORNEO_SITIO.factorObservacion063, al alza, y el JSON declara el medido y el factor;
+//     TORNEO_SITIO.factorObservacion063, al alza, y el JSON declara el medido y el factor (`promptMaxReserva`, la misma
+//     fuente que `estimarTorneo` y la ejecución del CLI);
 //   - por participante, las medias de entrada y salida y la mediana de latencia.
 // `torneo-entradas.test.ts` lo regenera y exige igualdad byte a byte: si cambian los precios o la evidencia, CI se
 // pone en rojo hasta que se vuelva a generar. No llama a red ni lee `.env`.
@@ -14,7 +15,7 @@ import { TORNEO_SITIO } from "../sim/limites";
 import { fabricaLlmReal } from "./smoke-modelos";
 import { esquemaTorneo } from "./torneo";
 import { leerEvidencias } from "./torneo-cli";
-import { entradasEstimacion, participantesReales, type EntradaCatalogo, type PreciosJson } from "./torneo-ejecucion";
+import { entradasEstimacion, participantesReales, promptMaxReserva, type EntradaCatalogo, type PreciosJson } from "./torneo-ejecucion";
 import type { EntradasSitio } from "./torneo-formatos";
 
 /** Torneo archivado del que salen los participantes del sitio. */
@@ -34,8 +35,8 @@ export function generarEntradasSitio(raiz: string): string {
     if (a.controlador !== p.controlador || a.deployment !== p.deployment) throw new Error(`${p.id}: el catálogo cambió su deployment o su controlador respecto del torneo ${TORNEO_ORIGEN_SITIO}`);
   }
   const { promptMax: medido, medidas } = entradasEstimacion(participantes, leerEvidencias(raiz));
-  // Brief 063 v1.1 § 17.4: las peticiones de reinicios-v7 son más grandes que las medidas el 22 oct.
-  const promptMax = { ...medido, tokens: Math.ceil(medido.tokens * TORNEO_SITIO.factorObservacion063), medido: medido.tokens, factorObservacion063: TORNEO_SITIO.factorObservacion063 };
+  // Brief 063 v1.1 § 17.4: las peticiones nuevas son más grandes que las medidas el 22 oct. La misma fuente que el CLI.
+  const promptMax = promptMaxReserva(medido);
   const entradas: EntradasSitio = { version: TORNEO_SITIO.version, torneoOrigen: TORNEO_ORIGEN_SITIO, participantes, promptMax, medidas };
   return JSON.stringify(entradas, null, 2) + "\n";
 }

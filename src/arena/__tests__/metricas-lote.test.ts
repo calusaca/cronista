@@ -12,7 +12,7 @@ const ATACANTE = "local-5", PORTERO = "visita-0", DEFENSOR = "visita-1";
 function muestra(tick: number, o: { manoAMano?: string | null; porteroX?: number; poseedor?: string | null; manos?: string | null; eventos?: number; pausado?: boolean } = {}): MuestraTick {
   const balon: Punto = { x: ARENA.largoM - ARENA.radioTiroM / 2, y: MEDIO_Y };
   return { tick, eventos: o.eventos ?? 0, poseedor: o.poseedor === undefined ? ATACANTE : o.poseedor, balon, manos: o.manos ?? null, pausado: o.pausado ?? false,
-    manoAMano: o.manoAMano ?? null, conducir: null, vuelo: false, superado: null, seleccion: null, persecucion: null,
+    manoAMano: o.manoAMano ?? null, conducir: null, vuelo: false, vueloInicioTick: null, superado: null, seleccion: null, persecucion: null,
     jugadores: [
       { id: ATACANTE, lado: "local", puesto: "DEL", x: balon.x, y: balon.y, vx: 0, vy: 0 },
       { id: PORTERO, lado: "visita", puesto: "POR", x: o.porteroX ?? ARENA.largoM - ARENA.areaLargoM / 2, y: MEDIO_Y, vx: 0, vy: 0 },

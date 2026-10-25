@@ -41,6 +41,8 @@ export interface MuestraTick {
   jugadores: JugadorMuestra[];
   /** Brief 063 § 11.1: hay un balón en vuelo. */
   vuelo: boolean;
+  /** Revisión de Codex sobre la publicación 2 (P2): `inicioTick` del vuelo en curso (null sin vuelo). */
+  vueloInicioTick: number | null;
   /** Brief 063 § 6.1: poseedor superado (`superadoPor`), fuera de pausa y saque, o null. Geométrico: igual en v5. */
   superado: string | null;
   /** Brief 063 v1.1 § 17.7: conjunto `seleccionRepliegue` reconstruido sobre la muestra y su destino. */
@@ -170,7 +172,7 @@ function muestrear(estado: EstadoArena, eventos: number, planes?: Record<Lado, O
   const ids = superado ? seleccionRepliegue(estado, perseguidoresDe(estado.jugadores, balon.posicion)).map(j => j.id) : [];
   return { tick: estado.tick, eventos, poseedor: balon.poseedor, balon: { ...balon.posicion }, manos: balon.manos?.portero ?? null, pausado, manoAMano: mam?.id ?? null, conducir,
     jugadores: estado.jugadores.map(j => ({ id: j.id, lado: j.lado, puesto: j.puesto, x: j.posicion.x, y: j.posicion.y, vx: j.velocidad.x, vy: j.velocidad.y, e: j.energia })),
-    vuelo: balon.vuelo !== null, superado: superado?.id ?? null, seleccion: superado ? { ids, destino: destinoRepliegue(balon.posicion, rival(superado.lado)) } : null,
+    vuelo: balon.vuelo !== null, vueloInicioTick: balon.vuelo?.inicioTick ?? null, superado: superado?.id ?? null, seleccion: superado ? { ids, destino: destinoRepliegue(balon.posicion, rival(superado.lado)) } : null,
     persecucion: estado.persecucion ? { ...estado.persecucion } : null };
 }
 
@@ -354,9 +356,13 @@ function medirLargoLejano(m: MetricasPartido, muestras: readonly MuestraTick[], 
       }
     }
     // Potencia (v1.2 § 18.3): remates que terminan sin contacto (gol, ancho, alto) o en el portero (atrapada, desvío).
+    // Revisión de Codex sobre la publicación 2 (P2): el evento `tiro` se fecha en el paso que avanza (un tick después
+    // de iniciar el vuelo, `MotorArena.evento`); los ticks de vuelo se cuentan desde `vuelo.inicioTick`, que guarda la
+    // muestra del tick del evento (el último paso de un partido no tiene muestra posterior: e.tick − 1).
     if (e.tipo === "tiro") {
       const { desenlace, evento } = cierreDeRemate(eventos, i), metros = evento ? distancia(e.desde, evento.hasta) : 0;
-      if (evento && desenlace !== "bloqueado" && desenlace !== "otro" && metros > 0) { l.ticksPorMSuma += (evento.tick - e.tick) / metros; l.ticksPorMN++; }
+      const inicio = porTick.get(e.tick)?.vueloInicioTick ?? e.tick - 1;
+      if (evento && desenlace !== "bloqueado" && desenlace !== "otro" && metros > 0) { l.ticksPorMSuma += (evento.tick - inicio) / metros; l.ticksPorMN++; }
     }
   });
   const vmax = new Map<string, number>();

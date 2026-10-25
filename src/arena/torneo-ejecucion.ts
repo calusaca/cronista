@@ -12,7 +12,7 @@ import { appendFileSync, closeSync, copyFileSync, existsSync, mkdirSync, openSyn
 import { join } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { gunzipSync, gzipSync } from "node:zlib";
-import { ARENA, SMOKE_MODELOS_ARENA as S, TORNEO_ARENA as T } from "../sim/limites";
+import { ARENA, SMOKE_MODELOS_ARENA as S, TORNEO_ARENA as T, TORNEO_SITIO } from "../sim/limites";
 import type { Lado } from "../sim/tipos";
 import { contenidoCanonico, ejecutarArena } from "./coordinador";
 import { razonamientoFuera, transporteInstrumentado, type EspecLlm, type EvidenciaSmoke, type FormatoSonda, type Peticion } from "./smoke-modelos";
@@ -458,7 +458,7 @@ export interface EstimacionParticipante {
   maxIntentoMicroUsd: number; reservaMicroUsd: number; medianaMs: number | null; latenciaPropia: boolean; precioEstimadoDe: string | null;
 }
 export interface EstimacionTorneo {
-  version: string; promptMax: { tokens: number; archivo: string; partido: string }; rondas: number; decisionesPorParticipante: number;
+  version: string; promptMax: PromptMaxReserva; rondas: number; decisionesPorParticipante: number;
   participantes: EstimacionParticipante[];
   partidos: { n: number; jornada: number; vuelta: boolean; local: string; visita: string; seed: number; reservaMicroUsd: number; tiempoS: number }[];
   tipicoMicroUsd: number; reservaSumaMicroUsd: number; reservaMaxPartidoMicroUsd: number; tiempoS: number; topeMicroUsd: number; rechazos: string[];
@@ -497,8 +497,20 @@ export function entradasEstimacion(participantes: readonly Pick<ParticipanteTorn
   return { promptMax, medidas };
 }
 
-export function estimarTorneo(o: { participantes: readonly ParticipanteTorneo[]; evidencias: readonly EvidenciaArchivo[]; duracionS: number; intervaloS: number; semilla: number; topeMicroUsd: number; topeUsd: number }): EstimacionTorneo {
-  const { promptMax, medidas } = entradasEstimacion(o.participantes, o.evidencias);
+/** Brief 063 v1.1 § 17.4 · revisión de Codex sobre la publicación 2 (P2): ÚNICA fuente del prompt máximo con el que
+ * se reserva, la misma para el CLI (`estimarTorneo` y la ejecución, que reserva y cobra los intentos sin `usage` con
+ * `estimacion.promptMax.tokens`) y para el sitio (`generarEntradasSitio` → `torneo-sitio-entradas.json`): el medido en la
+ * evidencia 052 por TORNEO_SITIO.factorObservacion063, al alza, declarando el medido y el factor. Las peticiones
+ * nuevas llevan las frases del 063 en el sistema y los datos del 063 en la observación, sean cuales sean sus reglas. */
+export interface PromptMaxReserva { tokens: number; archivo: string; partido: string; medido?: number; factorObservacion063?: number }
+export function promptMaxReserva(medido: { tokens: number; archivo: string; partido: string }, factor: number = TORNEO_SITIO.factorObservacion063): PromptMaxReserva {
+  return { tokens: Math.ceil(medido.tokens * factor), archivo: medido.archivo, partido: medido.partido, medido: medido.tokens, factorObservacion063: factor };
+}
+
+/** `factorObservacion` solo existe para reproducir estimaciones archivadas anteriores al 063 (factor 1). */
+export function estimarTorneo(o: { participantes: readonly ParticipanteTorneo[]; evidencias: readonly EvidenciaArchivo[]; duracionS: number; intervaloS: number; semilla: number; topeMicroUsd: number; topeUsd: number; factorObservacion?: number }): EstimacionTorneo {
+  const { promptMax: medido, medidas } = entradasEstimacion(o.participantes, o.evidencias);
+  const promptMax = promptMaxReserva(medido, o.factorObservacion);
   const P = promptMax.tokens;
   const rondas = rondasPartido(o.duracionS, o.intervaloS), n = o.participantes.length;
   const D = 2 * (n - 1) * rondas;
@@ -530,7 +542,7 @@ export function formatearEstimacion(e: EstimacionTorneo): string {
   const fila = (cols: string[]) => `| ${cols.join(" | ")} |`;
   const l = [
     `Estimación del torneo (${e.participantes.length} participantes, ${e.partidos.length} partidos, ${e.rondas} rondas por partido, ${e.decisionesPorParticipante} decisiones por modelo)`,
-    `Máximo por intento HTTP: entrada ceil(${e.promptMax.tokens} × ${S.factorEntradaReintento}) + ${ARENA.tokensOrdenes} + ${T.reserva.margenCorreccionTokens}, salida ${ARENA.tokensOrdenes}; P = ${e.promptMax.tokens} (${e.promptMax.archivo}, ${e.promptMax.partido}).`,
+    `Máximo por intento HTTP: entrada ceil(${e.promptMax.tokens} × ${S.factorEntradaReintento}) + ${ARENA.tokensOrdenes} + ${T.reserva.margenCorreccionTokens}, salida ${ARENA.tokensOrdenes}; P = ${e.promptMax.tokens}${e.promptMax.medido !== undefined ? ` = ceil(${e.promptMax.medido} medido × ${e.promptMax.factorObservacion063} del brief 063)` : ""} (${e.promptMax.archivo}, ${e.promptMax.partido}).`,
     `Reserva por lado y partido = ${e.rondas} rondas × ${ARENA.intentosOrdenes} intentos × (1 + ${T.http.reintentos} reintentos HTTP) × máximo por intento.`,
     "",
     fila(["Modelo", "Deployment", "Decisiones", "Típico/decisión", "Típico torneo", "Máx./intento", "Reserva torneo", "Medición propia", "Latencia mediana"]),

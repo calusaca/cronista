@@ -32,7 +32,7 @@ import { narrarEventoArena } from "../vista";
 import type { Lado } from "../../sim/tipos";
 import { estadosOraculo, observacionOraculo, type EntradaOraculo063 } from "../__fixtures__/generar-opcion-pase-063";
 import { condicionesFixtureV6, cumpleFixtureV6, DURACION_FIXTURE_V6_S } from "../__fixtures__/generar-reinicios-v6";
-import { bandasLote, incumplimientos, incumplimientos063, incumplimientosBC, incumplimientosControlado, medirControlado, medirLote } from "../metricas-lote";
+import { analizarPartido, bandasLote, cierreDeRemate, incumplimientos, incumplimientos063, incumplimientosBC, incumplimientosControlado, medirControlado, medirLote, muestrasPartido } from "../metricas-lote";
 import { atributosPlantillas, crearConfigArena, crearEstadoArena, MotorArena, reglasDesde, validarConfigArena } from "../motor";
 import { destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, limiteXPersecucion, perseguidoresDe, seleccionRepliegue, superadoPor } from "../persecucion";
 import { validarRaizTorneos, validarTorneo } from "../torneo-validacion";
@@ -1147,5 +1147,26 @@ describe("063 · bloque C · remate lejano y balón largo (reinicios-v7)", () =>
       expect({ seed, intervaloS, dentroDeCota: b7 < b5 + cota, menorQueMaximo: b7 < ARENA.archivoMaxBytes }).toEqual({ seed, intervaloS, dentroDeCota: true, menorQueMaximo: true });
     }
     console.log("[063 C11 tamaño]", JSON.stringify({ mayorBytes: mayor, archivoMaxBytes: ARENA.archivoMaxBytes }));
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+describe("063 · revisión de Codex de la publicación 2 (sin cambio de comportamiento en v7)", () => {
+  it("P2 · la métrica de potencia cuenta los ticks de vuelo desde vuelo.inicioTick (el evento `tiro` se fecha un tick después) (mutación: restar desde el tick del evento)", async () => {
+    // El primer remate del `local` de las semillas barridas que termina sin contacto (alto o ancho).
+    for (let seed = 1; seed <= BC.semillas; seed++) {
+      const { muestras, eventos } = await muestrasPartido(seed, L.duracionS, V7);
+      const porTick = new Map(muestras.map(s => [s.tick, s]));
+      const i = eventos.findIndex((e, k) => e.tipo === "tiro" && e.lado === "local" && ["alto", "ancho"].includes(cierreDeRemate(eventos, k).desenlace) && porTick.has(e.tick) && porTick.has(e.tick - 1));
+      if (i < 0) continue;
+      const tiro = eventos[i]!, fin = cierreDeRemate(eventos, i).evento!;
+      // Oráculo de las muestras: sin vuelo en el tick anterior al evento; en el del evento, el vuelo empezó en e.tick − 1.
+      expect({ antes: porTick.get(tiro.tick - 1)!.vuelo, ahora: porTick.get(tiro.tick)!.vuelo, inicio: porTick.get(tiro.tick)!.vueloInicioTick }).toEqual({ antes: false, ahora: true, inicio: tiro.tick - 1 });
+      const m = analizarPartido(seed, muestras, [tiro, fin]);
+      expect(m.local063.ticksPorMN).toBe(1);
+      expect(m.local063.ticksPorMSuma).toBeCloseTo((fin.tick - (tiro.tick - 1)) / distancia(tiro.desde, fin.hasta), 12);
+      return;
+    }
+    throw new Error("Sin remate local sin contacto en el barrido");
   });
 });

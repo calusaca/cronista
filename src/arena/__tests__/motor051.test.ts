@@ -688,7 +688,7 @@ describe("051 · helper de métricas: desenlace físico, lectura 045 e intercepc
   const A = "local-5", B = "visita-3", K = "visita-0", COMP = "local-6";
   const ev = (id: string, tick: number, tipo: EventoArena["tipo"], jugador: string, lado: Lado, extra: Partial<EventoArena> = {}): EventoArena =>
     ({ id, tick, tipo, lado, jugador, receptor: null, desde: { x: 0, y: 0 }, hasta: { x: 0, y: 0 }, distanciaM: 0, ...extra });
-  const muestras: MuestraTick[] = [{ tick: 0, eventos: 0, poseedor: null, balon: { x: 0, y: 0 }, manos: null, pausado: false, manoAMano: null, conducir: null, vuelo: false, superado: null, seleccion: null, persecucion: null,
+  const muestras: MuestraTick[] = [{ tick: 0, eventos: 0, poseedor: null, balon: { x: 0, y: 0 }, manos: null, pausado: false, manoAMano: null, conducir: null, vuelo: false, vueloInicioTick: null, superado: null, seleccion: null, persecucion: null,
     jugadores: [{ id: A, lado: "local", puesto: "DEL", x: 0, y: 0, vx: 0, vy: 0 }, { id: K, lado: "visita", puesto: "POR", x: ARENA.largoM, y: MEDIO_Y, vx: 0, vy: 0 }, { id: "local-0", lado: "local", puesto: "POR", x: 0, y: MEDIO_Y, vx: 0, vy: 0 }] }];
   const tiro = ev("t", 1, "tiro", A, "local", { hasta: { x: ARENA.largoM, y: MEDIO_Y } });
 
