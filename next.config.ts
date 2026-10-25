@@ -6,6 +6,8 @@ const config: NextConfig = {
   // /datos lee estos archivos en runtime; no dependen del cwd del checkout.
   outputFileTracingIncludes: {
     "/api/arena/grabaciones": ["./public/experimentos/arena-duelo-v3.json", "./public/experimentos/arena-llm-v3.json", "./public/experimentos/arena-llm-v1.json"],
+    // Brief 064: la crónica de arena lee los mismos ejemplos y los registros de los torneos archivados.
+    "/api/arena/cronicas": ["./public/experimentos/arena-duelo-v3.json", "./public/experimentos/arena-llm-v3.json", "./public/experimentos/arena-llm-v1.json", "./public/torneos/**/*.json.gz"],
     "/datos": ["./docs/dataset/ficha.json"],
     "/datos/datasheet": ["./docs/dataset/DATASHEET.md"],
   },
