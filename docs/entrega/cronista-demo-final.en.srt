@@ -12,89 +12,101 @@ CRONISTA is a multi-agent broadcast where
 every sentence is traceable.
 
 4
-00:00:08,720 --> 00:00:16,294
-Two LLM coaches, GPT-6 Sol and GPT-6 Luna, receive the same
-committed observation and return a plan for every player.
+00:00:08,720 --> 00:00:10,770
+Six models are in the catalogue;
 
 5
-00:00:16,334 --> 00:00:21,110
-A shared deterministic engine resolves the
-play; the clock waits for both.
+00:00:10,810 --> 00:00:14,231
+here GPT-6 Astra and GPT-6.1 Sol coach the two teams.
 
 6
-00:00:22,450 --> 00:00:28,523
-Statistician (spoken pre-match): Here is Sporting Quebralta, in
-a three-five-two: Rafael Celoales wears the armband.
+00:00:14,271 --> 00:00:19,390
+Both receive the same committed observation
+and return a plan for every player;
 
 7
-00:00:28,563 --> 00:00:32,058
-A starting eleven with an average ability of 70;
+00:00:19,430 --> 00:00:21,610
+a shared engine resolves the play.
 
 8
-00:00:32,098 --> 00:00:34,783
-Elio Dorera in the dugout, adaptable.
+00:00:22,850 --> 00:00:27,450
+Narrator (pre-match presentation): Welcome to the arena:
+Juventud Caleteo against Racing Arenablanca.
 
 9
-00:00:36,270 --> 00:00:47,086
-Narrator (goal call): Shot, and goooal! Mateo
-Soreloya, goal! It's a rout for Deportivo
-Lumbrera, nil–three, after 37 seconds.
+00:00:28,199 --> 00:00:33,639
+Narrator (pre-match presentation): Juventud Caleteo line up
+in a five-three-two, with GPT-6 Astra in charge.
 
 10
-00:00:49,069 --> 00:00:50,948
-Narrator (template): Over to you, Priya.
+00:00:34,680 --> 00:00:40,648
+Narrator (pre-match presentation): Racing Arenablanca line up
+in a three-five-two, with GPT-6.1 Sol in charge.
 
 11
-00:00:50,988 --> 00:00:55,997
-Commentator (LLM, verified): Mateo Soreloya
-(17) scored for Deportivo Lumbrera.
+00:00:41,497 --> 00:00:42,193
+Narrator (play-by-play): Ulises…
 
 12
-00:00:56,720 --> 00:00:59,708
-The commentator may only analyse with a cited fact.
+00:00:42,663 --> 00:00:52,951
+Narrator (goal call): What a goal! Mateo Rosánez scores!
+Juventud Caleteo take the lead, one–nil, after 47 seconds.
 
 13
-00:00:59,748 --> 00:01:03,805
+00:00:54,840 --> 00:00:57,828
+The commentator may only analyse with a cited fact.
+
+14
+00:00:57,868 --> 00:01:01,925
 Eight deterministic rules check
 citations, numbers, names and claims.
 
-14
-00:01:03,845 --> 00:01:08,080
+15
+00:01:01,965 --> 00:01:06,200
 A failed sentence is retried once, then
 replaced by a labelled template.
 
-15
-00:01:09,070 --> 00:01:15,330
-Match stats and each player's numbers are computed only from
-confirmed events, live as the broadcast plays.
-
 16
-00:01:19,570 --> 00:01:25,320
-Every line of the commentary can be downloaded,
-with its time, voice, evidence and checks.
+00:01:07,190 --> 00:01:09,519
+The six models also play each other:
 
 17
-00:01:28,070 --> 00:01:34,645
-A versioned Microsoft Foundry agent answers viewer questions
-with read-only tools over the confirmed play only.
+00:01:09,559 --> 00:01:14,389
+a full league, won by GPT-6 Astra, and a
+groups and knockout test bracket.
 
 18
-00:01:34,685 --> 00:01:36,850
-Its sentences pass the same verifier.
+00:01:14,429 --> 00:01:19,390
+Every match has a replay, and the page
+states what the results cannot prove.
 
 19
-00:01:38,020 --> 00:01:43,623
+00:01:20,380 --> 00:01:24,514
+The same verifier guards the automated
+recap, now with the arena's look:
+
+20
+00:01:24,554 --> 00:01:28,571
+click any sentence to see its events, or
+open every draft and verdict.
+
+21
+00:01:28,611 --> 00:01:30,890
+We claim traceability, not better prose.
+
+22
+00:01:31,830 --> 00:01:37,433
 It runs on Azure Container Apps with Blob, Key Vault,
 Application Insights, Speech and Foundry.
 
-20
-00:01:43,663 --> 00:01:46,534
+23
+00:01:37,473 --> 00:01:40,344
 More than two thousand automated tests run in CI.
 
-21
-00:01:46,574 --> 00:01:47,960
+24
+00:01:40,384 --> 00:01:41,770
 Everything is synthetic.
 
-22
-00:01:48,000 --> 00:01:50,930
+25
+00:01:41,810 --> 00:01:44,740
 CRONISTA: narrate the match, prove every sentence.
