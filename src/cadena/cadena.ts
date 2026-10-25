@@ -19,7 +19,7 @@
 
 import { analizar } from "../analista/analista";
 import type { Hecho } from "../analista/tipos";
-import type { Llm, Mensaje } from "../lib/llm";
+import type { Llm, Mensaje, OpcionesLlm } from "../lib/llm";
 import { VERIFICADORES } from "../sim/invariantes";
 import { validarConfig } from "../sim/motor";
 import type { Partido } from "../sim/tipos";
@@ -29,7 +29,7 @@ import { instruccionPerspectiva, repriorizar } from "./personalizacion";
 import { feedback, mensajeInicial, SYSTEM_PROMPT } from "./prompt";
 import type { CronicaDraft, CronicaVerificada, IntentoAudit, ModoPersonalizacion, Motivo } from "./tipos";
 import { MAX_REINTENTOS } from "./umbrales";
-import { cobertura, oracionesRechazadas, tituloRechazado, verificar, verificarDraft } from "./verificador";
+import { cobertura, type HechoVerificable, oracionesRechazadas, tituloRechazado, type Veredicto, verificar, verificarDraft } from "./verificador";
 
 /** Guarda de entrada (brief 003, de la auditoría del 002). Lanza si el Partido no es válido. */
 export function guardaDeEntrada(partido: Partido): void {
@@ -58,8 +58,13 @@ export interface ResultadoCadena {
 
 const BORRADOR_VACIO: CronicaDraft = { titulo_es: "", titulo_en: "", oraciones: [] };
 
-function asegurarVerificada(c: CronicaVerificada, hechos: Hecho[], partido: Partido): CronicaVerificada {
-  const motivos = verificarDraft(c, hechos, partido);
+function asegurarVerificada(
+  c: CronicaVerificada,
+  hechos: HechoVerificable[],
+  partido: Pick<Partido, "config">,
+  verificarExtra?: (draft: CronicaDraft) => Motivo[],
+): CronicaVerificada {
+  const motivos = [...verificarDraft(c, hechos, partido), ...(verificarExtra?.(c) ?? [])];
   if (motivos.length > 0) {
     throw new Error(`error de programa: la crónica final no pasa el Verificador: ${motivos.map((m) => `${m.regla} ${m.detalle}`).join(" | ")}`);
   }
@@ -79,7 +84,7 @@ function guardarEnCache(cache: Cache | undefined, clave: ClaveCache, hechos: Hec
   }
 }
 
-function acta(hechos: Hecho[], intentos: number, audit: IntentoAudit[]): CronicaVerificada {
+function acta(hechos: HechoVerificable[], intentos: number, audit: IntentoAudit[]): CronicaVerificada {
   return { ...borradorActa(hechos), intentos, frasesOmitidas: 0, modo: "acta", audit };
 }
 
@@ -103,37 +108,81 @@ export async function generarCronica(partido: Partido, opciones: OpcionesCadena)
   const cacheada = opciones.cache?.leer(clave, hechos);
   if (cacheada && verificarDraft(cacheada, hechos, partido).length === 0) return { cronica: cacheada, hechos, desdeCache: true };
 
+  const { cronica, huboErrorLlm } = await redactarYVerificar(hechos, partido, llm, { perspectiva });
+  if (!huboErrorLlm) guardarEnCache(opciones.cache, clave, hechos, cronica);
+  return { cronica, hechos, desdeCache: false };
+}
+
+/** Brief 064 § 4.4 · Opciones del bucle Cronista ⇄ Verificador. Sin ninguna, la conducta es la de la cadena histórica. */
+export interface OpcionesRedaccion {
+  /** Por defecto SYSTEM_PROMPT. */
+  system?: string;
+  /** La de 007, por defecto ninguna. */
+  perspectiva?: string;
+  /** Se suma a verificar/verificarDraft en cada intento y al final. */
+  verificarExtra?: (draft: CronicaDraft) => Motivo[];
+  /** Por defecto undefined: la llamada de hoy, con dos argumentos y sin opciones. */
+  opcionesLlm?: (intento: number) => OpcionesLlm;
+  /** Por defecto `feedback` de prompt.ts. */
+  feedback?: (motivos: Motivo[]) => string;
+  /** Antes de cada intento: si devuelve false, no se llama y el bucle termina como si se agotaran los intentos. */
+  antesDeLlamar?: (system: string, mensajes: Mensaje[], intento: number) => boolean;
+  /** Una salida más larga cuenta como intento fallido con motivo V1 y no se reenvía en la conversación. */
+  maxCaracteresRespuesta?: number;
+}
+
+/**
+ * Brief 064 § 4.4 · El bucle de la cadena (intentos con feedback, B6, omisión, acta y re-verificación final), extraído
+ * de `generarCronica` sin cambio de conducta. Devuelve si hubo error del LLM para que quien llama decida si cachea.
+ */
+export async function redactarYVerificar(
+  hechos: HechoVerificable[],
+  partido: Pick<Partido, "config">,
+  llm: Llm,
+  opciones: OpcionesRedaccion = {},
+): Promise<{ cronica: CronicaVerificada; huboErrorLlm: boolean }> {
+  const system = opciones.system ?? SYSTEM_PROMPT;
+  const extra = opciones.verificarExtra;
+  const darFeedback = opciones.feedback ?? feedback;
+  const conExtra = (v: Veredicto): Veredicto => (extra && v.draft ? { draft: v.draft, motivos: [...v.motivos, ...extra(v.draft)] } : v);
   const audit: IntentoAudit[] = [];
-  const mensajes: Mensaje[] = [{ rol: "user", contenido: mensajeInicial(hechos, perspectiva) }];
+  const mensajes: Mensaje[] = [{ rol: "user", contenido: mensajeInicial(hechos, opciones.perspectiva) }];
   let ultimo: { draft: CronicaDraft | null; motivos: Motivo[] } = { draft: null, motivos: [] };
   let huboErrorLlm = false;
 
   for (let n = 1; n <= 1 + MAX_REINTENTOS; n++) {
+    if (opciones.antesDeLlamar && !opciones.antesDeLlamar(system, mensajes, n)) break;
     let salida = "";
     let errorLlm: string | undefined;
+    let demasiadoLarga = false;
     try {
-      salida = await llm.completar(SYSTEM_PROMPT, mensajes);
+      salida = opciones.opcionesLlm ? await llm.completar(system, mensajes, opciones.opcionesLlm(n)) : await llm.completar(system, mensajes);
     } catch (e) {
       errorLlm = (e as Error).message;
       huboErrorLlm = true;
     }
+    if (errorLlm === undefined && opciones.maxCaracteresRespuesta !== undefined && salida.length > opciones.maxCaracteresRespuesta) {
+      demasiadoLarga = true;
+    }
     ultimo =
       errorLlm !== undefined
         ? { draft: null, motivos: [{ oracion: -1, regla: "V1", detalle: `el LLM falló: ${errorLlm}` }] }
-        : verificar(salida, hechos, partido);
+        : demasiadoLarga
+          ? { draft: null, motivos: [{ oracion: -1, regla: "V1", detalle: `respuesta demasiado larga (${salida.length} caracteres; máximo ${opciones.maxCaracteresRespuesta})` }] }
+          : conExtra(verificar(salida, hechos, partido));
     const intento: IntentoAudit = { n: n as 1 | 2 | 3, borrador: ultimo.draft ?? BORRADOR_VACIO, veredicto: ultimo.motivos };
-    if (!ultimo.draft) intento.crudo = salida;
+    if (!ultimo.draft) intento.crudo = demasiadoLarga ? `${salida.slice(0, opciones.maxCaracteresRespuesta)}…` : salida;
     audit.push(intento);
 
     if (ultimo.motivos.length === 0 && ultimo.draft) {
-      const cronica = asegurarVerificada({ ...ultimo.draft, intentos: n, frasesOmitidas: 0, modo: "llm", audit }, hechos, partido);
-      if (!huboErrorLlm) guardarEnCache(opciones.cache, clave, hechos, cronica);
-      return { cronica, hechos, desdeCache: false };
+      const cronica = asegurarVerificada({ ...ultimo.draft, intentos: n, frasesOmitidas: 0, modo: "llm", audit }, hechos, partido, extra);
+      return { cronica, huboErrorLlm };
     }
     // Un error del LLM se reintenta con la misma conversación (no hay respuesta que
     // devolverle); un rechazo del Verificador se reintenta con feedback explícito.
-    if (n <= MAX_REINTENTOS && errorLlm === undefined) {
-      const fb = feedback(ultimo.motivos);
+    // 064: una respuesta demasiado larga tampoco se devuelve (se trata como un error del LLM).
+    if (n <= MAX_REINTENTOS && errorLlm === undefined && !demasiadoLarga) {
+      const fb = darFeedback(ultimo.motivos);
       intento.feedback = fb;
       mensajes.push({ rol: "assistant", contenido: salida }, { rol: "user", contenido: fb });
     }
@@ -178,7 +227,6 @@ export async function generarCronica(partido: Partido, opciones: OpcionesCadena)
   } else {
     cronica = acta(hechos, intentos, audit);
   }
-  cronica = asegurarVerificada(cronica, hechos, partido);
-  if (!huboErrorLlm) guardarEnCache(opciones.cache, clave, hechos, cronica);
-  return { cronica, hechos, desdeCache: false };
+  cronica = asegurarVerificada(cronica, hechos, partido, extra);
+  return { cronica, huboErrorLlm };
 }

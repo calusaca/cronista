@@ -2,6 +2,7 @@
 // feedback explícito del Verificador en los reintentos.
 
 import type { Hecho } from "../analista/tipos";
+import type { HechoVerificable } from "./verificador";
 import type { Motivo } from "./tipos";
 import { COBERTURA } from "./umbrales";
 
@@ -27,7 +28,7 @@ const ABRE = "<hechos>";
 const CIERRA = "</hechos>";
 
 /** Lo que el Cronista ve de cada hecho (brief: id, textos, datos, relevancia). */
-export function serializarHechos(hechos: Hecho[]): string {
+export function serializarHechos(hechos: HechoVerificable[]): string {
   return JSON.stringify(
     hechos.map((h) => ({ id: h.id, tipo: h.tipo, relevancia: h.relevancia, texto_es: h.texto_es, texto_en: h.texto_en, datos: h.datos })),
     null,
@@ -36,7 +37,7 @@ export function serializarHechos(hechos: Hecho[]): string {
 }
 
 /** Primer mensaje del usuario: los hechos y cuáles son de cobertura obligatoria. */
-export function mensajeInicial(hechos: Hecho[], perspectiva?: string): string {
+export function mensajeInicial(hechos: HechoVerificable[], perspectiva?: string): string {
   const obligatorios = hechos.filter((h) => h.relevancia >= COBERTURA).map((h) => h.id);
   return [
     "Estos son los hechos verificados del partido, ordenados por relevancia:",
