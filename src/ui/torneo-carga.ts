@@ -5,22 +5,15 @@
 // Brief 062 § 7.6 · Un torneo lanzado en el sitio (`sitio-…`) no es estático: su base es /api/arena/torneos/sitio/<id>
 // (la instantánea en `[id]` y los registros en `[id]/[archivo]`). Las comprobaciones no cambian: esquema (ahora la
 // unión 059 | 062), coherencia, SHA-256, semilla, clubes y controladores.
-import { esquemaTorneoCualquiera, ID_TORNEO, archivoEncuentro, validarCoherencia, type EncuentroTorneo } from "../arena/torneo";
+import { esquemaTorneoCualquiera, ID_TORNEO, archivoEncuentro, origenDeEncuentro, validarCoherencia, type EncuentroTorneo, type OrigenTorneo } from "../arena/torneo";
 import { TORNEO_SITIO } from "../sim/limites";
-import { TEXTOS_TORNEO_SITIO } from "./textos-torneo-sitio";
 
 /** Base de los archivos de un torneo según su origen (por el prefijo del id). */
 export const baseTorneo = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? `/api/arena/torneos/sitio/${id}` : `/torneos/${id}`;
 const urlInstantanea = (id: string) => id.startsWith(TORNEO_SITIO.prefijoId) ? baseTorneo(id) : `${baseTorneo(id)}/torneo.json`;
 
 export interface PeticionTorneo { torneo: string; encuentro: string }
-export interface OrigenTorneo {
-  id: string; n: number; inicioUtc: string; local: { club: string; modelo: string }; visita: { club: string; modelo: string };
-  /** Brief 062 · Liga de prueba del operador (se rotula igual que en la página del torneo). */
-  prueba?: boolean;
-  /** Brief 062 · Fase del partido en un torneo de grupos (semifinal, final…); ausente en la liga. */
-  fase?: { es: string; en: string; desempate: boolean };
-}
+export type { OrigenTorneo } from "../arena/torneo";
 export class SinDescompresion extends Error { constructor() { super("Este navegador no puede abrir el registro comprimido"); } }
 
 export const esPeticionTorneo = (x: unknown): x is PeticionTorneo =>
@@ -51,10 +44,7 @@ export async function cargarEncuentroTorneo(p: PeticionTorneo, signal: AbortSign
   const registro = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).json() as unknown;
   const participante = (id: string) => torneo.participantes.find(x => x.id === id)!;
   if (!registroDelEncuentro(registro, e, participante(e.local.participante).controlador, participante(e.visita.participante).controlador)) throw new Error("El registro no corresponde a este encuentro");
-  const modelo = (id: string) => participante(id).nombre;
-  const t062 = torneo.version === "059-v1.1" ? null : torneo, e062 = t062?.encuentros.find(x => x.n === n);
-  const fase = t062?.formato === "grupos" && e062 ? { ...TEXTOS_TORNEO_SITIO.fases[e062.fase], desempate: e062.desempate } : undefined;
-  return { registro, origen: { id: torneo.id, n, inicioUtc: torneo.inicioUtc, ...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ...(fase ? { fase } : {}), local: { club: e.local.club, modelo: modelo(e.local.participante) }, visita: { club: e.visita.club, modelo: modelo(e.visita.participante) } } };
+  return { registro, origen: origenDeEncuentro(torneo, n) };
 }
 
 /** SHA-256 hexadecimal con la Web Crypto API (contexto seguro: https o localhost). */

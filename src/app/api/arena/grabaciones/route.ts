@@ -3,6 +3,7 @@ import { z } from "zod";
 import { readFile } from "node:fs/promises";
 import { Admision, admisionSubidas } from "../../../../arena/admision";
 import { contenidoCanonico, reproducirArena } from "../../../../arena/coordinador";
+import { registroCompleto } from "../../../../arena/cronica-hechos";
 import { ErrorPeticion, leerJsonDeCuerpo } from "../../../../arena/peticiones";
 import { ErrorSesion, gestorSesiones, respuestaErrorSesion } from "../../../../arena/sesiones";
 import type { RegistroArena } from "../../../../arena/tipos";
@@ -18,8 +19,9 @@ const archivos = {
 const esquemaArchivo = z.strictObject({ archivo: z.enum(["duelo", "ejemplo-v3", "ejemplo"]) });
 /** Brief 057 § 3.3 · Dos formas: un archivo del repositorio o un registro subido por el espectador. */
 const esquemaCuerpo = z.union([esquemaArchivo, z.strictObject({ registro: z.unknown() })]);
-/** Un registro completo cubre la duración configurada (o terminó antes por final anticipado). */
-const completo = (r: Pick<RegistroArena, "config" | "final">) => r.final.tick >= Math.round(r.config.duracionS / ARENA.pasoS) || Boolean(r.final.finalizado);
+/** Un registro completo cubre la duración configurada (o terminó antes por final anticipado). Brief 064: vive en
+ * `cronica-hechos.ts` (la misma expresión), que también la usa la crónica. */
+const completo = registroCompleto;
 /** Comprobación previa sobre el JSON crudo, solo si tiene la forma esperada; lo demás lo rechaza el validador. */
 function incompletoCrudo(crudo: unknown): boolean {
   const r = crudo as { config?: { duracionS?: unknown }; final?: { tick?: unknown; finalizado?: unknown } } | null;

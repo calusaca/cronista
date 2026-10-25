@@ -13,6 +13,7 @@ import type { Lado } from "../sim/tipos";
 import type { DecisionArena } from "./tipos";
 // Ciclo de importación deliberado y seguro: torneo-formatos.ts solo usa lo de aquí dentro de funciones.
 import { coherencia062 } from "./torneo-formatos";
+import { TEXTOS_TORNEO_SITIO } from "../ui/textos-torneo-sitio";
 
 export const VERSION_TORNEO = T.version;
 export const LADOS_TORNEO = ["local", "visita"] as const satisfies readonly Lado[];
@@ -543,4 +544,23 @@ export function metricasParticipante(t: Pick<TorneoArchivado, "encuentros">, id:
     posesionMediaPct: rec(media(c => c.posesionPct)), rematesPorPartido: rec(media(c => c.remates)), rematesDirectosPorPartido: rec(media(c => c.rematesDirectos)),
     precisionPasePct: rec(precision), recuperacionesPorPartido: rec(media(c => c.recuperaciones)),
   };
+}
+
+/** Brief 059/062 · Procedencia de un partido de torneo (club y modelo por lado, fecha, fase, prueba). */
+export interface OrigenTorneo {
+  id: string; n: number; inicioUtc: string; local: { club: string; modelo: string }; visita: { club: string; modelo: string };
+  /** Brief 062 · Liga de prueba del operador (se rotula igual que en la página del torneo). */
+  prueba?: boolean;
+  /** Brief 062 · Fase del partido en un torneo de grupos (semifinal, final…); ausente en la liga. */
+  fase?: { es: string; en: string; desempate: boolean };
+}
+
+/** Brief 064 § 4.7 · La parte pura de `cargarEncuentroTorneo` que arma el origen del encuentro `n` (cliente y servidor). */
+export function origenDeEncuentro(torneo: TorneoCualquiera, n: number): OrigenTorneo {
+  const e = torneo.encuentros.find(x => x.n === n);
+  if (!e) throw new Error("encuentro");
+  const modelo = (id: string) => torneo.participantes.find(x => x.id === id)!.nombre;
+  const t062 = torneo.version === "059-v1.1" ? null : torneo, e062 = t062?.encuentros.find(x => x.n === n);
+  const fase = t062?.formato === "grupos" && e062 ? { ...TEXTOS_TORNEO_SITIO.fases[e062.fase], desempate: e062.desempate } : undefined;
+  return { id: torneo.id, n, inicioUtc: torneo.inicioUtc, ...(t062?.lanzamiento === "prueba" ? { prueba: true } : {}), ...(fase ? { fase } : {}), local: { club: e.local.club, modelo: modelo(e.local.participante) }, visita: { club: e.visita.club, modelo: modelo(e.visita.participante) } };
 }

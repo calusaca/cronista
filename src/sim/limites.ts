@@ -1567,3 +1567,49 @@ export const TORNEO_SITIO = {
    * nuevo) → 1,1 × 1,2143 = 1,3357; se sube a 1,34 y se rehace la comprobación de topes (la prueba la repite). */
   factorObservacion063: 1.34,
 } as const;
+
+/**
+ * Brief 064 § 6 (bloque B) · Crónica verificada por partido de la arena. Las pruebas importan estas cifras; ninguna las
+ * repite a mano. `llamadasPorCronica` no vive aquí: es `1 + MAX_REINTENTOS` de `cadena/umbrales.ts`.
+ */
+export const CRONICA_ARENA = {
+  /** Versión del archivo `<h>.cronica.json`. */
+  version: "cronica-arena-v1",
+  /** Versión del catálogo del Analista de arena (§ 4.2); cambiarla invalida las guardadas (`desactualizada`). */
+  analista: "hechos-arena-v1",
+  /** Primer recorte de hechos; los obligatorios (≥ COBERTURA) nunca se recortan (después manda maxCaracteresEntrada). */
+  maxHechos: 24,
+  /** Que un partido largo no llene la crónica de una sola clase. */
+  maxPorClase: { lejanos: 3, amarillas: 4, cambios: 4 },
+  /** Relevancia de cada clase del catálogo; obligatorios = los que V5 exige con COBERTURA 70. */
+  relevancia: { resultado: 100, gol: 90, autogol: 90, varios: 80, expulsion: 75, finalAnticipado: 75, remates: 60, atajadas: 55, lejano: 50, amarilla: 45, largos: 40, cambio: 35, fueraJuego: 30 },
+  /** Generaciones con modelo por día UTC (tope estimado ≈ 5,04 USD/día, § 4.5); `ARENA_CRONICA_DIARIA` lo sustituye. */
+  diarias: 15,
+  /** Tokens de salida por llamada, razonamiento incluido; JSON bilingüe de ≤ hechos.length oraciones. */
+  maxTokensSalida: 5_000,
+  /** Plazos por intento y total, por debajo de los 240 s del ingress. */
+  plazoIntentoMs: 60_000,
+  plazoTotalMs: 150_000,
+  /** Plazo del cliente: total + margen. */
+  plazoClienteMs: 165_000,
+  /** System prompt + mensaje inicial; sin caber con los obligatorios → acta `tamano`. */
+  maxCaracteresEntrada: 22_000,
+  /** `feedbackAcotado`. */
+  maxCaracteresFeedback: 4_000,
+  /** Respuesta del modelo que se reenvía en la conversación; más larga = intento fallido V1. */
+  maxCaracteresRespuesta: 12_000,
+  /** `esquemaCronicaArena` serializado (la unitaria 7 lo mide con 24 hechos). */
+  maxCaracteresEsquema: 6_000,
+  /** Una réplica, coste predecible. */
+  generacionesSimultaneas: 1,
+  /** `retry-after` del 429 `en-curso`. */
+  reintentoOcupadoS: 5,
+  /** 2 × plazoTotalMs: una reserva pendiente más vieja es `abandonada`. */
+  reservaAbandonadaMs: 300_000,
+  /** Registros nuevos por día UTC: acota el almacén (≈ 1–2 MB por registro comprimido). */
+  registrosDiarios: 200,
+  /** Admisión de subidas `{ registro }`: protege la CPU de reproducirArena. */
+  admision: { porIpPorHora: 10, globalPorHora: 60, enCurso: 1, ventanaMs: 3_600_000 },
+  /** La repetición empieza un poco antes de la jugada. */
+  antesDelEventoS: 3,
+} as const;

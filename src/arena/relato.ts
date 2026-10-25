@@ -86,16 +86,21 @@ function indiceEvento(registro: RegistroArena, evento: EventoArena): number {
 
 /** Brief 054 v1.1 · «Remate y gol», por POSICIÓN en `registro.eventos`: el evento anterior más cercano
  * del goleador es un `tiro` con tick ≤ el del gol y el mismo `desde`, y entre los índices del tiro y del
- * gol no hay ningún evento de `CANTO_GOL.gritoRemate.tiposQueRompen`. Lo posterior al gol no cuenta. */
-export function golDeRemate(gol: EventoArena, registro: RegistroArena): boolean {
-  if (gol.tipo !== "gol") return false;
+ * gol no hay ningún evento de `CANTO_GOL.gritoRemate.tiposQueRompen`. Lo posterior al gol no cuenta.
+ * Brief 064 § 4.2 (v1.1): el mismo recorrido devuelve el tiro (o null); `golDeRemate` es `tiroDelGol(…) !== null`. */
+export function tiroDelGol(gol: EventoArena, registro: RegistroArena): EventoArena | null {
+  if (gol.tipo !== "gol") return null;
   const rompen: readonly string[] = CANTO_GOL.gritoRemate.tiposQueRompen;
   for (let k = indiceEvento(registro, gol) - 1; k >= 0; k--) {
     const e = registro.eventos[k]!;
-    if (e.jugador === gol.jugador) return e.tipo === "tiro" && e.tick <= gol.tick && e.desde.x === gol.desde.x && e.desde.y === gol.desde.y;
-    if (rompen.includes(e.tipo)) return false;
+    if (e.jugador === gol.jugador) return e.tipo === "tiro" && e.tick <= gol.tick && e.desde.x === gol.desde.x && e.desde.y === gol.desde.y ? e : null;
+    if (rompen.includes(e.tipo)) return null;
   }
-  return false;
+  return null;
+}
+
+export function golDeRemate(gol: EventoArena, registro: RegistroArena): boolean {
+  return tiroDelGol(gol, registro) !== null;
 }
 
 /** Brief 054 · «Golazo» por definición: remate cuya distancia en profundidad del origen a la línea de
