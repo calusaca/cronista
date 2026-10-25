@@ -1,12 +1,14 @@
 // Brief 016 §4 — /liga: la liga ficticia completa. Tabla de posiciones, selector de jornada con
 // sus 5 partidos (marcador + link a la vista de partido de siempre) y goleadores. Todo sale de
 // la temporada simulada en el server; los números son funciones puras de los resultados.
+import { BarraHeredada } from "../../ui/BarraHeredada";
 import Link from "../../ui/Enlace";
 import { CLIMA_EN } from "../../ui/textos";
 import { Simulador } from "../../ui/Simulador";
 import { mundo } from "../../mundo/mundo";
 import { jornadasDe } from "../../mundo/temporada";
 import { bajasDeJornada, jugadoresVisibles, ligaVisible, rutaPartidoLiga, temporadaVisible } from "../../vista/liga";
+import { idiomaDeLang } from "../../vista/raiz";
 import { presets } from "../../vista/servidor";
 import { notaDeduccion } from "../../vista/sanciones";
 
@@ -14,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 const GOLEADORES_VISIBLES = 10;
 
-export default async function PaginaLiga({ searchParams }: { searchParams: Promise<{ j?: string; tab?: string }> }) {
+export default async function PaginaLiga({ searchParams }: { searchParams: Promise<{ j?: string; tab?: string; lang?: string }> }) {
   const liga = ligaVisible();
   const pais = mundo().paises.find((p) => p.id === liga.pais);
   const t = temporadaVisible();
@@ -28,6 +30,7 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
 
   return (
     <>
+      <BarraHeredada idiomaInicial={idiomaDeLang(sp.lang)} />
       <Simulador presets={presets()} seccion="liga" />
       <main className="liga" data-testid="league-page">
         <header className="liga-head">

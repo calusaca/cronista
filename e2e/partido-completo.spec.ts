@@ -13,7 +13,7 @@ const m = micro(p);
 const total = p.eventos.length + m.eventos.length;
 
 test("partido completo: cada acción, páginas hasta el final, minuto, filtros y descarga íntegra sin API", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const peticiones: string[] = [];
   page.on("request", (r) => { if (new URL(r.url()).pathname.startsWith("/api/")) peticiones.push(r.url()); });
   await page.getByTestId("open-full-match").click();
@@ -59,7 +59,7 @@ test("partido completo: cada acción, páginas hasta el final, minuto, filtros y
 
 test("partido completo ES/EN, sin resultados de búsqueda, teclado y móvil de 360px", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.getByTestId("full-view-acciones").click();
   await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();

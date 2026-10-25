@@ -14,7 +14,7 @@ const ficha = JSON.parse(readFileSync(join(process.cwd(), "docs", "dataset", "fi
 const miles = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 test("barra → Data → cifras de la corrida, descarga de la muestra real, el DATASHEET; y a 360 px sin desborde", async ({ page, request, browser }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("data-link").click();
   await expect(page).toHaveURL(/\/datos$/);
   await expect(page.getByTestId("data-page")).toContainText("The CRONISTA match dataset");

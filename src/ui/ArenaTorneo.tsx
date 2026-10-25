@@ -22,7 +22,8 @@ import {
 } from "../arena/torneo";
 import type { LecturaTorneo } from "../arena/torneo-archivo";
 import { IDENTIDAD_ARENA } from "../sim/limites";
-import { EmblemaCronista } from "./Emblema";
+import { BarraSitio } from "./BarraSitio";
+import { PieSitio } from "./PieSitio";
 import Link from "./Enlace";
 import { Escudo } from "./Escudo";
 
@@ -74,18 +75,6 @@ const ordinal = (n: number, idioma: Idioma) => idioma === "es" ? `${n}.º` : `${
 const nn = (n: number) => String(n).padStart(2, "0");
 export const enlaceRepeticion = (id: string, n: number, idioma: Idioma) => `/arena?torneo=${id}&encuentro=${nn(n)}${idioma === "es" ? "&lang=es" : ""}`;
 
-function Barra({ idioma, cambiar }: { idioma: Idioma; cambiar: () => void }) {
-  const es = idioma === "es";
-  return <header className="topbar arena-topbar">
-    <Link href="/" className="brand" prefetch={false}><EmblemaCronista /><span className="brand-mark">CRONISTA</span><span className="brand-tag">{es ? "Torneo entre modelos" : "Model tournament"}</span></Link>
-    <nav className="topbar-links" aria-label={es ? "Secciones" : "Sections"}>
-      <Link href="/" prefetch={false}>{es ? "Crónicas" : "Match reports"}</Link>
-      <Link href={es ? "/arena?lang=es" : "/arena"} prefetch={false}>{es ? "Laboratorio" : "Lab"}</Link>
-      <button className="btn" onClick={cambiar} aria-label={es ? "Cambiar a inglés" : "Switch to Spanish"}>{es ? "EN" : "ES"}</button>
-    </nav>
-  </header>;
-}
-
 /** Nombre completo; a ≤ 520 px se ve el corto y el completo queda en `title` y en texto oculto. */
 function Modelo({ p }: { p: ParticipanteTorneo }) {
   return <span className="arena-torneo-modelo" title={p.nombre}><span className="arena-torneo-largo">{p.nombre}</span><span className="arena-torneo-corto" aria-hidden="true">{p.corto}</span></span>;
@@ -106,7 +95,8 @@ export function ArenaTorneo({ lectura, ediciones = [], lista, panel = false, clu
       <p role="alert" className="arena-torneo-banda" data-testid="arena-torneo-incoherente">{tx("incoherente")}</p></section>
     : <Contenido torneo={lectura.torneo} idioma={idioma} clubes={clubes} />;
   return <>
-    <Barra idioma={idioma} cambiar={cambiar} />
+    {/* Brief 064 § 3.1 · La barra única del sitio (CRONISTA · Arena · Torneo · ES/EN). */}
+    <BarraSitio idioma={idioma} alCambiarIdioma={cambiar} seccion="torneo" />
     <main className="arena-shell arena-torneo" lang={idioma} data-testid="arena-torneo">
       {panel && <ArenaTorneoLanzar idioma={idioma} />}
       {cuerpo}
@@ -114,6 +104,7 @@ export function ArenaTorneo({ lectura, ediciones = [], lista, panel = false, clu
       {!lista && ediciones.length > 1 && <section className="arena-torneo-panel" aria-labelledby="arena-torneo-ediciones"><h2 id="arena-torneo-ediciones">{es ? "Otras ediciones" : "Other editions"}</h2>
         <ul>{ediciones.map(e => <li key={e.id}><Link href={`/arena/torneo/${e.id}${es ? "?lang=es" : ""}`} prefetch={false}>{e.titulo[idioma]}</Link></li>)}</ul></section>}
     </main>
+    <PieSitio idioma={idioma} />
   </>;
 }
 

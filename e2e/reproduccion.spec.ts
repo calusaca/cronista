@@ -13,7 +13,7 @@ const { jugadas, cuadros } = construirRelato(p, filas);
 const carry = m.eventos.find(e => e.tipo === "conduccion")!;
 
 test("reproducción: ficha y balón se mueven, pausa estable y selección manual detiene incluso en la misma frase", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const errores: string[] = [], api: string[] = [];
   page.on("pageerror", e => errores.push(e.message));
   page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url()); });
@@ -43,7 +43,7 @@ test("reproducción: ficha y balón se mueven, pausa estable y selección manual
 });
 
 test("la jugada se detiene en su último ID; reinicio y partido completo cruzan la posesión sincronizando texto", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.getByTestId("pitch-speed").selectOption("2");
   await page.getByTestId("pitch-play").click();
@@ -66,7 +66,7 @@ test("la jugada se detiene en su último ID; reinicio y partido completo cruzan 
 });
 
 test("fluido/detallado ES/EN, formaciones narradas y descarga con todos los IDs", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await expect(page.getByTestId("commentary-lineups")).toContainText("4-3-3");
   await expect(page.getByTestId("commentary-lineups")).toBeInViewport();
@@ -94,7 +94,7 @@ test("fluido/detallado ES/EN, formaciones narradas y descarga con todos los IDs"
 
 test("movimiento reducido mantiene pasos discretos y lectura sincronizada", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.locator(`[data-relato-id="${carry.id}"]`).click();
   const ficha = page.locator(`.tactical-active[data-name="${carry.jugador}"]`);
@@ -112,7 +112,7 @@ test("movimiento reducido mantiene pasos discretos y lectura sincronizada", asyn
 
 test("móvil: cancha completa, pausa al volver al relato y Escape devuelve el foco", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();
   await page.locator(`[data-relato-id="${carry.id}"]`).click();
@@ -128,7 +128,7 @@ test("móvil: cancha completa, pausa al volver al relato y Escape devuelve el fo
 });
 
 test("ocultar la pestaña cancela la reproducción y no la reanuda sola", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.getByTestId("pitch-play").click();
   await expect(page.getByTestId("pitch-player")).toHaveAttribute("data-playing", "true");

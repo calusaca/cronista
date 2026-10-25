@@ -3,7 +3,7 @@
 import { expect, test } from "@playwright/test";
 
 test("home → League mode → tabla → jornada → partido completo con breadcrumb → volver", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("league-mode").click();
   await expect(page).toHaveURL(/\/liga$/);
   await expect(page.getByTestId("league-page")).toContainText("A fully simulated fictional league");

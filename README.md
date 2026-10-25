@@ -133,7 +133,7 @@ One sentence narrates exactly **one fact**. The Verifier checks, per sentence: s
 
 ```bash
 npm ci            # Node 22 or newer (CI uses 22 and 24)
-npm run dev       # offline stub mode → http://localhost:3000 and /arena
+npm run dev       # offline stub mode → http://localhost:3000 (redirects to /arena); 90-minute recaps at /cronicas
 npm test && npm run test:stats && npm run e2e
 ```
 

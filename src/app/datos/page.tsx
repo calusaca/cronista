@@ -1,6 +1,7 @@
 // Brief 028 §3 — /datos: la historia del dataset en una pantalla. Cifras de cabecera de la corrida
 // de referencia (ficha.json, escrita por el CLI), el esquema en una tabla corta (el diccionario del
 // código), la descarga de la muestra REAL de public/ y el DATASHEET. Nada a mano.
+import { BarraHeredada } from "../../ui/BarraHeredada";
 import Link from "../../ui/Enlace";
 import { CAMPOS_LINEA } from "../../dataset/esquema";
 import { dec, miles } from "../../dataset/texto";
@@ -8,11 +9,13 @@ import { ESQUEMA, MUESTRA_ARCHIVO } from "../../dataset/umbrales-dataset";
 import { Simulador } from "../../ui/Simulador";
 import { DescargaMuestra } from "../../ui/DescargaMuestra";
 import { kbMuestra, leerFicha, RUTA_DATASHEET } from "../../vista/datos";
+import { idiomaDeLang } from "../../vista/raiz";
 import { presets } from "../../vista/servidor";
 
 export const dynamic = "force-dynamic";
 
-export default function PaginaDatos() {
+export default async function PaginaDatos({ searchParams }: { searchParams: Promise<{ lang?: string }> }) {
+  const { lang } = await searchParams;
   const f = leerFicha();
   const kb = kbMuestra();
   const semillas = f.muestra.semillas;
@@ -21,6 +24,7 @@ export default function PaginaDatos() {
   const b = f.bandasCorrida;
   return (
     <>
+      <BarraHeredada idiomaInicial={idiomaDeLang(lang)} />
       <Simulador presets={presets()} seccion="datos" />
       <main className="liga datos" data-testid="data-page">
         <header className="liga-head">

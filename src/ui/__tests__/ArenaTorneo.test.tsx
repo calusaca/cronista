@@ -60,7 +60,11 @@ describe("059 · página del torneo (M25)", () => {
     const h = renderToStaticMarkup(<ArenaTorneo lectura={{ estado: "incoherente", id: "x", errores: ["plan"] }} ediciones={[]} idiomaInicial="es" />);
     expect(h).toContain(TEXTOS_TORNEO.incoherente.es);
     expect(h).not.toMatch(/<table|USD|<dd/);
-    expect(h.replace(/<[^>]+>/g, "")).not.toMatch(/\d/);
+    // Brief 064 § 3.4 · Ninguna cifra en el contenido del torneo (<main>); el pie común del sitio dice «Simulador de 90
+    // minutos» y queda fuera de esta comprobación.
+    const main = /<main\b[^>]*>(.*)<\/main>/s.exec(h)?.[1] ?? "";
+    expect(main).not.toBe("");
+    expect(main.replace(/<[^>]+>/g, "")).not.toMatch(/\d/);
     const v = renderToStaticMarkup(<ArenaTorneo lectura={null} ediciones={[]} idiomaInicial="en" />);
     expect(v).toContain(TEXTOS_TORNEO.vacio.en);
     expect(v).not.toContain("<table");

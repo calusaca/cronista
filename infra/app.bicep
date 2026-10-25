@@ -52,6 +52,8 @@ resource app 'Microsoft.App/containerApps@2025-01-01' = {
         resources: { cpu: json('0.5'), memory: '1Gi' }
         env: [
           { name: 'CRONISTA_LLM', value: 'azure-openai' }
+          // Brief 064 D3 · En este host (demo de crónicas) `/` sigue siendo la crónica destacada, no la arena.
+          { name: 'CRONISTA_RAIZ', value: 'cronicas' }
           { name: 'AZURE_OPENAI_ENDPOINT', value: openAiEndpoint }
           { name: 'AZURE_OPENAI_DEPLOYMENT', value: openAiDeployment }
           { name: 'AZURE_OPENAI_API_VERSION', value: apiVersion }

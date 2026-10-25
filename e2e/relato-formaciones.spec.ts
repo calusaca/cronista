@@ -13,7 +13,7 @@ const m = micro(p);
 const filas = accionesCompletas(p, m);
 
 test("relato conectado: frase→cancha, balón antes/después, cada acción y TXT completo con búsqueda activa", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const api: string[] = [];
   page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/")) api.push(r.url()); });
   await page.getByTestId("open-full-match").click();
@@ -50,7 +50,7 @@ test("relato conectado: frase→cancha, balón antes/después, cada acción y TX
 });
 
 test("formaciones: 22 dorsales iniciales y distribución tras cambios/rojas, con cambio de arcos", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-formations").click();
   await expect(page.getByTestId("formations-view")).toBeVisible();
   await expect(page.getByTestId("formation-shape")).toHaveText(["4-3-3", "4-3-3"]);
@@ -74,7 +74,7 @@ test("formaciones: 22 dorsales iniciales y distribución tras cambios/rojas, con
 });
 
 test("un gol abre su elaboración completa y el relato conserva remate, gol y evidencia previa", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const gol = p.eventos.find(e => e.tipo === "gol")!;
   await page.locator(`[data-testid="timeline-event"][data-event-id="${gol.id}"]`).click();
   await page.getByTestId("goal-open-commentary").click();
@@ -89,7 +89,7 @@ test("un gol abre su elaboración completa y el relato conserva remate, gol y ev
 
 test("relato y formaciones ES en móvil: lectura, cancha desplegable, foco y sin desborde", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
-  await page.goto("/");
+  await page.goto("/cronicas");
   await page.getByTestId("open-full-match").click();
   await page.getByTestId("full-match-language").getByRole("button", { name: "ES", exact: true }).click();
   await expect(page.getByTestId("commentary-story")).toContainText("¡Comienza el encuentro!");

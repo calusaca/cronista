@@ -3,7 +3,7 @@
 import { expect, test } from "@playwright/test";
 
 test("Random match navega a un partido válido distinto de la portada", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const boton = page.getByTestId("random-match");
   await expect(boton).toBeVisible();
   await expect(boton).toContainText("Random match");

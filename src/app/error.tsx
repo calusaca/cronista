@@ -12,6 +12,6 @@ export default function ErrorPagina() {
     <p role="alert">Please try again, or return to the featured match.</p>
     {/* La recarga permite recuperar también un módulo cuyo import quedó rechazado. */}
     <button type="button" className="btn btn-primary" disabled={pendiente} onClick={() => { setPendiente(true); window.location.reload(); }}>Try again</button>{" "}
-    <Link href="/" prefetch={false} className="btn">Featured match</Link>
+    <Link href="/cronicas" prefetch={false} className="btn">Featured match</Link>
   </main>;
 }

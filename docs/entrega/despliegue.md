@@ -117,10 +117,12 @@ compilar localmente; la plantilla corregida pasó el preflight y CI.
 ## Comprobar el resultado
 
 ```bash
-npm run smoke:public -- https://<app>.azurecontainerapps.io
+npm run smoke:public -- https://<app>.azurecontainerapps.io --raiz cronicas   # host de crónicas (CRONISTA_RAIZ=cronicas)
+npm run smoke:public -- https://<app>.azurecontainerapps.io                   # host sin CRONISTA_RAIZ: / → 307 /arena
 ```
 
-Comprueba salud, home con crónica del modelo real, assets JS, catálogo de datos,
+Desde el brief 064 la crónica destacada se lee en `/cronicas` en los dos hosts y la raíz se comprueba sin seguir
+redirecciones. Comprueba salud, crónica destacada del modelo real, assets JS, catálogo de datos,
 DATASHEET, diez registros descargables y un 404. Puede generar una crónica y
 consumir tokens si no existe caché. `/api/health` comprueba conectividad sin
 invocar al modelo. El recorrido público de Chromium comprobó clic en frase,

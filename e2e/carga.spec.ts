@@ -17,7 +17,7 @@ async function retenerPartido(page: Page) {
 
 for (const accion of ["semilla", "azar", "vacia", "historia"] as const) {
   test(`${accion}: aviso inmediato hasta recibir el partido y sin solicitudes duplicadas`, async ({ page }) => {
-    await page.goto(accion === "semilla" ? "/" : "/match/246");
+    await page.goto(accion === "semilla" ? "/cronicas" : "/match/246");
     const seed = page.getByTestId("seed-input");
     if (accion === "semilla") await seed.fill("42");
     if (accion === "vacia") await seed.fill("");

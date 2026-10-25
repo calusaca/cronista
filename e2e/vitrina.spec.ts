@@ -52,7 +52,7 @@ test("Match stats en el replay: «so far», y crecen con el reloj", async ({ pag
 });
 
 test("presets: cinco historias sin marcador, y elegir una abre su partido", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const select = page.getByTestId("preset-select");
   const opciones = await select.locator("option").evaluateAll((os) => os.map((o) => ({ v: (o as HTMLOptionElement).value, t: o.textContent ?? "" })));
   const historias = opciones.filter((o) => o.v !== "");

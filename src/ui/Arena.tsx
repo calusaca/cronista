@@ -8,7 +8,8 @@ import { etiquetasPerfil } from "../arena/personalidades";
 import { ARENA, CLIMAS_PARTIDO, IDENTIDAD_ARENA, TEMPERATURA_C } from "../sim/limites";
 import { identidadPartido } from "../arena/identidad";
 import { Escudo } from "./Escudo";
-import { EmblemaCronista } from "./Emblema";
+import { BarraSitio } from "./BarraSitio";
+import { PieSitio } from "./PieSitio";
 import { IconoEventoArena } from "./IconosArena";
 import { entornoDeFormulario } from "../arena/entorno-formulario";
 import type { Condiciones } from "../sim/tipos";
@@ -370,10 +371,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const cambiarFavoritos = (valor: FavoritosArena) => { if (!favoritos.hidratado) return; const ok = guardarFavoritos(almacenFavoritos(), valor); setFavoritos({ valor, error: !ok, hidratado: true }); };
   const estrellaClub = (lado: "local" | "visita") => <EstrellaFavorito activo={presentes.lado === lado} nombre={nombres[lado].nombre} tipo="club" idioma={idioma} testId="arena-favorite-club" lado={lado} alternar={() => cambiarFavoritos(alternarClub(favoritos.valor, nombres[lado].nombre))} />;
   return <>
-    <header className="topbar arena-topbar">
-      <Link href="/" className="brand" prefetch={false}><EmblemaCronista /><span className="brand-mark">CRONISTA</span><span className="brand-tag">{t("Team agents lab", "Laboratorio de equipos")}</span></Link>
-      <nav className="topbar-links" aria-label={t("Sections", "Secciones")}><Link href="/" prefetch={false}>{t("Match reports", "Crónicas")}</Link><Link href={`/arena/torneo${es ? "?lang=es" : ""}`} prefetch={false}>{t("Tournament", "Torneo")}</Link><button className="btn" onClick={() => setIdioma(es ? "en" : "es")} aria-label={t("Switch to Spanish", "Cambiar a inglés")}>{es ? "EN" : "ES"}</button></nav>
-    </header>
+    {/* Brief 064 § 3.1 · La barra única del sitio (CRONISTA · Arena · Torneo · ES/EN). */}
+    <BarraSitio idioma={idioma} alCambiarIdioma={() => setIdioma(es ? "en" : "es")} seccion="arena" />
     <main className="arena-shell" lang={idioma} data-testid="arena" style={identidad.variables as CSSProperties}>
       <div className="arena-intro"><p className="overline">{t("Experimental · simulated football", "Experimental · fútbol simulado")}</p>
         <h1>{t("Two teams. One shared pitch.", "Dos equipos. Una misma cancha.")}</h1>
@@ -539,5 +538,6 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       <ArenaDescripcion eventos={eventos} registro={registro} idioma={idioma} saltar={saltar} />
       <details className="arena-limits"><summary>{t("Prototype scope and limitations", "Alcance y límites del prototipo")}</summary><p>{estado.entrenadores ? t("Short synthetic 2D encounters with coaches, substitutions at stoppages and simplified contact fouls/cards. New matches include simplified kick-offs, throw-ins, corner kicks and goal kicks; archives retain their original rules. No regulation penalties, injuries or change of ends. Crosses have a simplified aerial phase, with no heights or headers, contested only near the landing point; the goalkeeper cannot be challenged while holding the ball. Shots are placed inside the goal and can go over the bar with a modelled probability, with no simulated height; there are no posts or rebounds. Movement, personalities and environmental effects require calibration. This is not a full regulation match or evidence of professional tactical quality.", "Encuentros sintéticos cortos en 2D con entrenadores, sustituciones en interrupciones y faltas/tarjetas por contacto simplificadas. Los partidos nuevos incluyen saques de centro, banda, esquina y meta simplificados; los archivos conservan sus reglas originales. Sin penales reglamentarios, lesiones ni cambio de campo. Los centros tienen una fase aérea simplificada, sin alturas ni cabezazos, que solo se disputa cerca del punto de caída; el portero no puede ser disputado con el balón en las manos. El remate se coloca dentro del arco y puede irse por encima del travesaño por una probabilidad modelada, sin altura simulada; no hay palos ni rebotes. Movimiento, personalidades y efectos ambientales requieren calibración. No es un partido reglamentario completo ni evidencia de calidad táctica profesional.") : t("Archived short 2D open-play scenario. Simplified restarts; no fouls, cards, injuries, substitutions or change of ends.", "Escenario archivado corto de juego abierto 2D. Reinicios simplificados; sin faltas, tarjetas, lesiones, sustituciones ni cambio de campo.")}{"persecucion" in registro.inicial && t(" Beaten defenders run back towards their goal and whoever loses the ball chases it for a stretch according to their line; this is a simplified synthetic rule.", " Los defensores superados corren hacia su arco y quien pierde el balón lo persigue un tramo según su línea; es una regla sintética simplificada.")}{registro.config.atributos && t(" Six synthetic attributes per player modulate speed, fatigue, duels, accuracy and power; there are long balls over the top and long-range shots, with no simulated height.", " Seis atributos sintéticos por jugador modulan velocidad, desgaste, duelos, precisión y potencia; hay balones largos por arriba y remates lejanos, sin altura simulada.")}{registro.config.estilosJuego && t(" Each club's playing identity is derived from its name and modulates the block, the chase and how often players try long balls and long-range shots.", " La identidad de juego del club se deriva de su nombre y modula bloque, persecución y frecuencia de balones largos y remates lejanos.")}{t(" The ball in the net and the front view of the goal are reconstructions: the lateral position comes from the record; the height is illustrative.", " El balón en la red y la vista frontal del arco son reconstrucciones: la posición lateral viene del registro; la altura es ilustrativa.")}</p></details>
     </main>
+    <PieSitio idioma={idioma} />
   </>;
 }

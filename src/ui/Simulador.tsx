@@ -1,5 +1,6 @@
 "use client";
-// Barra superior: marca + simular otro partido (presets con historia, o una semilla).
+// Tira del simulador de 90 minutos (brief 064 D5): enlaces de las crónicas + simular otro partido (presets con
+// historia, o una semilla).
 // Sin configuración avanzada a la vista (brief 004).
 
 import Link from "./Enlace";
@@ -8,14 +9,13 @@ import { type FormEvent, useState, useTransition } from "react";
 import type { Perspectiva, Preset } from "../vista/servidor";
 import { IconoDado } from "./Iconos";
 import { useAvisoCarga } from "./Actividad";
-import { EmblemaCronista } from "./Emblema";
 
 /** Brief 011: rango del partido al azar (Math.random está bien aquí: es UI, no src/sim). */
 const AZAR_MAX = 99999;
 
 const SEED_MAX = 4294967295;
 
-/** Brief 061 § 3 D4: sección del marco de las crónicas que marca `aria-current="page"` en la barra. */
+/** Brief 061 § 3 D4 + 064 D5: sección de las crónicas que marca `aria-current="page"` en la tira. */
 export type SeccionCronicas = "cronicas" | "liga" | "datos";
 
 /** Brief 016: `semillaActual` es opcional — en la liga el campo arranca vacío (su semilla no es un /match).
@@ -65,31 +65,25 @@ export function Simulador({
   };
 
   return (
-    // Brief 061 § 3 D3: la misma barra de rótulo que la arena (reglas Z1 del 047), ajustes propios en .topbar-cronicas.
-    <header className="topbar arena-topbar topbar-cronicas">
-      <Link href="/" className="brand" prefetch={false}>
-        <EmblemaCronista />
-        <span className="brand-mark">CRONISTA</span>
-        <span className="brand-tag">Match reports where every sentence shows its evidence</span>
-      </Link>
-      <div className="topbar-acciones">
-      <nav className="topbar-links" aria-label="Sections">
-        {/* Brief 061 § 3 D4: las crónicas, con el mismo nombre que en la barra de la arena. */}
-        <Link href="/" className="league-link" prefetch={false} data-testid="reports-link" aria-current={seccion === "cronicas" ? "page" : undefined}>
-          Match reports
-        </Link>
-        {/* Brief 016: la liga ficticia completa. */}
-        <Link href="/liga" className="league-link" prefetch={false} data-testid="league-mode" aria-current={seccion === "liga" ? "page" : undefined}>
-          League mode
-        </Link>
-        {/* Brief 028: el dataset descargable. */}
-        <Link href="/datos" className="league-link" prefetch={false} data-testid="data-link" aria-current={seccion === "datos" ? "page" : undefined}>
-          Data
-        </Link>
-        <Link href="/arena" className="league-link" prefetch={false} data-testid="arena-link">
-          Arena
-        </Link>
-      </nav>
+    // Brief 064 § 3.3 (D5) · Ya no es un <header>: es la tira propia de las rutas heredadas, debajo de la barra única
+    // (BarraSitio). Conserva sus enlaces, el formulario intacto y la guarda del 061 V2.
+    <nav className="cronicas-herramientas" aria-label="90-minute simulator">
+      <div className="cronicas-cabeza">
+        <span className="cronicas-rotulo">90-minute simulator · separate from the arena</span>
+        <span className="cronicas-enlaces">
+          <Link href="/cronicas" prefetch={false} data-testid="reports-link" aria-current={seccion === "cronicas" ? "page" : undefined}>
+            Featured match
+          </Link>
+          {/* Brief 016: la liga ficticia completa. */}
+          <Link href="/liga" prefetch={false} data-testid="league-mode" aria-current={seccion === "liga" ? "page" : undefined}>
+            League mode
+          </Link>
+          {/* Brief 028: el dataset descargable. */}
+          <Link href="/datos" prefetch={false} data-testid="data-link" aria-current={seccion === "datos" ? "page" : undefined}>
+            Data
+          </Link>
+        </span>
+      </div>
       <form className="sim-form" onSubmit={simular} aria-label="Simulate a match" aria-busy={pendiente}>
         <select
           className="field"
@@ -136,7 +130,6 @@ export function Simulador({
           </span>
         )}
       </form>
-      </div>
-    </header>
+    </nav>
   );
 }

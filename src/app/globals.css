@@ -3344,26 +3344,11 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 }
 
 /* ==========================================================================
-   Brief 061 · Crónicas con la barra de la arena.
-   El header del Simulador lleva .topbar.arena-topbar.topbar-cronicas: reutiliza las reglas Z1
-   del 047/055 (rótulo --ar-bug, marca lima, .btn transparente, foco lima, lema oculto ≤ 480 px)
-   y aquí solo se ajusta lo propio de las crónicas. Tokens --ar-* de la barra: :root del 010.
+   Brief 061 · Crónicas con la barra de la arena. Desde el 064 las crónicas usan la barra única (BarraSitio,
+   `.topbar.arena-topbar`, reglas Z1 del 047/055) y sus ajustes de enlaces y formulario se movieron al bloque 064
+   (`.cronicas-herramientas`); aquí queda lo que no depende de la barra.
    ========================================================================== */
-.topbar-cronicas .topbar-links a { color: var(--ar-bug-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-.topbar-cronicas .topbar-links a[aria-current="page"] { color: var(--ar-score-bg); text-decoration: none; }
 .sim-error { font-size: 14px; }
-/* --danger claro sobre --ar-bug no llega a 4,5: el error de la barra usa el rojo del rótulo. */
-.topbar-cronicas .sim-form [role="alert"] { color: var(--ar-card-red-bug); }
-/* v1.1 § V1 · Siempre: la navegación puede partirse en filas. */
-.topbar-cronicas .topbar-links { flex-wrap: wrap; column-gap: 16px; row-gap: 4px; }
-/* v1.1 § V1 · 901–1279 px: dos filas. Fila 1 = marca + navegación; fila 2 = formulario completo, a la derecha. */
-@media (min-width: 901px) and (max-width: 1279px) {
-  .topbar-cronicas { flex-wrap: wrap; row-gap: 8px; }
-  .topbar-cronicas .brand-tag { display: none; }
-  .topbar-cronicas .topbar-acciones { display: contents; }
-  .topbar-cronicas .topbar-links { margin-left: auto; }
-  .topbar-cronicas .sim-form { flex: 1 1 100%; flex-wrap: wrap; justify-content: flex-end; }
-}
 /* v1.1 § V3 · «← Arena»: enlace simple a la arena, primer hijo de main en / y /match/[seed]. */
 .volver-arena { display: inline-flex; align-items: center; min-height: 44px; margin: 0 0 var(--ar-s2, 8px); color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 /* En un inline-flex el espacio final de la flecha se pierde: se restituye con un margen. */
@@ -3436,3 +3421,40 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-lineups-now-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--ar-s1); }
 .arena-lineups-now-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ar-s1); min-height: 44px; overflow-wrap: anywhere; }
 .arena-lineups-now-note { margin: var(--ar-s1) 0 0; font-size: 12px; }
+
+/* ==========================================================================
+   Brief 064 · Barra única del sitio y tira del simulador de 90 minutos.
+   La barra (BarraSitio) es `.topbar.arena-topbar` en todas las páginas: aquí solo la sección actual y el reparto de sus
+   enlaces. La tira `nav.cronicas-herramientas` de las rutas heredadas recibe, movidas desde `.topbar-cronicas` (061),
+   las reglas del formulario: jerarquía secundaria de «Simulate match» (011), error legible y el ajuste 901–1279 del
+   061 V1. Tokens del 010 (claro/oscuro), sin hex ni transition/animation/transform (regla 047).
+   ========================================================================== */
+.arena-topbar .topbar-links { flex-wrap: wrap; column-gap: 16px; row-gap: 4px; }
+.arena-topbar .topbar-links a { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.arena-topbar .topbar-links a[aria-current="page"] { color: var(--ar-score-bg); text-decoration: none; }
+
+.cronicas-herramientas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding: 10px 32px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.cronicas-cabeza { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; min-width: 0; }
+.cronicas-rotulo { color: var(--muted); font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.cronicas-enlaces { display: flex; flex-wrap: wrap; column-gap: 16px; row-gap: 4px; }
+.cronicas-enlaces a { display: inline-flex; align-items: center; min-height: 32px; color: var(--accent); font-weight: 700; font-size: 14.5px; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.cronicas-enlaces a[aria-current="page"] { color: var(--ink); text-decoration: none; }
+.cronicas-herramientas .sim-form { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+/* 011 · En la tira simular es secundario; la acción principal de la pantalla es la del partido (Watch live). */
+.cronicas-herramientas .btn-primary { background: var(--surface); color: var(--accent); border-color: var(--hl-line); }
+.cronicas-herramientas .btn-primary:hover { border-color: var(--accent); }
+.cronicas-herramientas .sim-form [role="alert"] { color: var(--danger); }
+/* 061 v1.1 § V1 · 901–1279 px: fila 1 = rótulo + enlaces; fila 2 = formulario completo, a la derecha. */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .cronicas-herramientas .sim-form { flex: 1 1 100%; }
+}
+/* ≤ 900 px: cabecera y formulario a lo ancho (el formulario usa la rejilla del 011). */
+@media (max-width: 900px) {
+  .cronicas-herramientas { padding: 10px 16px; }
+  .cronicas-cabeza, .cronicas-herramientas .sim-form { flex: 1 1 100%; margin-left: 0; }
+}
+
+/* Pie común (PieSitio): dataset sintético y simulador de 90 minutos a un clic. */
+.arena-footer { flex-wrap: wrap; align-items: center; }
+.arena-footer-enlaces { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.arena-footer-enlaces a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }

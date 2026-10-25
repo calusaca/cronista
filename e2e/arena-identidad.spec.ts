@@ -82,8 +82,8 @@ test("055 · favicon SVG y emblema en / y en /arena", async ({ page }) => {
     expect(r.status()).toBe(200);
     expect(r.headers()["content-type"]).toContain("image/svg+xml");
     await expect(page.locator(".brand-emblem")).toBeVisible();
-    // El enlace .brand sigue siendo el enlace a / y el emblema no añade texto a su nombre.
-    await expect(page.locator("a.brand")).toHaveAttribute("href", "/");
+    // Brief 064 § 8.4.4 · El enlace .brand lleva a la arena y el emblema no añade texto a su nombre.
+    await expect(page.locator("a.brand")).toHaveAttribute("href", "/arena");
     expect(await page.locator(".brand-emblem").getAttribute("aria-hidden")).toBe("true");
   }
   await page.goto("/arena");

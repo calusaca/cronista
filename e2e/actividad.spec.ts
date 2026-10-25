@@ -16,9 +16,9 @@ async function retener(page: Page, aceptar: (request: Request) => boolean) {
 }
 
 const navegaciones = [
-  { de: "/", selector: '[data-testid="league-mode"]', a: "/liga", titulo: "Loading page…" },
-  { de: "/", selector: '[data-testid="data-link"]', a: "/datos", titulo: "Loading page…" },
-  { de: "/datos", selector: ".brand", a: "/", titulo: "Preparing your match…" },
+  { de: "/cronicas", selector: '[data-testid="league-mode"]', a: "/liga", titulo: "Loading page…" },
+  { de: "/cronicas", selector: '[data-testid="data-link"]', a: "/datos", titulo: "Loading page…" },
+  { de: "/datos", selector: ".brand", a: "/arena", titulo: "Loading page…" },
   { de: "/match/246", selector: '[data-perspective="visita"]', a: "/match/246?perspectiva=visita", titulo: "Preparing your report…" },
   { de: "/liga", selector: '[data-testid="tab-players"]', a: "/liga?tab=players&j=1", titulo: "Loading page…" },
   { de: "/liga", selector: '[data-testid="matchday-link"][data-jornada="7"]', a: "/liga?j=7", titulo: "Loading page…" },

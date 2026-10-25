@@ -20,7 +20,7 @@ test("el camino del juez: evidencia, inversa, idioma, caja de cristal y pizarra 
   // 51,5 s de los 60 s por defecto. 120 s para este test, y solo este.
   test.setTimeout(120_000);
   // 1. Home: el partido destacado ya está cargado, sin configurar nada.
-  await page.goto("/");
+  await page.goto("/cronicas");
   const destacado = page.getByTestId("featured-match");
   await expect(destacado).toBeVisible();
   const oraciones = destacado.getByTestId("sentence");
@@ -126,7 +126,7 @@ async function cifrasCronica(page: Page): Promise<string> {
 }
 
 test("personalización (007): Aficionado ↔ Analista sin llamadas, y «mi equipo» cambia el orden, no los números", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   await expect(page.getByTestId("sentence").first()).toBeVisible();
   const textosFan = await page.getByTestId("sentence-text").allInnerTexts();
   const cifrasNeutral = await cifrasCronica(page);
@@ -156,7 +156,7 @@ test("personalización (007): Aficionado ↔ Analista sin llamadas, y «mi equip
   // 2. «Mi equipo»: contar el partido para la afición visitante.
   const ordenNeutral = await page.getByTestId("sentence").evaluateAll((els) => els.map((e) => e.getAttribute("data-hecho")));
   await clicConMouse(page, page.getByTestId("perspective").locator('[data-perspective="visita"]'));
-  await page.waitForURL("**/?perspectiva=visita");
+  await page.waitForURL("**/cronicas?perspectiva=visita");
   await expect(page.getByTestId("perspective").locator('[data-perspective="visita"]')).toHaveAttribute("aria-current", "true");
   await expect(page.getByTestId("match-view")).toContainText("Told for");
   const ordenVisita = await page.getByTestId("sentence").evaluateAll((els) => els.map((e) => e.getAttribute("data-hecho")));
@@ -175,7 +175,7 @@ test("cargar la página NO pide de antemano las otras perspectivas (sin prefetch
   page.on("request", (r) => {
     if (r.url().includes("perspectiva=")) pedidas.push(r.url());
   });
-  await page.goto("/");
+  await page.goto("/cronicas");
   const selector = page.getByTestId("perspective");
   await selector.scrollIntoViewIfNeeded();
   await page.mouse.move(10, 10);
@@ -185,7 +185,7 @@ test("cargar la página NO pide de antemano las otras perspectivas (sin prefetch
 });
 
 test("simular otra semilla desde la barra superior abre su partido", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/cronicas");
   const semilla = page.getByTestId("seed-input");
   await semilla.click();
   await semilla.fill("42");
