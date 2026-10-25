@@ -1,5 +1,21 @@
 # Brief 063 · publicación 2 (`reinicios-v7`) · lotes y experimento controlado
 
+## Revisión de Codex (25 oct, P2): cociente de potencia corregido
+
+La métrica de potencia de v1.2 § 18.3 restaba un tick de vuelo: el evento `tiro` se fecha un tick después de iniciar el
+vuelo (`MotorArena.evento`), y la métrica contaba desde el evento. Desde `03dc55b` cuenta desde `vuelo.inicioTick`. El
+motor v7 no cambia. Medido de nuevo en un árbol limpio en `03dc55b` (`v7-potencia-corregida-1-100.json`, script
+`../medicion/potencia-corregida.mts`), semillas 1–100, potencia 65 frente a 90 del `local`:
+
+| | Ticks de vuelo por metro (65) | (90) | Cociente alto/bajo | Banda | |
+| --- | --- | --- | --- | --- | --- |
+| Antes (tick del evento) | — | — | 0,920 | ≤ 0,985 | cumple |
+| **Corregido (`inicioTick`)** | 0,4599 | 0,4373 | **0,951** | ≤ 0,985 | **cumple** |
+
+El cociente sube hacia 1 (cada remate suma un tick común a los dos lotes), pero sigue dentro de banda. La fórmula da
+1,024/1,064 = 0,962; la medida queda algo por debajo porque los remates de los dos lotes no son los mismos (la potencia
+cambia también qué remates lejanos se intentan). La banda y v7 no cambian.
+
 ## v1.3 § 19 (24 oct): entradaDuelo desacoplado; valor adoptado 0,24
 
 Tras el bloqueo de abajo, el brief v1.3 § 19 desacopla `entradaDuelo` de `aguanteDuelo` (que queda en 0,12) y prueba

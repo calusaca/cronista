@@ -1,0 +1,28 @@
+{
+ "generado": "2026-10-25T00:19:47.743Z",
+ "commit": "03dc55b83abc471e04b8c0599e6e1c224b46a996",
+ "arbolConCambios": false,
+ "nota": "Revisión de Codex de la publicación 2 (P2): ticks de vuelo contados desde vuelo.inicioTick. Solo cambia la métrica del helper; el motor v7 no cambia.",
+ "reglas": "reinicios-v7",
+ "semillas": {
+  "desde": 1,
+  "hasta": 100
+ },
+ "sobreUmbral": {
+  "bajo": 65,
+  "alto": 90,
+  "cocienteMax": 0.985
+ },
+ "cociente": 0.9508593529736631,
+ "incumplimientos": [],
+ "bajo": {
+  "ticksPorMRemate": 0.4599208775265633,
+  "lejanosPorPartido": 0.9,
+  "goles": 1.84
+ },
+ "alto": {
+  "ticksPorMRemate": 0.4373200680239873,
+  "lejanosPorPartido": 0.82,
+  "goles": 2
+ }
+}
