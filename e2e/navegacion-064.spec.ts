@@ -28,7 +28,7 @@ async function barra(page: Page) {
 }
 
 test.describe("064 · N1 raíz con 307", () => {
-  for (const [desde, hacia] of [["/", "/arena"], ["/?lang=es", "/arena?lang=es"], ["/?perspectiva=visita", "/cronicas?perspectiva=visita"], ["/?partido=abc&lang=es", "/arena?partido=abc&lang=es"]] as const) {
+  for (const [desde, hacia] of [["/", "/arena"], ["/?lang=es", "/arena?lang=es"], ["/?perspectiva=visita", "/cronicas?perspectiva=visita"], ["/?partido=abc&lang=es", "/arena?partido=abc&lang=es"], ["/?a=1&b=2&a=3", "/arena?a=1&b=2&a=3"]] as const) {
     test(`${desde} → 307 ${hacia}`, async ({ request, baseURL }) => {
       const r = await request.get(desde, { maxRedirects: 0 });
       expect(r.status()).toBe(307);

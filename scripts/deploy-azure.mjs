@@ -135,7 +135,8 @@ async function main() {
     const url = outputs.url.value;
     writeFileSync(join(cacheDir, "deployment.json"), JSON.stringify({ url, group, appName, registryName, imageTag, deployedUtc: new Date().toISOString() }, null, 2) + "\n");
     console.log(`Demo: ${url}`);
-    console.log(`Verificar desde otra red: npm run smoke:public -- ${url}`);
+    // Brief 064 D3: este host lleva CRONISTA_RAIZ=cronicas (infra/app.bicep), así que su smoke exige la portada en `/`.
+    console.log(`Verificar desde otra red: npm run smoke:public -- ${url} --raiz cronicas`);
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }
