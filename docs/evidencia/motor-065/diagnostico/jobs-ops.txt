@@ -1,0 +1,16 @@
+A-lejanoProb015	reinicios-v8	60	1	400	{"LARGO_ARENA.remate.probabilidad": 0.15}
+A-lejanoProb015	reinicios-v8	180	1	400	{"LARGO_ARENA.remate.probabilidad": 0.15}
+A2-lejanoPreciso	reinicios-v8	60	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015}
+A2-lejanoPreciso	reinicios-v8	180	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015}
+B-tiroMin055	reinicios-v8	60	1	400	{"PERSONALIDAD_ARENA.tiroMinFactor": 0.55}
+B-tiroMin055	reinicios-v8	180	1	400	{"PERSONALIDAD_ARENA.tiroMinFactor": 0.55}
+B2-tiroMin070	reinicios-v8	60	1	400	{"PERSONALIDAD_ARENA.tiroMinFactor": 0.7}
+B2-tiroMin070	reinicios-v8	180	1	400	{"PERSONALIDAD_ARENA.tiroMinFactor": 0.7}
+C-errorBase45	reinicios-v8	60	1	400	{"REMATE_ARENA.errorBaseM": 4.5}
+C-errorBase45	reinicios-v8	180	1	400	{"REMATE_ARENA.errorBaseM": 4.5}
+D-alcanceMax21	reinicios-v8	60	1	400	{"REMATE_ARENA.alcanceMaxM": 2.1}
+D-alcanceMax21	reinicios-v8	180	1	400	{"REMATE_ARENA.alcanceMaxM": 2.1}
+E-A2+B055	reinicios-v8	60	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "PERSONALIDAD_ARENA.tiroMinFactor": 0.55}
+E-A2+B055	reinicios-v8	180	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "PERSONALIDAD_ARENA.tiroMinFactor": 0.55}
+control-v8	reinicios-v8	60	1	400	{}
+control-v8	reinicios-v8	180	1	400	{}

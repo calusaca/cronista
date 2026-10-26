@@ -1,0 +1,30 @@
+v8-sinLejano	reinicios-v8	120	{"LARGO_ARENA.remate.probabilidad": 0}
+v8-sinLejano	reinicios-v8	180	{"LARGO_ARENA.remate.probabilidad": 0}
+v8-sinLargo	reinicios-v8	120	{"LARGO_ARENA.pase.visionMin": 1000}
+v8-sinLargo	reinicios-v8	180	{"LARGO_ARENA.pase.visionMin": 1000}
+v8-sinLejanoNiLargo	reinicios-v8	120	{"LARGO_ARENA.remate.probabilidad": 0, "LARGO_ARENA.pase.visionMin": 1000}
+v8-sinLejanoNiLargo	reinicios-v8	180	{"LARGO_ARENA.remate.probabilidad": 0, "LARGO_ARENA.pase.visionMin": 1000}
+v8-dueloNeutro	reinicios-v8	120	{"ATRIBUTOS_ARENA.entradaDuelo": 0, "ATRIBUTOS_ARENA.aguanteDuelo": 0}
+v8-dueloNeutro	reinicios-v8	180	{"ATRIBUTOS_ARENA.entradaDuelo": 0, "ATRIBUTOS_ARENA.aguanteDuelo": 0}
+v8-velocidadNeutra	reinicios-v8	120	{"ATRIBUTOS_ARENA.velocidadMax": 0, "ATRIBUTOS_ARENA.aceleracion": 0}
+v8-velocidadNeutra	reinicios-v8	180	{"ATRIBUTOS_ARENA.velocidadMax": 0, "ATRIBUTOS_ARENA.aceleracion": 0}
+v8-restoAtribNeutro	reinicios-v8	120	{"ATRIBUTOS_ARENA.potenciaVelocidad": 0, "ATRIBUTOS_ARENA.visionError": 0, "ATRIBUTOS_ARENA.resistenciaDesgaste": 0}
+v8-restoAtribNeutro	reinicios-v8	180	{"ATRIBUTOS_ARENA.potenciaVelocidad": 0, "ATRIBUTOS_ARENA.visionError": 0, "ATRIBUTOS_ARENA.resistenciaDesgaste": 0}
+v8-identidadNeutra	reinicios-v8	120	{"ESTILO_JUEGO_ARENA.efectos.defensivo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.ofensivo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.posesion": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.contragolpe": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.directo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.presion": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}}
+v8-identidadNeutra	reinicios-v8	180	{"ESTILO_JUEGO_ARENA.efectos.defensivo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.ofensivo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.posesion": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.contragolpe": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.directo": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}, "ESTILO_JUEGO_ARENA.efectos.presion": {"bloqueM": 0, "persecucion": 1, "extra": 0, "repliegue": 0, "largo": 1, "lejano": 1, "umbralLargo": 0, "umbralLejano": 0}}
+v8-sinPersecucion	reinicios-v8	120	{"PERSECUCION_ARENA.maxS": 0}
+v8-sinPersecucion	reinicios-v8	180	{"PERSECUCION_ARENA.maxS": 0}
+v8-sinRepliegue	reinicios-v8	120	{"PERSECUCION_ARENA.repliegue.radioM": 0}
+v8-sinRepliegue	reinicios-v8	180	{"PERSECUCION_ARENA.repliegue.radioM": 0}
+v7-sinLejano	reinicios-v7	120	{"LARGO_ARENA.remate.probabilidad": 0}
+v7-sinLejano	reinicios-v7	180	{"LARGO_ARENA.remate.probabilidad": 0}
+v7-sinLargo	reinicios-v7	120	{"LARGO_ARENA.pase.visionMin": 1000}
+v7-sinLargo	reinicios-v7	180	{"LARGO_ARENA.pase.visionMin": 1000}
+v7-dueloNeutro	reinicios-v7	120	{"ATRIBUTOS_ARENA.entradaDuelo": 0, "ATRIBUTOS_ARENA.aguanteDuelo": 0}
+v7-dueloNeutro	reinicios-v7	180	{"ATRIBUTOS_ARENA.entradaDuelo": 0, "ATRIBUTOS_ARENA.aguanteDuelo": 0}
+v7-velocidadNeutra	reinicios-v7	120	{"ATRIBUTOS_ARENA.velocidadMax": 0, "ATRIBUTOS_ARENA.aceleracion": 0}
+v7-velocidadNeutra	reinicios-v7	180	{"ATRIBUTOS_ARENA.velocidadMax": 0, "ATRIBUTOS_ARENA.aceleracion": 0}
+v7-restoAtribNeutro	reinicios-v7	120	{"ATRIBUTOS_ARENA.potenciaVelocidad": 0, "ATRIBUTOS_ARENA.visionError": 0, "ATRIBUTOS_ARENA.resistenciaDesgaste": 0}
+v7-restoAtribNeutro	reinicios-v7	180	{"ATRIBUTOS_ARENA.potenciaVelocidad": 0, "ATRIBUTOS_ARENA.visionError": 0, "ATRIBUTOS_ARENA.resistenciaDesgaste": 0}
+base	reinicios-v3	60	{}
+base	reinicios-v3	180	{}

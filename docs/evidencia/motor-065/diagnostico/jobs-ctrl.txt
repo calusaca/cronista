@@ -1,0 +1,4 @@
+control	{}
+A-lejanoProb015	{"LARGO_ARENA.remate.probabilidad": 0.15}
+R1-C45+F	{"REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+R2-D21+F	{"REMATE_ARENA.alcanceMaxM": 2.1, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}

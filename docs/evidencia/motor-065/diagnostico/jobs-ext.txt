@@ -1,0 +1,8 @@
+ext	reinicios-v5	60	201	400	{}
+ext	reinicios-v5	180	201	400	{}
+ext	reinicios-v6	60	201	400	{}
+ext	reinicios-v6	180	201	400	{}
+ext	reinicios-v7	60	201	400	{}
+ext	reinicios-v7	180	201	400	{}
+ext	reinicios-v8	60	201	400	{}
+ext	reinicios-v8	180	201	400	{}

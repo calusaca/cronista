@@ -1,0 +1,6 @@
+R1-C45+F	reinicios-v8	60	1	400	{"REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+R1-C45+F	reinicios-v8	180	1	400	{"REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+R2-D21+F	reinicios-v8	60	1	400	{"REMATE_ARENA.alcanceMaxM": 2.1, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+R2-D21+F	reinicios-v8	180	1	400	{"REMATE_ARENA.alcanceMaxM": 2.1, "REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+R3-C45+D21	reinicios-v8	60	1	400	{"REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.alcanceMaxM": 2.1}
+R3-C45+D21	reinicios-v8	180	1	400	{"REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.alcanceMaxM": 2.1}

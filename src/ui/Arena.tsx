@@ -191,6 +191,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     setPreparandoPartido(activa && presentacion === "preparada"); setEnDirecto(activa);
     if (!activa && !bufferRecibido.current) setBufferActivo(false);
     if (activa && !enDirecto) antesDelDirecto.current = { registro, contexto: contextoModelos };
+    // Móvil: la sala de control va antes de la cancha; al empezar el partido se baja a la cancha.
+    if (activa && !enDirecto && window.matchMedia?.("(max-width: 850px)").matches) requestAnimationFrame(() => document.getElementById("arena-cancha")?.scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "start" }));
     if (activa) { setOrigenTorneo(null); setContextoModelos(null); bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
   const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
@@ -384,7 +386,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
       {errorTorneo && <div className="arena-notice" role="alert" data-testid="arena-torneo-error">{errorTorneo === "descompresion" ? t("This browser cannot open the compressed record. The previous one is still available.", "Este navegador no puede abrir el registro comprimido. El anterior sigue disponible.") : t("Could not open this tournament match. The previous one is still available.", "No se pudo abrir este partido del torneo. El anterior sigue disponible.")}<button className="btn" onClick={() => void ejecutar(ultimaPeticion.current)} disabled={bloqueado}>{t("Retry", "Reintentar")}</button></div>}
       {error && <div className="arena-notice" role="alert">{error}{ultimaPeticion.current !== null && <button className="btn" onClick={() => void ejecutar(ultimaPeticion.current)} disabled={bloqueado}>{t("Retry", "Reintentar")}</button>}</div>}
       <div className="arena-grid" id="arena-watch">
-        <section className="arena-board" aria-label={t("Simulated pitch", "Cancha simulada")}>
+        <section className="arena-board" id="arena-cancha" aria-label={t("Simulated pitch", "Cancha simulada")}>
           {registro === inicial && !sesionActual && !enDirecto && <p className="arena-muted arena-empty">{t("Saved preview. Start a live match above or choose a recording.", "Vista previa guardada. Inicia un partido en vivo arriba o elige una grabación.")}</p>}
           <ArenaMarcador registro={registro} estado={estado} gol={gol} favorito={presentes.lado} estrella={estrellaClub} identidad={identidad} />
           <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock" data-cursor-s={tiempo.toFixed(3)}>{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
@@ -454,7 +456,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <div className="arena-source-tabs" role="group" aria-label={t("Choose a match", "Elegir partido")}>
             <button className="btn" aria-pressed={vista === "live"} disabled={bloqueado} onClick={() => { setVista("live"); setConfigurando(true); }}>{t("Live", "En vivo")}</button>
             <button className="btn" aria-pressed={vista === "guardados"} disabled={bloqueado} onClick={() => { setVista("guardados"); setConfigurando(true); }}>{t("Saved matches", "Partidos guardados")}</button>
-            <a href="#arena-watch">{t("Go to the pitch and narration", "Ir a la cancha y narración")}</a>
+            <a href="#arena-cancha">{t("Go to the pitch and narration", "Ir a la cancha y narración")}</a>
           </div>
           <details className="arena-setup" open={configurando} onToggle={e => setConfigurando(e.currentTarget.open)}>
             <summary>{vista === "live" ? t("Set up your live match", "Configura tu partido en vivo") : t("Choose a saved match or create a recording", "Elige un partido guardado o crea una grabación")}</summary>

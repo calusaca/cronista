@@ -1,0 +1,10 @@
+C2-errorBase35	reinicios-v8	60	1	400	{"REMATE_ARENA.errorBaseM": 3.5}
+C2-errorBase35	reinicios-v8	180	1	400	{"REMATE_ARENA.errorBaseM": 3.5}
+F-altoMitad	reinicios-v8	60	1	400	{"REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+F-altoMitad	reinicios-v8	180	1	400	{"REMATE_ARENA.altoBase": 0.01, "REMATE_ARENA.altoPotencia": 0.03, "REMATE_ARENA.altoNivel": 0.02}
+D2-alcanceMax19	reinicios-v8	60	1	400	{"REMATE_ARENA.alcanceMaxM": 1.9}
+D2-alcanceMax19	reinicios-v8	180	1	400	{"REMATE_ARENA.alcanceMaxM": 1.9}
+P1-A2+C45+D21	reinicios-v8	60	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.alcanceMaxM": 2.1}
+P1-A2+C45+D21	reinicios-v8	180	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "REMATE_ARENA.errorBaseM": 4.5, "REMATE_ARENA.alcanceMaxM": 2.1}
+P2-A2+C35+D21+B055	reinicios-v8	60	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "REMATE_ARENA.errorBaseM": 3.5, "REMATE_ARENA.alcanceMaxM": 2.1, "PERSONALIDAD_ARENA.tiroMinFactor": 0.55}
+P2-A2+C35+D21+B055	reinicios-v8	180	1	400	{"LARGO_ARENA.remate.errorPorM": 0.15, "LARGO_ARENA.remate.altoPorM": 0.015, "REMATE_ARENA.errorBaseM": 3.5, "REMATE_ARENA.alcanceMaxM": 2.1, "PERSONALIDAD_ARENA.tiroMinFactor": 0.55}

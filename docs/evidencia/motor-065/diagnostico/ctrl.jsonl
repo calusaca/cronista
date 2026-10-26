@@ -1,0 +1,4 @@
+{"etiqueta":"A-lejanoProb015","potenciaDif":0.62,"potenciaMin":0.4,"identidad":{"xSinBalon":4.7244040987726095,"largos":1.03,"lejanos":0.23,"persecucionS":2.0730000000000004},"incIdentidad":[]}
+{"etiqueta":"R1-C45+F","potenciaDif":0.96,"potenciaMin":0.4,"identidad":{"xSinBalon":4.82457553471145,"largos":1.03,"lejanos":0.32,"persecucionS":1.6310000000000002},"incIdentidad":[]}
+{"etiqueta":"R2-D21+F","potenciaDif":0.83,"potenciaMin":0.4,"identidad":{"xSinBalon":4.97495262425435,"largos":0.97,"lejanos":0.39,"persecucionS":1.6980000000000004},"incIdentidad":[]}
+{"etiqueta":"control","potenciaDif":0.8,"potenciaMin":0.4,"identidad":{"xSinBalon":4.767570070041913,"largos":0.87,"lejanos":0.42000000000000004,"persecucionS":1.8150000000000004},"incIdentidad":[]}

@@ -2636,7 +2636,7 @@ button.stats-row:hover {
 .arena-setup > summary, .arena-plans > summary { cursor: pointer; font-weight: 700; }
 .arena-setup .arena-settings { border: 0; padding: 10px 0; }
 .arena-tools[hidden] { display: none; }
-#arena-watch { scroll-margin-top: 96px; }
+#arena-watch, #arena-cancha { scroll-margin-top: 96px; }
 .arena-companion { position: sticky; top: 80px; min-width: 0; max-height: calc(100vh - 96px); overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 .arena-companion > .arena-intelligence, .arena-live-feed { padding: 16px; margin: 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
 .arena-companion h2 { font-size: 21px; }
@@ -3175,6 +3175,18 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-live-controls label.arena-live-voice, .arena-control-room .arena-live .arena-live-controls label.arena-live-voice { display: inline-flex; align-items: center; gap: var(--ar-s2); flex: 0 1 auto; min-height: 44px; cursor: pointer; white-space: normal; }
 .arena-live-controls label.arena-live-voice input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
 .arena-control-room .arena-live-controls .btn-primary { width: 100%; }
+/* Móvil (una columna): la sala de control va antes de la cancha, para que «Start live match» aparezca primero.
+   El acompañante se disuelve en la rejilla (display: contents) sin mover el DOM de escritorio; cada hijo es su tarjeta. */
+@media (max-width: 850px) {
+  .arena-companion { display: contents; }
+  .arena-companion > * { min-width: 0; border: 1px solid var(--line); border-radius: var(--ar-r-lg); background: var(--surface); box-shadow: var(--shadow); }
+  .arena-companion > .arena-control-room { order: -1; border-bottom: 1px solid var(--line); }
+  /* Dentro de la sala: pestañas, panel en vivo («Start live match») y después la configuración (orden visual). */
+  .arena-control-room { display: flex; flex-direction: column; }
+  .arena-control-room > .arena-live { order: 1; }
+  .arena-control-room > .arena-setup { order: 2; }
+  .arena-companion > .arena-live-feed { border-bottom: 1px solid var(--line); }
+}
 /* Aviso de vista previa: una sola línea de 36 px sobre el marcador (en móvil puede partirse). */
 .arena-board > .arena-empty:first-child { min-height: 36px; box-sizing: border-box; padding-block: var(--ar-s1); line-height: 1.3; }
 @media (min-width: 851px) { .arena-board > .arena-empty:first-child { height: 36px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
