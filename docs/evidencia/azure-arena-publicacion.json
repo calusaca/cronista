@@ -1,8 +1,8 @@
 {
-  "checkedUtc": "2026-10-26T15:59:55.723Z",
+  "checkedUtc": "2026-10-26T20:21:23.673Z",
   "phase": "deployed_pending_smoke",
   "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io",
-  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261026155705",
+  "image": "crcronistae1734ecca5ff.azurecr.io/cronista:arena-20261026201806",
   "sourceFiles": [
     {
       "path": "Dockerfile",
@@ -281,8 +281,8 @@
     },
     {
       "path": "src/app/globals.css",
-      "bytes": 141610,
-      "sha256": "92da243657617571b37c0ba1aedb3dcc4a645ac1c50f1a8697165f34ded4b3e1"
+      "bytes": 142371,
+      "sha256": "6d0c22b477c9a85b3c2d9d88cab3f32ea58ec1edde5f6293df4d0bef38fc8244"
     },
     {
       "path": "src/app/icon.svg",
@@ -2271,8 +2271,8 @@
     },
     {
       "path": "src/sim/limites.ts",
-      "bytes": 109644,
-      "sha256": "1ab640fa4a948321fb304ed59d3b6450269ef3c2fad10b741d78d2a6385dbedd"
+      "bytes": 109953,
+      "sha256": "69e2d94992543052eae684b27a77104f01ea0e44901e8ac681cc9707a4faea64"
     },
     {
       "path": "src/sim/micro.ts",
@@ -2321,8 +2321,8 @@
     },
     {
       "path": "src/ui/Arena.tsx",
-      "bytes": 68328,
-      "sha256": "155648ed76c323b3807e3dbfc7064af68b919c1bb47881478c1491ac6bcce815"
+      "bytes": 68946,
+      "sha256": "127ddd24e96b8aec75c9b6f482ebf06a9195a310b98948fd7ec0dc0890ae5a11"
     },
     {
       "path": "src/ui/ArenaAsistente.tsx",
@@ -2361,13 +2361,13 @@
     },
     {
       "path": "src/ui/ArenaEmisionBuffer.tsx",
-      "bytes": 62767,
-      "sha256": "71248e233617ceffba69044a09260fc04a06b6c71009dcb3292b2c177c944a2a"
+      "bytes": 68401,
+      "sha256": "48043b9c22b9a9d6c6136df67415bf2563106f77ac7dccc9e8f86e3a46e759bf"
     },
     {
       "path": "src/ui/ArenaEnDirecto.tsx",
-      "bytes": 22895,
-      "sha256": "88b81a0a626f5ddb0a27cae1069240aa476bd012b377a245c41f82d27240dd1c"
+      "bytes": 24451,
+      "sha256": "209edb370d689a471402d3c088730a9c1c12dfcac92fdca9b1bb994e60d19317"
     },
     {
       "path": "src/ui/ArenaFavoritos.tsx",
@@ -2635,6 +2635,11 @@
       "sha256": "0010c0b609678382cfef4016c4f1fc32d64a9685ec12c1b758df51d390cae268"
     },
     {
+      "path": "src/ui/__tests__/retomar-directo.test.ts",
+      "bytes": 6976,
+      "sha256": "3be5fc04a876c3144e5e0666d102b79c322353129601afec6cc57e2b936d2a60"
+    },
+    {
       "path": "src/ui/__tests__/simulador-061.test.tsx",
       "bytes": 4006,
       "sha256": "311ef94e70c7aa9c5716dbe286c3c95390aa3037a549e26c089df3107e39463f"
@@ -2678,6 +2683,16 @@
       "path": "src/ui/render3d.ts",
       "bytes": 9786,
       "sha256": "77ee929c03bf36488f863415905c5ca1fd5f10d803e8d35e582a890d34ca2600"
+    },
+    {
+      "path": "src/ui/retomar-directo.ts",
+      "bytes": 5523,
+      "sha256": "6cb1d84a9283904c3d49c86762de3d0b305d29e864b229f09cca375d4b7ea9b1"
+    },
+    {
+      "path": "src/ui/textos-retomar.ts",
+      "bytes": 801,
+      "sha256": "0e8fe64c55930b0eca21fe12ea1207172b7627a3ff433a554629b6d77953fcf3"
     },
     {
       "path": "src/ui/textos-torneo-sitio.ts",
