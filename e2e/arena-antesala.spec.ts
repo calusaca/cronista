@@ -13,7 +13,7 @@ import { relatoIntervencion } from "../src/arena/relato";
 import type { RegistroArena } from "../src/arena/tipos";
 import { rasgoDistintivo } from "../src/arena/atributos";
 import { mkdir } from "node:fs/promises";
-import { ANTESALA_ARENA, ATRIBUTOS_ARENA, NARRACION_DIRECTO } from "../src/sim/limites";
+import { ANTESALA_ARENA, ARENA_WEB, ATRIBUTOS_ARENA, NARRACION_DIRECTO } from "../src/sim/limites";
 
 test.describe.configure({ mode: "serial" });
 
@@ -854,7 +854,7 @@ test("defecto rev. 0000029 · con el directo terminado (sin abrir la repetición
   await iniciar(page);
   await expect.poll(() => cuerpos.length).toBe(2);
   expect(cuerpos[1]).toMatchObject({ segundos: 30 });
-  expect(cuerpos[0]).toMatchObject({ segundos: 60 });
+  expect(cuerpos[0]).toMatchObject({ segundos: ARENA_WEB.duracionDefectoS });
 });
 
 test("063 · B6 tira «En voz» con el rasgo distintivo de config.atributos (fixture reinicios-v7), 360 px, EN y ES, sin desbordar; arena-duelo-v3 (sin atributos) no lo muestra", async ({ browser }) => {

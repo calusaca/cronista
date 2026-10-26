@@ -21,7 +21,7 @@ quotas listed at the end. The latest public walkthrough of exactly this path is 
    Grok 4.7 and gpt-oss-120b were also tried through Foundry Models, but they were too slow or
    ran out of output tokens and were not admitted
    ([evidence](../evidencia/modelos-052/README.md)). **Programmed** runs the same
-   path with no model calls. Keep **Coach decides** for formations and the default 60-second
+   path with no model calls. Keep **Coach decides** for formations and the default 120-second
    duration; weather, pitch and crowd are optional. Press **Start live match**.
 3. **Watch the handover between agents.** The scoreboard shows *Coaches are deciding · simulation
    clock paused* while both models answer, then *Live · N s ready* once the 20-second buffer is
@@ -48,7 +48,7 @@ quotas listed at the end. The latest public walkthrough of exactly this path is 
    player** (click a shirt number on the pitch first). Switch **ES / EN** again: text, desk and
    voices change together.
 8. **After the final whistle.** *Match complete · recording available*: **Listen from the start**
-   prepares a continuous audio account (it can take longer than the 60-second match), **Open or
+   prepares a continuous audio account (it can take longer than the match itself), **Open or
    share this saved match** gives a link that replays without new inference, and the recording
    can be downloaded as JSON and re-imported.
 
@@ -82,8 +82,9 @@ a real GPT-5.6 Luna vs GPT-5.4 mini match replayed with no model calls, with
   visible.
 - **Speech:** per match, 80 narrator requests / 24,000 characters plus a separate pool of 16
   requests / 4,800 characters for the guest voices; 800 requests / 200,000 characters per day (raised from 120,000 for the judging week).
-  Listening to a 60-second match in both languages with both exchange variants can exhaust the
-  guest pool (the public smoke did: guests returned 429, the narrator was unaffected). Bundled
+  The guest pool fits about 6–8 clips, so a full default 120-second match exhausts it even in one
+  language (measured with simulated Speech: [evidence](../evidencia/motor-065/voz/README.md)); guests then return 429
+  and the narrator is unaffected (the public smoke saw the same at 60 s in both languages). Bundled
   backup clips cover Speech delays; a silent clip is never a failed match.
 - **Retention:** journals and recordings are kept 24 hours, 24 sessions per replica. A shared
   link older than that will not resolve; generate a new match.

@@ -5,6 +5,11 @@ import { crearSesion } from "./sesiones";
 import { contextoNarradorArena } from "../src/arena/narrador";
 import { construirRelato } from "../src/arena/relato";
 import { atributosJugador, type RegistroArena } from "../src/arena/tipos";
+import { relojArena } from "../src/arena/cronica-vista";
+import { ARENA, ARENA_WEB } from "../src/sim/limites";
+
+/** Brief 065 § 3: reloj al empezar un partido creado desde la web con la duración por defecto. */
+const RELOJ_INICIO_WEB = `0:00 / ${relojArena(ARENA_WEB.duracionDefectoS)}`;
 
 async function guardados(page: Page) {
   await page.getByRole("button", { name: "Saved matches", exact: true }).click();
@@ -228,7 +233,7 @@ test("arena: error recuperable, descarga íntegra e importación comprobada", as
   const archivo = await descarga;
   const datos = await readFile((await archivo.path())!);
   const registro = JSON.parse(datos.toString());
-  expect(registro.final.tick).toBe(600);
+  expect(registro.final.tick).toBe(Math.round(ARENA_WEB.duracionDefectoS / ARENA.pasoS));
   expect(registro.rondas.every((r: { decisiones: { local: { tipo: string } } }) => r.decisiones.local.tipo === "programado")).toBe(true);
   await page.getByLabel("Open saved run", { exact: true }).setInputFiles({ name: "arena.json", mimeType: "application/json", buffer: datos });
   await expect(page.getByText("Imported recording:", { exact: false })).toBeVisible();
@@ -389,11 +394,11 @@ test("arena: generar primero entrega el partido pausado, comparte el registro y 
   expect(respuesta.request().postDataJSON().presentacion).toBe("preparada");
   const { id } = await respuesta.json();
   await expect(panel.getByRole("status")).toContainText("Match ready");
-  await expect(page.getByTestId("arena-clock")).toHaveText("0:00 / 1:00");
+  await expect(page.getByTestId("arena-clock")).toHaveText(RELOJ_INICIO_WEB);
   const guardado = await request.get(`/api/arena/sesiones/${id}/reproduccion`);
   expect(guardado.status()).toBe(200);
   expect(guardado.headers()["cache-control"]).toContain("max-age=86400");
-  const resultado = await guardado.json(); expect(resultado.registro.final.tick).toBe(600);
+  const resultado = await guardado.json(); expect(resultado.registro.final.tick).toBe(Math.round(ARENA_WEB.duracionDefectoS / ARENA.pasoS));
   const enlace = panel.getByRole("link", { name: "Open or share this saved match" });
   expect(await enlace.getAttribute("href")).toBe(`/arena?partido=${id}`);
   const otro = await context.newPage();
@@ -401,7 +406,7 @@ test("arena: generar primero entrega el partido pausado, comparte el registro y 
   otro.on("request", r => { if (r.url().endsWith("/api/arena/sesiones") && r.method() === "POST") nuevasSesiones++; });
   await otro.goto(`/arena?partido=${id}`);
   await expect(otro.getByTestId("arena-live-status")).toContainText("Match ready");
-  await expect(otro.getByTestId("arena-clock")).toHaveText("0:00 / 1:00");
+  await expect(otro.getByTestId("arena-clock")).toHaveText(RELOJ_INICIO_WEB);
   expect(nuevasSesiones).toBe(0); await otro.close();
   await page.route("**/api/arena/**", route => route.abort());
   const jugador = page.getByTestId("arena-player").nth(5), antes = await jugador.getAttribute("transform");
@@ -524,6 +529,6 @@ test("arena: un fallo al cargar el registro permite reconectar sin generar otro 
   await expect(panel.getByRole("alert")).toBeVisible();
   await panel.getByRole("button", { name: "Reconnect to this match" }).click();
   await expect(panel.getByRole("status")).toContainText("Match ready");
-  await expect(page.getByTestId("arena-clock")).toHaveText("0:00 / 1:00");
+  await expect(page.getByTestId("arena-clock")).toHaveText(RELOJ_INICIO_WEB);
   expect(creadas).toBe(1);
 });

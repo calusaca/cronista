@@ -5,7 +5,7 @@ import { estructura } from "../arena/catalogo";
 import { formaciones, type FormacionArena, type RegistroArena } from "../arena/tipos";
 import { estadoVisual, golEnCelebracion, narrarEventoArena, reconstruccionGol } from "../arena/vista";
 import { etiquetasPerfil } from "../arena/personalidades";
-import { ARENA, CLIMAS_PARTIDO, IDENTIDAD_ARENA, TEMPERATURA_C } from "../sim/limites";
+import { ARENA, ARENA_WEB, CLIMAS_PARTIDO, IDENTIDAD_ARENA, TEMPERATURA_C } from "../sim/limites";
 import { identidadPartido } from "../arena/identidad";
 import { Escudo } from "./Escudo";
 import { BarraSitio } from "./BarraSitio";
@@ -69,7 +69,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const [superficie, setSuperficie] = useState<Condiciones["superficie"] | "auto">("auto");
   const [cesped, setCesped] = useState<"corto" | "alto">("corto");
   const [presion, setPresion] = useState<"auto" | "baja" | "media">("auto");
-  const [segundos, setSegundos] = useState(60), [velocidad, setVelocidad] = useState(2);
+  // Brief 065 § 3: la duración al abrir sale de ARENA_WEB (120 s).
+  const [segundos, setSegundos] = useState<number>(ARENA_WEB.duracionDefectoS), [velocidad, setVelocidad] = useState(2);
   const [reproduciendo, setReproduciendo] = useState(false), [reducido, setReducido] = useState(false);
   const [pendiente, setPendiente] = useState(false), [error, setError] = useState<string | null>(null);
   const [importado, setImportado] = useState(false);
@@ -464,7 +465,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <form className="arena-settings" onSubmit={simular} aria-busy={pendiente}>
             <label>{t("Home formation", "Formación local")}<select className="field" value={local} disabled={ajustesBloqueados} onChange={e => setLocal(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
             <label>{t("Away formation", "Formación visitante")}<select className="field" value={visita} disabled={ajustesBloqueados} onChange={e => setVisita(e.target.value as FormacionArena | "auto")}><option value="auto">{t("Coach decides", "Decide el entrenador")}</option>{formaciones.map(f => <option key={f}>{f}</option>)}</select></label>
-            <label>{t("Simulated duration", "Duración simulada")}<select className="field" value={segundos} disabled={ajustesBloqueados} onChange={e => setSegundos(Number(e.target.value))}><option value="30">30 s</option><option value="60">60 s</option><option value="180">180 s</option></select></label>
+            <label>{t("Simulated duration", "Duración simulada")}<select className="field" value={segundos} disabled={ajustesBloqueados} onChange={e => setSegundos(Number(e.target.value))}>{ARENA_WEB.duracionesS.map(s => <option key={s} value={s}>{s} s</option>)}</select></label>
             {vista === "guardados" && <button className="btn" disabled={bloqueado}>{t("Create recording without AI", "Crear grabación sin IA")}</button>}
             <details className="arena-settings-more"><summary>{t("Choose weather, pitch and crowd pressure", "Elegir clima, cancha y presión del público")}</summary><div className="arena-environment-settings">
               <label>{t("Weather", "Clima")}<select className="field" value={clima} disabled={ajustesBloqueados} onChange={e => { const c = e.target.value as typeof clima; setClima(c); if (c === "calor" || c === "frio") setTemperatura(String(ARENA.temperaturaDefectoC[c])); }}><option value="auto">{t("Generated", "Generado")}</option>{CLIMAS_PARTIDO.map(c => <option key={c} value={c}>{({ despejado: t("Clear", "Despejado"), calor: t("Heat", "Calor"), lluvia: t("Rain", "Lluvia"), frio: t("Cold", "Frío"), niebla: t("Fog", "Niebla") })[c]}</option>)}</select></label>

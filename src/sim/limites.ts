@@ -512,6 +512,15 @@ export const ARENA = {
   alturaBloqueM: { bajo: -6, medio: 0, alto: 6 },
 } as const;
 
+/** Brief 065 § 3 (opción B, elegida por Carlos el 26 oct) · Selector de duración simulada de `/arena` (directo, búfer y
+ * grabación sin IA): opciones y valor al abrir. 120 s (antes 60) deja más tiempo para los goles; el API admite hasta
+ * ARENA.duracionMaxS. El torneo (TORNEO_ARENA.duracionS), el smoke de modelos, los ejemplos y las grabaciones guardadas
+ * conservan su duración. La interfaz y las pruebas leen el valor de aquí. */
+export const ARENA_WEB = {
+  duracionesS: [30, 60, 120, 180],
+  duracionDefectoS: 120,
+} as const;
+
 /** Brief 046 · Portero (reinicios-v4). Cifras sintéticas por calibrar. */
 export const PORTERO_ARENA = {
   /** Radio (m) desde el centro del arco propio en el que un poseedor rival sin defensores de
