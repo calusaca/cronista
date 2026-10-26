@@ -13,7 +13,9 @@ import type { IntervencionArena, VarianteIntercambio } from "../arena/protocolo"
 import { esPrevia } from "../arena/previa";
 import { ANTESALA_ARENA, ARENA, MESA_ARENA, NARRACION_DIRECTO, RESERVAS_VOZ } from "../sim/limites";
 import { activarAntesala, antesalaPartido, elegirSolicitud, focoDeAntesala, iniciarAntesala, type FocoAntesala, pasoAntesala, siguientePedidoAntesala, todosPedidosAntesala, vencimientoAntesalaMs, type ClaseSolicitud, type EstadoAntesala, type RespuestaClip, type SalidaAntesala } from "../arena/antesala";
-import { arranquePropio, asignacionDirecto, descartarAudioCebado, guardarPreferenciaNarracion, instanteArranquePropio, leerPreferenciaNarracion, narracionAutomatica, suscribirAsignacionDirecto, tomarAudioCebado } from "./audio-directo";
+import { arranquePropio, asignacionDirecto, cebarAudioDirecto, descartarAudioCebado, guardarPreferenciaNarracion, instanteArranquePropio, leerPreferenciaNarracion, narracionAutomatica, suscribirAsignacionDirecto, tomarAudioCebado } from "./audio-directo";
+import { guardarSegundo, olvidarDirecto, tocaGuardar } from "./retomar-directo";
+import { TEXTOS_RETOMAR } from "./textos-retomar";
 
 type Segmento = Omit<ReturnType<typeof construirRelato>, "tipoRelato"> & { audio: { base64: string; tipo: string } | null; prioridad?: number; cierre?: boolean; firmaEstado?: string; claveVoz?: string; temaVoz?: string; tipoRelato?: "jugada" | "comentario" | "estado" | "entrada" | "cierre" | "invitado"; rol?: Rol; intervencion?: string; variante?: VarianteIntercambio; turnos?: number };
 type Clip = { segmento: Segmento; audio: AudioBuffer; consumido: boolean };
@@ -80,9 +82,12 @@ async function cargarReservas(s: Sonido, semilla: number): Promise<number> {
  * por adelantado y solo reproduce hechos que ya alcanzó la presentación. */
 /** Brief 060 § 4.1 · `ranura`: hueco de la barra de transporte bajo la cancha donde se pinta «Pause broadcast» (portal);
  * mientras es null no se pinta en ningún sitio (nunca hay dos). La lógica de pausa no cambia. */
-export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [], ranura = null, alAntesala }: {
+/** Brief 066 · `retomar`: la emisión retoma una sesión guardada (empieza en pausa, con «Continue match» sobre la cancha;
+ * `narracion` = la narración estaba activa al salir). `cancha`: nodo `.arena-pitch-wrap` donde se pinta ese aviso. */
+export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, idioma, registro, alTiempo, alRepeticion, intervenciones = [], ranura = null, alAntesala, retomar = null, cancha = null }: {
   sesion: string; registro: RegistroArena; hastaTick: number; terminada: boolean; inicioTick: number; idioma: "es" | "en"; intervenciones?: readonly IntervencionArena[];
   alTiempo: (tick: number) => void; alRepeticion: () => void; ranura?: HTMLElement | null;
+  retomar?: { narracion: boolean } | null; cancha?: HTMLElement | null;
   /** Brief 058 · C: foco del clip de la antesala que suena (null en huecos, esperas, reintentos y al terminar). */
   alAntesala?: (foco: FocoAntesala | null) => void;
 }) {
@@ -96,6 +101,14 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     retencionInicial.current = inicioTick === 0 && arranquePropio(sesion) && leerPreferenciaNarracion() && ANTESALA_ARENA.topeS > 0;
     if (retencionInicial.current) reloj.current.retener();
   }
+  // Brief 066 · A/B: una emisión retomada empieza en pausa; esa pausa no la pidió el espectador (muestra el aviso).
+  const retomarInicial = useRef<boolean | null>(null);
+  if (retomarInicial.current === null) { retomarInicial.current = !!retomar; if (retomar) reloj.current.pausar(); }
+  /** Brief 066 · B: pausa causada por ocultar la pestaña o por retomar (no por el espectador): «Continue match». */
+  const [avisoVolver, setAvisoVolver] = useState(!!retomar);
+  /** Brief 066 · A: la narración estaba activa al salir; «Continue match» la reactiva dentro de su gesto. */
+  const narracionPrevia = useRef(retomar?.narracion === true);
+  const avisoRef = useRef<HTMLDivElement | null>(null);
   const [vista, setVista] = useState({ segundo: inicioTick / 10, estado: reloj.current.estado, reserva: 0, retenido: reloj.current.retenido });
   const [voz, setVoz] = useState(false), [disponible, setDisponible] = useState(false), [error, setError] = useState(false), [pulsar, setPulsar] = useState(false), [version, setVersion] = useState(0);
   const [pasaje, setPasaje] = useState<Segmento | null>(null), [hablando, setHablando] = useState(false);
@@ -171,15 +184,26 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sesion, idioma]);
 
+  /** Brief 066 · C: intento de reanudación vigente; uno nuevo (p. ej. en un gesto) sustituye al anterior. */
+  const intentoReanudar = useRef(0);
   const reanudarAudio = (forzar = false) => {
     const s = sonido.current;
     // Brief 058 · A4: un contexto que ya corre (p. ej. se desbloqueó en este clic) retira el aviso.
     if (s && forzar && s.contexto.state === "running") { setPulsar(false); return; }
     if (!s || reanudando.current && !forzar || s.contexto.state === "running") return;
     reanudando.current = true;
+    const intento = ++intentoReanudar.current, vigente = () => sonido.current === s && intentoReanudar.current === intento;
+    // Brief 066 · C: si resume() no resuelve en desbloqueoMs, se libera `reanudando` y se ofrece «Enable audio
+    // playback» (nunca queda atascado). Con la pestaña oculta solo se libera: no es audio bloqueado.
+    const plazo = window.setTimeout(() => {
+      if (!vigente() || s.contexto.state === "running") return;
+      reanudando.current = false;
+      if (!document.hidden) setPulsar(true);
+    }, NARRACION_DIRECTO.desbloqueoMs);
+    // La llamada a resume() es síncrona: dentro de un gesto, cuenta como gesto (Brief 066 · C).
     void s.contexto.resume().then(() => {
-      if (sonido.current === s) setPulsar(s.contexto.state !== "running");
-    }).catch(() => { if (sonido.current === s) setPulsar(true); }).finally(() => { if (sonido.current === s) reanudando.current = false; });
+      if (vigente()) setPulsar(s.contexto.state !== "running");
+    }).catch(() => { if (vigente()) setPulsar(true); }).finally(() => { window.clearTimeout(plazo); if (vigente()) reanudando.current = false; });
   };
   /** Brief 058 · A: solo los gestos del usuario escriben la preferencia; la activación automática no. */
   const cambiarVoz = () => {
@@ -550,10 +574,16 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   }, [sesion, hastaTick, terminada, idioma, voz, version, bloque, intervenciones.length, vista.estado]);
 
   useEffect(() => {
-    let frame = 0, anterior = performance.now();
+    let frame = 0, anterior = performance.now(), guardado = -Infinity, terminadaEmision = false;
+    // Brief 066 · A: el segundo de la emisión (y si narra) se guarda con throttle, al ocultarse, al salir y al desmontar;
+    // al llegar al final se olvida la sesión guardada (solo si es esta).
+    // La narración de la visita anterior cuenta mientras no se haya continuado (una recarga no la pierde).
+    const guardar = () => { if (!terminadaEmision) guardarSegundo(sesion, reloj.current.segundo, vozRef.current || narracionPrevia.current); };
     const animar = (ahora: number) => {
       const r = reloj.current, datos = actual.current, s = sonido.current;
       const segundo = r.avanzar((ahora - anterior) / 1000, datos.hastaTick / 10, datos.terminada); anterior = ahora;
+      if (r.estado === "final") { if (!terminadaEmision) { terminadaEmision = true; olvidarDirecto(sesion); } }
+      else if (tocaGuardar(guardado, ahora)) { guardado = ahora; guardar(); }
       datos.alTiempo(segundo * 10);
       setVista(v => v.estado === r.estado && v.retenido === r.retenido && Math.abs(v.segundo - segundo) < .1 && Math.abs(v.reserva - (datos.hastaTick / 10 - segundo)) < .1 ? v : { segundo, estado: r.estado, reserva: Math.max(0, datos.hastaTick / 10 - segundo), retenido: r.retenido });
       if (s) {
@@ -671,9 +701,16 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       }
       frame = requestAnimationFrame(animar);
     };
-    const ocultar = () => { if (document.hidden) { reloj.current.pausar(); void sonido.current?.contexto.suspend(); } else finSuspensionPropia.current = performance.now(); };
-    document.addEventListener("visibilitychange", ocultar); frame = requestAnimationFrame(animar);
-    return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", ocultar); };
+    const ocultar = () => {
+      if (document.hidden) {
+        // Brief 066 · B: solo una pausa causada por ocultar (el reloj no estaba ya en pausa ni al final) muestra el aviso.
+        const r = reloj.current, causada = r.estado !== "pausada" && r.estado !== "final";
+        r.pausar(); void sonido.current?.contexto.suspend(); guardar();
+        if (causada) setAvisoVolver(true);
+      } else finSuspensionPropia.current = performance.now();
+    };
+    document.addEventListener("visibilitychange", ocultar); window.addEventListener("pagehide", guardar); frame = requestAnimationFrame(animar);
+    return () => { cancelAnimationFrame(frame); document.removeEventListener("visibilitychange", ocultar); window.removeEventListener("pagehide", guardar); guardar(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -687,11 +724,41 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
       intentarAntesala(s, t0Antesala.current);
     }
   };
-  const pausar = () => {
+  /** Brief 066 · B/C · Continuar (aviso «Continue match», «Resume broadcast» o Espacio): todo síncrono dentro del gesto.
+   * El audio se reanuda aquí (resume() antes de cualquier await); si la narración estaba activa al salir y aún no hay
+   * contexto (recarga), se reactiva en este mismo gesto. Con la narración desactivada no se toca el audio. */
+  const continuarEmision = () => {
     if (reloj.current.estado === "pausada") { reloj.current.continuar(); finSuspensionPropia.current = performance.now(); }
-    else { reloj.current.pausar(); void sonido.current?.contexto.suspend(); }
+    setAvisoVolver(false);
+    const s = sonido.current;
+    if (s && !s.silenciada) reanudarAudio(true);
+    // Tras una recarga no hay contexto: se ceba en este gesto (resume() y una muestra de silencio) y activarVoz lo adopta.
+    else if (!s && narracionPrevia.current && disponibleRef.current && !agotada.current) { cebarAudioDirecto(); activarVoz(false, performance.now()); }
+    narracionPrevia.current = false;
     setVersion(v => v + 1);
   };
+  const pausar = () => {
+    if (reloj.current.estado === "pausada") { continuarEmision(); return; }
+    reloj.current.pausar(); void sonido.current?.contexto.suspend();
+    setVersion(v => v + 1);
+  };
+  // Brief 066 · B: el aviso queda a la vista (390 y 1440 px) al aparecer; tras una recarga, también después de que el
+  // navegador restaure el desplazamiento (evento load).
+  const mostrarAviso = !!cancha && avisoVolver && vista.estado === "pausada";
+  useEffect(() => {
+    if (!mostrarAviso) return;
+    // Si no está entero a la vista: marcador y aviso juntos cuando caben; si no, solo el aviso.
+    const ver = () => {
+      const el = avisoRef.current, r = el?.getBoundingClientRect();
+      if (!el || !r || r.top >= 0 && r.bottom <= window.innerHeight) return;
+      const marcador = el.closest(".arena-board")?.querySelector(".arena-score");
+      if (marcador && r.bottom - marcador.getBoundingClientRect().top <= window.innerHeight) marcador.scrollIntoView?.({ block: "start" });
+      else el.scrollIntoView?.({ block: "nearest" });
+    };
+    const frame = requestAnimationFrame(ver);
+    if (document.readyState !== "complete") window.addEventListener("load", ver, { once: true });
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("load", ver); };
+  }, [mostrarAviso]);
   const estados = {
     preparando: t(`Preparing broadcast · ${Math.floor(vista.reserva)}/20 s ready`, `Preparando emisión · ${Math.floor(vista.reserva)}/20 s listos`),
     reproduciendo: t(`Live · ${Math.floor(vista.reserva)} s ready`, `En vivo · ${Math.floor(vista.reserva)} s listos`),
@@ -705,6 +772,11 @@ export function ArenaEmisionBuffer({ sesion, hastaTick, terminada, inicioTick, i
   const textoEstado = vista.retenido && (vista.estado === "preparando" || vista.estado === "recuperando") ? presentacion : estados[vista.estado];
   return <section className="arena-intelligence" data-testid="arena-buffer" aria-label={t("Live playback and audio", "Reproducción en vivo y audio")}>
     {ranura && createPortal(<button className="btn" data-estado={vista.estado} aria-keyshortcuts="Space" disabled={vista.estado === "final"} onClick={pausar}>{vista.estado === "pausada" ? t("Resume broadcast", "Continuar emisión") : t("Pause broadcast", "Pausar emisión")}</button>, ranura)}
+    {/* Brief 066 · B: aviso sobre la cancha tras una pausa por ocultación o al retomar; desaparece al continuar. */}
+    {mostrarAviso && createPortal(<div className="arena-volver" data-testid="arena-continue" ref={avisoRef}>
+      <button className="btn btn-primary" aria-keyshortcuts="Space" aria-describedby="arena-volver-nota" onClick={continuarEmision}>{TEXTOS_RETOMAR[idioma].boton(vista.segundo)}</button>
+      <p id="arena-volver-nota">{TEXTOS_RETOMAR[idioma].nota}</p>
+    </div>, cancha)}
     <h2>{t("Live match", "Partido en vivo")}</h2>
     <p className="arena-muted">{t("Continuous narration combines match action and commentary, with pauses under five seconds while audio is enabled.", "La narración continua combina jugadas y comentarios, con pausas de menos de cinco segundos mientras el audio está activado.")}</p>
     <p role="status" data-testid="arena-buffer-status" data-ready-seconds={vista.reserva.toFixed(2)}>{textoEstado}</p>

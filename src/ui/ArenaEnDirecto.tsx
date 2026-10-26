@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import type { AsignacionModelos, InstantaneaEmision, MensajeSesion, MetricasSesion, ModeloPublico, PublicacionSesion, SeleccionModelos, PresentacionArena, ReproduccionArena } from "../arena/protocolo";
 import { ENCUENTROS_LLM_DIARIOS } from "../sim/limites";
 import { cebarAudioDirecto, descartarAudioCebado, fijarAsignacionDirecto, guardarPreferenciaNarracion, leerPreferenciaNarracion, marcarArranquePropio } from "./audio-directo";
+import { conservarAlTerminar, decidirAlMontar, guardarSesionDirecto, leerSegundo, olvidarDirecto, sesionCaducada, tickInicial } from "./retomar-directo";
+import { TEXTOS_RETOMAR } from "./textos-retomar";
 
-const claveSesion = "cronista:arena:sesion";
-const clavePresentacion = "cronista:arena:presentacion";
 /** Brief 060 § 4.1 + v1.1 (4) · `alCancelar(fn)`: registra en `Arena` la función de cancelar (la misma petición, estados
  * y errores que «Cancel live match»), que «Stop match» llama desde la barra de la cancha. */
 export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActividad, alPreparado, presentacionVista, alCancelar }: {
   presentacionVista: "buffer" | "preparada"; ajustes: unknown; idioma: "es" | "en"; ocupado: boolean;
   alMensaje: (p: PublicacionSesion) => void; alActividad: (activa: boolean, presentacion?: PresentacionArena) => void;
-  alPreparado: (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => void;
+  alPreparado: (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean; retomar?: { narracion: boolean } }) => void;
   alCancelar?: (cancelar: () => void) => void;
 }) {
   const es = idioma === "es", t = (en: string, esp: string) => es ? esp : en;
@@ -44,6 +44,10 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
    * `await` (instantánea de /emision o /reproduccion del preparado) se descarta antes de adoptar resultados, abrir el
    * SSE o publicar el enlace; la sesión queda «cancelada» sin cargar nada. */
   const generacion = useRef(0);
+  /** Brief 066 · A · La conexión en curso retoma una sesión guardada (montaje o «Reconnect»), no un partido nuevo. */
+  const retomando = useRef(false), [noDisponible, setNoDisponible] = useState(false), avisoNoDisponible = useRef<HTMLParagraphElement | null>(null);
+  // El aviso queda a la vista aunque el inicio de la reconexión bajara a la cancha (móvil): después de ese desplazamiento.
+  useEffect(() => { if (noDisponible) requestAnimationFrame(() => avisoNoDisponible.current?.scrollIntoView?.({ block: "nearest" })); }, [noDisponible]);
   const callbacks = useRef({ alMensaje, alActividad, alPreparado });
   useEffect(() => { callbacks.current = { alMensaje, alActividad, alPreparado }; }, [alMensaje, alActividad, alPreparado]);
   useEffect(() => { if (!id && !iniciando) setPresentacion(presentacionVista); }, [presentacionVista]); // Session presentation stays fixed while connected.
@@ -55,12 +59,9 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       if (!r.modelos.length && modoActual.current !== "programado") { setModo("programado"); setModoConvertido(true); }
     }).catch(() => {});
     void fetch("/api/arena/herramientas", { signal: abort.signal }).then(r => r.json()).then((r: { voz?: unknown }) => { setVozDisponible(r.voz === true); if (r.voz !== true) descartarAudioCebado(); }).catch(() => { if (!abort.signal.aborted) { setVozDisponible(false); descartarAudioCebado(); } });
-    const compartido = new URLSearchParams(window.location.search).get("partido");
-    const anterior = compartido ?? sessionStorage.getItem(claveSesion);
-    if (anterior && /^[a-f0-9-]{36}$/.test(anterior)) {
-      const vista = new URLSearchParams(window.location.search).get("vista"), guardada = sessionStorage.getItem(clavePresentacion);
-      setPresentacion(compartido !== null ? vista === "buffer" ? "buffer" : "preparada" : guardada === "buffer" ? "buffer" : guardada === "preparada" ? "preparada" : "directo"); setId(anterior);
-    }
+    // Brief 066 · A: el enlace compartido se comporta como siempre; la sesión guardada se retoma en su segundo.
+    const montaje = decidirAlMontar(window.location.search);
+    if (montaje) { retomando.current = montaje.retomar; setPresentacion(montaje.presentacion); setId(montaje.id); }
     return () => { abort.abort(); solicitud.current?.abort(); };
   }, []);
   useEffect(() => {
@@ -73,7 +74,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     /** Detenida tras un `await`: no se adopta nada y la conexión termina como cancelada (sin SSE ni enlace). */
     const cerrarDetenida = () => {
       detenidoPorUsuario.current = false; eventos?.close(); if (fuente.current === eventos) fuente.current = null;
-      setEstado("cancelada"); callbacks.current.alActividad(false); sessionStorage.removeItem(claveSesion); setId(null);
+      setEstado("cancelada"); callbacks.current.alActividad(false); olvidarDirecto(id); setId(null);
     };
     const iniciar = async () => {
       if (presentacion === "buffer") {
@@ -86,17 +87,26 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
         }
         if (carga.signal.aborted) return;
         if (detenida()) { cerrarDetenida(); return; }
+        // Brief 066 · A: una sesión guardada que caducó o no existe se olvida, con un aviso breve.
+        if (respuesta && retomando.current && sesionCaducada(respuesta.status)) {
+          olvidarDirecto(id); retomando.current = false; setNoDisponible(true); setEstado("lista");
+          callbacks.current.alActividad(false); setId(null); return;
+        }
         if (!respuesta?.ok) throw new Error("Emisión");
         const instantanea = await respuesta.json() as InstantaneaEmision;
         if (carga.signal.aborted) return;
         if (detenida()) { cerrarDetenida(); return; }
         ultimoId.current = instantanea.ultimoMensaje;
         setAsignacion(instantanea.asignacion); fijarAsignacionDirecto(id, instantanea.asignacion);
-        const inicioTick = Math.max(0, Math.floor((instantanea.registro.final.tick - 200) / 50) * 50);
-        callbacks.current.alPreparado(id, instantanea, { inicioTick, terminada: instantanea.estado !== "ejecutando" });
+        // Brief 066 · A: al retomar, en el segundo guardado y en pausa (no en final − 20 s).
+        const guardado = retomando.current ? leerSegundo(id) : null;
+        const inicioTick = tickInicial(instantanea.registro.final.tick, guardado);
+        callbacks.current.alPreparado(id, instantanea, { inicioTick, terminada: instantanea.estado !== "ejecutando", ...(retomando.current ? { retomar: { narracion: guardado?.narracion ?? false } } : {}) });
+        retomando.current = false;
         if (instantanea.estado !== "ejecutando") {
           setEstado(instantanea.estado); setMetricas(instantanea.metricas); setGrabacionLista(instantanea.estado === "completa" ? id : null);
-          callbacks.current.alActividad(false); sessionStorage.removeItem(claveSesion); setId(null); return;
+          if (!conservarAlTerminar(presentacion, instantanea.estado)) olvidarDirecto(id);
+          callbacks.current.alActividad(false); setId(null); return;
         }
       }
       if (carga.signal.aborted) return;
@@ -118,7 +128,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
           // v1.1 (4) · Preparado detenido por el espectador: no se carga nada (tampoco una `completa` que ganó la carrera).
           if (presentacion === "preparada" && detenidoPorUsuario.current) {
             detenidoPorUsuario.current = false; setEstado("cancelada"); setMetricas(p.metricas);
-            callbacks.current.alActividad(false); sessionStorage.removeItem(claveSesion); setId(null); return;
+            callbacks.current.alActividad(false); olvidarDirecto(id); setId(null); return;
           }
           if (presentacion === "preparada" && p.estado === "completa") {
             setEstado("cargando");
@@ -135,7 +145,9 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
           if (p.estado === "completa" && presentacion === "buffer") setGrabacionLista(id);
           setMetricas(p.metricas);
           setEstado(p.estado === "completa" && presentacion === "preparada" ? "preparada" : p.estado); callbacks.current.alActividad(false); flujo.close(); fuente.current = null;
-          sessionStorage.removeItem(claveSesion); setId(null);
+          // Brief 066 · A: una emisión del búfer completa conserva la sesión hasta que la emisión llegue al final.
+          if (!conservarAlTerminar(presentacion, p.estado)) olvidarDirecto(id);
+          setId(null);
         }
       } catch { if (carga.signal.aborted) return; setError(true); flujo.close(); fuente.current = null; callbacks.current.alActividad(false); setReintento(id); setId(null); }
       });
@@ -155,8 +167,8 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     // Brief 058 · A: el cebado del audio va ANTES de cualquier await, dentro del gesto del clic.
     const t0 = performance.now(), narrada = presentacion === "buffer" && vozDisponible !== false && narrar;
     if (narrada) cebarAudioDirecto();
-    iniciandoRef.current = true; detenidoPorUsuario.current = false; callbacks.current.alActividad(true, presentacion);
-    setIniciando(true); setError(false); setRechazo(null); setAsignacion(null); setMetricas(null); setGrabacionLista(null); setReintento(null);
+    iniciandoRef.current = true; detenidoPorUsuario.current = false; retomando.current = false; callbacks.current.alActividad(true, presentacion);
+    setIniciando(true); setError(false); setNoDisponible(false); setRechazo(null); setAsignacion(null); setMetricas(null); setGrabacionLista(null); setReintento(null);
     const abort = new AbortController(); solicitud.current = abort;
     try {
       const seleccion = modo === "manual" ? { modo, local, visita } : { modo };
@@ -175,7 +187,7 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
       }
       if (narrada) marcarArranquePropio(s.id, t0);
       fijarAsignacionDirecto(s.id, s.asignacion);
-      sessionStorage.setItem(clavePresentacion, presentacion); sessionStorage.setItem(claveSesion, s.id); setAsignacion(s.asignacion); setId(s.id);
+      guardarSesionDirecto(s.id, presentacion); setAsignacion(s.asignacion); setId(s.id);
     } catch {
       // v1.1 (4) · Detenido con el POST en vuelo y el POST falló: no hay nada que cancelar.
       if (detenidoPorUsuario.current) { detenidoPorUsuario.current = false; setEstado("cancelada"); callbacks.current.alActividad(false); }
@@ -184,6 +196,8 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     finally { if (solicitud.current === abort) solicitud.current = null; iniciandoRef.current = false; setIniciando(false); }
   };
   const cancelar = async () => {
+    // Brief 066 · A: «Cancel live match» y «Stop match» olvidan la sesión guardada.
+    olvidarDirecto();
     if (!id) { if (iniciandoRef.current) { detenidoPorUsuario.current = true; setEstado("cancelando"); } return; }
     detenidoPorUsuario.current = true; generacion.current++;
     // El mensaje final del SSE puede llegar antes que la respuesta DELETE.
@@ -227,7 +241,8 @@ export function ArenaEnDirecto({ ajustes, idioma, ocupado, alMensaje, alActivida
     <p role="status" data-testid="arena-live-status">{textos[estado] ?? estado}</p>
     {id && presentacion === "buffer" && <p><a href={`/arena?partido=${id}&vista=buffer`}>{t("Share this broadcast", "Compartir esta emisión")}</a></p>}
     {grabacionLista && <p><a href={`/arena?partido=${grabacionLista}`}>{t("Open or share this saved match", "Abrir o compartir este partido guardado")}</a> · {t("Available for up to 24 hours", "Disponible hasta 24 horas")}</p>}
-    {reintento && !id && <button className="btn" onClick={() => { setError(false); setId(reintento); setReintento(null); }}>{t("Reconnect to this match", "Reconectar a este partido")}</button>}
+    {noDisponible && <p ref={avisoNoDisponible} role="status" className="arena-muted" data-testid="arena-live-gone">{TEXTOS_RETOMAR[idioma].noDisponible}</p>}
+    {reintento && !id && <button className="btn" onClick={() => { setError(false); retomando.current = presentacion === "buffer"; setId(reintento); setReintento(null); }}>{t("Reconnect to this match", "Reconectar a este partido")}</button>}
     {metricas && <p className="arena-muted" data-testid="arena-live-metrics">{t(`${metricas.decisiones} team decisions · ${metricas.respaldos} programmed fallbacks · ${(metricas.duracionMs / 1000).toFixed(1)} s elapsed`, `${metricas.decisiones} decisiones de equipo · ${metricas.respaldos} respaldos programados · ${(metricas.duracionMs / 1000).toFixed(1)} s transcurridos`)}{metricas.respaldos > 0 && t(". This result includes programmed intervention.", ". Este resultado incluye intervención programada.")}</p>}
     {error && <p role="alert" data-testid="arena-live-error" data-motivo={rechazo?.motivo}>{rechazo?.motivo === "limite-diario" ? (() => {
       const n = rechazo.limite ?? ENCUENTROS_LLM_DIARIOS, ahora = Date.now(), medianoche = Date.UTC(new Date(ahora).getUTCFullYear(), new Date(ahora).getUTCMonth(), new Date(ahora).getUTCDate() + 1), horas = Math.max(1, Math.ceil((medianoche - ahora) / 3_600_000));

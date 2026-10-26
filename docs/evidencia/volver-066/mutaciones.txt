@@ -1,0 +1,81 @@
+Brief 066 · Mutaciones vistas (26 oct 2026): cada una aplicada sobre la implementación en la copia del scratchpad y
+revertida; e2e/arena-volver-066.spec.ts contra next dev --webpack. M1 devuelve el removeItem en «terminada»; M2 muestra
+el aviso también tras una pausa del espectador; M3 quita el aviso al ocultar; M4 quita el plazo de reanudarAudio; M5
+saca resume() del gesto (setTimeout 0); M6 ignora el segundo guardado; M7 quita el caso 404; M8 no reactiva la narración
+al continuar tras recargar. Antes, sin el desplazamiento del aviso, la recarga fallaba en toBeInViewport (visto).
+
+=== MUTACION M1-removeItem-terminada (src/ui/ArenaEnDirecto.tsx) -g 'D ·|recarga'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:142:5 › 1440 × 900 › D · oculta, «terminada» llega oculta, vuelve con «Continue match» y «Resume broadcast» llega al final (C: resume() en el gesto) (8.9s)
+  ✘  2 [chromium] › e2e/arena-volver-066.spec.ts:167:5 › 1440 × 900 › A · recarga con la sesión completa: en pausa en el segundo guardado, «Continue match» y la narración vuelve en el gesto (16.6s)
+  ✘  3 [chromium] › e2e/arena-volver-066.spec.ts:142:5 › 390 × 844 › D · oculta, «terminada» llega oculta, vuelve con «Continue match» y «Resume broadcast» llega al final (C: resume() en el gesto) (8.2s)
+  ✘  4 [chromium] › e2e/arena-volver-066.spec.ts:167:5 › 390 × 844 › A · recarga con la sesión completa: en pausa en el segundo guardado, «Continue match» y la narración vuelve en el gesto (16.3s)
+    Error: «terminada» no borra la sesión mientras la emisión no acabe
+    Expected: "00000000-0000-4000-8000-000000014401"
+    Received: null
+    Error: expect(received).toBeGreaterThan(expected)
+    Expected: > 0
+    Received:   0
+    Error: «terminada» no borra la sesión mientras la emisión no acabe
+    Expected: "00000000-0000-4000-8000-000000003901"
+    Received: null
+    Error: expect(received).toBeGreaterThan(expected)
+    Expected: > 0
+    Received:   0
+  4 failed
+=== MUTACION M2-aviso-siempre (src/ui/ArenaEmisionBuffer.tsx) -g 'pausa pedida'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:218:5 › 1440 × 900 › B · una pausa pedida por el espectador no muestra el aviso, ni al ocultar y volver (17.1s)
+  ✘  2 [chromium] › e2e/arena-volver-066.spec.ts:218:5 › 390 × 844 › B · una pausa pedida por el espectador no muestra el aviso, ni al ocultar y volver (16.8s)
+    Error: expect(locator).toHaveCount(expected) failed
+    Expected: 0
+    Received: 1
+    Error: expect(locator).toHaveCount(expected) failed
+    Expected: 0
+    Received: 1
+  2 failed
+=== MUTACION M3-sin-aviso-al-ocultar (src/ui/ArenaEmisionBuffer.tsx) -g '1440.*D ·'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:142:5 › 1440 × 900 › D · oculta, «terminada» llega oculta, vuelve con «Continue match» y «Resume broadcast» llega al final (C: resume() en el gesto) (18.8s)
+    Error: expect(locator).toBeVisible() failed
+    Expected: visible
+    Error: element(s) not found
+  1 failed
+=== MUTACION M4-sin-plazo-reanudar (src/ui/ArenaEmisionBuffer.tsx) -g '1440.*C ·'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:236:5 › 1440 × 900 › C · si resume() no resuelve, «Enable audio playback» aparece a los 1500 ms y el reloj sigue (9.3s)
+    Error: expect(locator).toBeVisible() failed
+    Expected: visible
+    Error: element(s) not found
+  1 failed
+=== MUTACION M5-sin-resume-en-gesto (src/ui/ArenaEmisionBuffer.tsx) -g '390.*D ·'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:142:5 › 390 × 844 › D · oculta, «terminada» llega oculta, vuelve con «Continue match» y «Resume broadcast» llega al final (C: resume() en el gesto) (9.3s)
+    Error: resume() dentro del gesto
+    - Expected  - 1
+  1 failed
+=== MUTACION M6-ignora-segundo (src/ui/ArenaEnDirecto.tsx) -g 'Torneo'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:195:5 › 1440 × 900 › A · Torneo y «atrás» con la sesión en curso: retoma en el segundo guardado, sin saltar al vivo; Espacio continúa (9.6s)
+  ✘  2 [chromium] › e2e/arena-volver-066.spec.ts:195:5 › 390 × 844 › A · Torneo y «atrás» con la sesión en curso: retoma en el segundo guardado, sin saltar al vivo; Espacio continúa (8.3s)
+    Error: expect(received).toBeLessThanOrEqual(expected)
+    Expected: <= 0.11
+    Received:    64.507
+    Error: expect(received).toBeLessThanOrEqual(expected)
+    Expected: <= 0.11
+    Received:    65.134
+  2 failed
+=== MUTACION M7-sin-404 (src/ui/ArenaEnDirecto.tsx) -g 'caducada'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:254:5 › 1440 × 900 › A · sesión guardada caducada (404): aviso breve y la clave se limpia (16.0s)
+  ✘  2 [chromium] › e2e/arena-volver-066.spec.ts:254:5 › 390 × 844 › A · sesión guardada caducada (404): aviso breve y la clave se limpia (13.8s)
+    Error: expect(locator).toHaveText(expected) failed
+    Expected: "This match is no longer available"
+    Error: element(s) not found
+    Error: expect(locator).toHaveText(expected) failed
+    Expected: "This match is no longer available"
+    Error: element(s) not found
+  2 failed
+=== MUTACION M8-sin-narracion-al-recargar (src/ui/ArenaEmisionBuffer.tsx) -g '1440.*recarga'
+  ✘  1 [chromium] › e2e/arena-volver-066.spec.ts:167:5 › 1440 × 900 › A · recarga con la sesión completa: en pausa en el segundo guardado, «Continue match» y la narración vuelve en el gesto (21.7s)
+    Error: expect(locator).toBeVisible() failed
+    Expected: visible
+    Error: element(s) not found
+  1 failed
+
+Nota: tras la e2e oficial (build), la prueba «caducada» se cambió para escribir la sesión con addInitScript antes de
+cargar (escribirla tras goto competía con la hidratación: 2/8 en rojo con --repeat-each 4 contra el build; después
+10/10 y la spec completa 24/24 con --repeat-each 2). M7 se vio con la variante anterior; la lógica probada no cambia.

@@ -3123,6 +3123,11 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 @keyframes arena-gol-anillo { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
 @keyframes arena-gol-rotulo { from { opacity: 0; translate: -50% -6px; } to { opacity: 1; translate: -50% 0; } }
 @keyframes arena-gol-marcador { 0%, 100% { box-shadow: 0 0 0 3px var(--ar-score-bg); } 50% { box-shadow: 0 0 0 8px transparent; } }
+/* Brief 066 · B · «Continue match» sobre la cancha tras una pausa por ocultación o al retomar: centrado y por encima
+   del rótulo del gol, dentro de .arena-pitch-wrap (el marcador va fuera y no se tapa). */
+.arena-volver { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; justify-items: center; gap: var(--ar-s2); padding: var(--ar-s3); background: color-mix(in srgb, var(--ar-bug) 55%, transparent); text-align: center; }
+.arena-shell .arena-volver .btn { min-height: 56px; padding: 0 var(--ar-s5); font: 800 clamp(18px, 3.2vw, 24px)/1.2 var(--font-display), sans-serif; }
+.arena-volver p { margin: 0; color: var(--ar-bug-ink); font: 600 14px/1.35 var(--font-display), sans-serif; text-shadow: 0 1px 2px var(--ar-bug); }
 
 @media (prefers-reduced-motion: reduce) {
   .arena-match-clock[data-en-vivo]::before { animation: none; }

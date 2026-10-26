@@ -1,0 +1,47 @@
+Brief 066 · D · Reproducir primero el caso de Carlos (26 oct 2026, implementador Opus 5.5)
+
+Entorno: código de HEAD fe9b353 (con el B4 del 064 sin commit del árbol), `next dev --webpack` en una copia del
+scratchpad (CRONISTA_LLM=ensayo), Chromium de Playwright sin interfaz. Sin partidos con modelos ni Azure.
+
+Emulación de pestaña oculta (addInitScript, la misma de e2e/arena-volver-066.spec.ts):
+- `document.hidden` y `visibilityState` controlados por la prueba y `visibilitychange` emitido;
+- los callbacks de requestAnimationFrame RETENIDOS mientras está oculta y entregados al volver (navegador real);
+- sesión simulada por rutas: POST /sesiones, /emision (prefijo hasta el tick 1100 de un partido programado de 120 s,
+  semilla 47, en «ejecutando»), SSE que entrega el resto + `fin` + `terminada` (completa) cuando la prueba lo suelta,
+  /relato con 0,5 s de audio (directo narrado: «Turn narration off» visible).
+
+1. Caso del brief (oculta en mitad de la emisión, «terminada» llega oculta, vuelve, «Resume broadcast»):
+   NO SE REPRODUJO EL BLOQUEO DEL RELOJ. Con HEAD, a 1440 × 900 y 390 × 844, el reloj llega a 2:00 y el estado a
+   «End of broadcast» (2 passed, 1,2 min). Variantes probadas con HEAD, todas llegan a 2:00:
+   - oculta 15 s tras «terminada» (base-largo): t0 93,33 → +4 s 97,52;
+   - SSE cortado y reconectado mientras está oculta (sse-cortado): t0 93,31 → 97,49;
+   - búfer seco («Rebuilding the buffer…») al ocultar (seco): t0 110 → 114,08;
+   - resume() que no resuelve tras volver (resume-cuelga): t0 93,28 → 97,46.
+
+2. Lo que SÍ se reprodujo con HEAD (variante resume-cuelga):
+   resumes registrados ["false:running","true:suspended"], voz «Narration playing», botón «Enable audio playback»: 0.
+   Causa: src/ui/ArenaEmisionBuffer.tsx (HEAD) l. 178–182, `reanudarAudio` pone `reanudando.current = true` y solo
+   lo libera en el `finally` de resume(); si la promesa no se resuelve nunca, queda atascado. El bucle de animación
+   (l. 669, `else if (!reanudando.current) reanudarAudio()`) ya no reintenta y `verificarDesbloqueo` solo se arma al
+   activar la voz: la narración queda muda para siempre, con «Narration playing» y sin aviso. El reloj sigue.
+   Además, al volver la reanudación del audio ocurría fuera del gesto (rAF), y no dentro de «Resume broadcast».
+
+3. Rutas sospechosas revisadas (brief § 2, D):
+   - `bufferTerminada`/`hastaTick` tras «terminada»: `recibirDirecto` pone bufferTerminada con presentación búfer;
+     el reloj pasa de «recuperando» a «reproduciendo» con terminada = true. Sin bloqueo.
+   - `alActividad(false)`: con `bufferRecibido` en true no desmonta la emisión; solo la reconexión («Reconnect» o
+     montaje) hace `alActividad(true)` → `setSesionActual(null)` → remonta en `final − 20 s`: es el SALTO del brief
+     (ArenaEnDirecto.tsx l. 95 en HEAD), no un bloqueo.
+   - `sessionStorage.removeItem` en «terminada» (ArenaEnDirecto.tsx l. 138 en HEAD): borra la sesión aunque la
+     emisión siga; una recarga vuelve a la vista previa.
+   Hipótesis no verificable aquí: Edge real (pestañas suspendidas/eficiencia) o un «Resume broadcast» fuera de la
+   vista bajo la cancha a 1440 px. Se añaden las defensas A–C.
+
+4. La e2e definitiva (e2e/arena-volver-066.spec.ts, 12 casos) contra HEAD: 10 failed, 2 passed (los 2 que pasan
+   son «una pausa del espectador no muestra el aviso», que HEAD cumple por no tener aviso). Fallos en HEAD:
+   - D: «terminada no borra la sesión mientras la emisión no acabe» → Received: null;
+   - recarga: segundo guardado 0 (no se guardaba);
+   - Torneo y atrás: sin segundo guardado (null);
+   - C: sin «Continue match» y sin «Enable audio playback»;
+   - caducada: sin el aviso «This match is no longer available».
+   Con la implementación: 12 passed (2,5 min) contra el mismo dev server.

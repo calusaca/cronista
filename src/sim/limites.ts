@@ -1398,6 +1398,12 @@ export const NARRACION_DIRECTO = {
   esperaHerramientasMs: 1500,
 } as const;
 
+/** Brief 066 · A · Retomar el directo: cada cuánto (ms) se guarda en sessionStorage el segundo de la emisión (además
+ * de al ocultarse la pestaña, al salir de la página y al desmontar la emisión). No es un umbral estadístico. */
+export const RETOMAR_DIRECTO = {
+  guardarCadaMs: 1000,
+} as const;
+
 /** Brief 058 · C1 (23 oct): tope diario de Speech de la réplica. 200.000 c la semana de jueces (antes 120.000);
  * 800 audios sin cambio. A ≈ 15,5 USD por millón, como máximo ≈ 3,1 USD al día. Revisar tras el fallo. */
 export const SPEECH_DIARIO = { audios: 800, caracteres: 200_000 } as const;

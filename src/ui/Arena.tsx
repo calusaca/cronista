@@ -31,6 +31,7 @@ import { aplicarPublicacion } from "../arena/protocolo";
 import { rondaVisible } from "../arena/buffer";
 import { ArenaDescripcion } from "./ArenaDescripcion";
 import { ArenaEmisionBuffer } from "./ArenaEmisionBuffer";
+import { olvidarDirecto } from "./retomar-directo";
 import { ArenaCifras } from "./ArenaCifras";
 import { ArenaMarcador, ArenaRotuloGol, ArenaVistaArco } from "./ArenaCelebracion";
 import { AvisosFavoritos, EstrellaFavorito } from "./ArenaFavoritos";
@@ -87,6 +88,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   const controlesVoz = useRef<ControlesNarracion | null>(null);
   const alControles = useRef((c: ControlesNarracion) => { controlesVoz.current = c; }).current;
   const [bufferActivo, setBufferActivo] = useState(false), [bufferTerminada, setBufferTerminada] = useState(false), [bufferInicioTick, setBufferInicioTick] = useState(0);
+  /** Brief 066 · A/B · Emisión retomada (en pausa, con «Continue match» sobre la cancha) y nodo de la cancha. */
+  const [bufferRetomar, setBufferRetomar] = useState<{ narracion: boolean } | null>(null), [cancha, setCancha] = useState<HTMLElement | null>(null);
   const presentacionActual = useRef<PresentacionArena>("preparada");
   const bufferRecibido = useRef(false);
   const [estadoDirecto, setEstadoDirecto] = useState("esperando");
@@ -196,7 +199,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     if (activa && !enDirecto && window.matchMedia?.("(max-width: 850px)").matches) requestAnimationFrame(() => document.getElementById("arena-cancha")?.scrollIntoView({ behavior: reducido ? "auto" : "smooth", block: "start" }));
     if (activa) { setOrigenTorneo(null); setContextoModelos(null); bufferRecibido.current = false; setConfigurando(false); setBufferTerminada(false); setSesionActual(null); setArchivoActual(null); setReproduciendo(false); }
   };
-  const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean }) => {
+  const recibirPreparado = (id: string, resultado: ReproduccionArena, buffer?: { inicioTick: number; terminada: boolean; retomar?: { narracion: boolean } }) => {
     setOrigenTorneo(null); setContextoModelos(resultado.asignacion ? { forma: "sesion", asignacion: resultado.asignacion } : null);
     setRegistro(resultado.registro); setComentarios(resultado.comentarios); setIntervenciones(resultado.intervenciones ?? []); setSesionActual(id); setCargaId(c => c + 1);
     const inicio = (buffer?.inicioTick ?? 0) * ARENA.pasoS;
@@ -205,10 +208,11 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
     // igual que el mensaje `terminada` equivalente, libera los controles (CI 39610110045).
     const fallida = "estado" in resultado && ["cancelada", "interrumpida", "error"].includes(String(resultado.estado));
     if (buffer && fallida) { bufferRecibido.current = false; setBufferActivo(false); return; }
-    if (buffer) { bufferRecibido.current = true; setBufferInicioTick(buffer.inicioTick); setBufferTerminada(buffer.terminada || resultado.registro.final.tick * ARENA.pasoS >= resultado.registro.config.duracionS || Boolean(resultado.registro.final.finalizado)); setBufferActivo(true); }
+    if (buffer) { bufferRecibido.current = true; setBufferInicioTick(buffer.inicioTick); setBufferRetomar(buffer.retomar ?? null); setBufferTerminada(buffer.terminada || resultado.registro.final.tick * ARENA.pasoS >= resultado.registro.config.duracionS || Boolean(resultado.registro.final.finalizado)); setBufferActivo(true); }
   };
   const entornoElegido = entornoDeFormulario({ clima, temperatura, superficie, cesped, presion });
   const ejecutar = async (payload: unknown) => {
+    olvidarDirecto(); // Brief 066 · A: otro partido olvida el directo guardado.
     setSesionActual(null); setBufferActivo(false); setOrigenTorneo(null); setContextoModelos(null); setErrorTorneo(null);
     solicitud.current?.abort();
     const controlador = new AbortController(); solicitud.current = controlador;
@@ -310,6 +314,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
   /** § 4.2 + v1.1 (4) · «Stop match»: cancela la sesión en curso (la función de «Cancel live match»; sin DELETE si ya
    * terminó) y limpia: cursor 0:00, sin audio, sin selección y sin emisión. Un preparado vuelve a la vista anterior. */
   const detenerPartido = () => {
+    olvidarDirecto(); // Brief 066 · A: «Stop match» olvida el directo guardado.
     const enCurso = enDirecto;
     if (enCurso) { setDeteniendo(true); cancelarDirecto.current?.(); }
     pausadaPorUsuario.current = false; dueno.current = null; setReproduciendo(false); setTiempo(0); cursor.current = 0; setSeleccionado(null);
@@ -393,7 +398,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <div className="arena-match-clock" data-en-vivo={enDirecto || bufferActivo || undefined}><output className="tnum" data-testid="arena-clock" data-cursor-s={tiempo.toFixed(3)}>{reloj(tiempo)} / {reloj(enDirecto ? registro.config.duracionS : finS)}</output></div>
           {/* Brief 060 § 5.4 · Modelos que jugaron, por lado y con su procedencia; sin role="status". */}
           {modelos && <p className="arena-models" data-testid="arena-models" data-procedencia={modelos.procedencia}>{modelos.texto}</p>}
-          <div className="arena-pitch-wrap"><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} identidad={identidad} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
+          <div className="arena-pitch-wrap" ref={setCancha}><ArenaRotuloGol registro={registro} gol={gol} idioma={idioma} identidad={identidad} /><svg viewBox="-5 -5 115 78" role="group" aria-label={estado.arbitro ? t("22 simulated players, a referee and the ball; home attacks right", "22 jugadores simulados, un árbitro y el balón; el local ataca hacia la derecha") : t("22 simulated players and the ball; home attacks right", "22 jugadores simulados y el balón; el local ataca hacia la derecha")} data-testid="arena-pitch">
             <rect className="arena-runoff" x="-5" y="-5" width="115" height="78" rx="1.5" aria-hidden="true" />
             <rect className="arena-grass" x="0" y="0" width="105" height="68" />
             <g className="arena-stripes" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map(i => <rect key={i} className="arena-stripe" y="0" width="8.75" height="68" x={i * 17.5 + 8.75} />)}</g>
@@ -491,7 +496,7 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           </details>
           <ArenaEnDirecto ajustes={{ seed: seed === "" ? undefined : Number(seed), segundos, local, visita, entorno: entornoElegido }} presentacionVista={vista === "live" ? "buffer" : "preparada"} idioma={idioma} ocupado={pendiente || (seed !== "" && (!/^\d+$/.test(seed) || Number(seed) > 4294967295))} alMensaje={recibirDirecto} alActividad={actividadDirecto} alPreparado={recibirPreparado} alCancelar={registrarCancelar} />
           </div>
-          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} ranura={ranura} alAntesala={setFocoAntesala} />}
+          {bufferActivo && sesionActual && <ArenaEmisionBuffer key={sesionActual} registro={registro} sesion={sesionActual} hastaTick={registro.final.tick} terminada={bufferTerminada} inicioTick={bufferInicioTick} idioma={idioma} intervenciones={mesa} alTiempo={tick => { setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} alRepeticion={() => { setBufferActivo(false); setTiempo(0); cursor.current = 0; }} ranura={ranura} alAntesala={setFocoAntesala} retomar={bufferRetomar} cancha={cancha} />}
           {!bufferActivo && <ArenaNarracion alActividadAudio={setAudioActivo} registro={registro} carga={cargaId} alEstado={setEstadoVoz} alControles={alControles} sinPartido={registro === inicial && !sesionActual && !enDirecto} seed={registro.config.partido.seed} sesion={sesionActual} archivo={archivoActual} alRegistrar={setSesionActual} hastaTick={registro.final.tick} enDirecto={enDirecto} idioma={idioma} intervenciones={mesa} seleccionarTiempo={tick => { setReproduciendo(false); setTiempo(tick * ARENA.pasoS); cursor.current = tick * ARENA.pasoS; }} />}
           <ArenaMesa comentarios={comentarios} intervenciones={mesa} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}
