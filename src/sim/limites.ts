@@ -1061,8 +1061,11 @@ export const MESA_ARENA = {
      * Del orden de la cuota calibrada en la v1.2 (0,2 × 80 / 24.000). Coste máximo añadido por
      * encuentro: esta bolsa. Medición del narrador sin invitados (8 semillas, apertura + tramos +
      * cierre): 60 s ES+EN ≤ 28 solicitudes y 9.411 caracteres; 120 s ≤ 52 y 17.636; 180 s ≤ 76 y
-     * 26.058, que ya supera su presupuesto (límite anterior al 048, v1.3 (2)). */
-    bolsaSpeechInvitados: { solicitudes: 16, caracteres: 4800 },
+     * 26.058, que ya supera su presupuesto (límite anterior al 048, v1.3 (2)).
+     * [065] antes 16 / 4.800: con la web a 120 s se agotaba en 8/8 semillas incluso en un idioma (caben 6–8
+     * clips de ≈ 700 c; docs/evidencia/motor-065/voz/). 40 / 24.000 cubre 120 s ES+EN con una variante
+     * (≤ 26 clips pedidos; con 32 / 19.200 aún fallaba 1 de 8 semillas); decisión de Carlos del 26 oct. */
+    bolsaSpeechInvitados: { solicitudes: 40, caracteres: 24_000 },
     /** v1.2 (2) · Reserva propia del cierre del narrador, dentro de su presupuesto, que ningún otro
      * tramo puede usar: dos cierres (ES y EN) de ≤ 335 caracteres de SSML medidos, con margen. */
     reservaSpeechCierreCaracteres: 800,

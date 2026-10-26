@@ -266,6 +266,7 @@
 | 2026-10-25 | Publicación | `cronista-arena--0000044` (commit `64b5e18`, bloque A del 064), seguida de `--0000045` con los cupos temporales. Smoke público: `/?lang=es` da 307 hacia `/arena?lang=es`; `/arena`, `/cronicas`, `/match/246`, `/datos` y `/arena/torneo` dan 200. | Opus | ✅ · ⏳ retirar overrides |
 | 2026-10-26 | Diseño | Brief 065 v1.0, pedido de Carlos y opciones A + B elegidas por él. Móvil: en una columna, la sala de control y «Start live match» van antes de la cancha (solo CSS) y al empezar la página baja a la cancha. Diagnóstico de goles v4–v8 con 600 semillas: la caída grande viene del 051 y el 063 resta un 9 % más (remate lejano). Commit `d39f754`. Pruebas vistas correr: tsc limpio, vitest de `src/ui` 174/174 y e2e de la arena contra un dev server en una copia; los fallos que quedan también fallan en HEAD. | Opus | ✅ |
 | 2026-10-26 | Implementación | Brief 065 §§ 1–3. Reglas `reinicios-v9` con `REMATE_ARENA_V9` (errorBaseM 4,8, alcanceMaxM 2,2): segunda iteración permitida, porque 4,5/2,1 incumplía `golesTrasSaque` en el lote rápido. Goles por partido v8→v9 (semillas 1–400) a 60/120/180 s: 0,940→1,015 / 1,955→2,107 / 2,960→3,260. La web abre con 120 s (`ARENA_WEB`) y el torneo sigue en 60 s. e2e móvil `arena-movil-065`. Commits `238d010`, `1fa5879` y `327155f`, sin desplegar. Reportado por el implementador, sin verlo correr el coordinador: tsc limpio, npm test 2933/2933, stats 75/75, e2e 317 + 13 con un fallo (navegacion-064 N1, también en HEAD). | Opus | ⏳ validación |
+| 2026-10-26 | Implementación | Brief 065, decisión de Carlos: la bolsa de voz de los invitados pasa de 16 / 4.800 a 40 / 24.000 (`MESA_ARENA.dialogo.bolsaSpeechInvitados`). Antes se probó 32 / 19.200, que aún fallaba en 1 de 8 semillas. Medido con Speech simulado, semillas 1–8: a 120 s, ES y ES+EN con una variante, sin rechazos de invitados ni del narrador (`docs/evidencia/motor-065/voz/`). Pruebas vistas correr: tsc limpio, npm test 2933/2933. | Opus | ✅ |
 
 ## Deudas conocidas (honestas)
 
@@ -379,9 +380,8 @@ Enterprise, US$150; cobertura, renovación y factura siguen sin comprobarse.
 - Brief 065: la deuda del 055 («marcador a 538–611 px en móvil») queda más abajo a propósito, porque en una
   columna la sala de control va antes de la cancha. A 360×740, «Start live match» queda 24 px bajo el pliegue
   (`test.fail` declarado en `arena-movil-065`).
-- Brief 065: con 120 s por defecto, la bolsa de voz de los invitados (16 solicitudes, 4.800 caracteres) se agota en
-  todos los partidos narrados medidos, incluso con un solo idioma. Solo caben 6–8 clips. A 180 s ES+EN se agota
-  también el narrador. No se subió ninguna bolsa: decide Carlos.
+- Brief 065: con la bolsa de invitados en 40 / 24.000, a 120 s ES+EN solo se agota si se piden las dos variantes
+  (breve y completa). A 180 s ES+EN se sigue agotando el narrador, igual que antes.
 - Brief 065: el directo usa `intervaloS` 30 (`sesiones.ts`), así que salen 4 rondas a 120 s; el brief decía 8.
   El torneo sigue en 60 s, pero ya con reglas v9 en el próximo despliegue.
 - `navegacion-064` N1 (`/?a=1&b=2&a=3`, orden de la query del proxy) falla en la e2e oficial en HEAD `d39f754`.

@@ -40,3 +40,24 @@ En la fila de 180 s, el narrador recibe 68 rechazos «reservado para el cierre»
 
 Los invitados reciben un 429 propio, que no afecta al narrador ni al cierre. Este brief no sube ninguna bolsa: queda
 como deuda para Carlos.
+
+## Bolsa de invitados subida a 40 / 24.000 (26 oct, decisión de Carlos)
+
+Se repitió la misma medición, con el script de arriba colocado temporalmente y las semillas 1–8. Los datos están en
+`medicion-bolsa-40.jsonl`.
+
+Antes se probó 32 / 19.200, pero a 120 s ES+EN completa aún rechazaba invitados en 1 de 8 semillas, con un máximo de
+18.804 c.
+
+Con 40 / 24.000:
+
+| Duración | Idiomas | Variantes | Invitados pedidos | Máximo servido | Semillas con rechazo de invitados | Semillas con rechazo del narrador |
+|---|---|---|---|---|---|---|
+| 60 s | ES / ES+EN | completa | 5–7 / 10–14 | 7 / 14 (10.118 c) | 0 / 0 | 0 / 0 |
+| **120 s** | **ES** | completa | 10–13 | 13 (9.127 c) | **0** | 0 |
+| **120 s** | **ES+EN** | completa | 20–26 | 26 (19.465 c) | **0** | 0 |
+| 120 s | ES+EN | ambas | 40–52 | 38 (23.908 c) | 8 | 0 |
+| 180 s | ES+EN | completa | 28–34 | 34 (23.733 c) | 0 | 8 (ya antes) |
+
+Coste máximo añadido por encuentro: 24.000 caracteres de Speech. Los topes diarios
+(`ARENA_SPEECH_DIARIO_*`) siguen siendo la salvaguarda global.
