@@ -1,0 +1,8 @@
+v9-base	reinicios-v9	potencia	{}
+v9-C48D22	reinicios-v9	potencia	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-base	reinicios-v9	identidad	{}
+v9-C48D22	reinicios-v9	identidad	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-base	reinicios-v9	porteros	{}
+v9-C48D22	reinicios-v9	porteros	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-base	reinicios-v9	campo	{}
+v9-C48D22	reinicios-v9	campo	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}

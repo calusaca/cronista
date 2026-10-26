@@ -1,0 +1,20 @@
+v9-base	reinicios-v9	1	30	{}
+v9-D22	reinicios-v9	1	30	{"REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-C48	reinicios-v9	1	30	{"REMATE_ARENA_V9.errorBaseM": 4.8}
+v8-base	reinicios-v8	1	30	{}
+v9-base	reinicios-v9	1	100	{}
+v9-base	reinicios-v9	101	100	{}
+v9-D22	reinicios-v9	1	100	{"REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-D22	reinicios-v9	101	100	{"REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-C48	reinicios-v9	1	100	{"REMATE_ARENA_V9.errorBaseM": 4.8}
+v9-C48	reinicios-v9	101	100	{"REMATE_ARENA_V9.errorBaseM": 4.8}
+v9-C48	reinicios-v9	31	30	{"REMATE_ARENA_V9.errorBaseM": 4.8}
+v9-base	reinicios-v9	31	30	{}
+v9-C48D22	reinicios-v9	1	30	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-C48D22	reinicios-v9	1	100	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-C48D22	reinicios-v9	101	100	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9-final	reinicios-v9	1	30	{}
+v9-final	reinicios-v9	1	100	{}
+v9-final	reinicios-v9	101	100	{}
+v8	reinicios-v8	1	100	{}
+v8	reinicios-v8	101	100	{}

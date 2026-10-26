@@ -1,7 +1,8 @@
 // Brief 051 (reinicios-v5): funciones puras del remate y del portero ante el remate. El motor las
 // llama solo bajo v5 (getter `v5` de MotorArena); las pruebas las usan directamente. Las cifras
-// salen de REMATE_ARENA, PORTERO_ARENA y ARENA; aquí no hay umbrales propios.
-import { ARENA, PORTERO_ARENA as PO, REMATE_ARENA as RM } from "../sim/limites";
+// salen de REMATE_ARENA, PORTERO_ARENA y ARENA; aquí no hay umbrales propios. Brief 065 (reinicios-v9): el
+// error base y el alcance máximo del portero llegan como argumento (`remateDeReglas`, REMATE_ARENA_V9).
+import { ARENA, PORTERO_ARENA as PO, REMATE_ARENA as RM, REMATE_ARENA_V9 as RM9 } from "../sim/limites";
 import type { Lado } from "../sim/tipos";
 import { transformar } from "./catalogo";
 import { limitar } from "./geometria";
@@ -9,6 +10,10 @@ import { lineaArcoBalon } from "./portero";
 import type { Punto } from "./tipos";
 
 const MEDIO_Y = ARENA.anchoM / 2;
+
+/** Brief 065 § 2: las dos cifras del remate que dependen de las reglas; `v9` = reglas ≥ REMATE_ARENA_V9.desde. */
+export const remateDeReglas = (v9: boolean): { errorBaseM: number; alcanceMaxM: number } =>
+  v9 ? { errorBaseM: RM9.errorBaseM, alcanceMaxM: RM9.alcanceMaxM } : { errorBaseM: RM.errorBaseM, alcanceMaxM: RM.alcanceMaxM };
 /** Tendencia `remate` neutra (escala 0–100) de un jugador sin personalidad: no añade ni quita margen. */
 export const REMATE_NEUTRO = 50;
 /** Nivel de referencia (escala 0–100) del término de nivel de `probabilidadDesvio`. */
@@ -40,9 +45,10 @@ export const potenciaRemate = (distanciaM: number): number => limitar((distancia
 export const velocidadRemate = (potencia: number): number => ARENA.velocidadTiroMps * (1 + RM.potenciaVelocidad * (potencia - 0.5));
 
 /** Semiancho (m) del error lateral triangular por nivel, distancia y potencia; el motor le suma la
- * lluvia y la presión de la afición como al remate anterior. */
-export const errorRemate = (nivel: number, distanciaM: number, potencia: number): number =>
-  RM.errorBaseM * (1 - nivel / 100) * limitar(distanciaM / RM.referenciaM, RM.factorDistanciaMin, RM.factorDistanciaMax) * (1 + RM.errorPotencia * potencia);
+ * lluvia y la presión de la afición como al remate anterior. Brief 065: `errorBaseM` según las reglas
+ * (REMATE_ARENA hasta v8, REMATE_ARENA_V9 desde v9; lo elige el motor). */
+export const errorRemate = (nivel: number, distanciaM: number, potencia: number, errorBaseM: number = RM.errorBaseM): number =>
+  errorBaseM * (1 - nivel / 100) * limitar(distanciaM / RM.referenciaM, RM.factorDistanciaMin, RM.factorDistanciaMax) * (1 + RM.errorPotencia * potencia);
 
 /** Probabilidad de que el remate salga por encima del travesaño (modelada, sin altura simulada). */
 export const probabilidadAlto = (nivel: number, potencia: number): number => RM.altoBase + RM.altoPotencia * potencia + RM.altoNivel * (1 - nivel / 100);
@@ -51,10 +57,11 @@ export const probabilidadAlto = (nivel: number, potencia: number): number => RM.
 export const reaccionS = (): number => PO.reaccionM / ARENA.velocidadTiroMps;
 
 /** Radio de contacto (m) del portero ante un remate: alcance por nivel × min(1, t/reaccionS), nunca
- * menor que cuerpoM; t = distancia origen–portero / velocidad efectiva del remate (v1.1 #3). */
-export function alcancePortero(nivel: number, tiempoS: number): number {
+ * menor que cuerpoM; t = distancia origen–portero / velocidad efectiva del remate (v1.1 #3). Brief 065:
+ * `alcanceMaxM` según las reglas (REMATE_ARENA hasta v8, REMATE_ARENA_V9 desde v9; lo elige el motor). */
+export function alcancePortero(nivel: number, tiempoS: number, alcanceMaxM: number = RM.alcanceMaxM): number {
   const factor = Number.isFinite(tiempoS) ? Math.min(1, Math.max(0, tiempoS) / reaccionS()) : 1;
-  return Math.max(PO.cuerpoM, (RM.alcanceMinM + (RM.alcanceMaxM - RM.alcanceMinM) * nivel / 100) * factor);
+  return Math.max(PO.cuerpoM, (RM.alcanceMinM + (alcanceMaxM - RM.alcanceMinM) * nivel / 100) * factor);
 }
 
 /** Estirada ∈ [0, 1]: (distancia lateral del balón al portero − cuerpoM) / (alcance − cuerpoM); 0 si

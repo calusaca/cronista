@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { execFileSync } from "node:child_process";
 import { isDeepStrictEqual as isDeepEqual } from "node:util";
-import { ARENA, ATAQUE_ARENA as A46, ATRIBUTOS_ARENA as AT, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE, TECNICA_ARENA as T, TORNEO_ARENA, TORNEO_SITIO } from "../../sim/limites";
+import { ARENA, ATAQUE_ARENA as A46, ATRIBUTOS_ARENA as AT, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, LOTE_ARENA_063 as L63, PERSECUCION_ARENA as PE, REMATE_ARENA as RM, REMATE_ARENA_V9 as RM9, TECNICA_ARENA as T, TORNEO_ARENA, TORNEO_SITIO } from "../../sim/limites";
 import { prngDerivado } from "../../sim/prng";
 import type { Llm } from "../../lib/llm";
 import { ajusteDuelo, atributosDe, efectoAtributo, estiloJuegoDe, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax, lineaDePuesto } from "../atributos";
@@ -21,6 +21,7 @@ import { capacidadEfectiva } from "../entorno";
 import { varianteVoz } from "../expresion";
 import { condicionesFixtureV7, cumpleFixtureV7, DURACION_FIXTURE_V7_S } from "../__fixtures__/generar-reinicios-v7";
 import { condicionesFixtureV8, cumpleFixtureV8, DURACION_FIXTURE_V8_S } from "../__fixtures__/generar-reinicios-v8";
+import { condicionesFixtureV9, cumpleFixtureV9, DURACION_FIXTURE_V9_S } from "../__fixtures__/generar-reinicios-v9";
 import { distancia } from "../geometria";
 import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "../largo";
 import { narrarArena } from "../narrador";
@@ -41,6 +42,8 @@ import { validarRaizTorneos, validarTorneo } from "../torneo-validacion";
 import { atributosJugador, estilosJuego, lados, reglasArena, type AtributoJugador, type EstiloJuego, type AtributosJugador, type ConfigArena, type ControladorEquipo, type EstadoArena, type FormacionArena, type JugadorArena, type OrdenesEquipo, type OrdenJugador, type PersecucionArena, type Punto, type RegistroArena, type ReglasArena, type Vuelo } from "../tipos";
 
 const V8 = "reinicios-v8" as const, V7 = "reinicios-v7" as const, V6 = "reinicios-v6" as const, V5 = "reinicios-v5" as const;
+/** Brief 065: ARENA.reglas es reinicios-v9 (REMATE_ARENA_V9); v8 pasa a literal. */
+const V9 = "reinicios-v9" as const;
 /** § 4.3: la configuración `base` con otras reglas; desde reinicios-v7, con sus atributos, y desde reinicios-v8, con la
  * identidad de juego. */
 const conReglas = (base: ConfigArena, reglas: ReglasArena): ConfigArena => {
@@ -253,18 +256,20 @@ function duracionReferencia(linea: "DEF" | "MED" | "DEL", agresividad: number, b
 describe("063 · bloque 0 · compatibilidad", () => {
   const leer = async (nombre: string) => JSON.parse(await readFile(`src/arena/__fixtures__/${nombre}.json`, "utf8")) as RegistroArena;
 
-  it("0.1 · reglasArena y la predeterminada de la publicación 3; v1–v8 válidas (v7 con sus atributos, v8 además con su identidad), reinicios-v9 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6, V7, V8]);
-    expect(ARENA.reglas).toBe(V8);
-    expect(crearConfigArena().reglas).toBe(V8);
+  it("0.1 · reglasArena y la predeterminada (brief 065: reinicios-v9); v1–v9 válidas (v7 con sus atributos, v8 y v9 además con su identidad), reinicios-v10 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
+    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6, V7, V8, V9]);
+    expect(ARENA.reglas).toBe(V9);
+    expect(crearConfigArena().reglas).toBe(V9);
     const base = crearConfigArena({ reglas: V6 });
     for (const reglas of reglasArena) expect(() => validarConfigArena(conReglas(base, reglas))).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v9" as never })).toThrow("Reglas");
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v10" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) {
       expect(reglasDesde({ ...base, reglas }, V6)).toBe(i >= 5);
       expect(reglasDesde({ ...base, reglas }, V7)).toBe(i >= 6);
       expect(reglasDesde({ ...base, reglas }, V8)).toBe(i >= 7);
+      expect(reglasDesde({ ...base, reglas }, V9)).toBe(i >= 8);
     }
+    expect(RM9.desde).toBe(V9);
     expect(L63.desdeA).toBe(V6);
     expect(L63.desdeBC).toBe(V7);
     expect(L63.desdeD).toBe(V8);
@@ -833,13 +838,14 @@ describe("063 · bloque B · atributos (reinicios-v7)", () => {
       await ejecutarArena(crearConfigArena({ seed, duracionS: TORNEO_ARENA.duracionS, intervaloS: TORNEO_SITIO.intervaloS, reglas }), { local, visita: crearControladorProgramado() });
       return vistas;
     };
-    // Publicación 3: las peticiones nuevas (reinicios-v8, ARENA.reglas) llevan además `estiloJuego` y frasesIdentidad().
-    expect(ARENA.reglas).toBe(V8);
+    // Publicación 3: las peticiones de reinicios-v8 llevan además `estiloJuego` y frasesIdentidad(). Brief 065: reinicios-v9
+    // (ARENA.reglas) solo cambia dos cifras del remate; su petición tiene las mismas claves que v8 y se mide igual.
+    expect(ARENA.reglas).toBe(V9);
     let mayor = 0;
     const mayores: Record<string, number> = {};
     for (let seed = 1; seed <= BC.semillasTorneo; seed++) {
       const v5 = await peticiones(seed, V5, sistemaV5);
-      for (const reglas of [V7, V8]) {
+      for (const reglas of [V7, V8, V9]) {
         const vn = await peticiones(seed, reglas, SISTEMA_ARENA);
         expect(vn.length).toBe(Math.ceil(TORNEO_ARENA.duracionS / TORNEO_SITIO.intervaloS));
         vn.forEach((n, k) => { mayor = Math.max(mayor, n / v5[k]!); mayores[reglas] = Math.max(mayores[reglas] ?? 0, n / v5[k]!); });
@@ -1470,5 +1476,51 @@ describe("063 · bloque D · identidad de juego (reinicios-v8)", () => {
       expect({ seed, intervaloS, dentroDeCota: b8 < b5 + cota, menorQueMaximo: b8 < ARENA.archivoMaxBytes }).toEqual({ seed, intervaloS, dentroDeCota: true, menorQueMaximo: true });
     }
     console.log("[063 D5 tamaño]", JSON.stringify({ mayorBytes: mayor, archivoMaxBytes: ARENA.archivoMaxBytes }));
+  });
+});
+
+// Brief 065 § 2 · reinicios-v9 (REMATE_ARENA_V9): el remate del motor con el error base de v9, el lote rápido con las
+// mismas bandas que v8 y el fixture v9; los fixtures v1–v8 se reproducen exactos (congelados).
+describe("065 · reinicios-v9 (remate más preciso y portero con menos alcance)", () => {
+
+  it("v9.4 · ejecución de un tiro (corto y lejano): error lateral con errorBaseM de REMATE_ARENA_V9 en v9 y de REMATE_ARENA en v8, el resto igual (mutación: el error base de v9 también en v8)", () => {
+    for (const reglas of [V8, V9] as const) for (const metros of [BC.remateCortoM, BC.remateLejanoM]) for (let seed = 1; seed <= BC.semillas / 4; seed++) {
+      const { s, id } = rematador(reglas, aDistancia(metros), "tirar", {}, { seed });
+      const antes = structuredClone(s.motor.estado), t = antes.jugadores.find(j => j.id === id)!;
+      s.ticks(1);
+      const tiro = deTipo(s.motor, "tiro")[0]!, nivel = capacidadEfectiva(t, compatibilidadPuesto(t, t.puesto)), d = distancia(t.posicion, arcoVisita), potencia = potenciaRemate(d);
+      const lejos = lejosRemate(d), base = reglas === V9 ? RM9.errorBaseM : RM.errorBaseM;
+      const ob = objetivoRemate(t.posicion, portero(antes, "visita").posicion, nivel, t.personalidad?.remate ?? REMATE_NEUTRO, "local");
+      const rng = prngDerivado(seed, `arena:golpe:0:${id}`), lateral = rng.next() + rng.next() - 1;
+      const error = errorRemate(nivel, d, potencia, base) * (lejos > 0 ? factorErrorLejano(lejos) : 1);
+      expect({ reglas, metros, seed, y: tiro.hasta.y }).toEqual({ reglas, metros, seed, y: expect.closeTo(ob.y + lateral * error, 9) });
+    }
+  });
+
+  it("v9.5 · lote rápido v9: bandas `rapido` del 046 (recalibradas), del 051 (y su controlado de porteros), del bloque A y de los bloques B y C", { timeout: 300_000 }, async () => {
+    const lote = { desde: L.rapido.semillaDesde, semillas: L.rapido.semillas, reglas: V9 };
+    const m = await medirLote(lote);
+    const { b046, b051, b063, bBC } = bandasLote(V9, "rapido");
+    console.log("[065 v9 rápido]", JSON.stringify({ goles: m.golesPorPartido, conversion: m.remate.conversion, manoAMano: m.manoAMano.conversion, centros: m.centros.porPartido, a: m.persecucion063, bc: m.largoLejano063 }));
+    expect(b046.golesPorPartido).toEqual(L63.recalibracion046.rapido.golesPorPartido);
+    expect(incumplimientos(m, b046, b051)).toEqual([]);
+    expect(incumplimientos063(m, b063!)).toEqual([]);
+    expect(incumplimientosBC(m, bBC!)).toEqual([]);
+    const porteros = await medirControlado({ ...lote, quien: "portero" });
+    expect(incumplimientosControlado({ porteros: porteros.diferencia }, L51.rapido)).toEqual([]);
+  });
+
+  it("v9.6 · fixture v9 (45 s, búsqueda 1–400) con identidades distintas, atributos, balón largo, persecución, gol y atajada; reproducción exacta; los fixtures v1–v8 siguen exactos (mutación: cambiar el remate de v8)", { timeout: 300_000 }, async () => {
+    const r = JSON.parse(await readFile("src/arena/__fixtures__/arena-reinicios-v9.json", "utf8")) as RegistroArena;
+    expect(r.config.duracionS).toBe(DURACION_FIXTURE_V9_S);
+    expect(condicionesFixtureV9(r)).toEqual({ reglas: true, identidades: true, atributos: true, largo: true, persecucion: true, gol: true, atajada: true });
+    expect(cumpleFixtureV9(r)).toBe(true);
+    expect(r.rondas.flatMap(x => Object.values(x.decisiones)).every(d => d.tiempoMs === 0)).toBe(true);
+    expect(reproducirArena(structuredClone(r))).toEqual(r);
+    expect(Buffer.byteLength(JSON.stringify(r))).toBeLessThan(ARENA.archivoMaxBytes);
+    for (const v of ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"]) {
+      const x = JSON.parse(await readFile(`src/arena/__fixtures__/arena-reinicios-${v}.json`, "utf8")) as RegistroArena;
+      expect({ v, exacto: isDeepEqual(reproducirArena(structuredClone(x)), x) }).toEqual({ v, exacto: true });
+    }
   });
 });

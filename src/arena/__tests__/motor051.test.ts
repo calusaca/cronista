@@ -4,7 +4,8 @@
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, PORTERO_ARENA as PO, REMATE_ARENA as RM } from "../../sim/limites";
+import { ARENA, LOTE_ARENA_046 as L, LOTE_ARENA_051 as L51, PORTERO_ARENA as PO, REMATE_ARENA as RM, REMATE_ARENA_V9 as RM9 } from "../../sim/limites";
+import { factorPotencia } from "../atributos";
 import type { Lado, SimConfig } from "../../sim/tipos";
 import { prngDerivado } from "../../sim/prng";
 import type { Llm } from "../../lib/llm";
@@ -24,7 +25,7 @@ import { destinoSalida, enAreaPropia } from "../portero";
 import { RELATO_INTERVALOS } from "../protocolo";
 import { varianteVoz } from "../expresion";
 import { construirRelato } from "../relato";
-import { alcancePortero, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, reaccionS, REMATE_NEUTRO, velocidadRemate } from "../remate";
+import { alcancePortero, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, reaccionS, remateDeReglas, REMATE_NEUTRO, velocidadRemate } from "../remate";
 import { esquemaOrdenes, lados, reglasArena, type ConfigArena, type EstadoArena, type EventoArena, type JugadorArena, type OrdenesEquipo, type OrdenJugador, type Punto, type RegistroArena, type ReglasArena, type Vuelo } from "../tipos";
 import { narrarEventoArena } from "../vista";
 
@@ -760,5 +761,59 @@ describe("051 · lote rápido (bandas `rapido` de LOTE_ARENA_051 y LOTE_ARENA_04
     const porteros = await medirControlado({ ...lote, quien: "portero" });
     console.log("[051 v5 rápido · controlado porteros]", porteros.diferencia);
     expect(incumplimientosControlado({ porteros: porteros.diferencia }, L51.rapido)).toEqual([]);
+  });
+});
+
+// Brief 065 § 2 · reinicios-v9: el error base del remate y el alcance máximo del portero salen de REMATE_ARENA_V9 solo
+// desde v9; v5–v8 (publicadas y congeladas) siguen con REMATE_ARENA. Las cifras se leen de limites.ts.
+describe("065 · remate de reinicios-v9 (REMATE_ARENA_V9)", () => {
+  const V8 = "reinicios-v8" as const, V9 = "reinicios-v9" as const;
+
+  it("v9.1 (pura) · remateDeReglas y los argumentos nuevos: v9 más preciso y con menos alcance; sin argumento, las cifras de v5–v8 (mutación: invertir el selector; ignorar el argumento)", () => {
+    expect(RM9.desde).toBe(ARENA.reglas);
+    expect(RM9.errorBaseM).toBeLessThan(RM.errorBaseM);
+    expect(RM9.alcanceMaxM).toBeLessThan(RM.alcanceMaxM);
+    expect(RM9.alcanceMaxM).toBeGreaterThan(RM.alcanceMinM);
+    expect(remateDeReglas(false)).toEqual({ errorBaseM: RM.errorBaseM, alcanceMaxM: RM.alcanceMaxM });
+    expect(remateDeReglas(true)).toEqual({ errorBaseM: RM9.errorBaseM, alcanceMaxM: RM9.alcanceMaxM });
+    const n = ESCENARIO.nivelRematador;
+    for (const d of [RM.referenciaM, ESCENARIO.remateLejosM]) for (const p of [0, 1]) {
+      expect(errorRemate(n, d, p, RM.errorBaseM)).toBe(errorRemate(n, d, p));
+      expect(errorRemate(n, d, p, RM9.errorBaseM) / errorRemate(n, d, p)).toBeCloseTo(RM9.errorBaseM / RM.errorBaseM, 12);
+    }
+    expect(alcancePortero(100, reaccionS(), RM9.alcanceMaxM)).toBeCloseTo(RM9.alcanceMaxM, 12);
+    expect(alcancePortero(0, reaccionS(), RM9.alcanceMaxM)).toBeCloseTo(RM.alcanceMinM, 12);
+    expect(alcancePortero(100, reaccionS(), RM.alcanceMaxM)).toBe(alcancePortero(100, reaccionS()));
+    expect(alcancePortero(100, 0, RM9.alcanceMaxM)).toBe(PO.cuerpoM);
+  });
+
+  it("v9.2 · el motor elige las cifras por versión: REMATE_ARENA_V9 solo con v9; v1–v8 y archivos sin reglas, REMATE_ARENA (mutación: gating con la versión equivocada)", () => {
+    for (const r of reglasArena) {
+      const m = new MotorArena(crearConfigArena({ seed: ESCENARIO.semilla, reglas: r })) as unknown as { remate9: { errorBaseM: number; alcanceMaxM: number } };
+      expect({ r, cifras: m.remate9 }).toEqual({ r, cifras: remateDeReglas(r === V9) });
+    }
+    const c = conReglas(crearConfigArena({ seed: ESCENARIO.semilla }), "reinicios-v1"); delete c.reglas;
+    expect((new MotorArena(c) as unknown as { remate9: unknown }).remate9).toEqual(remateDeReglas(false));
+  });
+
+  it("v9.3 · el remate que pasa entre los dos alcances de un portero de nivel 100: lo ataja en v8 y entra en v9 (mutación: alcance de v9 en v8; ignorar el argumento en el motor)", () => {
+    const k = anclas("4-3-3", "local", "base").POR!, lateral = (RM.alcanceMaxM + RM9.alcanceMaxM) / 2, y = k.y + lateral;
+    expect(Math.abs(y - MEDIO_Y)).toBeLessThan(ARENA.arcoM / 2);
+    const pasar = (reglas: ReglasArena) => {
+      const s = vueloTiro(reglas, { origen: { x: k.x + ESCENARIO.origenM, y }, balon: { x: k.x + ESCENARIO.balonAdelanteM, y }, destino: { x: -ARENA.remateTrasLineaM, y }, potencia: 1, porteroEn: k,
+        partido: partidoConNiveles(ESCENARIO.semilla, ESCENARIO.nivelPorteroAlto, null), sinEntorno: true });
+      // Geometría: el alcance de cada versión, con la velocidad efectiva del autor y el nivel efectivo del portero.
+      const autor = s.motor.estado.balon.vuelo!.autor, a = s.config.atributos?.[autor];
+      const t = Math.hypot(ESCENARIO.origenM, lateral) / (velocidadRemate(1) * (a ? factorPotencia(a.potencia) : 1));
+      const nivel = (s.motor as unknown as { nivelEfectivo: (j: JugadorArena) => number }).nivelEfectivo(portero(s.motor.estado, "local"));
+      expect(alcancePortero(nivel, t, RM.alcanceMaxM)).toBeGreaterThan(lateral);
+      expect(alcancePortero(nivel, t, RM9.alcanceMaxM)).toBeLessThan(lateral);
+      s.hasta(sinFinRemate, ticksDe(ESCENARIO.duracionS));
+      return s.motor;
+    };
+    expect(de(pasar(V8), "atajada")).toHaveLength(1);
+    const v9 = pasar(V9);
+    expect(de(v9, "atajada")).toEqual([]);
+    expect(de(v9, "gol")).toHaveLength(1);
   });
 });

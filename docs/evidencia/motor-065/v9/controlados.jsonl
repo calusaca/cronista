@@ -1,0 +1,8 @@
+{"etiqueta":"v9-C48D22","reglas":"reinicios-v9","exp":"potencia","ov":{"REMATE_ARENA_V9.errorBaseM":4.8,"REMATE_ARENA_V9.alcanceMaxM":2.2},"diferencia":0.89,"min":0.4,"inc":[]}
+{"etiqueta":"v9-base","reglas":"reinicios-v9","exp":"campo","ov":{},"diferencia":0.23501284875183548,"inc":[]}
+{"etiqueta":"v9-base","reglas":"reinicios-v9","exp":"potencia","ov":{},"diferencia":1.01,"min":0.4,"inc":[]}
+{"etiqueta":"v9-C48D22","reglas":"reinicios-v9","exp":"porteros","ov":{"REMATE_ARENA_V9.errorBaseM":4.8,"REMATE_ARENA_V9.alcanceMaxM":2.2},"diferencia":0.17982133473462955,"inc":[]}
+{"etiqueta":"v9-base","reglas":"reinicios-v9","exp":"porteros","ov":{},"diferencia":0.1856051798458209,"inc":[]}
+{"etiqueta":"v9-C48D22","reglas":"reinicios-v9","exp":"campo","ov":{"REMATE_ARENA_V9.errorBaseM":4.8,"REMATE_ARENA_V9.alcanceMaxM":2.2},"diferencia":0.21280389600429483,"inc":[]}
+{"etiqueta":"v9-base","reglas":"reinicios-v9","exp":"identidad","ov":{},"diferencias":{"xSinBalon":5.229157255099146,"largos":0.96,"lejanos":0.3,"persecucionS":1.6870000000000003},"inc":[]}
+{"etiqueta":"v9-C48D22","reglas":"reinicios-v9","exp":"identidad","ov":{"REMATE_ARENA_V9.errorBaseM":4.8,"REMATE_ARENA_V9.alcanceMaxM":2.2},"diferencias":{"xSinBalon":5.312035567817006,"largos":1.04,"lejanos":0.33,"persecucionS":1.8760000000000003},"inc":[]}

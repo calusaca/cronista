@@ -1,7 +1,7 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, REMATE_ARENA_V9, TECNICA_ARENA as T } from "../sim/limites";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -17,7 +17,7 @@ import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } fr
 import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
 import { despejeManos, destinoSalida, enAreaPropia, limitarAreaPropia, manoAMano, radioAtajada, respetarManos, saqueAdmisible, saqueForzado, ticksManos } from "./portero";
-import { alcancePortero, balonCercaDelArco, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, REMATE_NEUTRO, velocidadRemate } from "./remate";
+import { alcancePortero, balonCercaDelArco, destinoPosicionamiento, errorRemate, estiradaPortero, objetivoRemate, potenciaRemate, probabilidadAlto, probabilidadDesvio, remateDeReglas, REMATE_NEUTRO, velocidadRemate } from "./remate";
 import { ajusteDuelo, atributosDe, estiloJuegoDe, factorAceleracion, factorDesgaste, factorErrorPase, factorPotencia, factorVelocidadMax } from "./atributos";
 import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "./largo";
 import { apoyoPersecucion, destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, perseguidoresDe, seleccionRepliegue, superadoPor } from "./persecucion";
@@ -209,6 +209,8 @@ export class MotorArena {
   private get v7() { return reglasDesde(this.config, "reinicios-v7"); }
   /** Todo el comportamiento del bloque D del brief 063 (identidad de juego del club) vive tras esta condición. */
   private get v8() { return reglasDesde(this.config, "reinicios-v8"); }
+  /** Brief 065 § 2: el error base del remate y el alcance máximo del portero de estas reglas (REMATE_ARENA_V9 desde v9). */
+  private get remate9() { return remateDeReglas(reglasDesde(this.config, REMATE_ARENA_V9.desde)); }
   /** Brief 063 § 4.2: los atributos guardados en la configuración (bajo v7; undefined en otro caso). */
   private atributos(id: string): AtributosJugador | undefined { return this.v7 ? this.config.atributos?.[id] : undefined; }
   /** Brief 063 § 9.2: la identidad de juego guardada en la configuración (bajo v8; undefined en otro caso). */
@@ -350,7 +352,9 @@ export class MotorArena {
       // probabilidad de irse alto (acotada). A d ≤ radioTiroM nada cambia.
       const lejos = this.v7 ? lejosRemate(d) : 0;
       lejano = lejos > 0;
-      error = (lejano ? errorRemate(nivel, d, potencia) * factorErrorLejano(lejos) : errorRemate(nivel, d, potencia)) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
+      // Brief 065 § 2 (v9): el error base sale de las reglas.
+      const base = errorRemate(nivel, d, potencia, this.remate9.errorBaseM);
+      error = (lejano ? base * factorErrorLejano(lejos) : base) + (entorno ? entorno.errorLluviaM + entorno.errorPresionM : lluvia);
       const alto = lejano ? altoLejano(probabilidadAlto(nivel, potencia), lejos) : probabilidadAlto(nivel, potencia);
       remate5 = { potencia, alto: prngDerivado(this.config.partido.seed, `arena:remate:${this.estado.tick}:${j.id}`).chance(alto) };
     }
@@ -798,7 +802,8 @@ export class MotorArena {
       const area = propia.x <= ARENA.areaLargoM && Math.abs(propia.y - ARENA.anchoM / 2) <= ARENA.areaAnchoM / 2;
       // Brief 046 (v4): ante un remate el radio del portero depende de la distancia de origen.
       // Brief 051 (v5): alcance según el nivel del portero y el tiempo de reacción con la velocidad efectiva.
-      const radio = j.puesto === "POR" && area ? (remate5 ? alcancePortero(this.nivelEfectivo(j), distancia(vuelo!.origen, j.posicion) / velocidadEfectiva) : this.v4 && vuelo?.tipo === "tiro" ? radioAtajada(distancia(vuelo.origen, j.posicion)) : ARENA.controlPorteroM) : ARENA.controlM;
+      // Brief 065 (v9): alcance máximo de REMATE_ARENA_V9.
+      const radio = j.puesto === "POR" && area ? (remate5 ? alcancePortero(this.nivelEfectivo(j), distancia(vuelo!.origen, j.posicion) / velocidadEfectiva, this.remate9.alcanceMaxM) : this.v4 && vuelo?.tipo === "tiro" ? radioAtajada(distancia(vuelo.origen, j.posicion)) : ARENA.controlPorteroM) : ARENA.controlM;
       // Brief 051 (v5): un remate por encima del travesaño no admite contactos de nadie.
       if (remate5?.alto) return { j, ...punto, contacto: false, radio };
       const ignorar = vuelo && ((j.id === vuelo.autor && (vuelo.reinicio || (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS)) || this.conReinicios && j.id === balon.ultimoToque?.jugador && (this.estado.tick - vuelo.inicioTick) * ARENA.pasoS <= ARENA.ignorarAutorS);

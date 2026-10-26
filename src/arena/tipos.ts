@@ -11,8 +11,9 @@ export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalid
  * Brief 051: "reinicios-v4" también es literal; ARENA.reglas es reinicios-v5.
  * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6.
  * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7.
- * Brief 063 (publicación 3): "reinicios-v7" también es literal; ARENA.reglas es reinicios-v8. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", ARENA.reglas] as const;
+ * Brief 063 (publicación 3): "reinicios-v7" también es literal; ARENA.reglas es reinicios-v8.
+ * Brief 065: "reinicios-v8" también es literal; ARENA.reglas es reinicios-v9. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", "reinicios-v8", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];

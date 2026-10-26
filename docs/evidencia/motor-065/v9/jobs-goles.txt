@@ -1,0 +1,24 @@
+v8	reinicios-v8	60	1	200	{}
+v9-45-21	reinicios-v9	60	1	200	{}
+v9-48-22	reinicios-v9	60	1	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v8	reinicios-v8	60	201	200	{}
+v9-45-21	reinicios-v9	60	201	200	{}
+v9-48-22	reinicios-v9	60	201	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v8	reinicios-v8	120	1	200	{}
+v9-45-21	reinicios-v9	120	1	200	{}
+v9-48-22	reinicios-v9	120	1	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v8	reinicios-v8	120	201	200	{}
+v9-45-21	reinicios-v9	120	201	200	{}
+v9-48-22	reinicios-v9	120	201	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v8	reinicios-v8	180	1	200	{}
+v9-45-21	reinicios-v9	180	1	200	{}
+v9-48-22	reinicios-v9	180	1	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v8	reinicios-v8	180	201	200	{}
+v9-45-21	reinicios-v9	180	201	200	{}
+v9-48-22	reinicios-v9	180	201	200	{"REMATE_ARENA_V9.errorBaseM": 4.8, "REMATE_ARENA_V9.alcanceMaxM": 2.2}
+v9	reinicios-v9	60	1	200	{}
+v9	reinicios-v9	60	201	200	{}
+v9	reinicios-v9	120	1	200	{}
+v9	reinicios-v9	120	201	200	{}
+v9	reinicios-v9	180	1	200	{}
+v9	reinicios-v9	180	201	200	{}

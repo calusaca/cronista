@@ -485,8 +485,9 @@ export const ARENA = {
    * Brief 051: reinicios-v5 (remate colocado, potencia, balón por encima y portero con nivel).
    * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida).
    * Brief 063 (publicación 2): reinicios-v7 (atributos de jugador, balones largos y remates lejanos).
-   * Brief 063 (publicación 3): reinicios-v8 (identidad de juego del club). */
-  reglas: "reinicios-v8",
+   * Brief 063 (publicación 3): reinicios-v8 (identidad de juego del club).
+   * Brief 065: reinicios-v9 (remate más preciso y portero con menos alcance, REMATE_ARENA_V9). */
+  reglas: "reinicios-v9",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -661,6 +662,23 @@ export const REMATE_ARENA = {
   /** Fuera del mano a mano, el portero se coloca a estos metros del centro del arco sobre la línea
    * balón–centro del arco (no la bisectriz del ángulo entre los postes; v1.1 #6). */
   posicionamientoM: 3,
+} as const;
+
+/** Brief 065 § 2 (opción A, elegida por Carlos el 26 oct) · Remate más preciso y portero con menos alcance, solo para
+ * reglas ≥ `desde`; v5–v8 conservan REMATE_ARENA sin cambio (están publicadas y congeladas). Sustituyen solo estas dos
+ * cifras de REMATE_ARENA; el resto sigue igual. Diagnóstico (semillas 1–600, docs/evidencia/motor-065/diagnostico/): los
+ * goles por partido a 60 s cayeron de 1,215 (v4) a 0,948 (v8), sobre todo por el remate del 051.
+ *   - errorBaseM: semiancho (m) del error lateral a nivel 0 y distancia referenciaM (v5–v8: 5,5).
+ *   - alcanceMaxM: alcance (m) del portero a nivel 100 (v5–v8: 2,4); alcanceMinM no cambia.
+ * Calibración (26 oct, docs/evidencia/motor-065/v9/): el brief propone 4,5 y 2,1, que cumplen los lotes completos 1–100
+ * y 101–200 pero no el lote rápido de `npm test` (golesTrasSaquePorPartido 2/30 = 0,067 > 0,05). Ajustes permitidos por
+ * el brief, sin mover bandas: iteración 1, alcanceMaxM 2,1 → 2,2 (el rápido sigue en 0,067); iteración 2, además
+ * errorBaseM 4,5 → 4,8: rápido, 1–100 y 101–200 sin incumplimientos y controlados del 051 y del 063 en verde (4,8 con
+ * 2,1 incumplía la conversión del mano a mano en 1–100: 0,433 > 0,42). */
+export const REMATE_ARENA_V9 = {
+  desde: "reinicios-v9",
+  errorBaseM: 4.8,
+  alcanceMaxM: 2.2,
 } as const;
 
 /**
@@ -1564,7 +1582,9 @@ export const TORNEO_SITIO = {
    * 1,3 no bastaba (mayor cociente medido de la petición completa 1,1924 → 1,1 × 1,1924 = 1,3117); se sube a 1,32 y los
    * dos formatos siguen cabiendo en su tope. Publicación 3 (reinicios-v8, § 18.2): la petición lleva además
    * `equipos[lado].estiloJuego` y frasesIdentidad(); mayor cociente medido 1,2143 (v8/v5; v7/v5 1,2050 con el sistema
-   * nuevo) → 1,1 × 1,2143 = 1,3357; se sube a 1,34 y se rehace la comprobación de topes (la prueba la repite). */
+   * nuevo) → 1,1 × 1,2143 = 1,3357; se sube a 1,34 y se rehace la comprobación de topes (la prueba la repite).
+   * Brief 065 (reinicios-v9): la petición tiene las mismas claves que v8; mayor cociente medido 1,2144 (v9/v5, semillas
+   * 1–50) → 1,1 × 1,2144 = 1,3359 ≤ 1,34: el factor no cambia y los topes de liga y grupos siguen cumpliéndose. */
   factorObservacion063: 1.34,
 } as const;
 
