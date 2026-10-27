@@ -10,6 +10,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import paquete from "../../package.json";
 import type { CronicaVerificada } from "../cadena/tipos";
+import type { Admision } from "../arena/admision";
 import type { AlmacenTorneos } from "../arena/almacen-torneos";
 import type { ArchivoCronica, ServicioCronicas } from "../arena/cronica";
 import { huellaRegistro, leerRegistroGuardado } from "../arena/cronica-almacen";
@@ -33,6 +34,10 @@ export interface DepsMcp {
   cronicas: Pick<ServicioCronicas, "leer">;
   /** Origen público (`https://…`) para dar URLs absolutas; sin él, rutas relativas. */
   origen?: string;
+  /** Presupuesto de fallos de memoria de `get_match_facts` (`MCP_ARENA.fallosMemo`) y la clave del cliente (último salto
+   * de x-forwarded-for). La ruta HTTP los pasa; el cronista in-process no (sus cupos son los de la crónica). */
+  admisionFallos?: Admision;
+  clave?: string;
 }
 
 /** Fuente aceptada por `get_match_facts`: solo partidos terminados (sin `sesion` ni `registro`). */
@@ -128,24 +133,40 @@ async function calcularHechos(deps: DepsMcp, fuente: FuenteMcp): Promise<HechosM
 }
 
 // Revisión Codex (071) · LRU por proceso y por conjunto de fuentes (MCP_ARENA.memoHechos): un partido terminado no
-// cambia (la huella es su SHA-256; los encuentros de torneo se validan por SHA-256), así que repetir la consulta no
-// vuelve a leer ni a reproducir el registro. Solo se memoriza un resultado ya obtenido (nunca un fallo ni una lectura
-// pendiente que pudiera quedarse colgada); cada llamada recibe una copia.
+// cambia, así que repetir la consulta no vuelve a leer ni a reproducir el registro. La clave fija la identidad del
+// partido: `h:<almacén>:<huella>` (la huella es el SHA-256 del registro, en ESA instancia de almacén),
+// `t:<torneo>:<nn>:<archivoSha256>` (el SHA-256 vigente del encuentro, comprobado ANTES de cada acierto junto con que el
+// torneo exista y no esté en curso) y `a:<archivo>` (archivos estáticos del repositorio). Solo se memoriza un resultado
+// ya obtenido (nunca un fallo ni una lectura pendiente); cada llamada recibe una copia. Un fallo de memoria gasta del
+// presupuesto `admisionFallos` (como mucho uno en curso): sin él, error «retry after N s».
 const memoHechos = new WeakMap<DepsFuentes, Map<string, HechosMcp>>();
-const claveFuenteMcp = (f: FuenteMcp) => ("huella" in f ? `h:${f.huella}` : "torneo" in f ? `t:${f.torneo}:${f.encuentro}` : `a:${f.archivo}`);
+const idsAlmacen = new WeakMap<object, number>();
+let siguienteId = 0;
+const idDe = (o: object) => { let id = idsAlmacen.get(o); if (id === undefined) { id = ++siguienteId; idsAlmacen.set(o, id); } return id; };
+
+async function claveMemo(deps: DepsMcp, fuente: FuenteMcp): Promise<string> {
+  if ("huella" in fuente) return `h:${idDe(await deps.almacen())}:${fuente.huella}`;
+  if ("archivo" in fuente) return `a:${fuente.archivo}`;
+  const t = await deps.fuentes.torneo(fuente.torneo);
+  if (!t || t.id !== fuente.torneo) throw new ErrorHerramienta("Tournament not found. Use list_matches to find one.");
+  if (enCurso(t)) throw new ErrorHerramienta("That tournament is still in progress; only finished tournaments are served.");
+  const e = t.encuentros.find((x) => x.n === Number(fuente.encuentro));
+  if (!e) throw new ErrorHerramienta("Match not found in that tournament. Use list_matches to find one.");
+  return `t:${t.id}:${fuente.encuentro}:${e.archivoSha256}`;
+}
 
 /** `get_match_facts`: la selección de hechos de un partido terminado (la misma función que usa el redactor). */
 export async function hechosDePartido(deps: DepsMcp, fuente: FuenteMcp): Promise<HechosMcp> {
-  if ("torneo" in fuente) {
-    const t = await deps.fuentes.torneo(fuente.torneo);
-    if (t && enCurso(t)) throw new ErrorHerramienta("That tournament is still in progress; only finished tournaments are served.");
-  }
+  const clave = await claveMemo(deps, fuente);
   let memo = memoHechos.get(deps.fuentes);
   if (!memo) { memo = new Map(); memoHechos.set(deps.fuentes, memo); }
-  const clave = claveFuenteMcp(fuente);
   let h = memo.get(clave);
   if (h) memo.delete(clave);
-  else h = await calcularHechos(deps, fuente);
+  else {
+    const pase = deps.admisionFallos?.admitir(deps.clave ?? "desconocida");
+    if (pase && !pase.ok) throw new ErrorHerramienta(`Too many uncached match lookups right now; retry after ${Math.max(1, Math.ceil(pase.reintentarEnMs / 1000))} s (matches already looked up still answer).`);
+    try { h = await calcularHechos(deps, fuente); } finally { if (pase?.ok) pase.liberar(); }
+  }
   memo.set(clave, h);
   while (memo.size > MCP_ARENA.memoHechos) memo.delete(memo.keys().next().value!);
   return structuredClone(h);

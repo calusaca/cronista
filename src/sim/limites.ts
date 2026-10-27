@@ -1781,6 +1781,15 @@ export const MCP_ARENA = {
    * cuerpo lento o incompleto nunca retiene una plaza. */
   plazoLecturaMs: 5_000,
   /** Selecciones de hechos memorizadas por partido terminado (LRU por proceso): repetir `get_match_facts` sobre el
-   * mismo partido no vuelve a reproducirlo. Cada entrada ≈ unas decenas de KB. */
-  memoHechos: 16,
+   * mismo partido no vuelve a leerlo ni a reproducirlo. Medido el 27 oct sobre los 30 encuentros del torneo
+   * 2026-10-24 y el fixture v11: ≤ 3,5 KB de JSON por selección (media 2,2 KB); la selección está acotada por
+   * CRONICA_ARENA.maxHechos y maxCaracteresEntrada, así que el peor caso ronda las decenas de KB. 256 entradas ≈ 1 MB
+   * típico y < 10 MB en el peor caso, y cubren de sobra los partidos terminados que se sirven. */
+  memoHechos: 256,
+  /** Presupuesto de FALLOS de memoria (lectura + reproducción de un registro, ≈ 0,1–0,2 s de CPU síncrona por partido de
+   * torneo): por IP (último salto) y global por hora, y como mucho `enCurso` a la vez. Un fallo fuera de presupuesto
+   * es un error de herramienta con «retry after N s» (las consultas que aciertan en memoria no gastan). Acota el
+   * trabajo a ≤ globalPorHora reproducciones por hora (≈ 2 por minuto) aunque alguien alterne más partidos de los que
+   * caben en memoria. El cronista in-process no pasa por este presupuesto (ya lo acotan los cupos de la crónica). */
+  fallosMemo: { porIpPorHora: 30, globalPorHora: 120, enCurso: 1, ventanaMs: 3_600_000 },
 } as const;

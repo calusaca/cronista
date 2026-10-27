@@ -112,7 +112,7 @@ To query it from GitHub Copilot (agent mode) in VS Code, or any MCP client, add 
 }
 ```
 
-Honest limits: read-only and finished matches only (never a live session, never an uploaded log); it never writes a report or calls a model or Speech; one JSON-RPC message per request (no batches), a short body deadline, browser requests from another origin rejected, and requests capped per IP and per hour (`MCP_ARENA` in [`src/sim/limites.ts`](src/sim/limites.ts)); the model does not call MCP during generation (the writer's input is unchanged and V1–V8 still decide). Locally: `npm run dev`, then `http://localhost:3000/api/mcp`.
+Honest limits: read-only and finished matches only (never a live session, never an uploaded log); it never writes a report or calls a model or Speech; one JSON-RPC message per request (no batches), a short body deadline, browser requests from another origin rejected, requests capped per IP and per hour, and a smaller budget for facts of matches not yet in the server's cache, one at a time (`MCP_ARENA` in [`src/sim/limites.ts`](src/sim/limites.ts)); the model does not call MCP during generation (the writer's input is unchanged and V1–V8 still decide). Locally: `npm run dev`, then `http://localhost:3000/api/mcp`.
 
 ## Microsoft and Azure technologies
 

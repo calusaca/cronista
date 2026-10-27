@@ -6,6 +6,7 @@ import { Admision } from "../../../../arena/admision";
 import { servicioCronicas } from "../../../../arena/cronica";
 import { ErrorCronica, esquemaFuente } from "../../../../arena/cronica-fuentes";
 import { ErrorPeticion, leerJsonDeCuerpo } from "../../../../arena/peticiones";
+import { claveLimitador } from "../../../../arena/torneo-sitio";
 import { ARENA, CRONICA_ARENA } from "../../../../sim/limites";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ export async function POST(req: Request): Promise<Response> {
     const primero = await lector.read();
     const pequena = !primero.done && FUENTE_PEQUENA.test(new TextDecoder().decode(primero.value.subarray(0, 64)));
     if (!pequena) {
-      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "desconocida";
+      const ip = claveLimitador(req.headers.get("x-forwarded-for"));
       const r = admision().admitir(ip);
       if (!r.ok) {
         await lector.cancel().catch(() => {});

@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { afterEach, describe, expect, it } from "vitest";
+import { Admision } from "../../arena/admision";
 import type { Llm, Mensaje } from "../../lib/llm";
 import { borradorDesdeHechos } from "../../lib/llm-stub";
 import { MCP_ARENA } from "../../sim/limites";
@@ -290,5 +291,78 @@ describe("071 · el cronista como cliente MCP y su respaldo", () => {
     const h = await guardarRegistro(m.almacen, leerJson(V11));
     await expect(hechosPorMcp({ ...m.deps, almacen: () => new Promise<never>(() => {}) }, h, 10)).rejects.toMatchObject({ motivo: "plazo" });
     await expect(hechosPorMcp(m.deps, "0".repeat(40))).rejects.toBeInstanceOf(ErrorClienteMcp);
+  });
+});
+
+/** Almacén que cuenta (y opcionalmente retrasa) las lecturas de registros: cada fallo de memoria lee uno. */
+function almacenContado(a: AlmacenTorneos, esperaMs = 0) {
+  const c = { lecturas: 0 };
+  const envuelto = new Proxy(a, { get(t, k) {
+    if (k === "leerBytes") return async (n: string) => { c.lecturas++; if (esperaMs) await new Promise((r) => setTimeout(r, esperaMs)); return t.leerBytes(n); };
+    const v = Reflect.get(t, k); return typeof v === "function" ? v.bind(t) : v;
+  } });
+  return { c, envuelto };
+}
+/** `n` registros distintos (otro nombre ficticio del local ⇒ otra huella) guardados en el almacén. */
+async function registrosDistintos(almacen: () => Promise<AlmacenTorneos>, n: number): Promise<string[]> {
+  const base = leerJson("public/experimentos/arena-llm-v1.json");
+  const hs: string[] = [];
+  for (let i = 0; i < n; i++) { const r = JSON.parse(JSON.stringify(base)) as RegistroArena; r.config.partido.local.nombre = `Club Ficticio ${7_100 + i}`; hs.push(await guardarRegistro(almacen, r)); }
+  return hs;
+}
+
+describe("071 · revisión Codex, ronda 2: memoria y presupuesto de fallos", () => {
+  it("alternar porIpPorHora + 1 partidos durante 3 rondas no lee/reproduce más que el presupuesto de fallos (MCP_ARENA.fallosMemo)", async () => {
+    const m = montar();
+    const presupuesto = MCP_ARENA.fallosMemo.porIpPorHora;
+    const hs = await registrosDistintos(m.almacen, presupuesto + 1);
+    const { c, envuelto } = almacenContado(await m.almacen());
+    const cl = await cliente({ ...m.deps, almacen: async () => envuelto, admisionFallos: new Admision(MCP_ARENA.fallosMemo), clave: "203.0.113.5" });
+    let rechazos = 0;
+    for (let ronda = 0; ronda < 3; ronda++) {
+      for (const h of hs) {
+        const r = await cl.callTool({ name: "get_match_facts", arguments: { fuente: { huella: h } } });
+        if (r.isError) { rechazos++; expect(texto(r)).toMatch(/retry/i); }
+      }
+    }
+    expect(c.lecturas).toBeLessThanOrEqual(presupuesto);
+    // Ronda 1: `presupuesto` fallos admitidos y 1 rechazado; rondas 2 y 3: aciertos en memoria y el mismo rechazado.
+    expect(rechazos).toBe(3 * (hs.length - presupuesto));
+    expect(MCP_ARENA.memoHechos).toBeGreaterThan(presupuesto);
+  });
+
+  it("como mucho un fallo de memoria en curso: dos partidos nuevos a la vez → uno espera su turno con un error «retry»", async () => {
+    const m = montar();
+    const hs = await registrosDistintos(m.almacen, 2);
+    const { envuelto } = almacenContado(await m.almacen(), 100);
+    const cl = await cliente({ ...m.deps, almacen: async () => envuelto, admisionFallos: new Admision(MCP_ARENA.fallosMemo), clave: "203.0.113.6" });
+    const rs = await Promise.all(hs.map((h) => cl.callTool({ name: "get_match_facts", arguments: { fuente: { huella: h } } })));
+    expect(rs.filter((r) => r.isError)).toHaveLength(MCP_ARENA.fallosMemo.enCurso);
+    expect(texto(rs.find((r) => r.isError)!)).toMatch(/retry/i);
+  });
+
+  it("memoria ligada a la huella del archivo del encuentro: SHA cambiado o torneo borrado → nunca se sirve la copia vieja", async () => {
+    let torneo: TorneoCualquiera | null = torneoEnsayo();
+    const m = montar({ torneos: () => (torneo ? [torneo] : []) });
+    const cl = await cliente(m.deps);
+    const fuente = { torneo: "ensayo-059", encuentro: "01" };
+    expect((await cl.callTool({ name: "get_match_facts", arguments: { fuente } })).isError).toBeFalsy();
+    torneo = { ...torneo, encuentros: torneo.encuentros.map((e) => (e.n === 1 ? { ...e, archivoSha256: "f".repeat(64) } : e)) } as TorneoCualquiera;
+    const alterado = await cl.callTool({ name: "get_match_facts", arguments: { fuente } });
+    expect(alterado.isError).toBe(true);
+    torneo = null;
+    const borrado = await cl.callTool({ name: "get_match_facts", arguments: { fuente } });
+    expect(borrado.isError).toBe(true);
+    expect(texto(borrado)).toMatch(/not found|inexistente/i);
+  });
+
+  it("memoria ligada a la instancia del almacén: la misma huella en otro almacén sin ese registro no sale de la memoria", async () => {
+    const m = montar();
+    const h = await guardarRegistro(m.almacen, leerJson("src/arena/__fixtures__/arena-reinicios-v11.json"));
+    const cl = await cliente(m.deps);
+    expect((await cl.callTool({ name: "get_match_facts", arguments: { fuente: { huella: h } } })).isError).toBeFalsy();
+    const otro = montar();
+    const cl2 = await cliente({ ...otro.deps, fuentes: m.deps.fuentes });
+    expect((await cl2.callTool({ name: "get_match_facts", arguments: { fuente: { huella: h } } })).isError).toBe(true);
   });
 });
