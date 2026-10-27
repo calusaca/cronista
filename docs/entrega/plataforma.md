@@ -20,7 +20,7 @@ TRY IT (free, no login, open until 10 Nov)
 • Judges' guide (testing instructions, 3 minutes): https://github.com/calusaca/cronista/blob/main/docs/entrega/judges-guide.md
 • Verified match recap: https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io
 • Code: https://github.com/calusaca/cronista
-• Demo video (under 2 minutes): https://youtu.be/JENkKNABuzI
+• Demo video (under 2 minutes): https://youtu.be/pBJaJP7VQm8
 
 CATEGORY: Best Multi-Agent Orchestration (Best Multi-Agent System in the official rules), built with another supported orchestration approach: custom TypeScript orchestration plus a Microsoft Foundry agent. Distinct roles: two LLM coaches, an LLM commentator, a template narrator, a deterministic statistician, a verifier and a Foundry analyst agent. Shared state: one match journal in Blob Storage under a lease. Handoffs: committed observation → coach plans → shared engine → broadcast desk. Recovery: an invalid or late plan falls back to a logged programmed plan; a sentence that fails V1–V8 is retried with the failed rule, then replaced by a labelled template. Also fits Best Azure Cloud Native Integration.
 
@@ -44,5 +44,5 @@ Limits, stated honestly: a short synthetic 2D prototype; the rules check citatio
 ## Images/Video
 
 The field takes a file upload (one video, processed by Azure AI Video Indexer), not a URL: `cronista-demo-final.mp4`
-(1:57) was uploaded there on 27 October 2026, and the same cut is public at https://youtu.be/JENkKNABuzI. Keep the
+(1:57) was uploaded there on 27 October 2026, and the same cut is public at https://youtu.be/pBJaJP7VQm8. Keep the
 current cover image ([`portada-cronista.png`](portada-cronista.png)).

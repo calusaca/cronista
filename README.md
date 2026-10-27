@@ -4,7 +4,7 @@
 
 [**Open the live arena**](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) ·
 [Verified match recap demo](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io) ·
-[Demo video](https://youtu.be/JENkKNABuzI) ·
+[Demo video](https://youtu.be/pBJaJP7VQm8) ·
 [Try it in two minutes (judges' guide)](docs/entrega/judges-guide.md) ·
 [Elevator pitch](docs/entrega/pitch.md)
 
