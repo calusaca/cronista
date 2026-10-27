@@ -20,6 +20,7 @@ TRY IT (free, no login, open until 10 Nov)
 • Judges' guide (testing instructions, 3 minutes): https://github.com/calusaca/cronista/blob/main/docs/entrega/judges-guide.md
 • Verified match recap: https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io
 • Code: https://github.com/calusaca/cronista
+• Demo video (under 2 minutes): https://youtu.be/JENkKNABuzI
 
 CATEGORY: Best Multi-Agent Orchestration (Best Multi-Agent System in the official rules). It also uses Microsoft Foundry (agent service, evaluation, models) and Azure Container Apps.
 
