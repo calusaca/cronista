@@ -1762,3 +1762,19 @@ export const CRONICA_ARENA = {
   /** La repetición empieza un poco antes de la jugada. */
   antesDelEventoS: 3,
 } as const;
+
+/**
+ * Brief 071 · Servidor MCP de solo lectura (`/api/mcp`) y el cliente in-process del cronista. Solo partidos terminados;
+ * nunca genera ni llama a un modelo. Las pruebas leen estas cifras; ninguna las repite.
+ */
+export const MCP_ARENA = {
+  /** Cuerpo de una petición POST (JSON-RPC): `initialize` y `tools/call` ocupan unos cientos de bytes. Más → 413. */
+  maxCuerpoBytes: 8_192,
+  /** Admisión por IP y global, en peticiones HTTP (una sesión de cliente ≈ 3 + 1 por herramienta llamada); el patrón y
+   * las cabeceras (429 + `retry-after`) son los de la admisión de crónicas. `enCurso` acota peticiones simultáneas. */
+  admision: { porIpPorHora: 120, globalPorHora: 3_000, enCurso: 4, ventanaMs: 3_600_000 },
+  /** Partidos devueltos por `list_matches` (ejemplos primero, después torneos del más reciente al más antiguo). */
+  maxPartidosLista: 100,
+  /** Plazo del cliente MCP in-process del cronista (conectar + `get_match_facts`); pasado, usa la llamada directa. */
+  plazoClienteMs: 5_000,
+} as const;

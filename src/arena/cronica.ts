@@ -20,11 +20,12 @@ import { CRONICA_ARENA } from "../sim/limites";
 import { etiquetaLlm } from "../vista/servidor";
 import type { AlmacenTorneos } from "./almacen-torneos";
 import catalogoPublico from "./catalogo-publico.json";
-import { archivosCronica, comprimirRegistro, crearSiNoExiste, diaUtc, existeRegistro, huellaRegistro, almacenCronicasDesdeEnv, leerJsonAlmacen, leerRegistroGuardado, LibroDiario } from "./cronica-almacen";
+import { archivosCronica, comprimirRegistro, crearSiNoExiste, diaUtc, existeRegistro, huellaRegistro, almacenCronicasDesdeEnv, jsonEstable, leerJsonAlmacen, leerRegistroGuardado, LibroDiario } from "./cronica-almacen";
+import { ErrorClienteMcp, hechosPorMcp, type MotivoRespaldoMcp } from "../mcp/cliente";
 import { resolverFuente, ErrorCronica, depsFuentesReales, type DepsFuentes } from "./cronica-fuentes";
 import { seleccionCronicaArena, SISTEMA_CRONICA_ARENA, type HechoCronicaArena } from "./cronica-hechos";
 import { reglasTiempoArena, verificarCronicaArena } from "./cronica-verificador";
-import type { FuenteCronica, OrigenCronica } from "./cronica-vista";
+import { urlCronica, type FuenteCronica, type OrigenCronica } from "./cronica-vista";
 import { catalogoModelos } from "./modelos";
 import { nombreControlador } from "./modelos-jugados";
 import { enteroPositivoEnv } from "./sesiones";
@@ -44,8 +45,13 @@ export interface ArchivoCronica {
   redactor: RedactorGuardado | null; provisional: boolean; motivoActa?: MotivoActa;
   /** Uso informado por el proveedor (si lo informa). */
   uso?: UsoLlm;
+  /** Brief 071 · Cómo obtuvo el cronista los hechos: su cliente MCP o la llamada directa (respaldo, con el motivo). Las
+   * guardadas antes del 071 no lo tienen. */
+  hechosVia?: "mcp" | "directo";
+  hechosViaMotivo?: MotivoRespaldoMcp;
   cronica: CronicaVerificada;
 }
+type ViaHechos = Pick<ArchivoCronica, "hechosVia" | "hechosViaMotivo">;
 export type EstadoCronica = "lista" | "sin-cronica" | "invalida" | "desactualizada";
 export interface RespuestaCronica { huella: string; url: string; modo: "llm" | "acta"; provisional: boolean; motivoActa?: MotivoActa; desdeAlmacen: boolean }
 export interface LecturaCronica {
@@ -55,7 +61,7 @@ export interface LecturaCronica {
   registro: RegistroArena; hechos: HechoCronicaArena[];
 }
 
-export const urlCronica = (h: string) => `/arena/cronica/${h}`;
+export { urlCronica };
 /** § 4.8 · Cupo efectivo de generaciones con modelo por día UTC (leído en cada uso). */
 export const cupoDiarioCronicas = () => enteroPositivoEnv("ARENA_CRONICA_DIARIA", CRONICA_ARENA.diarias);
 
@@ -139,6 +145,8 @@ export interface DepsServicio {
   fuentes: DepsFuentes;
   /** Sustituye la construcción del LLM (solo pruebas); se llama solo con ARENA_CRONICA_LLM=1. */
   crearLlm?: () => Llm;
+  /** Brief 071 · Sustituye el cliente MCP in-process del cronista (solo pruebas: fallos, plazos, discrepancias). */
+  hechosMcp?: typeof hechosPorMcp;
 }
 
 export class ServicioCronicas {
@@ -202,16 +210,18 @@ export class ServicioCronicas {
     await crearSiNoExiste(a, archivosCronica.origen(huella), JSON.stringify(origen));
     if (indice) await crearSiNoExiste(a, indice, JSON.stringify({ huella }));
 
-    const { hechos, cabe } = seleccionCronicaArena(registro);
+    const directa = seleccionCronicaArena(registro);
     const guardado = await leerJsonAlmacen<ArchivoCronica>(a, archivosCronica.cronica(huella));
-    const estado = estadoDe(guardado, registro, hechos);
+    const estado = estadoDe(guardado, registro, directa.hechos);
     if (estado === "lista" && guardado && !guardado.provisional) return this.respuesta(huella, guardado, true);
+    // Brief 071 · El cronista obtiene los hechos como cliente MCP (registro ya guardado arriba); si no, los directos.
+    const { hechos, cabe, via } = await this.hechosDelCronista(a, huella, directa);
 
     const acta = async (motivo: MotivoActa, base?: { cronica: CronicaVerificada; redactor: RedactorGuardado | null; uso?: UsoLlm }): Promise<RespuestaCronica> => {
       // Un acta provisional ya guardada con el mismo motivo se devuelve tal cual (sin reescribir).
       if (!base && estado === "lista" && guardado && guardado.provisional && guardado.motivoActa === motivo) return this.respuesta(huella, guardado, true);
       const cronica = base?.cronica ?? actaDe(hechos);
-      return this.guardar(a, huella, registro, hechos, cronica, base?.redactor ?? null, motivo, base?.uso);
+      return this.guardar(a, huella, registro, hechos, cronica, base?.redactor ?? null, motivo, base?.uso, via);
     };
     if (!cabe) return acta("tamano");
     const redactor = crearRedactor(env, this.deps.crearLlm);
@@ -248,20 +258,37 @@ export class ServicioCronicas {
       const datosRedactor = etiquetaRedactor(redactor.llm.id);
       const uso = redactor.llm.uso?.();
       const r = cronica.modo === "llm"
-        ? await this.guardar(a, huella, registro, hechos, cronica, datosRedactor, undefined, uso)
+        ? await this.guardar(a, huella, registro, hechos, cronica, datosRedactor, undefined, uso, via)
         : await acta(huboErrorLlm ? "error" : "rechazos", { cronica, redactor: datosRedactor, ...(uso ? { uso } : {}) });
       await a.borrar(archivosCronica.reserva(huella)).catch(() => {});
       return r;
     } finally { this.generandoConModelo--; }
   }
 
-  private async guardar(a: AlmacenTorneos, huella: string, registro: RegistroArena, hechos: HechoCronicaArena[], cronica: CronicaVerificada, redactor: RedactorGuardado | null, motivoActa?: MotivoActa, uso?: UsoLlm): Promise<RespuestaCronica> {
+  /**
+   * Brief 071 § 2.B · Hechos por `get_match_facts` (cliente MCP del SDK, in-process, con plazo). Respaldo a la llamada
+   * directa si el MCP falla, tarda o no devuelve exactamente la misma selección (deep-equal): la crónica nunca falla
+   * ni cambia por el MCP, y la vía queda en el archivo de la crónica.
+   */
+  private async hechosDelCronista(a: AlmacenTorneos, huella: string, directa: { hechos: HechoCronicaArena[]; cabe: boolean }): Promise<{ hechos: HechoCronicaArena[]; cabe: boolean; via: ViaHechos }> {
+    try {
+      const m = await (this.deps.hechosMcp ?? hechosPorMcp)({ almacen: async () => a, fuentes: this.deps.fuentes, cronicas: this }, huella);
+      if (m.cabe !== directa.cabe || jsonEstable(m.hechos) !== jsonEstable(directa.hechos)) throw new ErrorClienteMcp("discrepancia", "la selección por MCP no es idéntica a la directa");
+      return { hechos: m.hechos, cabe: m.cabe, via: { hechosVia: "mcp" } };
+    } catch (e) {
+      const motivo: MotivoRespaldoMcp = e instanceof ErrorClienteMcp ? e.motivo : "error";
+      console.warn("CRONISTA: hechos de la crónica por la llamada directa (respaldo del MCP)", { huella, motivo, detalle: e instanceof Error ? e.message.slice(0, 200) : "error" });
+      return { ...directa, via: { hechosVia: "directo", hechosViaMotivo: motivo } };
+    }
+  }
+
+  private async guardar(a: AlmacenTorneos, huella: string, registro: RegistroArena, hechos: HechoCronicaArena[], cronica: CronicaVerificada, redactor: RedactorGuardado | null, motivoActa?: MotivoActa, uso?: UsoLlm, via?: ViaHechos): Promise<RespuestaCronica> {
     // I9 · Nada sin verificar se guarda: si fallara aquí sería un error de programa.
     const motivos = motivosDe(cronica, hechos, registro);
     if (motivos.length > 0) throw new Error(`error de programa: la crónica de arena no pasa el Verificador: ${motivos.map((m) => `${m.regla} ${m.detalle}`).join(" | ")}`);
     const archivo: ArchivoCronica = {
       version: CRONICA_ARENA.version, analista: CRONICA_ARENA.analista, huella, hashHechos: hashSeleccion(hechos), generadaUtc: new Date(this.deps.ahora()).toISOString(),
-      redactor, provisional: motivoActa !== undefined && !ACTA_DEFINITIVA.includes(motivoActa), ...(motivoActa ? { motivoActa } : {}), ...(uso ? { uso } : {}), cronica,
+      redactor, provisional: motivoActa !== undefined && !ACTA_DEFINITIVA.includes(motivoActa), ...(motivoActa ? { motivoActa } : {}), ...(uso ? { uso } : {}), ...via, cronica,
     };
     await a.escribir(archivosCronica.cronica(huella), JSON.stringify(archivo));
     return this.respuesta(huella, archivo, false);

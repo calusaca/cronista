@@ -16,6 +16,7 @@ import { registroCompleto } from "./cronica-hechos";
 import type { FuenteCronica, OrigenCronica } from "./cronica-vista";
 import { gestorSesiones } from "./sesiones";
 import { archivoEncuentro, ID_TORNEO, origenDeEncuentro, type TorneoCualquiera } from "./torneo";
+import { leerIndice, leerTorneo } from "./torneo-archivo";
 import { datosPaginaTorneo } from "./torneo-pagina";
 import { gestorTorneoSitio } from "./torneo-sitio";
 import { descomprimirRegistro, sha256 } from "./torneo-validacion";
@@ -27,12 +28,16 @@ export class ErrorCronica extends Error {
 }
 
 export const ARCHIVOS_EJEMPLO = { duelo: "arena-duelo-v3.json", "ejemplo-v3": "arena-llm-v3.json", ejemplo: "arena-llm-v1.json" } as const;
+/** Brief 071 · Las fuentes de partidos terminados, por separado: el servidor MCP solo acepta estas tres. */
+export const fuenteTorneo = z.strictObject({ torneo: z.string().regex(ID_TORNEO), encuentro: z.string().regex(/^\d{2}$/) });
+export const fuenteArchivo = z.strictObject({ archivo: z.enum(["duelo", "ejemplo-v3", "ejemplo"]) });
+export const fuenteHuella = z.strictObject({ huella: z.string().regex(/^[a-f0-9]{40}$/) });
 export const esquemaFuente = z.union([
   z.strictObject({ sesion: z.string().regex(/^[0-9a-f-]{36}$/) }),
-  z.strictObject({ torneo: z.string().regex(ID_TORNEO), encuentro: z.string().regex(/^\d{2}$/) }),
-  z.strictObject({ archivo: z.enum(["duelo", "ejemplo-v3", "ejemplo"]) }),
+  fuenteTorneo,
+  fuenteArchivo,
   z.strictObject({ registro: z.unknown() }),
-  z.strictObject({ huella: z.string().regex(/^[a-f0-9]{40}$/) }),
+  fuenteHuella,
 ]);
 
 /** Dependencias de lectura (las pruebas las sustituyen por fixtures). */
@@ -41,6 +46,8 @@ export interface DepsFuentes {
   bytesTorneo(id: string, archivo: string): Promise<Uint8Array | null>;
   registroSesion(id: string): Promise<{ registro: RegistroArena; origen: OrigenCronica }>;
   archivoEjemplo(nombre: string): Promise<unknown>;
+  /** Brief 071 · Torneos guardados (archivados y del sitio) para `list_matches`; sin ella, solo los ejemplos. */
+  listarTorneos?(): Promise<TorneoCualquiera[]>;
 }
 
 const noExisteFs = (e: unknown) => (e as { code?: string })?.code === "ENOENT";
@@ -62,6 +69,12 @@ export const depsFuentesReales: DepsFuentes = {
   async archivoEjemplo(nombre) {
     // Como en grabaciones: se lee en tiempo de ejecución (el import del bundler puede reordenar propiedades).
     return JSON.parse(await readFile(/* turbopackIgnore: true */ join(process.cwd(), "public", "experimentos", nombre), "utf8")) as unknown;
+  },
+  async listarTorneos() {
+    // Las mismas lecturas que `datosPaginaTorneo` (solo leen): los archivados válidos y los del sitio.
+    const repo = (await Promise.all((await leerIndice()).map((e) => leerTorneo(e.id)))).flatMap((l) => (l?.estado === "ok" ? [l.torneo] : []));
+    const sitio = await gestorTorneoSitio().listarTorneosSitio().catch(() => []);
+    return [...repo, ...sitio.filter((t) => !repo.some((r) => r.id === t.id))];
   },
 };
 

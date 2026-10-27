@@ -8,6 +8,8 @@ const config: NextConfig = {
     "/api/arena/grabaciones": ["./public/experimentos/arena-duelo-v3.json", "./public/experimentos/arena-llm-v3.json", "./public/experimentos/arena-llm-v1.json"],
     // Brief 064: la crónica de arena lee los mismos ejemplos y los registros de los torneos archivados.
     "/api/arena/cronicas": ["./public/experimentos/arena-duelo-v3.json", "./public/experimentos/arena-llm-v3.json", "./public/experimentos/arena-llm-v1.json", "./public/torneos/**/*.json.gz"],
+    // Brief 071: el servidor MCP lista y lee los mismos partidos terminados que la crónica.
+    "/api/mcp": ["./public/experimentos/arena-duelo-v3.json", "./public/experimentos/arena-llm-v3.json", "./public/experimentos/arena-llm-v1.json", "./public/torneos/**/*.json.gz", "./public/torneos/**/*.json"],
     "/datos": ["./docs/dataset/ficha.json"],
     "/datos/datasheet": ["./docs/dataset/DATASHEET.md"],
   },

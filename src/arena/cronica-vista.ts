@@ -18,6 +18,9 @@ export type FuenteCronica =
   | { registro: unknown }
   | { huella: string };
 
+/** Página de la crónica de una huella (movida aquí desde `cronica.ts` por el brief 071: la usa también el servidor MCP). */
+export const urlCronica = (h: string) => `/arena/cronica/${h}`;
+
 /** § 4.7 · Origen guardado con la primera fuente de una huella. */
 export interface OrigenCronica {
   tipo: "sesion" | "torneo" | "ejemplo" | "subida";
