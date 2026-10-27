@@ -12,6 +12,16 @@ import { TEXTOS_CRONICA_ARENA as T } from "./textos-cronica-arena";
 export interface RespuestaBoton { huella: string; url: string; modo: "llm" | "acta"; provisional: boolean; desdeAlmacen: boolean }
 type Resultado = { ok: true; respuesta: RespuestaBoton } | { ok: false; status: number; motivo?: string; retryAfterS?: number };
 
+/** Texto honesto de cada fallo: 429 `en-curso` (otra crónica escribiéndose), `subidas` (admisión por hora de los partidos
+ * subidos o jugados aquí: la fuente `{ registro }`), `registros-diarios` (partidos nuevos del día) y el resto. Usa el
+ * `retry-after` de la API si lo trae. Exportada para la prueba. */
+export function mensajeErrorCronica(r: { status: number; motivo?: string; retryAfterS?: number }, idioma: "es" | "en"): string {
+  if (r.status === 429 && r.motivo === "en-curso") return T.ocupado[idioma](r.retryAfterS ?? CRONICA_ARENA.reintentoOcupadoS);
+  if (r.status === 429 && r.motivo === "subidas") return T.subidas[idioma](r.retryAfterS);
+  if (r.status === 429 && r.motivo === "registros-diarios") return T.registrosDiarios[idioma](r.retryAfterS);
+  return T.fallo[idioma];
+}
+
 const enCurso = new Map<string, Promise<Resultado>>();
 const enCursoRegistro = new WeakMap<object, Promise<Resultado>>();
 
@@ -57,7 +67,7 @@ export function BotonCronica({ fuente, idioma, variante = "boton" }: { fuente: F
       return;
     }
     setPendiente(false);
-    setError({ texto: r.status === 429 && r.motivo === "en-curso" ? T.ocupado[idioma](r.retryAfterS ?? CRONICA_ARENA.reintentoOcupadoS) : T.fallo[idioma] });
+    setError({ texto: mensajeErrorCronica(r, idioma) });
   };
   return <div className={`arena-cronica-boton${variante === "enlace" ? " arena-cronica-boton-enlace" : ""}`} lang={idioma}>
     <button type="button" className={variante === "enlace" ? "btn btn-quiet" : "btn btn-primary"} data-testid="arena-cronica" onClick={() => void pulsar()} disabled={pendiente} aria-describedby={variante === "boton" ? "arena-cronica-nota" : undefined}>

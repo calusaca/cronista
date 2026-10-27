@@ -4,6 +4,8 @@ import type { MotivoActa } from "../arena/cronica";
 
 type Idioma = "es" | "en";
 type Par = Record<Idioma, string>;
+/** Espera legible a partir del retry-after (s): segundos por debajo de dos minutos, minutos (hacia arriba) desde ahí. */
+const espera = (s: number) => (s < 120 ? `${s} s` : `${Math.ceil(s / 60)} min`);
 
 export const TEXTOS_CRONICA_ARENA = {
   overline: { en: "Match report · arena", es: "Crónica · arena" },
@@ -75,6 +77,14 @@ export const TEXTOS_CRONICA_ARENA = {
     es: "El redactor la escribe y el verificador revisa cada frase. Puede tardar hasta dos minutos.",
   },
   ocupado: { en: (s: number) => `Another match report is being written. Try again in ${s} s.`, es: (s: number) => `Se está escribiendo otra crónica. Vuelve a intentarlo en ${s} s.` },
+  subidas: {
+    en: (s?: number) => `Too many match reports have been requested for uploaded or locally played matches in the last hour. ${s ? `Try again in ${espera(s)}.` : "Try again later."}`,
+    es: (s?: number) => `Se han pedido demasiadas crónicas de partidos subidos o jugados aquí en la última hora. ${s ? `Vuelve a intentarlo en ${espera(s)}.` : "Vuelve a intentarlo más tarde."}`,
+  },
+  registrosDiarios: {
+    en: (s?: number) => `Today's limit of new matches with a match report has been reached. ${s ? `Try again in ${espera(s)}.` : "Try again tomorrow (UTC)."}`,
+    es: (s?: number) => `Se alcanzó el límite diario de partidos nuevos con crónica. ${s ? `Vuelve a intentarlo en ${espera(s)}.` : "Vuelve a intentarlo mañana (UTC)."}`,
+  },
   fallo: { en: "The match report could not be written.", es: "No se pudo escribir la crónica." },
   reintentar: { en: "Retry", es: "Reintentar" },
 } as const;

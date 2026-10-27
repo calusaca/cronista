@@ -23,7 +23,8 @@ import { almacenTorneosLocal } from "../../arena/almacen-torneos";
 import { archivosCronica } from "../../arena/cronica-almacen";
 import { ServicioCronicas, type MotivoActa } from "../../arena/cronica";
 import type { DepsFuentes } from "../../arena/cronica-fuentes";
-import { pedirUnaVez } from "../BotonCronica";
+import { CRONICA_ARENA } from "../../sim/limites";
+import { mensajeErrorCronica, pedirUnaVez } from "../BotonCronica";
 import { CronicaArena } from "../CronicaArena";
 import { propsCronicaArena } from "../cronica-arena-props";
 import { TEXTOS_CRONICA_ARENA as T } from "../textos-cronica-arena";
@@ -196,5 +197,32 @@ describe("064 § 4.10 · BotonCronica: un solo POST por fuente en el documento",
     expect(await pedirUnaVez({ archivo: "ejemplo" })).toEqual({ ok: false, status: 429, motivo: "en-curso", retryAfterS: 5 });
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("red caída"); }));
     expect(await pedirUnaVez({ archivo: "ejemplo" })).toEqual({ ok: false, status: 0 });
+  });
+});
+
+describe("064 § 4.10 · BotonCronica: un mensaje honesto por cada 429", () => {
+  const generico = { en: T.fallo.en, es: T.fallo.es };
+  it("en-curso: otra crónica escribiéndose, con la espera del retry-after (o la de limites)", () => {
+    expect(mensajeErrorCronica({ status: 429, motivo: "en-curso", retryAfterS: 7 }, "en")).toBe("Another match report is being written. Try again in 7 s.");
+    expect(mensajeErrorCronica({ status: 429, motivo: "en-curso" }, "es")).toBe(T.ocupado.es(CRONICA_ARENA.reintentoOcupadoS));
+  });
+  it("subidas: demasiadas peticiones de partidos subidos o jugados aquí en la última hora; usa el retry-after", () => {
+    const en = mensajeErrorCronica({ status: 429, motivo: "subidas", retryAfterS: 1500 }, "en");
+    expect(en).toBe("Too many match reports have been requested for uploaded or locally played matches in the last hour. Try again in 25 min.");
+    expect(mensajeErrorCronica({ status: 429, motivo: "subidas", retryAfterS: 45 }, "es")).toBe("Se han pedido demasiadas crónicas de partidos subidos o jugados aquí en la última hora. Vuelve a intentarlo en 45 s.");
+    expect(mensajeErrorCronica({ status: 429, motivo: "subidas" }, "en")).toBe("Too many match reports have been requested for uploaded or locally played matches in the last hour. Try again later.");
+    for (const l of ["es", "en"] as const) expect(mensajeErrorCronica({ status: 429, motivo: "subidas" }, l)).not.toBe(generico[l]);
+  });
+  it("registros-diarios: límite diario de partidos nuevos; mañana (UTC) o la espera del retry-after", () => {
+    expect(mensajeErrorCronica({ status: 429, motivo: "registros-diarios" }, "en")).toBe("Today's limit of new matches with a match report has been reached. Try again tomorrow (UTC).");
+    expect(mensajeErrorCronica({ status: 429, motivo: "registros-diarios" }, "es")).toBe("Se alcanzó el límite diario de partidos nuevos con crónica. Vuelve a intentarlo mañana (UTC).");
+    expect(mensajeErrorCronica({ status: 429, motivo: "registros-diarios", retryAfterS: 3600 }, "en")).toBe("Today's limit of new matches with a match report has been reached. Try again in 60 min.");
+    for (const l of ["es", "en"] as const) expect(mensajeErrorCronica({ status: 429, motivo: "registros-diarios" }, l)).not.toBe(generico[l]);
+  });
+  it("cualquier otro fallo: el mensaje genérico", () => {
+    for (const r of [{ status: 503 }, { status: 0 }, { status: 429 }, { status: 429, motivo: "otro" }, { status: 400, motivo: "subidas" }]) {
+      expect(mensajeErrorCronica(r, "en")).toBe(T.fallo.en);
+      expect(mensajeErrorCronica(r, "es")).toBe(T.fallo.es);
+    }
   });
 });
