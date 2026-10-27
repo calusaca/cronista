@@ -1,7 +1,7 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PORTERO_ARENA as PO, REMATE_ARENA_V9, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, FALTAS_ARENA_V10, PORTERO_ARENA as PO, REMATE_ARENA_V9, TECNICA_ARENA as T } from "../sim/limites";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -11,8 +11,8 @@ import { asignarPuestos, compatibilidadPuesto, elegirFormacion } from "./alineac
 import { emocionesEntrenador, entrenadorDe, estadoInicialEntrenador, planDelEntrenador, siguienteRevision } from "./entrenadores";
 import { capacidadEfectiva, efectosEntorno, prepararPartido, reaccionarAficion, resumir } from "./entorno";
 import { anclas, puestos, transformar } from "./catalogo";
-import { crearArbitro, moverArbitro } from "./arbitro";
-import { evaluarPases, opcionPase, planProgramado } from "./controladores";
+import { crearArbitro, moverArbitro, probabilidadFalta } from "./arbitro";
+import { evaluarPases, planProgramado } from "./controladores";
 import { designarCapitanes, personalidadDe, prefiereConducir, prefiereTirar } from "./personalidades";
 import { colocarCentro, cruceDeBanda, defensorDePorteria, PUNTO_CENTRAL } from "./reinicios";
 import { distancia, enCancha, limitar, proyeccion } from "./geometria";
@@ -22,7 +22,7 @@ import { ajusteDuelo, atributosDe, estiloJuegoDe, factorAceleracion, factorDesga
 import { alcanceLargo, altoLejano, destinoTrayectoria, errorExtraLargo, factorErrorLejano, lejosRemate, opcionPaseLargo, probabilidadLejano, puedeRematarLejos } from "./largo";
 import { apoyoPersecucion, destinoPersecucion, destinoRepliegue, duracionPersecucionS, hastaTickPersecucion, limitarPersecucion, perseguidoresDe, seleccionRepliegue, superadoPor } from "./persecucion";
 import { conduccionPorDefecto, destinosLlegada, enZonaCentro, limitarConduccion, lineaFueraDeJuego, opcionCentro, puedeCentrar, receptorCentro } from "./ataque";
-import { atributosJugador, estilosJuego, formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type AtributosJugador, type ConfigArena, type EstiloJuego, type EstadoArena, type EventoArena, type FormacionArena, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
+import { atributosJugador, estilosJuego, formaciones, lados, paresSustitucion, perfilesEntrenador, reglasArena, rival, type AtributosJugador, type ConfigArena, type EstiloJuego, type EstadoArena, type EventoArena, type FormacionArena, type FueraDeJuegoObservado, type JugadorArena, type ObservacionArena, type OrdenesEquipo, type OrdenJugador, type Punto, type ReglasArena, type VersionArena, type TipoReinicioArena } from "./tipos";
 
 export function crearConfigArena(opciones: { seed?: number; partido?: SimConfig; duracionS?: number; intervaloS?: number; local?: FormacionArena; visita?: FormacionArena; version?: VersionArena; entorno?: Partial<Condiciones>; reglas?: ReglasArena } = {}): ConfigArena {
   const version = opciones.version ?? ARENA.version;
@@ -181,6 +181,15 @@ export function adelantados(estado: EstadoArena, lado: Lado): string[] {
   return estado.jugadores.filter(j => j.lado === lado && transformar(j.posicion, lado).x > linea + ARENA.toleranciaM).map(j => j.id);
 }
 
+/** Brief 068 § 2.B · `fueraDeJuego` de la observación de `lado` (solo desde reinicios-v10): la x ABSOLUTA con un decimal de
+ * `lineaFueraDeJuego` de cada lado (la función devuelve la x orientada del atacante) y los adelantados propios. */
+export function fueraDeJuegoObservado(estado: EstadoArena, lado: Lado): FueraDeJuegoObservado {
+  const absoluta = (l: Lado) => Math.round(transformar({ x: lineaFueraDeJuego(estado, l), y: 0 }, l).x * 10) / 10;
+  return { propia: { linea: absoluta(lado), adelantados: adelantados(estado, lado) }, rival: { linea: absoluta(rival(lado)) } };
+}
+/** Brief 068: el pasador consciente del fuera de juego y `fueraDeJuego` en la observación existen desde estas reglas. */
+export const REGLAS_FUERA_DE_JUEGO_068: ReglasArena = "reinicios-v10";
+
 /** El saque de centro reglamentario (inicial y tras gol) existe desde reinicios-v2. */
 const centroReglamentario = (config: ConfigArena) => config.reglas !== undefined && config.reglas !== "reinicios-v1";
 /** Brief 046: ¿las reglas de la configuración son `desde` o posteriores? Compara por orden en
@@ -211,6 +220,16 @@ export class MotorArena {
   private get v8() { return reglasDesde(this.config, "reinicios-v8"); }
   /** Brief 065 § 2: el error base del remate y el alcance máximo del portero de estas reglas (REMATE_ARENA_V9 desde v9). */
   private get remate9() { return remateDeReglas(reglasDesde(this.config, REMATE_ARENA_V9.desde)); }
+  /** Brief 068 § 2.A y v1.1: en los pases rasos (pase explícito no largo, candidatos locales y saque de manos) el pasador
+   * no elige a un receptor en `adelantados(estado, lado)` en el tick de la decisión. Bajo v1–v9, null (sin filtro). */
+  private fueraPasador(lado: Lado): ReadonlySet<string> | null {
+    return reglasDesde(this.config, REGLAS_FUERA_DE_JUEGO_068) ? new Set(adelantados(this.estado, lado)) : null;
+  }
+  /** Brief 063 § 3.2 y brief 068 § 2.A: los candidatos de `evaluarPases` sin los de `fuera` (el primero válido es el mejor). */
+  private pasesValidos(j: JugadorArena, fuera: ReadonlySet<string> | null) {
+    const c = evaluarPases(j, this.observar(j.lado));
+    return fuera ? c.filter(x => !fuera.has(x.p.id)) : c;
+  }
   /** Brief 063 § 4.2: los atributos guardados en la configuración (bajo v7; undefined en otro caso). */
   private atributos(id: string): AtributosJugador | undefined { return this.v7 ? this.config.atributos?.[id] : undefined; }
   /** Brief 063 § 9.2: la identidad de juego guardada en la configuración (bajo v8; undefined en otro caso). */
@@ -377,6 +396,11 @@ export class MotorArena {
     const usarOrden = !ejecutadas.has(j.id);
     const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, j.lado);
     const receptorOrden = usarOrden && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor) : undefined;
+    // Brief 068 § 2.A y v1.1 (v10): los adelantados del lado en este tick (la misma función e instante que fijan la lista
+    // del árbitro al golpear). Un `pasar` explícito RASO a uno de ellos se trata como `pasarImposible`; el `pasar` largo
+    // del LLM, el balón largo local y los centros no se filtran (v1.1: riesgo real de timing, el árbitro sanciona).
+    const fuera = this.fueraPasador(j.lado);
+    const ordenFuera = !!fuera && !!receptorOrden && fuera.has(receptorOrden.id);
     // Brief 063 § 8.2 (v7): un `pasar` a un compañero de campo entre paseMaxM y el alcance de visión del pasador
     // (de campo) sale como balón largo, sin exigir ventaja.
     const v7 = this.v7, a7 = this.atributos(j.id);
@@ -385,7 +409,7 @@ export class MotorArena {
     const pasarLargo = alcance !== null && !!receptorOrden && receptorOrden.lado === j.lado && receptorOrden.id !== j.id && receptorOrden.puesto !== "POR" && dOrden > ARENA.paseMaxM && dOrden <= alcance;
     // Brief 046, lateral A (v4): un `pasar` hacia un receptor inexistente o fuera de alcance no
     // bloquea al poseedor; en este tick decide en local y la orden sigue pendiente.
-    const pasarImposible = this.v4 && usarOrden && orden.accion === "pasar" && !pasarLargo && (!receptorOrden || dOrden > ARENA.paseMaxM);
+    const pasarImposible = this.v4 && usarOrden && orden.accion === "pasar" && !pasarLargo && (!receptorOrden || dOrden > ARENA.paseMaxM || ordenFuera);
     // Brief 063 § 8.1 (v7, v1.1 § 17.2): un `tirar` desde más de LARGO_ARENA.remate.maxM no se ejecuta; ese tick
     // decide en local (soltar el balón consume la orden; conducir no, v1.2 § 18.5).
     const tirarImposible = v7 && usarOrden && orden.accion === "tirar" && distancia(j.posicion, arco) > LA.remate.maxM;
@@ -395,7 +419,8 @@ export class MotorArena {
     const accionExplicita = usarOrden && (["pasar", "conducir", "tirar"].includes(orden.accion) || this.v4 && orden.accion === "centrar") && !pasarImposible && !tirarImposible;
     // Solo una acción local usa la opción de pase; con orden explícita se descartaba. Brief 063 § 3.2: los
     // candidatos de `evaluarPases` (su primero es exactamente `opcionPase`).
-    const candidatosLocal = j.personalidad && !accionExplicita ? evaluarPases(j, this.observar(j.lado)) : undefined;
+    // Brief 068 § 2.A (v10): pases rasos sin los adelantados; el primero válido es el mejor.
+    const candidatosLocal = j.personalidad && !accionExplicita ? this.pasesValidos(j, fuera) : undefined;
     const paseLocal = candidatosLocal?.[0]?.p;
     const tiroLocal = j.personalidad
       ? !accionExplicita && prefiereTirar(j, distancia(j.posicion, arco), !!paseLocal)
@@ -423,13 +448,14 @@ export class MotorArena {
     }
     if (v7 && !(usarOrden && orden.accion === "pasar" && !pasarImposible) && !prefiereConducir(j) && j.puesto !== "POR") {
       // Bloque D (v8): el umbral de visión y la penalización por distancia según la identidad del club.
+      // Brief 068 v1.1 (v10): el largo no se filtra; el mejor corto con el que se compara es el mejor raso válido.
       const largo = opcionPaseLargo(j, a7, this.estado, estilo);
-      if (largo && largo.puntuacion > ((candidatosLocal ?? evaluarPases(j, this.observar(j.lado)))[0]?.puntuacion ?? -Infinity)) {
+      if (largo && largo.puntuacion > ((candidatosLocal ?? this.pasesValidos(j, fuera))[0]?.puntuacion ?? -Infinity)) {
         this.sacarBalon(j, "pase", largo.destino, largo.receptor.id, { motivo: "largo", aereo: true }); ejecutadas.add(j.id); return;
       }
     }
     const receptor = usarOrden && orden.accion === "pasar" && !pasarImposible ? receptorOrden
-      : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : opcionPase(j, this.observar(j.lado));
+      : prefiereConducir(j) ? undefined : j.personalidad ? paseLocal : this.pasesValidos(j, fuera)[0]?.p;
     if (receptor && distancia(j.posicion, receptor.posicion) <= ARENA.paseMaxM) {
       // Extrapolación de velocidad actual, no consulta a una posición futura.
       const viaje = distancia(j.posicion, receptor.posicion) / ARENA.velocidadBalonMps;
@@ -458,8 +484,10 @@ export class MotorArena {
       // 2. Antes del plazo solo suelta sin rivales a menos de distanciaManosM.
       if (rivales.some(p => distancia(p.posicion, j.posicion) < PO.distanciaManosM)) return;
       const orden = planes[j.lado].ordenes.find(o => o.jugador === j.id)!;
-      const explicito = !ejecutadas.has(j.id) && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === j.lado && p.id !== j.id) : undefined;
-      receptor = explicito && distancia(j.posicion, explicito.posicion) <= PO.saqueManosMaxM ? explicito : opcionPase(j, this.observar(j.lado));
+      // Brief 068 § 2.A (v10): el receptor explícito y el de `opcionPase` no pueden estar adelantados.
+      const fuera = this.fueraPasador(j.lado);
+      const explicito = !ejecutadas.has(j.id) && orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === j.lado && p.id !== j.id && !fuera?.has(p.id)) : undefined;
+      receptor = explicito && distancia(j.posicion, explicito.posicion) <= PO.saqueManosMaxM ? explicito : this.pasesValidos(j, fuera)[0]?.p;
       if (!receptor) return;
       destino = this.destinoPase(j, receptor);
       // v1.2: un saque corto con un rival cerca de la línea no sale; espera (o el forzado).
@@ -683,7 +711,8 @@ export class MotorArena {
   private resolverFalta(defensor: JugadorArena, portador: JugadorArena): boolean {
     if (!this.estado.entrenadores) return false;
     const p = defensor.personalidad!, rng = prngDerivado(this.config.partido.seed, `falta:arena-v3:${this.estado.tick}:${defensor.id}`);
-    const probabilidad = (R.faltaBase + R.faltaAgresividad * p.agresividad / 100 + R.faltaIndisciplina * (1 - p.disciplina / 100)) * (R.criterioBase + this.estado.arbitro!.criterioContacto! / 100);
+    // Brief 068 § 2.C (v10): la probabilidad por FALTAS_ARENA_V10.factorProbabilidad, con tope 1.
+    const probabilidad = probabilidadFalta(p, this.estado.arbitro!.criterioContacto!, reglasDesde(this.config, FALTAS_ARENA_V10.desde));
     if (!rng.chance(probabilidad)) return false;
     if (this.v6) this.estado.persecucion = null;
     const severidad = rng.next(), gravedad = severidad >= R.excesivaDesde ? "fuerza_excesiva" : severidad >= R.temerariaDesde ? "temeraria" : "imprudente";

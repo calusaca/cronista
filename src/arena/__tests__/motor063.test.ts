@@ -15,7 +15,7 @@ import { ajusteDuelo, atributosDe, efectoAtributo, estiloJuegoDe, factorAcelerac
 import { compatibilidadPuesto } from "../alineacion";
 import { anclas, transformar } from "../catalogo";
 import { contextoCompetitivo } from "../competencia";
-import { esquemaRespuestaArena, evaluarPases, frasesAtributos, frasesIdentidad, frasesLargo, frasesPersecucion, opcionPase, planProgramado, SISTEMA_ARENA, crearControladorProgramado, validarOrdenes } from "../controladores";
+import { esquemaRespuestaArena, evaluarPases, frasesAtributos, frasesFueraDeJuego, frasesIdentidad, frasesLargo, frasesPersecucion, opcionPase, planProgramado, SISTEMA_ARENA, crearControladorProgramado, validarOrdenes } from "../controladores";
 import { ejecutarArena, observarArena, reproducirArena } from "../coordinador";
 import { capacidadEfectiva } from "../entorno";
 import { varianteVoz } from "../expresion";
@@ -44,6 +44,8 @@ import { atributosJugador, estilosJuego, lados, reglasArena, type AtributoJugado
 const V8 = "reinicios-v8" as const, V7 = "reinicios-v7" as const, V6 = "reinicios-v6" as const, V5 = "reinicios-v5" as const;
 /** Brief 065: ARENA.reglas es reinicios-v9 (REMATE_ARENA_V9); v8 pasa a literal. */
 const V9 = "reinicios-v9" as const;
+/** Brief 068: ARENA.reglas es reinicios-v10 (fuera de juego del pasador y FALTAS_ARENA_V10); v9 pasa a literal. */
+const V10 = "reinicios-v10" as const;
 /** § 4.3: la configuración `base` con otras reglas; desde reinicios-v7, con sus atributos, y desde reinicios-v8, con la
  * identidad de juego. */
 const conReglas = (base: ConfigArena, reglas: ReglasArena): ConfigArena => {
@@ -256,18 +258,19 @@ function duracionReferencia(linea: "DEF" | "MED" | "DEL", agresividad: number, b
 describe("063 · bloque 0 · compatibilidad", () => {
   const leer = async (nombre: string) => JSON.parse(await readFile(`src/arena/__fixtures__/${nombre}.json`, "utf8")) as RegistroArena;
 
-  it("0.1 · reglasArena y la predeterminada (brief 065: reinicios-v9); v1–v9 válidas (v7 con sus atributos, v8 y v9 además con su identidad), reinicios-v10 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
-    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6, V7, V8, V9]);
-    expect(ARENA.reglas).toBe(V9);
-    expect(crearConfigArena().reglas).toBe(V9);
+  it("0.1 · reglasArena y la predeterminada (brief 068: reinicios-v10); v1–v10 válidas (v7 con sus atributos, v8–v10 además con su identidad), reinicios-v11 rechazada (mutación: olvidar el literal de la versión anterior)", () => {
+    expect(reglasArena).toEqual(["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", V5, V6, V7, V8, V9, V10]);
+    expect(ARENA.reglas).toBe(V10);
+    expect(crearConfigArena().reglas).toBe(V10);
     const base = crearConfigArena({ reglas: V6 });
     for (const reglas of reglasArena) expect(() => validarConfigArena(conReglas(base, reglas))).not.toThrow();
-    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v10" as never })).toThrow("Reglas");
+    expect(() => validarConfigArena({ ...base, reglas: "reinicios-v11" as never })).toThrow("Reglas");
     for (const [i, reglas] of reglasArena.entries()) {
       expect(reglasDesde({ ...base, reglas }, V6)).toBe(i >= 5);
       expect(reglasDesde({ ...base, reglas }, V7)).toBe(i >= 6);
       expect(reglasDesde({ ...base, reglas }, V8)).toBe(i >= 7);
       expect(reglasDesde({ ...base, reglas }, V9)).toBe(i >= 8);
+      expect(reglasDesde({ ...base, reglas }, V10)).toBe(i >= 9);
     }
     expect(RM9.desde).toBe(V9);
     expect(L63.desdeA).toBe(V6);
@@ -826,7 +829,7 @@ describe("063 · bloque B · atributos (reinicios-v7)", () => {
   });
 
   it("v1.1 § 17.4 y v1.2 § 18.2 · la petición completa v7 / v5 y v8 / v5 (semillas 1–50, tick 0 y mitad de partido) cabe en factorObservacion063 con un 10 % de margen; con el promptMax nuevo cada formato cabe en su tope", async () => {
-    const sistemaV5 = SISTEMA_ARENA.replace(`${frasesPersecucion()}\n`, "").replace(`${frasesAtributos()}\n`, "").replace(`${frasesLargo()}\n`, "").replace(`${frasesIdentidad()}\n`, "");
+    const sistemaV5 = SISTEMA_ARENA.replace(`${frasesPersecucion()}\n`, "").replace(`${frasesAtributos()}\n`, "").replace(`${frasesLargo()}\n`, "").replace(`${frasesIdentidad()}\n`, "").replace(`${frasesFueraDeJuego()}\n`, "");
     expect(sistemaV5.length).toBeLessThan(SISTEMA_ARENA.length);
     const peticiones = async (seed: number, reglas: ReglasArena, sistema: string) => {
       const vistas: number[] = [];
@@ -840,12 +843,14 @@ describe("063 · bloque B · atributos (reinicios-v7)", () => {
     };
     // Publicación 3: las peticiones de reinicios-v8 llevan además `estiloJuego` y frasesIdentidad(). Brief 065: reinicios-v9
     // (ARENA.reglas) solo cambia dos cifras del remate; su petición tiene las mismas claves que v8 y se mide igual.
-    expect(ARENA.reglas).toBe(V9);
+    // Brief 068: reinicios-v10 (ARENA.reglas) lleva además frasesFueraDeJuego() en el sistema y `fueraDeJuego` en la
+    // observación; se mide igual.
+    expect(ARENA.reglas).toBe(V10);
     let mayor = 0;
     const mayores: Record<string, number> = {};
     for (let seed = 1; seed <= BC.semillasTorneo; seed++) {
       const v5 = await peticiones(seed, V5, sistemaV5);
-      for (const reglas of [V7, V8, V9]) {
+      for (const reglas of [V7, V8, V9, V10]) {
         const vn = await peticiones(seed, reglas, SISTEMA_ARENA);
         expect(vn.length).toBe(Math.ceil(TORNEO_ARENA.duracionS / TORNEO_SITIO.intervaloS));
         vn.forEach((n, k) => { mayor = Math.max(mayor, n / v5[k]!); mayores[reglas] = Math.max(mayores[reglas] ?? 0, n / v5[k]!); });

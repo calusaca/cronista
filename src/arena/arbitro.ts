@@ -1,4 +1,4 @@
-import { ARBITRO_ARENA as R, ARBITRAJE_ARENA, ARENA } from "../sim/limites";
+import { ARBITRO_ARENA as R, ARBITRAJE_ARENA, ARENA, FALTAS_ARENA_V10 } from "../sim/limites";
 import { prngDerivado } from "../sim/prng";
 import { limitar } from "./geometria";
 import type { ArbitroArena, Punto } from "./tipos";
@@ -30,4 +30,12 @@ export function moverArbitro(arbitro: ArbitroArena, balon: Punto): void {
   const y = limitar(arbitro.posicion.y + (arbitro.velocidad.y + ay * factor) * ARENA.pasoS, 0, ARENA.anchoM);
   arbitro.velocidad = { x: (x - arbitro.posicion.x) / ARENA.pasoS, y: (y - arbitro.posicion.y) / ARENA.pasoS };
   arbitro.posicion = { x, y };
+}
+
+/** Brief 068 § 2.C · probabilidad de falta de un duelo (`resolverFalta`): base, agresividad e indisciplina del defensor por
+ * el criterio de contacto del árbitro (ARBITRAJE_ARENA). Desde reinicios-v10 (`v10`), multiplicada por
+ * FALTAS_ARENA_V10.factorProbabilidad con tope 1; antes, sin cambio (ni siquiera el tope). */
+export function probabilidadFalta(p: { agresividad: number; disciplina: number }, criterioContacto: number, v10: boolean): number {
+  const base = (ARBITRAJE_ARENA.faltaBase + ARBITRAJE_ARENA.faltaAgresividad * p.agresividad / 100 + ARBITRAJE_ARENA.faltaIndisciplina * (1 - p.disciplina / 100)) * (ARBITRAJE_ARENA.criterioBase + criterioContacto / 100);
+  return v10 ? Math.min(1, base * FALTAS_ARENA_V10.factorProbabilidad) : base;
 }

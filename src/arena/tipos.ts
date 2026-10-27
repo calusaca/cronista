@@ -12,8 +12,9 @@ export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalid
  * Brief 063 (publicación 1): "reinicios-v5" también es literal; ARENA.reglas es reinicios-v6.
  * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7.
  * Brief 063 (publicación 3): "reinicios-v7" también es literal; ARENA.reglas es reinicios-v8.
- * Brief 065: "reinicios-v8" también es literal; ARENA.reglas es reinicios-v9. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", "reinicios-v8", ARENA.reglas] as const;
+ * Brief 065: "reinicios-v8" también es literal; ARENA.reglas es reinicios-v9.
+ * Brief 068: "reinicios-v9" también es literal; ARENA.reglas es reinicios-v10. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", "reinicios-v8", "reinicios-v9", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -180,7 +181,14 @@ export interface ObservacionArena {
   condiciones: SimConfig["condiciones"] | null;
   recientes: EventoArena[];
   resumen?: Record<Lado, ResumenEquipo>;
+  /** Brief 068 § 2.B (desde reinicios-v10, y solo entonces): la línea de fuera de juego de cada lado en el instante de
+   * la observación. `linea` es la x ABSOLUTA (no orientada) con un decimal de `lineaFueraDeJuego`; `propia` es la que
+   * deben respetar los atacantes de `lado` y `adelantados` sus IDs propios adelantados (`adelantados(estado, lado)`);
+   * `rival`, la que deben respetar los atacantes rivales. */
+  fueraDeJuego?: FueraDeJuegoObservado;
 }
+/** Brief 068 § 2.B · la línea de fuera de juego en la observación (ver `ObservacionArena.fueraDeJuego`). */
+export interface FueraDeJuegoObservado { propia: { linea: number; adelantados: string[] }; rival: { linea: number } }
 export interface ControladorEquipo {
   readonly id: string;
   readonly tipo: "programado" | "llm";

@@ -5,7 +5,7 @@ import { ARENA, TECNICA_ARENA } from "../sim/limites";
 import { resumir } from "./entorno";
 import type { Lado } from "../sim/tipos";
 import { planProgramado, validarOrdenes } from "./controladores";
-import { crearEstadoArena, datosEquipos, MotorArena, validarConfigArena } from "./motor";
+import { crearEstadoArena, datosEquipos, fueraDeJuegoObservado, MotorArena, REGLAS_FUERA_DE_JUEGO_068, reglasDesde, validarConfigArena } from "./motor";
 import { lados, type ConfigArena, type ControladorEquipo, type DecisionArena, type ObservacionArena, type PublicacionArena, type RegistroArena, type RondaArena } from "./tipos";
 
 function congelar<T>(obj: T): T {
@@ -23,7 +23,12 @@ export function observarArena(motor: MotorArena, lado: Lado): ObservacionArena {
     ...(motor.estado.entrenadores ? { duracionS: motor.config.duracionS, resumen: resumir(motor.estado, motor.eventos, TECNICA_ARENA.ventanaMemoriaS) } : {}),
   };
   const id = createHash("sha256").update(JSON.stringify(publico)).digest("hex");
-  return congelar({ id, lado, tiempoS: motor.estado.tick * ARENA.pasoS, horizonteS: motor.config.intervaloS, ...publico });
+  // Brief 068 § 2.B: la línea de fuera de juego, solo desde reinicios-v10 (v1–v9: observación intacta). Depende del lado,
+  // así que queda fuera del hash: el id de la ronda es uno para los dos lados (`reproducirArena` lo comprueba con cada
+  // uno) y `fueraDeJuego` es función pura de `estado`, que sí está en el hash. Desviación declarada del brief y aceptada
+  // por el coordinador (v1.1).
+  const fueraDeJuego = reglasDesde(motor.config, REGLAS_FUERA_DE_JUEGO_068) ? { fueraDeJuego: fueraDeJuegoObservado(motor.estado, lado) } : {};
+  return congelar({ id, lado, tiempoS: motor.estado.tick * ARENA.pasoS, horizonteS: motor.config.intervaloS, ...publico, ...fueraDeJuego });
 }
 
 async function decidir(controlador: ControladorEquipo, obs: ObservacionArena, esperaMs: number, signal?: AbortSignal): Promise<DecisionArena> {

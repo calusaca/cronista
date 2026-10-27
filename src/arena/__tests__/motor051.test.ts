@@ -770,7 +770,9 @@ describe("065 · remate de reinicios-v9 (REMATE_ARENA_V9)", () => {
   const V8 = "reinicios-v8" as const, V9 = "reinicios-v9" as const;
 
   it("v9.1 (pura) · remateDeReglas y los argumentos nuevos: v9 más preciso y con menos alcance; sin argumento, las cifras de v5–v8 (mutación: invertir el selector; ignorar el argumento)", () => {
-    expect(RM9.desde).toBe(ARENA.reglas);
+    // Brief 068: ARENA.reglas es reinicios-v10; REMATE_ARENA_V9 rige desde v9 (v10 incluida).
+    expect(RM9.desde).toBe("reinicios-v9");
+    expect(reglasArena.indexOf(ARENA.reglas)).toBeGreaterThan(reglasArena.indexOf(RM9.desde));
     expect(RM9.errorBaseM).toBeLessThan(RM.errorBaseM);
     expect(RM9.alcanceMaxM).toBeLessThan(RM.alcanceMaxM);
     expect(RM9.alcanceMaxM).toBeGreaterThan(RM.alcanceMinM);
@@ -787,10 +789,10 @@ describe("065 · remate de reinicios-v9 (REMATE_ARENA_V9)", () => {
     expect(alcancePortero(100, 0, RM9.alcanceMaxM)).toBe(PO.cuerpoM);
   });
 
-  it("v9.2 · el motor elige las cifras por versión: REMATE_ARENA_V9 solo con v9; v1–v8 y archivos sin reglas, REMATE_ARENA (mutación: gating con la versión equivocada)", () => {
+  it("v9.2 · el motor elige las cifras por versión: REMATE_ARENA_V9 desde v9 (v9 y v10); v1–v8 y archivos sin reglas, REMATE_ARENA (mutación: gating con la versión equivocada)", () => {
     for (const r of reglasArena) {
       const m = new MotorArena(crearConfigArena({ seed: ESCENARIO.semilla, reglas: r })) as unknown as { remate9: { errorBaseM: number; alcanceMaxM: number } };
-      expect({ r, cifras: m.remate9 }).toEqual({ r, cifras: remateDeReglas(r === V9) });
+      expect({ r, cifras: m.remate9 }).toEqual({ r, cifras: remateDeReglas(reglasArena.indexOf(r) >= reglasArena.indexOf(V9)) });
     }
     const c = conReglas(crearConfigArena({ seed: ESCENARIO.semilla }), "reinicios-v1"); delete c.reglas;
     expect((new MotorArena(c) as unknown as { remate9: unknown }).remate9).toEqual(remateDeReglas(false));

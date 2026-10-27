@@ -486,8 +486,10 @@ export const ARENA = {
    * Brief 063 (publicación 1): reinicios-v6 (repliegue de emergencia y persecución tras pérdida).
    * Brief 063 (publicación 2): reinicios-v7 (atributos de jugador, balones largos y remates lejanos).
    * Brief 063 (publicación 3): reinicios-v8 (identidad de juego del club).
-   * Brief 065: reinicios-v9 (remate más preciso y portero con menos alcance, REMATE_ARENA_V9). */
-  reglas: "reinicios-v9",
+   * Brief 065: reinicios-v9 (remate más preciso y portero con menos alcance, REMATE_ARENA_V9).
+   * Brief 068: reinicios-v10 (pasador consciente del fuera de juego, la regla en el prompt y `fueraDeJuego` en la
+   * observación, y más faltas con FALTAS_ARENA_V10). */
+  reglas: "reinicios-v10",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -945,6 +947,39 @@ export const ARBITRAJE_ARENA = {
   criterioMin: 40, criterioMax: 85, minJugadores: 7,
   /** Factor de contacto del árbitro: base + criterioContacto/100. */
   criterioBase: 0.5,
+} as const;
+
+/** Brief 068 § 2.C (pedido de Carlos del 27 oct: «no he escuchado faltas nunca en los juegos, pueden pasar?») · Más
+ * faltas, solo para reglas ≥ `desde`; v1–v9 conservan ARBITRAJE_ARENA sin cambio (publicadas y congeladas). Las faltas
+ * solo nacen en los duelos (`resolverFalta`) y con pocos duelos por partido la mayoría no tenía ninguna: v9, 120 s,
+ * programados, semillas 1–100, 0,61 faltas por partido y el 60 % de los partidos sin falta.
+ *   - factorProbabilidad: multiplica la probabilidad de falta de cada duelo (con tope 1). Gravedad, tarjetas,
+ *     expulsiones y reinicios no cambian: las tarjetas suben en proporción.
+ * Prototipo del coordinador (filtro del pasador y ×3): 2,05 faltas, 15 % sin falta, 0,75 amarillas y 0,09 rojas por
+ * partido. Ajuste permitido por el brief si una banda falla: 2,5 y después 2 (sin mover bandas). */
+export const FALTAS_ARENA_V10 = {
+  desde: "reinicios-v10",
+  factorProbabilidad: 3,
+} as const;
+
+/** Brief 068 § 3 · Bandas de `npm run test:stats` para reinicios-v10 (programados, LOTE_ARENA_046.duracionS = 120 s,
+ * semillas LOTE_ARENA_046.completo: 1–100). Las bandas del 046, 051, 063 y 065 siguen además sobre v10.
+ *   - fuerasJuegoPorPartido: el filtro del pasador las baja (v9: 2,85), pero siguen existiendo (balón suelto, rechace,
+ *     centro o compañero que no era el receptor).
+ *   - fuerasJuegoPrevistoMax (v1.1 del brief): fueras de juego cuyo infractor era el receptor previsto de un pase RASO
+ *     de campo (sin `motivo` largo, centro ni saque_manos); el filtro garantiza que no ocurre. El balón largo y el centro
+ *     no se filtran (v1.1: filtrarlos dejaba 0,09 fueras por partido e incumplía las bandas de goles del 046, conversión
+ *     del 051 y exitoLargos del 063; docs/evidencia/motor-068/diagnostico/).
+ *   - faltasPorPartido, sinFaltaMax (fracción de partidos sin ninguna falta) y rojasPorPartidoMax: efecto de
+ *     FALTAS_ARENA_V10.
+ *   - golesFactorV9: los goles por partido de v10 son ≥ los de v9 en el mismo lote por este factor. */
+export const BANDAS_068 = {
+  fuerasJuegoPorPartido: { min: 0.3, max: 1.4 },
+  fuerasJuegoPrevistoMax: 0,
+  faltasPorPartido: { min: 1.5, max: 2.8 },
+  sinFaltaMax: 0.25,
+  rojasPorPartidoMax: 0.15,
+  golesFactorV9: 0.95,
 } as const;
 
 /** Preferencias sintéticas de arena-v2; no son capacidades ni cifras calibradas. */
@@ -1602,8 +1637,12 @@ export const TORNEO_SITIO = {
    * `equipos[lado].estiloJuego` y frasesIdentidad(); mayor cociente medido 1,2143 (v8/v5; v7/v5 1,2050 con el sistema
    * nuevo) → 1,1 × 1,2143 = 1,3357; se sube a 1,34 y se rehace la comprobación de topes (la prueba la repite).
    * Brief 065 (reinicios-v9): la petición tiene las mismas claves que v8; mayor cociente medido 1,2144 (v9/v5, semillas
-   * 1–50) → 1,1 × 1,2144 = 1,3359 ≤ 1,34: el factor no cambia y los topes de liga y grupos siguen cumpliéndose. */
-  factorObservacion063: 1.34,
+   * 1–50) → 1,1 × 1,2144 = 1,3359 ≤ 1,34: el factor no cambia y los topes de liga y grupos siguen cumpliéndose.
+   * Brief 068 (reinicios-v10): el sistema lleva además frasesFueraDeJuego() (para todas las reglas: SISTEMA_ARENA es
+   * compartido) y la observación v10 `fueraDeJuego`; mayor cociente medido 1,2482 (v10/v5, semillas 1–50; v7–v9 entre
+   * 1,2420 y 1,2451 con el sistema nuevo) → 1,1 × 1,2482 = 1,3731; se sube a 1,38 y se regeneran las entradas del sitio
+   * (la prueba 17.4 rehace la comprobación de los topes de liga y grupos). */
+  factorObservacion063: 1.38,
 } as const;
 
 /**

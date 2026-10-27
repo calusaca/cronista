@@ -176,6 +176,15 @@ export function frasesIdentidad(estilos: readonly string[] = estilosJuego): stri
   return `equipos[lado].estiloJuego es la identidad del club (${estilos.join(", ")}); mueve el bloque y la persecución y cambia cuántos balones largos y remates lejanos intentan tus jugadores por su cuenta; tus órdenes pueden ir contra ella.`;
 }
 
+/** Brief 068 § 2.B: la frase del fuera de juego (reinicios-v10), construida solo con constantes (la prueba la construye
+ * también con valores alterados). Misma regla que `adelantados` y `lineaFueraDeJuego`. SISTEMA_ARENA es una constante
+ * compartida por todas las reglas y no hay patrón para componerla por versión (las frases del 063 también van siempre):
+ * se añade de forma incondicional (aceptado por el coordinador, v1.1). Los partidos nuevos (directo, búfer, torneo con `ARENA.reglas`) son todos v10 y las
+ * repeticiones de registros archivados no llaman al LLM. */
+export function frasesFueraDeJuego(c: { toleranciaM: number; mitadM: number } = { toleranciaM: ARENA.toleranciaM, mitadM: ARENA.largoM / 2 }): string {
+  return `Fuera de juego: un compañero está adelantado si, en el instante del pase, está más cerca de la línea de gol rival que el penúltimo rival, que el balón y que la mitad de la cancha (x=${c.mitadM}), por más de ${c.toleranciaM} m. Si recibe el balón en esa posición, el árbitro lo sanciona y el rival reinicia. El poseedor no da un pase corto a un compañero adelantado: conduce o elige a otro. Un balón largo o un centro a un compañero adelantado sí se sanciona: ordénalos a quien esté en línea. Una orden profundidad o apoyar ataca el espacio partiendo en línea con la línea del rival, no por delante de ella. fueraDeJuego en la observación da la x absoluta de la línea de cada lado (propia: la que deben respetar tus atacantes, con los IDs propios adelantados en ese instante; rival: la que deben respetar los suyos).`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -192,6 +201,7 @@ ${frasesPersecucion()}
 ${frasesAtributos()}
 ${frasesLargo()}
 ${frasesIdentidad()}
+${frasesFueraDeJuego()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad
