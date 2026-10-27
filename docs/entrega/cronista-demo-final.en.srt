@@ -1,112 +1,125 @@
 1
-00:00:00,300 --> 00:00:01,981
+00:00:00,300 --> 00:00:01,969
 AI can call a football match.
 
 2
-00:00:02,021 --> 00:00:03,525
+00:00:02,009 --> 00:00:03,502
 Can it prove what it says?
 
 3
-00:00:03,565 --> 00:00:07,680
-CRONISTA is a multi-agent broadcast where
+00:00:03,542 --> 00:00:07,510
+CRONISTA: a multi-agent broadcast where
 every sentence is traceable.
 
 4
-00:00:08,720 --> 00:00:10,770
-Six models are in the catalogue;
+00:00:08,200 --> 00:00:13,063
+Two LLM coaches, GPT-6 Astra and
+GPT-6.1 Sol, manage the teams.
 
 5
-00:00:10,810 --> 00:00:14,231
-here GPT-6 Astra and GPT-6.1 Sol coach the two teams.
+00:00:13,103 --> 00:00:18,510
+A shared engine resolves the play; a desk
+of three voices narrates it.
 
 6
-00:00:14,271 --> 00:00:19,390
-Both receive the same committed observation
-and return a plan for every player;
+00:00:19,400 --> 00:00:24,288
+Narrator (pre-match presentation): Welcome to the arena:
+Atlético Puertoscuro against Olímpico Nebrisa.
 
 7
-00:00:19,430 --> 00:00:21,610
-a shared engine resolves the play.
+00:00:25,033 --> 00:00:30,929
+Narrator (pre-match presentation): Atlético Puertoscuro line up
+in a four-two-three-one, with GPT-6 Astra in charge.
 
 8
-00:00:22,850 --> 00:00:27,450
-Narrator (pre-match presentation): Welcome to the arena:
-Juventud Caleteo against Racing Arenablanca.
+00:00:31,920 --> 00:00:34,243
+While the coaches decide, the clock waits.
 
 9
-00:00:28,199 --> 00:00:33,639
-Narrator (pre-match presentation): Juventud Caleteo line up
-in a five-three-two, with GPT-6 Astra in charge.
+00:00:34,283 --> 00:00:38,970
+Both see the same committed state and return a
+validated JSON plan for every player.
 
 10
-00:00:34,680 --> 00:00:40,648
-Narrator (pre-match presentation): Racing Arenablanca line up
-in a three-five-two, with GPT-6.1 Sol in charge.
+00:00:40,560 --> 00:00:50,272
+Narrator (goal call): What a goal! Ismael Barido, goal!
+Olímpico Nebrisa level it, one–one, after 52 seconds.
 
 11
-00:00:41,497 --> 00:00:42,193
-Narrator (play-by-play): Ulises…
-
-12
-00:00:42,663 --> 00:00:52,951
-Narrator (goal call): What a goal! Mateo Rosánez scores!
-Juventud Caleteo take the lead, one–nil, after 47 seconds.
-
-13
-00:00:54,840 --> 00:00:57,828
+00:00:50,990 --> 00:00:53,741
 The commentator may only analyse with a cited fact.
 
+12
+00:00:53,781 --> 00:00:55,656
+Eight deterministic rules check it;
+
+13
+00:00:55,696 --> 00:00:58,940
+a failure is retried once, then becomes a labelled template.
+
 14
-00:00:57,868 --> 00:01:01,925
-Eight deterministic rules check
-citations, numbers, names and claims.
+00:00:59,580 --> 00:01:03,038
+Team and player numbers come from the
+engine's events and frames:
 
 15
-00:01:01,965 --> 00:01:06,200
-A failed sentence is retried once, then
-replaced by a labelled template.
+00:01:03,078 --> 00:01:06,320
+passes, shots, distance and top speed in kilometres per hour.
 
 16
-00:01:07,190 --> 00:01:09,519
-The six models also play each other:
+00:01:07,080 --> 00:01:07,827
+Make it yours:
 
 17
-00:01:09,559 --> 00:01:14,389
-a full league, won by GPT-6 Astra, and a
-groups and knockout test bracket.
+00:01:07,867 --> 00:01:13,001
+star a club and a player, follow only that player,
+and choose a fan, analyst or player view.
 
 18
-00:01:14,429 --> 00:01:19,390
-Every match has a replay, and the page
-states what the results cannot prove.
+00:01:13,041 --> 00:01:14,800
+Spanish switches text and voice.
 
 19
-00:01:20,380 --> 00:01:24,514
-The same verifier guards the automated
-recap, now with the arena's look:
+00:01:16,490 --> 00:01:19,040
+Narrator in Spanish: «Final del partido. Atlético…»
 
 20
-00:01:24,554 --> 00:01:28,571
+00:01:19,690 --> 00:01:25,073
+A versioned Microsoft Foundry agent answers questions
+with read-only tools over the confirmed play.
+
+21
+00:01:25,113 --> 00:01:27,100
+Its sentences pass the same verifier.
+
+22
+00:01:27,740 --> 00:01:29,548
+The six models also play each other.
+
+23
+00:01:29,588 --> 00:01:33,810
+Every league match has a replay, and the page
+states what the results cannot prove.
+
+24
+00:01:34,450 --> 00:01:37,432
+The same verifier guards the automated match report:
+
+25
+00:01:37,472 --> 00:01:41,500
 click any sentence to see its events, or
 open every draft and verdict.
 
-21
-00:01:28,611 --> 00:01:30,890
-We claim traceability, not better prose.
+26
+00:01:42,140 --> 00:01:47,140
+All data is synthetic: a documented dataset,
+and JSON for broadcast overlays.
 
-22
-00:01:31,830 --> 00:01:37,433
-It runs on Azure Container Apps with Blob, Key Vault,
-Application Insights, Speech and Foundry.
+27
+00:01:47,730 --> 00:01:54,038
+It runs on Azure OpenAI, Foundry, Speech and Container
+Apps, with over three thousand automated checks.
 
-23
-00:01:37,473 --> 00:01:40,344
-More than two thousand automated tests run in CI.
-
-24
-00:01:40,384 --> 00:01:41,770
-Everything is synthetic.
-
-25
-00:01:41,810 --> 00:01:44,740
+28
+00:01:54,078 --> 00:01:57,120
 CRONISTA: narrate the match, prove every sentence.

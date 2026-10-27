@@ -1,0 +1,100 @@
+{
+ "duracionS": 117.36,
+ "bytes": 10066734,
+ "flujos": [
+  "Stream #0:0[0x1](eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt470bg/unknown/unknown, progressive), 1440x900 [SAR 1:1 DAR 8:5], 567 kb/s, 25 fps, 25 tbr, 12800 tbn (default)",
+  "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 112 kb/s (default)"
+ ],
+ "capturas": [
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/01-gancho.jpg",
+   "t": 4.71
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/02-agentes.jpg",
+   "t": 14.42
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/03-antesala.jpg",
+   "t": 26.46
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/04-estado.jpg",
+   "t": 36.18
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/05-gol.jpg",
+   "t": 46.09
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/06-verificacion.jpg",
+   "t": 55.79
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/07-cifras.jpg",
+   "t": 63.73
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/08-personal.jpg",
+   "t": 74.3
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/09-analista.jpg",
+   "t": 84.17
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/10-torneo.jpg",
+   "t": 91.42
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/11-cronica.jpg",
+   "t": 98.71
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/12-datos.jpg",
+   "t": 105.17
+  },
+  {
+   "archivo": "docs/evidencia/video-067/fotogramas/13-cierre.jpg",
+   "t": 108.93
+  }
+ ],
+ "huellas": [
+  {
+   "escena": "antesala",
+   "relato": "062.mp3",
+   "alInicio": 19.3,
+   "coincide": true,
+   "tag": "31968:4b502a67",
+   "tagPagina": "31968:4b502a67",
+   "texto": "Welcome to the arena: Atlético Puertoscuro against Olímpico Nebrisa."
+  },
+  {
+   "escena": "antesala",
+   "relato": "063.mp3",
+   "alInicio": 24.93,
+   "coincide": true,
+   "tag": "38016:52c70a1c",
+   "tagPagina": "38016:52c70a1c",
+   "texto": "Atlético Puertoscuro line up in a four-two-three-one, with GPT-6 Astra in charge."
+  },
+  {
+   "escena": "gol",
+   "relato": "087.mp3",
+   "alInicio": 40.46,
+   "coincide": true,
+   "tag": "60912:8f63babe",
+   "tagPagina": "60912:8f63babe",
+   "texto": "What a goal! Ismael Barido, goal! Olímpico Nebrisa level it, one–one, after 52 seconds."
+  },
+  {
+   "escena": "personal",
+   "relato": "112.mp3",
+   "alInicio": 76.44,
+   "coincide": true,
+   "tag": "41904:c102e056",
+   "tagPagina": "41904:c102e056",
+   "texto": "Final del partido. Atlético Puertoscuro, 1; Olímpico Nebrisa, 1."
+  }
+ ]
+}

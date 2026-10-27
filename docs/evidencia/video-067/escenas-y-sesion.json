@@ -1,0 +1,371 @@
+{
+ "salida": "/home/calusaca/cronista/docs/entrega/cronista-demo-final.mp4",
+ "duracionS": 117.36,
+ "escenas": [
+  {
+   "id": "gancho",
+   "inicioS": 0,
+   "durS": 7.85,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 4.41,
+     "dur": 7.85
+    }
+   ]
+  },
+  {
+   "id": "agentes",
+   "inicioS": 7.85,
+   "durS": 10.95,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 12.26,
+     "dur": 10.95
+    }
+   ]
+  },
+  {
+   "id": "antesala",
+   "inicioS": 18.8,
+   "durS": 12.77,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 26.82,
+     "dur": 12.77
+    }
+   ]
+  },
+  {
+   "id": "estado",
+   "inicioS": 31.57,
+   "durS": 7.69,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 76.6,
+     "dur": 2.6
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 90.22,
+     "dur": 2.3
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 45.53,
+     "dur": 2.79
+    }
+   ]
+  },
+  {
+   "id": "gol",
+   "inicioS": 39.26,
+   "durS": 11.38,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 138.35,
+     "dur": 11.38
+    }
+   ]
+  },
+  {
+   "id": "verificacion",
+   "inicioS": 50.64,
+   "durS": 8.59,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 220.37,
+     "dur": 8.59
+    }
+   ]
+  },
+  {
+   "id": "cifras",
+   "inicioS": 59.23,
+   "durS": 7.5,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 234.33,
+     "dur": 3
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 245.75,
+     "dur": 4.5
+    }
+   ]
+  },
+  {
+   "id": "personal",
+   "inicioS": 66.73,
+   "durS": 12.61,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 250.81,
+     "dur": 1.72
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 255.19,
+     "dur": 1.72
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 260.5,
+     "dur": 1.98
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 266.75,
+     "dur": 1.38
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 269.24,
+     "dur": 1.55
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 272.38,
+     "dur": 4.26
+    }
+   ]
+  },
+  {
+   "id": "analista",
+   "inicioS": 79.34,
+   "durS": 8.05,
+   "piezas": [
+    {
+     "fuente": "arena.webm",
+     "desdeS": 102.21,
+     "dur": 3.54
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 110.39,
+     "dur": 4.51
+    }
+   ]
+  },
+  {
+   "id": "torneo",
+   "inicioS": 87.39,
+   "durS": 6.71,
+   "piezas": [
+    {
+     "fuente": "torneo.webm",
+     "desdeS": 2.93,
+     "dur": 6.71
+    }
+   ]
+  },
+  {
+   "id": "cronica",
+   "inicioS": 94.1,
+   "durS": 7.69,
+   "piezas": [
+    {
+     "fuente": "recap.webm",
+     "desdeS": 1.94,
+     "dur": 7.69
+    }
+   ]
+  },
+  {
+   "id": "datos",
+   "inicioS": 101.79,
+   "durS": 5.64,
+   "piezas": [
+    {
+     "fuente": "datos.webm",
+     "desdeS": 1.68,
+     "dur": 3.1
+    },
+    {
+     "fuente": "datos.webm",
+     "desdeS": 7.54,
+     "dur": 2.54
+    }
+   ]
+  },
+  {
+   "id": "cierre",
+   "inicioS": 107.43,
+   "durS": 10.03,
+   "piezas": [
+    {
+     "tarjeta": "arquitectura.png",
+     "dur": 3.2
+    },
+    {
+     "tarjeta": "azure.png",
+     "dur": 2.53
+    },
+    {
+     "tarjeta": "calidad.png",
+     "dur": 2.7
+    },
+    {
+     "fuente": "arena.webm",
+     "desdeS": 282.23,
+     "dur": 1.6
+    }
+   ]
+  }
+ ],
+ "rotulos": {
+  "gancho": "CRONISTA — multi-agent match broadcast · own emblem, fictional crests and kits · every sentence traceable",
+  "antesala": "Pre-match presentation · real audio as played in the live broadcast · first piece only (the whole presentation lasts about 50 s)",
+  "estado": "Shared state · coaches decide while the simulation clock waits · broadcast buffer · each coach's validated JSON plan and player orders",
+  "gol": "Goal call · real narrator audio as played in the live broadcast · ball in the net, GOAL banner, goal view (height illustrative)",
+  "verificacion": "V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims",
+  "cifras": "Match stats and player card · passes and shots from confirmed events · distance and top speed (km/h) sampled from engine frames",
+  "personal": "Favourite club and player (stored in this browser) · Only my player (and goals) · audience: Fan, Analyst, Follow selected player",
+  "personalEs": "Switched to Spanish · page text and the page's own narration (real Azure Speech audio, as played in this recording)",
+  "torneo": "Model league of 24 Oct · six models, archived and validated in CI · results describe these matches, not model quality",
+  "datos": "Synthetic dataset at /datos · DATASHEET · 10-match JSONL sample to download",
+  "cierreA": "Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions",
+  "cierreB": "All data synthetic · open source · claims link to evidence",
+  "agentes": "Home: GPT-6 Astra · Away: GPT-6.1 Sol · chosen manually · 120 s live match · same observation, strict JSON",
+  "cronica": "Match report /match/246 · page label: writer Microsoft Foundry · gpt-6.1-sol · served from cache · 11/11 sentences passed V1–V8",
+  "analista": "Microsoft Foundry Agent Service · AI explanation · read-only tool consultar_eventos · cited events · checked by V1–V8"
+ },
+ "audioSesion": [
+  {
+   "escena": "antesala",
+   "relato": "062.mp3",
+   "intervencion": "antesala:01-apertura:0",
+   "tag": "31968:4b502a67",
+   "alInicio": 19.3,
+   "dur": 5.33
+  },
+  {
+   "escena": "antesala",
+   "relato": "063.mp3",
+   "intervencion": "antesala:02-local-cabecera:0",
+   "tag": "38016:52c70a1c",
+   "alInicio": 24.93,
+   "dur": 6.34
+  },
+  {
+   "escena": "gol",
+   "relato": "087.mp3",
+   "intervencion": null,
+   "tag": "60912:8f63babe",
+   "alInicio": 40.46,
+   "dur": 10.15
+  },
+  {
+   "escena": "personal",
+   "relato": "112.mp3",
+   "intervencion": null,
+   "idioma": "es",
+   "tag": "41904:c102e056",
+   "alInicio": 76.44,
+   "dur": 2.6,
+   "durClip": 4.85
+  }
+ ],
+ "textoEs": "Final del partido. Atlético Puertoscuro, 1; Olímpico Nebrisa, 1.",
+ "vozOff": "en-US-AndrewNeural",
+ "asignacion": {
+  "modo": "manual",
+  "local": {
+   "id": "astra6",
+   "nombre": "GPT-6 Astra",
+   "controlador": "azure-openai:cronista-astra6:reasoning-low"
+  },
+  "visita": {
+   "id": "sol61",
+   "nombre": "GPT-6.1 Sol",
+   "controlador": "azure-openai:cronista-sol61:reasoning-low"
+  }
+ },
+ "sesion": {
+  "id": "e99d346b-b7b7-4571-af10-ccd0e75256ed",
+  "reglas": "reinicios-v10",
+  "version": "arena-v3",
+  "duracionS": 120,
+  "metricas": {
+   "duracionMs": 109861,
+   "decisiones": 8,
+   "respaldos": 0,
+   "esperaModeloMs": [
+    7712.24362900015,
+    8701.328499000054,
+    7333.845870000077,
+    11663.133858000161,
+    11979.206468999851,
+    9667.564170999918,
+    8235.962307000067,
+    12437.795819999883
+   ],
+   "solicitudesEquipo": 8,
+   "uso": {
+    "local": {
+     "llamadas": 4,
+     "respuestasConUso": 4,
+     "entrada": 43665,
+     "salida": 1856,
+     "cache": 0
+    },
+    "visita": {
+     "llamadas": 4,
+     "respuestasConUso": 4,
+     "entrada": 43506,
+     "salida": 1982,
+     "cache": 0
+    },
+    "narrador": {
+     "llamadas": 12,
+     "respuestasConUso": 12,
+     "entrada": 26037,
+     "salida": 2454,
+     "cache": 8192
+    }
+   }
+  },
+  "marcador": {
+   "local": 1,
+   "visita": 1
+  },
+  "goles": [
+   {
+    "tick": 138,
+    "s": 13.8,
+    "jugador": "local-8",
+    "autogol": false
+   },
+   {
+    "tick": 523,
+    "s": 52.3,
+    "jugador": "visita-15",
+    "autogol": false
+   }
+  ],
+  "faltas": 3,
+  "amarillas": 1,
+  "rojas": 1,
+  "fuerasDeJuego": 2
+ },
+ "toma": "toma067-1",
+ "recap": {
+  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/match/246",
+  "redactor": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
+  "verificacion": "11/11 sentences verified\n1 attempt\n0 corrected\n0 omitted\nView process"
+ },
+ "datos": {
+  "datos": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/datos",
+  "overlay": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/api/overlay/246"
+ },
+ "torneo": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena/torneo/2026-10-24",
+ "omitidas": []
+}

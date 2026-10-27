@@ -1,30 +1,35 @@
-// Vídeo final de la entrega (docs/entrega/guion-video.md). Graba las dos apps públicas con
+// Vídeo final de la entrega (docs/entrega/guion-video.md; corte del brief 067). Graba las apps públicas con
 // Playwright, sintetiza la voz en off con Azure Speech, monta tarjetas propias y subtítulos.
 // No modifica la app ni sube nada. Uso, desde la raíz del repo:
-//   node scripts/grabar-video-final.mjs [--fases=arena,previa,torneo,recap,tarjetas,voz,montar,verificar] [--controladores=azar|programado] [--toma=arena]
-// Intermedios en .cache/video-final/; salida docs/entrega/cronista-demo-final.{mp4,en.srt}.
+//   node scripts/grabar-video-final.mjs [--fases=arena,previa,torneo,recap,datos,tarjetas,voz,montar,verificar] [--controladores=azar|programado|manual] [--toma=toma067-1]
+// Intermedios en .cache/video-final/; salida docs/entrega/cronista-demo-final.{mp4,en.srt}; informe en docs/evidencia/video-067/.
 // Credenciales: .env y .cache/azure-servicios.env (nunca se imprimen ni se escriben).
 import { chromium } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-const ARENA = "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena";
-const RECAP = "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/match/246"; // 061: crónica con el aspecto de la arena
-const TORNEO_LIGA = "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena/torneo/2026-10-24";
-const TORNEO_GRUPOS = "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena/torneo/sitio-prueba-32ad2249691f";
+const HOST_ARENA = "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io";
+const HOST_CRONICAS = "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io"; // redactor real (GPT-6.1 Sol)
+const ARENA = `${HOST_ARENA}/arena`;
+const TORNEO_LIGA = `${HOST_ARENA}/arena/torneo/2026-10-24`;
+const TORNEO_GRUPOS = `${HOST_ARENA}/arena/torneo/sitio-prueba-32ad2249691f`;
+const DATOS = `${HOST_ARENA}/datos`, OVERLAY = `${HOST_ARENA}/api/overlay/246`;
 const VOZ_OFF = "en-US-AndrewNeural"; // Neutral; no la usa ningún rol de la mesa (Jenny, Davis, Guy).
 const ANCHO = 1440, ALTO = 900, FPS = 25;
 const TRABAJO = resolve(".cache/video-final");
 const SALIDA = resolve("docs/entrega/cronista-demo-final.mp4");
 const SALIDA_SRT = resolve("docs/entrega/cronista-demo-final.en.srt");
+const INFORME = resolve("docs/evidencia/video-067");
 const EVIDENCIA = resolve("docs/evidencia/publicacion-048");
 const arg = (n, d) => process.argv.find(a => a.startsWith(`--${n}=`))?.split("=")[1] ?? d;
-const fases = arg("fases", "arena,torneo,recap,tarjetas,voz,montar,verificar").split(",");
-const controladores = arg("controladores", "azar");
-const toma = arg("toma", "arena");
-const duracionPartido = +arg("duracion", "60");
+const fases = arg("fases", "arena,torneo,recap,datos,tarjetas,voz,montar,verificar").split(",");
+const controladores = arg("controladores", "manual");
+const toma = arg("toma", "toma067-1");
+const duracionPartido = +arg("duracion", "120");
+// 067 · Escena 11: host de crónicas con el redactor real; `--recap=arena` usa la del host de la arena.
+const RECAP = arg("recap", "cronicas") === "arena" ? `${HOST_ARENA}/match/246` : `${HOST_CRONICAS}/match/246`;
 const [modeloLocal, modeloVisita] = arg("modelos", "astra6,sol61").split(",");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 mkdirSync(TRABAJO, { recursive: true });
@@ -166,6 +171,12 @@ async function grabarArena() {
         }
       }
       if (/\/analisis$/.test(u)) estado.analisis = { http: r.status(), cuerpo: r.ok() ? await r.json() : null };
+      // 067 · Escena 8: audio en español de un comentario aprobado («Preparar audio del comentario»).
+      if (/\/voz$/.test(u) && r.request().method() === "POST") {
+        let pedido = {}; try { pedido = JSON.parse(r.request().postData() ?? "{}"); } catch { /* sin cuerpo */ }
+        estado.vozEs = { http: r.status(), pedido, recibidoS: (Date.now() - t0) / 1000, tipo: r.headers()["content-type"] ?? null };
+        if (r.ok()) { const bytes = await r.body(); writeFileSync(join(dir, "relatos", "voz-es.mp3"), bytes); estado.vozEs.archivo = "voz-es.mp3"; estado.vozEs.bytes = bytes.length; }
+      }
     } catch { /* respuestas parciales no interesan */ }
   });
   try {
@@ -182,31 +193,37 @@ async function grabarArena() {
     await g.mover(page.locator(".arena-score").first(), 1600);
     await g.mover(page.getByTestId("arena-player").nth(3), 1500);
     await g.mover(page.getByTestId("arena-player").nth(16), 1500);
+    await g.mover(page.getByTestId("arena-referee"), 1500); // 067: más tiempo de gancho antes de la elección
     // Escena 2: elección manual de modelos y arranque.
     const vivoPanel = page.getByTestId("arena-live");
     await g.desplazar(vivoPanel, 84, 1300);
     const select = vivoPanel.locator("select").first();
-    await g.mover(select, 600);
+    await g.mover(select, 1300);
     await g.marca("s2-modelos");
     if (controladores === "programado") await select.selectOption("programado");
     else {
       await select.selectOption("manual"); await sleep(700);
       const [local, visita] = [vivoPanel.locator("select").nth(1), vivoPanel.locator("select").nth(2)];
       await g.mover(local, 450); await local.selectOption(modeloLocal); await sleep(800);
-      await g.mover(visita, 450); await visita.selectOption(modeloVisita); await sleep(800);
+      await g.mover(visita, 450); await visita.selectOption(modeloVisita); await sleep(1400);
     }
     const boton = page.getByRole("button", { name: "Start live match" });
-    await g.mover(boton, 500);
+    await g.mover(boton, 1100);
     await g.marca("s2-clic");
     { const b = await boton.boundingBox(); await page.mouse.click(b.x + 40, b.y + b.height / 2); }
     let arrancado = await g.esperar(async () => (await txt("[data-testid=arena-live-assignment]")) || null, 15_000, "asignación");
     if (!arrancado) throw new Error("El partido no arrancó: " + await txt("[data-testid=arena-live]"));
     await g.marca("s2-asignacion", { texto: arrancado });
+    // 067 · Escena 4 (a): estado compartido; mientras los entrenadores deciden, el reloj simulado espera.
+    const decidiendo = await g.esperar(async () => /Coaches are deciding/.test(await txt("[data-testid=arena-live-status]")), 4_000, "entrenadores decidiendo");
+    if (decidiendo) await g.mover(page.getByTestId("arena-live-status"), 200);
+    await g.marca("s4-decidiendo", { visto: !!decidiendo, texto: await txt("[data-testid=arena-live-status]") });
+    await sleep(1300);
     // Narración activada en cuanto existe el botón (emisión preparándose, reloj en 0): así suena la previa.
     // Brief 058: la narración arranca sola con el partido («Turn narration off»); solo se pulsa si no.
+    // 067: la antesala empieza unos 3 s después del clic, así que se va directo a las alineaciones.
     const activar = page.getByRole("button", { name: "Enable narration" }), activa = page.getByRole("button", { name: "Turn narration off" });
     await g.esperar(async () => await activar.isVisible() || await activa.isVisible(), 60_000, "botón de narración");
-    await g.desplazar(page.getByTestId("arena-buffer"), 120, 900);
     await g.marca("narracion", { texto: await txt("[data-testid=arena-buffer-status]") });
     if (await activar.isVisible()) {
       await g.mover(activar, 400);
@@ -219,8 +236,59 @@ async function grabarArena() {
     else { console.log("  ! la tarjeta de alineaciones ya no está (el reloj arrancó)"); await g.desplazar(page.getByTestId("arena-pitch"), 175, 900); }
     await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 8 });
     await g.marca("previa", { tarjeta: conPrevia });
+    // 067 · Escena 4 (c): cuando ya sonó la primera pieza de la antesala (bienvenida y local), se abren los
+    // planes de equipo (JSON validado de cada entrenador) y las órdenes individuales; luego vuelve la cámara.
+    const piezaTerminada = async prefijo => {
+      const ahora = Date.now(), ev = await page.evaluate(() => window.__audio).catch(() => []);
+      return ev.some(e => { const r = e.tag ? estado.relatos.get(e.tag) : null; return r?.intervencion?.startsWith(prefijo) && ahora > (e.parada ?? e.t + (e.dur - e.offset) * 1000) + 400; });
+    };
+    if (conPrevia) await g.esperar(() => piezaTerminada("antesala:02"), 45_000, "fin de la pieza antesala:02");
+    const planes = page.locator("details.arena-plans");
+    if (await visible("[data-testid=arena-lineups]") || !conPrevia) {
+      await g.desplazar(planes, 96, 1100);
+      await g.pulsar(planes.locator(":scope > summary"), 400);
+      await g.esperar(async () => (await planes.locator(".arena-team-plan").count()) > 0, 25_000, "primer plan de equipo");
+      await sleep(700);
+      await g.marca("s4-planes", { texto: (await planes.innerText().catch(() => "")).slice(0, 1200) });
+      await sleep(2600);
+      const ordenes = planes.locator(".arena-team-plan details > summary").first();
+      if (await ordenes.count()) { await g.pulsar(ordenes, 400); await g.marca("s4-ordenes", { texto: (await planes.locator(".arena-team-plan").first().innerText().catch(() => "")).slice(0, 1200) }); await sleep(3200); }
+      if (await visible("[data-testid=arena-lineups]")) { await g.desplazar(page.getByTestId("arena-lineups"), 76, 1000); await page.mouse.move(ANCHO - 30, ALTO - 30, { steps: 8 }); }
+      else await g.desplazar(page.getByTestId("arena-pitch"), 175, 900);
+    } else console.log("  ! sin tiempo para los planes antes del saque");
     // Dirección de cámara: alineaciones mientras siguen visibles; luego cancha; mesa durante cada intercambio.
-    let camara = conPrevia ? "previa" : "cancha";
+    let camara = conPrevia && await visible("[data-testid=arena-lineups]") ? "previa" : "cancha";
+    let vivoVisto = false, analistaHecho = false, decidiendoVivo = 0;
+    // 067 · Escena 9: el analista de Foundry se consulta durante el partido. Tras un partido de 120 s narrado,
+    // la suma de reservas de voz del encuentro supera PRESUPUESTO_AUDIO_ENCUENTRO y /analisis responde 429
+    // («Se alcanzó el límite de consultas de este encuentro»; ensayo 21e577c6, 27 oct).
+    const asistente = page.getByTestId("arena-assistant");
+    const preguntarAnalista = async () => {
+      analistaHecho = true;
+      await g.desplazar(asistente, 90, 1100);
+      await g.marca("s9-ida");
+      const [pregunta, estilo] = [asistente.locator("select").nth(0), asistente.locator("select").nth(1)];
+      await g.mover(pregunta, 400); await pregunta.selectOption("momento");
+      await g.mover(estilo, 400); await estilo.selectOption("analyst");
+      await g.marca("s9");
+      const preguntar = asistente.getByRole("button", { name: "Ask analyst" });
+      await g.mover(preguntar, 400);
+      { const bb = await preguntar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
+      await g.marca("s9-pregunta");
+      const respuesta = await g.esperar(async () => (await asistente.getByTestId("arena-assistant-answer").count()) > 0 || (await asistente.getByRole("alert").count()) > 0, 45_000, "respuesta del analista");
+      await sleep(300);
+      await g.marca("s9-respuesta", { texto: await txt("[data-testid=arena-assistant-answer]"), alerta: await txt("[data-testid=arena-assistant] [role=alert]") });
+      if (respuesta && await asistente.getByTestId("arena-assistant-answer").count()) {
+        await sleep(1600);
+        await g.pulsar(asistente.getByTestId("arena-assistant-answer").locator("summary"), 300);
+        await g.marca("s9-herramientas", { texto: await txt("[data-testid=arena-assistant-answer]") });
+        await g.desplazar(asistente.getByTestId("arena-assistant-answer"), 120, 1000);
+        await sleep(3600);
+      }
+      await g.marca("s9-vuelta");
+    };
+    const segundosJuego = async () => { const m = /(\d+):(\d+)\s*\//.exec(await txt("[data-testid=arena-clock]")); return m ? +m[1] * 60 + +m[2] : 0; };
+    const desdeAnalista = +arg("analista-s", "12");
     const ir = async destino => {
       if (destino === camara) return;
       camara = destino;
@@ -241,6 +309,25 @@ async function grabarArena() {
       else if (esMesa && await visible("[data-testid=arena-mesa-dialogo]")) await ir("mesa");
       else if (!esMesa) await ir("cancha");
       const bs = await txt("[data-testid=arena-buffer]");
+      // 067 · Escena 4 (b): al saque, el estado de la emisión «Live · N s ready» (2,5 s) y vuelta a la cancha.
+      if (!vivoVisto && camara === "cancha" && /Live · \d+ s ready/.test(await txt("[data-testid=arena-buffer-status]"))) {
+        vivoVisto = true;
+        await g.desplazar(page.getByTestId("arena-buffer"), 300, 700);
+        await g.mover(page.getByTestId("arena-buffer-status"), 150);
+        await g.marca("s4-vivo", { texto: await txt("[data-testid=arena-buffer-status]") });
+        await sleep(2300);
+        camara = "x"; await ir("cancha"); continue;
+      }
+      // 067 · Escena 4: el estado «Coaches are deciding» vuelve en cada ventana de decisión mientras se genera;
+      // se marca cada aparición (con la cámara en la cancha el panel lateral la muestra).
+      if (camara === "cancha" && /Coaches are deciding/.test(await txt("[data-testid=arena-live-status]"))) {
+        if (!decidiendoVivo || ahora - decidiendoVivo > 8000) { decidiendoVivo = ahora; await g.marca("s4-decidiendo-vivo", { texto: await txt("[data-testid=arena-live-status]"), reloj: await txt("[data-testid=arena-clock]") }); }
+      }
+      const cantando = !!r && (r.temaVoz === "gol" || (r.fragmentos ?? []).some(f => f.canto));
+      if (vivoVisto && !analistaHecho && !cantando && !esMesa && camara === "cancha" && await segundosJuego() >= desdeAnalista) {
+        await preguntarAnalista();
+        camara = "x"; await ir("cancha"); continue;
+      }
       if (/End of narration/.test(bs)) break;
       if (/End of broadcast/.test(bs)) { finVisto ??= ahora; if (ahora - finVisto > 25_000) break; }
       await sleep(250);
@@ -255,54 +342,71 @@ async function grabarArena() {
     await sleep(4500);
     await g.desplazar(tarjeta, 84, 1500);
     await sleep(5500);
-    // Escena: cifras del partido (final) y ficha del goleador.
+    // 067 · Escena 7: cifras del partido (final) y ficha del goleador con distancia, velocidad máxima y pases.
     const cifras = page.getByTestId("arena-stats");
     await g.desplazar(cifras, 84, 1300);
-    await g.marca("s6-cifras");
-    await sleep(3000);
-    await g.desplazarPor(260, 1600);
-    await sleep(1500);
+    await g.marca("s7-cifras", { texto: (await txt("[data-testid=arena-stats]")).slice(0, 800) });
+    await sleep(3200);
     const goleador = estado.sesion ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); if (!r.ok) return null; const j = await r.json(); return j.registro?.eventos?.filter(e => e.tipo === "gol" && !e.autogol).at(-1)?.jugador ?? null; }, estado.sesion).catch(() => null) : null;
     await g.desplazar(page.getByTestId("arena-pitch"), 175, 1100);
     const ficha = goleador ? page.locator(`[data-testid=arena-player][data-player="${goleador}"]`) : page.getByTestId("arena-player").nth(9);
     await g.pulsar((await ficha.count()) ? ficha.first() : page.getByTestId("arena-player").nth(9), 500);
-    await g.marca("s6-seleccion", { jugador: goleador });
-    await g.desplazar(page.getByTestId("arena-player-card"), 84, 1400);
-    await g.marca("s6-jugador", { texto: (await txt("[data-testid=arena-player-card]")).slice(0, 600) });
-    await sleep(5000);
-    // Escena: descargar comentarios (Markdown).
-    const descargas = page.getByTestId("arena-downloads");
-    await g.desplazar(descargas, 220, 1300);
-    const md = descargas.getByRole("button", { name: "Download commentary (Markdown)" });
-    await g.mover(md, 700);
-    await g.marca("s7");
-    const espera = page.waitForEvent("download", { timeout: 20_000 });
-    { const bb = await md.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
-    const descarga = await espera;
-    await descarga.saveAs(join(dir, "descarga.md"));
-    await g.marca("s7-descargado", { archivo: descarga.suggestedFilename() });
-    await sleep(3000);
-    // Escena: agente de Foundry.
-    const asistente = page.getByTestId("arena-assistant");
-    await g.desplazar(asistente, 90, 1200);
-    const [pregunta, estilo] = [asistente.locator("select").nth(0), asistente.locator("select").nth(1)];
-    await g.mover(pregunta, 500); await pregunta.selectOption("momento");
-    await g.mover(estilo, 500); await estilo.selectOption("analyst");
-    await g.marca("s8");
-    const preguntar = asistente.getByRole("button", { name: "Ask analyst" });
-    await g.mover(preguntar, 500);
-    { const bb = await preguntar.boundingBox(); await page.mouse.click(bb.x + 40, bb.y + bb.height / 2); }
-    await g.marca("s8-pregunta");
-    const respuesta = await g.esperar(async () => (await asistente.getByTestId("arena-assistant-answer").count()) > 0 || (await asistente.getByRole("alert").count()) > 0, 90_000, "respuesta del analista");
-    await sleep(400);
-    await g.marca("s8-respuesta", { texto: await txt("[data-testid=arena-assistant-answer]") });
-    if (respuesta && await asistente.getByTestId("arena-assistant-answer").count()) {
-      await sleep(2200);
-      await g.pulsar(asistente.getByTestId("arena-assistant-answer").locator("summary"), 300);
-      await g.marca("s8-herramientas", { texto: await txt("[data-testid=arena-assistant-answer]") });
-      await g.desplazar(asistente.getByTestId("arena-assistant-answer"), 120, 1200);
-      await sleep(4500);
+    await g.marca("s7-seleccion", { jugador: goleador });
+    const statsJugador = page.getByTestId("arena-player-stats");
+    await g.desplazar(statsJugador, 250, 1400);
+    await g.mover(statsJugador.locator('[data-stat="velocidad_max_kmh"] dt'), 300);
+    await g.marca("s7-jugador", { jugador: goleador, texto: (await txt("[data-testid=arena-player-stats]")).slice(0, 900) });
+    await sleep(1500);
+    await g.mover(statsJugador.locator('[data-stat="pases_completados"] dt'), 300);
+    await sleep(1800);
+    // 067 · Escena 8: personalización. Estrella del jugador (en la ficha), estrella del club (marcador),
+    // «Only my player (and goals)», audiencias de «Understand this moment» y cambio a español (texto y voz).
+    const estrellaJugador = page.getByTestId("arena-favorite-player");
+    await g.desplazar(page.getByTestId("arena-player-card"), 84, 1100);
+    await g.mover(estrellaJugador, 500);
+    await g.marca("s8-fav-jugador-antes");
+    await g.pulsar(estrellaJugador, 100);
+    await g.marca("s8-fav-jugador", { pulsada: await estrellaJugador.getAttribute("aria-pressed").catch(() => null) });
+    await sleep(1400);
+    const lado = goleador?.startsWith("visita") ? "visita" : "local";
+    const estrellaClub = page.locator(`[data-testid=arena-favorite-club][data-side=${lado}]`);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" })); await sleep(1100);
+    await g.mover(estrellaClub, 500);
+    await g.pulsar(estrellaClub, 100);
+    await g.marca("s8-fav-club", { lado, pulsada: await estrellaClub.getAttribute("aria-pressed").catch(() => null) });
+    await sleep(1500);
+    const textoVivo = page.getByTestId("arena-live-text");
+    await g.desplazar(textoVivo, 84, 1200);
+    const solo = page.getByTestId("arena-only-favourite");
+    await g.mover(solo, 500);
+    await g.marca("s8-solo-antes", { items: await textoVivo.locator("li").count() });
+    await solo.check();
+    await g.marca("s8-solo", { items: await textoVivo.locator("li").count(), texto: (await txt("[data-testid=arena-live-text]")).slice(0, 600) });
+    await sleep(1800);
+    const audiencia = page.getByTestId("arena-intelligence").getByRole("combobox", { name: "Audience" });
+    await g.desplazar(page.getByTestId("arena-intelligence"), 140, 1000);
+    for (const modo of ["fan", "analyst", "player"]) {
+      await g.mover(audiencia, 350); await audiencia.selectOption(modo); await sleep(250);
+      await g.marca(`s8-audiencia-${modo}`, { texto: (await txt("[data-testid=arena-intelligence]")).slice(0, 600) });
+      await sleep(1500);
     }
+    // Español: la barra del sitio cambia el idioma; la narración de la propia página vuelve a sonar en español
+    // (brief 058 § 3.1) y se oye unos segundos antes de volver al inglés.
+    const botonEs = page.getByRole("button", { name: "Switch to Spanish" });
+    await g.mover(botonEs, 450);
+    await g.marca("s8-es-antes");
+    await g.pulsar(botonEs, 100);
+    await g.marca("s8-es", { texto: (await txt("[data-testid=arena-intelligence]")).slice(0, 400) });
+    const sonoEs = await g.esperar(async () => { const ev = await page.evaluate(() => window.__audio).catch(() => []); return ev.some(e => e.t > Date.now() - 6000 && estado.relatos.get(e.tag)?.idioma === "es"); }, 12_000, "narración en español");
+    await g.marca("s8-es-audio", { visto: !!sonoEs });
+    await sleep(3600);
+    const botonEn = page.getByRole("button", { name: "Cambiar a inglés" });
+    await g.mover(botonEn, 300);
+    await g.pulsar(botonEn, 100);
+    await g.marca("s8-en");
+    await sleep(800);
+    // Escena 9 (analista), si no se pudo grabar durante el partido.
+    if (!analistaHecho) await preguntarAnalista();
     // Fotograma final.
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" })); await sleep(1300);
     await page.mouse.move(ANCHO - 20, ALTO - 20, { steps: 6 });
@@ -311,8 +415,11 @@ async function grabarArena() {
     // Datos para subtítulos e informe: eventos de audio y registro de la sesión.
     const eventos = await page.evaluate(() => window.__audio);
     const sesion = estado.sesion ? await page.evaluate(async id => { const r = await fetch(`/api/arena/sesiones/${id}/emision`); return r.ok ? r.json() : { http: r.status }; }, estado.sesion).catch(() => null) : null;
-    writeFileSync(join(dir, "datos.json"), JSON.stringify({ t0, url: ARENA, controladores, sesion: estado.sesion, asignacion: estado.asignacion, marcas: g.marcas, eventosAudio: eventos.map(e => ({ ...e, t: (e.t - t0) / 1000, parada: e.parada === null ? null : (e.parada - t0) / 1000, relato: estado.relatos.get(e.tag)?.archivo ?? null })), analisis: estado.analisis, errores: estado.errores, peticionesRelato: estado.peticionesRelato }, null, 1));
-    if (sesion) writeFileSync(join(dir, "emision.json"), JSON.stringify({ estado: sesion.estado, metricas: sesion.metricas, asignacion: sesion.asignacion, reglas: sesion.registro?.config?.reglas ?? null, marcador: sesion.registro?.final?.marcador ?? null, goles: (sesion.registro?.eventos ?? []).filter(e => e.tipo === "gol"), intervenciones: sesion.intervenciones ?? sesion.registro?.intervenciones ?? null }, null, 1));
+    writeFileSync(join(dir, "datos.json"), JSON.stringify({ t0, url: ARENA, controladores, sesion: estado.sesion, asignacion: estado.asignacion, marcas: g.marcas, eventosAudio: eventos.map(e => ({ ...e, t: (e.t - t0) / 1000, parada: e.parada === null ? null : (e.parada - t0) / 1000, relato: estado.relatos.get(e.tag)?.archivo ?? null })), analisis: estado.analisis, vozEs: estado.vozEs ? { ...estado.vozEs, inicioS: estado.vozEsInicio ?? null, paradaS: estado.vozEsParada ?? null } : null, errores: estado.errores, peticionesRelato: estado.peticionesRelato }, null, 1));
+    if (sesion) {
+      const ev = sesion.registro?.eventos ?? [], cuenta = tipo => ev.filter(e => e.tipo === tipo).length;
+      writeFileSync(join(dir, "emision.json"), JSON.stringify({ estado: sesion.estado, metricas: sesion.metricas, asignacion: sesion.asignacion, reglas: sesion.registro?.config?.reglas ?? sesion.registro?.reglas ?? null, version: sesion.registro?.version ?? null, claves: Object.keys(sesion.registro?.config ?? {}), duracionS: sesion.registro?.config?.duracionS ?? null, marcador: sesion.registro?.final?.marcador ?? null, goles: ev.filter(e => e.tipo === "gol"), faltas: cuenta("falta"), amarillas: cuenta("amarilla"), rojas: cuenta("roja"), fuerasDeJuego: cuenta("fuera_juego"), comentarios: sesion.comentarios ?? [], intervenciones: sesion.intervenciones ?? sesion.registro?.intervenciones ?? null }, null, 1));
+    }
   } finally {
     await context.close();
     await browser.close();
@@ -447,7 +554,46 @@ async function grabarRecap() {
 }
 
 // --------------------------------------------------------------------------------------------
+// Fase datos (067 · escena 12): /datos (dataset sintético, DATASHEET y descarga) y un vistazo al JSON para
+// overlay de la crónica 246 en el host del redactor real. No se descarga nada durante la grabación.
+async function grabarDatos() {
+  const dir = join(TRABAJO, "datos"); mkdirSync(dir, { recursive: true });
+  const overlay = RECAP.replace(/\/match\/246$/, "/api/overlay/246");
+  const browser = await chromium.launch();
+  { const c = await browser.newContext(); const p = await c.newPage(); for (const u of [DATOS, overlay]) await p.goto(u, { waitUntil: "networkidle", timeout: 180_000 }); await c.close(); }
+  const context = await browser.newContext({ viewport: { width: ANCHO, height: ALTO }, colorScheme: "dark", locale: "en-US", recordVideo: { dir, size: { width: ANCHO, height: ALTO } } });
+  await context.addInitScript(scriptCursor);
+  const t0 = Date.now(), page = await context.newPage(), g = grabador(page, t0, dir);
+  let datos;
+  try {
+    await page.goto(DATOS, { waitUntil: "networkidle", timeout: 180_000 });
+    await sleep(700);
+    await page.mouse.move(700, 300, { steps: 4 });
+    await g.marca("datos", { texto: (await page.locator("main").innerText()).slice(0, 600) });
+    await g.mover(page.getByTestId("sample-download"), 1300);
+    await g.marca("datos-descarga", { href: await page.getByTestId("sample-download").getAttribute("href") });
+    await g.mover(page.getByTestId("datasheet-link"), 1300);
+    await g.marca("datos-datasheet");
+    await sleep(600);
+    await page.goto(overlay, { waitUntil: "networkidle", timeout: 180_000 });
+    // Casilla «Pretty-print» del visor de JSON de Chromium (arriba a la izquierda), pulsada con el cursor visible.
+    await page.mouse.move(104, 9, { steps: 10 }); await sleep(250); await page.mouse.click(104, 9);
+    await sleep(500);
+    await page.mouse.move(900, 420, { steps: 4 });
+    await g.marca("overlay", { url: overlay, texto: (await page.locator("body").innerText()).slice(0, 300) });
+    await sleep(3500);
+    datos = { t0, datos: DATOS, overlay, marcas: g.marcas };
+  } finally { await context.close(); await browser.close(); }
+  writeFileSync(join(dir, "datos.json"), JSON.stringify(datos, null, 1));
+  const video = readdirSync(dir).filter(f => f.endsWith(".webm") && f !== "datos.webm").map(f => join(dir, f)).at(-1);
+  renameSync(video, join(dir, "datos.webm"));
+}
+
+// --------------------------------------------------------------------------------------------
 // Fase tarjetas: tres tarjetas propias (paleta de la arena, sin logotipos).
+// 067 · § 2.3: cifras vistas correr (npm test en dbd70e0; Playwright 343 en el run 40451967668 sobre dbd70e0;
+// test:stats 80 en el brief 068). `--ci="run N · three jobs · commit sha · fecha"` solo si ese run terminó en verde.
+const CALIDAD = { unit: arg("unit", "2,961"), archivos: arg("archivos", "142"), e2e: arg("e2e", "343"), stats: arg("stats", "80"), statsNota: arg("stats-nota", "27 Oct, rules reinicios-v10"), ci: arg("ci", "").replace(/_/g, " "), sha: arg("sha", "dbd70e0"), runE2e: arg("run-e2e", "40451967668") };
 const TARJETAS_HTML = `<!doctype html><html lang="en"><meta charset="utf-8"><title>CRONISTA cards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&display=block" rel="stylesheet">
 <style>
@@ -470,7 +616,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
 .ci i{font-style:normal;background:var(--surface2);padding:8px 14px}.ci em{font-style:normal;background:var(--accent);color:var(--bg);padding:8px 14px}
 </style>
 <main id="arquitectura">
- <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure</div>
+ <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure · rules reinicios-v10</div>
  <h1>Separate roles, one shared journal,<br>a verifier before every spoken analysis.</h1>
  <div class="grid" style="grid-template-columns:1.05fr 40px 1.1fr 40px 1.1fr">
   <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI deployment · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>Six in the catalogue: GPT-6.1 Sol · GPT-6 Astra · GPT-6 Sol · GPT-6 Luna · GPT-5.6 Luna · GPT-5.4 mini</span></div></div>
@@ -506,13 +652,13 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
 </main>
 <main id="calidad">
  <div class="brand">CRONISTA</div><div class="over">Quality · evidence in the repository</div>
- <h1>More than two thousand automated checks</h1>
+ <h1>More than three thousand automated checks</h1>
  <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
-  <div class="box" style="padding:30px"><div class="num">2,741</div><div class="lbl">unit, invariant, oracle and lie-battery tests</div></div>
-  <div class="box" style="padding:30px"><div class="num">286</div><div class="lbl">Playwright journeys</div></div>
-  <div class="box" style="padding:30px"><div class="num">61</div><div class="lbl">statistical checks over simulated matches (last run 22 Oct)</div></div>
+  <div class="box" style="padding:30px"><div class="num">${CALIDAD.unit}</div><div class="lbl">unit, invariant, oracle and lie-battery tests in ${CALIDAD.archivos} files</div></div>
+  <div class="box" style="padding:30px"><div class="num">${CALIDAD.e2e}</div><div class="lbl">Playwright journeys</div></div>
+  <div class="box" style="padding:30px"><div class="num">${CALIDAD.stats}</div><div class="lbl">statistical checks over simulated matches (${CALIDAD.statsNota})</div></div>
  </div>
- <p style="margin-top:34px"><span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">run 40104418250 · three jobs · commit 02c8e3f · 24 Oct 2026</span></p>
+ <p style="margin-top:34px">${CALIDAD.ci ? `<span class="ci"><i>CI</i><em>passed</em></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">${CALIDAD.ci}</span>` : `<span class="ci"><i>Unit and statistical suites run locally on ${CALIDAD.sha}</i></span> <span style="color:var(--muted);font-size:21px;margin-left:12px">Playwright journeys passed in CI run ${CALIDAD.runE2e} on ${CALIDAD.sha}</span>`}</p>
  <p style="margin-top:26px"><span class="tag">All data synthetic</span><span class="tag">Open source</span><span class="tag">Claims link to evidence</span></p>
  <div class="foot">Live arena: cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena<br>Fictional clubs, players and broadcasters. The arena is a short 2D prototype, not a regulation match.</div>
 </main>
@@ -546,19 +692,21 @@ async function tarjetas() {
 }
 
 // --------------------------------------------------------------------------------------------
-// Fase voz: voz en off en inglés con Azure Speech (misma llamada REST que src/arena/voz.ts).
+// Fase voz: voz en off en inglés con Azure Speech (misma llamada REST que src/arena/voz.ts). Corte del 067.
 const VOZ = {
-  gancho: "AI can call a football match. Can it prove what it says? CRONISTA is a multi-agent broadcast where every sentence is traceable.",
-  modelos: "Six models are in the catalogue; here GPT-6 Astra and GPT-6.1 Sol coach the two teams. Both receive the same committed observation and return a plan for every player; a shared engine resolves the play.",
-  verificacion: "The commentator may only analyse with a cited fact. Eight deterministic rules check citations, numbers, names and claims. A failed sentence is retried once, then replaced by a labelled template.",
-  cifras: "Match stats and each player's numbers are computed only from confirmed events, live as the broadcast plays.",
-  descarga: "Every line of the commentary can be downloaded, with its time, voice, evidence and checks.",
-  analista: "A versioned Microsoft Foundry agent answers viewer questions with read-only tools over the confirmed play only. Its sentences pass the same verifier.",
-  cronica: "The same verifier guards the automated recap, now with the arena's look: click any sentence to see its events, or open every draft and verdict. We claim traceability, not better prose.",
-  torneo: "The six models also play each other: a full league, won by GPT-6 Astra, and a groups and knockout test bracket. Every match has a replay, and the page states what the results cannot prove.",
-  cierre: "It runs on Azure Container Apps with Blob, Key Vault, Application Insights, Speech and Foundry. More than two thousand automated tests run in CI. Everything is synthetic. CRONISTA: narrate the match, prove every sentence.",
+  gancho: "AI can call a football match. Can it prove what it says? CRONISTA: a multi-agent broadcast where every sentence is traceable.",
+  agentes: "Two LLM coaches, GPT-6 Astra and GPT-6.1 Sol, manage the teams. A shared engine resolves the play; a desk of three voices narrates it.",
+  estado: "While the coaches decide, the clock waits. Both see the same committed state and return a validated JSON plan for every player.",
+  verificacion: "The commentator may only analyse with a cited fact. Eight deterministic rules check it; a failure is retried once, then becomes a labelled template.",
+  cifras: "Team and player numbers come from the engine's events and frames: passes, shots, distance and top speed in kilometres per hour.",
+  personal: "Make it yours: star a club and a player, follow only that player, and choose a fan, analyst or player view. Spanish switches text and voice.",
+  analista: "A versioned Microsoft Foundry agent answers questions with read-only tools over the confirmed play. Its sentences pass the same verifier.",
+  torneo: "The six models also play each other. Every league match has a replay, and the page states what the results cannot prove.",
+  cronica: "The same verifier guards the automated match report: click any sentence to see its events, or open every draft and verdict.",
+  datos: "All data is synthetic: a documented dataset, and JSON for broadcast overlays.",
+  cierre: "It runs on Azure OpenAI, Foundry, Speech and Container Apps, with over three thousand automated checks. CRONISTA: narrate the match, prove every sentence.",
 };
-const RITMO = { gancho: "+9%", modelos: "+12%", verificacion: "+10%", cronica: "+12%", cierre: "+15%" };
+const RITMO = { gancho: "+12%", agentes: "+15%", estado: "+12%", verificacion: "+14%", cifras: "+12%", personal: "+14%", analista: "+12%", torneo: "+12%", cronica: "+12%", datos: "+12%", cierre: "+15%" };
 async function voz() {
   const dir = join(TRABAJO, "voz"); mkdirSync(dir, { recursive: true });
   for (const f of [".env", ".cache/azure-servicios.env"]) if (existsSync(f)) process.loadEnvFile(f);
@@ -587,31 +735,40 @@ async function voz() {
 }
 
 // --------------------------------------------------------------------------------------------
-// Fase montar: escenas, subtítulos (rótulo superior + transcripción inferior), mezcla y MP4.
+// Fase montar (067): trece escenas, subtítulos (rótulo superior + transcripción inferior), mezcla y MP4.
 const NOMBRE_ROL = { narrador: "Narrator", comentarista: "Commentator", estadista: "Statistician" };
 const ROTULO = {
   gancho: "CRONISTA — multi-agent match broadcast · own emblem, fictional crests and kits · every sentence traceable",
-  antesala: "Pre-match presentation · real audio as played in the live broadcast · shortened in the edit (the full presentation lasts about 50 s)",
-  "antesala-b": "Pre-match presentation · each team's header names the model coaching it",
-  torneo: "Model tournament · league of 24 Oct, archived and validated in CI · groups + knockout: operator test tournament · results describe these matches, not model quality",
-  previa: "Pre-match · same match replayed with narration from Saved matches · line-up card and the statistician's spoken pre-match, real audio as played",
+  antesala: "Pre-match presentation · real audio as played in the live broadcast · first piece only (the whole presentation lasts about 50 s)",
+  estado: "Shared state · coaches decide while the simulation clock waits · broadcast buffer · each coach's validated JSON plan and player orders",
   gol: "Goal call · real narrator audio as played in the live broadcast · ball in the net, GOAL banner, goal view (height illustrative)",
   verificacion: "V1–V8: schema · citations · numbers · names · coverage · ES=EN · negations · strong claims",
-  cifras: "Match stats and the selected player's stats · counted from confirmed engine events · estimates labelled",
-  descarga: "Download commentary · Markdown or JSON · each line with time, voice, evidence and checks",
-  cronica: "Automated recap /match/246 with the arena look · GPT-6.1 Sol · 0/163 baseline, 0/167 pipeline flagged · no reduction demonstrated",
+  cifras: "Match stats and player card · passes and shots from confirmed events · distance and top speed (km/h) sampled from engine frames",
+  personal: "Favourite club and player (stored in this browser) · Only my player (and goals) · audience: Fan, Analyst, Follow selected player",
+  personalEs: "Switched to Spanish · page text and the page's own narration (real Azure Speech audio, as played in this recording)",
+  torneo: "Model league of 24 Oct · six models, archived and validated in CI · results describe these matches, not model quality",
+  datos: "Synthetic dataset at /datos · DATASHEET · 10-match JSONL sample to download",
+  overlay: "/api/overlay/246 · the verified match-report updates as JSON for a broadcast overlay",
   cierreA: "Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions",
   cierreB: "All data synthetic · open source · claims link to evidence",
 };
+// Límites del corte (brief 067 § 2): estrictamente entre 1:50,0 y 1:58,0.
+const MIN_S = 110.2, MAX_S = 117.6;
 function montar() {
   const dir = join(TRABAJO, "montaje"); mkdirSync(dir, { recursive: true });
   const arena = JSON.parse(readFileSync(join(TRABAJO, toma, "datos.json"), "utf8"));
+  const emision = existsSync(join(TRABAJO, toma, "emision.json")) ? JSON.parse(readFileSync(join(TRABAJO, toma, "emision.json"), "utf8")) : null;
   const recap = JSON.parse(readFileSync(join(TRABAJO, "recap", "datos.json"), "utf8"));
+  const datosW = JSON.parse(readFileSync(join(TRABAJO, "datos", "datos.json"), "utf8"));
+  const torneo = JSON.parse(readFileSync(join(TRABAJO, "torneo", "datos.json"), "utf8"));
   const vozOff = JSON.parse(readFileSync(join(TRABAJO, "voz", "voz.json"), "utf8")).escenas;
   const m = (datos, n) => { const x = datos.marcas.findLast(k => k.nombre === n); if (!x) throw new Error(`Falta la marca ${n}`); return x; };
+  const mOpc = (datos, n) => datos.marcas.findLast(k => k.nombre === n) ?? null;
   const A = join(TRABAJO, toma, "arena.webm"), R = join(TRABAJO, "recap", "recap.webm"), T = join(TRABAJO, "tarjetas");
+  const TT = join(TRABAJO, "torneo", "torneo.webm"), DD = join(TRABAJO, "datos", "datos.webm");
   const durVoz = e => vozOff[e].duracionS;
-  const largo = (e, ranura) => Math.max(ranura, +(durVoz(e) + 0.7).toFixed(2));
+  const holgura = +arg("holgura", "0.4");
+  const largo = (e, ranura) => Math.max(ranura, +(durVoz(e) + holgura).toFixed(2));
   const sin = arg("sin", "").split(",").filter(Boolean);
 
   // Audio real de la sesión: cada clip que la página arrancó, identificado por huella.
@@ -627,87 +784,83 @@ function montar() {
   const esIntercambioCualquiera = r => !!r?.intervencion && !esPreviaR(r) && (r.fragmentos ?? []).some(f => f.rol === "comentarista");
   const desdeMesa = m(arena, "previa").t + 0.3, hastaMesa = m(arena, "fin-emision").t;
   const enMesa = eventos.filter(e => e.relato && e.t >= desdeMesa && e.fin <= hastaMesa && completo(e));
-  const cantos = enMesa.filter(e => esCanto(rel(e)));
-  let intercambios = enMesa.filter(e => esIntercambioLlm(rel(e)));
-  if (!intercambios.length) intercambios = enMesa.filter(e => esIntercambioCualquiera(rel(e)));
+  // Fuera de la cancha mientras se consulta al analista (escena 9, durante el partido): esas locuciones no valen.
+  const ida = mOpc(arena, "s9-ida"), vuelta = mOpc(arena, "s9-vuelta");
+  const enCancha = e => !(ida && vuelta && e.t < vuelta.t + 1.0 && e.fin > ida.t - 1.2);
+  const cantos = enMesa.filter(e => esCanto(rel(e)) && enCancha(e));
+  let intercambios = enMesa.filter(e => esIntercambioLlm(rel(e)) && enCancha(e));
+  if (!intercambios.length) intercambios = enMesa.filter(e => esIntercambioCualquiera(rel(e)) && enCancha(e));
   if (!cantos.length) throw new Error("No sonó ningún canto de gol completo en la vista de la cancha");
   const ajustar = (ini, fin) => {
     for (const e of eventos) if (e.t < ini && e.fin > ini) ini = e.fin + 0.03;
     for (const e of eventos) if (e.t > ini && e.t < fin && e.fin > fin + 0.05) fin = e.t - 0.02;
     return [Math.max(ini, desdeMesa), Math.min(fin, hastaMesa)];
   };
-  // Preferencia: un canto seguido del intercambio del comentarista sobre ese gol (una sola toma continua).
+  // Escenas 5 y 6: un canto seguido del intercambio de la mesa sobre ese gol (una sola toma continua), si lo hay.
   let canto = cantos[0], tras = null;
-  for (const c of cantos) { const x = intercambios.find(i => i.t > c.fin && i.t - c.fin < 12); if (x) { canto = c; tras = x; break; } }
-  const ventanas = [];
-  if (tras && tras.fin + 1 - (canto.t - 1.5) <= 27) ventanas.push({ id: "gol", ini: canto.t - 1.5, fin: tras.fin + 1.0, cambio: tras.t - 0.3, intercambio: tras });
-  else {
-    ventanas.push({ id: "gol", ini: canto.t - 1.5, fin: canto.fin + 1.2 });
-    // Sin intercambio justo tras el canto no se monta una escena de mesa aparte: con la mesa en el panel
-    // lateral, la tarjeta «Latest exchange» visible puede no ser la que se oye (corte 4, 25 oct).
-    if (process.argv.includes("--mesa-aparte")) {
-      const x = intercambios.find(i => i.t > canto.fin + 2) ?? intercambios.find(i => i.fin < canto.t - 2);
-      if (x) ventanas.push({ id: "mesa", ini: x.t - 1.0, fin: x.fin + 1.0, intercambio: x });
-    }
-  }
-  for (const v of ventanas) {
-    const ancla = v.id === "gol" ? canto : v.intercambio;
-    [v.ini, v.fin] = ajustar(v.ini, v.fin);
-    // Nunca empezar después de la locución que da sentido a la ventana (el canto o el intercambio).
-    if (ancla && v.ini > ancla.t - 0.4) v.ini = Math.max(desdeMesa, ancla.t - 0.4);
-    v.dur = +(v.fin - v.ini).toFixed(2);
-  }
-  console.log("  · cantos", cantos.map(c => [c.relato, +c.t.toFixed(1)]), "intercambios", intercambios.map(c => [c.relato, +c.t.toFixed(1)]), "ventanas", ventanas.map(v => [v.id, +v.ini.toFixed(1), +v.fin.toFixed(1)]));
+  if (!sin.includes("mesa")) for (const c of cantos) { const x = intercambios.find(i => i.t > c.fin && i.t - c.fin < 12); if (x) { canto = c; tras = x; break; } }
+  const ventanaGol = tras && tras.fin + 1 - (canto.t - 1.5) <= 27 ? { id: "gol", ini: canto.t - 1.5, fin: tras.fin + 1.0, cambio: tras.t - 0.3, intercambio: tras } : { id: "gol", ini: canto.t - 1.2, fin: canto.fin + 0.9 };
+  [ventanaGol.ini, ventanaGol.fin] = ajustar(ventanaGol.ini, ventanaGol.fin);
+  if (ventanaGol.ini > canto.t - 0.4) ventanaGol.ini = Math.max(desdeMesa, canto.t - 0.4);
+  ventanaGol.dur = +(ventanaGol.fin - ventanaGol.ini).toFixed(2);
+  console.log("  · cantos", cantos.map(c => [c.relato, +c.t.toFixed(1)]), "intercambios", intercambios.map(c => [c.relato, +c.t.toFixed(1)]), "gol", [+ventanaGol.ini.toFixed(1), +ventanaGol.fin.toFixed(1), !!ventanaGol.intercambio]);
 
-  const vivo = m(arena, "narracion").t + 1.0, mod = m(arena, "s2-modelos").t, clic = m(arena, "s2-clic").t;
-  // Previa: el mismo partido reproducido con narración desde «Saved matches» (fase previa); la primera
-  // pieza del estadista suena al principio de la pista narrada, con la tarjeta de alineaciones en pantalla.
-  const dirPrevia = join(TRABAJO, toma, "previa"), P = join(dirPrevia, "previa.webm");
-  let ventanaPrevia = null;
-  if (existsSync(join(dirPrevia, "datos.json"))) {
-    const dp = JSON.parse(readFileSync(join(dirPrevia, "datos.json"), "utf8")), son = dp.marcas.find(k => k.nombre === "sonando");
-    const pieza = dp.piezas.find(x => x.intervencion === "previa:1-local:0");
-    if (son && pieza) {
-      const durPieza = duracion(join(dirPrevia, pieza.archivo)), cero = son.t - son.audioC;
-      ventanaPrevia = { id: "previa", ini: cero - 0.6, fin: cero + durPieza + 0.6, dur: +(durPieza + 1.2).toFixed(2), pieza, durPieza, desfase: 0.6 };
-    }
-  }
-  if (!ventanaPrevia) console.log("  ! sin fase previa: la escena de la previa se omite");
-  // Antesala (brief 058 B) en el directo: apertura + cabecera local seguidas y, tras un corte, la cabecera
-  // visitante (cada cabecera nombra al modelo que dirige el equipo). El resto se recorta en el montaje.
+  // Escena 3: antesala en el directo, una sola pieza (apertura + cabecera local, que nombra al modelo).
   const antesala = eventos.filter(e => e.relato && esAntesalaR(rel(e)) && completo(e));
   const clipA = n => antesala.find(e => rel(e).intervencion.startsWith(`antesala:${n}-`));
-  const ventanasAntesala = [];
-  if (clipA("01") && clipA("02")) ventanasAntesala.push({ id: "antesala", ini: clipA("01").t - 0.5, fin: clipA("02").fin + 0.3 });
-  if (clipA("06")) ventanasAntesala.push({ id: "antesala-b", ini: clipA("06").t - 0.3, fin: clipA("06").fin + 0.4 });
-  for (const v of ventanasAntesala) v.dur = +(v.fin - v.ini).toFixed(2);
-  if (ventanasAntesala.length) ventanaPrevia = null;
-  const dirTorneo = join(TRABAJO, "torneo"), TT = join(dirTorneo, "torneo.webm");
-  const torneo = existsSync(join(dirTorneo, "datos.json")) ? JSON.parse(readFileSync(join(dirTorneo, "datos.json"), "utf8")) : null;
-  const L = { gancho: largo("gancho", 8), modelos: largo("modelos", 13), verificacion: largo("verificacion", 12), cifras: largo("cifras", 10.5), descarga: largo("descarga", 8.5), analista: largo("analista", 10), cronica: largo("cronica", 11), cierre: largo("cierre", 12), torneo: largo("torneo", 13) };
-  const piezaA2 = +(clic + 2.6 - (mod - 0.6)).toFixed(2);
-  const s8 = m(arena, "s8").t, s8p = m(arena, "s8-pregunta").t, s8r = m(arena, "s8-respuesta").t, piezaA8 = +(s8p + 1.6 - (s8 - 1.8)).toFixed(2);
+  if (!clipA("01")) throw new Error("Falta la pieza antesala:01 completa");
+  const ventanaAntesala = { id: "antesala", ini: clipA("01").t - 0.5, fin: (clipA("02") ?? clipA("01")).fin + 0.3 };
+  ventanaAntesala.dur = +(ventanaAntesala.fin - ventanaAntesala.ini).toFixed(2);
+
+  // Escena 8: narración en español de la propia página tras «Switch to Spanish», tal como sonó (huella).
+  const esClic = mOpc(arena, "s8-es")?.t ?? null;
+  const esEv = esClic === null || sin.includes("es") ? null : eventos.find(e => e.relato && e.t >= esClic - 0.2 && e.t < esClic + 8 && rel(e)?.idioma === "es" && e.offset === 0) ?? null;
+  const usoEs = esEv ? Math.min(+arg("es", "2.6"), esEv.fin - esEv.t) : 0;
+  const esDesde = esEv ? esClic - 0.6 : 0;
+
+  const L = { gancho: largo("gancho", 6), agentes: largo("agentes", 10), estado: largo("estado", 7.5), verificacion: largo("verificacion", 8.5), cifras: largo("cifras", 7.5), personal: largo("personal", 8), analista: largo("analista", 7.5), torneo: largo("torneo", 6.5), cronica: largo("cronica", 7.5), datos: largo("datos", 5), cierre: largo("cierre", 10) };
+  const s1 = m(arena, "s1").t, mod = m(arena, "s2-modelos").t, clic = m(arena, "s2-clic").t;
+  const finGancho = s1 - 0.3 + L.gancho, iniAgentes = Math.max(finGancho, clic + 1.5 - L.agentes); // la escena termina tras el clic
+  // Escena 4: «Coaches are deciding» → «Live · N s ready» → planes y órdenes.
+  // «Coaches are deciding»: la marca inicial si se vio; si no, la primera aparición durante el partido, o la
+  // hora indicada con --decidiendo=<s> tras revisar los fotogramas de la toma (se anota en el informe).
+  const decArg = arg("decidiendo", ""), decVivo = mOpc(arena, "s4-decidiendo-vivo");
+  const dec = decArg ? +decArg + 0.4 : m(arena, "s4-decidiendo").visto ? m(arena, "s4-decidiendo").t : decVivo ? decVivo.t : m(arena, "s4-decidiendo").t, vivoM = mOpc(arena, "s4-vivo"), pl = m(arena, "s4-planes").t, ordM = mOpc(arena, "s4-ordenes");
+  const pDec = 2.6, pVivo = vivoM ? 2.3 : 0, pPlan = +(L.estado - pDec - pVivo).toFixed(2);
+  // Escena 8: trozos alrededor de cada acción, repartidos para cubrir la voz en off; después el audio ES.
+  const trozos8 = [["s8-fav-jugador-antes", -0.2, 2.0], ["s8-fav-club", -1.4, 2.0], ["s8-solo-antes", -0.3, 2.3], ["s8-audiencia-analyst", -0.9, 1.6], ["s8-audiencia-player", -0.9, 1.8]];
+  const escala8 = L.personal / trozos8.reduce((s, x) => s + x[2], 0);
+  const s9 = m(arena, "s9").t, s9p = m(arena, "s9-pregunta").t, s9r = m(arena, "s9-respuesta").t, piezaA9 = +Math.min(L.analista * 0.45, s9p + 1.4 - (s9 - 1.2)).toFixed(2);
+  const herramientas = mOpc(arena, "s9-herramientas");
+  const pDatos = 3.1;
   const escenas = [
-    { id: "gancho", voz: "gancho", piezas: [{ src: A, desde: m(arena, "s1").t - 0.3, dur: L.gancho }] },
-    { id: "modelos", voz: "modelos", piezas: [{ src: A, desde: mod - 0.6, dur: piezaA2 }, { src: A, desde: Math.max(clic + 2.6, vivo - 0.6 - (L.modelos - piezaA2)), dur: +(L.modelos - piezaA2).toFixed(2) }] },
-    ...ventanasAntesala.map(v => ({ id: v.id, piezas: [{ src: A, desde: v.ini, dur: v.dur }], ventana: v })),
-    ...(ventanaPrevia ? [{ id: "previa", piezas: [{ src: P, desde: ventanaPrevia.ini, dur: ventanaPrevia.dur }], previa: ventanaPrevia }] : []),
-    ...ventanas.map(v => ({ id: v.id, piezas: [{ src: A, desde: v.ini, dur: v.dur }], ventana: v })),
+    { id: "gancho", voz: "gancho", piezas: [{ src: A, desde: s1 - 0.3, dur: L.gancho }] },
+    { id: "agentes", voz: "agentes", piezas: [{ src: A, desde: iniAgentes, dur: L.agentes }] },
+    { id: "antesala", piezas: [{ src: A, desde: ventanaAntesala.ini, dur: ventanaAntesala.dur }], ventana: ventanaAntesala },
+    { id: "estado", voz: "estado", piezas: [{ src: A, desde: dec - 0.4, dur: pDec }, ...(vivoM ? [{ src: A, desde: vivoM.t - 0.2, dur: pVivo }] : []), { src: A, desde: (ordM && pPlan < 4.2 ? ordM.t - 1.2 : pl - 0.5), dur: pPlan }] },
+    { id: "gol", piezas: [{ src: A, desde: ventanaGol.ini, dur: ventanaGol.dur }], ventana: ventanaGol },
     { id: "verificacion", voz: "verificacion", piezas: [{ src: A, desde: m(arena, "s5").t - 0.8, dur: L.verificacion }] },
-    { id: "cifras", voz: "cifras", piezas: [{ src: A, desde: m(arena, "s6-cifras").t - 0.4, dur: 5.6 }, { src: A, desde: m(arena, "s6-jugador").t - 0.3, dur: +(L.cifras - 5.6).toFixed(2) }] },
-    { id: "descarga", voz: "descarga", piezas: [{ src: A, desde: m(arena, "s7").t - 1.6, dur: 3.6 }, { img: join(T, "descarga.png"), dur: +(L.descarga - 3.6).toFixed(2) }] },
-    { id: "analista", voz: "analista", piezas: [{ src: A, desde: s8 - 1.8, dur: piezaA8 }, { src: A, desde: (arena.marcas.some(k => k.nombre === "s8-herramientas") ? m(arena, "s8-herramientas").t - 1.0 : s8r - 0.6), dur: +(L.analista - piezaA8).toFixed(2) }] },
-    ...(torneo ? [{ id: "torneo", voz: "torneo", piezas: [{ src: TT, desde: m(torneo, "liga").t - 0.4, dur: +(L.torneo * 0.55).toFixed(2) }, { src: TT, desde: m(torneo, "cuadro").t - 0.4, dur: +(L.torneo - +(L.torneo * 0.55).toFixed(2)).toFixed(2) }] }] : []),
-    { id: "cronica", voz: "cronica", piezas: [{ src: R, desde: m(recap, "r-clic").t - 2.6, dur: L.cronica }] },
+    { id: "cifras", voz: "cifras", piezas: [{ src: A, desde: m(arena, "s7-cifras").t - 0.4, dur: 3.0 }, { src: A, desde: m(arena, "s7-jugador").t + 1.0, dur: +(L.cifras - 3.0).toFixed(2) }] },
+    { id: "personal", voz: "personal", piezas: [...trozos8.map(([n, d, dur]) => ({ src: A, desde: m(arena, n).t + d, dur: +(dur * escala8).toFixed(2) })), ...(esEv ? [{ src: A, desde: esDesde, dur: +(esEv.t - esDesde + usoEs + 0.3).toFixed(2), es: true }] : [])] },
+    { id: "analista", voz: "analista", piezas: [{ src: A, desde: s9 - 1.2, dur: piezaA9 }, { src: A, desde: herramientas ? herramientas.t - 0.8 : s9r - 0.6, dur: +(L.analista - piezaA9).toFixed(2) }] },
+    { id: "torneo", voz: "torneo", piezas: [{ src: TT, desde: m(torneo, "liga").t - 0.4, dur: L.torneo }] },
+    { id: "cronica", voz: "cronica", piezas: [{ src: R, desde: m(recap, "r-clic").t - 2.4, dur: L.cronica }] },
+    { id: "datos", voz: "datos", piezas: [{ src: DD, desde: m(datosW, "datos").t - 0.3, dur: sin.includes("overlay") ? L.datos : pDatos }, ...(sin.includes("overlay") ? [] : [{ src: DD, desde: m(datosW, "overlay").t - 0.6, dur: +Math.max(1.9, L.datos - pDatos).toFixed(2), overlay: true }])] },
   ].filter(e => !sin.includes(e.id));
-  const fin9 = 1.6, cartas = L.cierre - fin9, c1 = +(cartas * 0.38).toFixed(2), c2 = +(cartas * 0.32).toFixed(2);
-  escenas.push({ id: "cierre", voz: "cierre", piezas: [{ img: join(T, "arquitectura.png"), dur: c1 }, { img: join(T, "azure.png"), dur: c2 }, { img: join(T, "calidad.png"), dur: +(cartas - c1 - c2).toFixed(2) }, { src: A, desde: m(arena, "fin").t + 0.6, dur: fin9 }] });
+  const fin13 = 1.6, cartas = L.cierre - fin13, c1 = +(cartas * 0.38).toFixed(2), c2 = +(cartas * 0.30).toFixed(2);
+  escenas.push({ id: "cierre", voz: "cierre", piezas: [{ img: join(T, "arquitectura.png"), dur: c1 }, { img: join(T, "azure.png"), dur: c2 }, { img: join(T, "calidad.png"), dur: +(cartas - c1 - c2).toFixed(2) }, { src: A, desde: m(arena, "fin").t + 0.6, dur: fin13 }] });
   const durTotal = () => escenas.reduce((s, e) => s + e.piezas.reduce((t, p) => t + p.dur, 0), 0);
-  // Recorte automático para quedar ≤ 1:55, de lo menos a lo más prioritario.
-  for (const id of ["analista", "descarga", "cifras", "cronica"]) if (durTotal() > 114.9 && escenas.some(e => e.id === id)) { escenas.splice(escenas.findIndex(e => e.id === id), 1); sin.push(id); console.log(`  · escena omitida por duración: ${id}`); }
+  // Orden de recorte del brief (§ 2.1): overlay, audio ES, mesa, torneo. Las escenas 2, 4, 5, 7 y 8 no se recortan.
+  const recortes = [
+    ["overlay", () => { const e = escenas.find(e => e.id === "datos"); const i = e?.piezas.findIndex(p => p.overlay) ?? -1; if (i < 0 || e.piezas.reduce((s, p) => s + p.dur, 0) - L.datos < 0.05) return false; e.piezas.splice(i, 1); e.piezas[0].dur = L.datos; return true; }],
+    ["es", () => { const e = escenas.find(e => e.id === "personal"); const i = e.piezas.findIndex(p => p.es); if (i < 0) return false; e.piezas.splice(i, 1); return true; }],
+    ["mesa", () => { const e = escenas.find(e => e.id === "gol"); const v = e.ventana; if (!v.intercambio) return false; v.fin = canto.fin + 0.9; delete v.intercambio; delete v.cambio; v.dur = +(v.fin - v.ini).toFixed(2); e.piezas[0].dur = v.dur; return true; }],
+    ["torneo", () => { const i = escenas.findIndex(e => e.id === "torneo"); if (i < 0) return false; escenas.splice(i, 1); return true; }],
+  ];
+  for (const [id, quitar] of recortes) if (durTotal() > MAX_S && quitar()) { sin.push(id); console.log(`  · recorte por duración: ${id} → ${durTotal().toFixed(2)} s`); }
   const total = durTotal();
   console.log(`  · duración prevista ${total.toFixed(2)} s`);
-  if (total > 114.9) throw new Error(`Supera 1:55 (${total.toFixed(2)} s): usa --sin=<escena>`);
+  if (total > MAX_S || total < MIN_S) throw new Error(`Fuera de 1:50–1:58 (${total.toFixed(2)} s): ajusta --holgura o --sin`);
 
   // 1) Segmentos de vídeo.
   const segmentos = []; let n = 0, reloj = 0; const inicio = {};
@@ -723,11 +876,11 @@ function montar() {
   writeFileSync(join(dir, "lista.txt"), segmentos.map(s => `file '${s}'`).join("\n") + "\n");
   ff(["-f", "concat", "-safe", "0", "-i", join(dir, "lista.txt"), "-c", "copy", join(dir, "mudo.mp4")]);
 
-  // 2) Audio: voz en off y audio real de la sesión en las ventanas del gol y de la mesa.
+  // 2) Audio: voz en off y audio real de la sesión (antesala, gol, mesa, español).
   const entradas = [], filtros = [], subt = [], audioSesion = [];
   const agregar = (archivo, alInicio, { volumen = 1, desde = 0, dur = null } = {}) => {
     const k = entradas.length / 2; entradas.push("-i", archivo);
-    filtros.push(`[${k}:a]aresample=48000,aformat=channel_layouts=mono,atrim=start=${desde.toFixed(3)}${dur ? `:duration=${dur.toFixed(3)}` : ""},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,volume=${volumen},adelay=${Math.round(alInicio * 1000)}:all=1[a${k}]`);
+    filtros.push(`[${k}:a]aresample=48000,aformat=channel_layouts=mono,atrim=start=${desde.toFixed(3)}${dur ? `:duration=${dur.toFixed(3)}` : ""},asetpts=PTS-STARTPTS,afade=t=in:d=0.03${dur ? `,afade=t=out:st=${Math.max(0, dur - 0.12).toFixed(3)}:d=0.12` : ""},volume=${volumen},adelay=${Math.round(alInicio * 1000)}:all=1[a${k}]`);
   };
   const desfase = e => e === "gancho" || e === "cierre" ? 0.25 : 0.3;
   const repartir = (texto, desde, dur) => {
@@ -739,26 +892,33 @@ function montar() {
   for (const e of escenas.filter(e => e.voz)) { agregar(join(TRABAJO, "voz", `${e.voz}.wav`), inicio[e.id] + desfase(e.id)); repartir(VOZ[e.voz], inicio[e.id] + desfase(e.id) + 0.05, durVoz(e.voz) - 0.25); }
   const rolDe = (r, f) => esAntesalaR(r) ? `${NOMBRE_ROL[f.rol] ?? "Narrator"} (pre-match presentation)` : esPreviaR(r) ? (f.rol === "estadista" ? "Statistician (spoken pre-match)" : "Narrator (pre-match)") : f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)"
     : f.canto || r.temaVoz === "gol" ? "Narrator (goal call)" : r.reserva ? "Narrator (backup clip)" : r.intervencion ? "Narrator (template)" : "Narrator (play-by-play)";
-  for (const e of escenas.filter(e => e.previa)) {
-    const v = e.previa, alInicio = inicio[e.id] + v.desfase;
-    agregar(join(dirPrevia, v.pieza.archivo), alInicio, { dur: v.durPieza });
-    audioSesion.push({ escena: e.id, relato: `previa/${v.pieza.archivo}`, alInicio: +alInicio.toFixed(2), dur: +v.durPieza.toFixed(2) });
-    const texto = v.pieza.texto, frases = texto.split(/(?<=[.;])\s+/), tot = texto.length; let t = alInicio + 0.1;
-    for (const [i, fr] of frases.entries()) { const d = (v.durPieza - 0.3) * fr.length / tot; subt.push({ ini: t, fin: t + d - 0.04, texto: i === 0 ? `Statistician (spoken pre-match): ${fr}` : fr }); t += d; }
-  }
+  const cortarFragmentos = (frags, fraccion) => {
+    if (fraccion >= 0.999) return frags;
+    const total = frags.reduce((s, f) => s + f.texto.length, 0), corte = total * fraccion; let acum = 0;
+    return frags.flatMap(f => { if (acum >= corte) return []; const resto = corte - acum; acum += f.texto.length; if (f.texto.length <= resto) return [f]; const pal = f.texto.slice(0, Math.max(1, Math.floor(resto))).replace(/\s+\S*$/, ""); return [{ ...f, texto: `${pal}…` }]; });
+  };
   for (const e of escenas.filter(e => e.ventana)) {
     const v = e.ventana;
     for (const ev of eventos.filter(x => x.relato && x.t >= v.ini - 0.05 && x.fin <= v.fin + 0.05 && x.fin - x.t >= 0.6)) {
       const alInicio = inicio[e.id] + (ev.t - v.ini), dur = ev.fin - ev.t;
       agregar(join(dirRelatos, ev.relato), alInicio, { desde: ev.offset, dur });
-      audioSesion.push({ escena: e.id, relato: ev.relato, alInicio: +alInicio.toFixed(2), dur: +dur.toFixed(2) });
       const r = rel(ev);
-      let frags = r.fragmentos?.length ? r.fragmentos : [{ rol: "narrador", texto: r.texto }];
+      audioSesion.push({ escena: e.id, relato: ev.relato, intervencion: r.intervencion ?? null, tag: ev.tag, alInicio: +alInicio.toFixed(2), dur: +dur.toFixed(2) });
       // Locución cortada por la propia emisión (una noticia posterior): el subtítulo se corta igual.
-      if (ev.parada !== null && ev.parada < ev.t + ev.dur - 0.15) { const total = frags.reduce((s, f) => s + f.texto.length, 0), corte = total * dur / ev.dur; let acum = 0; frags = frags.flatMap(f => { if (acum >= corte) return []; const resto = corte - acum; acum += f.texto.length; if (f.texto.length <= resto) return [f]; const pal = f.texto.slice(0, Math.max(1, Math.floor(resto))).replace(/\s+\S*$/, ""); return [{ ...f, texto: `${pal}…` }]; }); }
+      const frags = cortarFragmentos(r.fragmentos?.length ? r.fragmentos : [{ rol: "narrador", texto: r.texto }], ev.parada !== null && ev.parada < ev.t + ev.dur - 0.15 ? dur / ev.dur : 1);
       const chars = frags.reduce((s, f) => s + f.texto.length, 0); let t = alInicio + 0.1;
       for (const f of frags) { const d = (dur - 0.4) * f.texto.length / chars; subt.push({ ini: t, fin: t + d - 0.04, texto: `${rolDe(r, f)}: ${f.texto}` }); t += d; }
     }
+  }
+  // Audio en español: la narración que la página hizo sonar tras el cambio de idioma, recortada a usoEs.
+  let textoEs = null;
+  for (const e of escenas) for (const p of e.piezas.filter(p => p.es)) {
+    const alInicio = p.inicioFinal + (esEv.t - esDesde), r = rel(esEv);
+    agregar(join(dirRelatos, esEv.relato), alInicio, { dur: usoEs });
+    audioSesion.push({ escena: e.id, relato: esEv.relato, intervencion: r.intervencion ?? null, idioma: "es", tag: esEv.tag, alInicio: +alInicio.toFixed(2), dur: +usoEs.toFixed(2), durClip: +(esEv.fin - esEv.t).toFixed(2) });
+    textoEs = (r.fragmentos?.length ? r.fragmentos : [{ texto: r.texto }]).map(f => f.texto).join(" ");
+    const [f] = cortarFragmentos([{ texto: textoEs }], usoEs / (esEv.fin - esEv.t));
+    subt.push({ ini: alInicio + 0.05, fin: alInicio + usoEs, texto: `Narrator in Spanish: «${f.texto}»` });
   }
   const k = entradas.length / 2;
   filtros.push(`${Array.from({ length: k }, (_, i) => `[a${i}]`).join("")}amix=inputs=${k}:normalize=0:dropout_transition=0,apad,atrim=duration=${total.toFixed(3)},loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[mez]`);
@@ -773,19 +933,22 @@ function montar() {
   writeFileSync(SALIDA_SRT, subt.map((s, i) => `${i + 1}\n${srtT(s.ini)} --> ${srtT(s.fin)}\n${partir(s.texto).join("\n")}\n`).join("\n"));
   const asignacion = arena.asignacion;
   const rotuloMesa = x => { const r = rel(x); return `Real audio from this match · desk exchange${r.variante === "breve" ? " (short variant)" : ""}: ${(r.fragmentos ?? []).map(f => f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`; };
+  const analisisModo = arena.analisis?.cuerpo?.comentario?.modo;
   const rotulos = { ...ROTULO,
-    modelos: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · chosen manually · same observation, strict JSON, 60 s deadline`,
-    cronica: /offline stub/i.test(recap.redactor ?? "") ? "Match report /match/246 in the arena's look · writer on this host: the labelled offline stub · V1–V8 on every sentence"
-      : /gpt-6\.1-sol/i.test(recap.redactor ?? "") ? ROTULO.cronica : `Match report /match/246 · ${recap.redactor}`,
-    analista: arena.analisis?.cuerpo?.comentario?.modo === "llm" ? "Microsoft Foundry Agent Service · agent cronista-analista:1 · tools reject future ticks" : "Microsoft Foundry Agent Service · this answer: verified template fallback · tools reject future ticks",
+    agentes: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · chosen manually · ${emision?.duracionS ?? duracionPartido} s live match · same observation, strict JSON`,
+    cronica: /gpt-6\.1-sol/i.test(recap.redactor ?? "") ? `Match report /match/246 · page label: ${recap.redactor.replace(/^Writer: /, "writer ")} · ${(/(\d+\/\d+) sentences verified/.exec(recap.verificacion ?? "") ?? ["", "?"])[1]} sentences passed V1–V8`
+      : /offline stub/i.test(recap.redactor ?? "") ? "Match report /match/246 · writer on this host: the labelled offline stub · V1–V8 on every sentence" : `Match report /match/246 · ${recap.redactor}`,
+    analista: analisisModo === "llm" ? `Microsoft Foundry Agent Service · AI explanation · read-only tool ${[...new Set((arena.analisis?.cuerpo?.herramientas ?? []).map(h => h.nombre))].join(", ") || "calls"} · cited events · checked by V1–V8` : "Microsoft Foundry Agent Service · this answer: verified template fallback",
   };
   const assT = s => { const cs = Math.round(s * 100); return `${Math.floor(cs / 360000)}:${String(Math.floor(cs / 6000) % 60).padStart(2, "0")}:${String(Math.floor(cs / 100) % 60).padStart(2, "0")}.${String(cs % 100).padStart(2, "0")}`; };
   const ev = [], rot = (texto, ini, fin) => ev.push(`Dialogue: 1,${assT(ini)},${assT(fin)},Rotulo,,0,0,0,,${texto}`);
   for (const e of escenas) {
     const a = inicio[e.id] + 0.15, b = inicio[e.id] + e.dur - 0.1;
+    const corte = pred => e.piezas.find(pred)?.inicioFinal;
     if (e.id === "cierre") { const c3 = e.piezas[2].inicioFinal; rot(rotulos.cierreA, a, c3); rot(rotulos.cierreB, c3, b + 0.05); }
     else if (e.ventana?.cambio) { const c = inicio[e.id] + (e.ventana.cambio - e.ventana.ini); rot(rotulos.gol, a, c); rot(rotuloMesa(e.ventana.intercambio), c, b); }
-    else if (e.id === "mesa") rot(rotuloMesa(e.ventana.intercambio), a, b);
+    else if (e.id === "personal" && corte(p => p.es) !== undefined) { const c = corte(p => p.es); rot(rotulos.personal, a, c); rot(rotulos.personalEs, c, b); }
+    else if (e.id === "datos" && corte(p => p.overlay) !== undefined) { const c = corte(p => p.overlay); rot(rotulos.datos, a, c); rot(rotulos.overlay, c, b); }
     else rot(rotulos[e.id], a, b);
   }
   for (const s of subt) ev.push(`Dialogue: 0,${assT(s.ini)},${assT(s.fin)},Sub,,0,0,0,,${partir(s.texto).join("\\N")}`);
@@ -794,25 +957,37 @@ function montar() {
 
   // 4) Vídeo final.
   ff(["-i", join(dir, "mudo.mp4"), "-i", join(dir, "mezcla.wav"), "-vf", `ass=${join(dir, "subtitulos.ass")}:fontsdir=/usr/share/fonts/truetype/liberation`, "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-maxrate", "3000k", "-bufsize", "6000k", "-pix_fmt", "yuv420p", "-r", String(FPS), "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-shortest", SALIDA]);
-  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.dur.toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos, audioSesion, vozOff: VOZ_OFF, asignacion, sesion: arena.sesion, omitidas: sin };
+  const sesionInfo = emision ? { id: arena.sesion, reglas: emision.reglas, version: emision.version, duracionS: emision.duracionS, metricas: emision.metricas, marcador: emision.marcador, goles: emision.goles.map(g => ({ tick: g.tick, s: +(g.tick / 10).toFixed(1), jugador: g.jugador, autogol: !!g.autogol })), faltas: emision.faltas, amarillas: emision.amarillas, rojas: emision.rojas, fuerasDeJuego: emision.fuerasDeJuego } : { id: arena.sesion };
+  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.dur.toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos: Object.fromEntries(Object.entries(rotulos).filter(([id]) => escenas.some(e => id.startsWith(e.id)) || id.startsWith("cierre"))), audioSesion, textoEs, vozOff: VOZ_OFF, asignacion, sesion: sesionInfo, toma, recap: { url: recap.url, redactor: recap.redactor, verificacion: recap.verificacion }, datos: { datos: datosW.datos, overlay: datosW.overlay }, torneo: torneo.liga, omitidas: sin };
   writeFileSync(join(dir, "informe.json"), JSON.stringify(informe, null, 1));
   console.log(JSON.stringify({ duracionS: informe.duracionS, escenas: informe.escenas.map(e => `${e.id} ${e.inicioS}+${e.durS}`), audioSesion }, null, 1));
 }
 
-// Fase verificar: duración, flujos y un fotograma por escena para revisarlos a ojo.
+// Fase verificar: duración, flujos, un fotograma por escena (para revisarlos a ojo) y coincidencia de cada
+// subtítulo de voz real con el clip que suena (huella FNV-1a del MP3 frente a la que arrancó la página).
 function verificar() {
   const informe = JSON.parse(readFileSync(join(TRABAJO, "montaje", "informe.json"), "utf8"));
   let salida = ""; try { execFileSync(FF, ["-hide_banner", "-i", SALIDA], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); } catch (e) { salida = String(e.stderr); }
   const flujos = salida.split("\n").filter(l => /Stream #/.test(l)).map(l => l.trim());
-  const dir = resolve("docs/entrega/capturas"); mkdirSync(dir, { recursive: true });
-  for (const f of readdirSync(dir).filter(f => f.startsWith("video-final-"))) execFileSync("rm", ["-f", join(dir, f)]);
-  const puntos = informe.escenas.map((e, i) => [`${i + 1}-${e.id}`, e.inicioS + e.durS * (e.id === "cierre" ? 0.15 : 0.6)]);
-  for (const [nombre, t] of puntos) ff(["-ss", t.toFixed(2), "-i", SALIDA, "-frames:v", "1", join(dir, `video-final-${nombre}.png`)]);
-  const r = { duracionS: duracion(SALIDA), bytes: readFileSync(SALIDA).length, flujos, capturas: puntos.map(([n, t]) => ({ archivo: `docs/entrega/capturas/video-final-${n}.png`, t: +t.toFixed(2) })) };
+  const dir = join(INFORME, "fotogramas"); mkdirSync(dir, { recursive: true });
+  for (const f of readdirSync(dir).filter(f => /\.(png|jpg)$/.test(f))) execFileSync("rm", ["-f", join(dir, f)]);
+  const puntos = informe.escenas.map((e, i) => [`${String(i + 1).padStart(2, "0")}-${e.id}`, e.inicioS + e.durS * (e.id === "cierre" ? 0.15 : 0.6)]);
+  for (const [nombre, t] of puntos) ff(["-ss", t.toFixed(2), "-i", SALIDA, "-frames:v", "1", "-q:v", "3", join(dir, `${nombre}.jpg`)]);
+  const dirRelatos = join(TRABAJO, informe.toma, "relatos");
+  const huellas = informe.audioSesion.map(a => {
+    const bytes = readFileSync(join(dirRelatos, a.relato)), tag = huella(bytes);
+    const meta = existsSync(join(dirRelatos, a.relato.replace(".mp3", ".json"))) ? JSON.parse(readFileSync(join(dirRelatos, a.relato.replace(".mp3", ".json")), "utf8")) : null;
+    return { escena: a.escena, relato: a.relato, alInicio: a.alInicio, coincide: tag === a.tag, tag, tagPagina: a.tag ?? null, texto: meta?.fragmentos?.map(f => f.texto).join(" ") ?? meta?.texto ?? informe.textoEs };
+  });
+  const r = { duracionS: duracion(SALIDA), bytes: readFileSync(SALIDA).length, flujos, capturas: puntos.map(([n, t]) => ({ archivo: `docs/evidencia/video-067/fotogramas/${n}.jpg`, t: +t.toFixed(2) })), huellas };
   writeFileSync(join(TRABAJO, "montaje", "verificacion.json"), JSON.stringify(r, null, 1));
+  writeFileSync(join(INFORME, "verificacion.json"), JSON.stringify(r, null, 1));
+  writeFileSync(join(INFORME, "escenas-y-sesion.json"), JSON.stringify(informe, null, 1));
+  copyFileSync(join(TRABAJO, "montaje", "subtitulos.ass"), join(INFORME, "subtitulos.ass"));
   console.log(JSON.stringify(r, null, 1));
-  if (r.duracionS >= 115) throw new Error("El vídeo supera 1:55");
+  if (r.duracionS <= 110 || r.duracionS >= 118) throw new Error(`Duración fuera de 1:50–1:58: ${r.duracionS}`);
   if (!flujos.some(l => /Audio: aac/.test(l)) || !flujos.some(l => /Video: h264/.test(l))) throw new Error("Faltan flujos H.264/AAC");
+  if (huellas.some(h => !h.coincide)) throw new Error("Un clip de la sesión no coincide con la huella que sonó");
 }
 
 for (const f of fases) {
@@ -821,6 +996,7 @@ for (const f of fases) {
   else if (f === "previa") await grabarPrevia();
   else if (f === "recap") await grabarRecap();
   else if (f === "torneo") await grabarTorneo();
+  else if (f === "datos") await grabarDatos();
   else if (f === "tarjetas") await tarjetas();
   else if (f === "voz") await voz();
   else if (f === "montar") montar();
