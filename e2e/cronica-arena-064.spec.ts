@@ -214,3 +214,36 @@ for (const tema of ["light", "dark"] as const) for (const ancho of [1440, 360]) 
     await ctx.close();
   });
 }
+
+// Producción (rev. 0000056) · A ≥ 1100 px la rejilla del héroe de la arena (.arena-intro) mandaba todos los párrafos de
+// la cabecera a la misma celda: marcador, quién jugó y reglas se dibujaban unos encima de otros. Cada hijo de la
+// cabecera ocupa su propia franja, dentro de la tarjeta y sin desbordarla, en 1440 y 360, claro y oscuro.
+for (const tema of ["light", "dark"] as const) for (const ancho of [1440, 1100, 360]) {
+  test(`B9 · cabecera sin solapes ni desborde (${tema}, ${ancho} px)`, async ({ browser, request }) => {
+    const h = await cronicaDuelo(request);
+    const ctx = await browser.newContext({ colorScheme: tema, viewport: { width: ancho, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto(`/arena/cronica/${h}`);
+    const cabecera = page.getByTestId("cronica-arena-cabecera");
+    await expect(cabecera).toBeVisible();
+    const medida = await cabecera.evaluate(c => {
+      const caja = (e: Element) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, d: r.right, b: r.bottom, nombre: e.getAttribute("data-testid") ?? e.className }; };
+      // scrollHeight/scrollWidth no sirven: los adornos absolutos (::before/::after) del héroe se salen a propósito.
+      return { cabecera: caja(c), hijos: [...c.children].map(caja) };
+    });
+    expect(medida.hijos.length).toBeGreaterThanOrEqual(4);
+    const t = 1;
+    for (const a of medida.hijos) {
+      expect(a.x, a.nombre).toBeGreaterThanOrEqual(medida.cabecera.x - t);
+      expect(a.d, a.nombre).toBeLessThanOrEqual(medida.cabecera.d + t);
+      expect(a.y, a.nombre).toBeGreaterThanOrEqual(medida.cabecera.y - t);
+      expect(a.b, a.nombre).toBeLessThanOrEqual(medida.cabecera.b + t);
+    }
+    for (let i = 0; i < medida.hijos.length; i++) for (let j = i + 1; j < medida.hijos.length; j++) {
+      const a = medida.hijos[i]!, b = medida.hijos[j]!;
+      const corta = a.x < b.d - t && b.x < a.d - t && a.y < b.b - t && b.y < a.b - t;
+      expect(corta, `${a.nombre} ⟂ ${b.nombre}`).toBe(false);
+    }
+    await ctx.close();
+  });
+}
