@@ -40,7 +40,7 @@ Built for the **Inside the Game** hackathon (Microsoft × Premier League). Targe
 
 ## The multi-agent system
 
-Orchestration is custom TypeScript hosted on Azure, which the category text admits as "another supported orchestration approach". Microsoft Agent Framework, MCP and A2A are **not** implemented. Every model call goes through one seam, [`src/lib/llm.ts`](src/lib/llm.ts), which also enforces per-session call budgets.
+Orchestration is custom TypeScript hosted on Azure, which the category text admits as "another supported orchestration approach". Microsoft Agent Framework and A2A are **not** implemented. MCP is: a read-only [MCP server](#mcp-server) over finished matches, which the match-report writer itself uses as an MCP client to fetch its facts. Every model call goes through one seam, [`src/lib/llm.ts`](src/lib/llm.ts), which also enforces per-session call budgets.
 
 ```mermaid
 flowchart LR
@@ -87,6 +87,33 @@ flowchart LR
 
 **Why not one agent.** The two coaches must not see each other's private plan, so they need separate contexts and a neutral engine that commits both plans at once. The statistician and the verifier are deterministic because a model cannot certify its own numbers; the commentator is the only desk voice allowed to interpret, and only with a cited fact. The analyst is a separate Foundry agent because it answers on demand with tools, under its own quota, without touching the live budget. Honest counterpoint: the two paired Foundry evaluations of the recap pipeline did **not** show an improvement over a first draft ([first run](docs/evidencia/arena-eval-foundry/README.md), [second judge](docs/evidencia/arena-eval-revision-alcance/README.md)); the value we can show is traceability and recovery, not better prose.
 
+## MCP server
+
+`POST /api/mcp` on the arena app ([`https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/api/mcp`](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/api/mcp)) is a read-only [Model Context Protocol](https://modelcontextprotocol.io) server named `cronista` (Streamable HTTP, stateless, JSON responses, no authentication). Three tools, all `readOnlyHint`:
+
+| Tool | Input | Returns |
+|---|---|---|
+| `list_matches` | none | Finished matches: the archived examples and the matches of saved model tournaments, each with its `fuente`, teams, score, rules and duration (capped). |
+| `get_match_facts` | `fuente`: `{ "archivo": "duelo" }`, `{ "torneo": "<id>", "encuentro": "01" }` or `{ "huella": "<40 hex>" }` | The deterministic fact selection the match-report writer receives, each fact with its ES/EN text, its data and the IDs of the engine events behind it, plus the match fingerprint (`huella`). |
+| `get_match_report` | `huella` | The verified ES/EN match report **if one is already saved**: sentences with their fact IDs and state, the labelled author and the verification summary. |
+
+The match-report writer is a client of this same server: when a viewer presses **Match report**, [`src/arena/cronica.ts`](src/arena/cronica.ts) calls `get_match_facts` with the official SDK client, connected in-process, and the report page shows "Facts retrieved via MCP". The facts are checked to be identical to the direct computation; if the MCP call fails or is slow, the writer uses the direct call and records why, so a report never fails because of MCP.
+
+To query it from GitHub Copilot (agent mode) in VS Code, or any MCP client, add `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "cronista": {
+      "type": "http",
+      "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/api/mcp"
+    }
+  }
+}
+```
+
+Honest limits: read-only and finished matches only (never a live session, never an uploaded log); it never writes a report or calls a model or Speech; requests are capped per IP and per hour (`MCP_ARENA` in [`src/sim/limites.ts`](src/sim/limites.ts)); the model does not call MCP during generation (the writer's input is unchanged and V1–V8 still decide). Locally: `npm run dev`, then `http://localhost:3000/api/mcp`.
+
 ## Microsoft and Azure technologies
 
 | Technology | Used for | Where |
@@ -104,9 +131,10 @@ flowchart LR
 | Azure Container Apps Job | Manual batch worker for offline evaluation corpora (completed with zero model calls) | [`infra/evaluaciones-job.bicep`](infra/evaluaciones-job.bicep), [run](docs/evidencia/azure-lotes.json) |
 | Azure Container Registry | Remote image builds (`az acr build`) from an allow-listed source context, pulled with managed identity | [`infra/registry.bicep`](infra/registry.bicep), [`scripts/deploy-azure.mjs`](scripts/deploy-azure.mjs) |
 | Bicep + Azure CLI | All infrastructure as code; templates compiled in CI | [`infra/`](infra/), [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
+| Model Context Protocol (`@modelcontextprotocol/sdk` 1.32.2, not a Microsoft service) | **Implemented**: read-only server over finished matches (Streamable HTTP, stateless) + the in-process MCP client the match-report writer uses to fetch its facts | [`src/mcp/servidor.ts`](src/mcp/servidor.ts), [`src/mcp/cliente.ts`](src/mcp/cliente.ts), [`src/app/api/mcp/route.ts`](src/app/api/mcp/route.ts), [MCP server](#mcp-server) |
 | GitHub Actions, GitHub CLI | CI with three jobs (tests, Playwright, container + Bicep); repo and run management | [CI runs](https://github.com/calusaca/cronista/actions) |
 
-Not used: Microsoft Agent Framework, MCP, A2A, Fabric, AKS.
+Not used: Microsoft Agent Framework, A2A, Fabric, AKS.
 
 ## Quality
 

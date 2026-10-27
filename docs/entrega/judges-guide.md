@@ -125,3 +125,15 @@ Sources: [Azure integrations and limits](../azure-integraciones.md),
 [`MESA_ARENA` and `VOZ_BUFFER` in `src/sim/limites.ts`](../../src/sim/limites.ts),
 [deployment runbook](despliegue.md). To run everything offline: `npm ci && npm run dev`, then open
 `http://localhost:3000/arena` (programmed coaches, no keys needed).
+
+## Query CRONISTA from an MCP client (optional)
+
+The arena also exposes a read-only MCP server at
+`https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/api/mcp` (Streamable HTTP,
+no sign-in). In VS Code with GitHub Copilot in agent mode, add `.vscode/mcp.json` with
+`{ "servers": { "cronista": { "type": "http", "url": "<that URL>" } } }`, start the server and ask,
+for example, "list the finished matches and give me the facts of the recorded duel". The tools are
+`list_matches`, `get_match_facts` (the exact facts the match-report writer receives, with event IDs)
+and `get_match_report` (only a report that is already saved; it never writes one: press **Match
+report** in the arena first). Finished matches only, capped per IP and per hour. The match-report
+writer uses this same server as its own MCP client; its page says "Facts retrieved via MCP".
