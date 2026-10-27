@@ -46,6 +46,9 @@ export default defineConfig({
       ARENA_TORNEO_SITIO_SEGUNDOS: "10", ARENA_TORNEO_SITIO_SIN_RITMO: "1",
       ARENA_TORNEOS_SITIO_DIR: resolve(".cache/e2e/torneos-sitio"),
       ARENA_ORIGEN_PUBLICO: `http://127.0.0.1:${PUERTO}`, ARENA_ADMIN_TOKEN: TOKEN_ADMIN_E2E,
+      // Brief 064 § 8.2 · Crónica de arena: redactor encendido (el LLM de ENSAYO de arriba, rotulado como fixture) y un
+      // almacén propio que scripts/e2e-torneos.mjs vacía al preparar.
+      ARENA_CRONICA_LLM: "1", ARENA_CRONICAS_DIR: resolve(".cache/e2e/cronicas"),
     },
   },
 });

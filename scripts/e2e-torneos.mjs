@@ -36,3 +36,9 @@ const hoy = new Date().toISOString().slice(0, 10);
 const sembrados = readdirSync(fixtureSitio).filter(f => f !== `dia-${hoy}.json`);
 for (const f of sembrados) cpSync(join(fixtureSitio, f), join(sitio, f));
 console.log(`Almacén del torneo del sitio para el e2e: ${sembrados.filter(f => f.endsWith(".torneo.json")).join(", ")}.`);
+
+// (4) Brief 064 § 8.2 · El almacén de crónicas de arena del e2e (ARENA_CRONICAS_DIR = .cache/e2e/cronicas) se VACÍA.
+const cronicas = resolve(raiz, ".cache/e2e/cronicas");
+rmSync(cronicas, { recursive: true, force: true });
+mkdirSync(cronicas, { recursive: true });
+console.log("Almacén de crónicas de arena para el e2e: vacío.");

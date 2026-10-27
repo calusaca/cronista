@@ -3475,3 +3475,44 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-footer { flex-wrap: wrap; align-items: center; }
 .arena-footer-enlaces { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .arena-footer-enlaces a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ==========================================================================
+   Brief 064 (bloque B) · Crónica de un partido de la arena (/arena/cronica/<huella>) y botón «Crónica».
+   Tokens de la arena (main.arena-shell) y del 010; sin hex ni transition/animation/transform (regla 047).
+   ========================================================================== */
+.arena-cronica { display: grid; gap: var(--ar-s4); max-width: 1100px; margin: 0 auto; }
+.arena-cronica .arena-intro { margin: 0; }
+.arena-cronica-marcador { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s4); margin: var(--ar-s2) 0; font-family: var(--font-display), system-ui, sans-serif; font-size: clamp(18px, 3vw, 26px); font-weight: 700; overflow-wrap: anywhere; }
+.arena-cronica-marcador span { display: inline-flex; align-items: center; gap: var(--ar-s2); min-width: 0; }
+.arena-cronica-marcador strong { color: var(--ar-score-bg); font-size: 1.25em; }
+.arena-cronica-datos { display: flex; flex-wrap: wrap; gap: var(--ar-s1) var(--ar-s4); margin: 0 0 var(--ar-s2); color: var(--ar-bug-muted); font-size: 14px; }
+.arena-cronica-datos code { color: var(--ar-bug-ink); }
+.arena-cronica .arena-intro .arena-models { color: var(--ar-bug-muted); }
+.arena-cronica .arena-intro .arena-models .overline { color: var(--ar-bug-ink); margin-inline-end: var(--ar-s1); }
+.arena-cronica .arena-intro .arena-torneo-origen { color: var(--ar-bug-ink); }
+.arena-cronica .arena-intro a { color: var(--ar-score-bg); }
+.arena-cronica-cuerpo, .arena-cronica-linea, .arena-cronica-limites { padding: var(--ar-s4) var(--ar-s5); border: 1px solid var(--line); border-radius: var(--ar-r-lg); background: var(--surface); min-width: 0; }
+.arena-cronica-redactor { margin: 0 0 var(--ar-s3); font-weight: 600; overflow-wrap: anywhere; }
+.arena-cronica-detalle { margin-top: var(--ar-s2); }
+.arena-cronica-detalle p { margin: 0 0 var(--ar-s1); overflow-wrap: anywhere; }
+.arena-cronica-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s4); margin-top: var(--ar-s2); }
+.arena-cronica-acciones a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.arena-cronica .sentence { overflow-wrap: anywhere; }
+.arena-cronica .sentence:focus-visible, .arena-cronica-evento:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arena-cronica-leyenda { margin: var(--ar-s3) 0 0; }
+.arena-cronica-vacia { display: grid; gap: var(--ar-s3); }
+.arena-cronica-linea h2 { margin: 0 0 var(--ar-s1); font-size: 18px; }
+.arena-cronica-linea ol { margin: var(--ar-s3) 0 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+.arena-cronica-evento { display: grid; grid-template-columns: 48px 20px 1fr; align-items: center; gap: var(--ar-s2); width: 100%; min-height: 44px; padding: var(--ar-s1) var(--ar-s2); border: 1px solid transparent; border-radius: var(--radius); background: transparent; color: var(--ink); font: inherit; font-size: 14.5px; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.arena-cronica-evento:hover { background: var(--bg); }
+.arena-cronica-evento[data-highlighted="true"] { background: var(--hl); border-color: var(--hl-line); }
+.arena-cronica-reloj { color: var(--muted); font-weight: 700; text-align: right; }
+.arena-cronica-limites summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.arena-cronica-limites p { margin: var(--ar-s2) 0 0; color: var(--muted); }
+.arena-cronica-boton { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s3); margin: var(--ar-s3) 0; }
+.arena-cronica-boton-enlace { margin: 0; }
+.arena-cronica-error { flex: 1 1 100%; margin: 0; color: var(--danger); }
+@media (max-width: 480px) {
+  .arena-cronica-cuerpo, .arena-cronica-linea, .arena-cronica-limites { padding: var(--ar-s3); }
+  .arena-cronica-evento { grid-template-columns: 40px 18px 1fr; }
+}

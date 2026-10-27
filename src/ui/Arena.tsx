@@ -24,6 +24,9 @@ import { ArenaAsistente } from "./ArenaAsistente";
 import { ArenaNarracion } from "./ArenaNarracion";
 import { faseActiva, faseEspera, fasePista, transicionReloj, type AccionReloj, type ControlesNarracion, type DuenoReloj, type EstadoNarracion, type MotivoNarracion } from "./play-narrado";
 import { ArenaDescargas } from "./ArenaDescargas";
+import { BotonCronica } from "./BotonCronica";
+import { registroCompleto } from "../arena/cronica-hechos";
+import { fuenteCronica, mostrarBotonCronica } from "../arena/cronica-vista";
 import { ArenaPrevia } from "./ArenaPrevia";
 import { previaPartido, previaVisual } from "../arena/previa";
 import type { ComentarioArena } from "../arena/narrador";
@@ -501,6 +504,8 @@ export function Arena({ inicial }: { inicial: RegistroArena }) {
           <ArenaMesa comentarios={comentarios} intervenciones={mesa} tick={Math.floor(tiempo / ARENA.pasoS + 1e-9)} idioma={idioma} />
           {/* Brief 053 v1.1 § 4 · Corte en el cursor visible (tickCifras) en todas las vistas. */}
           <ArenaDescargas registro={registro} comentarios={comentarios} intervenciones={mesa} sesion={sesionActual} hastaTick={tickCifras} enCurso={enDirecto || bufferActivo} idioma={idioma} sinPartido={registro === inicial && !sesionActual && !enDirecto} />
+          {/* Brief 064 § 4.10 · «Crónica» solo con el partido completo y fuera del directo y de la emisión del búfer. */}
+          {mostrarBotonCronica({ completo: registroCompleto(registro), enDirecto, bufferActivo, finEmision: bufferTerminada && tiempo >= finS - ARENA.pasoS / 2, sinPartido }) && <BotonCronica fuente={fuenteCronica({ origenTorneo, archivoActual, contextoModelos: contextoModelos ?? { forma: "importado" }, sesionActual, registro })} idioma={idioma} variante="boton" />}
           <section className="arena-live-feed" aria-label={t("Live text narration", "Narración de texto en vivo")} data-testid="arena-live-text">
             <h2>{t("Latest actions", "Últimas acciones")}</h2>
             <a href="#arena-description">{t(`Complete description · ${eventos.length} actions`, `Descripción completa · ${eventos.length} acciones`)}</a>

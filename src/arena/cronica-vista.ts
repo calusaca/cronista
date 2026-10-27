@@ -39,6 +39,14 @@ export function fuenteCronica(estado: {
   return { registro: estado.registro };
 }
 
+/** § 4.10 · El botón «Crónica» solo con el partido completo, fuera del directo y mientras se emite el búfer (no adelanta
+ * el resultado), y nunca sobre el partido de muestra inicial de la página (`sinPartido`). La vista del búfer sigue
+ * montada al acabar: con la generación terminada y el cursor del espectador en el final (`finEmision`), la emisión
+ * terminó y el botón aparece. */
+export function mostrarBotonCronica(estado: { completo: boolean; enDirecto: boolean; bufferActivo: boolean; finEmision: boolean; sinPartido: boolean }): boolean {
+  return estado.completo && !estado.enDirecto && (!estado.bufferActivo || estado.finEmision) && !estado.sinPartido;
+}
+
 /** Clave estable de una fuente (una sola petición por fuente en el documento). */
 export function claveFuente(f: FuenteCronica): string {
   if ("torneo" in f) return `t:${f.torneo}:${f.encuentro}`;

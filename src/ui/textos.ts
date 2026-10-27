@@ -53,6 +53,18 @@ export const REGLA_EN: Record<Regla, string> = {
   V8: "A judgement, result verb or claim that its fact does not support.",
 };
 
+/** Brief 064 § 4.9 · Las mismas explicaciones en español (marco de la crónica de arena). */
+export const REGLA_ES: Record<Regla, string> = {
+  V1: "La salida del redactor no era JSON válido con la forma pedida.",
+  V2: "La frase cita un hecho que no existe, o ninguno.",
+  V3: "Una cifra, un marcador, un margen, un periodo o un tiempo que su hecho no afirma.",
+  V4: "Un nombre que no está en su hecho, o una palabra que el verificador no admite.",
+  V5: "Un hecho obligatorio no está narrado, o la frase no narra su hecho.",
+  V6: "El español y el inglés no tienen las mismas cifras, o uno está vacío.",
+  V7: "Afirma una ausencia; ningún hecho registra ausencias.",
+  V8: "Una valoración, un verbo de resultado o una afirmación que su hecho no respalda.",
+};
+
 // ---------------------------------------------------------------------------------
 // Brief 017 — xG en cristiano: UN formateador para toda cifra de xG del chrome.
 // ---------------------------------------------------------------------------------
