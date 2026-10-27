@@ -72,6 +72,13 @@ audio of 8, the desk exchange of 6, the tournament. Scenes 2, 4, 5, 7 and 8 are 
 
 ## Final cut as rendered (27 October 2026)
 
+> **Second montage, 27 October, ~20:00 UTC** (same take `toma067-1`, no new recording, voice-over reused from its cache):
+> the architecture card now reads `reinicios-v11` and drops the «Not implemented: …» footnote, the Azure card drops the
+> «Not used: …» footnote (custom TypeScript orchestration stays in the card's overline and in the README), and the quality
+> card shows run 40462385259 on `be3c96a`: 2,994 tests in 143 files, 343 Playwright journeys, 85 statistical checks.
+> Length unchanged (1:57.36); captions unchanged. Command: `node scripts/grabar-video-final.mjs --fases=voz,tarjetas,montar,verificar
+> --toma=toma067-1 --decidiendo=76.6 --holgura=0.35 "--ci=run 40462385259 · three jobs · commit be3c96a · 27 Oct 2026"`.
+
 File `cronista-demo-final.mp4` (**1:57.36**, 1440×900, H.264 + AAC, 9.7 MB, captions burned in)
 with transcript `cronista-demo-final.en.srt`. Montage report, frames and hash checks:
 [`docs/evidencia/video-067/`](../evidencia/video-067/). Commands:

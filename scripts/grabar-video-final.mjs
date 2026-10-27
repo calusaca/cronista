@@ -592,8 +592,9 @@ async function grabarDatos() {
 // --------------------------------------------------------------------------------------------
 // Fase tarjetas: tres tarjetas propias (paleta de la arena, sin logotipos).
 // 067 · § 2.3: cifras vistas correr (npm test en dbd70e0; Playwright 343 en el run 40451967668 sobre dbd70e0;
-// test:stats 80 en el brief 068). `--ci="run N · three jobs · commit sha · fecha"` solo si ese run terminó en verde.
-const CALIDAD = { unit: arg("unit", "2,961"), archivos: arg("archivos", "142"), e2e: arg("e2e", "343"), stats: arg("stats", "80"), statsNota: arg("stats-nota", "27 Oct, rules reinicios-v10"), ci: arg("ci", "").replace(/_/g, " "), sha: arg("sha", "dbd70e0"), runE2e: arg("run-e2e", "40451967668") };
+// test:stats 80 en el brief 068). Segundo montaje (27 oct): cifras del run 40462385259 sobre be3c96a, reglas v11,
+// sin las líneas «Not implemented» / «Not used» (la orquestación propia ya figura en el antetítulo y en el README). `--ci="run N · three jobs · commit sha · fecha"` solo si ese run terminó en verde.
+const CALIDAD = { unit: arg("unit", "2,994"), archivos: arg("archivos", "143"), e2e: arg("e2e", "343"), stats: arg("stats", "85"), statsNota: arg("stats-nota", "same CI run, rules up to reinicios-v11"), ci: arg("ci", "").replace(/_/g, " "), sha: arg("sha", "be3c96a"), runE2e: arg("run-e2e", "40462385259") };
 const TARJETAS_HTML = `<!doctype html><html lang="en"><meta charset="utf-8"><title>CRONISTA cards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Source+Sans+3:wght@400;600;700&display=block" rel="stylesheet">
 <style>
@@ -616,7 +617,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
 .ci i{font-style:normal;background:var(--surface2);padding:8px 14px}.ci em{font-style:normal;background:var(--accent);color:var(--bg);padding:8px 14px}
 </style>
 <main id="arquitectura">
- <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure · rules reinicios-v10</div>
+ <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure · rules reinicios-v11</div>
  <h1>Separate roles, one shared journal,<br>a verifier before every spoken analysis.</h1>
  <div class="grid" style="grid-template-columns:1.05fr 40px 1.1fr 40px 1.1fr">
   <div class="grid"><div class="box k"><b>Home coach</b><span>LLM · Azure OpenAI deployment · JSON plan per player</span></div><div class="box k"><b>Away coach</b><span>Six in the catalogue: GPT-6.1 Sol · GPT-6 Astra · GPT-6 Sol · GPT-6 Luna · GPT-5.6 Luna · GPT-5.4 mini</span></div></div>
@@ -633,7 +634,6 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
   <div class="box"><b>Desk coordinator</b><span>1–4 turn exchange, one SSML clip, ES / EN</span></div>
  </div>
  <div class="grid" style="grid-template-columns:1fr;margin-top:16px"><div class="box"><b>Match analyst · Microsoft Foundry Agent Service</b><span>On request, read-only tools over the confirmed play; answers pass the same verifier</span></div></div>
- <div class="foot">Not implemented: Microsoft Agent Framework, MCP, A2A.</div>
 </main>
 <main id="azure">
  <div class="brand">CRONISTA</div><div class="over">Running on Azure</div>
@@ -648,7 +648,6 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
   <div class="box"><b>Container Registry · Bicep</b><span>Remote image builds; all infrastructure as code</span></div>
   <div class="box"><b>GitHub Actions</b><span>CI: unit tests, Playwright journeys, container and Bicep build</span></div>
  </div>
- <div class="foot">Not used: Microsoft Agent Framework, MCP, A2A, Fabric, AKS.</div>
 </main>
 <main id="calidad">
  <div class="brand">CRONISTA</div><div class="over">Quality · evidence in the repository</div>
