@@ -15,6 +15,33 @@ Brief **cerrado v1.0**, martes 27 de octubre de 2026, 03:50 UTC. Lo diseña Opus
 desplegar con margen, la entrega del implementador (commit y push con todo en verde) debe estar **antes de las
 09:30 UTC**. Si a las 08:30 UTC no hay forma de llegar, se para y se informa de lo que esté verde.
 
+## v1.1 (04:20 UTC): prevalece sobre §§ 2.A, 2.B y 3
+
+El implementador midió que A completo, con el balón largo y el centro filtrados, incumple bandas que no se pueden
+mover:
+- fueras de juego 0,09 < 0,3;
+- goles 2,90 > 2,8 (046 recalibrada);
+- conversión 0,4286 > 0,42 (051);
+- `exitoLargos` 0,967 > 0,7 (063), porque casi todo largo fallido era un fuera de juego.
+
+Datos en `docs/evidencia/motor-068/diagnostico/`.
+
+**Decisión del coordinador:** se toma el **alcance del prototipo**.
+- **A filtra solo los pases rasos:**
+  - el `pasar` explícito no largo (tratado como `pasarImposible`);
+  - los candidatos de `evaluarPases` y `opcionPase`;
+  - el receptor del saque de manos.
+- **No se filtran** el balón largo (`opcionPaseLargo` y el `pasar` largo del LLM) ni los centros (`opcionCentro`,
+  `centrarOrden`). Quedan como el riesgo real de timing: un balón a la espalda o un centro sí puede acabar en fuera de
+  juego.
+- **B, la frase del prompt**, debe decirlo con exactitud:
+  - el poseedor no da un pase corto a un compañero adelantado;
+  - un balón largo o un centro a un compañero adelantado **se sanciona**, así que el entrenador debe ordenar esos
+    pases a quien esté en línea.
+- **Banda de § 3** «receptor previsto = 0»: se redefine como **0 en pases rasos de campo** (sin `motivo` `largo`,
+  `centro` ni `saque_manos`). Las demás bandas no cambian.
+- Factor de faltas: 3, medido sin incumplimientos.
+
 ## 1. Diagnóstico del coordinador
 
 **Torneo del 24 oct, 30 partidos con modelos** (`public/torneos/2026-10-24/e*.json.gz`, `reinicios-v5`, 60 s):
