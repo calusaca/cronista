@@ -1,0 +1,27 @@
+Brief 070 · mutaciones vistas en rojo (27 oct 2026, ~06:30 UTC), cada una aplicada sola sobre el árbol y restaurada
+(cmp contra la copia previa). Comando: npx vitest run --config vitest.config.ts src/arena/__tests__/motor070.test.ts
+
+M1 · sin distancia de barrera (motor.ts, prepararSaque: el tiro libre usa ARENA.distanciaSaqueBandaM)
+     × A1 · punto de la falta, ejecutor = quien la recibió, rivales a ≥ distanciaSaqueLibreM con el empuje de los saques, compañeros sin mover, pausa y evento con `fuentes` (mutación: sin distancia de barrera) 31ms
+     × V2 · fixture v11 (45 s, búsqueda 1–200) con identidades, atributos, falta, tiro libre, penal y gol; reproducción exacta; los fixtures v1–v10 siguen exactos (mutación: activar algo de v11 en v10) 44ms
+     × V3 · contarPartido070 sobre partidos reales: cada falta (salvo el portero en su área) tiene su tiro libre o penal en el mismo tick con `fuentes`; ningún rival a menos de la distancia en la ejecución; incumplimientos070 lee BANDAS_070 924ms
+      Tests  3 failed | 18 passed (21)
+
+M2 · penal tratado como libre (motor.ts, resolverFalta: `penal = false && …`)
+     × B1 · falta dentro del área del infractor (geometría de enAreaPropia) → penal desde el punto penal; justo fuera → tiro libre (mutación: penal tratado como libre) 10ms
+     × B2 · colocación: todos salvo el ejecutor fuera del área y a ≥ distanciaSaqueLibreM del punto; el portero defensor en su línea, en el centro 5ms
+     × B6 · el motor remata el penal al terminar la pausa con el desenlace de desenlacePenal y probabilidadPenal (potencia frente al nivel efectivo del portero): gol con `fuentes` al tiro y el tiro a la falta; atajada en las manos; fuera con saque de meta (mutación: conversión fija a 1) 10ms
+     × V2 · fixture v11 (45 s, búsqueda 1–200) con identidades, atributos, falta, tiro libre, penal y gol; reproducción exacta; los fixtures v1–v10 siguen exactos (mutación: activar algo de v11 en v10) 100ms
+      Tests  4 failed | 17 passed (21)
+
+M3 · conversión fija a 1 en el motor (lanzarPenal: `const p = 1;`)
+     × B6 · el motor remata el penal al terminar la pausa con el desenlace de desenlacePenal y probabilidadPenal (potencia frente al nivel efectivo del portero): gol con `fuentes` al tiro y el tiro a la falta; atajada en las manos; fuera con saque de meta (mutación: conversión fija a 1) 70ms
+      Tests  1 failed | 20 passed (21)
+
+M4 · conversión fija a 1 en limites.ts (PENAL_ARENA.conversion: 1)
+     × B4 · probabilidadPenal lee PENAL_ARENA: conversión con ejecutor y portero iguales, ± ajusteMax acotado, sin datos sin ajuste; con constantes alteradas; la conversión de la regla cabe en la banda (mutación: conversión fija a 1) 3ms
+     × B5 · desenlacePenal: determinista; gol dentro de los palos tras la línea, fuera por fuera del palo, atajada en el portero; sin portero no hay atajada 11ms
+     × B6 · el motor remata el penal al terminar la pausa con el desenlace de desenlacePenal y probabilidadPenal (potencia frente al nivel efectivo del portero): gol con `fuentes` al tiro y el tiro a la falta; atajada en las manos; fuera con saque de meta (mutación: conversión fija a 1) 1597ms
+      Tests  3 failed | 18 passed (21)
+
+Sin mutación: 21/21.
