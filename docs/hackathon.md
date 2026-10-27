@@ -1,12 +1,16 @@
 # Inside the Game: fuentes y preparación de la entrega
 
-> Actualización del 17 oct: integración real con GPT-6.1 Sol completada; evaluación
-> 0/163 frente a 0/167, sin reducción observada. [Evidencia actual](evidencia/validacion-entrega.json),
-> [video local de 1:50](entrega/demo-en-borrador.mp4), [guía EN para jueces](entrega/judges-guide.md)
-> y [despliegue](entrega/despliegue.md). [Demo pública en Azure](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io)
-> comprobada con HTTP y navegador. Publicación final del repositorio/video,
-> revisión humana desde otra red y confirmación del envío siguen pendientes. La tabla de
-> revisión del 10 oct se conserva debajo como historial.
+> Actualización del 27 oct: repositorio **público** desde las 03:45 UTC; arena y crónica en Azure
+> Container Apps con una réplica caliente cada una (arena en `cronista-arena--0000049` <!-- 068 -->);
+> catálogo público de seis modelos de Azure OpenAI; [pitch](entrega/pitch.md),
+> [guía EN para jueces](entrega/judges-guide.md) y [README](../README.md) al día con las cifras medidas en
+> `950007c`. El video final está en regrabación ([brief 067](disenos/067-entrega-final-video-y-materiales.md)).
+> Pendientes de Carlos: subir el video y pasar la URL, decidir los cupos temporales del juzgamiento y completar
+> los campos de «Projects» guardando el comprobante antes del **27 oct, 23:59 PT**. La nota del 17 oct se
+> conserva debajo; la versión anterior de la matriz queda en el historial de git.
+>
+> Nota del 17 oct: integración real con GPT-6.1 Sol completada; evaluación 0/163 frente a 0/167, sin
+> reducción observada ([evidencia](evidencia/validacion-entrega.json)).
 
 
 Revisado el **10 de octubre de 2026**. El estado del código y las prioridades están en la [revisión del proyecto](revision-2026-10-10.md). Las fuentes oficiales pueden cambiar: volver a consultarlas al congelar la entrega.
@@ -57,22 +61,22 @@ La conversión de noviembre contempla el cambio de horario del Pacífico; Costa 
 
 ## Preparación específica de CRONISTA
 
-| Evidencia o entregable | Estado al revisar | Acción para cerrarlo |
+| Evidencia o entregable | Estado al 27 oct | Acción para cerrarlo |
 | --- | --- | --- |
 | Inscripción | Registrada como completada en [BITACORA.md](../BITACORA.md), 30 sep; sin acceso al comprobante de la plataforma | Conservar confirmación y comprobar composición del equipo. |
-| Proyecto en la plataforma | Creación confirmada por el usuario el 10 oct | Completar materiales y verificar el envío final; crear el proyecto no confirma la entrega. |
+| Proyecto en la plataforma | Creación confirmada por el usuario el 10 oct | Carlos: completar los campos con pitch, repositorio, video y demo; crear el proyecto no confirma la entrega. |
 | Fecha de creación | Primer commit: 30 sep, 18:08 Costa Rica (`3c46f0f`) | Conservar historial y procedencia; git respalda la cronología, no prueba por sí solo toda la autoría. |
-| Datos sintéticos | Generador y dataset disponibles | Mostrar [DATASHEET](dataset/DATASHEET.md), límites y cómo reproducirlo. |
-| Crédito Azure | Captura del 10 oct: Visual Studio Enterprise, suscripción activa y US$150 restantes | Verificar renovación, cobertura y cuota del deployment; distribución propuesta en [005 — Entrega](disenos/005-entrega.md). |
-| Integración Microsoft | Adaptadores Foundry y Azure OpenAI implementados y probados con transporte simulado | Guardar una corrida real sin caché con deployment y backend identificados. |
-| Calidad de ejecución | [CI de `fix/dataset-memory` en verde](https://github.com/calusaca/cronista/actions/runs/38095123207): typecheck, 1.350 unitarias, 55 estadísticas y 47 e2e; dataset idéntico bajo 512 MiB de old space | Integrar la rama a `main` y mantener estas comprobaciones en cada cambio. |
-| Repositorio público | `calusaca/cronista` existe pero GitHub devuelve `PRIVATE` | Preparar publicación del código y revisar contenido e historial antes de cambiar visibilidad. |
-| Demo accesible | README sin URL; no hay evidencia de despliegue ni infraestructura versionada | Desplegar, probar desde otra red y mantener disponibilidad durante la evaluación. |
-| Video | Guion EN; sin URL ni grabación final | Grabar el producto real, usar un rechazo real si se muestra, medir duración y publicar. |
-| Pitch | Borrador EN | Acortar, retirar tecnologías aún no desplegadas y afirmaciones universales de veracidad. |
-| Instrucciones de prueba | Quick start EN local | Añadir instrucciones EN para la demo, backend, limitaciones y ruta de prueba de 60 segundos. |
+| Datos sintéticos | ✅ Generador, dataset descargable y [DATASHEET](dataset/DATASHEET.md); la arena usa clubes, jugadores y entrenadores ficticios | Ninguna. |
+| Crédito Azure | Crédito de 150 USD confirmado por Carlos; los topes diarios y por sesión acotan el gasto | Vigilar el consumo durante el juzgamiento. |
+| Integración Microsoft | ✅ Azure OpenAI real (seis modelos en la arena, GPT-6.1 Sol en la crónica), Foundry Agent Service y Evaluation, Azure AI Speech, Blob, Key Vault, Application Insights, Container Apps; [README](../README.md#microsoft-and-azure-technologies) | Ninguna. No se usan Agent Framework, MCP, A2A, Fabric ni AKS. |
+| Calidad de ejecución | ✅ En `950007c`, vistas correr el 27 oct: 2.945 pruebas unitarias en 141 archivos; 343 e2e de Playwright listadas en 48 archivos; 75 estadísticas vistas el 26 oct (brief 065). CI: tras hacerlo público el 27 oct (03:45 UTC) se relanzó sobre `d299dc5` el [run 40386483953](https://github.com/calusaca/cronista/actions/runs/40386483953); a las 03:55 UTC el trabajo de contenedor y Bicep había pasado y los de unitarias y Playwright seguían en curso. Del 26 oct hasta entonces los trabajos no arrancaban por la facturación de Actions, no por fallos del código. | Relanzar el CI sobre el commit final cuando termine el brief 068. |
+| Repositorio público | ✅ `calusaca/cronista` público desde el 27 oct, 03:45 UTC | Ninguna. |
+| Demo accesible | ✅ [Arena](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) y [crónica](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io) en Container Apps con `minReplicas` 1; smoke público tras cada publicación en [BITACORA.md](../BITACORA.md) | Mantenerlas hasta el 10 nov; nada de despliegues durante el juzgamiento sin necesidad. Cupos temporales del juzgamiento: decide Carlos. |
+| Video | En regrabación ([brief 067](disenos/067-entrega-final-video-y-materiales.md), bloque A); corte anterior del 25 oct en el historial de git; `VIDEO_URL` del README sigue como marcador | Carlos: subir el video a YouTube (público o no listado) y pasar la URL para sustituir el marcador. |
+| Pitch | ✅ [pitch.md](entrega/pitch.md) actualizado el 27 oct: 98 palabras el elevator pitch y 248 la descripción | Pegarlo en la plataforma. |
+| Instrucciones de prueba | ✅ [Guía EN para jueces](entrega/judges-guide.md): arena, torneo, crónica y límites | Ninguna. |
 | Derechos y elegibilidad | MIT propia y mundo ficticio; situación personal no comprobable en el repo | Completar declaración del equipo sobre derechos, conflictos y condiciones de participación. |
-| Confirmación de entrega | No encontrada | Completar campos en Projects y guardar comprobante de recepción. |
+| Confirmación de entrega | Pendiente de Carlos | Completar los campos de «Projects» y guardar el comprobante antes del **27 oct, 23:59 PT**. |
 
 ## Categoría y formación
 
