@@ -1,8 +1,8 @@
 # Submission text (English, ready to paste)
 
-Updated on 27 October 2026 against the published arena revision `cronista-arena--0000049` <!-- 068 -->
+Updated on 27 October 2026 against the published arena revision `cronista-arena--0000054` <!-- 070 -->
 and the recap demo; the public smoke figures come from revision `cronista-arena--0000013`
-([evidence](../evidencia/publicacion-048/)) and the test figures from commit `950007c`. Every figure below is backed by a
+([evidence](../evidencia/publicacion-048/)) and the test figures from commit `be3c96a`. Every figure below is backed by a
 file in `docs/evidencia/`; see the [README](../../README.md) for the links. Change nothing here
 without re-checking that evidence.
 
@@ -37,8 +37,8 @@ Key Vault, managed identity, Application Insights, Bicep, GitHub Actions. Orches
 TypeScript; Agent Framework, MCP and A2A are not used.
 
 **What it proves.** Public smoke: 4/4 valid coach decisions, 7/7 desk exchanges without
-structural failures, real audio in both languages. The code carries 2,945 unit tests, 75
-statistical checks and 343 browser journeys. Stated limits: a short synthetic
+structural failures, real audio in both languages. The code carries 2,994 unit tests, 85
+statistical checks and 343 browser journeys, green in CI. Stated limits: a short synthetic
 prototype, rules that check citations and numbers rather than the relevance of an analysis, and
 no demonstrated prose improvement over a first draft.
 

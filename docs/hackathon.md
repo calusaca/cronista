@@ -1,7 +1,7 @@
 # Inside the Game: fuentes y preparación de la entrega
 
 > Actualización del 27 oct: repositorio **público** desde las 03:45 UTC; arena y crónica en Azure
-> Container Apps con una réplica caliente cada una (arena en `cronista-arena--0000049` <!-- 068 -->);
+> Container Apps con una réplica caliente cada una (arena en `cronista-arena--0000054` <!-- 070 -->);
 > catálogo público de seis modelos de Azure OpenAI; [pitch](entrega/pitch.md),
 > [guía EN para jueces](entrega/judges-guide.md) y [README](../README.md) al día con las cifras medidas en
 > `950007c`. El video final está en regrabación ([brief 067](disenos/067-entrega-final-video-y-materiales.md)).
@@ -69,7 +69,7 @@ La conversión de noviembre contempla el cambio de horario del Pacífico; Costa 
 | Datos sintéticos | ✅ Generador, dataset descargable y [DATASHEET](dataset/DATASHEET.md); la arena usa clubes, jugadores y entrenadores ficticios | Ninguna. |
 | Crédito Azure | Crédito de 150 USD confirmado por Carlos; los topes diarios y por sesión acotan el gasto | Vigilar el consumo durante el juzgamiento. |
 | Integración Microsoft | ✅ Azure OpenAI real (seis modelos en la arena, GPT-6.1 Sol en la crónica), Foundry Agent Service y Evaluation, Azure AI Speech, Blob, Key Vault, Application Insights, Container Apps; [README](../README.md#microsoft-and-azure-technologies) | Ninguna. No se usan Agent Framework, MCP, A2A, Fabric ni AKS. |
-| Calidad de ejecución | ✅ [Run 40454094376](https://github.com/calusaca/cronista/actions/runs/40454094376) sobre `d3df090` (27 oct), **verde en los tres trabajos**: unitarias y estadísticas (2.961), Playwright (343) y contenedor/Bicep. El N1 de `navegacion-064` se corrigió en `dbd70e0` y el límite de 60 s de la prueba 17.4 en `d3df090`. Del 26 oct hasta hacerlo público, los trabajos no arrancaban por la facturación de Actions. | Relanzar el CI sobre el commit final tras el brief 070 y actualizar las cifras. |
+| Calidad de ejecución | ✅ [Run 40462385259](https://github.com/calusaca/cronista/actions/runs/40462385259) sobre `be3c96a` (27 oct), **verde en los tres trabajos**: 2.994 unitarias en 143 archivos, 85 estadísticas, 343 Playwright y contenedor/Bicep. Del 26 oct hasta hacerlo público, los trabajos no arrancaban por la facturación de Actions. | Mantener el CI en verde en cada cambio. |
 | Repositorio público | ✅ `calusaca/cronista` público desde el 27 oct, 03:45 UTC | Ninguna. |
 | Demo accesible | ✅ [Arena](https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena) y [crónica](https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io) en Container Apps con `minReplicas` 1; smoke público tras cada publicación en [BITACORA.md](../BITACORA.md) | Mantenerlas hasta el 10 nov; nada de despliegues durante el juzgamiento sin necesidad. Cupos temporales del juzgamiento: decide Carlos. |
 | Video | En regrabación ([brief 067](disenos/067-entrega-final-video-y-materiales.md), bloque A); corte anterior del 25 oct en el historial de git; `VIDEO_URL` del README sigue como marcador | Carlos: subir el video a YouTube (público o no listado) y pasar la URL para sustituir el marcador. |

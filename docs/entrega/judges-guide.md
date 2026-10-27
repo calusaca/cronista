@@ -9,7 +9,7 @@ judging period ends on 10 November 2026, so there is no cold start
 
 No login. The arena uses real Azure OpenAI, Azure Speech and a Microsoft Foundry agent, under the
 quotas listed at the end. A public smoke follows every release (current arena revision
-`cronista-arena--0000049` <!-- 068 -->) and is logged in the [work log](../../BITACORA.md); archived
+`cronista-arena--0000054` <!-- 070 -->) and is logged in the [work log](../../BITACORA.md); archived
 walkthroughs: [desk and checks](../evidencia/publicacion-048/), [line-up preview and
 tournament](../evidencia/publicacion-058-059/README.md). The top bar (**Arena · Tournament · ES / EN**)
 is the same on every page; `/` opens the arena, the 90-minute recaps live at `/cronicas` and the
