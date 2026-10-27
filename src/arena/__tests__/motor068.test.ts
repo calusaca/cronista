@@ -175,10 +175,11 @@ describe("068 · A · pasador consciente del fuera de juego en los pases rasos (
     expect(s.eventos("fuera_juego").map(e => e.jugador)).toEqual([d]);
   });
 
-  it("A7 · REGLAS_FUERA_DE_JUEGO_068 es reinicios-v10 (ARENA.reglas); v1–v10 válidas y v9 literal (mutación: olvidar el literal de v9)", () => {
+  it("A7 · REGLAS_FUERA_DE_JUEGO_068 es reinicios-v10 (brief 070: ARENA.reglas es reinicios-v11, posterior); v1–v10 válidas y v9 literal (mutación: olvidar el literal de v9)", () => {
     expect(REGLAS_FUERA_DE_JUEGO_068).toBe(V10);
-    expect(ARENA.reglas).toBe(V10);
-    expect(reglasArena.slice(-2)).toEqual([V9, V10]);
+    // Brief 070: ARENA.reglas es reinicios-v11; el pasador del 068 rige desde v10 (v11 incluida).
+    expect(reglasArena.indexOf(ARENA.reglas)).toBeGreaterThan(reglasArena.indexOf(V10));
+    expect(reglasArena.slice(-3, -1)).toEqual([V9, V10]);
     expect(reglasDesde(crearConfigArena({ reglas: V9 }), V10)).toBe(false);
     expect(reglasDesde(crearConfigArena({ reglas: V10 }), V10)).toBe(true);
   });

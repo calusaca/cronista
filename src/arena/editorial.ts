@@ -86,7 +86,7 @@ export function comentarioEditorial(registro: RegistroArena, tick: number, idiom
   const saque = estado.saque && estado.pausa && estado.pausa.hastaTick > estado.tick;
   if (saque) {
     const equipo = registro.config.partido[estado.saque!.lado].nombre;
-    const tipo = { centro: es ? "saque de centro" : "kick-off", banda: es ? "saque de banda" : "throw-in", esquina: es ? "saque de esquina" : "corner", meta: es ? "saque de meta" : "goal kick" }[estado.saque!.tipo];
+    const tipo = { centro: es ? "saque de centro" : "kick-off", banda: es ? "saque de banda" : "throw-in", esquina: es ? "saque de esquina" : "corner", meta: es ? "saque de meta" : "goal kick", libre: es ? "tiro libre" : "free kick", penal: es ? "penal" : "penalty" }[estado.saque!.tipo];
     agregar(es ? [`${equipo} prepara el ${tipo}.`, `La reanudación será para ${equipo}: ${tipo}.`, `${tipo[0]!.toUpperCase() + tipo.slice(1)} para ${equipo}.`, `Le corresponde el ${tipo} a ${equipo}.`]
       : [`${equipo} prepares for the ${tipo}.`, `${equipo} will restart with a ${tipo}.`, `A ${tipo} for ${equipo}.`, `The ${tipo} belongs to ${equipo}.`], `estado:${firma}`, "reanudacion", 60, [], [estado.tick], firma);
   } else if (poseedor) {

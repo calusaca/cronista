@@ -121,14 +121,16 @@ export function hechosCronicaArena(registro: RegistroArena): HechoCronicaArena[]
     const tiro = tiroDelGol(e, registro);
     const metros = tiro ? Math.round(tiro.distanciaM) : undefined;
     const fuera = tiro !== null && !enAreaRival(tiro.desde, tiro.lado);
-    const conRemate = metros !== undefined ? { es: `, con un remate de ${metros} m`, en: `, with a ${metros} m shot` } : { es: "", en: "" };
+    // Brief 070 § 2.C (reinicios-v11): el gol de penal lo dice y cita también la falta (`fuentes` del tiro).
+    const penal = tiro?.motivo === "penal";
+    const conRemate = metros !== undefined ? (penal ? { es: `, de penal, con un remate de ${metros} m`, en: `, from the penalty spot, with a ${metros} m shot` } : { es: `, con un remate de ${metros} m`, en: `, with a ${metros} m shot` }) : { es: "", en: "" };
     c.push({
       clase: "gol", tick: tiro?.tick ?? e.tick,
       texto_es: `Gol de ${nd(j)} para ${club[e.lado]} a los ${s} s${conRemate.es}; marcador: ${m}.`,
       texto_en: `Goal by ${nd(j)} for ${club[e.lado]} after ${s} s${conRemate.en}; score: ${m}.`,
       datos: { local: L, visita: V, jugador: j.nombre, dorsal: j.dorsal, equipo: club[e.lado], segundo: s, marcador_local: marcador.local, marcador_visita: marcador.visita,
         ...(metros !== undefined ? { metros } : {}), ...(fuera && metros !== undefined ? { distancia_m: metros } : {}) },
-      eventos: enOrden([...(tiro ? [tiro.id] : []), e.id]),
+      eventos: enOrden([...(penal ? tiro!.fuentes ?? [] : []), ...(tiro ? [tiro.id] : []), e.id]),
     });
     porGoleador.set(e.jugador, [...(porGoleador.get(e.jugador) ?? []), e]);
   }

@@ -1,7 +1,8 @@
 // Mundo único, 2D, a paso fijo. Los planes eligen intenciones; este motor es la
 // autoridad sobre contactos, posesión y resultados. No importa ningún LLM.
 import { z } from "zod";
-import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, FALTAS_ARENA_V10, PORTERO_ARENA as PO, REMATE_ARENA_V9, TECNICA_ARENA as T } from "../sim/limites";
+import { ARBITRAJE_ARENA as R, ARENA, ATAQUE_ARENA as A, ATRIBUTOS_ARENA as AT, ENTORNO_ARENA, ESTILO_JUEGO_ARENA as EJ, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, FALTAS_ARENA_V10, LIBRE_ARENA, PENAL_ARENA, PORTERO_ARENA as PO, REMATE_ARENA_V9, TECNICA_ARENA as T } from "../sim/limites";
+import { apartarDelSaque, colocacionPenal, desenlacePenal, ejecutorPenal, opcionDirecto, probabilidadPenal, puntoPenal } from "./libre";
 import { validarConfig } from "../sim/motor";
 import { configDeSemilla } from "../sim/plantillas";
 import { prngDerivado } from "../sim/prng";
@@ -220,6 +221,10 @@ export class MotorArena {
   private get v8() { return reglasDesde(this.config, "reinicios-v8"); }
   /** Brief 065 § 2: el error base del remate y el alcance máximo del portero de estas reglas (REMATE_ARENA_V9 desde v9). */
   private get remate9() { return remateDeReglas(reglasDesde(this.config, REMATE_ARENA_V9.desde)); }
+  /** Brief 070 § 2.A (v11): la falta se reanuda con un tiro libre (`libre`) desde el punto de la falta. */
+  private get libre11() { return reglasDesde(this.config, LIBRE_ARENA.desde); }
+  /** Brief 070 § 2.B (v11): la falta dentro del área del infractor es penal. */
+  private get penal11() { return reglasDesde(this.config, PENAL_ARENA.desde); }
   /** Brief 068 § 2.A y v1.1: en los pases rasos (pase explícito no largo, candidatos locales y saque de manos) el pasador
    * no elige a un receptor en `adelantados(estado, lado)` en el tick de la decisión. Bajo v1–v9, null (sin filtro). */
   private fueraPasador(lado: Lado): ReadonlySet<string> | null {
@@ -344,7 +349,7 @@ export class MotorArena {
     if (portador) this.estado.balon.posicion = { ...portador.posicion };
   }
   /** `extra` (solo reinicios-v4): `motivo` del evento (`centro`, `saque_manos`) y vuelo `centro`. */
-  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null, extra: { motivo?: "centro" | "saque_manos" | "largo"; centro?: true; aereo?: true } = {}): void {
+  private sacarBalon(j: JugadorArena, tipo: "pase" | "tiro", destino: Punto, receptor: string | null, extra: { motivo?: "centro" | "saque_manos" | "largo" | "libre"; centro?: true; aereo?: true } = {}): void {
     const desde = { ...j.posicion };
     const rng = prngDerivado(this.config.partido.seed, `arena:golpe:${this.estado.tick}:${j.id}`);
     const entorno = this.estado.entrenadores ? efectosEntorno(this.config, this.estado, j.lado, distancia(desde, destino)) : null;
@@ -383,7 +388,9 @@ export class MotorArena {
     const fuera = adelantados(this.estado, j.lado);
     this.estado.balon = { ...(this.conReinicios ? { ultimoToque: { jugador: j.id, lado: j.lado } } : {}), posicion: desde, poseedor: null, vuelo: { tipo, autor: j.id, lado: j.lado, receptor, origen: desde, destino: objetivo, inicioTick: this.estado.tick, adelantados: fuera, ...(extra.centro ? { centro: true as const } : {}), ...(extra.aereo ? { aereo: true as const } : {}),
       ...(remate5 ? { potencia: remate5.potencia, ...(remate5.alto ? { alto: true as const } : {}) } : {}), ...(lejano ? { lejano: true as const } : {}) } };
-    this.evento(tipo, j, desde, objetivo, receptor, lejano ? { motivo: "lejano" } : extra.motivo ? { motivo: extra.motivo } : {});
+    // Brief 070 (v11): el remate directo de un tiro libre lleva `motivo: "libre"` aunque sea lejano (el vuelo conserva
+    // `lejano` y su modelo de error).
+    this.evento(tipo, j, desde, objetivo, receptor, extra.motivo === "libre" ? { motivo: "libre" } : lejano ? { motivo: "lejano" } : extra.motivo ? { motivo: extra.motivo } : {});
     this.ultimaAccion = this.estado.tick;
   }
   private accionBalon(planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>): void {
@@ -632,23 +639,32 @@ export class MotorArena {
     if (j.puesto === "POR") return conduce && !manos ? limitado : { ...j.posicion };
     return conduce ? limitado : conduccionPorDefecto(j);
   }
-  private prepararSaque(tipo: TipoReinicioArena, lado: Lado, punto: Punto, ultimoToque?: string): void {
+  /** `falta` (brief 070, solo "libre" y "penal" bajo v11): el ejecutor elegido por `resolverFalta` y el id de la falta. */
+  private prepararSaque(tipo: TipoReinicioArena, lado: Lado, punto: Punto, ultimoToque?: string, falta?: { ejecutor: JugadorArena; id: string }): void {
     if (this.v6) this.estado.persecucion = null;
     this.realizarCambios();
     const propios = this.estado.jugadores.filter(j => j.lado === lado);
     const centroNuevo = tipo === "centro" && centroReglamentario(this.config);
-    const ejecutor = centroNuevo ? colocarCentro(this.estado, lado) : tipo === "meta" ? propios.find(j => j.puesto === "POR")! : propios.filter(j => j.puesto !== "POR").sort((a, b) => distancia(a.posicion, punto) - distancia(b.posicion, punto) || a.id.localeCompare(b.id))[0]!;
+    const ejecutor = falta ? falta.ejecutor : centroNuevo ? colocarCentro(this.estado, lado) : tipo === "meta" ? propios.find(j => j.puesto === "POR")! : propios.filter(j => j.puesto !== "POR").sort((a, b) => distancia(a.posicion, punto) - distancia(b.posicion, punto) || a.id.localeCompare(b.id))[0]!;
     const desde = { ...this.estado.balon.posicion };
     for (const j of this.estado.jugadores) {
       if (tipo === "centro" && !centroNuevo) {
         const base = anclas(this.estado.entrenadores![j.lado].formacion, j.lado, "base")[j.puesto]!;
         const nominal = transformar(base, j.lado); nominal.x = Math.min(nominal.x, j.lado === lado ? ARENA.centroPropioMaxM : ARENA.centroRivalMaxM);
         j.posicion = transformar(nominal, j.lado);
+      } else if (tipo === "penal") {
+        // Brief 070 § 2.B (v11): todos (salvo el ejecutor) fuera del área y a ≥ distanciaSaqueLibreM del punto; el
+        // portero defensor en su línea, en el centro del arco.
+        if (j.id !== ejecutor.id) j.posicion = colocacionPenal(j, rival(lado));
       } else if (j.lado !== lado) {
-        const minimo = tipo === "banda" ? ARENA.distanciaSaqueBandaM : tipo === "esquina" ? ARENA.distanciaSaqueEsquinaM : ARENA.distanciaSaqueMetaM;
+        // Brief 070 § 2.A (v11): en el tiro libre, los rivales a ≥ distanciaSaqueLibreM con el mismo empuje.
+        const minimo = tipo === "banda" ? ARENA.distanciaSaqueBandaM : tipo === "esquina" ? ARENA.distanciaSaqueEsquinaM : tipo === "libre" ? ARENA.distanciaSaqueLibreM : ARENA.distanciaSaqueMetaM;
         if (distancia(j.posicion, punto) < minimo) {
-          const dx = ARENA.largoM / 2 - punto.x, dy = ARENA.anchoM / 2 - punto.y, d = Math.hypot(dx, dy);
-          j.posicion = enCancha({ x: punto.x + dx / d * minimo, y: punto.y + dy / d * minimo });
+          if (tipo === "libre") j.posicion = apartarDelSaque(j.posicion, punto, minimo);
+          else {
+            const dx = ARENA.largoM / 2 - punto.x, dy = ARENA.anchoM / 2 - punto.y, d = Math.hypot(dx, dy);
+            j.posicion = enCancha({ x: punto.x + dx / d * minimo, y: punto.y + dy / d * minimo });
+          }
         }
         if (tipo === "meta") { const nominal = transformar(j.posicion, lado); nominal.x = Math.max(nominal.x, ARENA.areaLargoM + ARENA.margenAreaMetaM); j.posicion = transformar(nominal, lado); }
       }
@@ -657,20 +673,64 @@ export class MotorArena {
     ejecutor.posicion = { ...punto };
     this.estado.balon = { posicion: { ...punto }, poseedor: ejecutor.id, vuelo: null, ...(this.estado.balon.ultimoToque ? { ultimoToque: this.estado.balon.ultimoToque } : {}) };
     const hastaTick = this.estado.tick + Math.round(T.pausaS / ARENA.pasoS);
-    this.estado.saque = { tipo, lado, ejecutor: ejecutor.id, punto: { ...punto }, hastaTick };
+    this.estado.saque = { tipo, lado, ejecutor: ejecutor.id, punto: { ...punto }, hastaTick, ...(falta ? { falta: falta.id } : {}) };
     this.estado.pausa = { hastaTick, lado, punto: { ...punto }, motivo: "reinicio" };
-    this.evento("reinicio", ejecutor, enCancha(desde), punto, null, { reinicio: tipo, ultimoToque });
+    this.evento("reinicio", ejecutor, enCancha(desde), punto, null, falta ? { reinicio: tipo, fuentes: [falta.id] } : { reinicio: tipo, ultimoToque });
     this.ultimaAccion = this.estado.tick; this.ultimaDisputa = this.estado.tick;
   }
-  private ejecutarSaque(): void {
+  /** `planes` y `ejecutadas` (brief 070): las órdenes vigentes del ejecutor de un tiro libre (v11). */
+  private ejecutarSaque(planes?: Record<Lado, OrdenesEquipo>, ejecutadas?: Set<string>): void {
     const saque = this.estado.saque!;
     const autor = this.estado.jugadores.find(j => j.id === saque.ejecutor)!;
-    const receptor = this.estado.jugadores.filter(j => j.lado === saque.lado && j.id !== autor.id && j.puesto !== "POR").sort((a, b) => distancia(a.posicion, saque.punto) - distancia(b.posicion, saque.punto) || a.id.localeCompare(b.id))[0]!;
-    this.sacarBalon(autor, "pase", receptor.posicion, receptor.id);
+    // Brief 070 § 2.B (v11): el penal se resuelve con su propia probabilidad (`lanzarPenal`), no con el remate en juego.
+    if (saque.tipo === "penal") { this.estado.saque = null; this.estado.pausa = null; this.lanzarPenal(autor, saque.falta!); return; }
+    if (saque.tipo === "libre" && planes && ejecutadas) this.ejecutarLibre(autor, saque.punto, planes, ejecutadas);
+    else {
+      const receptor = this.estado.jugadores.filter(j => j.lado === saque.lado && j.id !== autor.id && j.puesto !== "POR").sort((a, b) => distancia(a.posicion, saque.punto) - distancia(b.posicion, saque.punto) || a.id.localeCompare(b.id))[0]!;
+      this.sacarBalon(autor, "pase", receptor.posicion, receptor.id);
+    }
     this.estado.balon.vuelo!.reinicio = saque.tipo;
+    // Brief 070 § 2.A: en el tiro libre NO se limpia `adelantados` (el fuera de juego se aplica como en el juego).
     if (["banda", "esquina", "meta"].includes(saque.tipo)) this.estado.balon.vuelo!.adelantados = [];
     this.eventos.at(-1)!.reinicio = saque.tipo;
     this.estado.saque = null; this.estado.pausa = null;
+  }
+  /** Brief 070 § 2.A (v11) · ejecución del tiro libre. 1) Una orden explícita vigente del ejecutor, con las validaciones
+   * del juego: `tirar` a ≤ LARGO_ARENA.remate.maxM; `pasar` a un compañero (no él mismo) raso a ≤ paseMaxM y no adelantado
+   * (068), o largo como en `accionBalon` (063 § 8.2). 2) Si no, tiro directo con probabilidad LIBRE_ARENA.probDirecto si
+   * el punto lo admite (`opcionDirecto`). 3) Si no, pase al compañero de campo más cercano, como en los otros saques. */
+  private ejecutarLibre(autor: JugadorArena, punto: Punto, planes: Record<Lado, OrdenesEquipo>, ejecutadas: Set<string>): void {
+    const arco = transformar({ x: ARENA.largoM, y: ARENA.anchoM / 2 }, autor.lado);
+    const orden = planes[autor.lado].ordenes.find(o => o.jugador === autor.id);
+    if (orden && !ejecutadas.has(autor.id)) {
+      if (orden.accion === "tirar" && distancia(autor.posicion, arco) <= LA.remate.maxM) {
+        this.sacarBalon(autor, "tiro", arco, null, { motivo: "libre" }); ejecutadas.add(autor.id); return;
+      }
+      const r = orden.accion === "pasar" ? this.estado.jugadores.find(p => p.id === orden.receptor && p.lado === autor.lado && p.id !== autor.id) : undefined;
+      if (r) {
+        const d = distancia(autor.posicion, r.posicion), alcance = autor.puesto !== "POR" ? alcanceLargo(this.atributos(autor.id)) : null;
+        if (d <= ARENA.paseMaxM && !this.fueraPasador(autor.lado)?.has(r.id)) { this.sacarBalon(autor, "pase", this.destinoPase(autor, r), r.id); ejecutadas.add(autor.id); return; }
+        if (alcance !== null && r.puesto !== "POR" && d > ARENA.paseMaxM && d <= alcance) { this.sacarBalon(autor, "pase", this.destinoPase(autor, r), r.id, { motivo: "largo", aereo: true }); ejecutadas.add(autor.id); return; }
+      }
+    }
+    if (opcionDirecto(punto, autor.lado) && prngDerivado(this.config.partido.seed, `libre:${this.estado.tick}:${autor.id}`).chance(LIBRE_ARENA.probDirecto)) {
+      this.sacarBalon(autor, "tiro", arco, null, { motivo: "libre" }); return;
+    }
+    const receptor = this.estado.jugadores.filter(j => j.lado === autor.lado && j.id !== autor.id && j.puesto !== "POR").sort((a, b) => distancia(a.posicion, punto) - distancia(b.posicion, punto) || a.id.localeCompare(b.id))[0]!;
+    this.sacarBalon(autor, "pase", receptor.posicion, receptor.id);
+  }
+  /** Brief 070 § 2.B (v11) · el ejecutor remata el penal desde el punto. Desenlace con `desenlacePenal` y la probabilidad
+   * de `probabilidadPenal` (potencia del ejecutor frente al nivel efectivo del portero); el vuelo dura lo de un remate de
+   * esa distancia y nadie lo toca (`moverBalon`). El `tiro` lleva `motivo: "penal"` y `fuentes` a la falta. */
+  private lanzarPenal(autor: JugadorArena, falta: string): void {
+    const portero = this.estado.jugadores.find(j => j.lado !== autor.lado && j.puesto === "POR");
+    const p = probabilidadPenal(this.atributos(autor.id)?.potencia, portero ? this.nivelEfectivo(portero) : undefined);
+    const origen = { ...this.estado.balon.posicion };
+    const { desenlace, destino } = desenlacePenal({ seed: this.config.partido.seed, tick: this.estado.tick, ejecutor: autor.id, lado: autor.lado, p, portero: portero ? { ...portero.posicion } : null });
+    const tiro = this.evento("tiro", autor, origen, destino, null, { motivo: "penal", reinicio: "penal", fuentes: [falta] });
+    this.estado.balon = { ultimoToque: { jugador: autor.id, lado: autor.lado }, posicion: origen, poseedor: null,
+      vuelo: { tipo: "tiro", autor: autor.id, lado: autor.lado, receptor: null, origen, destino, inicioTick: this.estado.tick, adelantados: [], reinicio: "penal", potencia: potenciaRemate(distancia(origen, destino)), penal: { desenlace, tiro: tiro.id } } };
+    this.ultimaAccion = this.estado.tick;
   }
   private resolverSalida(desde: Punto, hasta: Punto): boolean {
     const cruce = cruceDeBanda(desde, hasta);
@@ -685,7 +745,8 @@ export class MotorArena {
     const alto = this.v5 && vuelo?.tipo === "tiro" && vuelo.alto === true;
     if (!alto && Math.abs(cruce.punto.y - ARENA.anchoM / 2) <= ARENA.arcoM / 2 && vuelo?.reinicio !== "banda" && !(vuelo?.reinicio && ultimo.lado === defiende)) {
       const autor = this.estado.jugadores.find(j => j.id === (vuelo?.autor ?? ultimo.jugador))!;
-      this.evento("gol", autor, vuelo?.origen ?? desde, cruce.punto, null, { lado: ataca, ...(autor.lado !== ataca ? { autogol: true } : {}) });
+      // Brief 070 § 2.B (v11): el gol de penal cita su `tiro`, que a su vez cita la falta.
+      this.evento("gol", autor, vuelo?.origen ?? desde, cruce.punto, null, { lado: ataca, ...(autor.lado !== ataca ? { autogol: true } : {}), ...(vuelo?.penal ? { fuentes: [vuelo.penal.tiro] } : {}) });
       this.estado.marcador[ataca]++;
       this.prepararSaque("centro", defiende, { x: ARENA.largoM / 2, y: ARENA.anchoM / 2 }, ultimo.jugador);
     } else {
@@ -738,7 +799,18 @@ export class MotorArena {
       }
     }
     this.realizarCambios();
-    const receptor = this.estado.jugadores.find(j => j.id === portador.id) ?? this.estado.jugadores.filter(j => j.lado === portador.lado).sort((a, b) => distancia(a.posicion, portador.posicion) - distancia(b.posicion, portador.posicion))[0]!;
+    // Brief 070 (v11): tiro libre desde el punto de la falta (la posición del portador en el contacto, `falta.hasta`) o,
+    // dentro del área del infractor, penal. La falta sobre el portero en su área sigue con el balón en las manos (abajo).
+    const victima = this.estado.jugadores.find(j => j.id === portador.id);
+    if (this.libre11 && !(victima?.puesto === "POR" && enAreaPropia(victima.posicion, victima.lado))) {
+      const punto = enCancha(falta.hasta), penal = this.penal11 && enAreaPropia(punto, defensor.lado);
+      const companeros = this.estado.jugadores.filter(j => j.lado === portador.lado);
+      const ejecutor = victima ?? (penal ? ejecutorPenal(companeros, id => this.atributos(id)) : undefined)
+        ?? companeros.filter(j => j.puesto !== "POR").sort((a, b) => distancia(a.posicion, punto) - distancia(b.posicion, punto) || a.id.localeCompare(b.id))[0]!;
+      this.prepararSaque(penal ? "penal" : "libre", portador.lado, penal ? puntoPenal(portador.lado) : punto, undefined, { ejecutor, id: falta.id });
+      return true;
+    }
+    const receptor = this.estado.jugadores.find(j => j.id === portador.id) ??this.estado.jugadores.filter(j => j.lado === portador.lado).sort((a, b) => distancia(a.posicion, portador.posicion) - distancia(b.posicion, portador.posicion))[0]!;
     this.estado.balon = { posicion: { ...receptor.posicion }, poseedor: receptor.id, vuelo: null };
     const finPausa = this.estado.tick + Math.round(T.pausaS / ARENA.pasoS);
     // Brief 046 v1.1: la falta sobre el portero en su área se reanuda con el balón en las manos y
@@ -824,6 +896,16 @@ export class MotorArena {
       balon.posicion = factor === 1 ? { ...vuelo.destino } : { x: desde.x + (vuelo.destino.x - desde.x) * factor, y: desde.y + (vuelo.destino.y - desde.y) * factor };
     }
     const cruce = this.conReinicios ? cruceDeBanda(desde, balon.posicion) : null;
+    // Brief 070 § 2.B (v11): el remate del penal ya tiene desenlace; nadie lo toca. Gol y fuera cruzan la línea de fondo
+    // (`resolverSalida`: gol, o `tiro_fuera` y saque de meta); la atajada termina en las manos del portero al llegar.
+    if (vuelo?.penal) {
+      if (cruce && this.resolverSalida(desde, balon.posicion)) return;
+      if (distancia(balon.posicion, vuelo.destino) === 0) {
+        const portero = this.estado.jugadores.find(j => j.lado !== vuelo.lado && j.puesto === "POR");
+        if (portero) this.recibir(portero); else delete vuelo.penal;
+      }
+      return;
+    }
     const extremo = cruce?.punto ?? balon.posicion;
     const contactos = this.estado.jugadores.map(j => {
       const punto = proyeccion(j.posicion, desde, extremo);
@@ -896,7 +978,7 @@ export class MotorArena {
       const pausado = this.estado.pausa && this.estado.tick < this.estado.pausa.hastaTick;
       if (!pausado) {
         if (this.estado.entrenadores) this.estado.pausa = null;
-        if (this.estado.saque) this.ejecutarSaque();
+        if (this.estado.saque) this.ejecutarSaque(activos, ejecutadas);
         else this.accionBalon(activos, ejecutadas);
         this.moverJugadores(activos, posesionInicial);
       } else this.frenarJugadores();

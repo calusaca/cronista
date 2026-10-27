@@ -13,8 +13,9 @@ export type VersionArena = typeof ARENA.version | typeof ARENA.versionPersonalid
  * Brief 063 (publicación 2): "reinicios-v6" también es literal; ARENA.reglas es reinicios-v7.
  * Brief 063 (publicación 3): "reinicios-v7" también es literal; ARENA.reglas es reinicios-v8.
  * Brief 065: "reinicios-v8" también es literal; ARENA.reglas es reinicios-v9.
- * Brief 068: "reinicios-v9" también es literal; ARENA.reglas es reinicios-v10. */
-export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", "reinicios-v8", "reinicios-v9", ARENA.reglas] as const;
+ * Brief 068: "reinicios-v9" también es literal; ARENA.reglas es reinicios-v10.
+ * Brief 070: "reinicios-v10" también es literal; ARENA.reglas es reinicios-v11. */
+export const reglasArena = ["reinicios-v1", "reinicios-v2", "reinicios-v3", "reinicios-v4", "reinicios-v5", "reinicios-v6", "reinicios-v7", "reinicios-v8", "reinicios-v9", "reinicios-v10", ARENA.reglas] as const;
 export type ReglasArena = (typeof reglasArena)[number];
 export const perfilesEntrenador = ["posicional", "presion", "reactivo", "vertical", "adaptable"] as const;
 export type PerfilEntrenador = (typeof perfilesEntrenador)[number];
@@ -84,8 +85,10 @@ export interface ArbitroArena {
   criterioContacto?: number;
   ultimaDecision?: { tick: number; evento: string; tipo: "falta" | "amarilla" | "roja" } | null;
 }
-export type TipoReinicioArena = "centro" | "banda" | "esquina" | "meta";
-export interface SaqueArena { tipo: TipoReinicioArena; lado: Lado; ejecutor: string; punto: Punto; hastaTick: number }
+/** Brief 070 (reinicios-v11): "libre" (tiro libre desde el punto de la falta) y "penal" (falta dentro del área). */
+export type TipoReinicioArena = "centro" | "banda" | "esquina" | "meta" | "libre" | "penal";
+/** `falta` (brief 070, solo en "libre" y "penal"): id del evento `falta` que lo originó. */
+export interface SaqueArena { tipo: TipoReinicioArena; lado: Lado; ejecutor: string; punto: Punto; hastaTick: number; falta?: string }
 export interface Vuelo {
   /** "rechace" (reinicios-v3): balón suelto tras el desvío del portero. Su autor es el portero
    * (último toque, autogol si entra en su arco) pero conserva el `lado` del remate original;
@@ -104,6 +107,9 @@ export interface Vuelo {
   alto?: true;
   /** Brief 063 (reinicios-v7), solo en remates desde más de ARENA.radioTiroM: el portero va a la trayectoria. */
   lejano?: true;
+  /** Brief 070 (reinicios-v11), solo en el remate de un penal: desenlace ya decidido (PENAL_ARENA) e id del `tiro`.
+   * Nadie toca el balón en vuelo; «atajada» termina en las manos del portero al llegar a su destino. */
+  penal?: { desenlace: "gol" | "atajada" | "fuera"; tiro: string };
 }
 export interface EstadoArena {
   tick: number;
@@ -142,7 +148,7 @@ export interface EventoArena {
   id: string; tick: number; tipo: TipoEventoArena; lado: Lado; jugador: string;
   receptor: string | null; desde: Punto; hasta: Punto; distanciaM: number;
   /** `motivo`: p. ej. "desvio" (atajada), "centro"/"saque_manos"/"largo" (pase), "alto" (tiro_fuera, brief 051),
-   * "lejano" (tiro, brief 063). */
+   * "lejano" (tiro, brief 063), "libre"/"penal" (tiro, brief 070). */
   sale?: string; entrenador?: string; motivo?: string; fuentes?: string[];
   formacion?: FormacionArena;
   gravedad?: "imprudente" | "temeraria" | "fuerza_excesiva";

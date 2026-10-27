@@ -1,5 +1,5 @@
 import type { Llm, Mensaje } from "../lib/llm";
-import { ARENA, ATAQUE_ARENA as A, LARGO_ARENA as LA, PERSECUCION_ARENA as PE, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
+import { ARENA, ATAQUE_ARENA as A, LARGO_ARENA as LA, LIBRE_ARENA, PENAL_ARENA, PERSECUCION_ARENA as PE, PERSONALIDAD_ARENA as P, PORTERO_ARENA as PO, TECNICA_ARENA as T } from "../sim/limites";
 import { enAreaRival } from "./ataque";
 import { asignarPuestos } from "./alineacion";
 import { gestionarProgramado, planDelEntrenador } from "./entrenadores";
@@ -185,6 +185,13 @@ export function frasesFueraDeJuego(c: { toleranciaM: number; mitadM: number } = 
   return `Fuera de juego: un compañero está adelantado si, en el instante del pase, está más cerca de la línea de gol rival que el penúltimo rival, que el balón y que la mitad de la cancha (x=${c.mitadM}), por más de ${c.toleranciaM} m. Si recibe el balón en esa posición, el árbitro lo sanciona y el rival reinicia. El poseedor no da un pase corto a un compañero adelantado: conduce o elige a otro. Un balón largo o un centro a un compañero adelantado sí se sanciona: ordénalos a quien esté en línea. Una orden profundidad o apoyar ataca el espacio partiendo en línea con la línea del rival, no por delante de ella. fueraDeJuego en la observación da la x absoluta de la línea de cada lado (propia: la que deben respetar tus atacantes, con los IDs propios adelantados en ese instante; rival: la que deben respetar los suyos).`;
 }
 
+/** Brief 070 § 2.C: la frase del tiro libre y el penal (reinicios-v11), construida solo con constantes (la prueba la
+ * construye también con valores alterados). Como frasesFueraDeJuego, va en SISTEMA_ARENA de forma incondicional: es una
+ * constante compartida por todas las reglas y los partidos nuevos son todos v11 (las repeticiones no llaman al LLM). */
+export function frasesTiroLibre(c: { distanciaM: number; directoMaxM: number; pasilloM: number; mitadY: number; areaLargoM: number; areaAnchoM: number; puntoM: number } = { distanciaM: ARENA.distanciaSaqueLibreM, directoMaxM: LIBRE_ARENA.directoMaxM, pasilloM: LIBRE_ARENA.pasilloM, mitadY: ARENA.anchoM / 2, areaLargoM: ARENA.areaLargoM, areaAnchoM: ARENA.areaAnchoM, puntoM: PENAL_ARENA.puntoM }): string {
+  return `Faltas: el juego se detiene y quien recibió la falta reanuda con un tiro libre desde el punto de la falta, con los rivales (la barrera) a al menos ${c.distanciaM} m del balón; a ${c.directoMaxM} m o menos del arco rival y en el pasillo central (|y−${c.mitadY}| ≤ ${c.pasilloM}) el ejecutor puede rematar directo (orden tirar). Una falta dentro del área propia (${c.areaLargoM} m desde la línea de fondo y ${c.areaAnchoM} m de ancho) es penal: el rival remata desde el punto penal, a ${c.puntoM} m, con todos los demás fuera del área. Presionar o entrar dentro del área propia tiene ese coste.`;
+}
+
 export const SISTEMA_ARENA = `Controlas los once jugadores de UN equipo en un escenario sintético de fútbol 2D.
 TU OBJETIVO ES GANAR EL PARTIDO: terminar con más goles que el rival. Busca ocasiones de gol y evita que el contrario las genere.
 Eres un entrenador adversario independiente, no un narrador. Analiza el marcador, tiempo restante, espacio y acciones observadas del rival.
@@ -202,6 +209,7 @@ ${frasesAtributos()}
 ${frasesLargo()}
 ${frasesIdentidad()}
 ${frasesFueraDeJuego()}
+${frasesTiroLibre()}
 Cada orden es un objetivo persistente; los controladores locales reaccionan durante el intervalo.
 Cuando los jugadores tienen personalidad, combina sus tendencias (0..100) con el plan colectivo:
 defensiva/ofensiva orientan apoyos, pase/conduccion/remate preferencias, agresividad intensidad

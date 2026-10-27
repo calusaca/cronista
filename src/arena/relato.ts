@@ -19,6 +19,15 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   const es = idioma === "es";
   // Brief 050: el gol se canta con `cantoGol`; aquí solo llega si el goleador no está en la plantilla.
   if (e.autogol || e.motivo === "desvio") return es ? h.texto_es : h.texto_en;
+  // Brief 070 § 2.C (reinicios-v11): tiro libre, tiro libre directo, penal señalado y el desenlace del penal.
+  const equipo = registro.config.partido[e.lado].nombre;
+  if (breve && e.tipo === "reinicio" && e.reinicio === "libre") return (es ? [`Tiro libre para ${equipo}.`, `Falta: tiro libre para ${equipo}.`] : [`Free kick to ${equipo}.`, `Foul: a free kick to ${equipo}.`])[variante % 2]!;
+  if (breve && e.tipo === "reinicio" && e.reinicio === "penal") return (es ? [`¡Penal para ${equipo}!`, `¡Penal! Lo tiene ${equipo}.`] : [`Penalty to ${equipo}!`, `Penalty! It goes to ${equipo}.`])[variante % 2]!;
+  if (breve && e.tipo === "tiro" && e.motivo === "libre") return (es ? [`¡${j} remata directo el tiro libre!`, `¡Tiro libre directo de ${j}!`, `¡${j} le pega directo a puerta!`, `¡Directo al arco, ${j}!`] : [`${j} goes direct from the free kick!`, `A direct free kick from ${j}!`, `${j} shoots straight at goal!`, `${j} goes for goal from the free kick!`])[variante]!;
+  if (breve && e.tipo === "tiro" && e.motivo === "penal") return (es ? [`¡${j} lanza el penal!`, `¡Patea el penal ${j}!`, `¡${j}, desde los once metros!`, `¡Va ${j} con el penal!`] : [`${j} takes the penalty!`, `${j} steps up for the penalty!`, `${j} from the spot!`, `Penalty taken by ${j}!`])[variante]!;
+  const penal = e.tipo === "atajada" || e.tipo === "tiro_fuera" ? penalDe(e, registro) : null;
+  if (penal && e.tipo === "atajada") return (es ? [`¡${j} ataja el penal!`, `¡Penal atajado por ${j}!`, `¡${j} le detiene el penal!`, `¡Lo para ${j}! Penal atajado.`] : [`${j} saves the penalty!`, `Penalty saved by ${j}!`, `${j} keeps the penalty out!`, `${j} stops it! Penalty saved.`])[variante]!;
+  if (penal && e.tipo === "tiro_fuera") return (es ? [`¡${j} falla el penal!`, `¡Penal fuera! Lo falla ${j}.`, `¡Se le va el penal a ${j}!`, `¡${j} manda el penal fuera!`] : [`${j} misses the penalty!`, `Penalty wide! ${j} misses.`, `${j} puts the penalty wide!`, `${j} sends the penalty wide!`])[variante]!;
   if (e.tipo === "atajada") return (es ? [`¡Ataja ${j}!`, `¡${j} detiene el remate!`, `¡El remate lo ataja ${j}!`, `¡Atajada de ${j}!`] : [`${j} makes the save!`, `${j} stops the shot!`, `The shot is saved by ${j}!`, `A save by ${j}!`])[variante]!;
   // Brief 063 § 8.3: el remate lejano (reinicios-v7) tiene sus propias variantes breves.
   if (breve && e.tipo === "tiro" && e.motivo === "lejano") return (es ? [`¡Prueba desde lejos ${j}!`, `¡Disparo lejano de ${j}!`, `¡${j} se anima desde fuera!`, `¡Le pega de lejos ${j}!`] : [`${j} tries it from distance!`, `A long-range effort from ${j}!`, `${j} lets fly from range!`, `${j} has a go from deep!`])[variante]!;
@@ -34,6 +43,23 @@ function textoEvento(h: HechoArena, e: EventoArena, registro: RegistroArena, idi
   if (breve && e.tipo === "pase" && receptor) return es ? `${j} busca a ${receptor}.` : `${j} looks for ${receptor}.`;
   if (breve && e.tipo === "recepcion") return es ? `Recibe ${j}.` : `${j} receives it.`;
   return es ? h.texto_es : h.texto_en;
+}
+
+/** Brief 070 § 2.C · El `tiro` de penal (`motivo: "penal"`) del que sale `e`, o null: el gol lo cita en `fuentes`; la
+ * atajada (`receptor` = rematador) y el `tiro_fuera` (`jugador` = rematador) son del penal si el `tiro` anterior más
+ * cercano en `registro.eventos` es ese penal. Solo mira eventos anteriores. */
+export function penalDe(e: EventoArena, registro: RegistroArena): EventoArena | null {
+  if (e.tipo === "gol") {
+    const tiro = e.fuentes?.length ? registro.eventos.find(x => x.tipo === "tiro" && e.fuentes!.includes(x.id) && x.tick <= e.tick) : undefined;
+    return tiro?.motivo === "penal" ? tiro : null;
+  }
+  if (e.tipo !== "atajada" && e.tipo !== "tiro_fuera") return null;
+  const tirador = e.tipo === "atajada" ? e.receptor : e.jugador;
+  for (let k = indiceEvento(registro, e) - 1; k >= 0; k--) {
+    const x = registro.eventos[k]!;
+    if (x.tipo === "tiro") return x.motivo === "penal" && x.jugador === tirador ? x : null;
+  }
+  return null;
 }
 
 /** Brief 050 · Situación del marcador tras un gol, en el orden de resolución del brief. */
@@ -169,9 +195,11 @@ export function cantoGol(evento: EventoArena, registro: RegistroArena, idioma: "
   // Tras el prefijo, la plantilla que empieza por palabra (no por el equipo) va en minúscula.
   const situacion = rellenar(tardio && !plantillaSituacion.startsWith("{") ? plantillaSituacion[0]!.toLowerCase() + plantillaSituacion.slice(1) : plantillaSituacion, { equipo });
   const hechos = rellenar(p.hechos[idioma], { situacion: (tardio ? p.tardio[idioma] : "") + situacion, marcador: marcadorHablado(a, idioma), segundos: Math.floor(evento.tick * ARENA.pasoS + 1e-9) });
+  // Brief 070 § 2.C: el gol de penal usa su variante del tramo goleador.
+  const goleadorTpl: readonly string[] = penalDe(evento, registro) ? p.goleadorPenal[idioma] : p.goleador[idioma];
   const tramos: TramoCanto[] = evento.autogol
     ? [{ texto: rellenar(p.autogol[idioma], { goleador }), tipo: "autogol" }, { texto: hechos, tipo: "hechos" }]
-    : [{ texto: grito![idioma].texto, tipo: "grito", grito: grito!.clave }, { texto: rellenar(p.goleador[idioma][variante % p.goleador[idioma].length]!, { goleador }), tipo: "goleador" }, { texto: hechos, tipo: "hechos" }];
+    : [{ texto: grito![idioma].texto, tipo: "grito", grito: grito!.clave }, { texto: rellenar(goleadorTpl[variante % goleadorTpl.length]!, { goleador }), tipo: "goleador" }, { texto: hechos, tipo: "hechos" }];
   return { texto: tramos.map(t => t.texto).join(" "), tramos };
 }
 
@@ -214,7 +242,9 @@ export function construirRelato(registro: RegistroArena, desdeTick: number, hast
   // Brief 060 v1.1 (3) · `evento`: solo en la pista al ritmo (buffer), nunca con cierre ni entrada.
   if (opciones.evento !== undefined && (modo !== "buffer" || opciones.cierre || opciones.entradaTick !== undefined)) throw new Error("El evento elegido solo se admite en buffer, sin cierre ni entrada");
   if (modo === "buffer") return relatoBuffer(registro, desdeTick, hastaTick, idioma, todos, opciones.cierre, opciones.entradaTick, opciones.memoria, opciones.evento);
-  const seleccion = modo === "completo" ? todos : todos.filter(h => importantes.has(h.tipo) || h === todos.at(-1));
+  // Brief 070 § 2.C: en vivo también se narra el penal señalado (reinicio "penal", reinicios-v11).
+  const penales = new Set(registro.eventos.filter(e => e.tipo === "reinicio" && e.reinicio === "penal").map(e => `arena:${e.id}`));
+  const seleccion = modo === "completo" ? todos : todos.filter(h => importantes.has(h.tipo) || penales.has(h.id) || h === todos.at(-1));
   const ids = new Set(seleccion.map(h => h.id));
   const eventos = new Map(registro.eventos.filter(e => e.tick <= hastaTick).map(e => [e.id, e]));
   const frames = registro.fotogramas.filter(f => f.tick <= hastaTick);

@@ -14,7 +14,8 @@ export function claseIcono(e: Pick<EventoArena, "tipo" | "reinicio" | "motivo">)
     case "gol": case "tiro": case "tiro_fuera": case "atajada": case "amarilla": case "roja": case "cambio": case "fuera_juego": case "falta":
       return e.tipo;
     case "reinicio":
-      return e.reinicio === "esquina" ? "esquina" : "reinicio";
+      // Brief 070: no hay icono propio del penal; usa el de la falta (silbato). El tiro libre, el de reinicio.
+      return e.reinicio === "esquina" ? "esquina" : e.reinicio === "penal" ? "falta" : "reinicio";
     default:
       return null;
   }

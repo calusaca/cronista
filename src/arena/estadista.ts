@@ -124,11 +124,12 @@ export function datosEstadista(registro: RegistroArena, tick: number): DatoEstad
   // reinicios por tipo
   const reinicios = eventos.filter(e => e.tipo === "reinicio");
   const tipoReinicio = (e: EventoArena) => e.reinicio ?? (e.motivo === "falta" ? "falta" : "portero");
-  const tipos = ["centro", "banda", "esquina", "meta", "falta", "portero"] as const;
+  // Brief 070 (reinicios-v11): "libre" y "penal" solo aparecen en registros v11 (antes, la falta era "falta").
+  const tipos = ["centro", "banda", "esquina", "meta", "falta", "libre", "penal", "portero"] as const;
   const conteo = tipos.map(t => [t, reinicios.filter(e => tipoReinicio(e) === t).length] as const).filter(([, n]) => n > 0);
   const etiqueta = {
-    es: { centro: ["saque de centro", "saques de centro"], banda: ["saque de banda", "saques de banda"], esquina: ["saque de esquina", "saques de esquina"], meta: ["saque de meta", "saques de meta"], falta: ["reanudación tras falta", "reanudaciones tras falta"], portero: ["reanudación del portero", "reanudaciones del portero"] },
-    en: { centro: ["kick-off", "kick-offs"], banda: ["throw-in", "throw-ins"], esquina: ["corner", "corners"], meta: ["goal kick", "goal kicks"], falta: ["restart after a foul", "restarts after a foul"], portero: ["goalkeeper restart", "goalkeeper restarts"] },
+    es: { centro: ["saque de centro", "saques de centro"], banda: ["saque de banda", "saques de banda"], esquina: ["saque de esquina", "saques de esquina"], meta: ["saque de meta", "saques de meta"], falta: ["reanudación tras falta", "reanudaciones tras falta"], libre: ["tiro libre", "tiros libres"], penal: ["penal", "penales"], portero: ["reanudación del portero", "reanudaciones del portero"] },
+    en: { centro: ["kick-off", "kick-offs"], banda: ["throw-in", "throw-ins"], esquina: ["corner", "corners"], meta: ["goal kick", "goal kicks"], falta: ["restart after a foul", "restarts after a foul"], libre: ["free kick", "free kicks"], penal: ["penalty", "penalties"], portero: ["goalkeeper restart", "goalkeeper restarts"] },
   } as const;
   agregar("reinicios", conteo,
     conteo.length ? `Reinicios: ${conteo.map(([t, n]) => pl(n, etiqueta.es[t][0], etiqueta.es[t][1])).join(", ")}.` : `Sin reinicios en los primeros ${s} segundos.`,

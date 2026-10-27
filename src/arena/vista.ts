@@ -110,7 +110,7 @@ export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, 
   const nombre = `${j.nombre} (${j.dorsal})`;
   const metros = Math.round(evento.distanciaM);
   if (evento.tipo === "reinicio" && evento.reinicio) {
-    const saque = { centro: ["Saque de centro", "Kick-off"], banda: ["Saque de banda", "Throw-in"], esquina: ["Saque de esquina", "Corner kick"], meta: ["Saque de meta", "Goal kick"] }[evento.reinicio][idioma === "es" ? 0 : 1];
+    const saque = { centro: ["Saque de centro", "Kick-off"], banda: ["Saque de banda", "Throw-in"], esquina: ["Saque de esquina", "Corner kick"], meta: ["Saque de meta", "Goal kick"], libre: ["Tiro libre", "Free kick"], penal: ["Penal", "Penalty"] }[evento.reinicio][idioma === "es" ? 0 : 1];
     const equipo = registro.config.partido[evento.lado].nombre;
     return idioma === "es" ? `${saque} para ${equipo}; ejecuta ${nombre}.` : `${saque} for ${equipo}; ${nombre} takes it.`;
   }
@@ -124,6 +124,9 @@ export function narrarEventoArena(evento: EventoArena, registro: RegistroArena, 
   if (evento.tipo === "pase" && evento.motivo === "largo") return idioma === "es"
     ? `${nombre} lanza un balón largo hacia ${receptor?.nombre ?? "un compañero"} (${metros} m).` : `${nombre} plays a long ball towards ${receptor?.nombre ?? "a teammate"} (${metros} m).`;
   if (evento.tipo === "tiro" && evento.motivo === "lejano") return idioma === "es" ? `${nombre} prueba desde lejos (${metros} m).` : `${nombre} tries a long-range shot (${metros} m).`;
+  // Brief 070 § 2.C (reinicios-v11): remate directo de un tiro libre y lanzamiento del penal.
+  if (evento.tipo === "tiro" && evento.motivo === "libre") return idioma === "es" ? `${nombre} remata directo el tiro libre (${metros} m).` : `${nombre} shoots directly from the free kick (${metros} m).`;
+  if (evento.tipo === "tiro" && evento.motivo === "penal") return idioma === "es" ? `${nombre} lanza el penal.` : `${nombre} takes the penalty.`;
   if (evento.tipo === "atajada" && evento.motivo === "desvio") return idioma === "es" ? `${nombre} desvía el remate; el balón sigue en juego.` : `${nombre} deflects the shot; the ball stays in play.`;
   // Brief 051: remate por encima del travesaño (reinicios-v5); sin motivo, el texto genérico de abajo.
   if (evento.tipo === "tiro_fuera" && evento.motivo === "alto") return idioma === "es" ? `El remate de ${nombre} se va por encima del travesaño.` : `${nombre}'s shot goes over the bar.`;

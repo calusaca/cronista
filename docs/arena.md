@@ -391,7 +391,10 @@ amarillas expulsan. El jugador deja de recibir órdenes y un equipo con menos de
 siete termina el escenario. Cada tarjeta enlaza con su falta. La distinción se
 inspira en la [Regla 12 de IFAB](https://www.theifab.com/laws/latest/fouls-and-misconduct/);
 la gravedad se sortea dentro del modelo sintético, no se infiere de biomecánica
-real. Sin ventaja, penales reglamentarios, VAR ni todos los supuestos de infracción.
+real. Desde `reinicios-v11` ([brief 070](disenos/070-tiro-libre-y-penal.md)) la falta se reanuda con un
+tiro libre desde el punto donde se cometió, con los rivales a 9,15 m y opción de remate directo cerca del arco, y la
+falta dentro del área es penal, con una conversión modelada (no el remate en juego). Sin ventaja, barrera formada, VAR
+ni todos los supuestos de infracción.
 
 **Inspección:** el panel de contexto reúne entrenadores, rasgos, emociones,
 formación con nombres, decisiones y sus eventos, solicitudes pendientes, cancha,

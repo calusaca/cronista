@@ -488,8 +488,10 @@ export const ARENA = {
    * Brief 063 (publicación 3): reinicios-v8 (identidad de juego del club).
    * Brief 065: reinicios-v9 (remate más preciso y portero con menos alcance, REMATE_ARENA_V9).
    * Brief 068: reinicios-v10 (pasador consciente del fuera de juego, la regla en el prompt y `fueraDeJuego` en la
-   * observación, y más faltas con FALTAS_ARENA_V10). */
-  reglas: "reinicios-v10",
+   * observación, y más faltas con FALTAS_ARENA_V10).
+   * Brief 070: reinicios-v11 (tiro libre desde el punto de la falta con los rivales a distanciaSaqueLibreM y opción de
+   * tiro directo, LIBRE_ARENA; penal por falta dentro del área, PENAL_ARENA). */
+  reglas: "reinicios-v11",
   /** Jugadores de cada plantilla de arena-v3: once titulares más el banco. */
   plantillaArena: 16,
   /** Probabilidad de que el portero desvíe (en vez de atrapar) un remate que toca. */
@@ -498,6 +500,10 @@ export const ARENA = {
   desvioLateralM: 6,
   /** Distancia mínima (m) de los rivales al punto de saque: banda, esquina y meta. */
   distanciaSaqueBandaM: 2.1, distanciaSaqueEsquinaM: 10.2, distanciaSaqueMetaM: 9.65,
+  /** Brief 070 (reinicios-v11): distancia mínima (m) de los rivales al balón en el tiro libre y de todos los jugadores
+   * (salvo el ejecutor y el portero defensor) al punto penal. 9,15 m (10 yardas), la del reglamento: las medidas de la
+   * cancha son reales (105 × 68 m). */
+  distanciaSaqueLibreM: 9.15,
   /** Saque de centro: x propia máxima (m) del equipo que saca y de su rival. */
   centroPropioMaxM: 50, centroRivalMaxM: 43,
   /** Destino del desvío: metros más allá de la línea de fondo propia del portero. */
@@ -982,6 +988,63 @@ export const BANDAS_068 = {
   golesFactorV9: 0.95,
 } as const;
 
+/** Brief 070 § 2.A (pedido de Carlos del 27 oct: «cuando hay una falta, el partido se detiene, y la bola debe iniciar
+ * desde donde se dio la falta a favor del equipo al que le hicieron la falta») · Tiro libre, solo para reglas ≥ `desde`;
+ * v1–v10 conservan la reanudación anterior (balón en los pies del que recibió la falta, sin distancia). Diagnóstico v10
+ * (programados, 120 s, semillas 1–100): en 55 de 219 faltas (25 %) el infractor recupera o vuelve a cometer falta en los
+ * 4,5 s siguientes; 56 faltas a ≤ 30 m del arco, fuera del área, sin opción de tiro directo.
+ *   - directoMaxM: distancia máxima (m) del punto de la falta al centro del arco rival para el tiro directo.
+ *   - pasilloM: semiancho (m) del pasillo central (|y − anchoM/2| ≤ pasilloM) en el que cabe el tiro directo.
+ *   - probDirecto: probabilidad de que el ejecutor remate directo si el punto cumple las dos condiciones y no hay una
+ *     orden explícita válida (`pasar` o `tirar`) vigente. Ajuste permitido por el brief si una banda vieja falla: 0,3 y
+ *     después 0 (sin mover bandas). */
+export const LIBRE_ARENA = {
+  desde: "reinicios-v11",
+  directoMaxM: 25,
+  pasilloM: 12,
+  probDirecto: 0.5,
+} as const;
+
+/** Brief 070 § 2.B · Penal: una falta dentro del área del infractor (la geometría de `enAreaPropia`) se reanuda desde el
+ * punto penal, solo para reglas ≥ `desde`. Diagnóstico v10: el 8,2 % de las faltas (18 en 100 partidos de 120 s) ocurre
+ * en el área del infractor. El desenlace NO usa el modelo de tiro en juego (su conversión de cerca está calibrada para el
+ * mano a mano): PRNG propio `penal:{tick}:{ejecutor}`.
+ *   - puntoM: distancia (m) del punto penal a la línea de fondo, en el centro.
+ *   - conversion: probabilidad de gol de un ejecutor y un portero iguales; ajusteMax: ajuste máximo (±) según
+ *     (potencia del ejecutor − nivel efectivo del portero) / diferenciaPlena, acotado a [−1, 1]. Ajuste permitido por el
+ *     brief si una banda vieja falla: conversion hacia 0,7 (sin mover bandas).
+ *   - atajadaFraccion: de los penales que no son gol, fracción atajada (balón en las manos del portero); el resto se va
+ *     fuera (saque de meta).
+ *   - colocacionM: desvío lateral (m) del destino respecto del centro del arco en el gol (dentro de los palos, arcoM/2 =
+ *     3,66) y fueraM: metros por fuera del palo en el penal fallado; ambos uniformes en [min, max].
+ *   - diferenciaPlena: diferencia de puntos (0..100) con la que el ajuste llega a ±ajusteMax. */
+export const PENAL_ARENA = {
+  desde: "reinicios-v11",
+  puntoM: 11,
+  conversion: 0.76,
+  ajusteMax: 0.08,
+  diferenciaPlena: 50,
+  atajadaFraccion: 0.5,
+  colocacionM: { min: 0.5, max: 3.2 },
+  fueraM: { min: 0.4, max: 2 },
+} as const;
+
+/** Brief 070 § 3 · Bandas de `npm run test:stats` para reinicios-v11 (programados, LOTE_ARENA_046.duracionS = 120 s).
+ * Las del 046, 051, 063, 065 y 068 siguen además sobre v11.
+ *   - ventanaRecuperacionS y recuperacionInfractorMax: fracción de faltas tras las que el equipo infractor tiene una
+ *     `recuperacion` o comete otra `falta` con tick ≤ tick de la falta + ventanaRecuperacionS (la métrica del § 1 del
+ *     brief, la del diagnóstico: la ventana empieza en la falta e incluye la pausa; v10: 25 %), semillas 1–100.
+ *   - rivalesCercaMax: rivales a < ARENA.distanciaSaqueLibreM del balón en el tick de ejecución de un tiro libre o un
+ *     penal (en el penal, todos salvo el ejecutor y el portero defensor), semillas 1–100.
+ *   - penalesPorPartido (semillas 1–100) y conversionPenales (1–200 juntas). */
+export const BANDAS_070 = {
+  ventanaRecuperacionS: 4.5,
+  recuperacionInfractorMax: 0.1,
+  rivalesCercaMax: 0,
+  penalesPorPartido: { min: 0.08, max: 0.35 },
+  conversionPenales: { min: 0.6, max: 0.9 },
+} as const;
+
 /** Preferencias sintéticas de arena-v2; no son capacidades ni cifras calibradas. */
 export const PERSONALIDAD_ARENA = {
   semilla: 0x70657273, min: 0, max: 100, variacion: 12,
@@ -1366,6 +1429,12 @@ export const CANTO_GOL = {
       es: ["¡Gol de {goleador}!", "¡Lo marca {goleador}!", "¡{goleador}, gol!", "¡Gol, gol de {goleador}!"],
       en: ["Goal by {goleador}!", "{goleador} scores!", "{goleador}, goal!", "Goal, goal by {goleador}!"],
     },
+    /** Brief 070 § 2.C · tramo goleador de un gol de penal (`fuentes` al `tiro` con `motivo: "penal"`), en lugar del de
+     * arriba: cada plantilla mide como mucho lo que la más larga de `goleador` (el presupuesto de maxCaracteres no cambia). */
+    goleadorPenal: {
+      es: ["¡De penal, {goleador}!", "¡{goleador}, de penal!"],
+      en: ["{goleador} from the spot!", "Penalty goal, {goleador}!"],
+    },
     /** Autogol: sin grito; este tramo sustituye a grito + goleador. */
     autogol: { es: "Gol en propia puerta de {goleador}.", en: "An own goal by {goleador}." },
     situacion: {
@@ -1641,8 +1710,11 @@ export const TORNEO_SITIO = {
    * Brief 068 (reinicios-v10): el sistema lleva además frasesFueraDeJuego() (para todas las reglas: SISTEMA_ARENA es
    * compartido) y la observación v10 `fueraDeJuego`; mayor cociente medido 1,2482 (v10/v5, semillas 1–50; v7–v9 entre
    * 1,2420 y 1,2451 con el sistema nuevo) → 1,1 × 1,2482 = 1,3731; se sube a 1,38 y se regeneran las entradas del sitio
-   * (la prueba 17.4 rehace la comprobación de los topes de liga y grupos). */
-  factorObservacion063: 1.38,
+   * (la prueba 17.4 rehace la comprobación de los topes de liga y grupos).
+   * Brief 070 (reinicios-v11): el sistema lleva además frasesTiroLibre() (para todas las reglas, como la del 068); la
+   * observación tiene las mismas claves que v10. Mayor cociente medido 1,2723 (v10/v5 y v11/v5, semillas 1–50; v7 1,2661,
+   * v8 y v9 1,2686 con el sistema nuevo) → 1,1 × 1,2723 = 1,3995; se sube a 1,40 y se regeneran las entradas del sitio. */
+  factorObservacion063: 1.4,
 } as const;
 
 /**
