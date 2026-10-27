@@ -425,7 +425,7 @@ describe("070 · C · prompt, textos, estadista e iconos", () => {
     expect(claseIcono({ tipo: "reinicio", reinicio: "penal" })).toBe("falta");
     expect(claseIcono({ tipo: "reinicio", reinicio: "libre" })).toBe("reinicio");
     const tiro = r.eventos.find(e => e.tipo === "tiro" && e.motivo === "penal")!;
-    const h = hechosCronicaArena(r).find(x => x.hecho.tipo === "gol" || x.hecho.texto_es.startsWith("Gol de"))!;
+    const h = hechosCronicaArena(r).find(x => x.hecho.texto_es.startsWith("Gol de"))!;
     expect(h.hecho.texto_es).toContain(", de penal, con un remate de");
     expect(h.hecho.texto_en).toContain("from the penalty spot");
     expect(h.evidencia.eventos).toEqual(expect.arrayContaining([...tiro.fuentes!, tiro.id]));
