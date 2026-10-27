@@ -155,6 +155,20 @@ describe("071 · get_match_facts", () => {
     expect(g.hechos).toStrictEqual(t.hechos);
   });
 
+  it("memoria por partido terminado: repetir get_match_facts del mismo encuentro no lo vuelve a leer ni reproducir, y devuelve copias", async () => {
+    const m = montar();
+    let lecturas = 0;
+    const base = m.deps.fuentes;
+    const contadas: DepsFuentes = { ...base, async bytesTorneo(id, archivo) { lecturas++; return base.bytesTorneo(id, archivo); } };
+    const cl = await cliente({ ...m.deps, fuentes: contadas });
+    const fuente = { torneo: "ensayo-059", encuentro: "02" };
+    const a = (await cl.callTool({ name: "get_match_facts", arguments: { fuente } })).structuredContent as unknown as HechosMcp;
+    const b = (await cl.callTool({ name: "get_match_facts", arguments: { fuente } })).structuredContent as unknown as HechosMcp;
+    expect(lecturas).toBe(1);
+    expect(b).toStrictEqual(a);
+    expect(b.hechos).not.toBe(a.hechos);
+  });
+
   it("rechaza sesion, registro, archivos desconocidos, claves de más, huellas mal formadas o inexistentes y torneos en curso", async () => {
     const enCurso = { ...torneoEnsayo(), estado: "en_curso" } as unknown as TorneoCualquiera;
     const m = montar();

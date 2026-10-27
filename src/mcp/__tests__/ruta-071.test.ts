@@ -54,3 +54,42 @@ describe("071 · /api/mcp", () => {
     expect((await POST(peticion(listar(), "198.51.100.2"))).status).toBe(200);
   });
 });
+
+/** Un POST cuyo cuerpo envía `{` y nunca termina (cliente lento o malicioso). */
+const atascada = (ip: string) => new Request(URL_MCP, {
+  method: "POST", duplex: "half",
+  body: new ReadableStream<Uint8Array>({ start: (c) => { c.enqueue(new TextEncoder().encode("{")); } }),
+  headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "x-forwarded-for": ip },
+} as RequestInit & { duplex: "half" });
+const conTope = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<"sin-respuesta">((r) => setTimeout(() => r("sin-respuesta"), ms))]);
+
+describe("071 · /api/mcp: revisión Codex", () => {
+  it("un lote JSON-RPC (array) se rechaza con 400 antes de ejecutar nada (MCP 2025-06-18 sin lotes)", async () => {
+    const r = await POST(peticion([listar(1), { jsonrpc: "2.0", id: 2, method: "tools/call", params: { name: "get_match_facts", arguments: { fuente: { archivo: "duelo" } } } }]));
+    expect(r.status).toBe(400);
+    const d = await r.json();
+    expect(d.error.message).toMatch(/batch/i);
+    expect(d.result).toBeUndefined();
+    expect((await POST(peticion("[]"))).status).toBe(400);
+  });
+
+  it("cuerpos atascados: no retienen plazas; una petición normal posterior entra y los atascados reciben 408 dentro del plazo", async () => {
+    const atascadas = Array.from({ length: MCP_ARENA.admision.enCurso }, (_, i) => POST(atascada(`192.0.2.${i + 1}`)));
+    await new Promise((r) => setTimeout(r, 50));
+    expect((await POST(peticion(listar(), "192.0.2.200"))).status).toBe(200);
+    const resultados = await Promise.all(atascadas.map((p) => conTope(p, MCP_ARENA.plazoLecturaMs + 2_000)));
+    for (const r of resultados) { expect(r).not.toBe("sin-respuesta"); expect((r as Response).status).toBe(408); }
+    expect((await POST(peticion(listar(), "192.0.2.201"))).status).toBe(200);
+  }, MCP_ARENA.plazoLecturaMs * 3);
+
+  it("Origin ajeno → 403; el mismo origen (con x-forwarded-proto) y sin Origin → 200", async () => {
+    const ajeno = await POST(peticion(listar(), "203.0.113.30", { origin: "https://evil.example" }));
+    expect(ajeno.status).toBe(403);
+    expect(ajeno.headers.get("access-control-allow-origin")).toBeNull();
+    expect((await POST(peticion(listar(), "203.0.113.31", { origin: "http://localhost:3417" }))).status).toBe(200);
+    expect((await POST(peticion(listar(), "203.0.113.32", { origin: "https://localhost:3417", "x-forwarded-proto": "https" }))).status).toBe(200);
+    expect((await POST(peticion(listar(), "203.0.113.33", { origin: "http://localhost:9999" }))).status).toBe(403);
+    expect((await POST(peticion(listar(), "203.0.113.34", { origin: "null" }))).status).toBe(403);
+    expect((await POST(peticion(listar(), "203.0.113.35"))).status).toBe(200);
+  });
+});

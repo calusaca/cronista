@@ -112,23 +112,43 @@ export async function listarPartidos(deps: DepsMcp): Promise<{ partidos: Partido
   return { partidos: partidos.slice(0, MCP_ARENA.maxPartidosLista), truncada: partidos.length > MCP_ARENA.maxPartidosLista };
 }
 
-/** `get_match_facts`: la selección de hechos de un partido terminado (la misma función que usa el redactor). */
-export async function hechosDePartido(deps: DepsMcp, fuente: FuenteMcp): Promise<HechosMcp> {
+/** Selección de hechos de una fuente ya admitida (sin memoria). */
+async function calcularHechos(deps: DepsMcp, fuente: FuenteMcp): Promise<HechosMcp> {
   let registro: RegistroArena, huella: string;
   if ("huella" in fuente) {
     const r = await leerRegistroGuardado(await deps.almacen(), fuente.huella);
     if (!r) throw new ErrorHerramienta(`No saved match with fingerprint ${fuente.huella}. Use list_matches to find one.`);
     registro = r; huella = fuente.huella;
   } else {
-    if ("torneo" in fuente) {
-      const t = await deps.fuentes.torneo(fuente.torneo);
-      if (t && enCurso(t)) throw new ErrorHerramienta("That tournament is still in progress; only finished tournaments are served.");
-      registro = (await resolverFuente(fuente, deps.fuentes)).registro;
-    } else registro = await registroEjemplo(deps.fuentes, fuente.archivo);
+    registro = "torneo" in fuente ? (await resolverFuente(fuente, deps.fuentes)).registro : await registroEjemplo(deps.fuentes, fuente.archivo);
     huella = huellaRegistro(registro);
   }
   const { hechos, cabe } = seleccionCronicaArena(registro);
   return { huella, ...datosPartido(registro), cabe, hechos };
+}
+
+// Revisión Codex (071) · LRU por proceso y por conjunto de fuentes (MCP_ARENA.memoHechos): un partido terminado no
+// cambia (la huella es su SHA-256; los encuentros de torneo se validan por SHA-256), así que repetir la consulta no
+// vuelve a leer ni a reproducir el registro. Solo se memoriza un resultado ya obtenido (nunca un fallo ni una lectura
+// pendiente que pudiera quedarse colgada); cada llamada recibe una copia.
+const memoHechos = new WeakMap<DepsFuentes, Map<string, HechosMcp>>();
+const claveFuenteMcp = (f: FuenteMcp) => ("huella" in f ? `h:${f.huella}` : "torneo" in f ? `t:${f.torneo}:${f.encuentro}` : `a:${f.archivo}`);
+
+/** `get_match_facts`: la selección de hechos de un partido terminado (la misma función que usa el redactor). */
+export async function hechosDePartido(deps: DepsMcp, fuente: FuenteMcp): Promise<HechosMcp> {
+  if ("torneo" in fuente) {
+    const t = await deps.fuentes.torneo(fuente.torneo);
+    if (t && enCurso(t)) throw new ErrorHerramienta("That tournament is still in progress; only finished tournaments are served.");
+  }
+  let memo = memoHechos.get(deps.fuentes);
+  if (!memo) { memo = new Map(); memoHechos.set(deps.fuentes, memo); }
+  const clave = claveFuenteMcp(fuente);
+  let h = memo.get(clave);
+  if (h) memo.delete(clave);
+  else h = await calcularHechos(deps, fuente);
+  memo.set(clave, h);
+  while (memo.size > MCP_ARENA.memoHechos) memo.delete(memo.keys().next().value!);
+  return structuredClone(h);
 }
 
 const autorDe = (a: ArchivoCronica) => a.cronica.modo === "acta"

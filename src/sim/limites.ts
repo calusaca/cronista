@@ -1777,4 +1777,10 @@ export const MCP_ARENA = {
   maxPartidosLista: 100,
   /** Plazo del cliente MCP in-process del cronista (conectar + `get_match_facts`); pasado, usa la llamada directa. */
   plazoClienteMs: 5_000,
+  /** Plazo para recibir el cuerpo completo de un POST (408); la admisión se reserva solo después de leerlo, así un
+   * cuerpo lento o incompleto nunca retiene una plaza. */
+  plazoLecturaMs: 5_000,
+  /** Selecciones de hechos memorizadas por partido terminado (LRU por proceso): repetir `get_match_facts` sobre el
+   * mismo partido no vuelve a reproducirlo. Cada entrada ≈ unas decenas de KB. */
+  memoHechos: 16,
 } as const;
