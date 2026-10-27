@@ -51,6 +51,8 @@ test("B1 · arena → duelo archivado → «Match report» con espera accesible 
   const redactor = page.getByTestId("cronica-redactor");
   await expect(redactor).toContainText("Writer: Rehearsal fixture");
   await expect(redactor).toHaveAttribute("data-fixture", "true");
+  // Brief 071 · El cronista obtuvo los hechos como cliente MCP.
+  await expect(page.getByTestId("cronica-hechos-via")).toHaveText("Facts retrieved via MCP");
   await expect(page.getByTestId("cronica-arena-cabecera")).toContainText("60 s");
   await expect(page.getByTestId("cronica-arena-modelos")).toHaveAttribute("data-procedencia", "declarada");
   const corregida = page.locator('[data-testid="sentence"][data-state="corregida"]').first();

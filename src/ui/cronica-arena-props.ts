@@ -32,7 +32,7 @@ export function propsCronicaArena(l: LecturaCronica, idiomaInicial: "es" | "en")
     },
     ...(cronica && archivo ? {
       cronica,
-      redactor: { id: archivo.redactor?.id ?? null, etiqueta: archivo.redactor?.etiqueta ?? "", fixture: archivo.redactor?.fixture ?? false, modo: cronica.modo, ...(archivo.motivoActa ? { motivoActa: archivo.motivoActa } : {}), provisional: archivo.provisional },
+      redactor: { id: archivo.redactor?.id ?? null, etiqueta: archivo.redactor?.etiqueta ?? "", fixture: archivo.redactor?.fixture ?? false, modo: cronica.modo, ...(archivo.motivoActa ? { motivoActa: archivo.motivoActa } : {}), provisional: archivo.provisional, ...(archivo.hechosVia ? { hechosVia: archivo.hechosVia } : {}) },
     } : {}),
     hechos: hechos.map((h) => ({ id: h.id, tipo: h.tipo, texto_es: h.texto_es, texto_en: h.texto_en, eventos: h.eventos })),
     linea: lineaTiempoCronica(registro, hechos).map((e) => ({ id: e.id, reloj: relojArena(e.tick * ARENA.pasoS), clase: claseIcono(e), texto_es: narrarEventoArena(e, registro, "es"), texto_en: narrarEventoArena(e, registro, "en"), lado: e.lado })),

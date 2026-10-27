@@ -20,6 +20,8 @@ export const TEXTOS_CRONICA_ARENA = {
     es: "Acta determinista — frases de plantilla del analista de la arena, sin modelo de lenguaje",
   },
   provisional: { en: "Provisional: a later request with the writer available can replace it.", es: "Provisional: una petición posterior con el redactor disponible puede sustituirla." },
+  /** Brief 071 · Solo con `hechosVia === "mcp"` (las guardadas antes del 071 no muestran nada). */
+  hechosMcp: { en: "Facts retrieved via MCP", es: "Hechos obtenidos por MCP" },
   motivos: {
     desactivado: { en: "the model writer is turned off on this server", es: "el redactor con modelo está desactivado en este servidor" },
     redactor: { en: "the writer model is not available", es: "el modelo redactor no está disponible" },

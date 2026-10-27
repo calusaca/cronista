@@ -226,3 +226,29 @@ describe("064 § 4.10 · BotonCronica: un mensaje honesto por cada 429", () => {
     }
   });
 });
+
+describe("071 · «Facts retrieved via MCP» en la página", () => {
+  it("con hechosVia «mcp»: el rótulo discreto en EN y ES", async () => {
+    const { html, props } = await pagina({ ARENA_CRONICA_LLM: "1" }, dobleSol);
+    expect(props.redactor?.hechosVia).toBe("mcp");
+    expect(cuenta(html, "cronica-hechos-via")).toBe(1);
+    expect(html).toContain(T.hechosMcp.en);
+    expect(T.hechosMcp.en).toBe("Facts retrieved via MCP");
+    expect(renderToStaticMarkup(<CronicaArena {...props} idiomaInicial="es" />)).toContain("Hechos obtenidos por MCP");
+  });
+
+  it("sin hechosVia (guardada antes del 071) o por la llamada directa: no se muestra nada", async () => {
+    const { dir, servicio, r, props } = await pagina({ ARENA_CRONICA_LLM: "1" }, dobleSol);
+    const ruta = join(dir, archivosCronica.cronica(r.huella));
+    const { hechosVia: _via, hechosViaMotivo: _motivo, ...antiguo } = JSON.parse(readFileSync(ruta, "utf8"));
+    writeFileSync(ruta, JSON.stringify(antiguo));
+    const l = (await servicio.leer(r.huella))!;
+    expect(l.estado).toBe("lista");
+    const sinVia = propsCronicaArena(l, "en");
+    expect(sinVia.redactor).toBeDefined();
+    expect(sinVia.redactor!.hechosVia).toBeUndefined();
+    expect(renderToStaticMarkup(<CronicaArena {...sinVia} />)).not.toContain("cronica-hechos-via");
+    const directo = { ...props, redactor: { ...props.redactor!, hechosVia: "directo" as const } };
+    expect(renderToStaticMarkup(<CronicaArena {...directo} />)).not.toContain("cronica-hechos-via");
+  });
+});

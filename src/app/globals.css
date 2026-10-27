@@ -3500,6 +3500,7 @@ g.arena-player:focus-visible > g.arena-token > circle.arena-select-ring { stroke
 .arena-cronica .arena-intro a { color: var(--ar-score-bg); }
 .arena-cronica-cuerpo, .arena-cronica-linea, .arena-cronica-limites { padding: var(--ar-s4) var(--ar-s5); border: 1px solid var(--line); border-radius: var(--ar-r-lg); background: var(--surface); min-width: 0; }
 .arena-cronica-redactor { margin: 0 0 var(--ar-s3); font-weight: 600; overflow-wrap: anywhere; }
+.arena-cronica-via { margin: 0 0 var(--ar-s3); }
 .arena-cronica-detalle { margin-top: var(--ar-s2); }
 .arena-cronica-detalle p { margin: 0 0 var(--ar-s1); overflow-wrap: anywhere; }
 .arena-cronica-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ar-s2) var(--ar-s4); margin-top: var(--ar-s2); }

@@ -28,7 +28,7 @@ export interface CabeceraCronica {
   modelos: Record<Idioma, { texto: string; procedencia: string }>;
   torneo: { id: string; n: number; fecha: Record<Idioma, string>; prueba: boolean } | null;
 }
-export interface RedactorPagina { id: string | null; etiqueta: string; fixture: boolean; modo: "llm" | "acta"; motivoActa?: MotivoActa; provisional: boolean }
+export interface RedactorPagina { id: string | null; etiqueta: string; fixture: boolean; modo: "llm" | "acta"; motivoActa?: MotivoActa; provisional: boolean; hechosVia?: "mcp" | "directo" }
 export interface PropsCronicaArena {
   huella: string; idiomaInicial: Idioma; cabecera: CabeceraCronica;
   estado: "lista" | "sin-cronica" | "invalida" | "desactualizada";
@@ -92,6 +92,7 @@ export function CronicaArena(p: PropsCronicaArena) {
         {p.redactor && <p className="arena-cronica-redactor" data-testid="cronica-redactor" data-fixture={p.redactor.fixture ? "true" : "false"} data-modo={p.redactor.modo} data-motivo={p.redactor.motivoActa}>
           {rotuloRedactor(p.redactor, idioma)}{p.redactor.provisional && <span className="arena-muted"> · {T.provisional[idioma]}</span>}
         </p>}
+        {p.redactor?.hechosVia === "mcp" && <p className="arena-muted arena-cronica-via" data-testid="cronica-hechos-via">{T.hechosMcp[idioma]}</p>}
 
         {c && r ? <>
           {r.modo === "llm" ? (
