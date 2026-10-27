@@ -782,7 +782,9 @@ export async function leerCuerpoAcotado(req: Request, maxBytes: number, plazoMs:
     }
   // Revisión Codex #4 · La cancelación se lanza sin esperarla: un flujo cuya cancelación no termina no retiene la
   // respuesta (408/413) ni la plaza del limitador, que la ruta libera en su `finally`.
-  } catch (error) { void Promise.resolve().then(() => lector.cancel()).catch(() => {}); throw error; }
+  // Brief 071 (revisión Codex, ronda 3) · Se lanza YA, antes de que el `finally` suelte el bloqueo: diferida a una
+  // microtarea fallaba en silencio (lector ya liberado) y el flujo nunca se cancelaba.
+  } catch (error) { try { void lector.cancel(error).catch(() => {}); } catch { /* ya liberado o cerrado */ } throw error; }
   finally { clearTimeout(temporizador); try { lector.releaseLock(); } catch { /* cancelado */ } }
   try { return JSON.parse(Buffer.concat(partes).toString("utf8")) as unknown; }
   catch { throw new ErrorSitio(bytes ? "JSON inválido" : "Petición vacía", 400); }

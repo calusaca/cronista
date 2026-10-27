@@ -47,7 +47,8 @@ function origenPublico(req: Request): string | null {
   const host = req.headers.get("host")?.trim();
   if (!host || !HOST_VALIDO.test(host)) return null;
   const proto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
-  const esquema = proto === "https" || proto === "http" ? proto : new URL(req.url).protocol.slice(0, -1);
+  // El protocolo lo declara el ingreso (validado http/https); sin cabecera, http (desarrollo local), nunca `req.url`.
+  const esquema = proto === "https" || proto === "http" ? proto : "http";
   try { return new URL(`${esquema}://${host}`).origin; } catch { return null; }
 }
 
