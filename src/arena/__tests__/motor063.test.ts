@@ -864,7 +864,7 @@ describe("063 · bloque B · atributos (reinicios-v7)", () => {
       const ficha = estimarFormato(formato, entradas);
       expect({ formato, cabe: ficha.tipicoMicroUsd.maxConDesempates - tipicoPartidoMaxMicroUsd(entradas) + ficha.reservaMaxPartidoMicroUsd <= ficha.topeMicroUsd }).toEqual({ formato, cabe: true });
     }
-  });
+  }, 180_000); // 068: con la frase v10 la petición crece; en el runner de CI pasó de 60 s.
 });
 
 describe("063 · bloque C · remate lejano y balón largo (reinicios-v7)", () => {
