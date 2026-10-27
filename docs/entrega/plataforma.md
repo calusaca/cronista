@@ -2,7 +2,7 @@
 
 The project page has no separate demo-URL, testing-instructions or category field, so all three go at the
 top of **Description** (the portal's Getting Started page lists no submit button or category picker; the
-page itself is the submission). The video goes in **Images/Video** once it is on YouTube. Texts follow
+page itself is the submission). The video file is uploaded in **Images/Video**; its YouTube link goes in the Description. Texts follow
 [`pitch.md`](pitch.md) and the [judges' guide](judges-guide.md).
 
 ## Tagline
@@ -40,5 +40,6 @@ Limits, stated honestly: a short synthetic 2D prototype; the rules check citatio
 
 ## Images/Video
 
-YouTube URL of `cronista-demo-final.mp4` (under 2 minutes). Keep the current cover image
-([`portada-cronista.png`](portada-cronista.png)).
+The field takes a file upload (one video, processed by Azure AI Video Indexer), not a URL: `cronista-demo-final.mp4`
+(1:57) was uploaded there on 27 October 2026, and the same cut is public at https://youtu.be/JENkKNABuzI. Keep the
+current cover image ([`portada-cronista.png`](portada-cronista.png)).
