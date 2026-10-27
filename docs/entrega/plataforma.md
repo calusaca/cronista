@@ -22,7 +22,10 @@ TRY IT (free, no login, open until 10 Nov)
 • Code: https://github.com/calusaca/cronista
 • Demo video (under 2 minutes): https://youtu.be/JENkKNABuzI
 
-CATEGORY: Best Multi-Agent Orchestration (Best Multi-Agent System in the official rules). It also uses Microsoft Foundry (agent service, evaluation, models) and Azure Container Apps.
+CATEGORY: Best Multi-Agent Orchestration (Best Multi-Agent System in the official rules), built with another supported orchestration approach: custom TypeScript orchestration plus a Microsoft Foundry agent. Distinct roles: two LLM coaches, an LLM commentator, a template narrator, a deterministic statistician, a verifier and a Foundry analyst agent. Shared state: one match journal in Blob Storage under a lease. Handoffs: committed observation → coach plans → shared engine → broadcast desk. Recovery: an invalid or late plan falls back to a logged programmed plan; a sentence that fails V1–V8 is retried with the failed rule, then replaced by a labelled template. Also fits Best Azure Cloud Native Integration.
+
+PIPELINE
+Ingest: synthetic events (passes, shots, tackles, fouls, offsides, possession changes) stream live. Interpret: a deterministic statistician turns them into stats and key moments. Explain: the commentator says why a moment matters, citing event ids. Render: on-screen desk, live stats, player card and a machine-readable overlay JSON. Personalize: Fan, Analyst and follow-a-player views, favourite club and player, English or Spanish.
 
 WHAT WE BUILT
 CRONISTA is a multi-agent football broadcast on Azure that turns synthetic match events into explainable, personalized match intelligence. Two LLM coaches, drawn from six Azure OpenAI deployments, receive the same observation and return strict JSON plans; a shared deterministic engine resolves passes, shots, tackles, fouls, offsides and goals. A three-voice desk narrates live in English or Spanish through Azure Speech: a template narrator calls the play, an LLM commentator may only analyse with cited facts, and a deterministic statistician quotes the numbers. A Microsoft Foundry agent answers viewer questions with read-only tools.
@@ -34,7 +37,7 @@ PERSONALIZED
 Fan, Analyst and follow-a-player views; favourite club and player with "Only my player"; live stats and a player card with distance and top speed; ES/EN text and voices; a six-model tournament; replays and downloadable recordings; a reproducible synthetic dataset and overlay JSON.
 
 MICROSOFT AND AZURE
-Azure OpenAI, Microsoft Foundry Agent Service and Evaluation, Azure AI Speech, Container Apps and Jobs, Container Registry, Blob Storage, Key Vault, managed identity, Application Insights, Bicep, GitHub Actions. Orchestration is custom TypeScript (no Agent Framework, MCP or A2A).
+Azure OpenAI, Microsoft Foundry Agent Service and Evaluation, Azure AI Speech, Container Apps and Jobs, Container Registry, Blob Storage, Key Vault, managed identity, Application Insights, Bicep, GitHub Actions.
 
 Limits, stated honestly: a short synthetic 2D prototype; the rules check citations, numbers and names, not the relevance of an analysis.
 
