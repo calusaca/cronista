@@ -1,7 +1,8 @@
 # Innovation Studio project page — fields ready to paste
 
-The project page has no separate demo-URL or testing-instructions field, so both go at the top of
-**Description**. The video goes in **Images/Video** once it is on YouTube. Texts follow
+The project page has no separate demo-URL, testing-instructions or category field, so all three go at the
+top of **Description** (the portal's Getting Started page lists no submit button or category picker; the
+page itself is the submission). The video goes in **Images/Video** once it is on YouTube. Texts follow
 [`pitch.md`](pitch.md) and the [judges' guide](judges-guide.md).
 
 ## Tagline
@@ -19,6 +20,8 @@ TRY IT (free, no login, open until 10 Nov)
 • Judges' guide (testing instructions, 3 minutes): https://github.com/calusaca/cronista/blob/main/docs/entrega/judges-guide.md
 • Verified match recap: https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io
 • Code: https://github.com/calusaca/cronista
+
+CATEGORY: Best Multi-Agent Orchestration (Best Multi-Agent System in the official rules). It also uses Microsoft Foundry (agent service, evaluation, models) and Azure Container Apps.
 
 WHAT WE BUILT
 CRONISTA is a multi-agent football broadcast on Azure that turns synthetic match events into explainable, personalized match intelligence. Two LLM coaches, drawn from six Azure OpenAI deployments, receive the same observation and return strict JSON plans; a shared deterministic engine resolves passes, shots, tackles, fouls, offsides and goals. A three-voice desk narrates live in English or Spanish through Azure Speech: a template narrator calls the play, an LLM commentator may only analyse with cited facts, and a deterministic statistician quotes the numbers. A Microsoft Foundry agent answers viewer questions with read-only tools.
