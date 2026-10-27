@@ -1,0 +1,1 @@
+{"modo":"c","factor":"3","tamano":"completo","goles":2.56,"fallosViejas":["exitoLargos=0.96875 ∉ [0.3; 0.7]"],"m068":{"reglas":"reinicios-v10","duracionS":120,"desde":1,"partidos":100,"fuerasJuegoPorPartido":0.47,"fuerasJuegoPrevisto":38,"faltasPorPartido":2.25,"sinFalta":0.12,"amarillasPorPartido":0.83,"rojasPorPartido":0.09,"golesPorPartido":2.56,"tirosPorPartido":5.98}}

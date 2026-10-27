@@ -1,0 +1,24 @@
+Brief 068 · mutaciones vistas en rojo (27 oct 2026, ~04:20 UTC), cada una aplicada sola sobre el árbol y restaurada
+(cmp contra la copia previa). Comando: npx vitest run --config vitest.config.ts src/arena/__tests__/motor068.test.ts
+
+M1 · quitar el filtro del pase explícito (motor.ts: `const ordenFuera = false && ...`)
+     × A2 · un `pasar` explícito raso a un adelantado no sale en v10 y la orden queda pendiente si conduce
+     × C2 · lote corto de programados (120 s): ... ningún fuera de juego del receptor previsto de un pase raso
+      Tests  2 failed | 12 passed (14)
+
+M2 · quitar el filtro local (motor.ts, pasesValidos: `return c;`)
+     × A2 · (el poseedor sin orden válida elige localmente al adelantado)
+     × A3 · la decisión local no elige a un adelantado y toma el siguiente candidato
+     × C2 · lote corto de programados (120 s)
+      Tests  3 failed | 11 passed (14)
+
+M3 · factor a 1 en el motor (resolverFalta: `probabilidadFalta(p, criterio, false)`)
+     Primera pasada: solo cayó v10.2 (fixture); C2 seguía en verde porque v10 > v9 en faltas aun sin el factor (el
+     filtro cambia el juego). Se reforzó C2 con el mínimo de BANDAS_068.faltasPorPartido (leído de limites.ts):
+     × C2 · AssertionError: expected 0.5333333333333333 to be greater than or equal to 1.5
+     (con C2 reforzado, el archivo entero vuelve a 14/14 sin la mutación)
+
+M4 · factor a 1 en limites.ts (FALTAS_ARENA_V10.factorProbabilidad: 1)
+     × C1 · probabilidadFalta aplica FALTAS_ARENA_V10.factorProbabilidad (con tope 1) solo en v10
+     × v10.2 · fixture v10 (reproducción exacta)
+      Tests  2 failed | 12 passed (14)
