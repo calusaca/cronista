@@ -2,6 +2,7 @@
 // claves repetidas, y no redirige con `CRONISTA_RAIZ=cronicas` (D3).
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it } from "vitest";
+import nextConfig from "../../next.config";
 import { config, proxy } from "../proxy";
 
 const antes = process.env.CRONISTA_RAIZ;
@@ -31,6 +32,14 @@ describe("064 · proxy de la raíz", () => {
     delete process.env.CRONISTA_RAIZ;
     const r = proxy(new NextRequest("http://ejemplo.test:4000/?lang=es"));
     expect(new URL(r.headers.get("location")!, "http://otro.test").origin).toBe("http://ejemplo.test:4000");
+  });
+  it("Next entrega al proxy la URL sin normalizar (si no, agrupa las claves repetidas antes del proxy)", () => {
+    expect(nextConfig.skipProxyUrlNormalize).toBe(true);
+  });
+  it("descarta el _rsc interno de las navegaciones del cliente y conserva el resto en su orden", () => {
+    delete process.env.CRONISTA_RAIZ;
+    expect(destino("http://localhost:3000/?a=1&_rsc=abc12&b=2&a=3")).toEqual({ status: 307, ruta: "/arena?a=1&b=2&a=3" });
+    expect(destino("http://localhost:3000/?_rsc=abc12")).toEqual({ status: 307, ruta: "/arena" });
   });
   it("con CRONISTA_RAIZ=cronicas no redirige (D3)", () => {
     process.env.CRONISTA_RAIZ = "cronicas";
