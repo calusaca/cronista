@@ -27,6 +27,30 @@ export function raizEsCronicas(env: Record<string, string | undefined> = process
   return env.CRONISTA_RAIZ?.trim() === "cronicas";
 }
 
+/**
+ * Brief 069 · Origen de la arena pública en el host de crónicas (`CRONISTA_ARENA_URL`), leído en el servidor en cada
+ * petición, nunca compilado en la imagen. Devuelve solo el origen (`https://host`), sin ruta ni barra final; sin la
+ * variable, vacía o sin una URL http(s) válida devuelve `null` y los enlaces quedan relativos, como antes.
+ */
+export function origenArenaPublica(env: Record<string, string | undefined> = process.env): string | null {
+  const crudo = env.CRONISTA_ARENA_URL?.trim();
+  if (!crudo) return null;
+  try {
+    const url = new URL(crudo);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.origin : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Brief 069 · Una ruta de la arena: relativa, o absoluta al origen de la arena pública si lo hay. Vive aquí (módulo
+ * puro, sin "use client") para que las páginas del servidor puedan llamarla.
+ */
+export function enlaceArena(ruta: string, origenArena?: string | null): string {
+  return origenArena ? `${origenArena}${ruta}` : ruta;
+}
+
 /** D5 · Idioma inicial de la barra en las rutas heredadas: `es` solo con `?lang=es`. */
 export function idiomaDeLang(lang: string | string[] | undefined): "es" | "en" {
   return lang === "es" ? "es" : "en";

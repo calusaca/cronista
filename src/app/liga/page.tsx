@@ -8,7 +8,7 @@ import { Simulador } from "../../ui/Simulador";
 import { mundo } from "../../mundo/mundo";
 import { jornadasDe } from "../../mundo/temporada";
 import { bajasDeJornada, jugadoresVisibles, ligaVisible, rutaPartidoLiga, temporadaVisible } from "../../vista/liga";
-import { idiomaDeLang } from "../../vista/raiz";
+import { idiomaDeLang, origenArenaPublica } from "../../vista/raiz";
 import { presets } from "../../vista/servidor";
 import { notaDeduccion } from "../../vista/sanciones";
 
@@ -30,7 +30,7 @@ export default async function PaginaLiga({ searchParams }: { searchParams: Promi
 
   return (
     <>
-      <BarraHeredada idiomaInicial={idiomaDeLang(sp.lang)} />
+      <BarraHeredada idiomaInicial={idiomaDeLang(sp.lang)} origenArena={origenArenaPublica()} />
       <Simulador presets={presets()} seccion="liga" />
       <main className="liga" data-testid="league-page">
         <header className="liga-head">

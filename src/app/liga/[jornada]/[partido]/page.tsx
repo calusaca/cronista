@@ -8,7 +8,7 @@ import { Pie } from "../../../../ui/Pie";
 import { Simulador } from "../../../../ui/Simulador";
 import { VistaPartido } from "../../../../ui/VistaPartido";
 import { cargarPartidoLiga, contextoDe, leerRefPartido, rutaPartidoLiga } from "../../../../vista/liga";
-import { idiomaDeLang } from "../../../../vista/raiz";
+import { idiomaDeLang, origenArenaPublica } from "../../../../vista/raiz";
 import { leerPerspectiva, presets } from "../../../../vista/servidor";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +30,7 @@ export default async function PartidoDeLiga({
   const ruta = rutaPartidoLiga(ref);
   return (
     <>
-      <BarraHeredada idiomaInicial={idiomaDeLang(q.lang)} />
+      <BarraHeredada idiomaInicial={idiomaDeLang(q.lang)} origenArena={origenArenaPublica()} />
       <Simulador presets={presets()} seccion="liga" />
       <main>
         <nav className="breadcrumb" aria-label="League" data-testid="league-breadcrumb">

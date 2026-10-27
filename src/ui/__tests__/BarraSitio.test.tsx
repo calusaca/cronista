@@ -11,6 +11,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { BarraSitio, enlacesSitio, type SeccionSitio } from "../BarraSitio";
+import { BarraHeredada } from "../BarraHeredada";
 
 const html = (idioma: "es" | "en", seccion: SeccionSitio) => renderToStaticMarkup(<BarraSitio idioma={idioma} alCambiarIdioma={() => {}} seccion={seccion} />);
 const atributo = (etiqueta: string, nombre: string) => new RegExp(`\\s${nombre}="([^"]*)"`).exec(etiqueta)?.[1] ?? null;
@@ -72,5 +73,42 @@ describe("064 · BarraSitio", () => {
       for (const viejo of ["Match reports", "Crónicas", "League mode", ">Data<", "Lab", "Team agents lab", "Model tournament", "Match reports where every sentence shows its evidence"]) expect(h).not.toContain(viejo);
       expect(enlaces(h)).toHaveLength(2);
     }
+  });
+});
+
+// Brief 069 · Con el origen de la arena pública (CRONISTA_ARENA_URL, leída en el servidor y pasada por props), la marca,
+// «Arena» y «Torneo» son URL absolutas a ese origen, con el lang de siempre; sin él, las relativas de arriba.
+describe("069 · BarraSitio con la arena pública", () => {
+  const ARENA = "https://arena.ejemplo.invalid";
+  const marca = (h: string) => atributo(/<a\b[^>]*class="brand"[^>]*>/.exec(h)![0], "href");
+
+  it("enlacesSitio con origen: absolutos, con el lang aplicado", () => {
+    expect(enlacesSitio("en", ARENA)).toEqual({ marca: `${ARENA}/arena`, arena: `${ARENA}/arena`, torneo: `${ARENA}/arena/torneo` });
+    expect(enlacesSitio("es", ARENA)).toEqual({ marca: `${ARENA}/arena?lang=es`, arena: `${ARENA}/arena?lang=es`, torneo: `${ARENA}/arena/torneo?lang=es` });
+  });
+
+  it("enlacesSitio sin origen (undefined o null): idéntico a hoy", () => {
+    for (const origen of [undefined, null]) {
+      expect(enlacesSitio("en", origen)).toEqual(enlacesSitio("en"));
+      expect(enlacesSitio("es", origen)).toEqual({ marca: "/arena?lang=es", arena: "/arena?lang=es", torneo: "/arena/torneo?lang=es" });
+    }
+  });
+
+  it("la barra renderizada lleva los hrefs absolutos en EN y ES", () => {
+    const en = renderToStaticMarkup(<BarraSitio idioma="en" alCambiarIdioma={() => {}} seccion={null} origenArena={ARENA} />);
+    expect(enlaces(en).map((a) => [a.nombre, a.href])).toEqual([["Arena", `${ARENA}/arena`], ["Tournament", `${ARENA}/arena/torneo`]]);
+    expect(marca(en)).toBe(`${ARENA}/arena`);
+    const es = renderToStaticMarkup(<BarraSitio idioma="es" alCambiarIdioma={() => {}} seccion={null} origenArena={ARENA} />);
+    expect(enlaces(es).map((a) => [a.nombre, a.href])).toEqual([["Arena", `${ARENA}/arena?lang=es`], ["Torneo", `${ARENA}/arena/torneo?lang=es`]]);
+    expect(marca(es)).toBe(`${ARENA}/arena?lang=es`);
+  });
+
+  it("BarraHeredada pasa el origen a la barra; sin él, relativos", () => {
+    const con = renderToStaticMarkup(<BarraHeredada idiomaInicial="es" origenArena={ARENA} />);
+    expect(marca(con)).toBe(`${ARENA}/arena?lang=es`);
+    expect(enlaces(con).map((a) => a.href)).toEqual([`${ARENA}/arena?lang=es`, `${ARENA}/arena/torneo?lang=es`]);
+    const sin = renderToStaticMarkup(<BarraHeredada idiomaInicial="en" />);
+    expect(marca(sin)).toBe("/arena");
+    expect(enlaces(sin).map((a) => a.href)).toEqual(["/arena", "/arena/torneo"]);
   });
 });

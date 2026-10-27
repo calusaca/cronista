@@ -3,9 +3,14 @@
 import { afterEach, describe, expect, it } from "vitest";
 import Raiz from "../page";
 import { PortadaCronicas } from "../../ui/PortadaCronicas";
+import Cronicas from "../cronicas/page";
 
 const antes = process.env.CRONISTA_RAIZ;
-afterEach(() => { if (antes === undefined) delete process.env.CRONISTA_RAIZ; else process.env.CRONISTA_RAIZ = antes; });
+const antesArena = process.env.CRONISTA_ARENA_URL;
+afterEach(() => {
+  if (antes === undefined) delete process.env.CRONISTA_RAIZ; else process.env.CRONISTA_RAIZ = antes;
+  if (antesArena === undefined) delete process.env.CRONISTA_ARENA_URL; else process.env.CRONISTA_ARENA_URL = antesArena;
+});
 
 async function errorDe(p: Promise<unknown>): Promise<{ digest?: string }> {
   try { await p; } catch (e) { return e as { digest?: string }; }
@@ -36,5 +41,28 @@ describe("064 · página raíz", () => {
     const e = await errorDe(Raiz({ searchParams: Promise.resolve({ perspectiva: "visita" }) }));
     expect(e.digest).toContain("/cronicas?perspectiva=visita");
     expect(e.digest).toContain("307");
+  });
+});
+
+// Brief 069 · En el host de crónicas, la página lee CRONISTA_ARENA_URL en el servidor, en cada petición, y pasa su
+// origen a la portada (barra y «← Arena»). Sin la variable, `null`: enlaces relativos como hasta ahora.
+describe("069 · origen de la arena pública en la portada", () => {
+  type Elemento = { type: unknown; props: Record<string, unknown> };
+  it("con CRONISTA_ARENA_URL: / y /cronicas pasan el origen a PortadaCronicas", async () => {
+    process.env.CRONISTA_RAIZ = "cronicas";
+    process.env.CRONISTA_ARENA_URL = "https://arena.ejemplo.invalid/";
+    const raiz = (await Raiz({ searchParams: Promise.resolve({ lang: "es" }) })) as unknown as Elemento;
+    expect(raiz.type).toBe(PortadaCronicas);
+    expect(raiz.props.origenArena).toBe("https://arena.ejemplo.invalid");
+    expect(raiz.props.idiomaBarra).toBe("es");
+    const cronicas = (await Cronicas({ searchParams: Promise.resolve({}) })) as unknown as Elemento;
+    expect(cronicas.type).toBe(PortadaCronicas);
+    expect(cronicas.props.origenArena).toBe("https://arena.ejemplo.invalid");
+  });
+  it("sin CRONISTA_ARENA_URL: origen null en / y /cronicas", async () => {
+    process.env.CRONISTA_RAIZ = "cronicas";
+    delete process.env.CRONISTA_ARENA_URL;
+    expect(((await Raiz({ searchParams: Promise.resolve({}) })) as unknown as Elemento).props.origenArena).toBeNull();
+    expect(((await Cronicas({ searchParams: Promise.resolve({}) })) as unknown as Elemento).props.origenArena).toBeNull();
   });
 });

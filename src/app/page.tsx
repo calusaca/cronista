@@ -3,9 +3,10 @@
 // portada, para no romper los enlaces ya entregados. `redirect` va fuera de cualquier `try`.
 // La redirección efectiva la hace `src/proxy.ts` (conserva el orden original de la query, también con claves repetidas);
 // este `redirect` queda como respaldo con el mismo criterio.
+// Brief 069 · `CRONISTA_ARENA_URL` se lee aquí, en el servidor y en cada petición, y llega a la barra por props.
 import { redirect } from "next/navigation";
 import { PortadaCronicas } from "../ui/PortadaCronicas";
-import { destinoRaiz, idiomaDeLang, raizEsCronicas } from "../vista/raiz";
+import { destinoRaiz, idiomaDeLang, origenArenaPublica, raizEsCronicas } from "../vista/raiz";
 import { leerPerspectiva } from "../vista/servidor";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,7 @@ export default async function Raiz({ searchParams }: { searchParams: Promise<Rec
   const q = await searchParams;
   if (raizEsCronicas()) {
     const perspectiva = typeof q.perspectiva === "string" ? q.perspectiva : undefined;
-    return <PortadaCronicas ruta="/" perspectiva={leerPerspectiva(perspectiva)} idiomaBarra={idiomaDeLang(q.lang)} />;
+    return <PortadaCronicas ruta="/" perspectiva={leerPerspectiva(perspectiva)} idiomaBarra={idiomaDeLang(q.lang)} origenArena={origenArenaPublica()} />;
   }
   redirect(destinoRaiz(q));
 }

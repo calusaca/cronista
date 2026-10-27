@@ -9,7 +9,7 @@ import { ESQUEMA, MUESTRA_ARCHIVO } from "../../dataset/umbrales-dataset";
 import { Simulador } from "../../ui/Simulador";
 import { DescargaMuestra } from "../../ui/DescargaMuestra";
 import { kbMuestra, leerFicha, RUTA_DATASHEET } from "../../vista/datos";
-import { idiomaDeLang } from "../../vista/raiz";
+import { idiomaDeLang, origenArenaPublica } from "../../vista/raiz";
 import { presets } from "../../vista/servidor";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export default async function PaginaDatos({ searchParams }: { searchParams: Prom
   const b = f.bandasCorrida;
   return (
     <>
-      <BarraHeredada idiomaInicial={idiomaDeLang(lang)} />
+      <BarraHeredada idiomaInicial={idiomaDeLang(lang)} origenArena={origenArenaPublica()} />
       <Simulador presets={presets()} seccion="datos" />
       <main className="liga datos" data-testid="data-page">
         <header className="liga-head">

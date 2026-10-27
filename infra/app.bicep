@@ -15,6 +15,8 @@ param apiVersion string = '2024-10-21'
 param reasoningEffort string = 'low'
 @secure()
 param openAiApiKey string
+@description('Brief 069 · Origen público de la arena. La barra única y «← Arena» de este host (crónicas) enlazan allí, no a su propia /arena. Vacío: enlaces relativos.')
+param arenaUrl string = 'https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io'
 
 resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = { name: registryName }
 resource pullIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = { name: '${registryName}-pull' }
@@ -54,6 +56,8 @@ resource app 'Microsoft.App/containerApps@2025-01-01' = {
           { name: 'CRONISTA_LLM', value: 'azure-openai' }
           // Brief 064 D3 · En este host (demo de crónicas) `/` sigue siendo la crónica destacada, no la arena.
           { name: 'CRONISTA_RAIZ', value: 'cronicas' }
+          // Brief 069 · Leída en el servidor en cada petición, no compilada en la imagen: la barra lleva a la arena pública.
+          { name: 'CRONISTA_ARENA_URL', value: arenaUrl }
           { name: 'AZURE_OPENAI_ENDPOINT', value: openAiEndpoint }
           { name: 'AZURE_OPENAI_DEPLOYMENT', value: openAiDeployment }
           { name: 'AZURE_OPENAI_API_VERSION', value: apiVersion }
