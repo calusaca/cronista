@@ -51,6 +51,20 @@ it("reserva, caché y límite de consultas sobreviven a reinicios sin volver a p
   await expect(otro.extra(s.id, "audio", "fallo", pedir, 20)).rejects.toThrow("no se repetirá"); expect(llamadas).toBe(3);
 });
 
+// Defecto visto al grabar el video (27 oct): tras un directo narrado de 120 s, el analista respondía 429 porque su
+// comprobación sumaba todo el audio de la sesión (narrador, invitados, antesala) contra PRESUPUESTO_AUDIO_ENCUENTRO.
+// Desde el 048 v1.3 cada clase de voz tiene su bolsa; el analista solo cuenta sus 2 consultas por encuentro.
+it("el audio reservado de la sesión (narrador e invitados, más de 24.000 c en total) no agota las consultas del analista", async () => {
+  const g = new GestorSesiones({ directorio: await carpeta(), ritmoMsPorSegundo: 0 });
+  const s = await g.crear(config); await g.esperarFinal(s.id);
+  const audio = () => Promise.resolve({ ok: true });
+  for (let i = 0; i < 18; i++) await g.extra(s.id, "audio", `narrador-${i}`, audio, 1_000, "narrador");
+  for (let i = 0; i < 10; i++) await g.extra(s.id, "audio", `invitado-${i}`, audio, 1_000, "invitado");
+  expect(await g.extra(s.id, "analisis", "uno", () => Promise.resolve({ texto: "respuesta" }))).toEqual({ texto: "respuesta" });
+  await g.extra(s.id, "analisis", "dos", () => Promise.resolve({ texto: "otra" }));
+  await expect(g.extra(s.id, "analisis", "tres", () => Promise.resolve({ texto: "no" }))).rejects.toThrow("límite");
+});
+
 it("las herramientas no permiten consultar el futuro, otro jugador ni mutar el motor", () => {
   const h = herramientasAnalista(registro, 200), antes = JSON.stringify(registro);
   expect(() => h.ejecutar("consultar_eventos", JSON.stringify({ desdeTick: 0, hastaTick: 201, tipo: "todos" }))).toThrow("futuro");

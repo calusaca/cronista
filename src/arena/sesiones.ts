@@ -370,9 +370,11 @@ export class GestorSesiones {
       // La voz expresiva reserva también el SSML; el texto hablado conserva
       // su límite de 6.000 y la reserva nunca supera el total por sesión.
       if (!Number.isInteger(caracteres) || caracteres < 0 || caracteres > 24_000) throw new ErrorSesion("Presupuesto de voz inválido", 400);
-      const usadas = Object.values(r).filter(x => x.tipo === tipo).length, reservados = Object.values(r).reduce((s, x) => s + (x.caracteres ?? 0), 0);
-      // El audio se presupuesta por clase en rechazoCuotaVoz (048 v1.3: narrador e invitados por separado).
-      if (tipo === "analisis" && (usadas >= 2 || reservados + caracteres > PRESUPUESTO_AUDIO_ENCUENTRO.caracteres)) throw new ErrorSesion("Se alcanzó el límite de consultas de este encuentro", 429);
+      const usadas = Object.values(r).filter(x => x.tipo === tipo).length;
+      // El audio se presupuesta por clase en rechazoCuotaVoz (048 v1.3: narrador e invitados por separado). El analista
+      // solo cuenta sus propias reservas: sumar el audio de la sesión lo bloqueaba tras un directo narrado (27 oct).
+      const reservadosAnalisis = Object.values(r).filter(x => x.tipo === "analisis").reduce((s, x) => s + (x.caracteres ?? 0), 0);
+      if (tipo === "analisis" && (usadas >= 2 || reservadosAnalisis + caracteres > PRESUPUESTO_AUDIO_ENCUENTRO.caracteres)) throw new ErrorSesion("Se alcanzó el límite de consultas de este encuentro", 429);
       // Brief 048 v1.3 (1): bolsa propia de los invitados y reserva del cierre, presupuestadas con el SSML.
       const cuota = tipo === "audio" ? rechazoCuotaVoz(Object.values(r), caracteres, clase ?? "narrador") : null;
       if (cuota) throw new ErrorSesion(cuota, 429);
