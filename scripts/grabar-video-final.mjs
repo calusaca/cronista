@@ -1,7 +1,7 @@
 // Vídeo final de la entrega (docs/entrega/guion-video.md; corte del brief 067). Graba las apps públicas con
 // Playwright, sintetiza la voz en off con Azure Speech, monta tarjetas propias y subtítulos.
 // No modifica la app ni sube nada. Uso, desde la raíz del repo:
-//   node scripts/grabar-video-final.mjs [--fases=arena,previa,torneo,recap,datos,tarjetas,voz,montar,verificar] [--controladores=azar|programado|manual] [--toma=toma067-1]
+//   node scripts/grabar-video-final.mjs [--fases=arena,previa,torneo,recap,datos,tarjetas,voz,montar,verificar] [--controladores=azar|programado|manual] [--toma=toma067-1] [--recap=arena-cronica:<huella>]
 // Intermedios en .cache/video-final/; salida docs/entrega/cronista-demo-final.{mp4,en.srt}; informe en docs/evidencia/video-067/.
 // Credenciales: .env y .cache/azure-servicios.env (nunca se imprimen ni se escriben).
 import { chromium } from "@playwright/test";
@@ -30,6 +30,12 @@ const toma = arg("toma", "toma067-1");
 const duracionPartido = +arg("duracion", "120");
 // 067 · Escena 11: host de crónicas con el redactor real; `--recap=arena` usa la del host de la arena.
 const RECAP = arg("recap", "cronicas") === "arena" ? `${HOST_ARENA}/match/246` : `${HOST_CRONICAS}/match/246`;
+// Tercer montaje (brief 064 B4 + 071): `--recap=arena-cronica:<huella>` graba la crónica de la arena de ESE partido
+// (/arena/cronica/<huella>) en su propia carpeta; `montar` la usa en la escena 11 si recibe el mismo argumento.
+const HUELLA_CRONICA = /^arena-cronica:([a-f0-9]{40})$/.exec(arg("recap", ""))?.[1] ?? null;
+const CRONICA_ARENA = HUELLA_CRONICA ? `${HOST_ARENA}/arena/cronica/${HUELLA_CRONICA}` : null;
+const DIR_RECAP = HUELLA_CRONICA ? resolve(".cache/video-final", `recap-arena-${HUELLA_CRONICA.slice(0, 12)}`) : resolve(".cache/video-final/recap");
+const RECAP_DATOS = HUELLA_CRONICA ? `${HOST_CRONICAS}/match/246` : RECAP; // la fase datos sigue en el host del redactor
 const [modeloLocal, modeloVisita] = arg("modelos", "astra6,sol61").split(",");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 mkdirSync(TRABAJO, { recursive: true });
@@ -554,11 +560,78 @@ async function grabarRecap() {
 }
 
 // --------------------------------------------------------------------------------------------
+// Fase recap, tercer montaje: la crónica de la arena de este mismo partido (/arena/cronica/<huella>, brief 064 B4),
+// con la coreografía de grabarRecap: cabecera con el redactor y la barra de verificación, clic en una frase → sus
+// eventos se iluminan en la línea de tiempo, y «View process». Se precalienta fuera de la grabación.
+async function grabarCronicaArena() {
+  const dir = DIR_RECAP; mkdirSync(dir, { recursive: true });
+  const browser = await chromium.launch();
+  { const c = await browser.newContext(); const p = await c.newPage(); await p.goto(CRONICA_ARENA, { waitUntil: "networkidle", timeout: 240_000 }); await p.getByTestId("sentence").first().waitFor({ timeout: 60_000 }); await c.close(); }
+  const context = await browser.newContext({ viewport: { width: ANCHO, height: ALTO }, colorScheme: "dark", locale: "en-US", recordVideo: { dir, size: { width: ANCHO, height: ALTO } } });
+  await context.addInitScript(scriptCursor);
+  const t0 = Date.now(), page = await context.newPage(), g = grabador(page, t0, dir);
+  const errores = []; page.on("pageerror", e => errores.push(e.message));
+  let datos;
+  try {
+    await page.goto(CRONICA_ARENA, { waitUntil: "networkidle", timeout: 240_000 });
+    await page.getByTestId("sentence").first().waitFor();
+    const redactor = page.getByTestId("cronica-redactor"), barra = page.getByTestId("verify-bar"), via = page.getByTestId("cronica-hechos-via");
+    const leido = {
+      redactor: await redactor.innerText().catch(() => ""), fixture: await redactor.getAttribute("data-fixture").catch(() => null), modo: await redactor.getAttribute("data-modo").catch(() => null),
+      via: (await via.count()) ? await via.innerText() : null, verificacion: await barra.innerText().catch(() => ""), modoBarra: await barra.getAttribute("data-mode").catch(() => null),
+      marcador: await g.texto("[data-testid=cronica-arena-marcador]"), cabecera: await g.texto("[data-testid=cronica-arena-cabecera]"), modelos: await g.texto("[data-testid=cronica-arena-modelos]"),
+      titulo: await g.texto("[data-testid=chronicle-title]"), lang: await page.evaluate(() => `${document.documentElement.lang}/${document.querySelector("main")?.lang ?? ""}`),
+    };
+    console.log(`  · ${leido.redactor} · ${leido.via ?? "sin rótulo MCP"} · ${leido.verificacion.split("\n")[0]}`);
+    await sleep(800);
+    await page.mouse.move(700, 120, { steps: 4 });
+    await g.marca("c-inicio");
+    await g.mover(page.getByTestId("cronica-arena-marcador"), 700);
+    await g.mover(redactor, 1000);
+    if (leido.via) await g.mover(via, 600);
+    await g.mover(barra.locator(".verify-main, strong").first(), 900);
+    // La frase: la del último gol (cita eventos; en toma067-1, el 1–1 cuyo canto suena en la escena 5); si no, la primera que cita eventos.
+    const frases = await page.evaluate(() => [...document.querySelectorAll("[data-testid=sentence]")].map(e => ({ ids: (e.dataset.eventIds ?? "").trim(), texto: e.querySelector("[data-testid=sentence-text]")?.innerText ?? "" })));
+    let i = frases.findLastIndex(f => f.ids && /scor|goal/i.test(f.texto));
+    if (i < 0) i = frases.findIndex(f => f.ids);
+    if (i < 0) throw new Error("Ninguna frase cita eventos");
+    const frase = page.getByTestId("sentence").nth(i), textoFrase = frase.getByTestId("sentence-text");
+    await g.mover(textoFrase, 450);
+    await g.marca("c-clic", { indice: i, frase: frases[i].texto, eventos: frases[i].ids });
+    { const bb = await textoFrase.boundingBox(); await page.mouse.click(bb.x + 60, bb.y + bb.height / 2); }
+    const resaltado = page.locator('[data-testid="timeline-event"][data-highlighted="true"]');
+    await resaltado.first().waitFor({ state: "attached", timeout: 10_000 });
+    await sleep(1000);
+    // Frase y eventos en el mismo encuadre si caben; si no, se baja hasta el primer evento resaltado.
+    const [yFrase, yFinEvento] = await page.evaluate(([f, e]) => [f.getBoundingClientRect().top + scrollY, e.getBoundingClientRect().bottom + scrollY], [await frase.elementHandle(), await resaltado.last().elementHandle()]);
+    if (yFinEvento - yFrase < ALTO - 170) await g.desplazar(frase, 100, 1000);
+    else await g.desplazar(resaltado.first(), 360, 1000);
+    await g.mover(resaltado.first(), 250);
+    await g.marca("c-eventos", { resaltados: await resaltado.count(), texto: (await resaltado.first().innerText().catch(() => "")).slice(0, 200) });
+    await sleep(1900);
+    await g.desplazar(barra, 110, 1000);
+    const proceso = page.getByTestId("open-process").first();
+    await g.mover(proceso, 350);
+    await g.marca("c-proceso-ir");
+    { const bb = await proceso.boundingBox(); await page.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); }
+    await page.getByTestId("process-view").waitFor();
+    await g.marca("c-proceso", { texto: (await g.texto("[data-testid=process-view]")).slice(0, 600) });
+    await page.mouse.move(1300, 760, { steps: 10 });
+    await sleep(4500);
+    datos = { tipo: "arena-cronica", t0, url: CRONICA_ARENA, huella: HUELLA_CRONICA, ...leido, errores, marcas: g.marcas };
+  } finally { await context.close(); await browser.close(); }
+  writeFileSync(join(dir, "datos.json"), JSON.stringify(datos, null, 1));
+  const video = readdirSync(dir).filter(f => f.startsWith("page@") && f.endsWith(".webm")).map(f => join(dir, f)).sort((a, b) => statSync(a).mtimeMs - statSync(b).mtimeMs).at(-1);
+  renameSync(video, join(dir, "recap.webm"));
+  console.log(JSON.stringify({ ...datos, marcas: datos.marcas.map(m => [m.nombre, +m.t.toFixed(2)]) }, null, 1));
+}
+
+// --------------------------------------------------------------------------------------------
 // Fase datos (067 · escena 12): /datos (dataset sintético, DATASHEET y descarga) y un vistazo al JSON para
 // overlay de la crónica 246 en el host del redactor real. No se descarga nada durante la grabación.
 async function grabarDatos() {
   const dir = join(TRABAJO, "datos"); mkdirSync(dir, { recursive: true });
-  const overlay = RECAP.replace(/\/match\/246$/, "/api/overlay/246");
+  const overlay = RECAP_DATOS.replace(/\/match\/246$/, "/api/overlay/246");
   const browser = await chromium.launch();
   { const c = await browser.newContext(); const p = await c.newPage(); for (const u of [DATOS, overlay]) await p.goto(u, { waitUntil: "networkidle", timeout: 180_000 }); await c.close(); }
   const context = await browser.newContext({ viewport: { width: ANCHO, height: ALTO }, colorScheme: "dark", locale: "en-US", recordVideo: { dir, size: { width: ANCHO, height: ALTO } } });
@@ -615,6 +688,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
 .num{font:900 76px/1 Archivo,sans-serif;color:var(--accent);letter-spacing:-.03em}.lbl{font-size:22px;margin-top:10px}
 .ci{display:inline-flex;align-items:center;gap:10px;border-radius:8px;overflow:hidden;font:700 20px Archivo,sans-serif;border:1px solid var(--line)}
 .ci i{font-style:normal;background:var(--surface2);padding:8px 14px}.ci em{font-style:normal;background:var(--accent);color:var(--bg);padding:8px 14px}
+#arquitectura{padding-top:80px}#arquitectura h1{margin-bottom:14px} /* tercer montaje: fila MCP sin pisar los subtítulos */
 </style>
 <main id="arquitectura">
  <div class="brand">CRONISTA</div><div class="over">Multi-agent architecture · custom TypeScript orchestration on Azure · rules reinicios-v11</div>
@@ -633,7 +707,7 @@ h1{font:800 48px/1.08 Archivo,sans-serif;letter-spacing:-.02em;margin:10px 0 26p
   <div class="arr">→</div>
   <div class="box"><b>Desk coordinator</b><span>1–4 turn exchange, one SSML clip, ES / EN</span></div>
  </div>
- <div class="grid" style="grid-template-columns:1fr;margin-top:16px"><div class="box"><b>Match analyst · Microsoft Foundry Agent Service</b><span>On request, read-only tools over the confirmed play; answers pass the same verifier</span></div></div>
+ <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px"><div class="box"><b>Match analyst · Microsoft Foundry Agent Service</b><span>On request, read-only tools over the confirmed play; answers pass the same verifier</span></div><div class="box"><b>MCP server · read-only /api/mcp</b><span>The match-report agent reads its facts through it; any MCP client can query finished matches</span></div></div>
 </main>
 <main id="azure">
  <div class="brand">CRONISTA</div><div class="over">Running on Azure</div>
@@ -701,7 +775,8 @@ const VOZ = {
   personal: "Make it yours: star a club and a player, follow only that player, and choose a fan, analyst or player view. Spanish switches text and voice.",
   analista: "A versioned Microsoft Foundry agent answers questions with read-only tools over the confirmed play. Its sentences pass the same verifier.",
   torneo: "The six models also play each other. Every league match has a replay, and the page states what the results cannot prove.",
-  cronica: "The same verifier guards the automated match report: click any sentence to see its events, or open every draft and verdict.",
+  // Tercer montaje: la crónica de la arena de este mismo partido (la del 067 era /match/246, aparte de la arena).
+  cronica: "After the final whistle, another agent writes the match report from these events. Every sentence is verified; one click shows its evidence.",
   datos: "All data is synthetic: a documented dataset, and JSON for broadcast overlays.",
   cierre: "It runs on Azure OpenAI, Foundry, Speech and Container Apps, with over three thousand automated checks. CRONISTA: narrate the match, prove every sentence.",
 };
@@ -757,13 +832,13 @@ function montar() {
   const dir = join(TRABAJO, "montaje"); mkdirSync(dir, { recursive: true });
   const arena = JSON.parse(readFileSync(join(TRABAJO, toma, "datos.json"), "utf8"));
   const emision = existsSync(join(TRABAJO, toma, "emision.json")) ? JSON.parse(readFileSync(join(TRABAJO, toma, "emision.json"), "utf8")) : null;
-  const recap = JSON.parse(readFileSync(join(TRABAJO, "recap", "datos.json"), "utf8"));
+  const recap = JSON.parse(readFileSync(join(DIR_RECAP, "datos.json"), "utf8"));
   const datosW = JSON.parse(readFileSync(join(TRABAJO, "datos", "datos.json"), "utf8"));
   const torneo = JSON.parse(readFileSync(join(TRABAJO, "torneo", "datos.json"), "utf8"));
   const vozOff = JSON.parse(readFileSync(join(TRABAJO, "voz", "voz.json"), "utf8")).escenas;
   const m = (datos, n) => { const x = datos.marcas.findLast(k => k.nombre === n); if (!x) throw new Error(`Falta la marca ${n}`); return x; };
   const mOpc = (datos, n) => datos.marcas.findLast(k => k.nombre === n) ?? null;
-  const A = join(TRABAJO, toma, "arena.webm"), R = join(TRABAJO, "recap", "recap.webm"), T = join(TRABAJO, "tarjetas");
+  const A = join(TRABAJO, toma, "arena.webm"), R = join(DIR_RECAP, "recap.webm"), T = join(TRABAJO, "tarjetas");
   const TT = join(TRABAJO, "torneo", "torneo.webm"), DD = join(TRABAJO, "datos", "datos.webm");
   const durVoz = e => vozOff[e].duracionS;
   const holgura = +arg("holgura", "0.4");
@@ -843,7 +918,11 @@ function montar() {
     { id: "personal", voz: "personal", piezas: [...trozos8.map(([n, d, dur]) => ({ src: A, desde: m(arena, n).t + d, dur: +(dur * escala8).toFixed(2) })), ...(esEv ? [{ src: A, desde: esDesde, dur: +(esEv.t - esDesde + usoEs + 0.3).toFixed(2), es: true }] : [])] },
     { id: "analista", voz: "analista", piezas: [{ src: A, desde: s9 - 1.2, dur: piezaA9 }, { src: A, desde: herramientas ? herramientas.t - 0.8 : s9r - 0.6, dur: +(L.analista - piezaA9).toFixed(2) }] },
     { id: "torneo", voz: "torneo", piezas: [{ src: TT, desde: m(torneo, "liga").t - 0.4, dur: L.torneo }] },
-    { id: "cronica", voz: "cronica", piezas: [{ src: R, desde: m(recap, "r-clic").t - 2.4, dur: L.cronica }] },
+    { id: "cronica", voz: "cronica", piezas: recap.tipo === "arena-cronica"
+      // Tercer montaje: cabecera (redactor, MCP, barra) → clic en la frase → eventos iluminados → «View process».
+      ? (() => { const tr = [["c-inicio", -0.2, 2.3], ["c-clic", -0.8, 2.0], ["c-eventos", -0.5, 1.9], ["c-proceso-ir", -0.3, 1.6]], k = L.cronica / tr.reduce((s, x) => s + x[2], 0);
+          const p = tr.map(([n, d, dur]) => ({ src: R, desde: m(recap, n).t + d, dur: +(dur * k).toFixed(2) })); p.at(-1).dur = +(L.cronica - p.slice(0, -1).reduce((s, x) => s + x.dur, 0)).toFixed(2); return p; })()
+      : [{ src: R, desde: m(recap, "r-clic").t - 2.4, dur: L.cronica }] },
     { id: "datos", voz: "datos", piezas: [{ src: DD, desde: m(datosW, "datos").t - 0.3, dur: sin.includes("overlay") ? L.datos : pDatos }, ...(sin.includes("overlay") ? [] : [{ src: DD, desde: m(datosW, "overlay").t - 0.6, dur: +Math.max(1.9, L.datos - pDatos).toFixed(2), overlay: true }])] },
   ].filter(e => !sin.includes(e.id));
   const fin13 = 1.6, cartas = L.cierre - fin13, c1 = +(cartas * 0.38).toFixed(2), c2 = +(cartas * 0.30).toFixed(2);
@@ -933,9 +1012,21 @@ function montar() {
   const asignacion = arena.asignacion;
   const rotuloMesa = x => { const r = rel(x); return `Real audio from this match · desk exchange${r.variante === "breve" ? " (short variant)" : ""}: ${(r.fragmentos ?? []).map(f => f.rol === "comentarista" ? `Commentator (${r.modoIntervencion === "llm" ? "LLM, verified" : "template fallback"})` : f.rol === "estadista" ? "Statistician (deterministic)" : "Narrator (template)").join(" → ")}`; };
   const analisisModo = arena.analisis?.cuerpo?.comentario?.modo;
+  // Tercer montaje: el rótulo de la crónica de la arena dice solo lo que la página grabada muestra. «This same match»
+  // exige marcador, modelos y duración iguales a los de la sesión de la toma; «via MCP», el rótulo de la página.
+  const rotuloCronicaArena = r => {
+    const autor = /^Writer: (.+?)(?: · Azure OpenAI)?$/.exec((r.redactor ?? "").trim())?.[1] ?? null;
+    const n = /(\d+)\/(\d+) sentences verified/.exec(r.verificacion ?? "");
+    const goles = /(\d+)\s*–\s*(\d+)/.exec(r.marcador ?? "");
+    const mismo = !!(emision && goles && +goles[1] === emision.marcador?.local && +goles[2] === emision.marcador?.visita
+      && [asignacion.local.nombre, asignacion.visita.nombre].every(x => (r.modelos ?? "").includes(x)) && (r.cabecera ?? "").includes(`${emision.duracionS} s`));
+    return [mismo ? "Match report of this same match" : `Match report /arena/cronica/${r.huella.slice(0, 8)}…`,
+      autor && r.fixture === "false" && r.modo === "llm" ? `written after the final whistle by ${autor} from its events` : `page label: ${r.redactor}`,
+      n ? `${n[1]}/${n[2]} sentences verified (V1–V8)` : null, /^Facts retrieved via MCP$/.test((r.via ?? "").trim()) ? "facts retrieved via MCP" : null].filter(Boolean).join(" · ");
+  };
   const rotulos = { ...ROTULO,
     agentes: `Home: ${asignacion.local.nombre} · Away: ${asignacion.visita.nombre} · chosen manually · ${emision?.duracionS ?? duracionPartido} s live match · same observation, strict JSON`,
-    cronica: /gpt-6\.1-sol/i.test(recap.redactor ?? "") ? `Match report /match/246 · page label: ${recap.redactor.replace(/^Writer: /, "writer ")} · ${(/(\d+\/\d+) sentences verified/.exec(recap.verificacion ?? "") ?? ["", "?"])[1]} sentences passed V1–V8`
+    cronica: recap.tipo === "arena-cronica" ? rotuloCronicaArena(recap) : /gpt-6\.1-sol/i.test(recap.redactor ?? "") ? `Match report /match/246 · page label: ${recap.redactor.replace(/^Writer: /, "writer ")} · ${(/(\d+\/\d+) sentences verified/.exec(recap.verificacion ?? "") ?? ["", "?"])[1]} sentences passed V1–V8`
       : /offline stub/i.test(recap.redactor ?? "") ? "Match report /match/246 · writer on this host: the labelled offline stub · V1–V8 on every sentence" : `Match report /match/246 · ${recap.redactor}`,
     analista: analisisModo === "llm" ? `Microsoft Foundry Agent Service · AI explanation · read-only tool ${[...new Set((arena.analisis?.cuerpo?.herramientas ?? []).map(h => h.nombre))].join(", ") || "calls"} · cited events · checked by V1–V8` : "Microsoft Foundry Agent Service · this answer: verified template fallback",
   };
@@ -957,7 +1048,7 @@ function montar() {
   // 4) Vídeo final.
   ff(["-i", join(dir, "mudo.mp4"), "-i", join(dir, "mezcla.wav"), "-vf", `ass=${join(dir, "subtitulos.ass")}:fontsdir=/usr/share/fonts/truetype/liberation`, "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-maxrate", "3000k", "-bufsize", "6000k", "-pix_fmt", "yuv420p", "-r", String(FPS), "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", "-shortest", SALIDA]);
   const sesionInfo = emision ? { id: arena.sesion, reglas: emision.reglas, version: emision.version, duracionS: emision.duracionS, metricas: emision.metricas, marcador: emision.marcador, goles: emision.goles.map(g => ({ tick: g.tick, s: +(g.tick / 10).toFixed(1), jugador: g.jugador, autogol: !!g.autogol })), faltas: emision.faltas, amarillas: emision.amarillas, rojas: emision.rojas, fuerasDeJuego: emision.fuerasDeJuego } : { id: arena.sesion };
-  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.dur.toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos: Object.fromEntries(Object.entries(rotulos).filter(([id]) => escenas.some(e => id.startsWith(e.id)) || id.startsWith("cierre"))), audioSesion, textoEs, vozOff: VOZ_OFF, asignacion, sesion: sesionInfo, toma, recap: { url: recap.url, redactor: recap.redactor, verificacion: recap.verificacion }, datos: { datos: datosW.datos, overlay: datosW.overlay }, torneo: torneo.liga, omitidas: sin };
+  const informe = { salida: SALIDA, duracionS: +duracion(SALIDA).toFixed(2), escenas: escenas.map(e => ({ id: e.id, inicioS: +inicio[e.id].toFixed(2), durS: +e.dur.toFixed(2), piezas: e.piezas.map(p => p.img ? { tarjeta: p.img.split("/").at(-1), dur: p.dur } : { fuente: p.src.split("/").at(-1), desdeS: +p.desde.toFixed(2), dur: p.dur }) })), rotulos: Object.fromEntries(Object.entries(rotulos).filter(([id]) => escenas.some(e => id.startsWith(e.id)) || id.startsWith("cierre"))), audioSesion, textoEs, vozOff: VOZ_OFF, asignacion, sesion: sesionInfo, toma, recap: { url: recap.url, tipo: recap.tipo ?? "match-246", redactor: recap.redactor, verificacion: recap.verificacion, ...(recap.tipo === "arena-cronica" ? { huella: recap.huella, via: recap.via, marcador: recap.marcador, modelos: recap.modelos, frase: recap.marcas.find(k => k.nombre === "c-clic")?.frase ?? null, eventos: recap.marcas.find(k => k.nombre === "c-clic")?.eventos ?? null } : {}) }, datos: { datos: datosW.datos, overlay: datosW.overlay }, torneo: torneo.liga, omitidas: sin };
   writeFileSync(join(dir, "informe.json"), JSON.stringify(informe, null, 1));
   console.log(JSON.stringify({ duracionS: informe.duracionS, escenas: informe.escenas.map(e => `${e.id} ${e.inicioS}+${e.durS}`), audioSesion }, null, 1));
 }
@@ -993,7 +1084,7 @@ for (const f of fases) {
   console.log(`== ${f}`);
   if (f === "arena") await grabarArena();
   else if (f === "previa") await grabarPrevia();
-  else if (f === "recap") await grabarRecap();
+  else if (f === "recap") await (HUELLA_CRONICA ? grabarCronicaArena() : grabarRecap());
   else if (f === "torneo") await grabarTorneo();
   else if (f === "datos") await grabarDatos();
   else if (f === "tarjetas") await tarjetas();

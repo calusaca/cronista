@@ -102,24 +102,24 @@ Every league match has a replay, and the page
 states what the results cannot prove.
 
 24
-00:01:34,450 --> 00:01:37,432
-The same verifier guards the automated match report:
+00:01:34,450 --> 00:01:38,648
+After the final whistle, another agent writes
+the match report from these events.
 
 25
-00:01:37,472 --> 00:01:41,500
-click any sentence to see its events, or
-open every draft and verdict.
+00:01:38,688 --> 00:01:41,630
+Every sentence is verified; one click shows its evidence.
 
 26
-00:01:42,140 --> 00:01:47,140
+00:01:42,270 --> 00:01:47,270
 All data is synthetic: a documented dataset,
 and JSON for broadcast overlays.
 
 27
-00:01:47,730 --> 00:01:54,038
+00:01:47,860 --> 00:01:54,168
 It runs on Azure OpenAI, Foundry, Speech and Container
 Apps, with over three thousand automated checks.
 
 28
-00:01:54,078 --> 00:01:57,120
+00:01:54,208 --> 00:01:57,250
 CRONISTA: narrate the match, prove every sentence.

@@ -1,8 +1,8 @@
 {
- "duracionS": 117.36,
- "bytes": 10051825,
+ "duracionS": 117.52000000000001,
+ "bytes": 10377506,
  "flujos": [
-  "Stream #0:0[0x1](eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt470bg/unknown/unknown, progressive), 1440x900 [SAR 1:1 DAR 8:5], 566 kb/s, 25 fps, 25 tbr, 12800 tbn (default)",
+  "Stream #0:0[0x1](eng): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt470bg/unknown/unknown, progressive), 1440x900 [SAR 1:1 DAR 8:5], 587 kb/s, 25 fps, 25 tbr, 12800 tbn (default)",
   "Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 112 kb/s (default)"
  ],
  "capturas": [
@@ -48,15 +48,15 @@
   },
   {
    "archivo": "docs/evidencia/video-067/fotogramas/11-cronica.jpg",
-   "t": 98.71
+   "t": 98.79
   },
   {
    "archivo": "docs/evidencia/video-067/fotogramas/12-datos.jpg",
-   "t": 105.17
+   "t": 105.3
   },
   {
    "archivo": "docs/evidencia/video-067/fotogramas/13-cierre.jpg",
-   "t": 108.93
+   "t": 109.06
   }
  ],
  "huellas": [

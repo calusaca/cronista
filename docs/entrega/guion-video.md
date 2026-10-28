@@ -48,7 +48,9 @@ audio of 8, the desk exchange of 6, the tournament. Scenes 2, 4, 5, 7 and 8 are 
 - Launch a tournament from the site for the video (the daily launch is public and costs money);
   use the tournaments already played.
 - Call the verifier rejection a "caught hallucination" or say the pipeline writes better prose.
-- Claim Microsoft Agent Framework, MCP or A2A, Fabric or AKS.
+- Claim Microsoft Agent Framework, A2A, Fabric or AKS. MCP may be named only as brief 071 built it: a
+  read-only server at `/api/mcp` over finished matches, through which the match-report agent reads its
+  facts (third montage).
 - Imply the arena is a regulation match, that voices were human-reviewed, or that model
   superiority was measured.
 
@@ -71,6 +73,23 @@ audio of 8, the desk exchange of 6, the tournament. Scenes 2, 4, 5, 7 and 8 are 
    then publish on YouTube or Vimeo and replace `VIDEO_URL` in the README.
 
 ## Final cut as rendered (27 October 2026)
+
+> **Third montage, 28 October, ~00:10 UTC** (same take `toma067-1`; only scene 11, its voice line and the architecture card
+> change). Scene 11 now records the arena match report of **this same match**,
+> `/arena/cronica/2c482d475f34dc63fa8e78c8013801218c1c18fc` (brief 064 B4, arena revision `cronista-arena--0000060` with the
+> brief 071 MCP server), instead of `/match/246`: header (1–1, 120 s, GPT-6 Astra vs GPT-6.1 Sol), «Writer: GPT-6.1 Sol ·
+> Azure OpenAI», «Facts retrieved via MCP», «7/7 sentences verified»; click on Ismael Barido's equaliser sentence → events
+> a36/a37 lit in the timeline; **View process**. The label is built from what the recorded page shows: «Match report of this
+> same match · written after the final whistle by GPT-6.1 Sol from its events · 7/7 sentences verified (V1–V8) · facts
+> retrieved via MCP». New voice line (22 words, 7.47 s): "After the final whistle, another agent writes the match report
+> from these events. Every sentence is verified; one click shows its evidence." The architecture card adds a box «MCP server ·
+> read-only /api/mcp — the match-report agent reads its facts through it; any MCP client can query finished matches» next to
+> the Foundry analyst (card top padding reduced so the row clears the captions). Length **1:57.52**. Command:
+> `node scripts/grabar-video-final.mjs --fases=recap --recap=arena-cronica:2c482d475f34dc63fa8e78c8013801218c1c18fc`, then
+> `node scripts/grabar-video-final.mjs --fases=voz,tarjetas,montar,verificar --toma=toma067-1 --decidiendo=76.6 --holgura=0.35
+> "--ci=run 40462385259 · three jobs · commit be3c96a · 27 Oct 2026" --recap=arena-cronica:2c482d475f34dc63fa8e78c8013801218c1c18fc`.
+> The table below describes the 27 October cut: its «Match report» row is replaced by the above (1:34.1–1:41.9), and the
+> Data and Close rows shift 0.13 s later.
 
 > **Second montage, 27 October, ~20:00 UTC** (same take `toma067-1`, no new recording, voice-over reused from its cache):
 > the architecture card now reads `reinicios-v11` and drops the «Not implemented: …» footnote, the Azure card drops the

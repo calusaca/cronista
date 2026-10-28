@@ -1,6 +1,6 @@
 {
- "salida": "/home/calusaca/cronista/docs/entrega/cronista-demo-final.mp4",
- "duracionS": 117.36,
+ "salida": "/tmp/claude-1001/-home-calusaca-cronista/fd8c1ae1-6ac2-4b57-aeb9-3797dae63e96/scratchpad/wt-mcp/docs/entrega/cronista-demo-final.mp4",
+ "duracionS": 117.52,
  "escenas": [
   {
    "id": "gancho",
@@ -170,18 +170,33 @@
   {
    "id": "cronica",
    "inicioS": 94.1,
-   "durS": 7.69,
+   "durS": 7.82,
    "piezas": [
     {
      "fuente": "recap.webm",
-     "desdeS": 1.94,
-     "dur": 7.69
+     "desdeS": 1.99,
+     "dur": 2.31
+    },
+    {
+     "fuente": "recap.webm",
+     "desdeS": 6.7,
+     "dur": 2.01
+    },
+    {
+     "fuente": "recap.webm",
+     "desdeS": 10.19,
+     "dur": 1.9
+    },
+    {
+     "fuente": "recap.webm",
+     "desdeS": 14.47,
+     "dur": 1.6
     }
    ]
   },
   {
    "id": "datos",
-   "inicioS": 101.79,
+   "inicioS": 101.92,
    "durS": 5.64,
    "piezas": [
     {
@@ -198,7 +213,7 @@
   },
   {
    "id": "cierre",
-   "inicioS": 107.43,
+   "inicioS": 107.56,
    "durS": 10.03,
    "piezas": [
     {
@@ -235,7 +250,7 @@
   "cierreA": "Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions",
   "cierreB": "All data synthetic · open source · claims link to evidence",
   "agentes": "Home: GPT-6 Astra · Away: GPT-6.1 Sol · chosen manually · 120 s live match · same observation, strict JSON",
-  "cronica": "Match report /match/246 · page label: writer Microsoft Foundry · gpt-6.1-sol · served from cache · 11/11 sentences passed V1–V8",
+  "cronica": "Match report of this same match · written after the final whistle by GPT-6.1 Sol from its events · 7/7 sentences verified (V1–V8) · facts retrieved via MCP",
   "analista": "Microsoft Foundry Agent Service · AI explanation · read-only tool consultar_eventos · cited events · checked by V1–V8"
  },
  "audioSesion": [
@@ -358,9 +373,16 @@
  },
  "toma": "toma067-1",
  "recap": {
-  "url": "https://cronista.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/match/246",
-  "redactor": "Writer: Microsoft Foundry · gpt-6.1-sol · served from cache",
-  "verificacion": "11/11 sentences verified\n1 attempt\n0 corrected\n0 omitted\nView process"
+  "url": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena/cronica/2c482d475f34dc63fa8e78c8013801218c1c18fc",
+  "tipo": "arena-cronica",
+  "redactor": "Writer: GPT-6.1 Sol · Azure OpenAI",
+  "verificacion": "7/7 sentences verified\n1 attempt\n0 corrected\n0 omitted\nView process",
+  "huella": "2c482d475f34dc63fa8e78c8013801218c1c18fc",
+  "via": "Facts retrieved via MCP",
+  "marcador": "1 – 1",
+  "modelos": "WHO PLAYED Home: GPT-6 Astra · Away: GPT-6.1 Sol · verified: assigned by this session's server",
+  "frase": "Ismael Barido (17) scored for Olímpico Nebrisa after 52 s with a 24 m shot to make the score Atlético Puertoscuro 1, Olímpico Nebrisa 1.",
+  "eventos": "a36 a37"
  },
  "datos": {
   "datos": "https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/datos",

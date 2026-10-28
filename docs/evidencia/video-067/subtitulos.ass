@@ -23,11 +23,11 @@ Dialogue: 1,0:01:06.88,0:01:15.08,Rotulo,,0,0,0,,Favourite club and player (stor
 Dialogue: 1,0:01:15.08,0:01:19.24,Rotulo,,0,0,0,,Switched to Spanish · page text and the page's own narration (real Azure Speech audio, as played in this recording)
 Dialogue: 1,0:01:19.49,0:01:27.29,Rotulo,,0,0,0,,Microsoft Foundry Agent Service · AI explanation · read-only tool consultar_eventos · cited events · checked by V1–V8
 Dialogue: 1,0:01:27.54,0:01:34.00,Rotulo,,0,0,0,,Model league of 24 Oct · six models, archived and validated in CI · results describe these matches, not model quality
-Dialogue: 1,0:01:34.25,0:01:41.69,Rotulo,,0,0,0,,Match report /match/246 · page label: writer Microsoft Foundry · gpt-6.1-sol · served from cache · 11/11 sentences passed V1–V8
-Dialogue: 1,0:01:41.94,0:01:44.89,Rotulo,,0,0,0,,Synthetic dataset at /datos · DATASHEET · 10-match JSONL sample to download
-Dialogue: 1,0:01:44.89,0:01:47.33,Rotulo,,0,0,0,,/api/overlay/246 · the verified match-report updates as JSON for a broadcast overlay
-Dialogue: 1,0:01:47.58,0:01:53.16,Rotulo,,0,0,0,,Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions
-Dialogue: 1,0:01:53.16,0:01:57.41,Rotulo,,0,0,0,,All data synthetic · open source · claims link to evidence
+Dialogue: 1,0:01:34.25,0:01:41.82,Rotulo,,0,0,0,,Match report of this same match · written after the final whistle by GPT-6.1 Sol from its events · 7/7 sentences verified (V1–V8) · facts retrieved via MCP
+Dialogue: 1,0:01:42.07,0:01:45.02,Rotulo,,0,0,0,,Synthetic dataset at /datos · DATASHEET · 10-match JSONL sample to download
+Dialogue: 1,0:01:45.02,0:01:47.46,Rotulo,,0,0,0,,/api/overlay/246 · the verified match-report updates as JSON for a broadcast overlay
+Dialogue: 1,0:01:47.71,0:01:53.29,Rotulo,,0,0,0,,Azure OpenAI · Foundry Agent Service · Azure Speech · Container Apps + Jobs · Blob · Key Vault · App Insights · ACR · Bicep · GitHub Actions
+Dialogue: 1,0:01:53.29,0:01:57.54,Rotulo,,0,0,0,,All data synthetic · open source · claims link to evidence
 Dialogue: 0,0:00:00.30,0:00:01.97,Sub,,0,0,0,,AI can call a football match.
 Dialogue: 0,0:00:02.01,0:00:03.50,Sub,,0,0,0,,Can it prove what it says?
 Dialogue: 0,0:00:03.54,0:00:07.51,Sub,,0,0,0,,CRONISTA: a multi-agent broadcast where\Nevery sentence is traceable.
@@ -51,8 +51,8 @@ Dialogue: 0,0:01:19.69,0:01:25.07,Sub,,0,0,0,,A versioned Microsoft Foundry agen
 Dialogue: 0,0:01:25.11,0:01:27.10,Sub,,0,0,0,,Its sentences pass the same verifier.
 Dialogue: 0,0:01:27.74,0:01:29.55,Sub,,0,0,0,,The six models also play each other.
 Dialogue: 0,0:01:29.59,0:01:33.81,Sub,,0,0,0,,Every league match has a replay, and the page\Nstates what the results cannot prove.
-Dialogue: 0,0:01:34.45,0:01:37.43,Sub,,0,0,0,,The same verifier guards the automated match report:
-Dialogue: 0,0:01:37.47,0:01:41.50,Sub,,0,0,0,,click any sentence to see its events, or\Nopen every draft and verdict.
-Dialogue: 0,0:01:42.14,0:01:47.14,Sub,,0,0,0,,All data is synthetic: a documented dataset,\Nand JSON for broadcast overlays.
-Dialogue: 0,0:01:47.73,0:01:54.04,Sub,,0,0,0,,It runs on Azure OpenAI, Foundry, Speech and Container\NApps, with over three thousand automated checks.
-Dialogue: 0,0:01:54.08,0:01:57.12,Sub,,0,0,0,,CRONISTA: narrate the match, prove every sentence.
+Dialogue: 0,0:01:34.45,0:01:38.65,Sub,,0,0,0,,After the final whistle, another agent writes\Nthe match report from these events.
+Dialogue: 0,0:01:38.69,0:01:41.63,Sub,,0,0,0,,Every sentence is verified; one click shows its evidence.
+Dialogue: 0,0:01:42.27,0:01:47.27,Sub,,0,0,0,,All data is synthetic: a documented dataset,\Nand JSON for broadcast overlays.
+Dialogue: 0,0:01:47.86,0:01:54.17,Sub,,0,0,0,,It runs on Azure OpenAI, Foundry, Speech and Container\NApps, with over three thousand automated checks.
+Dialogue: 0,0:01:54.21,0:01:57.25,Sub,,0,0,0,,CRONISTA: narrate the match, prove every sentence.
