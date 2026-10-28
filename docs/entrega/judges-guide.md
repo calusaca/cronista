@@ -67,6 +67,13 @@ synthetic dataset is linked in the footer.
    prepares a continuous audio account (it can take longer than the match itself), **Open or
    share this saved match** gives a link that replays without new inference, and the recording
    can be downloaded as JSON and re-imported.
+11. **Match report.** After the final whistle, or on any saved match, **Match report** (under
+   *Download commentary*) opens the written report of that same match. GPT-6.1 Sol writes it from
+   the match facts, which the crónica agent retrieves through CRONISTA's read-only MCP server; every
+   sentence passes V1–V8. Click a sentence to light up its events; **View process** shows drafts
+   and verdicts. Example, the match in the demo video:
+   https://cronista-arena.mangoocean-cf77f6f8.eastus2.azurecontainerapps.io/arena/cronica/2c482d475f34dc63fa8e78c8013801218c1c18fc. Up to 10 model-written reports per day; after that, a labelled
+   deterministic record.
 
 If the daily model quota is already spent, go to **Saved matches** → **Load recorded model duel**:
 a real GPT-5.6 Luna vs GPT-5.4 mini match replayed with no model calls, with
